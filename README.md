@@ -1,4 +1,4 @@
 stratio-deep
 ============
 
-Spark + Cassandra = DEEP
+Cassandra plus Spark
