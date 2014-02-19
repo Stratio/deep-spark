@@ -20,9 +20,9 @@
 	</properties>
 
 	<scm>
-		<connection>scm:git:git@bitbucket.org:stratio/stratiodeep.git</connection>
-		<developerConnection>scm:git:git@bitbucket.org:stratio/stratiodeep.git</developerConnection>
-		<url>https://bitbucket.org/stratio/stratiodeep</url>
+		<connection>scm:git:git@github.com:Stratio/stratio-deep.git</connection>
+		<developerConnection>scm:git:git@github.com:Stratio/stratio-deep.git</developerConnection>
+		<url>https://github.com/Stratio/stratio-deep</url>
 	</scm>
 
     <distributionManagement>
