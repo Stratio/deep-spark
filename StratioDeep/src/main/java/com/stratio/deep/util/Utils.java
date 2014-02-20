@@ -3,31 +3,20 @@ package com.stratio.deep.util;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.db.marshal.TypeParser;
-import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.cassandra.exceptions.SyntaxException;
-import org.apache.cassandra.utils.Pair;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
-
-import scala.Tuple2;
 
 import com.stratio.deep.annotations.DeepField;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.DeepByteBuffer;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.serializer.IDeepSerializer;
+import org.apache.cassandra.utils.Pair;
+import scala.Tuple2;
 
 /**
  * Utility class providing useful methods to manipulate the conversion
@@ -36,28 +25,16 @@ import com.stratio.deep.serializer.IDeepSerializer;
  *
  * @author Luca Rosellini <luca@strat.io>
  */
-public final class CassandraRDDUtils {
+public final class Utils {
+
     /**
-     * Returns the cassandra's marshalled for the given field.
+     * Utility method that converts an IDeepType to tuple of two Cells.<br/>
+     * The first Cells element contains the list of Cell elements that represent the key (partition + cluster key). <br/>
+     * The second Cells element contains all the other columns.
      *
-     * @param f
+     * @param cells
      * @return
      */
-    public static AbstractType<?> cassandraMarshaller(Field f) {
-
-	DeepField annotation = f.getAnnotation(DeepField.class);
-	Class<? extends AbstractType<?>> type = annotation.validationClass();
-
-	AbstractType<?> typeInstance;
-	try {
-	    typeInstance = TypeParser.parse(type.getName());
-	} catch (SyntaxException | ConfigurationException e) {
-	    throw new DeepGenericException(e);
-	}
-
-	return typeInstance;
-    }
-
     public static Tuple2<Cells, Cells> cellList2tuple(Cells cells) {
 	Cells keys = new Cells();
 	Cells values = new Cells();
@@ -73,88 +50,6 @@ public final class CassandraRDDUtils {
 	}
 
 	return new Tuple2<>(keys, values);
-    }
-
-    /**
-     * Constructs a new object of type T using the serialized
-     * tuple coming from Spark.
-     *
-     * @param tuple
-     * @param deepType
-     * @param serializer
-     * @return
-     */
-    public static <T extends IDeepType> T createTargetObject(
-	    Tuple2<Map<String, DeepByteBuffer<?>>, Map<String, DeepByteBuffer<?>>> tuple, Class<T> deepType,
-	    IDeepSerializer<T> serializer) {
-
-	Map<String, DeepByteBuffer<?>> left = tuple._1();
-	Map<String, DeepByteBuffer<?>> right = tuple._2();
-
-	T instance = newTypeInstance(deepType);
-
-	for (Map.Entry<String, DeepByteBuffer<?>> entry : left.entrySet()) {
-	    setBeanField(entry.getValue(), instance, serializer, deepType);
-	}
-
-	for (Map.Entry<String, DeepByteBuffer<?>> entry : right.entrySet()) {
-	    setBeanField(entry.getValue(), instance, serializer, deepType);
-	}
-
-	return instance;
-    }
-
-    /**
-     * Converts a <i>Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>></i>
-     * coming from the underlying Cassandra API to a serializable
-     * <i>Tuple2<Map<String, DeepByteBuffer<?, T>>,Map<String, DeepByteBuffer<?,T>>></i>
-     *
-     * @param pair
-     * @param deepType
-     * @param serializer
-     * @return
-     */
-    public static <T extends IDeepType> Tuple2<Map<String, DeepByteBuffer<?>>, Map<String, DeepByteBuffer<?>>> createTupleFromByteBufferPair(
-	    Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> pair, Class<T> deepType,
-	    IDeepSerializer<T> serializer) {
-
-	Map<String, ByteBuffer> left = pair.left;
-	Map<String, ByteBuffer> right = pair.right;
-
-	Map<String, DeepByteBuffer<?>> oLeft = new HashMap<>();
-	Map<String, DeepByteBuffer<?>> oRight = new HashMap<>();
-
-	for (Map.Entry<String, ByteBuffer> entry : left.entrySet()) {
-	    oLeft.put(entry.getKey(), serializer.serialize(entry, deepType));
-	}
-
-	for (Map.Entry<String, ByteBuffer> entry : right.entrySet()) {
-	    oRight.put(entry.getKey(), serializer.serialize(entry, deepType));
-	}
-
-	return new Tuple2<>(oLeft, oRight);
-    }
-
-    /**
-     * Returns a {@link Field} object corresponding to the
-     * field of class <i>clazz</i> whose name is <i>id</i>.
-     *
-     * @param id
-     * @param clazz
-     * @return
-     */
-    public static <T extends IDeepType> Field deepField(String id, Class<T> clazz) {
-	Field[] fields = filterDeepFields(clazz.getDeclaredFields());
-
-	for (Field field : fields) {
-	    DeepField annotation = field.getAnnotation(DeepField.class);
-
-	    if (id.equals(field.getName()) || id.equals(annotation.fieldName())) {
-		return field;
-	    }
-	}
-
-	return null;
     }
 
     /**
@@ -198,7 +93,7 @@ public final class CassandraRDDUtils {
 
 	    if (value != null) {
 		keys.add(Cell.create(deepFieldName(keyField), value, deepField.isPartOfPartitionKey(),
-			deepField.isPartOfClusterKey()));
+				deepField.isPartOfClusterKey()));
 	    }
 	}
 
@@ -206,7 +101,7 @@ public final class CassandraRDDUtils {
 	    Serializable value = getBeanFieldValue(e, valueField);
 	    DeepField deepField = valueField.getAnnotation(DeepField.class);
 	    values.add(Cell.create(deepFieldName(valueField), value, deepField.isPartOfPartitionKey(),
-		    deepField.isPartOfClusterKey()));
+			    deepField.isPartOfClusterKey()));
 	}
 
 	return new Tuple2<>(keys, values);
@@ -296,57 +191,10 @@ public final class CassandraRDDUtils {
     }
 
     /**
-     * Utility method that converts pair if Maps coming from the underlying Cassandra API
-     * to the declared user type.
-     *
-     * @param pair
-     * @param deepType
-     * @param serializer
-     * @return
-     */
-    public static <T extends IDeepType> T pair2DeepType(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> pair,
-	    Class<T> deepType, IDeepSerializer<T> serializer) {
-
-	return createTargetObject(createTupleFromByteBufferPair(pair, deepType, serializer), deepType, serializer);
-    }
-
-    /**
      * Quoting for working with uppercase
      */
     public static String quote(String identifier) {
 	return "\"" + identifier.replaceAll("\"", "\"\"") + "\"";
-    }
-
-    /**
-     * Utility method that:
-     * <ol>
-     * <li>Uses reflection to obtain the {@link Field} object corresponding<br/>
-     * to the field with name <i>buffer.getFieldNam()</i> </li>
-     * <li></li>
-     * </ol>
-     *
-     * @param buffer
-     * @param instance
-     * @param serializer
-     * @param beanType
-     */
-    public static <T extends IDeepType> void setBeanField(DeepByteBuffer<?> buffer, T instance,
-	    IDeepSerializer<T> serializer, Class<T> beanType) {
-
-	if (buffer == null) {
-	    return;
-	}
-
-	Field f = deepField(buffer.getFieldName(), beanType);
-
-	Object value = serializer.deserialize(buffer);
-
-	try {
-	    BeanUtils.setProperty(instance, f.getName(), value);
-	} catch (IllegalAccessException | InvocationTargetException e) {
-	    throw new DeepGenericException(e);
-	}
-
     }
 
     /**
@@ -361,10 +209,10 @@ public final class CassandraRDDUtils {
      * @return
      */
     public static <T extends IDeepType> String updateQueryGenerator(Cells keys, Cells values, String outputKeyspace,
-	    String outputColumnFamily) {
+		    String outputColumnFamily) {
 
 	StringBuilder sb = new StringBuilder("UPDATE ").append(outputKeyspace).append(".").append(outputColumnFamily)
-		.append(" SET ");
+			.append(" SET ");
 
 	int k = 0;
 
@@ -397,7 +245,7 @@ public final class CassandraRDDUtils {
 	return sb.toString();
     }
 
-    private CassandraRDDUtils() {
+    private Utils() {
 
     }
 

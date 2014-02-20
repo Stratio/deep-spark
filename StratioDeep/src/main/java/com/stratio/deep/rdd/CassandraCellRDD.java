@@ -10,9 +10,10 @@ import org.apache.cassandra.utils.Pair;
 import org.apache.spark.SparkContext;
 
 /**
- * Created by luca on 04/02/14.
+ * Concrete implementation of a CassandraRDD representing an RDD of {@link com.stratio.deep.entity.Cells} element.<br/>
+ *
  */
-public class CassandraCellRDD extends CassandraGenericRDD<Cells> {
+public class CassandraCellRDD extends CassandraRDD<Cells> {
 
     private static final long serialVersionUID = -738528971629963221L;
 
@@ -20,6 +21,9 @@ public class CassandraCellRDD extends CassandraGenericRDD<Cells> {
 	super(sc, config);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("unchecked")
     @Override
     protected Cells transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem) {
@@ -30,7 +34,7 @@ public class CassandraCellRDD extends CassandraGenericRDD<Cells> {
 	for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
 	    Cell cd = columnDefinitions.get(entry.getKey());
 	    cells.add(Cell.create(entry.getKey(), entry.getValue(), cd.marshallerClassName(), cd.isPartitionKey(),
-		    cd.isClusterKey()));
+			    cd.isClusterKey()));
 	}
 
 	for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {

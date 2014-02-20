@@ -12,10 +12,8 @@ import com.datastax.driver.core.*;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.cql.DeepConfigHelper;
 import com.stratio.deep.entity.Cell;
-import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
-import com.stratio.deep.serializer.IDeepSerializer;
 import com.stratio.deep.util.Constants;
 import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.dht.IPartitioner;
@@ -32,7 +30,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
     private static Logger logger = Logger.getLogger("com.stratio.deep.config.impl.GenericDeepJobConfig");
     private static final long serialVersionUID = -7179376653643603038L;
     private String partitionerClassName = "org.apache.cassandra.dht.Murmur3Partitioner";
-    private String serializerClassName = "com.stratio.deep.serializer.impl.DefaultDeepSerializer";
 
     private transient Job hadoopJob;
 
@@ -117,7 +114,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
 	Session session = cluster.connect();
 
 	KeyspaceMetadata ksMetadata = session.getCluster().getMetadata().getKeyspace(getKeyspace());
-	session.shutdown();
 
 	TableMetadata tableMetadata = ksMetadata.getTable(getTable());
 	columnDefinitionMap = new HashMap<>();
@@ -138,10 +134,13 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
 
 	for (ColumnMetadata key : allColumns) {
 	    Cell metadata = Cell.createMetadataCell(key.getName(), key.getType().asJavaClass(), Boolean.FALSE, Boolean.FALSE);
-	    if (!columnDefinitionMap.containsKey(key.getName())){
+	    if (!columnDefinitionMap.containsKey(key.getName())) {
 		columnDefinitionMap.put(key.getName(), metadata);
 	    }
 	}
+
+	session.shutdown();
+
 	return columnDefinitionMap;
     }
 
@@ -195,21 +194,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
     @Override
     public String getTable() {
 	return getColumnFamily();
-    }
-
-    private ColumnFamilyStore getColumnFamilyStore() {
-	if (columnFamilyStore != null) {
-	    return columnFamilyStore;
-	}
-
-	for (ColumnFamilyStore familyStore : ColumnFamilyStore.all()) {
-	    if (columnFamily.equals(familyStore.getColumnFamilyName())) {
-		columnFamilyStore = familyStore;
-		break;
-	    }
-	}
-
-	return columnFamilyStore;
     }
 
     /* (non-Javadoc)
@@ -292,27 +276,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
 	return cqlPort;
     }
 
-    /* (non-Javadoc)
-     * @see com.stratio.deep.config.IDeepJobConfig#getSerializer()
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public IDeepSerializer<T> getSerializer() {
-
-	try {
-	    return (IDeepSerializer<T>) Class.forName(serializerClassName).newInstance();
-	} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-
-	    throw new DeepGenericException(e);
-	}
-    }
-
-    @Override
-    public String getSerializerClassName() {
-	checkInitialized();
-	return serializerClassName;
-    }
-
     @Override
     public Integer getThriftFramedTransportSizeMB() {
 	checkInitialized();
@@ -372,6 +335,8 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
 	    ConfigHelper.setThriftFramedTransportSizeInMb(c, thriftFramedTransportSizeMB);
 
 	    configuration = c;
+
+	    columnDefinitions();
 	} catch (IOException e) {
 	    throw new DeepIOException(e);
 	}
@@ -430,16 +395,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
     @Override
     public IDeepJobConfig<T> cqlPort(Integer port) {
 	this.cqlPort = port;
-
-	return this;
-    }
-
-    /* (non-Javadoc)
-     * @see com.stratio.deep.config.IDeepJobConfig#serializer(com.stratio.deep.serializer.IDeepSerializer)
-     */
-    @Override
-    public IDeepJobConfig<T> serializer(String serializerClassName) {
-	this.serializerClassName = serializerClassName;
 
 	return this;
     }

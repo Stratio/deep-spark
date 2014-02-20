@@ -1,26 +1,25 @@
 package com.stratio.deep.rdd;
 
-import static org.testng.Assert.*;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.CharacterCodingException;
 
+import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.spark.Partition;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import scala.collection.Seq;
 
-import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.context.AbstractDeepSparkContextTest;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
-public abstract class CassandraGenericRDDTest<W> extends AbstractDeepSparkContextTest {
+public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     private Logger logger = Logger.getLogger(getClass());
 
-    private CassandraGenericRDD<W> rdd;
+    private CassandraRDD<W> rdd;
     private IDeepJobConfig<W> rddConfig;
     private IDeepJobConfig<W> writeConfig;
 
@@ -28,7 +27,7 @@ public abstract class CassandraGenericRDDTest<W> extends AbstractDeepSparkContex
 
     protected abstract void checkSimpleTestData();
 
-    protected CassandraGenericRDD<W> getRDD() {
+    protected CassandraRDD<W> getRDD() {
 	return this.rdd;
     }
 
@@ -40,13 +39,13 @@ public abstract class CassandraGenericRDDTest<W> extends AbstractDeepSparkContex
 	return writeConfig;
     }
 
-    protected abstract CassandraGenericRDD<W> initRDD();
+    protected abstract CassandraRDD<W> initRDD();
 
     protected abstract IDeepJobConfig<W> initReadConfig();
 
     @BeforeClass
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
-	    InterruptedException {
+		    InterruptedException {
 
 	rddConfig = initReadConfig();
 	writeConfig = initWriteConfig();

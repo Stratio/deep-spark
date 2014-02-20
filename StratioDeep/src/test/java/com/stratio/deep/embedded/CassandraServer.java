@@ -75,7 +75,7 @@ public class CassandraServer {
 
     /**
      * Copies a resource from within the jar to a directory.
-     * 
+     *
      * @param resource
      * @param directory
      * @throws IOException
@@ -97,7 +97,7 @@ public class CassandraServer {
 
     /**
      * Creates a directory
-     * 
+     *
      * @param dir
      * @throws IOException
      */
@@ -134,7 +134,7 @@ public class CassandraServer {
 	    return;
 	}
 	Cluster cluster = Cluster.builder().withPort(CASSANDRA_CQL_PORT)
-		.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+			.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
 	Session session = cluster.connect();
 
 	try {
@@ -165,7 +165,7 @@ public class CassandraServer {
 
     /**
      * Set embedded cassandra up and spawn it in a new thread.
-     * 
+     *
      * @throws TTransportException
      * @throws IOException
      * @throws InterruptedException

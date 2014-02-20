@@ -1,18 +1,19 @@
 package org.apache.cassandra.hadoop.cql3;
 
-import static com.stratio.deep.util.CassandraRDDUtils.*;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.exception.DeepGenericException;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.db.marshal.LongType;
@@ -25,25 +26,15 @@ import org.apache.cassandra.hadoop.AbstractColumnFamilyOutputFormat;
 import org.apache.cassandra.hadoop.AbstractColumnFamilyRecordWriter;
 import org.apache.cassandra.hadoop.ConfigHelper;
 import org.apache.cassandra.hadoop.Progressable;
-import org.apache.cassandra.thrift.Cassandra;
-import org.apache.cassandra.thrift.Column;
-import org.apache.cassandra.thrift.Compression;
-import org.apache.cassandra.thrift.ConsistencyLevel;
-import org.apache.cassandra.thrift.CqlPreparedResult;
-import org.apache.cassandra.thrift.CqlResult;
+import org.apache.cassandra.thrift.*;
 import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.cassandra.utils.FBUtilities;
-import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.thrift.TException;
 import org.apache.thrift.transport.TTransport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.exception.DeepGenericException;
+import static com.stratio.deep.util.Utils.updateQueryGenerator;
 
 /**
  * Created by luca on 05/02/14.
@@ -87,7 +78,8 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
 	 */
 	@Override
 	public void run() {
-	    outer: while (run || !queue.isEmpty()) {
+	    outer:
+	    while (run || !queue.isEmpty()) {
 		List<ByteBuffer> bindVariables;
 		try {
 		    bindVariables = queue.take();
@@ -250,10 +242,10 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
 	String cfName = ConfigHelper.getOutputColumnFamily(conf);
 
 	String query = "SELECT key_validator," + "       key_aliases," + "       column_aliases "
-		+ "FROM system.schema_columnfamilies " + "WHERE keyspace_name='%s' and columnfamily_name='%s'";
+			+ "FROM system.schema_columnfamilies " + "WHERE keyspace_name='%s' and columnfamily_name='%s'";
 	String formatted = String.format(query, keyspace, cfName);
 	CqlResult result = client.execute_cql3_query(ByteBufferUtil.bytes(formatted), Compression.NONE,
-		ConsistencyLevel.ONE);
+			ConsistencyLevel.ONE);
 
 	Column rawKeyValidator = result.rows.get(0).columns.get(0);
 	String validator = ByteBufferUtil.string(ByteBuffer.wrap(rawKeyValidator.getValue()));
@@ -292,7 +284,7 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
     public void write(Cells keys, Cells values) throws IOException {
 	/* generate SQL */
 	cql = updateQueryGenerator(keys, values, ConfigHelper.getOutputKeyspace(conf),
-		ConfigHelper.getOutputColumnFamily(conf));
+			ConfigHelper.getOutputColumnFamily(conf));
 
 	@SuppressWarnings("rawtypes")
 	Range<Token> range = ringCache.getRange(getPartitionKey(keys));

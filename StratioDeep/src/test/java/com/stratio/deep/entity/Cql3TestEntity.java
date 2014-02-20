@@ -1,9 +1,8 @@
 package com.stratio.deep.entity;
 
-import org.apache.cassandra.db.marshal.Int32Type;
-
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.annotations.DeepField;
+import org.apache.cassandra.db.marshal.Int32Type;
 
 /**
  * Created by luca on 03/02/14.
@@ -12,7 +11,7 @@ import com.stratio.deep.annotations.DeepField;
 public class Cql3TestEntity implements IDeepType {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 4248945021023974172L;
 
@@ -45,7 +44,7 @@ public class Cql3TestEntity implements IDeepType {
     }
 
     public Cql3TestEntity(String name, String password, String color, String gender, String food, String animal,
-	    String lucene) {
+		    String lucene) {
 	this.name = name;
 	this.password = password;
 	this.color = color;

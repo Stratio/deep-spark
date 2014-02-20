@@ -1,28 +1,25 @@
 package com.stratio.deep.context;
 
-import static org.testng.Assert.*;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.log4j.Logger;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeSuite;
+import com.google.common.io.Resources;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.google.common.io.Resources;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.util.Constants;
+import org.apache.cassandra.exceptions.ConfigurationException;
+import org.apache.log4j.Logger;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
 public abstract class AbstractDeepSparkContextTest {
 
@@ -43,22 +40,22 @@ public abstract class AbstractDeepSparkContextTest {
     protected static final int cql3TestDataSize = 20;
 
     protected String createOutputCF = "CREATE TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY
-	    + " (id text, " + "url text, " + "domain_name text, " + "response_code int, " + "charset text,"
-	    + "response_time int," + "download_time bigint," + "first_download_time bigint,"
-	    + "title text, PRIMARY KEY (id) );";
+		    + " (id text, " + "url text, " + "domain_name text, " + "response_code int, " + "charset text,"
+		    + "response_time int," + "download_time bigint," + "first_download_time bigint,"
+		    + "title text, PRIMARY KEY (id) );";
 
     protected String createCql3CF = "create table " + KEYSPACE_NAME + "." + CQL3_COLUMN_FAMILY
-	    + "(name varchar, password varchar, color varchar, gender varchar, food varchar, "
-	    + " animal varchar, lucene varchar,age int,PRIMARY KEY ((name, gender), age, animal));";
+		    + "(name varchar, password varchar, color varchar, gender varchar, food varchar, "
+		    + " animal varchar, lucene varchar,age int,PRIMARY KEY ((name, gender), age, animal));";
 
     protected String createCql3OutputCF = "create table " + OUTPUT_KEYSPACE_NAME + "." + CQL3_OUTPUT_COLUMN_FAMILY
-	    + "(name varchar, password varchar, color varchar, gender varchar, food varchar, "
-	    + " animal varchar, lucene varchar,age int,PRIMARY KEY ((name, gender), age, animal));";
+		    + "(name varchar, password varchar, color varchar, gender varchar, food varchar, "
+		    + " animal varchar, lucene varchar,age int,PRIMARY KEY ((name, gender), age, animal));";
 
     protected String createCql3EntityOutputCF = "create table " + OUTPUT_KEYSPACE_NAME + "."
-	    + CQL3_ENTITY_OUTPUT_COLUMN_FAMILY
-	    + "(name varchar, password varchar, color varchar, gender varchar, food varchar, "
-	    + " animal varchar, lucene varchar,age int,PRIMARY KEY ((name, gender), age, animal));";
+		    + CQL3_ENTITY_OUTPUT_COLUMN_FAMILY
+		    + "(name varchar, password varchar, color varchar, gender varchar, food varchar, "
+		    + " animal varchar, lucene varchar,age int,PRIMARY KEY ((name, gender), age, animal));";
 
     private String buildTestDataInsertBatch() {
 	URL testData = Resources.getResource("testdata.csv");
@@ -68,12 +65,12 @@ public abstract class AbstractDeepSparkContextTest {
 	java.util.List<String> inserts = new ArrayList<>();
 
 	try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(
-		new File(testData.toURI()))))) {
+			new File(testData.toURI()))))) {
 	    String line;
 
 	    String rawInsert = "INSERT INTO %s (" + "\"id\", \"charset\", \"domain_name\", "
-		    + "\"download_time\", \"response_time\", " + "\"first_download_time\", \"url\") "
-		    + "values (\'%s\', \'%s\', \'%s\', %s, %s, %s, \'%s\');";
+			    + "\"download_time\", \"response_time\", " + "\"first_download_time\", \"url\") "
+			    + "values (\'%s\', \'%s\', \'%s\', %s, %s, %s, \'%s\');";
 
 	    while ((line = br.readLine()) != null) {
 		String[] fields = (COLUMN_FAMILY + "," + line).split(",");
@@ -86,11 +83,11 @@ public abstract class AbstractDeepSparkContextTest {
 	}
 
 	try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(
-		cql3TestData.toURI()))))) {
+			cql3TestData.toURI()))))) {
 	    String line;
 
 	    String rawInsert = "INSERT INTO %s "
-		    + "(name, gender, age, animal, food, password) VALUES (%s,%s,%s,%s,%s,%s);\n";
+			    + "(name, gender, age, animal, food, password) VALUES (%s,%s,%s,%s,%s,%s);\n";
 
 	    int idx = 0;
 	    while ((line = br.readLine()) != null) {
@@ -117,7 +114,7 @@ public abstract class AbstractDeepSparkContextTest {
 
     private void checkTestData() {
 	Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-		.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+			.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
 
 	Session session = cluster.connect();
 
@@ -127,7 +124,7 @@ public abstract class AbstractDeepSparkContextTest {
 	assertEquals(rs.one().getLong(0), entityTestDataSize);
 
 	command = "select * from " + KEYSPACE_NAME + "." + COLUMN_FAMILY
-		+ " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
+			+ " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
 
 	rs = session.execute(command);
 	Row row = rs.one();
@@ -144,7 +141,7 @@ public abstract class AbstractDeepSparkContextTest {
 	assertEquals(rs.one().getLong(0), cql3TestDataSize);
 
 	command = "select * from " + KEYSPACE_NAME + "." + CQL3_COLUMN_FAMILY
-		+ " WHERE name = 'pepito_3' and gender = 'male' and age = -2 and animal = 'monkey';";
+			+ " WHERE name = 'pepito_3' and gender = 'male' and age = -2 and animal = 'monkey';";
 
 	rs = session.execute(command);
 
@@ -175,7 +172,7 @@ public abstract class AbstractDeepSparkContextTest {
     protected void executeCustomCQL(String... cqls) {
 
 	Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-		.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+			.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
 	Session session = cluster.connect();
 	for (String cql : cqls) {
 	    session.execute(cql);
@@ -189,24 +186,24 @@ public abstract class AbstractDeepSparkContextTest {
 	context = new DeepSparkContext("local", "deepSparkContextTest");
 
 	String createKeyspace = "CREATE KEYSPACE " + KEYSPACE_NAME
-		+ " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 };";
+			+ " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 };";
 
 	String createOutputKeyspace = "CREATE KEYSPACE " + OUTPUT_KEYSPACE_NAME
-		+ " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 };";
+			+ " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 };";
 
 	String useKeyspace = "USE " + KEYSPACE_NAME + ";";
 
 	String createCF = "CREATE TABLE " + COLUMN_FAMILY + " (id text PRIMARY KEY, " + "url text, "
-		+ "domain_name text, " + "response_code int, " + "charset text," + "response_time int,"
-		+ "download_time bigint," + "first_download_time bigint," + "title text ) ;";
+			+ "domain_name text, " + "response_code int, " + "charset text," + "response_time int,"
+			+ "download_time bigint," + "first_download_time bigint," + "title text ) ;";
 
 	String useOutputKeyspace = "USE " + OUTPUT_KEYSPACE_NAME + ";";
 
 	String initialDataset = buildTestDataInsertBatch();
 
 	String[] startupCommands = new String[] { createKeyspace, createOutputKeyspace, useKeyspace, createCF,
-		createCql3CF, initialDataset, useOutputKeyspace, createOutputCF, createCql3OutputCF,
-		createCql3EntityOutputCF };
+			createCql3CF, initialDataset, useOutputKeyspace, createOutputCF, createCql3OutputCF,
+			createCql3EntityOutputCF };
 
 	cassandraServer = new CassandraServer();
 	cassandraServer.setStartupCommands(startupCommands);

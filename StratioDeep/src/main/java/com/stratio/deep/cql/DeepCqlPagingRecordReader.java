@@ -19,7 +19,7 @@ import org.apache.cassandra.utils.Pair;
  * @author Luca Rosellini <luca@strat.io>
  *
  */
-public class DeepCqlPagingRecordReader extends CqlPagingRecordReader{
+public class DeepCqlPagingRecordReader extends CqlPagingRecordReader {
     private static final String UNDERLYING_ROW_ITERATOR_NAME = "rowIterator";
 
     /**
@@ -34,7 +34,7 @@ public class DeepCqlPagingRecordReader extends CqlPagingRecordReader{
 	try {
 	    f = CqlPagingRecordReader.class.getDeclaredField(UNDERLYING_ROW_ITERATOR_NAME);
 	} catch (NoSuchFieldException nsfe) {
-	    throw new DeepNoSuchFieldException("Could not find field "+UNDERLYING_ROW_ITERATOR_NAME,nsfe);
+	    throw new DeepNoSuchFieldException("Could not find field " + UNDERLYING_ROW_ITERATOR_NAME, nsfe);
 	}
 
 	boolean originalAccessor = f.isAccessible();
@@ -43,7 +43,7 @@ public class DeepCqlPagingRecordReader extends CqlPagingRecordReader{
 	try {
 	    return (Iterator<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>>) f.get(this);
 	} catch (IllegalAccessException iae) {
-	    throw new DeepIllegalAccessException("Underlying iterator " + UNDERLYING_ROW_ITERATOR_NAME + " cannot be accessed even though its accessibility has been changed.",iae);
+	    throw new DeepIllegalAccessException("Underlying iterator " + UNDERLYING_ROW_ITERATOR_NAME + " cannot be accessed even though its accessibility has been changed.", iae);
 	} finally {
 	    f.setAccessible(originalAccessor);
 	}
@@ -65,8 +65,8 @@ public class DeepCqlPagingRecordReader extends CqlPagingRecordReader{
      *
      * @return
      */
-    public Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> next(){
-	if (!this.hasNext()){
+    public Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> next() {
+	if (!this.hasNext()) {
 	    throw new DeepIllegalAccessException("DeepCqlPagingRecordReader exhausted");
 	}
 	return getPrivateRowIterator().next();

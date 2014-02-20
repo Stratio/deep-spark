@@ -13,9 +13,9 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 /**
  * {@link CqlPagingRecordReader} implementation that returns an instance of a
  * {@link DeepCqlPagingRecordReader}.
- * 
+ *
  * @author Luca Rosellini <luca@strat.io>
- * 
+ *
  */
 public class DeepCqlPagingInputFormat extends CqlPagingInputFormat {
 
@@ -25,7 +25,7 @@ public class DeepCqlPagingInputFormat extends CqlPagingInputFormat {
      */
     @Override
     public RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> createRecordReader(InputSplit arg0,
-	    TaskAttemptContext arg1) throws IOException, InterruptedException {
+		    TaskAttemptContext arg1) throws IOException, InterruptedException {
 
 	return new DeepCqlPagingRecordReader();
     }

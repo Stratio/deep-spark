@@ -6,10 +6,16 @@ import java.nio.charset.CharacterCodingException;
 import java.util.List;
 import java.util.Map;
 
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
+import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.StrippedTestEntity;
 import com.stratio.deep.entity.TestEntity;
 import com.stratio.deep.util.Constants;
@@ -26,7 +32,7 @@ import scala.Tuple2;
 
 import static org.testng.Assert.*;
 
-@Test(suiteName = "cassandraRddTests", dependsOnGroups = { "CassandraCellRDDTest" })
+@Test(suiteName = "cassandraRddTests", dependsOnGroups = { "CassandraCellRDDTest" }, groups = { "CassandraJavaRDDTest" })
 public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     private Logger logger = Logger.getLogger(getClass());
 
@@ -34,17 +40,20 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     protected IDeepJobConfig<TestEntity> rddConfig;
 
     JavaRDD<TestEntity> slowPages = null;
-
     JavaRDD<TestEntity> quickPages = null;
 
     @BeforeClass
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
-	    InterruptedException {
+		    InterruptedException {
 
-	rddConfig = DeepJobConfigFactory.create(TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST)
-			.cqlPort(CassandraServer.CASSANDRA_CQL_PORT).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY)
-		.partitioner("org.apache.cassandra.dht.Murmur3Partitioner")
-		.serializer("com.stratio.deep.serializer.impl.DefaultDeepSerializer").username("").password("");
+	rddConfig = DeepJobConfigFactory.create(TestEntity.class)
+			.host(Constants.DEFAULT_CASSANDRA_HOST)
+			.cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+			.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+			.keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY)
+			.partitioner("org.apache.cassandra.dht.Murmur3Partitioner")
+			.username("")
+			.password("");
 
 	rddConfig.getConfiguration();
 
@@ -54,14 +63,14 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 	rdd = context.cassandraJavaRDD(rddConfig);
     }
 
-    //@Test
+    @Test
     public void testCassandraRDDInstantiation() {
 	logger.info("testCassandraRDDInstantiation()");
 
 	assertNotNull(rdd);
     }
 
-    //@Test(dependsOnMethods = "testCassandraRDDInstantiation")
+    @Test(dependsOnMethods = "testCassandraRDDInstantiation")
     public void testCollect() throws CharacterCodingException {
 	logger.info("testCollect()");
 	long count = rdd.count();
@@ -88,7 +97,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 	}
     }
 
-    //@Test(dependsOnMethods = "testCollect")
+    @Test(dependsOnMethods = "testCollect")
     public void testFilter() {
 	slowPages = rdd.filter(new FilterSlowPagesFunction());
 	assertEquals(slowPages.count(), 13L);
@@ -103,7 +112,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 	quickPages.cache();
     }
 
-    //@Test(dependsOnMethods = "testFilter")
+    @Test(dependsOnMethods = "testFilter")
     public void testGroupByKey() {
 	/* 1. I need to define which is the key, let's say it's the domain */
 	JavaPairRDD<String, TestEntity> pairRDD = rdd.map(new DomainEntityPairFunction());
@@ -127,7 +136,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 	assertEquals(domainAlicanteconfidencial.size(), 3);
     }
 
-    //@Test(dependsOnMethods = "testFilter")
+    @Test(dependsOnMethods = "testGroupByKey")
     public void testJoin() {
 	verifyRDD();
 
@@ -140,7 +149,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 	assertEquals(joinedRDDElems.size(), 4);
     }
 
-    //@Test(dependsOnMethods = "testFilter")
+    @Test(dependsOnMethods = "testJoin")
     public void testMap() {
 	verifyRDD();
 
@@ -151,7 +160,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 	assertEquals(mappedQuickPages.count(), 6L);
     }
 
-    //@Test(dependsOnMethods = "testFilter")
+    @Test(dependsOnMethods = "testMap")
     public void testReduceByKey() {
 	/* 1. I need to define which is the key, let's say it's the domain */
 	JavaPairRDD<String, Integer> pairRDD = rdd.map(new DomainCounterPairFunction());
@@ -183,6 +192,91 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     private void verifyRDD() {
 	assertNotNull(slowPages);
 	assertNotNull(quickPages);
+    }
+
+    @Test(dependsOnMethods = "testReduceByKey")
+    public void testSaveToCassandra() {
+	final String table = "save_java_rdd";
+
+	executeCustomCQL("create table  " + OUTPUT_KEYSPACE_NAME + "." + table + " (domain text, count int, PRIMARY KEY(domain));");
+
+	IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.create()
+			.host(Constants.DEFAULT_CASSANDRA_HOST)
+			.cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+			.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+			.keyspace(OUTPUT_KEYSPACE_NAME)
+			.columnFamily(table)
+			.username("")
+			.password("").initialize();
+
+	/* 1. I need to define which is the key, let's say it's the domain */
+	JavaPairRDD<String, Integer> pairRDD = rdd.map(new DomainCounterPairFunction());
+
+	/* 2. Not I can group by domain */
+	JavaPairRDD<String, Integer> reducedRDD = pairRDD.reduceByKey(new IntegerReducer());
+
+	JavaRDD<Cells> cells = reducedRDD
+			.map(new Tuple2CellsFunction());
+
+	CassandraRDD.saveRDDToCassandra(cells, writeConfig);
+
+	checkOutputTestData();
+
+    }
+
+    private void checkOutputTestData() {
+	Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
+			.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+	Session session = cluster.connect();
+
+	String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + ".save_java_rdd;";
+	ResultSet rs = session.execute(command);
+
+	assertEquals(rs.one().getLong(0), 8);
+	command = "select * from " + OUTPUT_KEYSPACE_NAME + ".save_java_rdd;";
+
+	rs = session.execute(command);
+
+	for (Row r : rs) {
+	    switch (r.getString("domain")) {
+	    case "wickedin.es":
+		assertEquals(r.getInt("count"), 2);
+		break;
+	    case "11870.com":
+		assertEquals(r.getInt("count"), 3);
+		break;
+	    case "alicanteconfidencial.blogspot.com.es":
+		assertEquals(r.getInt("count"), 3);
+		break;
+	    case "about.wickedin.es":
+		assertEquals(r.getInt("count"), 1);
+		break;
+	    case "actualidades.es":
+		assertEquals(r.getInt("count"), 3);
+		break;
+	    case "ahorromovil.wordpress.com":
+		assertEquals(r.getInt("count"), 3);
+		break;
+	    case "airscoop-espana.blogspot.com.es":
+		assertEquals(r.getInt("count"), 3);
+		break;
+	    case "america.infobae.com":
+		assertEquals(r.getInt("count"), 1);
+		break;
+	    default:
+		fail();
+	    }
+	}
+	session.shutdown();
+    }
+
+
+}
+
+class Tuple2CellsFunction extends Function<Tuple2<String, Integer>, Cells> {
+    @Override
+    public Cells call(Tuple2<String, Integer> t) throws Exception {
+	return new Cells(Cell.create("domain", t._1(), true, false), Cell.create("count", t._2()));
     }
 }
 

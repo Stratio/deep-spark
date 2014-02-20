@@ -8,7 +8,7 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.entity.TestEntity;
-import com.stratio.deep.functions.AbstractSerializableFunction1;
+import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.util.Constants;
 import org.apache.spark.rdd.RDD;
 import org.testng.annotations.Test;
@@ -21,20 +21,20 @@ import static org.testng.Assert.*;
  * Created by luca on 05/02/14.
  */
 @Test(suiteName = "cassandraRddTests", groups = { "CassandraEntityRDDTest" })
-public class CassandraEntityRDDTest extends CassandraGenericRDDTest<TestEntity> {
+public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
-    private static class TestEntityAbstractSerializableFunction1 extends
-	    AbstractSerializableFunction1<TestEntity, TestEntity> {
+    private static class TestEntityAbstractSerializableFunction extends
+		    AbstractSerializableFunction<TestEntity, TestEntity> {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -1555102599662015841L;
 
 	@Override
 	public TestEntity apply(TestEntity e) {
 	    return new TestEntity(e.getId(), e.getDomain(), e.getUrl(), e.getResponseTime() + 1, e.getResponseCode(),
-		    e.getNotMappedField());
+			    e.getNotMappedField());
 	}
     }
 
@@ -62,7 +62,7 @@ public class CassandraEntityRDDTest extends CassandraGenericRDDTest<TestEntity> 
 
     protected void checkOutputTestData() {
 	Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-		.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+			.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
 	Session session = cluster.connect();
 
 	String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY + ";";
@@ -71,7 +71,7 @@ public class CassandraEntityRDDTest extends CassandraGenericRDDTest<TestEntity> 
 	assertEquals(rs.one().getLong(0), entityTestDataSize);
 
 	command = "SELECT * from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY
-		+ " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
+			+ " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
 
 	rs = session.execute(command);
 	Row row = rs.one();
@@ -88,7 +88,7 @@ public class CassandraEntityRDDTest extends CassandraGenericRDDTest<TestEntity> 
     @Override
     protected void checkSimpleTestData() {
 	Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-		.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+			.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
 	Session session = cluster.connect();
 
 	String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY + ";";
@@ -97,7 +97,7 @@ public class CassandraEntityRDDTest extends CassandraGenericRDDTest<TestEntity> 
 	assertEquals(rs.one().getLong(0), entityTestDataSize);
 
 	command = "select * from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY
-		+ " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
+			+ " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
 
 	rs = session.execute(command);
 	Row row = rs.one();
@@ -110,7 +110,7 @@ public class CassandraEntityRDDTest extends CassandraGenericRDDTest<TestEntity> 
     }
 
     @Override
-    protected CassandraGenericRDD<TestEntity> initRDD() {
+    protected CassandraRDD<TestEntity> initRDD() {
 	assertNotNull(context);
 	return context.cassandraEntityRDD(getReadConfig());
     }
@@ -118,7 +118,7 @@ public class CassandraEntityRDDTest extends CassandraGenericRDDTest<TestEntity> 
     @Override
     protected IDeepJobConfig<TestEntity> initReadConfig() {
 	IDeepJobConfig<TestEntity> config = DeepJobConfigFactory.create(TestEntity.class)
-		.host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+			.host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
 			.cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY);
 
 	config.getConfiguration();
@@ -129,7 +129,7 @@ public class CassandraEntityRDDTest extends CassandraGenericRDDTest<TestEntity> 
     @Override
     protected IDeepJobConfig<TestEntity> initWriteConfig() {
 	IDeepJobConfig<TestEntity> writeConfig = DeepJobConfigFactory.create(TestEntity.class)
-		.host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+			.host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
 			.cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(OUTPUT_KEYSPACE_NAME).columnFamily(OUTPUT_COLUMN_FAMILY);
 
 	writeConfig.getConfiguration();
@@ -138,22 +138,22 @@ public class CassandraEntityRDDTest extends CassandraGenericRDDTest<TestEntity> 
 
     @Override
     public void testSaveToCassandra() {
-	Function1<TestEntity, TestEntity> mappingFunc = new TestEntityAbstractSerializableFunction1();
+	Function1<TestEntity, TestEntity> mappingFunc = new TestEntityAbstractSerializableFunction();
 
-	RDD<TestEntity> mappedRDD = getRDD().map(mappingFunc, ClassTag$.MODULE$.<TestEntity> apply(TestEntity.class));
+	RDD<TestEntity> mappedRDD = getRDD().map(mappingFunc, ClassTag$.MODULE$.<TestEntity>apply(TestEntity.class));
 
 	executeCustomCQL("TRUNCATE  " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY);
 
 	assertTrue(mappedRDD.count() > 0);
 
-	CassandraGenericRDD.saveEntityRDDToCassandra(mappedRDD, getWriteConfig());
+	CassandraRDD.saveRDDToCassandra(mappedRDD, getWriteConfig());
 
 	checkOutputTestData();
     }
 
     @Override
     public void testSimpleSaveToCassandra() {
-	CassandraGenericRDD.saveEntityRDDToCassandra(getRDD(), getWriteConfig());
+	CassandraRDD.saveRDDToCassandra(getRDD(), getWriteConfig());
 	checkSimpleTestData();
     }
 

@@ -38,15 +38,32 @@ public final class Cell<T extends Serializable> implements Serializable {
 
     private static final long serialVersionUID = 2298549804049316156L;
 
-
+    /**
+     * Name of the cell. Mapped to a Cassandra column name.
+     */
     private String cellName;
 
+    /**
+     * Cell value.
+     */
     private T cellValue;
 
+    /**
+     * flag that tells if this cell is part of the partition key.
+     * Defaults to FALSE.
+     */
     private Boolean isPartitionKey = Boolean.FALSE;
 
+    /**
+     * flag that tells if this cell is part of the clustering key.
+     * Defaults to FALSE.
+     */
     private Boolean isClusterKey = Boolean.FALSE;
 
+    /**
+     * Cassandra's validator class name for the current cell.<br/>
+     * The provided type must extends {@link org.apache.cassandra.db.marshal.AbstractType}
+     */
     private String validator = "org.apache.cassandra.db.marshal.UTF8Type";
 
     /**
@@ -395,7 +412,7 @@ public final class Cell<T extends Serializable> implements Serializable {
 	return isPartitionKey;
     }
 
-    private AbstractType<T> marshaller() {
+    public AbstractType<T> marshaller() {
 	return marshaller(this.validator);
     }
 

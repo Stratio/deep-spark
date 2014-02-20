@@ -17,4 +17,8 @@ public class DeepNoSuchFieldException extends RuntimeException {
 	super(cause);
     }
 
+    public DeepNoSuchFieldException(String cause) {
+	super(cause);
+    }
+
 }

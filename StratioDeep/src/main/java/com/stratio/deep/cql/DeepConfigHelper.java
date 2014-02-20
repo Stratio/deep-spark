@@ -5,7 +5,7 @@ import org.apache.hadoop.conf.Configuration;
 /**
  * Stratio Deep utility class used to get/save specific properties to
  * Hadoop' configuration object.
- * 
+ *
  * @author Luca Rosellini <luca@stratio.com>
  *
  */
@@ -22,7 +22,7 @@ public final class DeepConfigHelper {
 
     /**
      * sets the batch size used to write to cassandra. Defaults to 100.
-     * 
+     *
      * @param conf
      * @param batchSize
      */
