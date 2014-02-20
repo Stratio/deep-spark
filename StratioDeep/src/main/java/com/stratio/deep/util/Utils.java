@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
@@ -195,6 +196,31 @@ public final class Utils {
      */
     public static String quote(String identifier) {
 	return "\"" + identifier.replaceAll("\"", "\"\"") + "\"";
+    }
+
+    public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters){
+	if (additionalFilters == null || additionalFilters.size() == 0){
+	    return null;
+	}
+
+	StringBuilder sb = new StringBuilder();
+
+	for (Map.Entry<String, Serializable> entry : additionalFilters.entrySet()) {
+	    String value = entry.getValue().toString();
+	    if ((entry.getValue() instanceof  String)){
+		value = value.trim();
+		if (!value.startsWith("'")){
+		    value = "'" + value;
+		}
+		if (!value.endsWith("'")){
+		    value = value + "'";
+		}
+	    }
+
+	    sb.append(" AND ").append(quote(entry.getKey())).append(" = ").append(value);
+	}
+
+	return sb.toString();
     }
 
     /**

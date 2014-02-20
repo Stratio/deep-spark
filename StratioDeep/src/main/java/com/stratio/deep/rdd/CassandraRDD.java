@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.config.impl.GenericDeepJobConfig;
 import com.stratio.deep.cql.DeepCqlPagingInputFormat;
 import com.stratio.deep.cql.DeepCqlPagingRecordReader;
 import com.stratio.deep.entity.Cells;
@@ -293,6 +294,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
 	    final DeepCqlPagingRecordReader recordReader = (DeepCqlPagingRecordReader) inputFormat
 			    .createRecordReader(dp.splitWrapper().value(), taskCtx);
+	    recordReader.setAdditionalFilters( ((GenericDeepJobConfig) config.value()).getAdditionalFilters() );
 
 	    log().debug("Initializing recordReader for split: " + dp);
 	    recordReader.initialize(dp.splitWrapper().value(), taskCtx);
@@ -303,5 +305,29 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 	} catch (IOException | InterruptedException e) {
 	    throw new DeepIOException(e);
 	}
+    }
+
+    /**
+     * Adds a new filter on the specified. This will affect the generation of queries<br/>
+     * against the underlying Cassandra datastore.
+     *
+     * @param fieldName
+     * @param value
+     * @return
+     */
+    public CassandraRDD<T> filterByField(String fieldName, String value){
+	((GenericDeepJobConfig)config.value()).addFilter(fieldName, value);
+	return this;
+    }
+
+    /**
+     * Removes the specified filter on the provided field (if exists).
+     *
+     * @param fieldName
+     * @return
+     */
+    public CassandraRDD<T> removeFilterOnField(String fieldName){
+	((GenericDeepJobConfig)config.value()).removeFilter(fieldName);
+	return this;
     }
 }

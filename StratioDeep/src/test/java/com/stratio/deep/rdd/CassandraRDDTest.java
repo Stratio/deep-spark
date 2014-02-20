@@ -19,7 +19,7 @@ import static org.testng.Assert.assertNotNull;
 public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     private Logger logger = Logger.getLogger(getClass());
 
-    private CassandraRDD<W> rdd;
+    protected CassandraRDD<W> rdd;
     private IDeepJobConfig<W> rddConfig;
     private IDeepJobConfig<W> writeConfig;
 

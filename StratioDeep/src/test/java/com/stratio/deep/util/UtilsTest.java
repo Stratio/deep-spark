@@ -1,6 +1,9 @@
 package com.stratio.deep.util;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.TreeMap;
 
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
@@ -70,6 +73,17 @@ public class UtilsTest {
 	assertTrue(keyFields.right.length == 5);
 
 	assertTrue(keyFields.left[0].getName().equals("id"));
+    }
+
+    @Test
+    public void testAdditionalFilters(){
+	Map<String, Serializable> map = new TreeMap<>();
+
+	String filter = "address:* AND NOT address:*uropa*";
+
+	map.put("lucene", filter);
+
+	assertEquals(additionalFilterGenerator(map), " AND \"lucene\" = \'address:* AND NOT address:*uropa*\'");
     }
 
     @Test

@@ -1,5 +1,9 @@
 package com.stratio.deep.rdd;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -11,8 +15,13 @@ import com.stratio.deep.entity.TestEntity;
 import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.util.Constants;
 import org.apache.spark.rdd.RDD;
+import org.apache.spark.serializer.DeserializationStream;
+import org.apache.spark.serializer.JavaSerializer;
+import org.apache.spark.serializer.SerializationStream;
+import org.apache.spark.serializer.SerializerInstance;
 import org.testng.annotations.Test;
 import scala.Function1;
+import scala.collection.Iterator;
 import scala.reflect.ClassTag$;
 
 import static org.testng.Assert.*;
@@ -155,6 +164,34 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     public void testSimpleSaveToCassandra() {
 	CassandraRDD.saveRDDToCassandra(getRDD(), getWriteConfig());
 	checkSimpleTestData();
+    }
+
+    @Test
+    public void testJavaSerialization(){
+	JavaSerializer ser = new JavaSerializer(context.getConf());
+
+	SerializerInstance instance = ser.newInstance();
+
+	ByteBuffer serializedRDD = instance.serialize(rdd);
+
+	CassandraRDD deserializedRDD = instance.deserialize(serializedRDD);
+
+	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+	SerializationStream serializationStream = instance.serializeStream(baos);
+	serializationStream = serializationStream.writeObject(rdd);
+
+	serializationStream.flush();
+	serializationStream.close();
+
+	ByteArrayInputStream bais = new ByteArrayInputStream(serializedRDD.array());
+
+	DeserializationStream deserializationStream = instance.deserializeStream(bais);
+	Iterator<Object> iter = deserializationStream.asIterator();
+	assertTrue(iter.hasNext());
+
+	deserializedRDD = (CassandraRDD)iter.next();
+	assertNotNull(deserializedRDD);
     }
 
 }

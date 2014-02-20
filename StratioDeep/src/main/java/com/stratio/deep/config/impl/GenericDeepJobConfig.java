@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -76,6 +77,8 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
      * default "where" filter to use to access ColumnFamily's data.
      */
     private String defaultFilter;
+
+    private Map<String, String> additionalFilters = new TreeMap<>();
 
     /**
      * Defines a projection over the CF columns.
@@ -439,6 +442,20 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
     @Override
     public IDeepJobConfig<T> batchSize(int batchSize) {
 	this.batchSize = batchSize;
+	return this;
+    }
+
+    public Map<String, String> getAdditionalFilters() {
+	return additionalFilters;
+    }
+
+    public IDeepJobConfig<T> removeFilter(String fieldName){
+	additionalFilters.remove(fieldName);
+	return this;
+    }
+
+    public IDeepJobConfig<T> addFilter(String fieldName, String filter){
+	additionalFilters.put(fieldName, filter);
 	return this;
     }
 }
