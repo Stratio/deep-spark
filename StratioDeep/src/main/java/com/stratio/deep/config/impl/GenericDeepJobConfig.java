@@ -95,7 +95,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
      */
     private int batchSize = Constants.DEFAULT_BATCH_SIZE;
 
-    private Map<String, Cell> columnDefinitionMap;
+    private transient Map<String, Cell> columnDefinitionMap;
 
     protected void checkInitialized() {
 	if (configuration == null) {
