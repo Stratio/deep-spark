@@ -35,9 +35,6 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     private static class TestEntityAbstractSerializableFunction extends
 		    AbstractSerializableFunction<TestEntity, TestEntity> {
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = -1555102599662015841L;
 
 	@Override
@@ -66,7 +63,6 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 	if (!found) {
 	    fail();
 	}
-
     }
 
     protected void checkOutputTestData() {
@@ -116,6 +112,24 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 	assertEquals(row.getLong("download_time"), 1380802049275L);
 	assertEquals(row.getString("url"), "http://11870.com/k/es/de");
 	session.shutdown();
+    }
+
+    @Test
+    public void testAdditionalFilters(){
+
+	CassandraRDD<TestEntity> otherRDD=initRDD();
+
+	TestEntity[] entities = (TestEntity[])otherRDD.collect();
+	int allElements = entities.length;
+	assertTrue(allElements > 2);
+
+	otherRDD.filterByField("response_time", 371);
+	entities = (TestEntity[])otherRDD.collect();
+	assertEquals(entities.length, 2);
+
+	otherRDD.removeFilterOnField("response_time");
+	entities = (TestEntity[])otherRDD.collect();
+	assertEquals(entities.length, allElements);
     }
 
     @Override

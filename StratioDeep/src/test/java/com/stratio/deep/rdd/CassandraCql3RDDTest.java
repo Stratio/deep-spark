@@ -61,6 +61,36 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
 
     }
 
+    @Test
+    public void testAdditionalFilters(){
+
+	CassandraRDD<Cql3TestEntity> otherRDD=initRDD();
+
+	Cql3TestEntity[] entities = (Cql3TestEntity[])otherRDD.collect();
+
+	int allElements = entities.length;
+	assertTrue(allElements > 1);
+	otherRDD.filterByField("food", "donuts");
+
+	entities = (Cql3TestEntity[])otherRDD.collect();
+
+	assertEquals(entities.length, 1);
+	assertEquals(entities[0].getFood(), "donuts");
+	assertEquals(entities[0].getName(), "pepito_3");
+	assertEquals(entities[0].getGender(), "male");
+	assertEquals(entities[0].getAge(), Integer.valueOf(-2));
+	assertEquals(entities[0].getAnimal(), "monkey");
+
+	otherRDD.filterByField("food", "chips");
+	entities = (Cql3TestEntity[])otherRDD.collect();
+	assertEquals(entities.length, allElements-1);
+
+	otherRDD.removeFilterOnField("food");
+	entities = (Cql3TestEntity[])otherRDD.collect();
+	assertEquals(entities.length, allElements);
+    }
+
+
     protected void checkOutputTestData() {
 	Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
 			.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();

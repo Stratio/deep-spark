@@ -198,23 +198,22 @@ public final class Utils {
 	return "\"" + identifier.replaceAll("\"", "\"\"") + "\"";
     }
 
-    public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters){
-	if (additionalFilters == null || additionalFilters.size() == 0){
-	    return null;
+    public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters) {
+	if (additionalFilters == null || additionalFilters.size() == 0) {
+	    return "";
 	}
 
-	StringBuilder sb = new StringBuilder();
+	StringBuilder sb = new StringBuilder("");
 
 	for (Map.Entry<String, Serializable> entry : additionalFilters.entrySet()) {
+	    if (entry.getValue() == null) {
+		continue;
+	    }
+
 	    String value = entry.getValue().toString();
-	    if ((entry.getValue() instanceof  String)){
-		value = value.trim();
-		if (!value.startsWith("'")){
-		    value = "'" + value;
-		}
-		if (!value.endsWith("'")){
-		    value = value + "'";
-		}
+
+	    if (entry.getValue() instanceof String) {
+		value = cleanFilterString(entry, value.trim());
 	    }
 
 	    sb.append(" AND ").append(quote(entry.getKey())).append(" = ").append(value);
@@ -222,6 +221,21 @@ public final class Utils {
 
 	return sb.toString();
     }
+
+    static String cleanFilterString(Map.Entry<String, Serializable> entry, String value) {
+	if (value.contains("\"")) {
+	    throw new DeepGenericException("value for filter \'" + entry.getKey() + "\' contains double quotes, please check your syntax.");
+	}
+
+	if (!value.startsWith("'")) {
+	    value = "'" + value;
+	}
+	if (!value.endsWith("'")) {
+	    value = value + "'";
+	}
+	return value;
+    }
+
 
     /**
      * Generates the update query for the provided IDeepType.
@@ -234,6 +248,7 @@ public final class Utils {
      * @param <T>
      * @return
      */
+
     public static <T extends IDeepType> String updateQueryGenerator(Cells keys, Cells values, String outputKeyspace,
 		    String outputColumnFamily) {
 

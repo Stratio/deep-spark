@@ -1,6 +1,7 @@
 package com.stratio.deep.rdd;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
@@ -10,6 +11,7 @@ import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.impl.GenericDeepJobConfig;
 import com.stratio.deep.cql.DeepCqlPagingInputFormat;
 import com.stratio.deep.cql.DeepCqlPagingRecordReader;
+import com.stratio.deep.cql.DeepTaskAttemptContext;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepIOException;
@@ -19,7 +21,10 @@ import com.stratio.deep.partition.impl.DeepPartition;
 import org.apache.cassandra.hadoop.cql3.DeepCqlOutputFormat;
 import org.apache.cassandra.utils.Pair;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.hadoop.mapreduce.JobID;
+import org.apache.hadoop.mapreduce.TaskAttemptID;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
@@ -290,11 +295,10 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 	    TaskAttemptID attemptId = new TaskAttemptID(STRATIO_DEEP_TASK_PREFIX + System.currentTimeMillis(), id(),
 			    true, dp.index(), 0);
 
-	    TaskAttemptContext taskCtx = new TaskAttemptContext(config.value().getConfiguration(), attemptId);
+	    DeepTaskAttemptContext taskCtx = new DeepTaskAttemptContext((GenericDeepJobConfig) config.value(), attemptId);
 
 	    final DeepCqlPagingRecordReader recordReader = (DeepCqlPagingRecordReader) inputFormat
 			    .createRecordReader(dp.splitWrapper().value(), taskCtx);
-	    recordReader.setAdditionalFilters( ((GenericDeepJobConfig) config.value()).getAdditionalFilters() );
 
 	    log().debug("Initializing recordReader for split: " + dp);
 	    recordReader.initialize(dp.splitWrapper().value(), taskCtx);
@@ -315,7 +319,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * @param value
      * @return
      */
-    public CassandraRDD<T> filterByField(String fieldName, String value){
+    public CassandraRDD<T> filterByField(String fieldName, Serializable value){
 	((GenericDeepJobConfig)config.value()).addFilter(fieldName, value);
 	return this;
     }

@@ -1,10 +1,8 @@
 package com.stratio.deep.config.impl;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.Serializable;
+import java.util.*;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -16,7 +14,6 @@ import com.stratio.deep.entity.Cell;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.util.Constants;
-import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.hadoop.ConfigHelper;
 import org.apache.cassandra.hadoop.cql3.CqlConfigHelper;
@@ -35,8 +32,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
     private transient Job hadoopJob;
 
     private transient Configuration configuration;
-
-    protected transient ColumnFamilyStore columnFamilyStore;
 
     /**
      * keyspace name
@@ -78,7 +73,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
      */
     private String defaultFilter;
 
-    private Map<String, String> additionalFilters = new TreeMap<>();
+    private Map<String, Serializable> additionalFilters = new TreeMap<>();
 
     /**
      * Defines a projection over the CF columns.
@@ -445,8 +440,8 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
 	return this;
     }
 
-    public Map<String, String> getAdditionalFilters() {
-	return additionalFilters;
+    public Map<String, Serializable> getAdditionalFilters() {
+	return Collections.unmodifiableMap(additionalFilters);
     }
 
     public IDeepJobConfig<T> removeFilter(String fieldName){
@@ -454,8 +449,8 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
 	return this;
     }
 
-    public IDeepJobConfig<T> addFilter(String fieldName, String filter){
-	additionalFilters.put(fieldName, filter);
+    public IDeepJobConfig<T> addFilter(String filterColumnName, Serializable filterValue){
+	additionalFilters.put(filterColumnName, filterValue);
 	return this;
     }
 }

@@ -39,14 +39,23 @@ public abstract class AbstractDeepSparkContextTest {
     protected static final int entityTestDataSize = 19;
     protected static final int cql3TestDataSize = 20;
 
+    protected String createCF = "CREATE TABLE " + KEYSPACE_NAME + "." + COLUMN_FAMILY + " (id text PRIMARY KEY, " + "url text, "
+		    + "domain_name text, " + "response_code int, " + "charset text," + "response_time int,"
+		    + "download_time bigint," + "first_download_time bigint," + "title text ) ;";
+
+    protected String createCFIndex = "create index idx_" + COLUMN_FAMILY + "_resp_time on " +KEYSPACE_NAME + "." + COLUMN_FAMILY + " (response_time);";
+
     protected String createOutputCF = "CREATE TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY
 		    + " (id text, " + "url text, " + "domain_name text, " + "response_code int, " + "charset text,"
 		    + "response_time int," + "download_time bigint," + "first_download_time bigint,"
 		    + "title text, PRIMARY KEY (id) );";
 
+
     protected String createCql3CF = "create table " + KEYSPACE_NAME + "." + CQL3_COLUMN_FAMILY
 		    + "(name varchar, password varchar, color varchar, gender varchar, food varchar, "
-		    + " animal varchar, lucene varchar,age int,PRIMARY KEY ((name, gender), age, animal));";
+		    + " animal varchar, lucene varchar,age int,PRIMARY KEY ((name, gender), age, animal)); ";
+
+    protected  String createCql3CFIndex = "create index idx_" + CQL3_COLUMN_FAMILY + "_food on " + KEYSPACE_NAME + "." + CQL3_COLUMN_FAMILY + "(food);";
 
     protected String createCql3OutputCF = "create table " + OUTPUT_KEYSPACE_NAME + "." + CQL3_OUTPUT_COLUMN_FAMILY
 		    + "(name varchar, password varchar, color varchar, gender varchar, food varchar, "
@@ -193,16 +202,14 @@ public abstract class AbstractDeepSparkContextTest {
 
 	String useKeyspace = "USE " + KEYSPACE_NAME + ";";
 
-	String createCF = "CREATE TABLE " + COLUMN_FAMILY + " (id text PRIMARY KEY, " + "url text, "
-			+ "domain_name text, " + "response_code int, " + "charset text," + "response_time int,"
-			+ "download_time bigint," + "first_download_time bigint," + "title text ) ;";
+
 
 	String useOutputKeyspace = "USE " + OUTPUT_KEYSPACE_NAME + ";";
 
 	String initialDataset = buildTestDataInsertBatch();
 
-	String[] startupCommands = new String[] { createKeyspace, createOutputKeyspace, useKeyspace, createCF,
-			createCql3CF, initialDataset, useOutputKeyspace, createOutputCF, createCql3OutputCF,
+	String[] startupCommands = new String[] { createKeyspace, createOutputKeyspace, useKeyspace, createCF, createCFIndex,
+			createCql3CF, createCql3CFIndex, initialDataset, useOutputKeyspace, createOutputCF, createCql3OutputCF,
 			createCql3EntityOutputCF };
 
 	cassandraServer = new CassandraServer();

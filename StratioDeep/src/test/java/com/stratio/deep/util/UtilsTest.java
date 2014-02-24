@@ -20,7 +20,6 @@ import static com.stratio.deep.util.Utils.*;
 import static org.testng.Assert.*;
 
 public class UtilsTest {
-
     class NotInstantiable implements IDeepType {
 
 	private static final long serialVersionUID = -3311345712290429412L;
@@ -79,11 +78,46 @@ public class UtilsTest {
     public void testAdditionalFilters(){
 	Map<String, Serializable> map = new TreeMap<>();
 
+	map.put("lucene", null);
+
+	assertEquals(additionalFilterGenerator(map), "");
+
 	String filter = "address:* AND NOT address:*uropa*";
 
 	map.put("lucene", filter);
 
 	assertEquals(additionalFilterGenerator(map), " AND \"lucene\" = \'address:* AND NOT address:*uropa*\'");
+
+	filter = "'address:* AND NOT address:*uropa*";
+
+	map.put("lucene", filter);
+
+	assertEquals(additionalFilterGenerator(map), " AND \"lucene\" = \'address:* AND NOT address:*uropa*\'");
+
+	filter = "address:* AND NOT address:*uropa*'";
+
+	map.put("lucene", filter);
+
+	assertEquals(additionalFilterGenerator(map), " AND \"lucene\" = \'address:* AND NOT address:*uropa*\'");
+
+	filter = "'address:* AND NOT address:*uropa*'";
+
+	map.put("lucene", filter);
+
+	assertEquals(additionalFilterGenerator(map), " AND \"lucene\" = \'address:* AND NOT address:*uropa*\'");
+
+	filter = "'address:* AND NOT address:\"*uropa*\"'";
+
+	map.put("lucene", filter);
+
+	try {
+	    additionalFilterGenerator(map);
+
+	    // if there's no error the code is broken
+	    fail();
+	} catch (DeepGenericException e) {
+	    // ok
+	}
     }
 
     @Test

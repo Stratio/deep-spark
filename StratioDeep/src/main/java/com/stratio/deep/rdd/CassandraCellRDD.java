@@ -39,6 +39,10 @@ public class CassandraCellRDD extends CassandraRDD<Cells> {
 
 	for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
 	    Cell cd = columnDefinitions.get(entry.getKey());
+	    if (cd == null){
+		continue;
+	    }
+
 	    cells.add(Cell.create(entry.getKey(), entry.getValue(), cd.marshallerClassName(), cd.isPartitionKey(),
 			    cd.isClusterKey()));
 	}
