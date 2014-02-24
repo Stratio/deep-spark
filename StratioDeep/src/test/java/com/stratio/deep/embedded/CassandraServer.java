@@ -30,6 +30,7 @@ public class CassandraServer {
 	public void run() {
 	    cassandraDaemon = new CassandraDaemon();
 	    cassandraDaemon.activate();
+	    cassandraDaemon.start();
 	}
     }
 
@@ -191,6 +192,7 @@ public class CassandraServer {
 	System.setProperty("cassandra.config", "file:" + dirPath + yamlFilePath);
 	System.setProperty("log4j.configuration", "file:" + dirPath + "/log4j.properties");
 	System.setProperty("cassandra-foreground", "true");
+	System.setProperty("cassandra.skip_wait_for_gossip_to_settle", "0");
 
 	cleanupAndLeaveDirs();
 
