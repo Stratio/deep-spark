@@ -67,14 +67,15 @@ git checkout "$SPARK_BRANCH" || { echo "Cannot checkout branch: ${SPARK_BRANCH}"
 
 cd ..
 
-cp ${TMPDIR}/lib/*.jar ${STRATIOSPARKDIR}/dist/jars/
-mv ${STRATIOSPARKDIR}/dist/ spark-deep-distribution
+DISTDIR=spark-deep-distribution-${RELEASE_VER}
+DISTFILENAME=${DISTDIR}.tgz
 
-DISTFILENAME=spark-deep-distribution-${RELEASE_VER}.tgz
+cp ${TMPDIR}/lib/*.jar ${STRATIOSPARKDIR}/dist/jars/
+mv ${STRATIOSPARKDIR}/dist/ ${DISTDIR}
 
 echo "DISTFILENAME: ${DISTFILENAME}"
 
-tar czf ${DISTFILENAME} spark-deep-distribution || { echo "Cannot create tgz"; exit 1; }
+tar czf ${DISTFILENAME} ${DISTDIR} || { echo "Cannot create tgz"; exit 1; }
 
 mv ${DISTFILENAME} ${LOCAL_DIR}
 
