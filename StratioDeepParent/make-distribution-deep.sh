@@ -14,6 +14,10 @@ fi
 
 SPARK_BRANCH="$2"
 
+if [ -z "$EDITOR" ]; then
+    EDITOR=$(which vim)
+fi
+
 if [ -z "$2" ]; then
     SPARK_BRANCH="branch-0.9"
 fi
@@ -48,6 +52,11 @@ mkdir -p ${TMPDIR}/lib || { echo "Cannot create output lib directory"; exit 1; }
 cp ../*/target/*.jar ${TMPDIR}/lib || { echo "Cannot copy target jars to output lib directory, aborting"; exit 1; }
 cp ../*/target/alternateLocation/*.jar ${TMPDIR}/lib || { echo "Cannot copy alternate jars to output lib directory, aborting"; exit 1; }
 
+git fetch --tags
+latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+
+echo -e "[${RELEASE_VER}]\n\n$(git log ${latest_tag}..HEAD)\n\n$(cat ChangeLog.txt)" > ChangeLog.txt
+
 #mvn dependency:get -DgroupId=org.apache.cassandra -DartifactId=cassandra-clientutil -Dversion=${CASS_VER} -Ddest=. -Dtransitive=false -DremoteRepositories=stratio-snapshots::default::http://nexus.strat.io:8081/nexus/content/repositories/snapshots/
 
 echo "################################################"
@@ -72,6 +81,7 @@ DISTFILENAME=${DISTDIR}.tgz
 
 cp ${TMPDIR}/lib/*.jar ${STRATIOSPARKDIR}/dist/jars/
 mv ${STRATIOSPARKDIR}/dist/ ${DISTDIR}
+cp ${LOCAL_DIR}/ChangeLog.txt ${DISTDIR}/
 
 echo "DISTFILENAME: ${DISTFILENAME}"
 
