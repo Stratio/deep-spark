@@ -17,22 +17,6 @@ if [ -z "$2" ]; then
     SPARK_BRANCH="branch-0.9"
 fi
 
-#if [ -z "$2" ]; then
-#echo "Usage: $0 -cv <cassandra version>"
-#  exit 0
-#fi
-#
-## Parse arguments
-#while (( "$#" )); do
-#case $1 in
-#    -cv)
-#      CASS_VER="$2"
-#      shift
-#      ;;
-#  esac
-#shift
-#done
-
 LOCAL_DIR=`pwd`
 
 echo "LOCAL_DIR=$LOCAL_DIR"
@@ -136,14 +120,15 @@ git checkout "$SPARK_BRANCH" || { echo "Cannot checkout branch: ${SPARK_BRANCH}"
 echo " >>> Executing make distribution script"
 ./make-distribution.sh || { echo "Cannot make Spark distribution"; exit 1; }
 
-cp ${TMPDIR}/lib/*.jar ${TMPDIR_SPARK}/dist/jars/
-mv ${TMPDIR_SPARK}/dist/ spark-deep-distribution
+DISTDIR=spark-deep-distribution-${RELEASE_VER}
+DISTFILENAME=${DISTDIR}.tgz
 
-DISTFILENAME=spark-deep-distribution-${RELEASE_VER}.tgz
+cp ${TMPDIR}/lib/*.jar ${TMPDIR_SPARK}/dist/jars/
+mv ${TMPDIR_SPARK}/dist/ ${DISTDIR}
 
 echo "DISTFILENAME: ${DISTFILENAME}"
 
-tar czf ${DISTFILENAME} spark-deep-distribution || { echo "Cannot create tgz"; exit 1; }
+tar czf ${DISTFILENAME} ${DISTDIR} || { echo "Cannot create tgz"; exit 1; }
 
 #### (TODO) Upload the tgz file to a remote repository (Stratio Nexus)
 
