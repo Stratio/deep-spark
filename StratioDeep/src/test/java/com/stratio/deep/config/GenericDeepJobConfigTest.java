@@ -8,6 +8,7 @@ import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.entity.TestEntity;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.util.Constants;
+import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
 
@@ -153,6 +154,34 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
 	}
 
 	djc.columnFamily("test_page");
+
+
+	try {
+	    djc.readConsistencyLevel("not valid CL");
+	    djc.initialize();
+	    fail();
+	} catch (IllegalArgumentException iae) {
+	    // OK
+	    log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
+	} catch (Exception e) {
+	    fail(e.getMessage());
+	}
+
+	djc.readConsistencyLevel(ConsistencyLevel.LOCAL_ONE.name());
+
+	try {
+	    djc.writeConsistencyLevel("not valid CL");
+	    djc.initialize();
+	    fail();
+	} catch (IllegalArgumentException iae) {
+	    // OK
+	    log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
+	} catch (Exception e) {
+	    fail(e.getMessage());
+	}
+
+	djc.writeConsistencyLevel(ConsistencyLevel.LOCAL_ONE.name());
+
 	djc.initialize();
     }
 

@@ -220,6 +220,26 @@ public interface IDeepJobConfig<T> extends Serializable {
     public abstract IDeepJobConfig<T> batchSize(int batchSize);
 
     /**
+     * Sets read consistency level. <br/>
+     * Can be one of those consistency levels defined in {@link org.apache.cassandra.db.ConsistencyLevel}.<br/>
+     * Defaults to {@link org.apache.cassandra.db.ConsistencyLevel#LOCAL_ONE}.
+     *
+     * @param level
+     * @return
+     */
+    public abstract IDeepJobConfig<T> readConsistencyLevel(String level);
+
+    /**
+     * Sets write consistency level. <br/>
+     * Can be one of those consistency levels defined in {@link org.apache.cassandra.db.ConsistencyLevel}.<br/>
+     * Defaults to {@link org.apache.cassandra.db.ConsistencyLevel#LOCAL_ONE}.
+     *
+     * @param level
+     * @return
+     */
+    public abstract IDeepJobConfig<T> writeConsistencyLevel(String level);
+
+    /**
      * Returns the name of the configured column family.
      * 
      * @return

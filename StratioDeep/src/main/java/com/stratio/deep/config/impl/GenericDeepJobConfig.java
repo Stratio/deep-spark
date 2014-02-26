@@ -92,6 +92,10 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
 
     private transient Map<String, Cell> columnDefinitionMap;
 
+    private String readConsistencyLevel;
+
+    private String writeConsistencyLevel;
+
     protected void checkInitialized() {
 	if (configuration == null) {
 	    throw new DeepIllegalAccessException("EntityDeepJobConfig has not been initialized!");
@@ -332,6 +336,10 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
 
 	    ConfigHelper.setThriftFramedTransportSizeInMb(c, thriftFramedTransportSizeMB);
 
+	    if (readConsistencyLevel != null){
+		ConfigHelper.setReadConsistencyLevel(c, readConsistencyLevel);
+	    }
+
 	    configuration = c;
 
 	    columnDefinitions();
@@ -428,6 +436,24 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
 	if (StringUtils.isEmpty(columnFamily)) {
 	    throw new IllegalArgumentException("columnFamily cannot be null");
 	}
+
+	if (readConsistencyLevel != null){
+	    try {
+		org.apache.cassandra.db.ConsistencyLevel.valueOf(readConsistencyLevel);
+
+	    } catch (Exception e) {
+		throw new IllegalArgumentException("readConsistencyLevel not valid, should be one of thos defined in org.apache.cassandra.db.ConsistencyLevel",e);
+	    }
+	}
+
+	if (writeConsistencyLevel != null){
+	    try {
+		org.apache.cassandra.db.ConsistencyLevel.valueOf(writeConsistencyLevel);
+
+	    } catch (Exception e) {
+		throw new IllegalArgumentException("writeConsistencyLevel not valid, should be one of thos defined in org.apache.cassandra.db.ConsistencyLevel",e);
+	    }
+	}
     }
 
     /*
@@ -451,6 +477,25 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
 
     public IDeepJobConfig<T> addFilter(String filterColumnName, Serializable filterValue){
 	additionalFilters.put(filterColumnName, filterValue);
+	return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IDeepJobConfig<T> readConsistencyLevel(String level) {
+	this.readConsistencyLevel = level;
+
+	return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IDeepJobConfig<T> writeConsistencyLevel(String level) {
+	this.writeConsistencyLevel = level;
 	return this;
     }
 }
