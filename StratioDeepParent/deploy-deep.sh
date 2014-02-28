@@ -17,6 +17,16 @@ if [ -z "$2" ]; then
     SPARK_BRANCH="branch-0.9"
 fi
 
+LOCAL_EDITOR=$(which vim)
+
+if [ -z "$LOCAL_EDITOR" ]; then
+    $LOCAL_EDITOR=$(which vi)
+fi
+
+if [ -z "$LOCAL_EDITOR" ]; then
+    echo "Cannot find any command line editor, ChangeLog.txt won't be edited interactively"
+fi
+
 LOCAL_DIR=`pwd`
 
 echo "LOCAL_DIR=$LOCAL_DIR"
@@ -73,6 +83,16 @@ mkdir -p ${TMPDIR}/lib || { echo "Cannot create output lib directory"; exit 1; }
 cp ../*/target/*.jar ${TMPDIR}/lib || { echo "Cannot copy target jars to output lib directory, aborting"; exit 1; }
 cp ../*/target/alternateLocation/*.jar ${TMPDIR}/lib || { echo "Cannot copy alternate jars to output lib directory, aborting"; exit 1; }
 
+# Generating ChangeLog
+git fetch --tags
+latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+
+echo -e "[${RELEASE_VER}]\n\n$(git log ${latest_tag}..HEAD)\n\n$(cat ChangeLog.txt)" > ChangeLog.txt
+
+if [ -n "$LOCAL_EDITOR" ]; then
+    $LOCAL_EDITOR ChangeLog.txt
+fi
+
 echo "Finishing release ${RELEASE_VER}"
 mvn clean
 
@@ -91,7 +111,7 @@ echo "Next SNAPSHOT version: ${next_version}"
 cd .. 
 
 echo "Finishing release"
-git flow release finish -mFinishing_Release_$RELEASE_VER $RELEASE_VER || { echo "Cannot finnish Stratio Deep ${next_version}"; exit 1; }
+git flow release finish -mFinishing_Release_$RELEASE_VER $RELEASE_VER || { echo "Cannot finish Stratio Deep ${next_version}"; exit 1; }
 git checkout develop
 
 cd StratioDeepParent
@@ -125,6 +145,7 @@ DISTFILENAME=${DISTDIR}.tgz
 
 cp ${TMPDIR}/lib/*.jar ${TMPDIR_SPARK}/dist/jars/
 mv ${TMPDIR_SPARK}/dist/ ${DISTDIR}
+cp ${TMPDIR}/StratioDeepParent/ChangeLog.txt ${DISTDIR}/
 
 echo "DISTFILENAME: ${DISTFILENAME}"
 

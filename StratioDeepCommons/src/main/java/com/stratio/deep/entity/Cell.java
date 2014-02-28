@@ -2,21 +2,14 @@ package com.stratio.deep.entity;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetAddress;
 import java.nio.ByteBuffer;
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
-
-import com.google.common.collect.ImmutableMap;
 
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
+import com.stratio.deep.utils.AnnotationUtils;
 import org.apache.cassandra.db.marshal.*;
 
 /**
@@ -57,27 +50,6 @@ public final class Cell<T extends Serializable> implements Serializable {
      * The provided type must extends {@link org.apache.cassandra.db.marshal.AbstractType}
      */
     private String validator = "org.apache.cassandra.db.marshal.UTF8Type";
-
-    /**
-     * Static map of associations between Class objects and the equivalent
-     * Cassandra marshaller.
-     */
-    private static Map<Class, AbstractType<?>> mapValueTypes =
-		    ImmutableMap.<Class, AbstractType<?>>builder()
-				    .put(String.class, UTF8Type.instance)
-				    .put(Integer.class, Int32Type.instance)
-				    .put(Boolean.class, BooleanType.instance)
-				    .put(Date.class,  TimestampType.instance)
-				    .put(BigDecimal.class, DecimalType.instance)
-				    .put(Long.class, LongType.instance)
-				    .put(Double.class, DoubleType.instance)
-				    .put(Float.class, FloatType.instance)
-				    .put(InetAddress.class, InetAddressType.instance)
-				    .put(Inet4Address.class, InetAddressType.instance)
-				    .put(Inet6Address.class, InetAddressType.instance)
-				    .put(BigInteger.class, IntegerType.instance)
-				    .put(UUID.class, UUIDType.instance).build();
-
 
     /**
      * Factory method, creates a new Cell.<br/>
@@ -158,7 +130,7 @@ public final class Cell<T extends Serializable> implements Serializable {
 	    return UTF8Type.instance;
 	}
 
-	return mapValueTypes.get(obj);
+	return AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(obj);
     }
 
     /**
@@ -173,7 +145,7 @@ public final class Cell<T extends Serializable> implements Serializable {
 	    return UTF8Type.instance;
 	}
 
-	AbstractType<?> res = mapValueTypes.get(obj.getClass());
+	AbstractType<?> res = AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(obj.getClass());
 
 	if (res == null){
 	    throw new DeepGenericException("parameter class "+obj.getClass().getCanonicalName()+"does not have a Cassandra marshaller");
@@ -291,6 +263,16 @@ public final class Cell<T extends Serializable> implements Serializable {
 			isClusterKey.equals(cell.isClusterKey) &&
 			isPartitionKey.equals(cell.isPartitionKey) &&
 			validator.equals(cell.validator);
+    }
+
+    public Class<T> getValueType(){
+	for (Map.Entry<Class, AbstractType<?>> entry : AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.entrySet()) {
+	    if (entry.getValue().getClass().getCanonicalName().equals(validator)){
+		return entry.getKey();
+	    }
+	}
+
+	return null;
     }
 
     public String getCellName() {

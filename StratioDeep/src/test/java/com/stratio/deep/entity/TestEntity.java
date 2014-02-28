@@ -21,7 +21,7 @@ public class TestEntity implements IDeepType {
     @DeepField(validationClass = Int32Type.class, fieldName = "response_time")
     private Integer responseTime;
 
-    @DeepField(validationClass = Int32Type.class, fieldName = "response_code")
+    @DeepField(fieldName = "response_code")
     private Integer responseCode;
 
     @DeepField(validationClass = LongType.class, fieldName = "download_time")

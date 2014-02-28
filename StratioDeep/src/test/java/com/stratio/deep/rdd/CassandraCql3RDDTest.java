@@ -10,6 +10,8 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.entity.Cql3TestEntity;
+import com.stratio.deep.exception.DeepIndexNotFoundException;
+import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.util.Constants;
 import org.apache.spark.rdd.RDD;
@@ -66,6 +68,20 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
 
 	CassandraRDD<Cql3TestEntity> otherRDD=initRDD();
 
+	try {
+	    otherRDD.filterByField("notExistentField", "val");
+	    fail();
+	} catch (DeepNoSuchFieldException e) {
+	    // OK
+	}
+
+	try {
+	    otherRDD.filterByField("lucene", "val");
+	    fail();
+	} catch (DeepIndexNotFoundException e) {
+	    // OK
+	}
+
 	Cql3TestEntity[] entities = (Cql3TestEntity[])otherRDD.collect();
 
 	int allElements = entities.length;
@@ -107,7 +123,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
 	for (Row r : rs) {
 	    assertEquals(r.getInt("age"), 15);
 	}
-	session.shutdown();
+	session.close();
     }
 
     @Override
@@ -134,7 +150,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
 
 	assertEquals(r.getString("password"), "xyz");
 
-	session.shutdown();
+	session.close();
     }
 
     @Override

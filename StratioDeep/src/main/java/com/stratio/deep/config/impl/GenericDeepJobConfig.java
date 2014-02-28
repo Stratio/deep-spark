@@ -13,6 +13,8 @@ import com.stratio.deep.cql.DeepConfigHelper;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
+import com.stratio.deep.exception.DeepIndexNotFoundException;
+import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.util.Constants;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.hadoop.ConfigHelper;
@@ -102,6 +104,15 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
 	}
     }
 
+    private TableMetadata fetchTableMetadata(String table){
+	Cluster cluster = Cluster.builder().withPort(getCqlPort())
+			.addContactPoint(getHost()).build();
+
+	try (Session session = cluster.connect()){
+	    return session.getCluster().getMetadata().getKeyspace(getKeyspace()).getTable(table);
+	}
+    }
+
     @Override
     public Map<String, Cell> columnDefinitions() {
 	if (columnDefinitionMap != null) {
@@ -110,14 +121,8 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
 
 	logger.info("Connecting to " + getHost() + ":" + getCqlPort());
 
-	Cluster cluster = Cluster.builder().withPort(getCqlPort())
-			.addContactPoint(getHost()).build();
+	TableMetadata tableMetadata = fetchTableMetadata(getTable());
 
-	Session session = cluster.connect();
-
-	KeyspaceMetadata ksMetadata = session.getCluster().getMetadata().getKeyspace(getKeyspace());
-
-	TableMetadata tableMetadata = ksMetadata.getTable(getTable());
 	columnDefinitionMap = new HashMap<>();
 
 	List<ColumnMetadata> partitionKeys = tableMetadata.getPartitionKey();
@@ -125,6 +130,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
 	List<ColumnMetadata> allColumns = tableMetadata.getColumns();
 
 	for (ColumnMetadata key : partitionKeys) {
+
 	    Cell metadata = Cell.createMetadataCell(key.getName(), key.getType().asJavaClass(), Boolean.TRUE, Boolean.FALSE);
 	    columnDefinitionMap.put(key.getName(), metadata);
 	}
@@ -140,9 +146,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
 		columnDefinitionMap.put(key.getName(), metadata);
 	    }
 	}
-
-	session.shutdown();
-
 	return columnDefinitionMap;
     }
 
@@ -476,6 +479,18 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
     }
 
     public IDeepJobConfig<T> addFilter(String filterColumnName, Serializable filterValue){
+	/* check if there's an index specified on the provided column */
+	TableMetadata tableMetadata = fetchTableMetadata(getTable());
+	ColumnMetadata columnMetadata = tableMetadata.getColumn(filterColumnName);
+
+	if (columnMetadata == null){
+	    throw new DeepNoSuchFieldException("No column with name " + filterColumnName + " has been found on table " + getKeyspace() + "."+ getTable());
+	}
+
+	if (columnMetadata.getIndex() == null){
+	    throw new DeepIndexNotFoundException("No index has been found on column " + columnMetadata.getName() + " on table "  + getKeyspace() + "."+ getTable() );
+	}
+
 	additionalFilters.put(filterColumnName, filterValue);
 	return this;
     }

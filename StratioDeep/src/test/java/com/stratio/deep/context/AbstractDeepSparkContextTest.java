@@ -84,6 +84,7 @@ public abstract class AbstractDeepSparkContextTest {
 	    while ((line = br.readLine()) != null) {
 		String[] fields = (COLUMN_FAMILY + "," + line).split(",");
 		String insert = String.format(rawInsert, (Object[]) fields);
+		System.out.println(insert);
 		inserts.add(insert);
 
 	    }
@@ -164,7 +165,7 @@ public abstract class AbstractDeepSparkContextTest {
 	assertEquals(r.getString("password"), "abc");
 	assertEquals(r.getString("food"), "donuts");
 
-	session.shutdown();
+	session.close();
     }
 
     @AfterSuite
@@ -186,7 +187,7 @@ public abstract class AbstractDeepSparkContextTest {
 	for (String cql : cqls) {
 	    session.execute(cql);
 	}
-	session.shutdown();
+	session.close();
     }
 
     @BeforeSuite

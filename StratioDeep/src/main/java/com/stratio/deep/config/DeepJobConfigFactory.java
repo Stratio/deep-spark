@@ -33,10 +33,4 @@ public final class DeepJobConfigFactory implements Serializable {
     public static <T extends IDeepType> IDeepJobConfig<T> create(Class<T> entityClass) {
 	return new EntityDeepJobConfig<>(entityClass);
     }
-
-    /**
-     * Private constructor.
-     */
-    private DeepJobConfigFactory() {
-    }
 }

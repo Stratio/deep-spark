@@ -14,9 +14,16 @@ fi
 
 SPARK_BRANCH="$2"
 
-if [ -z "$EDITOR" ]; then
-    EDITOR=$(which vim)
+LOCAL_EDITOR=$(which vim)
+
+if [ -z "$LOCAL_EDITOR" ]; then
+    $LOCAL_EDITOR=$(which vi)
 fi
+
+if [ -z "$LOCAL_EDITOR" ]; then
+    echo "Cannot find any command line editor, ChangeLog.txt won't be edited interactively"
+fi
+
 
 if [ -z "$2" ]; then
     SPARK_BRANCH="branch-0.9"
@@ -55,7 +62,11 @@ cp ../*/target/alternateLocation/*.jar ${TMPDIR}/lib || { echo "Cannot copy alte
 git fetch --tags
 latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
 
-echo -e "[${RELEASE_VER}]\n\n$(git log ${latest_tag}..HEAD)\n\n$(cat ChangeLog.txt)" > ChangeLog.txt
+echo -e "[${RELEASE_VER}]\n\n$(git log ${latest_tag}..HEAD)\n\n$(cat ChangeLog.txt)" > ${TMPDIR}/ChangeLog.txt
+
+if [ -n "$LOCAL_EDITOR" ]; then
+    $LOCAL_EDITOR ${TMPDIR}/ChangeLog.txt
+fi
 
 #mvn dependency:get -DgroupId=org.apache.cassandra -DartifactId=cassandra-clientutil -Dversion=${CASS_VER} -Ddest=. -Dtransitive=false -DremoteRepositories=stratio-snapshots::default::http://nexus.strat.io:8081/nexus/content/repositories/snapshots/
 
@@ -81,7 +92,7 @@ DISTFILENAME=${DISTDIR}.tgz
 
 cp ${TMPDIR}/lib/*.jar ${STRATIOSPARKDIR}/dist/jars/
 mv ${STRATIOSPARKDIR}/dist/ ${DISTDIR}
-cp ${LOCAL_DIR}/ChangeLog.txt ${DISTDIR}/
+cp ${TMPDIR}/ChangeLog.txt ${DISTDIR}/
 
 echo "DISTFILENAME: ${DISTFILENAME}"
 

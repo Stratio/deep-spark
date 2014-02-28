@@ -84,7 +84,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
 	    assertEquals(row.getInt("age"), 15);
 	}
 
-	session.shutdown();
+	session.close();
 
     }
 
@@ -111,7 +111,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
 
 	assertEquals(r.getString("password"), "xyz");
 
-	session.shutdown();
+	session.close();
 
     }
 

@@ -6,13 +6,16 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
-import com.stratio.deep.util.Utils;
+import com.stratio.deep.utils.AnnotationUtils;
 
 /**
  * Class containing the appropiate configuration for a CassandraEntityRDD.
@@ -28,7 +31,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
 
     private Class<T> entityClass;
 
-    private Map<String, Method> mapDBNameToEntityName = new HashMap<>();
+    private Map<String, String> mapDBNameToEntityName = new HashMap<>();
 
     /**
      * {@inheritDoc}
@@ -37,20 +40,26 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
     public IDeepJobConfig<T> initialize() {
 	super.initialize();
 
-	Field[] deepFields = Utils.filterDeepFields(entityClass.getDeclaredFields());
+	Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass.getDeclaredFields());
 
 	for (Field f : deepFields) {
-	    String fieldName = Utils.deepFieldName(f);
+	    String dbName = AnnotationUtils.deepFieldName(f);
 	    String beanFieldName = f.getName();
+
+	    //String dbName = f.getAnnotation(DeepField.class).fieldName();
+
+	    /*
 	    Method setter;
+
 	    try {
 		setter = entityClass.getMethod("set" + beanFieldName.substring(0, 1).toUpperCase() +
 				beanFieldName.substring(1), f.getType());
 	    } catch (NoSuchMethodException e) {
 		throw new DeepIOException(e);
 	    }
+	    */
 
-	    mapDBNameToEntityName.put(fieldName, setter);
+	    mapDBNameToEntityName.put(dbName, beanFieldName);
 	}
 
 	return this;
@@ -87,14 +96,35 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
     }
 
     public void setInstancePropertyFromDbName(T instance, String dbName, Object value) {
-	Method m = mapDBNameToEntityName.get(dbName);
+	Method setter;
 
-	if (m == null) {
+	Map<String, Cell> cfs = columnDefinitions();
+       	Cell metadataCell = cfs.get(dbName);
+
+	String f = mapDBNameToEntityName.get(dbName);
+
+	if (StringUtils.isEmpty(f)){
+	    // DB column is not mapped in the entity
+
+	    return;
+	}
+
+	String setterName = "set" + f.substring(0, 1).toUpperCase() +
+			f.substring(1);
+
+	try {
+
+	    setter = entityClass.getMethod(setterName, metadataCell.getValueType() );
+	} catch (NoSuchMethodException e) {
+	    throw new DeepIOException(e);
+	}
+
+	if (setter == null) {
 	    throw new DeepNoSuchFieldException("Cannot find setter for property: " + dbName);
 	}
 
 	try {
-	    m.invoke(instance, value);
+	    setter.invoke(instance, value);
 	} catch (Exception e) {
 	    throw new DeepGenericException(e);
 	}

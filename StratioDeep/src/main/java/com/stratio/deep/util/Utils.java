@@ -3,12 +3,9 @@ package com.stratio.deep.util;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
 
 import com.stratio.deep.annotations.DeepField;
 import com.stratio.deep.entity.Cell;
@@ -16,6 +13,7 @@ import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
+import com.stratio.deep.utils.AnnotationUtils;
 import org.apache.cassandra.utils.Pair;
 import scala.Tuple2;
 
@@ -54,22 +52,6 @@ public final class Utils {
     }
 
     /**
-     * Returns the field name as known by the datastore.
-     *
-     * @param field
-     * @return
-     */
-    public static String deepFieldName(Field field) {
-
-	DeepField annotation = field.getAnnotation(DeepField.class);
-	if (StringUtils.isNotEmpty(annotation.fieldName())) {
-	    return annotation.fieldName();
-	} else {
-	    return field.getName();
-	}
-    }
-
-    /**
      * Convers an instance of type <T> to a tuple of ( Map<String, ByteBuffer>, List<ByteBuffer> ).
      * The first map contains the key column names and the corresponding values.
      * The ByteBuffer list contains the value of the columns that will be bounded to CQL query parameters.
@@ -80,7 +62,7 @@ public final class Utils {
      */
     public static <T extends IDeepType> Tuple2<Cells, Cells> deepType2tuple(T e) {
 
-	Pair<Field[], Field[]> fields = filterKeyFields(e.getClass().getDeclaredFields());
+	Pair<Field[], Field[]> fields = AnnotationUtils.filterKeyFields(e.getClass().getDeclaredFields());
 
 	Field[] keyFields = fields.left;
 	Field[] otherFields = fields.right;
@@ -93,7 +75,7 @@ public final class Utils {
 	    DeepField deepField = keyField.getAnnotation(DeepField.class);
 
 	    if (value != null) {
-		keys.add(Cell.create(deepFieldName(keyField), value, deepField.isPartOfPartitionKey(),
+		keys.add(Cell.create(AnnotationUtils.deepFieldName(keyField), value, deepField.isPartOfPartitionKey(),
 				deepField.isPartOfClusterKey()));
 	    }
 	}
@@ -101,52 +83,11 @@ public final class Utils {
 	for (Field valueField : otherFields) {
 	    Serializable value = getBeanFieldValue(e, valueField);
 	    DeepField deepField = valueField.getAnnotation(DeepField.class);
-	    values.add(Cell.create(deepFieldName(valueField), value, deepField.isPartOfPartitionKey(),
+	    values.add(Cell.create(AnnotationUtils.deepFieldName(valueField), value, deepField.isPartOfPartitionKey(),
 			    deepField.isPartOfClusterKey()));
 	}
 
 	return new Tuple2<>(keys, values);
-    }
-
-    /**
-     * Utility method that filters out all the fields _not_ annotated
-     * with the {@link DeepField} annotation.
-     *
-     * @param fields
-     * @return
-     */
-    public static Field[] filterDeepFields(Field[] fields) {
-	List<Field> filtered = new ArrayList<>();
-	for (Field f : fields) {
-	    if (f.isAnnotationPresent(DeepField.class)) {
-		filtered.add(f);
-	    }
-	}
-	return filtered.toArray(new Field[filtered.size()]);
-    }
-
-    /**
-     * Return a pair of Field[] whose left element is
-     * the array of keys fields.
-     * The right element contains the array of all other non-key fields.
-     *
-     * @param fields
-     * @return
-     */
-    public static Pair<Field[], Field[]> filterKeyFields(Field[] fields) {
-	Field[] filtered = filterDeepFields(fields);
-	List<Field> keys = new ArrayList<>();
-	List<Field> others = new ArrayList<>();
-
-	for (Field field : filtered) {
-	    if (isKey(field.getAnnotation(DeepField.class))) {
-		keys.add(field);
-	    } else {
-		others.add(field);
-	    }
-	}
-
-	return Pair.create(keys.toArray(new Field[keys.size()]), others.toArray(new Field[others.size()]));
     }
 
     /**
@@ -165,16 +106,6 @@ public final class Utils {
 	    throw new DeepIOException(e1);
 	}
 
-    }
-
-    /**
-     * Returns true is given field is part of the table key.
-     *
-     * @param field
-     * @return
-     */
-    public static boolean isKey(DeepField field) {
-	return field.isPartOfClusterKey() || field.isPartOfPartitionKey();
     }
 
     /**

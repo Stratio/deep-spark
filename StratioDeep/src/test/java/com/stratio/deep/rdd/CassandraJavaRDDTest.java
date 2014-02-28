@@ -267,7 +267,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 		fail();
 	    }
 	}
-	session.shutdown();
+	session.close();
     }
 
 

@@ -32,8 +32,4 @@ public final class DeepConfigHelper {
 	    conf.setInt(OUTPUT_BATCH_SIZE, batchSize);
 	}
     }
-    private DeepConfigHelper() {
-
-    }
-
 }

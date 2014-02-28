@@ -10,6 +10,7 @@ import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.entity.TestEntity;
 import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.utils.AnnotationUtils;
 import org.apache.cassandra.utils.Pair;
 import org.testng.annotations.Test;
 import scala.Tuple2;
@@ -54,7 +55,7 @@ public class UtilsTest {
 
 	assertTrue(fields.length > 6);
 
-	fields = filterDeepFields(fields);
+	fields = AnnotationUtils.filterDeepFields(fields);
 
 	assertEquals(fields.length, 6);
     }
@@ -63,7 +64,7 @@ public class UtilsTest {
     public void testFilterKeyFields() {
 	Field[] fields = TestEntity.class.getDeclaredFields();
 
-	Pair<Field[], Field[]> keyFields = filterKeyFields(filterDeepFields(fields));
+	Pair<Field[], Field[]> keyFields = AnnotationUtils.filterKeyFields(AnnotationUtils.filterDeepFields(fields));
 
 	assertNotNull(keyFields);
 	assertNotNull(keyFields.left);

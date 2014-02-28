@@ -12,6 +12,8 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.entity.TestEntity;
+import com.stratio.deep.exception.DeepIndexNotFoundException;
+import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.util.Constants;
 import org.apache.spark.rdd.RDD;
@@ -87,7 +89,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
 	//TODO: cannot delete a column using CQL, forcing it to null converts it to 0!!! see CASSANDRA-5885 and CASSANDRA-6180
 	assertEquals(row.getLong("download_time"), 0);
-	session.shutdown();
+	session.close();
     }
 
     @Override
@@ -111,13 +113,27 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 	assertEquals(row.getInt("response_time"), 421);
 	assertEquals(row.getLong("download_time"), 1380802049275L);
 	assertEquals(row.getString("url"), "http://11870.com/k/es/de");
-	session.shutdown();
+	session.close();
     }
 
     @Test
     public void testAdditionalFilters(){
 
 	CassandraRDD<TestEntity> otherRDD=initRDD();
+
+	try {
+	    otherRDD.filterByField("notExistentField", "val");
+	    fail();
+	} catch (DeepNoSuchFieldException e) {
+	    // OK
+	}
+
+	try {
+	    otherRDD.filterByField("url", "val");
+	    fail();
+	} catch (DeepIndexNotFoundException e) {
+	    // OK
+	}
 
 	TestEntity[] entities = (TestEntity[])otherRDD.collect();
 	int allElements = entities.length;
