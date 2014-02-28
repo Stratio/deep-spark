@@ -1,1 +1,45 @@
+[0.0.23]
+
+commit 1bc0b857cfe4f73e14c1037b47a4d9e843669ac7
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Feb 28 10:05:24 2014 +0100
+
+    - Updated dependency to datastax java driver rc3 (was rc2)
+    - fixed a few sonar violations
+    - Added unit tests
+    - Added validation for filterByField method
+    - Refactored utils methods
+    - Changed deploy scripts in order to take into account ChangeLog generation
+
+commit c83d1eafb595ce7f9199988cffb8dae8f7442933
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Feb 26 10:06:33 2014 +0100
+
+    Not it's possible to specify read and write consistency levels in the configuration object
+
+commit e686b0fba0a45178df1106660097503f9a3e4130
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon Feb 24 14:40:07 2014 +0100
+
+    Updated to Cassandra 2.0.5
+
+commit a3f2ab4be5e93ae6e8dd47bab652843b4be27bcc
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon Feb 24 13:57:55 2014 +0100
+
+    - Added filterByField/removeFilter to CassandraRDD
+    - Code cleanup 
+    - Added tests
+
+commit 1501fdb1a2551278df342ad595a2cf704e63bf6b
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Feb 20 12:56:43 2014 +0100
+
+    - code cleanup
+    - CassandraRDD renamed to CassandraEntityRDD
+    - abstract class CassandraGenericRDD renamed to CassandraRDD
+    - unification of save* commands in CassandraRDD
+    - performance improvements for CassandraEntityRDD
+    - removed unused classes and methods
+
 [release-0.0.21]
