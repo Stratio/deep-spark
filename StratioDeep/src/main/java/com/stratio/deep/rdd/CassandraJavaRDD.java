@@ -1,13 +1,12 @@
 package com.stratio.deep.rdd;
 
 import org.apache.spark.api.java.JavaRDD;
-
 import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
 
 /**
  * Commodity RDD implementation that should be used as a
- * Java Wrapper for {@link CassandraRDD}.
+ * Java Wrapper for {@link CassandraEntityRDD}.
  *
  * @param <W>
  * @author Luca Rosellini <luca@strat.io>
@@ -20,12 +19,15 @@ public final class CassandraJavaRDD<W> extends JavaRDD<W> {
      *
      * @param rdd
      */
-    public CassandraJavaRDD(CassandraGenericRDD<W> rdd) {
-	super(rdd, ClassTag$.MODULE$.<W> apply(rdd.config.value().getEntityClass()));
+    public CassandraJavaRDD(CassandraRDD<W> rdd) {
+	super(rdd, ClassTag$.MODULE$.<W>apply(rdd.config.value().getEntityClass()));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ClassTag<W> classTag() {
-	return ClassTag$.MODULE$.<W> apply(((CassandraGenericRDD<W>) this.rdd()).config.value().getEntityClass());
+	return ClassTag$.MODULE$.<W>apply(((CassandraRDD<W>) this.rdd()).config.value().getEntityClass());
     }
 }

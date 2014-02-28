@@ -1,2 +1,4 @@
 *.iml
 */.idea
+spark-deep-distribution*
+*/*.versionsBackup

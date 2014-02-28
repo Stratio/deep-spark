@@ -11,7 +11,7 @@ import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.functions.AbstractSerializableFunction1;
+import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.util.Constants;
 import org.apache.spark.rdd.RDD;
 import org.testng.annotations.Test;
@@ -24,19 +24,19 @@ import static org.testng.Assert.*;
  * Created by luca on 03/02/14.
  */
 @Test(suiteName = "cassandraRddTests", dependsOnGroups = { "CassandraCql3RDDTest" }, groups = { "CassandraCellRDDTest" })
-public class CassandraCellRDDTest extends CassandraGenericRDDTest<Cells> {
-    private static class CellsAbstractSerializableFunction1 extends AbstractSerializableFunction1<Cells, Cells> {
+public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
+    private static class CellsAbstractSerializableFunction extends AbstractSerializableFunction<Cells, Cells> {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 78298010100204823L;
 
 	@Override
 	public Cells apply(Cells e) {
 	    return new Cells(e.getCellByName("name"), e.getCellByName("gender"), Cell.create("age", 15, false, true),
-		    e.getCellByName("animal"), e.getCellByName("password"), e.getCellByName("color"),
-		    e.getCellByName("lucene"), e.getCellByName("food"));
+			    e.getCellByName("animal"), e.getCellByName("password"), e.getCellByName("color"),
+			    e.getCellByName("lucene"), e.getCellByName("food"));
 	}
     }
 
@@ -50,7 +50,7 @@ public class CassandraCellRDDTest extends CassandraGenericRDDTest<Cells> {
 	    Cells valueCells = cells.getValueCells();
 
 	    if (indexCells.equals(new Cells(Cell.create("name", "pepito_3", true, false), Cell.create("gender", "male",
-		    true, false), Cell.create("age", -2, false, true), Cell.create("animal", "monkey", false, true)))) {
+			    true, false), Cell.create("age", -2, false, true), Cell.create("animal", "monkey", false, true)))) {
 		assertEquals(valueCells.getCellByName("password").getCellValue(), "abc");
 		assertNull(valueCells.getCellByName("color").getCellValue());
 		assertEquals(valueCells.getCellByName("food").getCellValue(), "donuts");
@@ -69,7 +69,7 @@ public class CassandraCellRDDTest extends CassandraGenericRDDTest<Cells> {
 
     protected void checkOutputTestData() {
 	Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-		.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+			.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
 	Session session = cluster.connect();
 
 	String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + CQL3_OUTPUT_COLUMN_FAMILY + ";";
@@ -84,14 +84,14 @@ public class CassandraCellRDDTest extends CassandraGenericRDDTest<Cells> {
 	    assertEquals(row.getInt("age"), 15);
 	}
 
-	session.shutdown();
+	session.close();
 
     }
 
     @Override
     protected void checkSimpleTestData() {
 	Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-		.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+			.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
 	Session session = cluster.connect();
 
 	String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + CQL3_OUTPUT_COLUMN_FAMILY + ";";
@@ -99,7 +99,7 @@ public class CassandraCellRDDTest extends CassandraGenericRDDTest<Cells> {
 	assertEquals(rs.one().getLong(0), 20);
 
 	command = "select * from " + OUTPUT_KEYSPACE_NAME + "." + CQL3_OUTPUT_COLUMN_FAMILY
-		+ " WHERE name = 'pepito_1' and gender = 'male' and age = 0  and animal = 'monkey';";
+			+ " WHERE name = 'pepito_1' and gender = 'male' and age = 0  and animal = 'monkey';";
 	rs = session.execute(command);
 
 	List<Row> rows = rs.all();
@@ -111,12 +111,12 @@ public class CassandraCellRDDTest extends CassandraGenericRDDTest<Cells> {
 
 	assertEquals(r.getString("password"), "xyz");
 
-	session.shutdown();
+	session.close();
 
     }
 
     @Override
-    protected CassandraGenericRDD<Cells> initRDD() {
+    protected CassandraRDD<Cells> initRDD() {
 	assertNotNull(context);
 	return context.cassandraGenericRDD(getReadConfig());
     }
@@ -124,8 +124,8 @@ public class CassandraCellRDDTest extends CassandraGenericRDDTest<Cells> {
     @Override
     protected IDeepJobConfig<Cells> initReadConfig() {
 	IDeepJobConfig<Cells> rddConfig = DeepJobConfigFactory.create().host(Constants.DEFAULT_CASSANDRA_HOST)
-		.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(KEYSPACE_NAME).columnFamily(CQL3_COLUMN_FAMILY)
-		.cqlPort(CassandraServer.CASSANDRA_CQL_PORT).initialize();
+			.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(KEYSPACE_NAME).columnFamily(CQL3_COLUMN_FAMILY)
+			.cqlPort(CassandraServer.CASSANDRA_CQL_PORT).initialize();
 
 	return rddConfig;
     }
@@ -133,26 +133,26 @@ public class CassandraCellRDDTest extends CassandraGenericRDDTest<Cells> {
     @Override
     protected IDeepJobConfig<Cells> initWriteConfig() {
 	IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.create().host(Constants.DEFAULT_CASSANDRA_HOST)
-		.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(OUTPUT_KEYSPACE_NAME)
-		.cqlPort(CassandraServer.CASSANDRA_CQL_PORT).columnFamily(CQL3_OUTPUT_COLUMN_FAMILY).initialize();
+			.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(OUTPUT_KEYSPACE_NAME)
+			.cqlPort(CassandraServer.CASSANDRA_CQL_PORT).columnFamily(CQL3_OUTPUT_COLUMN_FAMILY).initialize();
 
 	return writeConfig;
     }
 
     @Override
     public void testSaveToCassandra() {
-	Function1<Cells, Cells> mappingFunc = new CellsAbstractSerializableFunction1();
-	RDD<Cells> mappedRDD = getRDD().map(mappingFunc, ClassTag$.MODULE$.<Cells> apply(Cells.class));
+	Function1<Cells, Cells> mappingFunc = new CellsAbstractSerializableFunction();
+	RDD<Cells> mappedRDD = getRDD().map(mappingFunc, ClassTag$.MODULE$.<Cells>apply(Cells.class));
 	truncateCf(OUTPUT_KEYSPACE_NAME, CQL3_OUTPUT_COLUMN_FAMILY);
 	assertTrue(mappedRDD.count() > 0);
-	CassandraGenericRDD.saveCellRDDToCassandra(mappedRDD, getWriteConfig());
+	CassandraRDD.saveRDDToCassandra(mappedRDD, getWriteConfig());
 	checkOutputTestData();
     }
 
     @Override
     public void testSimpleSaveToCassandra() {
 	truncateCf(OUTPUT_KEYSPACE_NAME, CQL3_OUTPUT_COLUMN_FAMILY);
-	CassandraGenericRDD.saveCellRDDToCassandra(getRDD(), getWriteConfig());
+	CassandraRDD.saveRDDToCassandra(getRDD(), getWriteConfig());
 	checkSimpleTestData();
 
     }

@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.DeepByteBuffer;
-import com.stratio.deep.serializer.IDeepSerializer;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.hadoop.conf.Configuration;
 
@@ -131,21 +129,6 @@ public interface IDeepJobConfig<T> extends Serializable {
     public abstract Integer getCqlPort();
 
     /**
-     * Returns the instance of the serializer used to convert
-     * a {@link DeepByteBuffer} to an entity.
-     * 
-     * @return
-     */
-    public abstract IDeepSerializer<T> getSerializer();
-
-    /**
-     * Returns the serializer class name.
-     * 
-     * @return
-     */
-    public abstract String getSerializerClassName();
-
-    /**
      * Returns the thrift frame size.
      * @return
      */
@@ -223,14 +206,6 @@ public interface IDeepJobConfig<T> extends Serializable {
     public abstract IDeepJobConfig<T> cqlPort(Integer port);
 
     /**
-     * Let's the user specify an alternative serializer. The default one is
-     * com.stratio.deep.serializer.impl.DefaultDeepSerializer.
-     *
-     * @return this object.
-     */
-    public abstract IDeepJobConfig<T> serializer(String serializer);
-
-    /**
      * Sets the username to use to login to Cassandra. Leave empty if you do not need authentication.
      *
      * @return this object.
@@ -243,6 +218,26 @@ public interface IDeepJobConfig<T> extends Serializable {
      * @return this object.
      */
     public abstract IDeepJobConfig<T> batchSize(int batchSize);
+
+    /**
+     * Sets read consistency level. <br/>
+     * Can be one of those consistency levels defined in {@link org.apache.cassandra.db.ConsistencyLevel}.<br/>
+     * Defaults to {@link org.apache.cassandra.db.ConsistencyLevel#LOCAL_ONE}.
+     *
+     * @param level
+     * @return
+     */
+    public abstract IDeepJobConfig<T> readConsistencyLevel(String level);
+
+    /**
+     * Sets write consistency level. <br/>
+     * Can be one of those consistency levels defined in {@link org.apache.cassandra.db.ConsistencyLevel}.<br/>
+     * Defaults to {@link org.apache.cassandra.db.ConsistencyLevel#LOCAL_ONE}.
+     *
+     * @param level
+     * @return
+     */
+    public abstract IDeepJobConfig<T> writeConsistencyLevel(String level);
 
     /**
      * Returns the name of the configured column family.

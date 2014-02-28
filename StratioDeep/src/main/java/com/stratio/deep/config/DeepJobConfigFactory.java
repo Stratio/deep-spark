@@ -9,7 +9,7 @@ import com.stratio.deep.entity.IDeepType;
 
 /**
  * Factory class for deep configuration objects.
- * 
+ *
  * @author Luca Rosellini <luca@stratio.com>
  *
  */
@@ -27,16 +27,10 @@ public final class DeepJobConfigFactory implements Serializable {
 
     /**
      * Creates an entity-based configuration object.
-     * 
+     *
      * @return
      */
     public static <T extends IDeepType> IDeepJobConfig<T> create(Class<T> entityClass) {
 	return new EntityDeepJobConfig<>(entityClass);
-    }
-
-    /**
-     * Private constructor.
-     */
-    private DeepJobConfigFactory() {
     }
 }

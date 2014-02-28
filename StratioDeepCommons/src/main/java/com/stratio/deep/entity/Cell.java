@@ -2,30 +2,15 @@ package com.stratio.deep.entity;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.InetAddress;
 import java.nio.ByteBuffer;
-import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
-
-import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.db.marshal.BooleanType;
-import org.apache.cassandra.db.marshal.DecimalType;
-import org.apache.cassandra.db.marshal.DoubleType;
-import org.apache.cassandra.db.marshal.FloatType;
-import org.apache.cassandra.db.marshal.InetAddressType;
-import org.apache.cassandra.db.marshal.Int32Type;
-import org.apache.cassandra.db.marshal.IntegerType;
-import org.apache.cassandra.db.marshal.LongType;
-import org.apache.cassandra.db.marshal.TimeUUIDType;
-import org.apache.cassandra.db.marshal.TimestampType;
-import org.apache.cassandra.db.marshal.UTF8Type;
-import org.apache.cassandra.db.marshal.UUIDType;
 
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
+import com.stratio.deep.utils.AnnotationUtils;
+import org.apache.cassandra.db.marshal.*;
 
 /**
  * Generic abstraction for cassandra's columns.
@@ -38,15 +23,32 @@ public final class Cell<T extends Serializable> implements Serializable {
 
     private static final long serialVersionUID = 2298549804049316156L;
 
-
+    /**
+     * Name of the cell. Mapped to a Cassandra column name.
+     */
     private String cellName;
 
+    /**
+     * Cell value.
+     */
     private T cellValue;
 
+    /**
+     * flag that tells if this cell is part of the partition key.
+     * Defaults to FALSE.
+     */
     private Boolean isPartitionKey = Boolean.FALSE;
 
+    /**
+     * flag that tells if this cell is part of the clustering key.
+     * Defaults to FALSE.
+     */
     private Boolean isClusterKey = Boolean.FALSE;
 
+    /**
+     * Cassandra's validator class name for the current cell.<br/>
+     * The provided type must extends {@link org.apache.cassandra.db.marshal.AbstractType}
+     */
     private String validator = "org.apache.cassandra.db.marshal.UTF8Type";
 
     /**
@@ -124,53 +126,11 @@ public final class Cell<T extends Serializable> implements Serializable {
      * @return
      */
     private static <T extends Serializable> AbstractType<?> getValueType(Class<T> obj) {
-	if (obj == null || obj.equals(String.class)) {
+	if (obj == null) {
 	    return UTF8Type.instance;
 	}
 
-	if (obj.equals(Integer.class)) {
-	    return Int32Type.instance;
-	}
-
-	if (obj.equals(Boolean.class)) {
-	    return BooleanType.instance;
-	}
-
-	if (obj.equals(Date.class)) {
-	    return TimestampType.instance;
-	}
-
-	if (obj.equals(BigDecimal.class)) {
-	    return DecimalType.instance;
-	}
-
-	if (obj.equals(Long.class)) {
-	    return LongType.instance;
-	}
-
-	if (obj.equals(Double.class)) {
-	    return DoubleType.instance;
-	}
-
-	if (obj.equals(Float.class)) {
-	    return FloatType.instance;
-	}
-
-	if (obj.equals(InetAddress.class)) {
-	    return InetAddressType.instance;
-	}
-
-	if (obj.equals(BigInteger.class)) {
-	    return IntegerType.instance;
-	}
-
-	if (obj.equals(UUID.class)) {
-	    return UUIDType.instance;
-	}
-
-	throw new DeepGenericException(
-			new IllegalArgumentException("cell value not matching any cassandra validator. Offending type: "
-					+ obj.getClass().getCanonicalName()));
+	return AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(obj);
     }
 
     /**
@@ -181,44 +141,14 @@ public final class Cell<T extends Serializable> implements Serializable {
      * @return
      */
     private static <T extends Serializable> AbstractType<?> getValueType(T obj) {
-	if (obj == null || obj instanceof String) {
+	if (obj == null) {
 	    return UTF8Type.instance;
 	}
 
-	if (obj instanceof Integer) {
-	    return Int32Type.instance;
-	}
+	AbstractType<?> res = AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(obj.getClass());
 
-	if (obj instanceof Boolean) {
-	    return BooleanType.instance;
-	}
-
-	if (obj instanceof Date) {
-	    return TimestampType.instance;
-	}
-
-	if (obj instanceof BigDecimal) {
-	    return DecimalType.instance;
-	}
-
-	if (obj instanceof Long) {
-	    return LongType.instance;
-	}
-
-	if (obj instanceof Double) {
-	    return DoubleType.instance;
-	}
-
-	if (obj instanceof Float) {
-	    return FloatType.instance;
-	}
-
-	if (obj instanceof InetAddress) {
-	    return InetAddressType.instance;
-	}
-
-	if (obj instanceof BigInteger) {
-	    return IntegerType.instance;
+	if (res == null){
+	    throw new DeepGenericException("parameter class "+obj.getClass().getCanonicalName()+"does not have a Cassandra marshaller");
 	}
 
 	if (obj instanceof UUID) {
@@ -231,9 +161,7 @@ public final class Cell<T extends Serializable> implements Serializable {
 	    }
 	}
 
-	throw new DeepGenericException(
-		new IllegalArgumentException("cell value not matching any cassandra validator. Offending type: "
-			+ obj.getClass().getCanonicalName()));
+	return res;
     }
 
     /**
@@ -330,20 +258,21 @@ public final class Cell<T extends Serializable> implements Serializable {
 
 	Cell cell = (Cell) o;
 
-	if (!cellName.equals(cell.cellName)) {
-	    return false;
-	}
-	if (cellValue != null ? !cellValue.equals(cell.cellValue) : cell.cellValue != null) {
-	    return false;
-	}
-	if (!isClusterKey.equals(cell.isClusterKey)) {
-	    return false;
-	}
-	if (!isPartitionKey.equals(cell.isPartitionKey)) {
-	    return false;
-	}
-	return validator.equals(cell.validator);
+	return cellName.equals(cell.cellName) &&
+			(cellValue != null ? cellValue.equals(cell.cellValue) : cell.cellValue != null) &&
+			isClusterKey.equals(cell.isClusterKey) &&
+			isPartitionKey.equals(cell.isPartitionKey) &&
+			validator.equals(cell.validator);
+    }
 
+    public Class<T> getValueType(){
+	for (Map.Entry<Class, AbstractType<?>> entry : AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.entrySet()) {
+	    if (entry.getValue().getClass().getCanonicalName().equals(validator)){
+		return entry.getKey();
+	    }
+	}
+
+	return null;
     }
 
     public String getCellName() {
@@ -395,7 +324,7 @@ public final class Cell<T extends Serializable> implements Serializable {
 	return isPartitionKey;
     }
 
-    private AbstractType<T> marshaller() {
+    public AbstractType<T> marshaller() {
 	return marshaller(this.validator);
     }
 

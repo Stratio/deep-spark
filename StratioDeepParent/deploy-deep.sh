@@ -17,21 +17,15 @@ if [ -z "$2" ]; then
     SPARK_BRANCH="branch-0.9"
 fi
 
-#if [ -z "$2" ]; then
-#echo "Usage: $0 -cv <cassandra version>"
-#  exit 0
-#fi
-#
-## Parse arguments
-#while (( "$#" )); do
-#case $1 in
-#    -cv)
-#      CASS_VER="$2"
-#      shift
-#      ;;
-#  esac
-#shift
-#done
+LOCAL_EDITOR=$(which vim)
+
+if [ -z "$LOCAL_EDITOR" ]; then
+    $LOCAL_EDITOR=$(which vi)
+fi
+
+if [ -z "$LOCAL_EDITOR" ]; then
+    echo "Cannot find any command line editor, ChangeLog.txt won't be edited interactively"
+fi
 
 LOCAL_DIR=`pwd`
 
@@ -89,6 +83,16 @@ mkdir -p ${TMPDIR}/lib || { echo "Cannot create output lib directory"; exit 1; }
 cp ../*/target/*.jar ${TMPDIR}/lib || { echo "Cannot copy target jars to output lib directory, aborting"; exit 1; }
 cp ../*/target/alternateLocation/*.jar ${TMPDIR}/lib || { echo "Cannot copy alternate jars to output lib directory, aborting"; exit 1; }
 
+# Generating ChangeLog
+git fetch --tags
+latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+
+echo -e "[${RELEASE_VER}]\n\n$(git log ${latest_tag}..HEAD)\n\n$(cat ChangeLog.txt)" > ChangeLog.txt
+
+if [ -n "$LOCAL_EDITOR" ]; then
+    $LOCAL_EDITOR ChangeLog.txt
+fi
+
 echo "Finishing release ${RELEASE_VER}"
 mvn clean
 
@@ -107,7 +111,7 @@ echo "Next SNAPSHOT version: ${next_version}"
 cd .. 
 
 echo "Finishing release"
-git flow release finish -mFinishing_Release_$RELEASE_VER $RELEASE_VER || { echo "Cannot finnish Stratio Deep ${next_version}"; exit 1; }
+git flow release finish -mFinishing_Release_$RELEASE_VER $RELEASE_VER || { echo "Cannot finish Stratio Deep ${next_version}"; exit 1; }
 git checkout develop
 
 cd StratioDeepParent
@@ -136,14 +140,16 @@ git checkout "$SPARK_BRANCH" || { echo "Cannot checkout branch: ${SPARK_BRANCH}"
 echo " >>> Executing make distribution script"
 ./make-distribution.sh || { echo "Cannot make Spark distribution"; exit 1; }
 
-cp ${TMPDIR}/lib/*.jar ${TMPDIR_SPARK}/dist/jars/
-mv ${TMPDIR_SPARK}/dist/ spark-deep-distribution
+DISTDIR=spark-deep-distribution-${RELEASE_VER}
+DISTFILENAME=${DISTDIR}.tgz
 
-DISTFILENAME=spark-deep-distribution-${RELEASE_VER}.tgz
+cp ${TMPDIR}/lib/*.jar ${TMPDIR_SPARK}/dist/jars/
+mv ${TMPDIR_SPARK}/dist/ ${DISTDIR}
+cp ${TMPDIR}/StratioDeepParent/ChangeLog.txt ${DISTDIR}/
 
 echo "DISTFILENAME: ${DISTFILENAME}"
 
-tar czf ${DISTFILENAME} spark-deep-distribution || { echo "Cannot create tgz"; exit 1; }
+tar czf ${DISTFILENAME} ${DISTDIR} || { echo "Cannot create tgz"; exit 1; }
 
 #### (TODO) Upload the tgz file to a remote repository (Stratio Nexus)
 

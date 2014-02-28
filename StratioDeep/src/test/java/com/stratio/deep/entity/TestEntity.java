@@ -1,10 +1,9 @@
 package com.stratio.deep.entity;
 
-import org.apache.cassandra.db.marshal.Int32Type;
-import org.apache.cassandra.db.marshal.LongType;
-
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.annotations.DeepField;
+import org.apache.cassandra.db.marshal.Int32Type;
+import org.apache.cassandra.db.marshal.LongType;
 
 @DeepEntity
 public class TestEntity implements IDeepType {
@@ -22,7 +21,7 @@ public class TestEntity implements IDeepType {
     @DeepField(validationClass = Int32Type.class, fieldName = "response_time")
     private Integer responseTime;
 
-    @DeepField(validationClass = Int32Type.class, fieldName = "response_code")
+    @DeepField(fieldName = "response_code")
     private Integer responseCode;
 
     @DeepField(validationClass = LongType.class, fieldName = "download_time")
@@ -35,7 +34,7 @@ public class TestEntity implements IDeepType {
     }
 
     public TestEntity(String id, String domain, String url, Integer responseTime, Integer responseCode,
-	    String notMappedField) {
+		    String notMappedField) {
 	this.id = id;
 	this.domain = domain;
 	this.url = url;
@@ -104,10 +103,10 @@ public class TestEntity implements IDeepType {
     @Override
     public String toString() {
 	return "TestEntity [" + (id != null ? "id=" + id + ", " : "")
-		+ (domain != null ? "domain=" + domain + ", " : "") + (url != null ? "url=" + url + ", " : "")
-		+ (responseTime != null ? "responseTime=" + responseTime + ", " : "")
-		+ (responseCode != null ? "responseCode=" + responseCode + ", " : "")
-		+ (downloadTime != null ? "downloadTime=" + downloadTime + ", " : "")
-		+ (notMappedField != null ? "notMappedField=" + notMappedField : "") + "]\n";
+			+ (domain != null ? "domain=" + domain + ", " : "") + (url != null ? "url=" + url + ", " : "")
+			+ (responseTime != null ? "responseTime=" + responseTime + ", " : "")
+			+ (responseCode != null ? "responseCode=" + responseCode + ", " : "")
+			+ (downloadTime != null ? "downloadTime=" + downloadTime + ", " : "")
+			+ (notMappedField != null ? "notMappedField=" + notMappedField : "") + "]\n";
     }
 }

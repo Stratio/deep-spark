@@ -1,9 +1,8 @@
 package com.stratio.deep.entity;
 
-import org.apache.cassandra.db.marshal.Int32Type;
-
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.annotations.DeepField;
+import org.apache.cassandra.db.marshal.Int32Type;
 
 @DeepEntity
 public class StrippedTestEntity implements IDeepType {

@@ -30,6 +30,7 @@ public class CassandraServer {
 	public void run() {
 	    cassandraDaemon = new CassandraDaemon();
 	    cassandraDaemon.activate();
+	    cassandraDaemon.start();
 	}
     }
 
@@ -75,7 +76,7 @@ public class CassandraServer {
 
     /**
      * Copies a resource from within the jar to a directory.
-     * 
+     *
      * @param resource
      * @param directory
      * @throws IOException
@@ -97,7 +98,7 @@ public class CassandraServer {
 
     /**
      * Creates a directory
-     * 
+     *
      * @param dir
      * @throws IOException
      */
@@ -134,10 +135,9 @@ public class CassandraServer {
 	    return;
 	}
 	Cluster cluster = Cluster.builder().withPort(CASSANDRA_CQL_PORT)
-		.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
-	Session session = cluster.connect();
+			.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
 
-	try {
+	try (Session session = cluster.connect()) {
 	    for (String command : startupCommands) {
 		try {
 
@@ -148,10 +148,7 @@ public class CassandraServer {
 		    e.printStackTrace();
 		}
 	    }
-	} finally {
-	    session.shutdown();
 	}
-
     }
 
     public void setStartupCommands(String[] startupCommands) {
@@ -165,7 +162,7 @@ public class CassandraServer {
 
     /**
      * Set embedded cassandra up and spawn it in a new thread.
-     * 
+     *
      * @throws TTransportException
      * @throws IOException
      * @throws InterruptedException
@@ -191,6 +188,7 @@ public class CassandraServer {
 	System.setProperty("cassandra.config", "file:" + dirPath + yamlFilePath);
 	System.setProperty("log4j.configuration", "file:" + dirPath + "/log4j.properties");
 	System.setProperty("cassandra-foreground", "true");
+	System.setProperty("cassandra.skip_wait_for_gossip_to_settle", "0");
 
 	cleanupAndLeaveDirs();
 
