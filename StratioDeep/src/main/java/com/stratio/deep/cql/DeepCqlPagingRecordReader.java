@@ -86,12 +86,26 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
 
   private Map<String, Serializable> additionalFilters;
 
+  /**
+   * public constructor. Takes a list of filters to pass to the underlying datastores.
+   * {@link com.stratio.deep.rdd.CassandraRDD#filterByField(String, java.io.Serializable)}.
+   *
+   * @param additionalFilters
+   */
   public DeepCqlPagingRecordReader(Map<String, Serializable> additionalFilters)
   {
     super();
     this.additionalFilters = additionalFilters;
   }
 
+  /**
+   * Initialized this object.
+   * <p>Creates a new client and row iterator.</p>
+   *
+   * @param split
+   * @param context
+   * @throws IOException
+   */
   public void initialize(InputSplit split, TaskAttemptContext context) throws IOException
   {
     this.split = (ColumnFamilySplit) split;
@@ -160,6 +174,9 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
     logger.debug("created {}", rowIterator);
   }
 
+  /**
+   * Closes this input reader object.
+   */
   public void close()
   {
     if (client != null)
@@ -173,16 +190,29 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
     }
   }
 
+  /**
+   * Returns the key for the current row.
+   *
+   * @return
+   */
   public Map<String, ByteBuffer> getCurrentKey()
   {
     return currentRow.left;
   }
 
+  /**
+   * Returns the value of the current row.
+   *
+   * @return
+   */
   public Map<String, ByteBuffer> getCurrentValue()
   {
     return currentRow.right;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public float getProgress()
   {
     if (!rowIterator.hasNext())
@@ -195,6 +225,9 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
     return progress > 1.0F ? 1.0F : progress;
   }
 
+  /**
+   * Checks if the current iterator has a next value, and, if it does, advances the iterator.
+   */
   public boolean nextKeyValue() throws IOException
   {
     if (!rowIterator.hasNext())
@@ -245,11 +278,13 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
     return split.getLocations();
   }
 
-  // Because the old Hadoop API wants us to write to the key and value
-  // and the new asks for them, we need to copy the output of the new API
-  // to the old. Thus, expect a small performance hit.
-  // And obviously this wouldn't work for wide rows. But since ColumnFamilyInputFormat
-  // and ColumnFamilyRecordReader don't support them, it should be fine for now.
+  /**
+   * Because the old Hadoop API wants us to write to the key and value
+   * and the new asks for them, we need to copy the output of the new API
+   * to the old. Thus, expect a small performance hit.
+   * And obviously this wouldn't work for wide rows. But since ColumnFamilyInputFormat
+   * and ColumnFamilyRecordReader don't support them, it should be fine for now.
+   */
   public boolean next(Map<String, ByteBuffer> keys, Map<String, ByteBuffer> value) throws IOException
   {
     if (nextKeyValue())
@@ -265,16 +300,32 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
     return false;
   }
 
+  /**
+   * Returns the total number of rows read.
+   *
+   * @return
+   * @throws IOException
+   */
   public long getPos() throws IOException
   {
     return (long) rowIterator.totalRead;
   }
 
+  /**
+   * Creates a new key map.
+   *
+   * @return
+   */
   public Map<String, ByteBuffer> createKey()
   {
     return new LinkedHashMap<String, ByteBuffer>();
   }
 
+  /**
+   * Creates a new value map.
+   *
+   * @return
+   */
   public Map<String, ByteBuffer> createValue()
   {
     return new LinkedHashMap<String, ByteBuffer>();
