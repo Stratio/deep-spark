@@ -10,15 +10,17 @@ import scala.Tuple2;
  * The first Cells element contains the list of Cell elements that represent the key (partition + cluster key). <br/>
  * The second Cells element contains all the other columns.
  */
-public class DeepType2TupleFunction<T extends IDeepType> extends AbstractSerializableFunction<T, Tuple2<Cells, Cells>> {
+public class DeepType2TupleFunction<T extends IDeepType> extends AbstractSerializableFunction<T, Tuple2<Cells, Cells>>
+{
 
-    private static final long serialVersionUID = 3701384431140105598L;
+  private static final long serialVersionUID = 3701384431140105598L;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Tuple2<Cells, Cells> apply(T e) {
-	return Utils.deepType2tuple(e);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Tuple2<Cells, Cells> apply(T e)
+  {
+    return Utils.deepType2tuple(e);
+  }
 }

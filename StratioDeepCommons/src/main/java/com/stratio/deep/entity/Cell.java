@@ -70,7 +70,30 @@ public final class Cell<T extends Serializable> implements Serializable {
      * @return
      */
     public static <T extends Serializable> Cell<T> create(String cellName, ByteBuffer cellValue, String validator,
-	    Boolean isPartitionKey, Boolean isClusterKey) {
+		    Boolean isPartitionKey, Boolean isClusterKey) {
+	return new Cell<T>(cellName, cellValue, validator, isPartitionKey, isClusterKey);
+    }
+
+    /**
+     * Factory method, creates a new Cell.<br/>
+     *
+     * <p>
+     * In validator is an UUID type this factory method will explicitly check if the provided
+     * UUID serialized in the <i>value</i> ByteBuffer is an UUID or a Time UUID (UUID version 1).<br/>
+     * In this case, the provided validator will be overridden and TimeUUIDType will be used instead.
+     * </p>
+     *
+     * @param cellName the cell name
+     * @param cellValue the cell value, provided as a ByteBuffer.
+     * @param validator the validator classname must be a valid qualified name of one of the marshallers
+     *                  contained in the org.apache.cassandra.db.marshal package.
+     * @param isPartitionKey true if this cell is part of the cassandra's partition key.
+     * @param isClusterKey true if this cell is part of the cassandra's clustering key.
+     * @param <T>
+     * @return
+     */
+    public static <T extends Serializable> Cell<T> create(String cellName, T cellValue, String validator,
+		    Boolean isPartitionKey, Boolean isClusterKey) {
 	return new Cell<T>(cellName, cellValue, validator, isPartitionKey, isClusterKey);
     }
 
@@ -210,6 +233,18 @@ public final class Cell<T extends Serializable> implements Serializable {
 	if (cellValue != null) {
 	    this.cellValue = marshaller().compose(cellValue);
 	}
+    }
+
+    /**
+     * Private constructor.
+     */
+    private Cell(String cellName, T cellValue, String validator, Boolean isPartitionKey,
+		    Boolean isClusterKey) {
+	this.cellName = cellName;
+	this.isPartitionKey = isPartitionKey;
+	this.isClusterKey = isClusterKey;
+	this.validator = validator;
+	this.cellValue = cellValue;
     }
 
     /**

@@ -22,46 +22,55 @@ import org.apache.spark.SparkContext;
  *
  * @author Luca Rosellini <luca@strat.io>
  */
-public final class CassandraEntityRDD<T extends IDeepType> extends CassandraRDD<T> {
+public final class CassandraEntityRDD<T extends IDeepType> extends CassandraRDD<T>
+{
 
-    private static final long serialVersionUID = -3208994171892747470L;
+  private static final long serialVersionUID = -3208994171892747470L;
 
-    public CassandraEntityRDD(SparkContext sc, IDeepJobConfig<T> config) {
-	super(sc, config);
+  public CassandraEntityRDD(SparkContext sc, IDeepJobConfig<T> config)
+  {
+    super(sc, config);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem)
+  {
+    Map<String, Cell> columnDefinitions = config.value().columnDefinitions();
+
+    Class<T> entityClass = config.value().getEntityClass();
+
+    EntityDeepJobConfig<T> edjc = (EntityDeepJobConfig) config.value();
+    T instance = Utils.newTypeInstance(entityClass);
+
+    for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet())
+    {
+      Cell metadata = columnDefinitions.get(entry.getKey());
+      AbstractType<?> marshaller = metadata.marshaller();
+      edjc.setInstancePropertyFromDbName(instance, entry.getKey(), marshaller.compose(entry.getValue()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem) {
-	Map<String, Cell> columnDefinitions = config.value().columnDefinitions();
+    for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet())
+    {
+      if (entry.getValue() == null)
+      {
+        continue;
+      }
 
-	Class<T> entityClass = config.value().getEntityClass();
-
-	EntityDeepJobConfig<T> edjc = (EntityDeepJobConfig) config.value();
-	T instance = Utils.newTypeInstance(entityClass);
-
-	for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
-	    Cell metadata = columnDefinitions.get(entry.getKey());
-	    AbstractType<?> marshaller = metadata.marshaller();
-	    edjc.setInstancePropertyFromDbName(instance, entry.getKey(), marshaller.compose(entry.getValue()));
-	}
-
-	for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
-	    if (entry.getValue() == null) {
-		continue;
-	    }
-
-	    Cell metadata = columnDefinitions.get(entry.getKey());
-	    AbstractType<?> marshaller = metadata.marshaller();
-	    try {
-		edjc.setInstancePropertyFromDbName(instance, entry.getKey(), marshaller.compose(entry.getValue()));
-	    } catch (DeepNoSuchFieldException e) {
-		log().debug(e.getMessage());
-	    }
-	}
-
-	return instance;
+      Cell metadata = columnDefinitions.get(entry.getKey());
+      AbstractType<?> marshaller = metadata.marshaller();
+      try
+      {
+        edjc.setInstancePropertyFromDbName(instance, entry.getKey(), marshaller.compose(entry.getValue()));
+      }
+      catch (DeepNoSuchFieldException e)
+      {
+        log().debug(e.getMessage());
+      }
     }
+
+    return instance;
+  }
 }

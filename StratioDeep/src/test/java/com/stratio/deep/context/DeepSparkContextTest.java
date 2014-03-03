@@ -11,27 +11,32 @@ import org.testng.annotations.Test;
  * Created by luca on 28/02/14.
  */
 @Test
-public class DeepSparkContextTest {
+public class DeepSparkContextTest
+{
 
-    public void testInstantiationBySparkContext(){
-	SparkContext sc = new SparkContext("local", "myapp1", new SparkConf());
-	new DeepSparkContext(sc);
+  public void testInstantiationBySparkContext()
+  {
+    SparkContext sc = new SparkContext("local", "myapp1", new SparkConf());
+    new DeepSparkContext(sc);
 
-    }
+  }
 
-    public void testInstantiationWithJar(){
-	new DeepSparkContext("local", "myapp1", "/tmp", "");
+  public void testInstantiationWithJar()
+  {
+    new DeepSparkContext("local", "myapp1", "/tmp", "");
 
-    }
+  }
 
 
-    public void testInstantiationWithJars(){
-	new DeepSparkContext("local", "myapp1", "/tmp", new String[]{"",""});
+  public void testInstantiationWithJars()
+  {
+    new DeepSparkContext("local", "myapp1", "/tmp", new String[] { "", "" });
 
-    }
+  }
 
-    public void testInstantiationWithJarsAndEnv(){
-	Map<String, String> env = new HashMap<>();
-	new DeepSparkContext("local", "myapp1", "/tmp", new String[]{"",""}, env);
-    }
+  public void testInstantiationWithJarsAndEnv()
+  {
+    Map<String, String> env = new HashMap<>();
+    new DeepSparkContext("local", "myapp1", "/tmp", new String[] { "", "" }, env);
+  }
 }
