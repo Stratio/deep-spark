@@ -27,6 +27,13 @@ public final class CassandraEntityRDD<T extends IDeepType> extends CassandraRDD<
 
   private static final long serialVersionUID = -3208994171892747470L;
 
+  /**
+   * This constructor should not be called explicitly.<br/>
+   * Use {@link com.stratio.deep.context.DeepSparkContext} instead to create an RDD.
+   *
+   * @param sc
+   * @param config
+   */
   public CassandraEntityRDD(SparkContext sc, IDeepJobConfig<T> config)
   {
     super(sc, config);

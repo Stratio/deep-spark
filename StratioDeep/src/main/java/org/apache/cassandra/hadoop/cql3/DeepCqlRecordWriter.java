@@ -331,7 +331,7 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
   @Override
   public void write(Cells keys, Cells values) throws IOException
   {
-  /* generate SQL */
+    /* generate SQL */
     cql = updateQueryGenerator(keys, values, ConfigHelper.getOutputKeyspace(conf),
         ConfigHelper.getOutputColumnFamily(conf));
 

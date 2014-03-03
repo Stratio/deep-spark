@@ -31,7 +31,9 @@ import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
 /**
- * Created by luca on 04/02/14.
+ * Base class for all config implementations providing default implementations for methods
+ * defined in {@link com.stratio.deep.config.IDeepJobConfig}.
+ *
  */
 public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
 {
@@ -100,14 +102,33 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
    */
   private int batchSize = Constants.DEFAULT_BATCH_SIZE;
 
+  /**
+   * holds columns metadata fetched from Cassandra.
+   */
   private transient Map<String, Cell> columnDefinitionMap;
 
+  /**
+   * Default read consistency level. Defaults to LOCAL_ONE.
+   */
   private String readConsistencyLevel;
 
+  /**
+   * Default write consistency level. Defaults to LOCAL_ONE.
+   */
   private String writeConsistencyLevel;
 
+  /**
+   * Enables/Disables auto-creation of column family when writing to Cassandra.
+   * By Default we do not create the output column family.
+   *
+   */
   private Boolean createTableOnWrite = Boolean.FALSE;
 
+  /**
+   * Checks if this configuration object has been initialized or not.
+   *
+   * @throws com.stratio.deep.exception.DeepIllegalAccessException if not initialized
+   */
   protected void checkInitialized()
   {
     if (configuration == null)
@@ -116,6 +137,10 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     }
   }
 
+  /**
+   * Fetches table metadata from the underlying datastore, using DataStax java driver.
+   * @return
+   */
   private TableMetadata fetchTableMetadata()
   {
     Cluster cluster = Cluster.builder().withPort(this.cqlPort)
@@ -127,7 +152,17 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     }
   }
 
-  @Override
+  /**
+   * Creates the output column family if not exists. <br/>
+   * We first check if the column family exists. <br/>
+   * If not, we get the first element from <i>tupleRDD</i> and we use it as a template to get columns metadata.
+   * <p>
+   * This is a very heavy operation since to obtain the schema
+   * we need to get at least one element of the output RDD.
+   * </p>
+   *
+   * @param tupleRDD
+   */
   public void createOutputTableIfNeeded(RDD<Tuple2<Cells, Cells>> tupleRDD)
   {
     Cluster cluster = Cluster.builder().withPort(this.cqlPort)
@@ -155,6 +190,12 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     }
   }
 
+  /**
+   * Fetches table metadata from Casandra and generates a Map<K, V> where the key is the column name, and the value
+   * is the {@link com.stratio.deep.entity.Cell} containing column's metadata.
+   *
+   * @return
+   */
   @Override
   public Map<String, Cell> columnDefinitions()
   {
@@ -167,7 +208,9 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
 
     if (tableMetadata == null && !createTableOnWrite)
     {
-      throw new DeepIOException("Cannot write RDD, output table does not exists and configuration object has 'createTableOnWrite' = false");
+      logger.warn("Cannot write RDD, output table does not exists and configuration object has 'createTableOnWrite' = false");
+
+      return  null;
     }
     else if (tableMetadata == null)
     {
@@ -182,7 +225,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
 
     for (ColumnMetadata key : partitionKeys)
     {
-
       Cell metadata = Cell.createMetadataCell(key.getName(), key.getType().asJavaClass(), Boolean.TRUE, Boolean.FALSE);
       columnDefinitionMap.put(key.getName(), metadata);
     }
@@ -342,9 +384,9 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     return rpcPort;
   }
 
-  /* (non-Javadoc)
-  * @see com.stratio.deep.config.IDeepJobConfig#getRpcPort()
-  */
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Integer getCqlPort()
   {
@@ -352,6 +394,9 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     return cqlPort;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Integer getThriftFramedTransportSizeMB()
   {
@@ -359,8 +404,8 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     return thriftFramedTransportSizeMB;
   }
 
-  /* (non-Javadoc)
-   * @see com.stratio.deep.config.IDeepJobConfig#getUsername()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public String getUsername()
@@ -369,9 +414,9 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     return username;
   }
 
-  /* (non-Javadoc)
-  * @see com.stratio.deep.config.IDeepJobConfig#host(java.lang.String)
-  */
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public IDeepJobConfig<T> host(String hostname)
   {
@@ -380,6 +425,9 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public IDeepJobConfig<T> initialize()
   {
@@ -436,9 +484,8 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     return this;
   }
 
-  /*
-   * (non-Jvadoc)
-   * @see com.stratio.deep.config.IDeepJobConfig#inputColumns(java.lang.String[])
+  /**
+   * {@inheritDoc}
    */
   @Override
   public IDeepJobConfig<T> inputColumns(String... columns)
@@ -448,8 +495,8 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     return this;
   }
 
-  /* (non-Javadoc)
-   * @see com.stratio.deep.config.IDeepJobConfig#keyspace(java.lang.String)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public IDeepJobConfig<T> keyspace(String keyspace)
@@ -458,9 +505,9 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     return this;
   }
 
-  /* (non-Javadoc)
-  * @see com.stratio.deep.config.IDeepJobConfig#partitioner(org.apache.cassandra.dht.IPartitioner)
-  */
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <P extends IPartitioner<?>> IDeepJobConfig<T> partitioner(String partitionerClassName)
   {
@@ -468,8 +515,8 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     return this;
   }
 
-  /* (non-Javadoc)
-   * @see com.stratio.deep.config.IDeepJobConfig#password(java.lang.String)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public IDeepJobConfig<T> password(String password)
@@ -479,9 +526,9 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     return this;
   }
 
-  /* (non-Javadoc)
-  * @see com.stratio.deep.config.IDeepJobConfig#rpcPort(java.lang.Integer)
-  */
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public IDeepJobConfig<T> rpcPort(Integer port)
   {
@@ -490,6 +537,9 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public IDeepJobConfig<T> cqlPort(Integer port)
   {
@@ -498,9 +548,9 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     return this;
   }
 
-  /* (non-Javadoc)
-  * @see com.stratio.deep.config.IDeepJobConfig#username(java.lang.String)
-  */
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public IDeepJobConfig<T> username(String username)
   {
@@ -563,9 +613,8 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.stratio.deep.config.IDeepJobConfig#batchSize()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public IDeepJobConfig<T> batchSize(int batchSize)
@@ -574,6 +623,9 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Boolean isCreateTableOnWrite()
   {
@@ -591,17 +643,41 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>
     return this;
   }
 
+  /**
+   * Returns the map of additional filters specified by the user.
+   *
+   * @return
+   */
   public Map<String, Serializable> getAdditionalFilters()
   {
     return Collections.unmodifiableMap(additionalFilters);
   }
 
+  /**
+   * Removes a filter on the specified column.
+   *
+   * @param fieldName
+   * @return
+   */
   public IDeepJobConfig<T> removeFilter(String fieldName)
   {
     additionalFilters.remove(fieldName);
     return this;
   }
 
+  /**
+   * Adds a new filter for the Cassandra underlying datastore.<br/>
+   * Once a new filter has been added, all subsequent queries generated to the underlying datastore
+   * will include the filter on the specified column called <i>filterColumnName</i>.
+   * Before propagating the filter we check if an index exists in Cassandra.
+   *
+   * @param filterColumnName
+   * @param filterValue
+   * @throws DeepIndexNotFoundException if the specified field has not been indexed in Cassandra.
+   * @throws com.stratio.deep.exception.DeepNoSuchFieldException if the specified field is not a valid column in Cassandra.
+   *
+   * @return
+   */
   public IDeepJobConfig<T> addFilter(String filterColumnName, Serializable filterValue)
   {
   /* check if there's an index specified on the provided column */

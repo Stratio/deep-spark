@@ -135,7 +135,7 @@ public abstract class CassandraRDD<T> extends RDD<T>
     RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
         ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
 
-    writeConfig.createOutputTableIfNeeded(mappedRDD);
+    ((GenericDeepJobConfig)writeConfig).createOutputTableIfNeeded(mappedRDD);
 
     ClassTag<Cells> keyClassTag = ClassTag$.MODULE$.apply(Cells.class);
 
@@ -186,10 +186,10 @@ public abstract class CassandraRDD<T> extends RDD<T>
     saveRDDToCassandra(rdd.rdd(), writeConfig);
   }
 
+
   @SuppressWarnings("unchecked")
   public CassandraRDD(SparkContext sc, IDeepJobConfig<T> config)
   {
-
     super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
 
     long timestamp = System.currentTimeMillis();
@@ -348,6 +348,10 @@ public abstract class CassandraRDD<T> extends RDD<T>
   /**
    * Adds a new filter on the specified. This will affect the generation of queries<br/>
    * against the underlying Cassandra datastore.
+   * Using this method to specify a default filter over a field of the underlying datastore
+   * is much more flexible than {@link com.stratio.deep.config.IDeepJobConfig#defaultFilter(String)}
+   * since filters can be added / removed directly on the RDD, and does not involve creating a new configuration
+   * object (and thus a new RDD).
    *
    * @param fieldName
    * @param value

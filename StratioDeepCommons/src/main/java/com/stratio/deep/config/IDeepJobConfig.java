@@ -4,11 +4,8 @@ import java.io.Serializable;
 import java.util.Map;
 
 import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.spark.rdd.RDD;
-import scala.Tuple2;
 
 /**
  * Defines the public methods that each Stratio Deep configuration object should implement.
@@ -260,16 +257,4 @@ public interface IDeepJobConfig<T> extends Serializable {
      * @return
      */
     public abstract String getTable();
-
-    /**
-     * Creates the output table if not exists.
-     * <p>
-     * This is a very heavy operation since to obtain the schema
-     * we need to get at least one element of the output RDD.
-     * </p>
-     */
-    public abstract void createOutputTableIfNeeded(RDD<Tuple2<Cells, Cells>> tupleRDD);
-
-
-
 }
