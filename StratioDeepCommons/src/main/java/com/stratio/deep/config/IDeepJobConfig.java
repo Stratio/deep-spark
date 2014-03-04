@@ -52,7 +52,7 @@ public interface IDeepJobConfig<T> extends Serializable {
 
     /**
      * Returns the name of the configured column family.
-     * 
+     *
      * @return
      */
     public abstract String getColumnFamily();
@@ -64,7 +64,7 @@ public interface IDeepJobConfig<T> extends Serializable {
 
     /**
      * Returns the default filter string.
-     * 
+     *
      * @return
      */
     public abstract String getDefaultFilter();
@@ -72,42 +72,44 @@ public interface IDeepJobConfig<T> extends Serializable {
     /**
      * Returns the underlying entity class used to map the Cassandra
      * Column family.
-     * 
+     *
      * @return
      */
     public abstract Class<T> getEntityClass();
 
     /**
      * Returns the hostname of the cassandra server.
-     * 
+     *
      * @return
      */
     public abstract String getHost();
 
     /**
-     * Returns the list of column names that will 
+     * Returns the list of column names that will
      * be fetched from the underlying datastore.
+     *
      * @return
      */
     public abstract String[] getInputColumns();
 
     /**
      * Returns the name of the keyspace.
-     *  
+     *
      * @return
      */
     public abstract String getKeyspace();
 
     /**
      * Returns the partitioner class name.
-     * 
+     *
      * @return
      */
     public abstract String getPartitionerClassName();
 
     /**
-     * Returns the password needed to authenticate 
+     * Returns the password needed to authenticate
      * to the remote cassandra cluster.
+     *
      * @return
      */
     public abstract String getPassword();
@@ -130,6 +132,7 @@ public interface IDeepJobConfig<T> extends Serializable {
 
     /**
      * Returns the thrift frame size.
+     *
      * @return
      */
     public abstract Integer getThriftFramedTransportSizeMB();
@@ -137,7 +140,7 @@ public interface IDeepJobConfig<T> extends Serializable {
     /**
      * Returns the username used to authenticate to the cassandra server.
      * Defaults to the empty string.
-     * 
+     *
      * @return
      */
     public abstract String getUsername();
@@ -177,8 +180,8 @@ public interface IDeepJobConfig<T> extends Serializable {
      * Let's the user specify an alternative partitioner class. The default partitioner is
      * org.apache.cassandra.dht.Murmur3Partitioner.
      *
-     * @return this object.
      * @param partitionerClassName
+     * @return this object.
      */
     public abstract <P extends IPartitioner<?>> IDeepJobConfig<T> partitioner(String partitionerClassName);
 
@@ -214,14 +217,14 @@ public interface IDeepJobConfig<T> extends Serializable {
 
     /**
      * Sets the batch size used to write to Cassandra.
-     * 
+     *
      * @return this object.
      */
     public abstract IDeepJobConfig<T> batchSize(int batchSize);
 
     /**
      * Whether or not to create the output column family on write.<br/>.
-     *
+     * <p/>
      * Defaults to FALSE.
      *
      * @param createTableOnWrite
@@ -253,7 +256,7 @@ public interface IDeepJobConfig<T> extends Serializable {
 
     /**
      * Returns the name of the configured column family.
-     * 
+     *
      * @return
      */
     public abstract String getTable();

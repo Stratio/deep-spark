@@ -25,31 +25,28 @@ import com.stratio.deep.utils.AnnotationUtils;
  *
  * @author Luca Rosellini <luca@strat.io>
  */
-public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJobConfig<T>
-{
+public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJobConfig<T> {
 
-  private static final long serialVersionUID = 4490719746563473495L;
+    private static final long serialVersionUID = 4490719746563473495L;
 
-  private Class<T> entityClass;
+    private Class<T> entityClass;
 
-  private Map<String, String> mapDBNameToEntityName = new HashMap<>();
+    private Map<String, String> mapDBNameToEntityName = new HashMap<>();
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public IDeepJobConfig<T> initialize()
-  {
-    super.initialize();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IDeepJobConfig<T> initialize() {
+        super.initialize();
 
-    Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass.getDeclaredFields());
+        Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass.getDeclaredFields());
 
-    for (Field f : deepFields)
-    {
-      String dbName = AnnotationUtils.deepFieldName(f);
-      String beanFieldName = f.getName();
+        for (Field f : deepFields) {
+            String dbName = AnnotationUtils.deepFieldName(f);
+            String beanFieldName = f.getName();
 
-      //String dbName = f.getAnnotation(DeepField.class).fieldName();
+            //String dbName = f.getAnnotation(DeepField.class).fieldName();
 
 	    /*
       Method setter;
@@ -62,88 +59,74 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
 	    }
 	    */
 
-      mapDBNameToEntityName.put(dbName, beanFieldName);
+            mapDBNameToEntityName.put(dbName, beanFieldName);
+        }
+
+        return this;
     }
 
-    return this;
-  }
+    public EntityDeepJobConfig(Class<T> entityClass) {
+        super();
+        this.entityClass = entityClass;
+    }
 
-  public EntityDeepJobConfig(Class<T> entityClass)
-  {
-    super();
-    this.entityClass = entityClass;
-  }
-
-  /* (non-Javadoc)
-   * @see com.stratio.deep.config.IDeepJobConfig#getEntityClass()
-   */
-  @Override
-  public Class<T> getEntityClass()
-  {
-    checkInitialized();
-    return entityClass;
-  }
-
-  /* (non-Javadoc)
-     * @see com.stratio.deep.config.IDeepJobConfig#validate()
+    /* (non-Javadoc)
+     * @see com.stratio.deep.config.IDeepJobConfig#getEntityClass()
      */
-  @Override
-  public void validate()
-  {
-    super.validate();
-
-    if (entityClass == null)
-    {
-      throw new IllegalArgumentException("entity class cannot be null");
+    @Override
+    public Class<T> getEntityClass() {
+        checkInitialized();
+        return entityClass;
     }
 
-    if (!entityClass.isAnnotationPresent(DeepEntity.class))
-    {
-      throw new AnnotationTypeMismatchException(null, entityClass.getCanonicalName());
-    }
-  }
+    /* (non-Javadoc)
+       * @see com.stratio.deep.config.IDeepJobConfig#validate()
+       */
+    @Override
+    public void validate() {
+        super.validate();
 
-  public void setInstancePropertyFromDbName(T instance, String dbName, Object value)
-  {
-    Method setter;
+        if (entityClass == null) {
+            throw new IllegalArgumentException("entity class cannot be null");
+        }
 
-    Map<String, Cell> cfs = columnDefinitions();
-    Cell metadataCell = cfs.get(dbName);
-
-    String f = mapDBNameToEntityName.get(dbName);
-
-    if (StringUtils.isEmpty(f))
-    {
-      // DB column is not mapped in the entity
-
-      return;
+        if (!entityClass.isAnnotationPresent(DeepEntity.class)) {
+            throw new AnnotationTypeMismatchException(null, entityClass.getCanonicalName());
+        }
     }
 
-    String setterName = "set" + f.substring(0, 1).toUpperCase() +
-        f.substring(1);
+    public void setInstancePropertyFromDbName(T instance, String dbName, Object value) {
+        Method setter;
 
-    try
-    {
+        Map<String, Cell> cfs = columnDefinitions();
+        Cell metadataCell = cfs.get(dbName);
 
-      setter = entityClass.getMethod(setterName, metadataCell.getValueType());
-    }
-    catch (NoSuchMethodException e)
-    {
-      throw new DeepIOException(e);
-    }
+        String f = mapDBNameToEntityName.get(dbName);
 
-    if (setter == null)
-    {
-      throw new DeepNoSuchFieldException("Cannot find setter for property: " + dbName);
-    }
+        if (StringUtils.isEmpty(f)) {
+            // DB column is not mapped in the entity
 
-    try
-    {
-      setter.invoke(instance, value);
+            return;
+        }
+
+        String setterName = "set" + f.substring(0, 1).toUpperCase() +
+            f.substring(1);
+
+        try {
+
+            setter = entityClass.getMethod(setterName, metadataCell.getValueType());
+        } catch (NoSuchMethodException e) {
+            throw new DeepIOException(e);
+        }
+
+        if (setter == null) {
+            throw new DeepNoSuchFieldException("Cannot find setter for property: " + dbName);
+        }
+
+        try {
+            setter.invoke(instance, value);
+        } catch (Exception e) {
+            throw new DeepGenericException(e);
+        }
     }
-    catch (Exception e)
-    {
-      throw new DeepGenericException(e);
-    }
-  }
 }

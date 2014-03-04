@@ -16,101 +16,91 @@ import scala.collection.Seq;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
-public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest
-{
-  private Logger logger = Logger.getLogger(getClass());
+public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
+    private Logger logger = Logger.getLogger(getClass());
 
-  protected CassandraRDD<W> rdd;
-  private IDeepJobConfig<W> rddConfig;
-  private IDeepJobConfig<W> writeConfig;
+    protected CassandraRDD<W> rdd;
+    private IDeepJobConfig<W> rddConfig;
+    private IDeepJobConfig<W> writeConfig;
 
-  protected abstract void checkComputedData(W[] entities);
+    protected abstract void checkComputedData(W[] entities);
 
-  protected abstract void checkSimpleTestData();
+    protected abstract void checkSimpleTestData();
 
-  protected CassandraRDD<W> getRDD()
-  {
-    return this.rdd;
-  }
+    protected CassandraRDD<W> getRDD() {
+        return this.rdd;
+    }
 
-  protected IDeepJobConfig<W> getReadConfig()
-  {
-    return rddConfig;
-  }
+    protected IDeepJobConfig<W> getReadConfig() {
+        return rddConfig;
+    }
 
-  protected IDeepJobConfig<W> getWriteConfig()
-  {
-    return writeConfig;
-  }
+    protected IDeepJobConfig<W> getWriteConfig() {
+        return writeConfig;
+    }
 
-  protected abstract CassandraRDD<W> initRDD();
+    protected abstract CassandraRDD<W> initRDD();
 
-  protected abstract IDeepJobConfig<W> initReadConfig();
+    protected abstract IDeepJobConfig<W> initReadConfig();
 
-  @BeforeClass
-  protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
-      InterruptedException
-  {
+    @BeforeClass
+    protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
+        InterruptedException {
 
-    rddConfig = initReadConfig();
-    writeConfig = initWriteConfig();
-    rdd = initRDD();
-  }
+        rddConfig = initReadConfig();
+        writeConfig = initWriteConfig();
+        rdd = initRDD();
+    }
 
-  protected abstract IDeepJobConfig<W> initWriteConfig();
+    protected abstract IDeepJobConfig<W> initWriteConfig();
 
-  @SuppressWarnings("unchecked")
-  @Test(dependsOnMethods = "testGetPreferredLocations")
-  public void testCompute() throws CharacterCodingException
-  {
+    @SuppressWarnings("unchecked")
+    @Test(dependsOnMethods = "testGetPreferredLocations")
+    public void testCompute() throws CharacterCodingException {
 
-    logger.info("testCompute()");
-    Object obj = getRDD().collect();
+        logger.info("testCompute()");
+        Object obj = getRDD().collect();
 
-    assertNotNull(obj);
+        assertNotNull(obj);
 
-    W[] entities = (W[]) obj;
+        W[] entities = (W[]) obj;
 
-    checkComputedData(entities);
-  }
+        checkComputedData(entities);
+    }
 
-  @Test(dependsOnMethods = "testRDDInstantiation")
-  public void testGetPartitions()
-  {
-    logger.info("testGetPartitions()");
-    Partition[] partitions = getRDD().partitions();
+    @Test(dependsOnMethods = "testRDDInstantiation")
+    public void testGetPartitions() {
+        logger.info("testGetPartitions()");
+        Partition[] partitions = getRDD().partitions();
 
-    assertNotNull(partitions);
-    assertEquals(partitions.length, 8 + 1);
-  }
+        assertNotNull(partitions);
+        assertEquals(partitions.length, 8 + 1);
+    }
 
-  @Test(dependsOnMethods = "testGetPartitions")
-  public void testGetPreferredLocations()
-  {
-    logger.info("testGetPreferredLocations()");
-    Partition[] partitions = getRDD().partitions();
+    @Test(dependsOnMethods = "testGetPartitions")
+    public void testGetPreferredLocations() {
+        logger.info("testGetPreferredLocations()");
+        Partition[] partitions = getRDD().partitions();
 
-    Seq<String> locations = getRDD().getPreferredLocations(partitions[0]);
+        Seq<String> locations = getRDD().getPreferredLocations(partitions[0]);
 
-    assertNotNull(locations);
-  }
+        assertNotNull(locations);
+    }
 
-  @Test
-  public void testRDDInstantiation()
-  {
-    logger.info("testRDDInstantiation()");
-    assertNotNull(getRDD());
-  }
+    @Test
+    public void testRDDInstantiation() {
+        logger.info("testRDDInstantiation()");
+        assertNotNull(getRDD());
+    }
 
-  @Test(dependsOnMethods = "testSimpleSaveToCassandra")
-  public abstract void testSaveToCassandra();
+    @Test(dependsOnMethods = "testSimpleSaveToCassandra")
+    public abstract void testSaveToCassandra();
 
-  @Test(dependsOnMethods = "testCompute")
-  public abstract void testSimpleSaveToCassandra();
+    @Test(dependsOnMethods = "testCompute")
+    public abstract void testSimpleSaveToCassandra();
 
-  protected void truncateCf(String keyspace, String cf)
-  {
-    executeCustomCQL("TRUNCATE  " + keyspace + "." + cf);
+    protected void truncateCf(String keyspace, String cf) {
+        executeCustomCQL("TRUNCATE  " + keyspace + "." + cf);
 
-  }
+    }
 }

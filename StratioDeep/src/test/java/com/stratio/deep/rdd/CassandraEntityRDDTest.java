@@ -32,267 +32,235 @@ import static org.testng.Assert.*;
 /**
  * Created by luca on 05/02/14.
  */
-@Test(suiteName = "cassandraRddTests", groups = { "CassandraEntityRDDTest" })
-public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity>
-{
+@Test(suiteName = "cassandraRddTests", groups = {"CassandraEntityRDDTest"})
+public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
-  private static class TestEntityAbstractSerializableFunction extends
-      AbstractSerializableFunction<TestEntity, TestEntity>
-  {
+    private static class TestEntityAbstractSerializableFunction extends
+        AbstractSerializableFunction<TestEntity, TestEntity> {
 
-    private static final long serialVersionUID = -1555102599662015841L;
+        private static final long serialVersionUID = -1555102599662015841L;
+
+        @Override
+        public TestEntity apply(TestEntity e) {
+            return new TestEntity(e.getId(), e.getDomain(), e.getUrl(), e.getResponseTime() + 1, e.getResponseCode(),
+                e.getNotMappedField());
+        }
+    }
 
     @Override
-    public TestEntity apply(TestEntity e)
-    {
-      return new TestEntity(e.getId(), e.getDomain(), e.getUrl(), e.getResponseTime() + 1, e.getResponseCode(),
-          e.getNotMappedField());
-    }
-  }
+    protected void checkComputedData(TestEntity[] entities) {
+        boolean found = false;
 
-  @Override
-  protected void checkComputedData(TestEntity[] entities)
-  {
-    boolean found = false;
+        assertEquals(entities.length, entityTestDataSize);
 
-    assertEquals(entities.length, entityTestDataSize);
+        for (TestEntity e : entities) {
+            if (e.getId().equals("e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7")) {
+                assertEquals(e.getUrl(), "http://11870.com/k/es/de");
+                assertEquals(e.getResponseTime(), new Integer(421));
+                assertEquals(e.getDownloadTime(), new Long(1380802049275L));
+                found = true;
+                break;
+            }
+        }
 
-    for (TestEntity e : entities)
-    {
-      if (e.getId().equals("e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7"))
-      {
-        assertEquals(e.getUrl(), "http://11870.com/k/es/de");
-        assertEquals(e.getResponseTime(), new Integer(421));
-        assertEquals(e.getDownloadTime(), new Long(1380802049275L));
-        found = true;
-        break;
-      }
+        if (!found) {
+            fail();
+        }
     }
 
-    if (!found)
-    {
-      fail();
-    }
-  }
+    protected void checkOutputTestData() {
+        Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
+            .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+        Session session = cluster.connect();
 
-  protected void checkOutputTestData()
-  {
-    Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-        .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
-    Session session = cluster.connect();
+        String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY + ";";
 
-    String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY + ";";
+        ResultSet rs = session.execute(command);
+        assertEquals(rs.one().getLong(0), entityTestDataSize);
 
-    ResultSet rs = session.execute(command);
-    assertEquals(rs.one().getLong(0), entityTestDataSize);
+        command = "SELECT * from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY
+            + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
 
-    command = "SELECT * from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY
-        + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
+        rs = session.execute(command);
+        Row row = rs.one();
 
-    rs = session.execute(command);
-    Row row = rs.one();
+        assertEquals(row.getString("domain_name"), "11870.com");
+        assertEquals(row.getString("url"), "http://11870.com/k/es/de");
+        assertEquals(row.getInt("response_time"), 421 + 1);
 
-    assertEquals(row.getString("domain_name"), "11870.com");
-    assertEquals(row.getString("url"), "http://11870.com/k/es/de");
-    assertEquals(row.getInt("response_time"), 421 + 1);
-
-    //TODO: cannot delete a column using CQL, forcing it to null converts it to 0!!! see CASSANDRA-5885 and CASSANDRA-6180
-    assertEquals(row.getLong("download_time"), 0);
-    session.close();
-  }
-
-  @Override
-  protected void checkSimpleTestData()
-  {
-    Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-        .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
-    Session session = cluster.connect();
-
-    String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY + ";";
-
-    ResultSet rs = session.execute(command);
-    assertEquals(rs.one().getLong(0), entityTestDataSize);
-
-    command = "select * from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY
-        + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
-
-    rs = session.execute(command);
-    Row row = rs.one();
-
-    assertEquals(row.getString("domain_name"), "11870.com");
-    assertEquals(row.getInt("response_time"), 421);
-    assertEquals(row.getLong("download_time"), 1380802049275L);
-    assertEquals(row.getString("url"), "http://11870.com/k/es/de");
-    session.close();
-  }
-
-  @Test
-  public void testAdditionalFilters()
-  {
-
-    CassandraRDD<TestEntity> otherRDD = initRDD();
-
-    try
-    {
-      otherRDD.filterByField("notExistentField", "val");
-      fail();
-    }
-    catch (DeepNoSuchFieldException e)
-    {
-      // OK
+        //TODO: cannot delete a column using CQL, forcing it to null converts it to 0!!! see CASSANDRA-5885 and CASSANDRA-6180
+        assertEquals(row.getLong("download_time"), 0);
+        session.close();
     }
 
-    try
-    {
-      otherRDD.filterByField("url", "val");
-      fail();
-    }
-    catch (DeepIndexNotFoundException e)
-    {
-      // OK
-    }
+    @Override
+    protected void checkSimpleTestData() {
+        Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
+            .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+        Session session = cluster.connect();
 
-    TestEntity[] entities = (TestEntity[]) otherRDD.collect();
-    int allElements = entities.length;
-    assertTrue(allElements > 2);
+        String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY + ";";
 
-    otherRDD.filterByField("response_time", 371);
-    entities = (TestEntity[]) otherRDD.collect();
-    assertEquals(entities.length, 2);
+        ResultSet rs = session.execute(command);
+        assertEquals(rs.one().getLong(0), entityTestDataSize);
 
-    otherRDD.removeFilterOnField("response_time");
-    entities = (TestEntity[]) otherRDD.collect();
-    assertEquals(entities.length, allElements);
-  }
+        command = "select * from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY
+            + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
 
-  @Override
-  protected CassandraRDD<TestEntity> initRDD()
-  {
-    assertNotNull(context);
-    return context.cassandraEntityRDD(getReadConfig());
-  }
+        rs = session.execute(command);
+        Row row = rs.one();
 
-  @Override
-  protected IDeepJobConfig<TestEntity> initReadConfig()
-  {
-    IDeepJobConfig<TestEntity> config = DeepJobConfigFactory.create(TestEntity.class)
-        .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-        .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY);
-
-    config.getConfiguration();
-
-    return config;
-  }
-
-  @Override
-  protected IDeepJobConfig<TestEntity> initWriteConfig()
-  {
-    IDeepJobConfig<TestEntity> writeConfig = DeepJobConfigFactory.create(TestEntity.class)
-        .host(Constants.DEFAULT_CASSANDRA_HOST)
-        .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-        .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-        .keyspace(OUTPUT_KEYSPACE_NAME)
-        .columnFamily(OUTPUT_COLUMN_FAMILY)
-        .createTableOnWrite(Boolean.TRUE);
-    return writeConfig.initialize();
-  }
-
-  @Override
-  public void testSaveToCassandra()
-  {
-    Function1<TestEntity, TestEntity> mappingFunc = new TestEntityAbstractSerializableFunction();
-
-    RDD<TestEntity> mappedRDD = getRDD().map(mappingFunc, ClassTag$.MODULE$.<TestEntity>apply(TestEntity.class));
-
-    try
-    {
-      executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY);
-    }
-    catch (Exception e)
-    {
+        assertEquals(row.getString("domain_name"), "11870.com");
+        assertEquals(row.getInt("response_time"), 421);
+        assertEquals(row.getLong("download_time"), 1380802049275L);
+        assertEquals(row.getString("url"), "http://11870.com/k/es/de");
+        session.close();
     }
 
-    assertTrue(mappedRDD.count() > 0);
+    @Test
+    public void testAdditionalFilters() {
 
-    IDeepJobConfig<TestEntity> writeConfig = getWriteConfig();
-    writeConfig.createTableOnWrite(Boolean.FALSE);
+        CassandraRDD<TestEntity> otherRDD = initRDD();
 
-    try
-    {
-      CassandraRDD.saveRDDToCassandra(mappedRDD, writeConfig);
+        try {
+            otherRDD.filterByField("notExistentField", "val");
+            fail();
+        } catch (DeepNoSuchFieldException e) {
+            // OK
+        }
 
-      fail();
-    }
-    catch (DeepIOException e)
-    {
-      // ok
-      writeConfig.createTableOnWrite(Boolean.TRUE);
-    }
+        try {
+            otherRDD.filterByField("url", "val");
+            fail();
+        } catch (DeepIndexNotFoundException e) {
+            // OK
+        }
 
-    CassandraRDD.saveRDDToCassandra(mappedRDD, writeConfig);
+        TestEntity[] entities = (TestEntity[]) otherRDD.collect();
+        int allElements = entities.length;
+        assertTrue(allElements > 2);
 
-    checkOutputTestData();
-  }
+        otherRDD.filterByField("response_time", 371);
+        entities = (TestEntity[]) otherRDD.collect();
+        assertEquals(entities.length, 2);
 
-  @Override
-  public void testSimpleSaveToCassandra()
-  {
-    IDeepJobConfig<TestEntity> writeConfig = getWriteConfig();
-    writeConfig.createTableOnWrite(Boolean.FALSE);
-
-    try
-    {
-      executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY);
-    }
-    catch (Exception e)
-    {
-      e.printStackTrace();
+        otherRDD.removeFilterOnField("response_time");
+        entities = (TestEntity[]) otherRDD.collect();
+        assertEquals(entities.length, allElements);
     }
 
-    try
-    {
-      CassandraRDD.saveRDDToCassandra(getRDD(), writeConfig);
-
-      fail();
-    }
-    catch (Exception e)
-    {
-      // ok
-      writeConfig.createTableOnWrite(Boolean.TRUE);
+    @Override
+    protected CassandraRDD<TestEntity> initRDD() {
+        assertNotNull(context);
+        return context.cassandraEntityRDD(getReadConfig());
     }
 
-    CassandraRDD.saveRDDToCassandra(getRDD(), writeConfig);
+    @Override
+    protected IDeepJobConfig<TestEntity> initReadConfig() {
+        IDeepJobConfig<TestEntity> config = DeepJobConfigFactory.create(TestEntity.class)
+            .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY);
 
-    checkSimpleTestData();
-  }
+        config.getConfiguration();
 
-  @Test
-  public void testJavaSerialization()
-  {
-    JavaSerializer ser = new JavaSerializer(context.getConf());
+        return config;
+    }
 
-    SerializerInstance instance = ser.newInstance();
+    @Override
+    protected IDeepJobConfig<TestEntity> initWriteConfig() {
+        IDeepJobConfig<TestEntity> writeConfig = DeepJobConfigFactory.create(TestEntity.class)
+            .host(Constants.DEFAULT_CASSANDRA_HOST)
+            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+            .keyspace(OUTPUT_KEYSPACE_NAME)
+            .columnFamily(OUTPUT_COLUMN_FAMILY)
+            .batchSize(2)
+            .createTableOnWrite(Boolean.TRUE);
+        return writeConfig.initialize();
+    }
 
-    ByteBuffer serializedRDD = instance.serialize(rdd);
+    @Override
+    public void testSaveToCassandra() {
 
-    CassandraRDD deserializedRDD = instance.deserialize(serializedRDD);
+        Function1<TestEntity, TestEntity> mappingFunc = new TestEntityAbstractSerializableFunction();
 
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        RDD<TestEntity> mappedRDD = getRDD().map(mappingFunc, ClassTag$.MODULE$.<TestEntity>apply(TestEntity.class));
 
-    SerializationStream serializationStream = instance.serializeStream(baos);
-    serializationStream = serializationStream.writeObject(rdd);
+        try {
+            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY);
+        } catch (Exception e) {
+        }
 
-    serializationStream.flush();
-    serializationStream.close();
+        assertTrue(mappedRDD.count() > 0);
 
-    ByteArrayInputStream bais = new ByteArrayInputStream(serializedRDD.array());
+        IDeepJobConfig<TestEntity> writeConfig = getWriteConfig();
+        writeConfig.createTableOnWrite(Boolean.FALSE);
 
-    DeserializationStream deserializationStream = instance.deserializeStream(bais);
-    Iterator<Object> iter = deserializationStream.asIterator();
-    assertTrue(iter.hasNext());
+        try {
+            CassandraRDD.saveRDDToCassandra(mappedRDD, writeConfig);
 
-    deserializedRDD = (CassandraRDD) iter.next();
-    assertNotNull(deserializedRDD);
-  }
+            fail();
+        } catch (DeepIOException e) {
+            // ok
+            writeConfig.createTableOnWrite(Boolean.TRUE);
+        }
+
+        CassandraRDD.saveRDDToCassandra(mappedRDD, writeConfig);
+
+        checkOutputTestData();
+
+    }
+
+    @Override
+    public void testSimpleSaveToCassandra() {
+        IDeepJobConfig<TestEntity> writeConfig = getWriteConfig();
+        writeConfig.createTableOnWrite(Boolean.FALSE);
+
+        try {
+            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY);
+        } catch (Exception e) {
+        }
+
+        try {
+            CassandraRDD.saveRDDToCassandra(getRDD(), writeConfig);
+
+            fail();
+        } catch (Exception e) {
+            // ok
+            writeConfig.createTableOnWrite(Boolean.TRUE);
+        }
+
+        CassandraRDD.saveRDDToCassandra(getRDD(), writeConfig);
+
+        checkSimpleTestData();
+    }
+
+    @Test
+    public void testJavaSerialization() {
+        JavaSerializer ser = new JavaSerializer(context.getConf());
+
+        SerializerInstance instance = ser.newInstance();
+
+        ByteBuffer serializedRDD = instance.serialize(rdd);
+
+        CassandraRDD deserializedRDD = instance.deserialize(serializedRDD);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        SerializationStream serializationStream = instance.serializeStream(baos);
+        serializationStream = serializationStream.writeObject(rdd);
+
+        serializationStream.flush();
+        serializationStream.close();
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(serializedRDD.array());
+
+        DeserializationStream deserializationStream = instance.deserializeStream(bais);
+        Iterator<Object> iter = deserializationStream.asIterator();
+        assertTrue(iter.hasNext());
+
+        deserializedRDD = (CassandraRDD) iter.next();
+        assertNotNull(deserializedRDD);
+    }
 
 }

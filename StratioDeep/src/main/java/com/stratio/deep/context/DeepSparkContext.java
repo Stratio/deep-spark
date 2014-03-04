@@ -20,112 +20,101 @@ import org.apache.spark.api.java.JavaSparkContext;
  *
  * @author Luca Rosellini <luca@strat.io>
  */
-public class DeepSparkContext extends JavaSparkContext
-{
+public class DeepSparkContext extends JavaSparkContext {
 
-  /**
-   * Overridden superclass constructor.
-   *
-   * @param sc
-   */
-  public DeepSparkContext(SparkContext sc)
-  {
-    super(sc);
-  }
-
-  /**
-   * Overridden superclass constructor.
-   *
-   * @param master
-   * @param appName
-   */
-  public DeepSparkContext(String master, String appName)
-  {
-    super(master, appName);
-  }
-
-  /**
-   * Overridden superclass constructor.
-   *
-   * @param master
-   * @param appName
-   * @param sparkHome
-   * @param jarFile
-   */
-  public DeepSparkContext(String master, String appName, String sparkHome, String jarFile)
-  {
-    super(master, appName, sparkHome, jarFile);
-  }
-
-  /**
-   * Overridden superclass constructor.
-   *
-   * @param master
-   * @param appName
-   * @param sparkHome
-   * @param jars
-   */
-  public DeepSparkContext(String master, String appName, String sparkHome, String[] jars)
-  {
-    super(master, appName, sparkHome, jars);
-  }
-
-  /**
-   * Overridden superclass constructor.
-   *
-   * @param master
-   * @param appName
-   * @param sparkHome
-   * @param jars
-   * @param environment
-   */
-  public DeepSparkContext(String master, String appName, String sparkHome, String[] jars,
-      Map<String, String> environment)
-  {
-    super(master, appName, sparkHome, jars, environment);
-  }
-
-  /**
-   * Builds a new CassandraEntityRDD.
-   *
-   * @param config
-   * @return
-   */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public <T> CassandraJavaRDD<T> cassandraJavaRDD(IDeepJobConfig<T> config)
-  {
-    if (config instanceof EntityDeepJobConfig)
-    {
-      return new CassandraJavaRDD<T>(cassandraEntityRDD((EntityDeepJobConfig) config));
+    /**
+     * Overridden superclass constructor.
+     *
+     * @param sc
+     */
+    public DeepSparkContext(SparkContext sc) {
+        super(sc);
     }
 
-    if (config instanceof CellDeepJobConfig)
-    {
-      return new CassandraJavaRDD<T>((CassandraRDD<T>) cassandraGenericRDD((CellDeepJobConfig) config));
+    /**
+     * Overridden superclass constructor.
+     *
+     * @param master
+     * @param appName
+     */
+    public DeepSparkContext(String master, String appName) {
+        super(master, appName);
     }
 
-    throw new DeepGenericException("not recognized config type");
-  }
+    /**
+     * Overridden superclass constructor.
+     *
+     * @param master
+     * @param appName
+     * @param sparkHome
+     * @param jarFile
+     */
+    public DeepSparkContext(String master, String appName, String sparkHome, String jarFile) {
+        super(master, appName, sparkHome, jarFile);
+    }
 
-  /**
-   * Builds a new entity based CassandraEntityRDD.
-   *
-   * @param config
-   * @return
-   */
-  public <T extends IDeepType> CassandraRDD<T> cassandraEntityRDD(IDeepJobConfig<T> config)
-  {
-    return new CassandraEntityRDD<T>(sc(), config);
-  }
+    /**
+     * Overridden superclass constructor.
+     *
+     * @param master
+     * @param appName
+     * @param sparkHome
+     * @param jars
+     */
+    public DeepSparkContext(String master, String appName, String sparkHome, String[] jars) {
+        super(master, appName, sparkHome, jars);
+    }
 
-  /**
-   * Builds a new generic (cell based) CassandraEntityRDD.
-   *
-   * @param config
-   * @return
-   */
-  public CassandraRDD<Cells> cassandraGenericRDD(IDeepJobConfig<Cells> config)
-  {
-    return new CassandraCellRDD(sc(), config);
-  }
+    /**
+     * Overridden superclass constructor.
+     *
+     * @param master
+     * @param appName
+     * @param sparkHome
+     * @param jars
+     * @param environment
+     */
+    public DeepSparkContext(String master, String appName, String sparkHome, String[] jars,
+        Map<String, String> environment) {
+        super(master, appName, sparkHome, jars, environment);
+    }
+
+    /**
+     * Builds a new CassandraEntityRDD.
+     *
+     * @param config
+     * @return
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public <T> CassandraJavaRDD<T> cassandraJavaRDD(IDeepJobConfig<T> config) {
+        if (config instanceof EntityDeepJobConfig) {
+            return new CassandraJavaRDD<T>(cassandraEntityRDD((EntityDeepJobConfig) config));
+        }
+
+        if (config instanceof CellDeepJobConfig) {
+            return new CassandraJavaRDD<T>((CassandraRDD<T>) cassandraGenericRDD((CellDeepJobConfig) config));
+        }
+
+        throw new DeepGenericException("not recognized config type");
+    }
+
+    /**
+     * Builds a new entity based CassandraEntityRDD.
+     *
+     * @param config
+     * @return
+     */
+    public <T extends IDeepType> CassandraRDD<T> cassandraEntityRDD(IDeepJobConfig<T> config) {
+        return new CassandraEntityRDD<T>(sc(), config);
+    }
+
+    /**
+     * Builds a new generic (cell based) CassandraEntityRDD.
+     *
+     * @param config
+     * @return
+     */
+    public CassandraRDD<Cells> cassandraGenericRDD(IDeepJobConfig<Cells> config) {
+        return new CassandraCellRDD(sc(), config);
+    }
 }

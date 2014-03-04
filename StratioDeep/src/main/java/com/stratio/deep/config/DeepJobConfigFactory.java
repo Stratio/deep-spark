@@ -12,28 +12,25 @@ import com.stratio.deep.entity.IDeepType;
  *
  * @author Luca Rosellini <luca@stratio.com>
  */
-public final class DeepJobConfigFactory implements Serializable
-{
+public final class DeepJobConfigFactory implements Serializable {
 
-  private static final long serialVersionUID = -4559130919203819088L;
+    private static final long serialVersionUID = -4559130919203819088L;
 
-  /**
-   * Creates a new cell-based job configuration object.
-   *
-   * @return
-   */
-  public static IDeepJobConfig<Cells> create()
-  {
-    return new CellDeepJobConfig();
-  }
+    /**
+     * Creates a new cell-based job configuration object.
+     *
+     * @return
+     */
+    public static IDeepJobConfig<Cells> create() {
+        return new CellDeepJobConfig();
+    }
 
-  /**
-   * Creates an entity-based configuration object.
-   *
-   * @return
-   */
-  public static <T extends IDeepType> IDeepJobConfig<T> create(Class<T> entityClass)
-  {
-    return new EntityDeepJobConfig<>(entityClass);
-  }
+    /**
+     * Creates an entity-based configuration object.
+     *
+     * @return
+     */
+    public static <T extends IDeepType> IDeepJobConfig<T> create(Class<T> entityClass) {
+        return new EntityDeepJobConfig<>(entityClass);
+    }
 }

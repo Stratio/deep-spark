@@ -15,18 +15,16 @@ import org.apache.hadoop.mapreduce.RecordReader;
  *
  * @author Luca Rosellini <luca@strat.io>
  */
-public class DeepCqlPagingInputFormat extends CqlPagingInputFormat
-{
+public class DeepCqlPagingInputFormat extends CqlPagingInputFormat {
 
 
-  /**
-   * Returns a new instance of {@link DeepCqlPagingRecordReader}.
-   */
-  public RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> createRecordReader(InputSplit arg0,
-      DeepTaskAttemptContext arg1) throws IOException, InterruptedException
-  {
+    /**
+     * Returns a new instance of {@link DeepCqlPagingRecordReader}.
+     */
+    public RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> createRecordReader(InputSplit arg0,
+        DeepTaskAttemptContext arg1) throws IOException, InterruptedException {
 
-    return new DeepCqlPagingRecordReader(arg1.conf.getAdditionalFilters());
-  }
+        return new DeepCqlPagingRecordReader(arg1.conf.getAdditionalFilters());
+    }
 
 }
