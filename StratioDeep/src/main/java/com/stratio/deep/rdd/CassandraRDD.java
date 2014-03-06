@@ -1,7 +1,6 @@
 package com.stratio.deep.rdd;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
@@ -311,33 +310,5 @@ public abstract class CassandraRDD<T> extends RDD<T> {
         } catch (IOException | InterruptedException e) {
             throw new DeepIOException(e);
         }
-    }
-
-    /**
-     * Adds a new filter on the specified. This will affect the generation of queries<br/>
-     * against the underlying Cassandra datastore.
-     * Using this method to specify a default filter over a field of the underlying datastore
-     * is much more flexible than {@link com.stratio.deep.config.IDeepJobConfig#defaultFilter(String)}
-     * since filters can be added / removed directly on the RDD, and does not involve creating a new configuration
-     * object (and thus a new RDD).
-     *
-     * @param fieldName
-     * @param value
-     * @return
-     */
-    public CassandraRDD<T> filterByField(String fieldName, Serializable value) {
-        ((GenericDeepJobConfig) config.value()).addFilter(fieldName, value);
-        return this;
-    }
-
-    /**
-     * Removes the specified filter on the provided field (if exists).
-     *
-     * @param fieldName
-     * @return
-     */
-    public CassandraRDD<T> removeFilterOnField(String fieldName) {
-        ((GenericDeepJobConfig) config.value()).removeFilter(fieldName);
-        return this;
     }
 }

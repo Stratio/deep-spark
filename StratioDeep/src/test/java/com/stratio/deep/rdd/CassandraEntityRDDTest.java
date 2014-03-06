@@ -120,33 +120,72 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     @Test
     public void testAdditionalFilters() {
 
-        CassandraRDD<TestEntity> otherRDD = initRDD();
 
         try {
-            otherRDD.filterByField("notExistentField", "val");
+            DeepJobConfigFactory
+                .create(TestEntity.class)
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .keyspace(KEYSPACE_NAME)
+                .columnFamily(COLUMN_FAMILY)
+                .filterByField("notExistentField", "val")
+                .initialize();
+
             fail();
         } catch (DeepNoSuchFieldException e) {
             // OK
         }
 
         try {
-            otherRDD.filterByField("url", "val");
+            DeepJobConfigFactory
+                .create(TestEntity.class)
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .keyspace(KEYSPACE_NAME)
+                .columnFamily(COLUMN_FAMILY)
+                .filterByField("url", "val")
+                .initialize();
+
             fail();
         } catch (DeepIndexNotFoundException e) {
             // OK
         }
 
-        TestEntity[] entities = (TestEntity[]) otherRDD.collect();
+        TestEntity[] entities = (TestEntity[]) rdd.collect();
         int allElements = entities.length;
         assertTrue(allElements > 2);
 
-        otherRDD.filterByField("response_time", 371);
+        IDeepJobConfig<TestEntity> config = DeepJobConfigFactory
+            .create(TestEntity.class)
+            .host(Constants.DEFAULT_CASSANDRA_HOST)
+            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+            .keyspace(KEYSPACE_NAME)
+            .columnFamily(COLUMN_FAMILY)
+            .filterByField("response_time", 371)
+            .initialize();
+
+        CassandraRDD<TestEntity> otherRDD = context.cassandraEntityRDD(config);
+
         entities = (TestEntity[]) otherRDD.collect();
         assertEquals(entities.length, 2);
 
-        otherRDD.removeFilterOnField("response_time");
-        entities = (TestEntity[]) otherRDD.collect();
-        assertEquals(entities.length, allElements);
+        config = DeepJobConfigFactory
+            .create(TestEntity.class)
+            .host(Constants.DEFAULT_CASSANDRA_HOST)
+            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+            .keyspace(KEYSPACE_NAME)
+            .columnFamily(COLUMN_FAMILY)
+            .filterByField("lucene", "response_time:[160 TO 840]")
+            .initialize();
+
+        otherRDD = context.cassandraEntityRDD(config);
+
+        entities = (TestEntity[])otherRDD.collect();
+        assertEquals(entities.length, 9);
     }
 
     @Override

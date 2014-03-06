@@ -66,28 +66,54 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
 
     @Test
     public void testAdditionalFilters() {
-
-        CassandraRDD<Cql3TestEntity> otherRDD = initRDD();
-
         try {
-            otherRDD.filterByField("notExistentField", "val");
+            DeepJobConfigFactory
+                .create(Cql3TestEntity.class)
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .keyspace(KEYSPACE_NAME)
+                .columnFamily(CQL3_COLUMN_FAMILY)
+                .filterByField("notExistentField", "val")
+                .initialize();
+
             fail();
         } catch (DeepNoSuchFieldException e) {
             // OK
         }
 
         try {
-            otherRDD.filterByField("lucene", "val");
+            DeepJobConfigFactory
+                .create(Cql3TestEntity.class)
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .keyspace(KEYSPACE_NAME)
+                .columnFamily(CQL3_COLUMN_FAMILY)
+                .filterByField("lucene", "val")
+                .initialize();
+
             fail();
         } catch (DeepIndexNotFoundException e) {
             // OK
         }
 
-        Cql3TestEntity[] entities = (Cql3TestEntity[]) otherRDD.collect();
+        Cql3TestEntity[] entities = (Cql3TestEntity[]) rdd.collect();
 
         int allElements = entities.length;
         assertTrue(allElements > 1);
-        otherRDD.filterByField("food", "donuts");
+
+        IDeepJobConfig<Cql3TestEntity> config = DeepJobConfigFactory
+            .create(Cql3TestEntity.class)
+            .host(Constants.DEFAULT_CASSANDRA_HOST)
+            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+            .keyspace(KEYSPACE_NAME)
+            .columnFamily(CQL3_COLUMN_FAMILY)
+            .filterByField("food", "donuts")
+            .initialize();
+
+        CassandraRDD<Cql3TestEntity> otherRDD = context.cassandraEntityRDD(config);
 
         entities = (Cql3TestEntity[]) otherRDD.collect();
 
@@ -98,13 +124,26 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
         assertEquals(entities[0].getAge(), Integer.valueOf(-2));
         assertEquals(entities[0].getAnimal(), "monkey");
 
-        otherRDD.filterByField("food", "chips");
+        config = DeepJobConfigFactory
+            .create(Cql3TestEntity.class)
+            .host(Constants.DEFAULT_CASSANDRA_HOST)
+            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+            .keyspace(KEYSPACE_NAME)
+            .columnFamily(CQL3_COLUMN_FAMILY)
+            .filterByField("food", "chips")
+            .initialize();
+
+        otherRDD = context.cassandraEntityRDD(config);
+
         entities = (Cql3TestEntity[]) otherRDD.collect();
         assertEquals(entities.length, allElements - 1);
 
+        /*
         otherRDD.removeFilterOnField("food");
         entities = (Cql3TestEntity[]) otherRDD.collect();
         assertEquals(entities.length, allElements);
+        */
     }
 
 

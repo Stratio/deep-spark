@@ -13,7 +13,6 @@ public final class DeepConfigHelper {
 
     public static final String OUTPUT_BATCH_SIZE = "output.batch.size";
     public static final String CF_METADATA = "cassandra.cf.metadata";
-    public static final String ADDITIONAL_FILTER_MAP = "cassandra.additional.filters";
 
     public static int getOutputBatchSize(Configuration conf) {
         return conf.getInt(OUTPUT_BATCH_SIZE, Constants.DEFAULT_BATCH_SIZE);

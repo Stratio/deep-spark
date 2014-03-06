@@ -195,6 +195,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
         } catch (AnnotationTypeMismatchException iae) {
             log.info("Correctly catched AnnotationTypeMismatchException: " + iae.getLocalizedMessage());
         } catch (Exception e) {
+            log.error("Error", e);
             fail(e.getMessage());
         }
     }

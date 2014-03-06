@@ -32,13 +32,7 @@ public interface IDeepJobConfig<T> extends Serializable {
      */
     public abstract IDeepJobConfig<T> columnFamily(String columnFamily);
 
-    /**
-     * Sets the default "where" filter to use to access ColumnFamily's data.
-     *
-     * @param defaultFilter
-     * @return
-     */
-    public abstract IDeepJobConfig<T> defaultFilter(String defaultFilter);
+    public abstract IDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue);
 
     /**
      * Sets the default thrift frame size.
@@ -61,13 +55,6 @@ public interface IDeepJobConfig<T> extends Serializable {
      * Validates and initializes this configuration object.
      */
     public abstract Configuration getConfiguration();
-
-    /**
-     * Returns the default filter string.
-     *
-     * @return
-     */
-    public abstract String getDefaultFilter();
 
     /**
      * Returns the underlying entity class used to map the Cassandra
@@ -208,6 +195,7 @@ public interface IDeepJobConfig<T> extends Serializable {
      */
     public abstract IDeepJobConfig<T> cqlPort(Integer port);
 
+    /**
     /**
      * Sets the username to use to login to Cassandra. Leave empty if you do not need authentication.
      *
