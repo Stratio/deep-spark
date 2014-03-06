@@ -8,7 +8,7 @@
 
 	<properties>
 		<!-- Cassandra -->
-		<cassandra.version>2.0.5</cassandra.version>
+		<cassandra.version>2.0.51-SNAPSHOT</cassandra.version>
 
 		<!-- Spark version -->
 		<spark.version>0.9.0-incubating-SNAPSHOT</spark.version>
