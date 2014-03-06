@@ -84,7 +84,6 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
        */
     @Override
     public void validate() {
-        super.validate();
 
         if (entityClass == null) {
             throw new IllegalArgumentException("entity class cannot be null");
@@ -93,6 +92,8 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         if (!entityClass.isAnnotationPresent(DeepEntity.class)) {
             throw new AnnotationTypeMismatchException(null, entityClass.getCanonicalName());
         }
+
+        super.validate();
     }
 
     public void setInstancePropertyFromDbName(T instance, String dbName, Object value) {
