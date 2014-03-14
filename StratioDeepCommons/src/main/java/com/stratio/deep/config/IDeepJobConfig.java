@@ -223,6 +223,20 @@ public interface IDeepJobConfig<T> extends Serializable {
     public abstract Boolean isCreateTableOnWrite();
 
     /**
+     * Returns the configured read consistency level.
+     *
+     * @return
+     */
+    public abstract String getReadConsistencyLevel();
+
+    /**
+     * Returns the configured write consistency level.
+     *
+     * @return
+     */
+    public abstract String getWriteConsistencyLevel();
+
+    /**
      * Sets read consistency level. <br/>
      * Can be one of those consistency levels defined in {@link org.apache.cassandra.db.ConsistencyLevel}.<br/>
      * Defaults to {@link org.apache.cassandra.db.ConsistencyLevel#LOCAL_ONE}.

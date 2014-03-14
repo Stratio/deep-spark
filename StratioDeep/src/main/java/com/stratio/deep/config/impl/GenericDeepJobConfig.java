@@ -606,6 +606,22 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
      * {@inheritDoc}
      */
     @Override
+    public String getReadConsistencyLevel() {
+        return readConsistencyLevel;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getWriteConsistencyLevel() {
+        return writeConsistencyLevel;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public IDeepJobConfig<T> readConsistencyLevel(String level) {
         this.readConsistencyLevel = level;
 
