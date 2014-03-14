@@ -213,7 +213,46 @@ public class UtilsTest {
                 " (\"id1\" timeuuid, \"domain_name\" text, \"url\" text, " +
                 "\"response_time\" bigint, \"response_code\" int, \"download_time\" timestamp, " +
                 "PRIMARY KEY (\"id1\"));");
+    }
 
+    @Test
+    public void testPrepareTuple4CqlDriver(){
+        UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
+        Date testDate = new Date();
 
+        Cells keys = new Cells(Cell.create("id1", "", true, false),
+            Cell.create("id2", testTimeUUID, true, false),
+            Cell.create("id3", new Integer(0), false, true));
+
+        Cells values = new Cells(
+            Cell.create("domain_name", ""),
+            Cell.create("url", ""),
+            Cell.create("response_time", new Long(0)),
+            Cell.create("response_code", new Integer(200)),
+            Cell.create("download_time", testDate));
+
+        Tuple2<String[], Object[]>
+            bindVars = prepareTuple4CqlDriver(new Tuple2<Cells, Cells>(keys, values));
+
+        String[] names = bindVars._1();
+        Object[] vals = bindVars._2();
+
+        assertEquals(names[0], "id1");
+        assertEquals(names[1], "id2");
+        assertEquals(names[2], "id3");
+        assertEquals(names[3], "domain_name");
+        assertEquals(names[4], "url");
+        assertEquals(names[5], "response_time");
+        assertEquals(names[6], "response_code");
+        assertEquals(names[7], "download_time");
+
+        assertEquals(vals[0], "");
+        assertEquals(vals[1], testTimeUUID);
+        assertEquals(vals[2], 0);
+        assertEquals(vals[3], "");
+        assertEquals(vals[4], "");
+        assertEquals(vals[5], 0L);
+        assertEquals(vals[6], 200);
+        assertEquals(vals[7], testDate);
     }
 }

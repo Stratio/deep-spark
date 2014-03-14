@@ -337,6 +337,36 @@ public final class Utils {
         return sb.toString();
     }
 
+    /**
+     * Splits columns names and values as required by Datastax java driver to generate an Insert query.
+     *
+     * @param tuple
+     * @return
+     */
+    public static Tuple2<String[], Object[]> prepareTuple4CqlDriver(Tuple2<Cells, Cells> tuple){
+        Cells keys = tuple._1();
+        Cells columns = tuple._2();
+
+        String[] names = new String[keys.size() + columns.size()];
+        Object[] values= new Object[keys.size() + columns.size()];
+
+        for (int k = 0; k < keys.size(); k++){
+            Cell cell = keys.getCellByIdx(k);
+
+            names[k] = cell.getCellName();
+            values[k] = cell.getCellValue();
+        }
+
+        for (int v = keys.size(); v < (keys.size() + columns.size()); v++){
+            Cell cell = columns.getCellByIdx(v - keys.size());
+
+            names[v] = cell.getCellName();
+            values[v] = cell.getCellValue();
+        }
+
+        return new Tuple2<String[], Object[]>(names, values);
+    }
+
     private Utils() {
 
     }
