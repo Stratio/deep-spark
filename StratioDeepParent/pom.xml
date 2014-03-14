@@ -9,8 +9,9 @@
 	<properties>
 		<!-- Cassandra -->
 		<cassandra.version>2.0.51-SNAPSHOT</cassandra.version>
+        <datastax.driver.version>2.0.0</datastax.driver.version>
 
-		<!-- Spark version -->
+        <!-- Spark version -->
 		<spark.version>0.9.1-incubating-SNAPSHOT</spark.version>
 
 		<java.version>1.7</java.version>
@@ -64,6 +65,20 @@
             <url>http://nexus.strat.io:8081/nexus/content/repositories/releases</url>
         </repository>
     </repositories>
+
+    <dependencies>
+        <!-- cassandra -->
+        <dependency>
+            <groupId>org.apache.cassandra</groupId>
+            <artifactId>cassandra-all</artifactId>
+            <version>${cassandra.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.datastax.cassandra</groupId>
+            <artifactId>cassandra-driver-core</artifactId>
+            <version>${datastax.driver.version}</version>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<pluginManagement>

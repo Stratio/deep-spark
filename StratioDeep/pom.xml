@@ -29,7 +29,6 @@
 
         <proguard.version>4.10</proguard.version>
 
-        <datastax.driver.version>2.0.0-rc3</datastax.driver.version>
         <lucene.version>4.6.1</lucene.version>
     </properties>
 
@@ -93,18 +92,6 @@
                     <groupId>org.apache.avro</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <!-- cassandra -->
-        <dependency>
-            <groupId>org.apache.cassandra</groupId>
-            <artifactId>cassandra-all</artifactId>
-            <version>${cassandra.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.datastax.cassandra</groupId>
-            <artifactId>cassandra-driver-core</artifactId>
-            <version>${datastax.driver.version}</version>
         </dependency>
 
         <dependency>

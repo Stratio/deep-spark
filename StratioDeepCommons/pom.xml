@@ -12,12 +12,7 @@
     </parent>
 
     <dependencies>
-        <!-- cassandra -->
-        <dependency>
-            <groupId>org.apache.cassandra</groupId>
-            <artifactId>cassandra-all</artifactId>
-            <version>${cassandra.version}</version>
-        </dependency>
+
 
         <!-- spark artifact -->
         <dependency>
