@@ -12,9 +12,13 @@ import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.cql.DeepConfigHelper;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.exception.*;
+import com.stratio.deep.exception.DeepIOException;
+import com.stratio.deep.exception.DeepIllegalAccessException;
+import com.stratio.deep.exception.DeepIndexNotFoundException;
+import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.util.Constants;
 import com.stratio.deep.util.Utils;
+import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.hadoop.ConfigHelper;
 import org.apache.cassandra.hadoop.cql3.CqlConfigHelper;
@@ -100,12 +104,12 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
     /**
      * Default read consistency level. Defaults to LOCAL_ONE.
      */
-    private String readConsistencyLevel;
+    private String readConsistencyLevel = ConsistencyLevel.LOCAL_ONE.name();
 
     /**
      * Default write consistency level. Defaults to LOCAL_ONE.
      */
-    private String writeConsistencyLevel;
+    private String writeConsistencyLevel = ConsistencyLevel.LOCAL_ONE.name();
 
     /**
      * Enables/Disables auto-creation of column family when writing to Cassandra.
