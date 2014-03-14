@@ -237,14 +237,14 @@ public class UtilsTest {
         String[] names = bindVars._1();
         Object[] vals = bindVars._2();
 
-        assertEquals(names[0], "id1");
-        assertEquals(names[1], "id2");
-        assertEquals(names[2], "id3");
-        assertEquals(names[3], "domain_name");
-        assertEquals(names[4], "url");
-        assertEquals(names[5], "response_time");
-        assertEquals(names[6], "response_code");
-        assertEquals(names[7], "download_time");
+        assertEquals(names[0], "\"id1\"");
+        assertEquals(names[1], "\"id2\"");
+        assertEquals(names[2], "\"id3\"");
+        assertEquals(names[3], "\"domain_name\"");
+        assertEquals(names[4], "\"url\"");
+        assertEquals(names[5], "\"response_time\"");
+        assertEquals(names[6], "\"response_code\"");
+        assertEquals(names[7], "\"download_time\"");
 
         assertEquals(vals[0], "");
         assertEquals(vals[1], testTimeUUID);

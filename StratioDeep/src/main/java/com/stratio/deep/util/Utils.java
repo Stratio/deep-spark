@@ -278,10 +278,9 @@ public final class Utils {
      *
      * @param outputKeyspace
      * @param outputColumnFamily
-     * @param <T>
      * @return
      */
-    public static <T extends IDeepType> String updateQueryGenerator(Cells keys, Cells values, String outputKeyspace,
+    public static String updateQueryGenerator(Cells keys, Cells values, String outputKeyspace,
         String outputColumnFamily) {
 
         StringBuilder sb = new StringBuilder("UPDATE ").append(outputKeyspace).append(".").append(outputColumnFamily)
@@ -353,14 +352,14 @@ public final class Utils {
         for (int k = 0; k < keys.size(); k++){
             Cell cell = keys.getCellByIdx(k);
 
-            names[k] = cell.getCellName();
+            names[k] = quote(cell.getCellName());
             values[k] = cell.getCellValue();
         }
 
         for (int v = keys.size(); v < (keys.size() + columns.size()); v++){
             Cell cell = columns.getCellByIdx(v - keys.size());
 
-            names[v] = cell.getCellName();
+            names[v] = quote(cell.getCellName());
             values[v] = cell.getCellValue();
         }
 
