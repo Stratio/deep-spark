@@ -248,4 +248,11 @@ public interface IDeepJobConfig<T> extends Serializable {
      * @return
      */
     public abstract String getTable();
+
+    /**
+     * Returns the batch size used for writing objects to the underying Cassandra datastore.
+     *
+     * @return
+     */
+    int getBatchSize();
 }

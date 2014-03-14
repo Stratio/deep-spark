@@ -620,4 +620,11 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
         this.writeConsistencyLevel = level;
         return this;
     }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getBatchSize() {
+        return batchSize;
+    }
 }
