@@ -103,4 +103,7 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
         executeCustomCQL("TRUNCATE  " + keyspace + "." + cf);
 
     }
+
+    @Test(dependsOnMethods = "testSaveToCassandra")
+    public abstract void testCql3SaveToCassandra();
 }

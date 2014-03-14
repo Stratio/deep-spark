@@ -184,7 +184,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
         otherRDD = context.cassandraEntityRDD(config);
 
-        entities = (TestEntity[])otherRDD.collect();
+        entities = (TestEntity[]) otherRDD.collect();
         assertEquals(entities.length, 9);
     }
 
@@ -273,6 +273,20 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
         checkSimpleTestData();
     }
+
+    @Override
+    public void testCql3SaveToCassandra() {
+        try {
+            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY);
+        } catch (Exception e) {
+        }
+
+        IDeepJobConfig<TestEntity> writeConfig = getWriteConfig();
+
+        CassandraRDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
+        checkSimpleTestData();
+    }
+
 
     @Test
     public void testJavaSerialization() {

@@ -6,6 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.datastax.driver.core.querybuilder.Batch;
+import com.datastax.driver.core.querybuilder.Insert;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.impl.GenericDeepJobConfig;
 import com.stratio.deep.cql.DeepCqlPagingInputFormat;
@@ -17,6 +20,7 @@ import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.functions.CellList2TupleFunction;
 import com.stratio.deep.functions.DeepType2TupleFunction;
 import com.stratio.deep.partition.impl.DeepPartition;
+import com.stratio.deep.util.Utils;
 import org.apache.cassandra.hadoop.cql3.DeepCqlOutputFormat;
 import org.apache.cassandra.utils.Pair;
 import org.apache.hadoop.io.Writable;
@@ -24,6 +28,7 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.JobID;
 import org.apache.hadoop.mapreduce.TaskAttemptID;
+import org.apache.log4j.Logger;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
@@ -108,6 +113,70 @@ public abstract class CassandraRDD<T> extends RDD<T> {
             return null;
         }
 
+    }
+
+    private static <W> void doCql3SaveToCassandra(RDD<W> rdd, IDeepJobConfig<W> writeConfig,
+        Function1<W, Tuple2<Cells, Cells>> transformer) {
+
+        Tuple2<Map<String, ByteBuffer>, Map<String, ByteBuffer>> tuple = new Tuple2<>(null, null);
+
+        RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
+            ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
+
+        ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD);
+
+        final int pageSize = writeConfig.getBatchSize();
+        int offset = 0;
+
+        Logger logger = Logger.getLogger(CassandraRDD.class);
+
+        Tuple2<Cells, Cells>[] elements = null;
+
+        do {
+            logger.info("Iterating. pageSize: " + pageSize + ", offset: " + offset);
+
+            elements = (Tuple2<Cells, Cells>[]) mappedRDD.dropTake(pageSize * (offset++), pageSize);
+
+            Batch batch = QueryBuilder.batch();
+
+            for (Tuple2<Cells, Cells> t : elements) {
+                Tuple2<String[], Object[]> bindVars = Utils.prepareTuple4CqlDriver(t);
+
+                Insert insert = QueryBuilder.insertInto(writeConfig.getKeyspace(), writeConfig.getTable())
+                    .values(bindVars._1(), bindVars._2());
+
+                batch.add(insert);
+            }
+
+            writeConfig.getSession().execute(batch);
+
+
+        } while (elements != null && elements.length > 0 && elements.length == pageSize);
+    }
+
+    /**
+     * Persists the given RDD to the underlying Cassandra datastore using the java cql3 driver.<br/>
+     * Beware: this method does not perform a distributed write as {@link  #saveRDDToCassandra(org.apache.spark.rdd.RDD, com.stratio.deep.config.IDeepJobConfig)}
+     * does, uses the Datastax Java Driver to perform a batch write to the Cassandra server.<br/>
+     * This currently scans the partitions one by one, so it will be slow if a lot of partitions are required.
+     *
+     * @param rdd
+     * @param writeConfig
+     */
+    public static <W, T extends IDeepType> void cql3SaveRDDToCassandra(RDD<W> rdd, IDeepJobConfig<W> writeConfig) {
+        if (IDeepType.class.isAssignableFrom(writeConfig.getEntityClass())) {
+            IDeepJobConfig<T> c = (IDeepJobConfig<T>) writeConfig;
+            RDD<T> r = (RDD<T>) rdd;
+
+            doCql3SaveToCassandra(r, c, new DeepType2TupleFunction<T>());
+        } else if (Cells.class.isAssignableFrom(writeConfig.getEntityClass())) {
+            IDeepJobConfig<Cells> c = (IDeepJobConfig<Cells>) writeConfig;
+            RDD<Cells> r = (RDD<Cells>) rdd;
+
+            doCql3SaveToCassandra(r, c, new CellList2TupleFunction());
+        } else {
+            throw new IllegalArgumentException("Provided RDD must be an RDD of com.stratio.deep.entity.Cells or an RDD of com.stratio.deep.entity.IDeepType");
+        }
     }
 
     /**

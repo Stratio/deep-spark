@@ -265,4 +265,17 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
         checkSimpleTestData();
 
     }
+
+    @Override
+    public void testCql3SaveToCassandra() {
+        try {
+            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + CQL3_ENTITY_OUTPUT_COLUMN_FAMILY);
+        } catch (Exception e) {
+        }
+
+        IDeepJobConfig<Cql3TestEntity> writeConfig = getWriteConfig();
+
+        CassandraRDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
+        checkSimpleTestData();
+    }
 }
