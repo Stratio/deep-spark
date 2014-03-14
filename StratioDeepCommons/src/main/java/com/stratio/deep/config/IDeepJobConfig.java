@@ -3,6 +3,7 @@ package com.stratio.deep.config;
 import java.io.Serializable;
 import java.util.Map;
 
+import com.datastax.driver.core.Session;
 import com.stratio.deep.entity.Cell;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.hadoop.conf.Configuration;
@@ -13,6 +14,18 @@ import org.apache.hadoop.conf.Configuration;
  * @param <T>
  */
 public interface IDeepJobConfig<T> extends Serializable {
+
+    /**
+     * Returns the session opened to the cassandra server.
+     * @return
+     */
+    Session getSession();
+
+    /**
+     * Sets the session to use. If a session is not provided, this object will open a new one.
+     * @param session
+     */
+    IDeepJobConfig<T> session(Session session);
 
     Map<String, Cell> columnDefinitions();
 

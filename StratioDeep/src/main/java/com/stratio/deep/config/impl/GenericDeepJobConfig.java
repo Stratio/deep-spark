@@ -32,7 +32,7 @@ import scala.Tuple2;
  * Base class for all config implementations providing default implementations for methods
  * defined in {@link com.stratio.deep.config.IDeepJobConfig}.
  */
-public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
+public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, AutoCloseable {
     private static Logger logger = Logger.getLogger("com.stratio.deep.config.impl.GenericDeepJobConfig");
     private static final long serialVersionUID = -7179376653643603038L;
     private String partitionerClassName = "org.apache.cassandra.dht.Murmur3Partitioner";
@@ -117,6 +117,55 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
      */
     private Boolean createTableOnWrite = Boolean.FALSE;
 
+    private transient Session session;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IDeepJobConfig<T> session(Session session){
+        this.session = session;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Session getSession() {
+        if (session == null) {
+            Cluster cluster = Cluster.builder()
+                .withPort(this.cqlPort)
+                .addContactPoint(this.host)
+                .withCredentials(this.username, this.password)
+                .build();
+
+            session = cluster.connect();
+        }
+
+        return session;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void close() throws Exception {
+        logger.debug("closing " + getClass().getCanonicalName());
+        if (session != null) {
+            session.close();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void finalize() throws Throwable {
+        logger.debug("finalizing " + getClass().getCanonicalName());
+        close();
+    }
+
     /**
      * Checks if this configuration object has been initialized or not.
      *
@@ -134,18 +183,15 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
      * @return
      */
     private TableMetadata fetchTableMetadata() {
-        Cluster cluster = Cluster.builder().withPort(this.cqlPort)
-            .addContactPoint(this.host).build();
 
-        try (Session session = cluster.connect()) {
-            Metadata metadata = session.getCluster().getMetadata();
-            KeyspaceMetadata ksMetadata = null;
+        Metadata metadata = getSession().getCluster().getMetadata();
+        KeyspaceMetadata ksMetadata = null;
 
-            if (metadata != null && (ksMetadata = metadata.getKeyspace(this.keyspace)) != null){
-                return ksMetadata.getTable(this.columnFamily);
-            } else
-                return null;
-        }
+        if (metadata != null && (ksMetadata = metadata.getKeyspace(this.keyspace)) != null) {
+            return ksMetadata.getTable(this.columnFamily);
+        } else
+            return null;
+
     }
 
     /**
@@ -160,30 +206,25 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
      * @param tupleRDD
      */
     public void createOutputTableIfNeeded(RDD<Tuple2<Cells, Cells>> tupleRDD) {
-        Cluster cluster = Cluster.builder().withPort(this.cqlPort)
-            .addContactPoint(this.host).build();
 
-        try (Session session = cluster.connect()) {
-            TableMetadata metadata = session.getCluster().getMetadata().getKeyspace(this.keyspace).getTable(this.columnFamily);
+        TableMetadata metadata = getSession().getCluster().getMetadata().getKeyspace(this.keyspace).getTable(this
+            .columnFamily);
 
-            if (metadata == null && !createTableOnWrite) {
-                throw new DeepIOException("Cannot write RDD, output table does not exists and configuration object has 'createTableOnWrite' = false");
-            }
-
-            if (metadata != null) {
-                return;
-            }
-
-            Tuple2<Cells, Cells> first = tupleRDD.first();
-
-            if (first._1() == null || first._1().size() == 0){
-                throw new DeepNoSuchFieldException("no key structure found on row metadata");
-            }
-
-            String createTableQuery = Utils.createTableQueryGenerator(first._1(), first._2(), getKeyspace(), getColumnFamily());
-
-            session.execute(createTableQuery);
+        if (metadata == null && !createTableOnWrite) {
+            throw new DeepIOException("Cannot write RDD, output table does not exists and configuration object has 'createTableOnWrite' = false");
         }
+
+        if (metadata != null) {
+            return;
+        }
+
+        Tuple2<Cells, Cells> first = tupleRDD.first();
+
+        if (first._1() == null || first._1().size() == 0) {
+            throw new DeepNoSuchFieldException("no key structure found on row metadata");
+        }
+        String createTableQuery = Utils.createTableQueryGenerator(first._1(), first._2(), getKeyspace(), getColumnFamily());
+        getSession().execute(createTableQuery);
     }
 
     /**
@@ -201,7 +242,8 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
         TableMetadata tableMetadata = fetchTableMetadata();
 
         if (tableMetadata == null && !createTableOnWrite) {
-            logger.warn("Cannot write RDD, output table does not exists and configuration object has 'createTableOnWrite' = false");
+            logger.warn("Canfiguration not suitable for writing RDD: output table does not exists and configuration " +
+                "object has 'createTableOnWrite' = false");
 
             return null;
         } else if (tableMetadata == null) {
@@ -531,7 +573,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
 
         TableMetadata tableMetadata = fetchTableMetadata();
 
-        if (tableMetadata == null){
+        if (tableMetadata == null) {
             return;
         }
 
@@ -640,6 +682,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
         this.writeConsistencyLevel = level;
         return this;
     }
+
     /**
      * {@inheritDoc}
      */
