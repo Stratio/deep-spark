@@ -130,16 +130,16 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
         Logger logger = Logger.getLogger(CassandraRDD.class);
 
-        Tuple2<Cells, Cells>[] elements = null;
-
+        List<Tuple2<Cells, Cells>> elements = Arrays.asList((Tuple2<Cells, Cells>[])mappedRDD.collect());
+        List<Tuple2<Cells, Cells>> split;
         do {
             logger.info("Iterating. pageSize: " + pageSize + ", offset: " + offset);
 
-            elements = (Tuple2<Cells, Cells>[]) mappedRDD.dropTake(pageSize * (offset++), pageSize);
+            split = elements.subList(pageSize * (offset++), Math.min(pageSize * offset, elements.size()));
 
             Batch batch = QueryBuilder.batch();
 
-            for (Tuple2<Cells, Cells> t : elements) {
+            for (Tuple2<Cells, Cells> t : split) {
                 Tuple2<String[], Object[]> bindVars = Utils.prepareTuple4CqlDriver(t);
 
                 Insert insert = QueryBuilder.insertInto(writeConfig.getKeyspace(), writeConfig.getTable())
@@ -147,11 +147,9 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
                 batch.add(insert);
             }
-
             writeConfig.getSession().execute(batch);
 
-
-        } while (elements != null && elements.length > 0 && elements.length == pageSize);
+        } while (split != null && split.size() > 0 && split.size() == pageSize);
     }
 
     /**
