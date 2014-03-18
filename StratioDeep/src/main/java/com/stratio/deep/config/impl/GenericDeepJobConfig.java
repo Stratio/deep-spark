@@ -234,7 +234,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * @return
      */
     @Override
-    public Map<String, Cell> columnDefinitions() {
+    public synchronized Map<String, Cell> columnDefinitions() {
         if (columnDefinitionMap != null) {
             return columnDefinitionMap;
         }
@@ -272,6 +272,9 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
                 columnDefinitionMap.put(key.getName(), metadata);
             }
         }
+
+        columnDefinitionMap = Collections.unmodifiableMap(columnDefinitionMap);
+
         return columnDefinitionMap;
     }
 
