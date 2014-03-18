@@ -149,7 +149,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
             }
             writeConfig.getSession().execute(batch);
 
-        } while (split != null && split.size() > 0 && split.size() == pageSize);
+        } while (split.size() > 0 && split.size() == pageSize);
     }
 
     /**
