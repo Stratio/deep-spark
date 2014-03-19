@@ -3,6 +3,7 @@ package com.stratio.deep.config.impl;
 import java.lang.annotation.AnnotationTypeMismatchException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
 
     private Class<T> entityClass;
 
-    private Map<String, String> mapDBNameToEntityName = new HashMap<>();
+    private Map<String, String> mapDBNameToEntityName;
 
     /**
      * {@inheritDoc}
@@ -40,27 +41,18 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
     public IDeepJobConfig<T> initialize() {
         super.initialize();
 
+        Map<String, String> tmpMap = new HashMap<>();
+
         Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass.getDeclaredFields());
 
         for (Field f : deepFields) {
             String dbName = AnnotationUtils.deepFieldName(f);
             String beanFieldName = f.getName();
 
-            //String dbName = f.getAnnotation(DeepField.class).fieldName();
-
-	    /*
-      Method setter;
-
-	    try {
-		setter = entityClass.getMethod("set" + beanFieldName.substring(0, 1).toUpperCase() +
-				beanFieldName.substring(1), f.getType());
-	    } catch (NoSuchMethodException e) {
-		throw new DeepIOException(e);
-	    }
-	    */
-
-            mapDBNameToEntityName.put(dbName, beanFieldName);
+            tmpMap.put(dbName, beanFieldName);
         }
+
+        mapDBNameToEntityName = Collections.unmodifiableMap(tmpMap);
 
         return this;
     }

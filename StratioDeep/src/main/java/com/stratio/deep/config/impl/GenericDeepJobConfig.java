@@ -132,7 +132,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public Session getSession() {
+    public synchronized Session getSession() {
         if (session == null) {
             Cluster cluster = Cluster.builder()
                 .withPort(this.cqlPort)
