@@ -1,30 +1,32 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.stratio.deep</groupId>
-	<artifactId>StratioDeepParent</artifactId>
-	<version>0.0.25-SNAPSHOT</version>
-	<packaging>pom</packaging>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.stratio.deep</groupId>
+    <artifactId>StratioDeepParent</artifactId>
+    <version>0.0.26-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-	<properties>
-		<!-- Cassandra -->
-		<cassandra.version>2.0.51-SNAPSHOT</cassandra.version>
+    <properties>
+        <!-- Cassandra -->
+        <cassandra.version>2.0.51-SNAPSHOT</cassandra.version>
         <datastax.driver.version>2.0.0</datastax.driver.version>
 
         <!-- Spark version -->
-		<spark.version>0.9.0-incubating</spark.version>
+        <spark.version>0.9.1-incubating-SNAPSHOT</spark.version>
 
-		<java.version>1.7</java.version>
+        <java.version>1.7</java.version>
 
         <!-- Artifacts include -->
-        <distribution.include>org.apache.cassandra,org.apache.thrift,com.github.stephenc.high-scale-lib,com.googlecode.concurrentlinkedhashmap,com.github.stephenc,org.apache.commons,net.jpountz.lz4,com.yammer.metrics,org.yaml,org.antlr,com.datastax.cassandra</distribution.include>
-	</properties>
+        <distribution.include>
+            org.apache.cassandra,org.apache.thrift,com.github.stephenc.high-scale-lib,com.googlecode.concurrentlinkedhashmap,com.github.stephenc,org.apache.commons,net.jpountz.lz4,com.yammer.metrics,org.yaml,org.antlr,com.datastax.cassandra
+        </distribution.include>
+    </properties>
 
-	<scm>
-		<connection>scm:git:git@github.com:Stratio/stratio-deep.git</connection>
-		<developerConnection>scm:git:git@github.com:Stratio/stratio-deep.git</developerConnection>
-		<url>https://github.com/Stratio/stratio-deep</url>
-	</scm>
+    <scm>
+        <connection>scm:git:git@github.com:Stratio/stratio-deep.git</connection>
+        <developerConnection>scm:git:git@github.com:Stratio/stratio-deep.git</developerConnection>
+        <url>https://github.com/Stratio/stratio-deep</url>
+    </scm>
 
     <distributionManagement>
 
@@ -80,59 +82,59 @@
         </dependency>
     </dependencies>
 
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<configuration>
-						<source>${java.version}</source>
-						<target>${java.version}</target>
-					</configuration>
-				</plugin>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                    </configuration>
+                </plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-release-plugin</artifactId>
-					<version>2.4.2</version>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.4.2</version>
 
-					<configuration>
-						<autoVersionSubmodules>true</autoVersionSubmodules>
-						<preparationGoals>clean verify install</preparationGoals>
-						<pushChanges>false</pushChanges>
+                    <configuration>
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
+                        <preparationGoals>clean verify install</preparationGoals>
+                        <pushChanges>false</pushChanges>
                         <localCheckout>true</localCheckout>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
-	<modules>
-		<module>../StratioDeepCommons</module>
-		<module>../StratioDeep</module>
-	</modules>
+    <modules>
+        <module>../StratioDeepCommons</module>
+        <module>../StratioDeep</module>
+    </modules>
 
-	<profiles>
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>2.2.1</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

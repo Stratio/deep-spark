@@ -106,7 +106,6 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
             f.substring(1);
 
         try {
-
             setter = entityClass.getMethod(setterName, metadataCell.getValueType());
         } catch (NoSuchMethodException e) {
             throw new DeepIOException(e);
