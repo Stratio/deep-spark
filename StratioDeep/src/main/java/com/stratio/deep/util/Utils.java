@@ -3,6 +3,7 @@ package com.stratio.deep.util;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
+import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.utils.AnnotationUtils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.utils.Pair;
@@ -364,6 +366,30 @@ public final class Utils {
         }
 
         return new Tuple2<String[], Object[]>(names, values);
+    }
+
+    public static Method findSetter(String f, Class entityClass, Class valueType){
+        Method setter;
+
+        String setterName = "set" + f.substring(0, 1).toUpperCase() +
+            f.substring(1);
+
+        try {
+           setter = entityClass.getMethod(setterName, valueType);
+        } catch (NoSuchMethodException e) {
+            // let's try with scala setter name
+            try {
+                setter = entityClass.getMethod(f + "_$eq", valueType);
+            } catch (NoSuchMethodException e1) {
+                throw new DeepIOException(e1);
+            }
+        }
+
+        if (setter == null) {
+            throw new DeepNoSuchFieldException("Cannot find setter for property: " + f);
+        }
+
+        return setter;
     }
 
     private Utils() {
