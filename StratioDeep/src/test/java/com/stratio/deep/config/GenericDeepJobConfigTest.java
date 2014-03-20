@@ -6,7 +6,9 @@ import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.entity.TestEntity;
+import com.stratio.deep.entity.WronglyMappedTestEntity;
 import com.stratio.deep.exception.DeepIllegalAccessException;
+import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.util.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.log4j.Logger;
@@ -22,7 +24,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
 
     private Logger log = Logger.getLogger(getClass());
 
-    @Test
+    @Test(dependsOnMethods = "testValidation")
     public void testCorrectInitialisation() {
         IDeepJobConfig<TestEntity> djc = DeepJobConfigFactory.create(TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
             .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace("test_keyspace").columnFamily("test_page");
@@ -32,6 +34,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
 
     @Test
     public void testValidation() {
+
         IDeepJobConfig<TestEntity> djc = DeepJobConfigFactory.create(TestEntity.class);
 
         djc.host(null).rpcPort(null);
@@ -182,6 +185,22 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
         djc.writeConsistencyLevel(ConsistencyLevel.LOCAL_ONE.name());
 
         djc.initialize();
+    }
+
+    @Test
+    public void testWronglyMappedField(){
+
+        IDeepJobConfig<WronglyMappedTestEntity> djc = DeepJobConfigFactory.create(WronglyMappedTestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace("test_keyspace").columnFamily("test_page");
+
+        try {
+            djc.initialize();
+
+            fail();
+        } catch (DeepNoSuchFieldException e){
+            // ok
+            log.info("Correctly catched DeepNoSuchFieldException: " + e.getLocalizedMessage());
+        }
     }
 
     @Test
