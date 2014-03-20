@@ -45,7 +45,7 @@ public abstract class AbstractDeepSparkContextTest {
 
     protected String createLuceneIndex =
         "CREATE CUSTOM INDEX page_lucene ON "+KEYSPACE_NAME + "." +COLUMN_FAMILY+" (lucene) USING 'org.apache.cassandra.db.index.stratio.RowIndex' " +
-            "WITH OPTIONS = { 'schema':'{default_analyzer:\"org.apache.lucene.analysis.standard.StandardAnalyzer\", " +
+            "WITH OPTIONS = {'refresh_seconds':'1', 'schema':'{default_analyzer:\"org.apache.lucene.analysis.standard.StandardAnalyzer\", " +
             "fields:{ charset:{type:\"string\"}, url:{type:\"string\"}, domain_name:{type:\"string\"}, " +
             "response_code:{type:\"integer\"}, id:{type:\"string\"}, response_time:{type:\"integer\"} } }'};";
 
@@ -205,6 +205,10 @@ public abstract class AbstractDeepSparkContextTest {
         cassandraServer.start();
 
         checkTestData();
+    }
+
+    protected DeepSparkContext getContext(){
+        return context;
     }
 
 }
