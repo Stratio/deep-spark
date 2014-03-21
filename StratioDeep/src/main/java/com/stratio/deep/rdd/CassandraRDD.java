@@ -1,12 +1,14 @@
 package com.stratio.deep.rdd;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.datastax.driver.core.querybuilder.Batch;
+import com.datastax.driver.core.querybuilder.Insert;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.impl.GenericDeepJobConfig;
 import com.stratio.deep.cql.DeepCqlPagingInputFormat;
@@ -18,6 +20,7 @@ import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.functions.CellList2TupleFunction;
 import com.stratio.deep.functions.DeepType2TupleFunction;
 import com.stratio.deep.partition.impl.DeepPartition;
+import com.stratio.deep.util.Utils;
 import org.apache.cassandra.hadoop.cql3.DeepCqlOutputFormat;
 import org.apache.cassandra.utils.Pair;
 import org.apache.hadoop.io.Writable;
@@ -25,12 +28,13 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.JobID;
 import org.apache.hadoop.mapreduce.TaskAttemptID;
+import org.apache.log4j.Logger;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.broadcast.Broadcast;
+import org.apache.spark.rdd.PairRDDFunctions;
 import org.apache.spark.rdd.RDD;
 import scala.Function1;
 import scala.Tuple2;
@@ -86,33 +90,95 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * @author Luca Rosellini <luca@strat.io>
      */
     class OnComputedRDDCallback<R> extends AbstractFunction0<R> {
-	private final org.apache.hadoop.mapred.RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader;
-	private final DeepPartition deepPartition;
+        private final org.apache.hadoop.mapred.RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader;
+        private final DeepPartition deepPartition;
 
-	public OnComputedRDDCallback(
-			org.apache.hadoop.mapred.RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader,
-			DeepPartition dp) {
-	    super();
-	    this.recordReader = recordReader;
-	    this.deepPartition = dp;
-	}
+        public OnComputedRDDCallback(
+            org.apache.hadoop.mapred.RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader,
+            DeepPartition dp) {
+            super();
+            this.recordReader = recordReader;
+            this.deepPartition = dp;
+        }
 
-	@Override
-	public R apply() {
-	    try {
-		log().debug("Closing context for partition " + deepPartition);
+        @Override
+        public R apply() {
+            try {
+                log().debug("Closing context for partition " + deepPartition);
 
-		recordReader.close();
-	    } catch (IOException e) {
-		throw new DeepIOException(e);
-	    }
-	    return null;
-	}
+                recordReader.close();
+            } catch (IOException e) {
+                throw new DeepIOException(e);
+            }
+            return null;
+        }
 
     }
 
+    private static <W> void doCql3SaveToCassandra(RDD<W> rdd, IDeepJobConfig<W> writeConfig,
+        Function1<W, Tuple2<Cells, Cells>> transformer) {
+
+        Tuple2<Map<String, ByteBuffer>, Map<String, ByteBuffer>> tuple = new Tuple2<>(null, null);
+
+        RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
+            ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
+
+        ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD);
+
+        final int pageSize = writeConfig.getBatchSize();
+        int offset = 0;
+
+        Logger logger = Logger.getLogger(CassandraRDD.class);
+
+        List<Tuple2<Cells, Cells>> elements = Arrays.asList((Tuple2<Cells, Cells>[])mappedRDD.collect());
+        List<Tuple2<Cells, Cells>> split;
+        do {
+            logger.info("Iterating. pageSize: " + pageSize + ", offset: " + offset);
+
+            split = elements.subList(pageSize * (offset++), Math.min(pageSize * offset, elements.size()));
+
+            Batch batch = QueryBuilder.batch();
+
+            for (Tuple2<Cells, Cells> t : split) {
+                Tuple2<String[], Object[]> bindVars = Utils.prepareTuple4CqlDriver(t);
+
+                Insert insert = QueryBuilder.insertInto(writeConfig.getKeyspace(), writeConfig.getTable())
+                    .values(bindVars._1(), bindVars._2());
+
+                batch.add(insert);
+            }
+            writeConfig.getSession().execute(batch);
+
+        } while (split.size() > 0 && split.size() == pageSize);
+    }
+
     /**
-     * Provided the mapping function <i>transformer</i> that transforms a generic RDD to an RDD<Tuple2<Cells, Cells>>, 
+     * Persists the given RDD to the underlying Cassandra datastore using the java cql3 driver.<br/>
+     * Beware: this method does not perform a distributed write as {@link  #saveRDDToCassandra(org.apache.spark.rdd.RDD, com.stratio.deep.config.IDeepJobConfig)}
+     * does, uses the Datastax Java Driver to perform a batch write to the Cassandra server.<br/>
+     * This currently scans the partitions one by one, so it will be slow if a lot of partitions are required.
+     *
+     * @param rdd
+     * @param writeConfig
+     */
+    public static <W, T extends IDeepType> void cql3SaveRDDToCassandra(RDD<W> rdd, IDeepJobConfig<W> writeConfig) {
+        if (IDeepType.class.isAssignableFrom(writeConfig.getEntityClass())) {
+            IDeepJobConfig<T> c = (IDeepJobConfig<T>) writeConfig;
+            RDD<T> r = (RDD<T>) rdd;
+
+            doCql3SaveToCassandra(r, c, new DeepType2TupleFunction<T>());
+        } else if (Cells.class.isAssignableFrom(writeConfig.getEntityClass())) {
+            IDeepJobConfig<Cells> c = (IDeepJobConfig<Cells>) writeConfig;
+            RDD<Cells> r = (RDD<Cells>) rdd;
+
+            doCql3SaveToCassandra(r, c, new CellList2TupleFunction());
+        } else {
+            throw new IllegalArgumentException("Provided RDD must be an RDD of com.stratio.deep.entity.Cells or an RDD of com.stratio.deep.entity.IDeepType");
+        }
+    }
+
+    /**
+     * Provided the mapping function <i>transformer</i> that transforms a generic RDD to an RDD<Tuple2<Cells, Cells>>,
      * this generic method persists the RDD to underlying Cassandra datastore.
      *
      * @param rdd
@@ -120,19 +186,21 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * @param transformer
      */
     private static <W> void doSaveToCassandra(RDD<W> rdd, IDeepJobConfig<W> writeConfig,
-		    Function1<W, Tuple2<Cells, Cells>> transformer) {
+        Function1<W, Tuple2<Cells, Cells>> transformer) {
 
-	Tuple2<Map<String, ByteBuffer>, Map<String, ByteBuffer>> tuple = new Tuple2<>(null, null);
+        Tuple2<Map<String, ByteBuffer>, Map<String, ByteBuffer>> tuple = new Tuple2<>(null, null);
 
-	RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
-			ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
+        RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
+            ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
 
-	ClassTag<Cells> keyClassTag = ClassTag$.MODULE$.apply(Cells.class);
+        ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD);
 
-	JavaPairRDD<Cells, Cells> pairRDD = new JavaPairRDD<>(mappedRDD, keyClassTag, keyClassTag);
+        ClassTag<Cells> keyClassTag = ClassTag$.MODULE$.apply(Cells.class);
 
-	pairRDD.saveAsNewAPIHadoopFile(writeConfig.getKeyspace(), Cells.class, Cells.class, DeepCqlOutputFormat.class,
-			writeConfig.getConfiguration());
+        PairRDDFunctions<Cells, Cells> functions = new PairRDDFunctions<>(mappedRDD, keyClassTag, keyClassTag);
+
+        functions.saveAsNewAPIHadoopFile(writeConfig.getKeyspace(), Cells.class, Cells.class, DeepCqlOutputFormat.class,
+            writeConfig.getConfiguration());
     }
 
     /**
@@ -143,19 +211,19 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * @param writeConfig
      */
     public static <W, T extends IDeepType> void saveRDDToCassandra(RDD<W> rdd, IDeepJobConfig<W> writeConfig) {
-	if (IDeepType.class.isAssignableFrom(writeConfig.getEntityClass())) {
-	    IDeepJobConfig<T> c = (IDeepJobConfig<T>) writeConfig;
-	    RDD<T> r = (RDD<T>) rdd;
+        if (IDeepType.class.isAssignableFrom(writeConfig.getEntityClass())) {
+            IDeepJobConfig<T> c = (IDeepJobConfig<T>) writeConfig;
+            RDD<T> r = (RDD<T>) rdd;
 
-	    doSaveToCassandra(r, c, new DeepType2TupleFunction<T>());
-	} else if (Cells.class.isAssignableFrom(writeConfig.getEntityClass())) {
-	    IDeepJobConfig<Cells> c = (IDeepJobConfig<Cells>) writeConfig;
-	    RDD<Cells> r = (RDD<Cells>) rdd;
+            doSaveToCassandra(r, c, new DeepType2TupleFunction<T>());
+        } else if (Cells.class.isAssignableFrom(writeConfig.getEntityClass())) {
+            IDeepJobConfig<Cells> c = (IDeepJobConfig<Cells>) writeConfig;
+            RDD<Cells> r = (RDD<Cells>) rdd;
 
-	    doSaveToCassandra(r, c, new CellList2TupleFunction());
-	} else {
-	    throw new IllegalArgumentException("Provided RDD must be an RDD of com.stratio.deep.entity.Cells or an RDD of com.stratio.deep.entity.IDeepType");
-	}
+            doSaveToCassandra(r, c, new CellList2TupleFunction());
+        } else {
+            throw new IllegalArgumentException("Provided RDD must be an RDD of com.stratio.deep.entity.Cells or an RDD of com.stratio.deep.entity.IDeepType");
+        }
     }
 
     /**
@@ -166,17 +234,17 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * @param <W>
      */
     public static <W> void saveRDDToCassandra(JavaRDD<W> rdd, IDeepJobConfig<W> writeConfig) {
-	saveRDDToCassandra(rdd.rdd(), writeConfig);
+        saveRDDToCassandra(rdd.rdd(), writeConfig);
     }
+
 
     @SuppressWarnings("unchecked")
     public CassandraRDD(SparkContext sc, IDeepJobConfig<T> config) {
+        super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
 
-	super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
-
-	long timestamp = System.currentTimeMillis();
-	hadoopJobId = new JobID(STRATIO_DEEP_JOB_PREFIX + timestamp, id());
-	this.config = sc.broadcast(config);
+        long timestamp = System.currentTimeMillis();
+        hadoopJobId = new JobID(STRATIO_DEEP_JOB_PREFIX + timestamp, id());
+        this.config = sc.broadcast(config);
     }
 
     /**
@@ -186,41 +254,41 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     @Override
     public Iterator<T> compute(Partition split, TaskContext ctx) {
 
-	final DeepCqlPagingInputFormat inputFormat = new DeepCqlPagingInputFormat();
-	DeepPartition deepPartition = (DeepPartition) split;
+        final DeepCqlPagingInputFormat inputFormat = new DeepCqlPagingInputFormat();
+        DeepPartition deepPartition = (DeepPartition) split;
 
-	log().debug("Executing compute for split: " + deepPartition);
+        log().debug("Executing compute for split: " + deepPartition);
 
-	final DeepCqlPagingRecordReader recordReader = initRecordReader(ctx, inputFormat, deepPartition);
+        final DeepCqlPagingRecordReader recordReader = initRecordReader(ctx, inputFormat, deepPartition);
 
 	/*
-	 * Creates a new anonymous iterator inner class and returns it as a
+   * Creates a new anonymous iterator inner class and returns it as a
 	 * scala iterator.
 	 */
-	java.util.Iterator<T> recordReaderIterator = new java.util.Iterator<T>() {
+        java.util.Iterator<T> recordReaderIterator = new java.util.Iterator<T>() {
 
-	    @Override
-	    public boolean hasNext() {
-		return recordReader.hasNext();
-	    }
+            @Override
+            public boolean hasNext() {
+                return recordReader.hasNext();
+            }
 
-	    @Override
-	    public T next() {
-		return transformElement(recordReader.next());
-	    }
+            @Override
+            public T next() {
+                return transformElement(recordReader.next());
+            }
 
-	    @Override
-	    public void remove() {
-		throw new DeepIOException("Method not implemented (and won't be implemented anytime soon!!!)");
-	    }
-	};
+            @Override
+            public void remove() {
+                throw new DeepIOException("Method not implemented (and won't be implemented anytime soon!!!)");
+            }
+        };
 
-	return asScalaIterator(recordReaderIterator);
+        return asScalaIterator(recordReaderIterator);
     }
 
     protected AbstractFunction0<BoxedUnit> getComputeCallback(DeepCqlPagingRecordReader recordReader,
-		    DeepPartition dp) {
-	return new OnComputedRDDCallback<>(recordReader, dp);
+        DeepPartition dp) {
+        return new OnComputedRDDCallback<>(recordReader, dp);
     }
 
     /**
@@ -233,27 +301,27 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      */
     @Override
     public Partition[] getPartitions() {
-	final JobContext hadoopJobContext = new JobContext(config.value().getConfiguration(), hadoopJobId);
+        final JobContext hadoopJobContext = new JobContext(config.value().getConfiguration(), hadoopJobId);
 
-	final DeepCqlPagingInputFormat cqlInputFormat = new DeepCqlPagingInputFormat();
+        final DeepCqlPagingInputFormat cqlInputFormat = new DeepCqlPagingInputFormat();
 
-	List<InputSplit> underlyingInputSplits;
-	try {
-	    underlyingInputSplits = cqlInputFormat.getSplits(hadoopJobContext);
-	} catch (IOException e) {
-	    throw new DeepIOException(e);
-	}
+        List<InputSplit> underlyingInputSplits;
+        try {
+            underlyingInputSplits = cqlInputFormat.getSplits(hadoopJobContext);
+        } catch (IOException e) {
+            throw new DeepIOException(e);
+        }
 
-	Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
+        Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
 
-	for (int i = 0; i < underlyingInputSplits.size(); i++) {
-	    InputSplit split = underlyingInputSplits.get(i);
-	    partitions[i] = new DeepPartition(id(), i, (Writable) split);
+        for (int i = 0; i < underlyingInputSplits.size(); i++) {
+            InputSplit split = underlyingInputSplits.get(i);
+            partitions[i] = new DeepPartition(id(), i, (Writable) split);
 
-	    log().debug("Detected partition: " + partitions[i]);
-	}
+            log().debug("Detected partition: " + partitions[i]);
+        }
 
-	return partitions;
+        return partitions;
     }
 
     /**
@@ -265,12 +333,12 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      */
     @Override
     public Seq<String> getPreferredLocations(Partition split) {
-	DeepPartition p = (DeepPartition) split;
+        DeepPartition p = (DeepPartition) split;
 
-	String[] locations = p.splitWrapper().value().getLocations();
-	log().debug("getPreferredLocations: " + p);
+        String[] locations = p.splitWrapper().value().getLocations();
+        log().debug("getPreferredLocations: " + p);
 
-	return asScalaBuffer(Arrays.asList(locations));
+        return asScalaBuffer(Arrays.asList(locations));
     }
 
     /**
@@ -289,49 +357,25 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * @return
      */
     protected DeepCqlPagingRecordReader initRecordReader(TaskContext ctx,
-		    final DeepCqlPagingInputFormat inputFormat, final DeepPartition dp) {
-	try {
+        final DeepCqlPagingInputFormat inputFormat, final DeepPartition dp) {
+        try {
 
-	    TaskAttemptID attemptId = new TaskAttemptID(STRATIO_DEEP_TASK_PREFIX + System.currentTimeMillis(), id(),
-			    true, dp.index(), 0);
+            TaskAttemptID attemptId = new TaskAttemptID(STRATIO_DEEP_TASK_PREFIX + System.currentTimeMillis(), id(),
+                true, dp.index(), 0);
 
-	    DeepTaskAttemptContext taskCtx = new DeepTaskAttemptContext((GenericDeepJobConfig) config.value(), attemptId);
+            DeepTaskAttemptContext taskCtx = new DeepTaskAttemptContext((GenericDeepJobConfig) config.value(), attemptId);
 
-	    final DeepCqlPagingRecordReader recordReader = (DeepCqlPagingRecordReader) inputFormat
-			    .createRecordReader(dp.splitWrapper().value(), taskCtx);
+            final DeepCqlPagingRecordReader recordReader = (DeepCqlPagingRecordReader) inputFormat
+                .createRecordReader(dp.splitWrapper().value(), taskCtx);
 
-	    log().debug("Initializing recordReader for split: " + dp);
-	    recordReader.initialize(dp.splitWrapper().value(), taskCtx);
+            log().debug("Initializing recordReader for split: " + dp);
+            recordReader.initialize(dp.splitWrapper().value(), taskCtx);
 
-	    ctx.addOnCompleteCallback(getComputeCallback(recordReader, dp));
+            ctx.addOnCompleteCallback(getComputeCallback(recordReader, dp));
 
-	    return recordReader;
-	} catch (IOException | InterruptedException e) {
-	    throw new DeepIOException(e);
-	}
-    }
-
-    /**
-     * Adds a new filter on the specified. This will affect the generation of queries<br/>
-     * against the underlying Cassandra datastore.
-     *
-     * @param fieldName
-     * @param value
-     * @return
-     */
-    public CassandraRDD<T> filterByField(String fieldName, Serializable value){
-	((GenericDeepJobConfig)config.value()).addFilter(fieldName, value);
-	return this;
-    }
-
-    /**
-     * Removes the specified filter on the provided field (if exists).
-     *
-     * @param fieldName
-     * @return
-     */
-    public CassandraRDD<T> removeFilterOnField(String fieldName){
-	((GenericDeepJobConfig)config.value()).removeFilter(fieldName);
-	return this;
+            return recordReader;
+        } catch (IOException | InterruptedException e) {
+            throw new DeepIOException(e);
+        }
     }
 }

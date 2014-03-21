@@ -10,6 +10,7 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.entity.Cql3TestEntity;
+import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
@@ -24,172 +25,257 @@ import static org.testng.Assert.*;
 /**
  * Created by luca on 03/02/14.
  */
-@Test(suiteName = "cassandraRddTests", groups = { "CassandraCql3RDDTest" }, dependsOnGroups = { "CassandraEntityRDDTest" })
+@Test(suiteName = "cassandraRddTests", groups = {"CassandraCql3RDDTest"}, dependsOnGroups = {"CassandraEntityRDDTest"})
 public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
 
     private static class TestEntityAbstractSerializableFunction extends
-		    AbstractSerializableFunction<Cql3TestEntity, Cql3TestEntity> {
-	private static final long serialVersionUID = 6678218192781434399L;
+        AbstractSerializableFunction<Cql3TestEntity, Cql3TestEntity> {
+        private static final long serialVersionUID = 6678218192781434399L;
 
-	@Override
-	public Cql3TestEntity apply(Cql3TestEntity e) {
-	    return new Cql3TestEntity(e.getName(), e.getPassword(), e.getColor(), e.getGender(), e.getFood(),
-			    e.getAnimal(), e.getLucene());
-	}
+        @Override
+        public Cql3TestEntity apply(Cql3TestEntity e) {
+            return new Cql3TestEntity(e.getName(), e.getPassword(), e.getColor(), e.getGender(), e.getFood(),
+                e.getAnimal(), e.getLucene());
+        }
     }
 
     @Override
     protected void checkComputedData(Cql3TestEntity[] entities) {
 
-	boolean found = false;
+        boolean found = false;
 
-	assertEquals(entities.length, cql3TestDataSize);
+        assertEquals(entities.length, cql3TestDataSize);
 
-	for (Cql3TestEntity e : entities) {
-	    if (e.getName().equals("pepito_3") && e.getAge().equals(-2) && e.getGender().equals("male")
-			    && e.getAnimal().equals("monkey")) {
-		assertNull(e.getColor());
-		assertNull(e.getLucene());
-		assertEquals(e.getFood(), "donuts");
-		assertEquals(e.getPassword(), "abc");
-		found = true;
-		break;
-	    }
-	}
+        for (Cql3TestEntity e : entities) {
+            if (e.getName().equals("pepito_3") && e.getAge().equals(-2) && e.getGender().equals("male")
+                && e.getAnimal().equals("monkey")) {
+                assertNull(e.getColor());
+                assertNull(e.getLucene());
+                assertEquals(e.getFood(), "donuts");
+                assertEquals(e.getPassword(), "abc");
+                found = true;
+                break;
+            }
+        }
 
-	if (!found) {
-	    fail();
-	}
+        if (!found) {
+            fail();
+        }
 
     }
 
     @Test
-    public void testAdditionalFilters(){
+    public void testAdditionalFilters() {
+        try {
+            DeepJobConfigFactory
+                .create(Cql3TestEntity.class)
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .keyspace(KEYSPACE_NAME)
+                .columnFamily(CQL3_COLUMN_FAMILY)
+                .filterByField("notExistentField", "val")
+                .initialize();
 
-	CassandraRDD<Cql3TestEntity> otherRDD=initRDD();
+            fail();
+        } catch (DeepNoSuchFieldException e) {
+            // OK
+        }
 
-	try {
-	    otherRDD.filterByField("notExistentField", "val");
-	    fail();
-	} catch (DeepNoSuchFieldException e) {
-	    // OK
-	}
+        try {
+            DeepJobConfigFactory
+                .create(Cql3TestEntity.class)
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .keyspace(KEYSPACE_NAME)
+                .columnFamily(CQL3_COLUMN_FAMILY)
+                .filterByField("lucene", "val")
+                .initialize();
 
-	try {
-	    otherRDD.filterByField("lucene", "val");
-	    fail();
-	} catch (DeepIndexNotFoundException e) {
-	    // OK
-	}
+            fail();
+        } catch (DeepIndexNotFoundException e) {
+            // OK
+        }
 
-	Cql3TestEntity[] entities = (Cql3TestEntity[])otherRDD.collect();
+        Cql3TestEntity[] entities = (Cql3TestEntity[]) rdd.collect();
 
-	int allElements = entities.length;
-	assertTrue(allElements > 1);
-	otherRDD.filterByField("food", "donuts");
+        int allElements = entities.length;
+        assertTrue(allElements > 1);
 
-	entities = (Cql3TestEntity[])otherRDD.collect();
+        IDeepJobConfig<Cql3TestEntity> config = DeepJobConfigFactory
+            .create(Cql3TestEntity.class)
+            .host(Constants.DEFAULT_CASSANDRA_HOST)
+            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+            .keyspace(KEYSPACE_NAME)
+            .columnFamily(CQL3_COLUMN_FAMILY)
+            .filterByField("food", "donuts")
+            .initialize();
 
-	assertEquals(entities.length, 1);
-	assertEquals(entities[0].getFood(), "donuts");
-	assertEquals(entities[0].getName(), "pepito_3");
-	assertEquals(entities[0].getGender(), "male");
-	assertEquals(entities[0].getAge(), Integer.valueOf(-2));
-	assertEquals(entities[0].getAnimal(), "monkey");
+        CassandraRDD<Cql3TestEntity> otherRDD = context.cassandraEntityRDD(config);
 
-	otherRDD.filterByField("food", "chips");
-	entities = (Cql3TestEntity[])otherRDD.collect();
-	assertEquals(entities.length, allElements-1);
+        entities = (Cql3TestEntity[]) otherRDD.collect();
 
-	otherRDD.removeFilterOnField("food");
-	entities = (Cql3TestEntity[])otherRDD.collect();
-	assertEquals(entities.length, allElements);
+        assertEquals(entities.length, 1);
+        assertEquals(entities[0].getFood(), "donuts");
+        assertEquals(entities[0].getName(), "pepito_3");
+        assertEquals(entities[0].getGender(), "male");
+        assertEquals(entities[0].getAge(), Integer.valueOf(-2));
+        assertEquals(entities[0].getAnimal(), "monkey");
+
+        config = DeepJobConfigFactory
+            .create(Cql3TestEntity.class)
+            .host(Constants.DEFAULT_CASSANDRA_HOST)
+            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+            .keyspace(KEYSPACE_NAME)
+            .columnFamily(CQL3_COLUMN_FAMILY)
+            .filterByField("food", "chips")
+            .initialize();
+
+        otherRDD = context.cassandraEntityRDD(config);
+
+        entities = (Cql3TestEntity[]) otherRDD.collect();
+        assertEquals(entities.length, allElements - 1);
+
+        /*
+        otherRDD.removeFilterOnField("food");
+        entities = (Cql3TestEntity[]) otherRDD.collect();
+        assertEquals(entities.length, allElements);
+        */
     }
 
 
     protected void checkOutputTestData() {
-	Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-			.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
-	Session session = cluster.connect();
+        Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
+            .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+        Session session = cluster.connect();
 
-	String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + CQL3_ENTITY_OUTPUT_COLUMN_FAMILY + ";";
+        String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + CQL3_ENTITY_OUTPUT_COLUMN_FAMILY + ";";
 
-	ResultSet rs = session.execute(command);
-	assertEquals(rs.one().getLong(0), 4);
+        ResultSet rs = session.execute(command);
+        assertEquals(rs.one().getLong(0), 4);
 
-	command = "SELECT * from " + OUTPUT_KEYSPACE_NAME + "." + CQL3_ENTITY_OUTPUT_COLUMN_FAMILY + ";";
+        command = "SELECT * from " + OUTPUT_KEYSPACE_NAME + "." + CQL3_ENTITY_OUTPUT_COLUMN_FAMILY + ";";
 
-	rs = session.execute(command);
-	for (Row r : rs) {
-	    assertEquals(r.getInt("age"), 15);
-	}
-	session.close();
+        rs = session.execute(command);
+        for (Row r : rs) {
+            assertEquals(r.getInt("age"), 15);
+        }
+        session.close();
     }
 
     @Override
     protected void checkSimpleTestData() {
-	Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-			.addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
-	Session session = cluster.connect();
+        Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
+            .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+        Session session = cluster.connect();
 
-	String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + CQL3_ENTITY_OUTPUT_COLUMN_FAMILY + ";";
+        String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + CQL3_ENTITY_OUTPUT_COLUMN_FAMILY + ";";
 
-	ResultSet rs = session.execute(command);
-	assertEquals(rs.one().getLong(0), cql3TestDataSize);
+        ResultSet rs = session.execute(command);
+        assertEquals(rs.one().getLong(0), cql3TestDataSize);
 
-	command = "select * from " + OUTPUT_KEYSPACE_NAME + "." + CQL3_ENTITY_OUTPUT_COLUMN_FAMILY
-			+ " WHERE name = 'pepito_1' and gender = 'male' and age = 0  and animal = 'monkey';";
-	rs = session.execute(command);
+        command = "select * from " + OUTPUT_KEYSPACE_NAME + "." + CQL3_ENTITY_OUTPUT_COLUMN_FAMILY
+            + " WHERE name = 'pepito_1' and gender = 'male' and age = 0  and animal = 'monkey';";
+        rs = session.execute(command);
 
-	List<Row> rows = rs.all();
+        List<Row> rows = rs.all();
 
-	assertNotNull(rows);
-	assertEquals(rows.size(), 1);
+        assertNotNull(rows);
+        assertEquals(rows.size(), 1);
 
-	Row r = rows.get(0);
+        Row r = rows.get(0);
 
-	assertEquals(r.getString("password"), "xyz");
+        assertEquals(r.getString("password"), "xyz");
 
-	session.close();
+        session.close();
     }
 
     @Override
     protected CassandraRDD<Cql3TestEntity> initRDD() {
-	assertNotNull(context);
-	return context.cassandraEntityRDD(getReadConfig());
+        assertNotNull(context);
+        return context.cassandraEntityRDD(getReadConfig());
     }
 
     @Override
     protected IDeepJobConfig<Cql3TestEntity> initReadConfig() {
-	return DeepJobConfigFactory.create(Cql3TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST)
-			.cqlPort(CassandraServer.CASSANDRA_CQL_PORT).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(KEYSPACE_NAME).columnFamily(CQL3_COLUMN_FAMILY)
-			.initialize();
+        return DeepJobConfigFactory.create(Cql3TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST)
+            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(KEYSPACE_NAME).columnFamily(CQL3_COLUMN_FAMILY)
+            .initialize();
     }
 
     @Override
     protected IDeepJobConfig<Cql3TestEntity> initWriteConfig() {
 
-	return DeepJobConfigFactory.create(Cql3TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST)
-			.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(OUTPUT_KEYSPACE_NAME)
-			.cqlPort(CassandraServer.CASSANDRA_CQL_PORT).columnFamily(CQL3_ENTITY_OUTPUT_COLUMN_FAMILY).initialize();
+        return DeepJobConfigFactory.create(Cql3TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST)
+            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(OUTPUT_KEYSPACE_NAME)
+            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).columnFamily(CQL3_ENTITY_OUTPUT_COLUMN_FAMILY)
+            .createTableOnWrite(Boolean.TRUE).initialize();
     }
 
     @Override
     public void testSaveToCassandra() {
-	Function1<Cql3TestEntity, Cql3TestEntity> mappingFunc = new TestEntityAbstractSerializableFunction();
-	RDD<Cql3TestEntity> mappedRDD = getRDD().map(mappingFunc,
-			ClassTag$.MODULE$.<Cql3TestEntity>apply(Cql3TestEntity.class));
-	truncateCf(OUTPUT_KEYSPACE_NAME, CQL3_ENTITY_OUTPUT_COLUMN_FAMILY);
-	assertTrue(mappedRDD.count() > 0);
-	CassandraRDD.saveRDDToCassandra(mappedRDD, getWriteConfig());
-	checkOutputTestData();
+        Function1<Cql3TestEntity, Cql3TestEntity> mappingFunc = new TestEntityAbstractSerializableFunction();
+        RDD<Cql3TestEntity> mappedRDD = getRDD().map(mappingFunc,
+            ClassTag$.MODULE$.<Cql3TestEntity>apply(Cql3TestEntity.class));
+        try {
+            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + CQL3_ENTITY_OUTPUT_COLUMN_FAMILY);
+        } catch (Exception e) {
+        }
+
+        assertTrue(mappedRDD.count() > 0);
+
+        IDeepJobConfig<Cql3TestEntity> writeConfig = getWriteConfig();
+        writeConfig.createTableOnWrite(Boolean.FALSE);
+
+        try {
+            CassandraRDD.saveRDDToCassandra(mappedRDD, writeConfig);
+            fail();
+        } catch (DeepIOException e) {
+            // ok
+            writeConfig.createTableOnWrite(Boolean.TRUE);
+        }
+
+        CassandraRDD.saveRDDToCassandra(mappedRDD, writeConfig);
+        checkOutputTestData();
     }
 
     @Override
     public void testSimpleSaveToCassandra() {
-	truncateCf(OUTPUT_KEYSPACE_NAME, CQL3_ENTITY_OUTPUT_COLUMN_FAMILY);
-	CassandraRDD.saveRDDToCassandra(getRDD(), getWriteConfig());
-	checkSimpleTestData();
+        try {
+            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + CQL3_ENTITY_OUTPUT_COLUMN_FAMILY);
+        } catch (Exception e) {
+        }
 
+        IDeepJobConfig<Cql3TestEntity> writeConfig = getWriteConfig();
+        writeConfig.createTableOnWrite(Boolean.FALSE);
+
+        try {
+            CassandraRDD.saveRDDToCassandra(getRDD(), writeConfig);
+            fail();
+        } catch (DeepIOException e) {
+            // ok
+            writeConfig.createTableOnWrite(Boolean.TRUE);
+        }
+
+        CassandraRDD.saveRDDToCassandra(getRDD(), writeConfig);
+
+        checkSimpleTestData();
+
+    }
+
+    @Override
+    public void testCql3SaveToCassandra() {
+        try {
+            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + CQL3_ENTITY_OUTPUT_COLUMN_FAMILY);
+        } catch (Exception e) {
+        }
+
+        IDeepJobConfig<Cql3TestEntity> writeConfig = getWriteConfig();
+
+        CassandraRDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
+        checkSimpleTestData();
     }
 }

@@ -28,15 +28,15 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     protected abstract void checkSimpleTestData();
 
     protected CassandraRDD<W> getRDD() {
-	return this.rdd;
+        return this.rdd;
     }
 
     protected IDeepJobConfig<W> getReadConfig() {
-	return rddConfig;
+        return rddConfig;
     }
 
     protected IDeepJobConfig<W> getWriteConfig() {
-	return writeConfig;
+        return writeConfig;
     }
 
     protected abstract CassandraRDD<W> initRDD();
@@ -45,11 +45,11 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
 
     @BeforeClass
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
-		    InterruptedException {
+        InterruptedException {
 
-	rddConfig = initReadConfig();
-	writeConfig = initWriteConfig();
-	rdd = initRDD();
+        rddConfig = initReadConfig();
+        writeConfig = initWriteConfig();
+        rdd = initRDD();
     }
 
     protected abstract IDeepJobConfig<W> initWriteConfig();
@@ -58,39 +58,39 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     @Test(dependsOnMethods = "testGetPreferredLocations")
     public void testCompute() throws CharacterCodingException {
 
-	logger.info("testCompute()");
-	Object obj = getRDD().collect();
+        logger.info("testCompute()");
+        Object obj = getRDD().collect();
 
-	assertNotNull(obj);
+        assertNotNull(obj);
 
-	W[] entities = (W[]) obj;
+        W[] entities = (W[]) obj;
 
-	checkComputedData(entities);
+        checkComputedData(entities);
     }
 
     @Test(dependsOnMethods = "testRDDInstantiation")
     public void testGetPartitions() {
-	logger.info("testGetPartitions()");
-	Partition[] partitions = getRDD().partitions();
+        logger.info("testGetPartitions()");
+        Partition[] partitions = getRDD().partitions();
 
-	assertNotNull(partitions);
-	assertEquals(partitions.length, 8 + 1);
+        assertNotNull(partitions);
+        assertEquals(partitions.length, 8 + 1);
     }
 
     @Test(dependsOnMethods = "testGetPartitions")
     public void testGetPreferredLocations() {
-	logger.info("testGetPreferredLocations()");
-	Partition[] partitions = getRDD().partitions();
+        logger.info("testGetPreferredLocations()");
+        Partition[] partitions = getRDD().partitions();
 
-	Seq<String> locations = getRDD().getPreferredLocations(partitions[0]);
+        Seq<String> locations = getRDD().getPreferredLocations(partitions[0]);
 
-	assertNotNull(locations);
+        assertNotNull(locations);
     }
 
     @Test
     public void testRDDInstantiation() {
-	logger.info("testRDDInstantiation()");
-	assertNotNull(getRDD());
+        logger.info("testRDDInstantiation()");
+        assertNotNull(getRDD());
     }
 
     @Test(dependsOnMethods = "testSimpleSaveToCassandra")
@@ -100,7 +100,10 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     public abstract void testSimpleSaveToCassandra();
 
     protected void truncateCf(String keyspace, String cf) {
-	executeCustomCQL("TRUNCATE  " + keyspace + "." + cf);
+        executeCustomCQL("TRUNCATE  " + keyspace + "." + cf);
 
     }
+
+    @Test(dependsOnMethods = "testSaveToCassandra")
+    public abstract void testCql3SaveToCassandra();
 }

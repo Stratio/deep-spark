@@ -19,6 +19,6 @@ public class DeepType2TupleFunction<T extends IDeepType> extends AbstractSeriali
      */
     @Override
     public Tuple2<Cells, Cells> apply(T e) {
-	return Utils.deepType2tuple(e);
+        return Utils.deepType2tuple(e);
     }
 }

@@ -24,36 +24,36 @@ public class AnnotationUtils {
      * Cassandra marshaller.
      */
     public static final Map<Class, AbstractType<?>> MAP_JAVA_TYPE_TO_ABSTRACT_TYPE =
-		    ImmutableMap.<Class, AbstractType<?>>builder()
-				    .put(String.class, UTF8Type.instance)
-				    .put(Integer.class, Int32Type.instance)
-				    .put(Boolean.class, BooleanType.instance)
-				    .put(Date.class, TimestampType.instance)
-				    .put(BigDecimal.class, DecimalType.instance)
-				    .put(Long.class, LongType.instance)
-				    .put(Double.class, DoubleType.instance)
-				    .put(Float.class, FloatType.instance)
-				    .put(InetAddress.class, InetAddressType.instance)
-				    .put(Inet4Address.class, InetAddressType.instance)
-				    .put(Inet6Address.class, InetAddressType.instance)
-				    .put(BigInteger.class, IntegerType.instance)
-				    .put(UUID.class, UUIDType.instance).build();
+        ImmutableMap.<Class, AbstractType<?>>builder()
+            .put(String.class, UTF8Type.instance)
+            .put(Integer.class, Int32Type.instance)
+            .put(Boolean.class, BooleanType.instance)
+            .put(Date.class, TimestampType.instance)
+            .put(BigDecimal.class, DecimalType.instance)
+            .put(Long.class, LongType.instance)
+            .put(Double.class, DoubleType.instance)
+            .put(Float.class, FloatType.instance)
+            .put(InetAddress.class, InetAddressType.instance)
+            .put(Inet4Address.class, InetAddressType.instance)
+            .put(Inet6Address.class, InetAddressType.instance)
+            .put(BigInteger.class, IntegerType.instance)
+            .put(UUID.class, UUIDType.instance).build();
 
     public static final Map<Class<?>, AbstractType<?>> MAP_ABSTRACT_TYPE_CLASS_TO_ABSTRACT_TYPE =
-		    ImmutableMap.<Class<?>, AbstractType<?>>builder()
-				    .put(UTF8Type.class, UTF8Type.instance)
-				    .put(Int32Type.class, Int32Type.instance)
-				    .put(BooleanType.class, BooleanType.instance)
-				    .put(TimestampType.class, TimestampType.instance)
-				    .put(DecimalType.class, DecimalType.instance)
-				    .put(LongType.class, LongType.instance)
-				    .put(DoubleType.class, DoubleType.instance)
-				    .put(FloatType.class, FloatType.instance)
-				    .put(InetAddressType.class, InetAddressType.instance)
-				    .put(IntegerType.class, IntegerType.instance)
-				    .put(UUIDType.class, UUIDType.instance)
-				    .put(TimeUUIDType.class, TimeUUIDType.instance)
-				    .build();
+        ImmutableMap.<Class<?>, AbstractType<?>>builder()
+            .put(UTF8Type.class, UTF8Type.instance)
+            .put(Int32Type.class, Int32Type.instance)
+            .put(BooleanType.class, BooleanType.instance)
+            .put(TimestampType.class, TimestampType.instance)
+            .put(DecimalType.class, DecimalType.instance)
+            .put(LongType.class, LongType.instance)
+            .put(DoubleType.class, DoubleType.instance)
+            .put(FloatType.class, FloatType.instance)
+            .put(InetAddressType.class, InetAddressType.instance)
+            .put(IntegerType.class, IntegerType.instance)
+            .put(UUIDType.class, UUIDType.instance)
+            .put(TimeUUIDType.class, TimeUUIDType.instance)
+            .build();
 
 
     /**
@@ -64,12 +64,12 @@ public class AnnotationUtils {
      */
     public static String deepFieldName(Field field) {
 
-	DeepField annotation = field.getAnnotation(DeepField.class);
-	if (StringUtils.isNotEmpty(annotation.fieldName())) {
-	    return annotation.fieldName();
-	} else {
-	    return field.getName();
-	}
+        DeepField annotation = field.getAnnotation(DeepField.class);
+        if (StringUtils.isNotEmpty(annotation.fieldName())) {
+            return annotation.fieldName();
+        } else {
+            return field.getName();
+        }
     }
 
     /**
@@ -80,13 +80,13 @@ public class AnnotationUtils {
      * @return
      */
     public static Field[] filterDeepFields(Field[] fields) {
-	List<Field> filtered = new ArrayList<>();
-	for (Field f : fields) {
-	    if (f.isAnnotationPresent(DeepField.class)) {
-		filtered.add(f);
-	    }
-	}
-	return filtered.toArray(new Field[filtered.size()]);
+        List<Field> filtered = new ArrayList<>();
+        for (Field f : fields) {
+            if (f.isAnnotationPresent(DeepField.class)) {
+                filtered.add(f);
+            }
+        }
+        return filtered.toArray(new Field[filtered.size()]);
     }
 
     /**
@@ -98,19 +98,19 @@ public class AnnotationUtils {
      * @return
      */
     public static Pair<Field[], Field[]> filterKeyFields(Field[] fields) {
-	Field[] filtered = filterDeepFields(fields);
-	List<Field> keys = new ArrayList<>();
-	List<Field> others = new ArrayList<>();
+        Field[] filtered = filterDeepFields(fields);
+        List<Field> keys = new ArrayList<>();
+        List<Field> others = new ArrayList<>();
 
-	for (Field field : filtered) {
-	    if (isKey(field.getAnnotation(DeepField.class))) {
-		keys.add(field);
-	    } else {
-		others.add(field);
-	    }
-	}
+        for (Field field : filtered) {
+            if (isKey(field.getAnnotation(DeepField.class))) {
+                keys.add(field);
+            } else {
+                others.add(field);
+            }
+        }
 
-	return Pair.create(keys.toArray(new Field[keys.size()]), others.toArray(new Field[others.size()]));
+        return Pair.create(keys.toArray(new Field[keys.size()]), others.toArray(new Field[others.size()]));
     }
 
     /**
@@ -120,6 +120,6 @@ public class AnnotationUtils {
      * @return
      */
     public static boolean isKey(DeepField field) {
-	return field.isPartOfClusterKey() || field.isPartOfPartitionKey();
+        return field.isPartOfClusterKey() || field.isPartOfPartitionKey();
     }
 }

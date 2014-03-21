@@ -11,7 +11,6 @@ import com.stratio.deep.entity.IDeepType;
  * Factory class for deep configuration objects.
  *
  * @author Luca Rosellini <luca@stratio.com>
- *
  */
 public final class DeepJobConfigFactory implements Serializable {
 
@@ -19,10 +18,11 @@ public final class DeepJobConfigFactory implements Serializable {
 
     /**
      * Creates a new cell-based job configuration object.
+     *
      * @return
      */
     public static IDeepJobConfig<Cells> create() {
-	return new CellDeepJobConfig();
+        return new CellDeepJobConfig();
     }
 
     /**
@@ -31,6 +31,6 @@ public final class DeepJobConfigFactory implements Serializable {
      * @return
      */
     public static <T extends IDeepType> IDeepJobConfig<T> create(Class<T> entityClass) {
-	return new EntityDeepJobConfig<>(entityClass);
+        return new EntityDeepJobConfig<>(entityClass);
     }
 }

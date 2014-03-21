@@ -20,7 +20,7 @@ public final class CassandraJavaRDD<W> extends JavaRDD<W> {
      * @param rdd
      */
     public CassandraJavaRDD(CassandraRDD<W> rdd) {
-	super(rdd, ClassTag$.MODULE$.<W>apply(rdd.config.value().getEntityClass()));
+        super(rdd, ClassTag$.MODULE$.<W>apply(rdd.config.value().getEntityClass()));
     }
 
     /**
@@ -28,6 +28,6 @@ public final class CassandraJavaRDD<W> extends JavaRDD<W> {
      */
     @Override
     public ClassTag<W> classTag() {
-	return ClassTag$.MODULE$.<W>apply(((CassandraRDD<W>) this.rdd()).config.value().getEntityClass());
+        return ClassTag$.MODULE$.<W>apply(((CassandraRDD<W>) this.rdd()).config.value().getEntityClass());
     }
 }

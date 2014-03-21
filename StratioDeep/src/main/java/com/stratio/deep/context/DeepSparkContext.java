@@ -19,7 +19,6 @@ import org.apache.spark.api.java.JavaSparkContext;
  * Entry point to the Cassandra-aware Spark context.
  *
  * @author Luca Rosellini <luca@strat.io>
- *
  */
 public class DeepSparkContext extends JavaSparkContext {
 
@@ -29,7 +28,7 @@ public class DeepSparkContext extends JavaSparkContext {
      * @param sc
      */
     public DeepSparkContext(SparkContext sc) {
-	super(sc);
+        super(sc);
     }
 
     /**
@@ -39,7 +38,7 @@ public class DeepSparkContext extends JavaSparkContext {
      * @param appName
      */
     public DeepSparkContext(String master, String appName) {
-	super(master, appName);
+        super(master, appName);
     }
 
     /**
@@ -51,7 +50,7 @@ public class DeepSparkContext extends JavaSparkContext {
      * @param jarFile
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String jarFile) {
-	super(master, appName, sparkHome, jarFile);
+        super(master, appName, sparkHome, jarFile);
     }
 
     /**
@@ -63,7 +62,7 @@ public class DeepSparkContext extends JavaSparkContext {
      * @param jars
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String[] jars) {
-	super(master, appName, sparkHome, jars);
+        super(master, appName, sparkHome, jars);
     }
 
     /**
@@ -76,8 +75,8 @@ public class DeepSparkContext extends JavaSparkContext {
      * @param environment
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String[] jars,
-		    Map<String, String> environment) {
-	super(master, appName, sparkHome, jars, environment);
+        Map<String, String> environment) {
+        super(master, appName, sparkHome, jars, environment);
     }
 
     /**
@@ -86,17 +85,17 @@ public class DeepSparkContext extends JavaSparkContext {
      * @param config
      * @return
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> CassandraJavaRDD<T> cassandraJavaRDD(IDeepJobConfig<T> config) {
-	if (config instanceof EntityDeepJobConfig) {
-	    return new CassandraJavaRDD<T>(cassandraEntityRDD((EntityDeepJobConfig) config));
-	}
+        if (config instanceof EntityDeepJobConfig) {
+            return new CassandraJavaRDD<T>(cassandraEntityRDD((EntityDeepJobConfig) config));
+        }
 
-	if (config instanceof CellDeepJobConfig) {
-	    return new CassandraJavaRDD<T>((CassandraRDD<T>) cassandraGenericRDD((CellDeepJobConfig) config));
-	}
+        if (config instanceof CellDeepJobConfig) {
+            return new CassandraJavaRDD<T>((CassandraRDD<T>) cassandraGenericRDD((CellDeepJobConfig) config));
+        }
 
-	throw new DeepGenericException("not recognized config type");
+        throw new DeepGenericException("not recognized config type");
     }
 
     /**
@@ -106,7 +105,7 @@ public class DeepSparkContext extends JavaSparkContext {
      * @return
      */
     public <T extends IDeepType> CassandraRDD<T> cassandraEntityRDD(IDeepJobConfig<T> config) {
-	return new CassandraEntityRDD<T>(sc(), config);
+        return new CassandraEntityRDD<T>(sc(), config);
     }
 
     /**
@@ -116,6 +115,6 @@ public class DeepSparkContext extends JavaSparkContext {
      * @return
      */
     public CassandraRDD<Cells> cassandraGenericRDD(IDeepJobConfig<Cells> config) {
-	return new CassandraCellRDD(sc(), config);
+        return new CassandraCellRDD(sc(), config);
     }
 }

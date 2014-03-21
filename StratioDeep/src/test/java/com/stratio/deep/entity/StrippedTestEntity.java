@@ -19,33 +19,33 @@ public class StrippedTestEntity implements IDeepType {
     private Integer responseTime;
 
     public StrippedTestEntity(TestEntity te) {
-	this.id = te.getId();
-	this.url = te.getUrl();
-	this.responseTime = te.getResponseTime();
+        this.id = te.getId();
+        this.url = te.getUrl();
+        this.responseTime = te.getResponseTime();
     }
 
     String getId() {
-	return id;
+        return id;
     }
 
     Integer getResponseTime() {
-	return responseTime;
+        return responseTime;
     }
 
     String getUrl() {
-	return url;
+        return url;
     }
 
     void setId(String id) {
-	this.id = id;
+        this.id = id;
     }
 
     void setResponseTime(Integer responseTime) {
-	this.responseTime = responseTime;
+        this.responseTime = responseTime;
     }
 
     void setUrl(String url) {
-	this.url = url;
+        this.url = url;
     }
 
 }

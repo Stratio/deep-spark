@@ -1,10 +1,9 @@
 package com.stratio.deep.exception;
 
 /**
- * Generic Deep exception. 
- * 
- * @author Luca Rosellini <luca@stratio.com>
+ * Generic Deep exception.
  *
+ * @author Luca Rosellini <luca@stratio.com>
  */
 public class DeepGenericException extends RuntimeException {
 
@@ -12,26 +11,25 @@ public class DeepGenericException extends RuntimeException {
 
     /**
      * Default constructor.
-     * 
      */
     public DeepGenericException() {
-	super();
+        super();
     }
 
     public DeepGenericException(String message) {
-	super(message);
+        super(message);
     }
 
     public DeepGenericException(String message, Throwable cause) {
-	super(message, cause);
+        super(message, cause);
     }
 
     public DeepGenericException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-	super(message, cause, enableSuppression, writableStackTrace);
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 
     public DeepGenericException(Throwable cause) {
-	super(cause);
+        super(cause);
     }
 
 }

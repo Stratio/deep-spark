@@ -12,8 +12,8 @@ public class DeepTaskAttemptContext<T> extends TaskAttemptContext {
     GenericDeepJobConfig<T> conf;
 
     public DeepTaskAttemptContext(GenericDeepJobConfig<T> conf, TaskAttemptID taskId) {
-	super(conf.getConfiguration(), taskId);
+        super(conf.getConfiguration(), taskId);
 
-	this.conf = conf;
+        this.conf = conf;
     }
 }

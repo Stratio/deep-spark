@@ -57,7 +57,7 @@ RELEASE_VER=$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dex
 cd ${TMPDIR}/
 
 git flow init -d || { echo "Cannot initialize git flow in stratiodeep-clone project"; exit 1; }
-git flow release start $RELEASE_VER || { echo "Cannot create $RELEASE_VER branch"; exit 1; }
+git flow release start version-$RELEASE_VER || { echo "Cannot create $RELEASE_VER branch"; exit 1; }
 
 git status
 
@@ -72,7 +72,7 @@ find . -name 'pom.xml.versionsBackup' | xargs rm
 git commit -a -m "[StratioDeep release prepare] preparing for version ${RELEASE_VER}"  || { echo "Cannot commit changes in stratiodeep-clone project"; exit 1; }
 
 echo " >>> Uploading new release branch to remote repository"
-git flow release publish $RELEASE_VER || { echo "Cannot publish $RELEASE_VER branch"; exit 1; }
+git flow release publish version-$RELEASE_VER || { echo "Cannot publish $RELEASE_VER branch"; exit 1; }
 
 cd StratioDeepParent
 
@@ -96,6 +96,8 @@ fi
 echo "Finishing release ${RELEASE_VER}"
 mvn clean
 
+git commit -a -m "[Updated ChangeLog.txt for release ${RELEASE_VER}]"
+
 echo "Generating next SNAPSHOT version"
 curr_version=$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version 2>/dev/null | grep -v '\[')
 major=$(echo $curr_version | cut -d "." -f 1)
@@ -111,7 +113,9 @@ echo "Next SNAPSHOT version: ${next_version}"
 cd .. 
 
 echo "Finishing release"
-git flow release finish -mFinishing_Release_$RELEASE_VER $RELEASE_VER || { echo "Cannot finish Stratio Deep ${next_version}"; exit 1; }
+git flow release finish -k -mFinishing_Release_$RELEASE_VER version-$RELEASE_VER || { echo "Cannot finish Stratio Deep ${next_version}"; exit 1; }
+git push --tags
+
 git checkout develop
 
 cd StratioDeepParent

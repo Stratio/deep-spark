@@ -19,36 +19,36 @@ public class DeepPartition implements Partition {
 
     public DeepPartition(int rddId, int idx, Writable s) {
 
-	this.splitWrapper = new SerializableWritable<>((ColumnFamilySplit) s);
-	this.rddId = rddId;
-	this.idx = idx;
+        this.splitWrapper = new SerializableWritable<>((ColumnFamilySplit) s);
+        this.rddId = rddId;
+        this.idx = idx;
     }
 
     @Override
     public int hashCode() {
-	return (MAGIC_NUMBER * (MAGIC_NUMBER + this.rddId) + this.idx);
+        return (MAGIC_NUMBER * (MAGIC_NUMBER + this.rddId) + this.idx);
     }
 
     @Override
     public int index() {
-	return this.idx;
+        return this.idx;
     }
 
     public SerializableWritable<ColumnFamilySplit> splitWrapper() {
-	return this.splitWrapper;
+        return this.splitWrapper;
     }
 
     @Override
     public String toString() {
-	return "DeepPartition [rddId="
-			+ rddId
-			+ ", idx="
-			+ idx
-			+ ", "
-			+ (splitWrapper != null ? "startToken=" + splitWrapper.value().getStartToken() : "")
-			+ (splitWrapper != null ? ", endToken=" + splitWrapper.value().getEndToken() : "")
-			+ (splitWrapper != null ? ", locations=" + ArrayUtils.toString(splitWrapper.value().getLocations())
-			: "") + "]";
+        return "DeepPartition [rddId="
+            + rddId
+            + ", idx="
+            + idx
+            + ", "
+            + (splitWrapper != null ? "startToken=" + splitWrapper.value().getStartToken() : "")
+            + (splitWrapper != null ? ", endToken=" + splitWrapper.value().getEndToken() : "")
+            + (splitWrapper != null ? ", locations=" + ArrayUtils.toString(splitWrapper.value().getLocations())
+            : "") + "]";
     }
 
 }

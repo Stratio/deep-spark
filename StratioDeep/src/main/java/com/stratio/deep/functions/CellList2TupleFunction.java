@@ -17,6 +17,6 @@ public class CellList2TupleFunction extends AbstractSerializableFunction<Cells, 
      */
     @Override
     public Tuple2<Cells, Cells> apply(Cells cells) {
-	return Utils.cellList2tuple(cells);
+        return Utils.cellList2tuple(cells);
     }
 }

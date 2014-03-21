@@ -6,7 +6,6 @@ import com.stratio.deep.entity.Cells;
  * Cell-based configuration object.
  *
  * @author Luca Rosellini <luca@stratio.com>
- *
  */
 public class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
 
@@ -14,13 +13,13 @@ public class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
     private Cells dummyCells;
 
     {
-	dummyCells = new Cells();
+        dummyCells = new Cells();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Class<Cells> getEntityClass() {
-	return (Class<Cells>) dummyCells.getClass();
+        return (Class<Cells>) dummyCells.getClass();
     }
 
 }

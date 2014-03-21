@@ -11,14 +11,20 @@ import org.apache.spark.SparkContext;
 
 /**
  * Concrete implementation of a CassandraRDD representing an RDD of {@link com.stratio.deep.entity.Cells} element.<br/>
- *
  */
 public class CassandraCellRDD extends CassandraRDD<Cells> {
 
     private static final long serialVersionUID = -738528971629963221L;
 
+    /**
+     * This constructor should not be called explicitly.<br/>
+     * Use {@link com.stratio.deep.context.DeepSparkContext} instead to create an RDD.
+     *
+     * @param sc
+     * @param config
+     */
     public CassandraCellRDD(SparkContext sc, IDeepJobConfig<Cells> config) {
-	super(sc, config);
+        super(sc, config);
     }
 
     /**
@@ -28,25 +34,25 @@ public class CassandraCellRDD extends CassandraRDD<Cells> {
     @Override
     protected Cells transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem) {
 
-	Cells cells = new Cells();
-	Map<String, Cell> columnDefinitions = config.value().columnDefinitions();
+        Cells cells = new Cells();
+        Map<String, Cell> columnDefinitions = config.value().columnDefinitions();
 
-	for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
-	    Cell cd = columnDefinitions.get(entry.getKey());
-	    cells.add(Cell.create(entry.getKey(), entry.getValue(), cd.marshallerClassName(), cd.isPartitionKey(),
-			    cd.isClusterKey()));
-	}
+        for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
+            Cell cd = columnDefinitions.get(entry.getKey());
+            cells.add(Cell.create(entry.getKey(), entry.getValue(), cd.marshallerClassName(), cd.isPartitionKey(),
+                cd.isClusterKey()));
+        }
 
-	for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
-	    Cell cd = columnDefinitions.get(entry.getKey());
-	    if (cd == null){
-		continue;
-	    }
+        for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
+            Cell cd = columnDefinitions.get(entry.getKey());
+            if (cd == null) {
+                continue;
+            }
 
-	    cells.add(Cell.create(entry.getKey(), entry.getValue(), cd.marshallerClassName(), cd.isPartitionKey(),
-			    cd.isClusterKey()));
-	}
+            cells.add(Cell.create(entry.getKey(), entry.getValue(), cd.marshallerClassName(), cd.isPartitionKey(),
+                cd.isClusterKey()));
+        }
 
-	return cells;
+        return cells;
     }
 }

@@ -44,78 +44,78 @@ public class Cql3TestEntity implements IDeepType {
     }
 
     public Cql3TestEntity(String name, String password, String color, String gender, String food, String animal,
-		    String lucene) {
-	this.name = name;
-	this.password = password;
-	this.color = color;
-	this.gender = gender;
-	this.food = food;
-	this.animal = animal;
-	this.lucene = lucene;
-	this.age = 15;
+        String lucene) {
+        this.name = name;
+        this.password = password;
+        this.color = color;
+        this.gender = gender;
+        this.food = food;
+        this.animal = animal;
+        this.lucene = lucene;
+        this.age = 15;
     }
 
     public Integer getAge() {
-	return age;
+        return age;
     }
 
     public String getAnimal() {
-	return animal;
+        return animal;
     }
 
     public String getColor() {
-	return color;
+        return color;
     }
 
     public String getFood() {
-	return food;
+        return food;
     }
 
     public String getGender() {
-	return gender;
+        return gender;
     }
 
     public String getLucene() {
-	return lucene;
+        return lucene;
     }
 
     public String getName() {
-	return name;
+        return name;
     }
 
     public String getPassword() {
-	return password;
+        return password;
     }
 
     public void setAge(Integer age) {
-	this.age = age;
+        this.age = age;
     }
 
     public void setAnimal(String animal) {
-	this.animal = animal;
+        this.animal = animal;
     }
 
     public void setColor(String color) {
-	this.color = color;
+        this.color = color;
     }
 
     public void setFood(String food) {
-	this.food = food;
+        this.food = food;
     }
 
     public void setGender(String gender) {
-	this.gender = gender;
+        this.gender = gender;
     }
 
     public void setLucene(String lucene) {
-	this.lucene = lucene;
+        this.lucene = lucene;
     }
 
     public void setName(String name) {
-	this.name = name;
+        this.name = name;
     }
 
     public void setPassword(String password) {
-	this.password = password;
+        this.password = password;
     }
 }

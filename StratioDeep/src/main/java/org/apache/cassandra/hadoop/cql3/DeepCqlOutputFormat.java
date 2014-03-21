@@ -17,13 +17,15 @@ import org.apache.hadoop.util.Progressable;
  */
 public class DeepCqlOutputFormat extends AbstractColumnFamilyOutputFormat<Cells, Cells> {
 
-    /** Fills the deprecated OutputFormat interface for streaming. */
+    /**
+     * Fills the deprecated OutputFormat interface for streaming.
+     */
     @Override
     @Deprecated
     public RecordWriter<Cells, Cells> getRecordWriter(FileSystem fileSystem, JobConf entries, String s,
-		    Progressable progressable) throws IOException {
-	throw new NotImplementedException(
-			"Deprecated method \'getRecordWriter(FileSystem fileSystem, JobConf entries, String s, Progressable progressable)\' not implemented");
+        Progressable progressable) throws IOException {
+        throw new NotImplementedException(
+            "Deprecated method \'getRecordWriter(FileSystem fileSystem, JobConf entries, String s, Progressable progressable)\' not implemented");
     }
 
     /**
@@ -36,8 +38,8 @@ public class DeepCqlOutputFormat extends AbstractColumnFamilyOutputFormat<Cells,
      */
     @Override
     public org.apache.hadoop.mapreduce.RecordWriter<Cells, Cells> getRecordWriter(final TaskAttemptContext context)
-		    throws IOException, InterruptedException {
-	return new DeepCqlRecordWriter(context);
+        throws IOException, InterruptedException {
+        return new DeepCqlRecordWriter(context);
     }
 
 }
