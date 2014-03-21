@@ -1,3 +1,122 @@
+[0.1.0]
+
+- Changes in Spark:
+
+commit 318dc4f76e1d67e7cba18ffcd8e224717d7f038b
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Mar 18 14:51:12 2014 +0100
+
+    backported fix for SPARK-942 from master (will be 1.0.0)
+
+commit 4918bd474c076806bb34e2b327927797dcbccde5
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Mar 12 14:49:11 2014 +0100
+
+    added dropTake method to RDD (merged pull request https://github.com/mesos/spark/pull/617)
+
+commit a62a6d8afd089c3adab7e7a5040774ee576849be
+Merge: 7838bc4 0661cdc
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Mar 11 13:01:53 2014 +0100
+
+    Merge branch 'branch-0.9' of git://git.apache.org/incubator-spark into branch-0.9
+
+- Changes in Stratio DEEP:
+ 
+commit 2f20aafe6620ced3f68f038b3dba1d1473711e54
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Mar 20 18:39:21 2014 +0100
+
+    Added scala entity example and a new entity rdd test developed in Scala
+
+commit feb72ffd9f960c01f26d1b5b8346d61a77b69098
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Mar 20 18:38:43 2014 +0100
+
+    Added test for wrong fieldName property on @DeepField annotation
+
+commit 52615fe1e35cccdec251a316cc5e933dd04b79bc
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Mar 20 18:37:29 2014 +0100
+
+    - Refactored setter resolution to an utility class
+    - Added validation on fieldName field of @DeepField annotation
+
+commit 867ca6f91096410483e2880f0326cfb6a8f930f0
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Mar 20 18:35:02 2014 +0100
+
+    - added mixed java/scala nature
+
+commit a5bbef7559dc40c27252723a2453868bd29745eb
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Mar 19 11:15:03 2014 +0100
+
+    fixed race condition on the getSession and columnDefinitions() methods in GenericDeepJobConfig. Thanks MAPFRE team!
+
+commit ee343da86ab07f2d93531b0d206f0e71ed9c7aeb
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Mar 14 17:53:57 2014 +0100
+
+    Added cql3SaveRDDToCassandra and tests
+
+commit bf92698b84b24d24fc92887ab852d25f4a321c9b
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Mar 14 17:52:22 2014 +0100
+
+    configuration object maintains a persistent session opened to cassandra throughout the duration of its life.
+
+commit 12459af5f97ef681f525526b3e8a8ece647bc2ee
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Mar 14 10:08:12 2014 +0100
+
+    updated dependency to spark 0.9.1-incubating-SNAPSHOT (added method dropTake from spark pull request 617 (https://github.com/mesos/spark/pull/617)
+
+commit fadfd466ceaae6827ff1d49cf2bc1810d5c29714
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Mar 14 10:07:01 2014 +0100
+
+    FIX: initializes default read/write consistency level correctly
+
+commit 9c59b0898cbff7031811edac6c75b9b8c1270c58
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Mar 14 09:12:01 2014 +0100
+
+    NEW FEATURE: added getters for read/write consistency levels
+
+commit 29e0c5c710604c0d29423131238714931f45ff47
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Mar 6 09:02:08 2014 +0100
+
+    - FIX: filterByField has been removed from RDD and relegated to configuration object (since it's not possible to change the configuration on an already broadcasted configuration object).
+    - FIX: removeFilerOnField has been removed.
+
+commit e0b8f043bc3bc82caabb078e6aba6f78284af661
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Mar 6 09:00:14 2014 +0100
+
+    Update cassandra dependency to 2.0.53 (which is 2.0.5 modified by Stratio).
+
+commit ae4b0d513bee3220563b4326979c7b9153fa16af
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Mar 6 08:51:24 2014 +0100
+
+    Added lucene transitive dependencies
+
+commit d6455110163eaf35cf55edf03cefdbd25e2b7c6c
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Mar 4 15:16:30 2014 +0100
+
+    - Batch support for writes
+    - Added validation when writing an RDD in which we don't specify primary key metadata
+    - Code reformatted using a more sane formatting template
+
+commit 6b396c6de89363795b42e2a419c47f749802d564
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon Mar 3 14:55:29 2014 +0100
+
+    Now we create output CQL table if not exists on RDD write
+
 [0.0.23]
 
 commit 1bc0b857cfe4f73e14c1037b47a4d9e843669ac7
@@ -43,3 +162,4 @@ Date:   Thu Feb 20 12:56:43 2014 +0100
     - removed unused classes and methods
 
 [release-0.0.21]
+
