@@ -113,6 +113,7 @@
     <modules>
         <module>../StratioDeepCommons</module>
         <module>../StratioDeep</module>
+        <module>../StratioDeepExamples</module>
     </modules>
 
     <profiles>
