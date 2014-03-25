@@ -41,7 +41,7 @@ import org.apache.log4j.Logger;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@Test//(suiteName = "cassandraRddTests", dependsOnGroups = "ScalaCassandraEntityRDDTest", groups = "CassandraCollectionsTest" )
+@Test(suiteName = "cassandraRddTests", dependsOnGroups = "ScalaCassandraEntityRDDTest", groups = "CassandraCollectionsTest" )
 public class CassandraCollectionsTest extends CassandraRDDTest<Cql3CollectionsTestEntity> {
 
     private Logger logger = Logger.getLogger(getClass());
