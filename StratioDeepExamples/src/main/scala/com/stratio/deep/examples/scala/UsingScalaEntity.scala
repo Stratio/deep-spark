@@ -56,9 +56,9 @@ object UsingScalaEntity {
         try {
             doMain(args, deepContext)
         } finally {
-            deepContext.stop
-            System.exit(0)
+            // deepContext.stop
         }
+        System.exit(0)
     }
 
     private def doMain(args: Array[String], deepContext: DeepSparkContext) = {
