@@ -37,7 +37,8 @@ public class AnnotationUtils {
             .put(Inet4Address.class, InetAddressType.instance)
             .put(Inet6Address.class, InetAddressType.instance)
             .put(BigInteger.class, IntegerType.instance)
-            .put(UUID.class, UUIDType.instance).build();
+            .put(UUID.class, UUIDType.instance)
+            .build();
 
     public static final Map<Class<?>, AbstractType<?>> MAP_ABSTRACT_TYPE_CLASS_TO_ABSTRACT_TYPE =
         ImmutableMap.<Class<?>, AbstractType<?>>builder()

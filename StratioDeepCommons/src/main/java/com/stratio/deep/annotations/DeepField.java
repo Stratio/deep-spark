@@ -18,6 +18,6 @@ public @interface DeepField {
 
     boolean isPartOfPartitionKey() default false;
 
-    Class<? extends AbstractType<?>> validationClass() default UTF8Type.class;
+    Class<? extends AbstractType> validationClass() default UTF8Type.class;
 
 }

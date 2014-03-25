@@ -20,21 +20,28 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.google.common.io.Resources;
 
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Session;
+import com.datastax.driver.core.Statement;
+import com.datastax.driver.core.querybuilder.Batch;
+import com.datastax.driver.core.querybuilder.Insert;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.entity.Cql3CollectionsTestEntity;
 import com.stratio.deep.util.Constants;
-import com.stratio.deep.util.Utils;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@Test(suiteName = "cassandraRddTests", dependsOnGroups = "ScalaCassandraEntityRDDTest", groups = "CassandraCollectionsTest" )
+@Test//(suiteName = "cassandraRddTests", dependsOnGroups = "ScalaCassandraEntityRDDTest", groups = "CassandraCollectionsTest" )
 public class CassandraCollectionsTest extends CassandraRDDTest<Cql3CollectionsTestEntity> {
 
     private Logger logger = Logger.getLogger(getClass());
@@ -46,33 +53,30 @@ public class CassandraCollectionsTest extends CassandraRDDTest<Cql3CollectionsTe
 
         URL cql3TestData = Resources.getResource("cql3_collections_test_data.csv");
 
-        String batch = "BEGIN BATCH \n";
-        java.util.List<String> inserts = new ArrayList<>();
+        Batch batch = QueryBuilder.batch();
+        java.util.List<Statement> inserts = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(
             cql3TestData.toURI()))))) {
             String line;
 
-            String rawInsert = "INSERT INTO %s "
-                + "(id, first_name, last_name, emails) VALUES (%s,%s,%s,%s);\n";
-
             int idx = 0;
+            final int emailsStartPos = 3;
+
             while ((line = br.readLine()) != null) {
-                String[] fields = (CQL3_COLLECTION_COLUMN_FAMILY + "," + line).split(",");
+                String[] fields = line.split(",");
 
-                String emails = "{";
+                Set<String> emails = new HashSet<>();
 
-                for (int k = 3;  k<fields.length; k++){
-                    if (k > 3){
-                        emails += ",";
-                    }
-                    emails += Utils.singleQuote(fields[k]);
+                for (int k = emailsStartPos;  k<fields.length; k++){
+                    emails.add(fields[k]);
                 }
 
-                emails += "}";
+                Insert stmt = QueryBuilder.insertInto(CQL3_COLLECTION_COLUMN_FAMILY).values(
+                    new String[]{"id", "first_name", "last_name", "emails"},
+                    new Object[]{Integer.parseInt(fields[0]), fields[1], fields[2], emails});
 
-                String insert = String.format(rawInsert, new Object[]{fields[0], fields[1], fields[2], emails});
-                inserts.add(insert);
+                batch.add(stmt);
                 ++idx;
             }
 
@@ -81,14 +85,11 @@ public class CassandraCollectionsTest extends CassandraRDDTest<Cql3CollectionsTe
             logger.error("Error", e);
         }
 
-        if (inserts.size() > 0) {
-            for (String insert : inserts) {
-                batch += insert;
-            }
-        }
-        batch += " APPLY BATCH; ";
 
-        executeCustomCQL(batch);
+        Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
+            .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+        Session session = cluster.connect(KEYSPACE_NAME);
+        session.execute(batch);
     }
 
     @Override

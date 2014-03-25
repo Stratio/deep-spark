@@ -1,3 +1,19 @@
+/*
+ * Copyright 2014, Stratio.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.stratio.deep.rdd;
 
 import java.io.IOException;
@@ -294,7 +310,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     /**
      * Returns the partitions on which this RDD depends on.
      * <p/>
-     * Uses the underlying CqlPagingInputFormat in order to retreive the splits.
+     * Uses the underlying CqlPagingInputFormat in order to retrieve the splits.
      * <p/>
      * The number of splits, and hence the number of partitions equals to the
      * number of tokens configured in cassandra.yaml + 1.
@@ -326,10 +342,6 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
     /**
      * Returns a list of hosts on which the given split resides.
-     * <p/>
-     * TODO: check what happens in an environment where the split is replicated
-     * on N machines. It would be optimum if the RDD were computed only on the
-     * machine(s) where the split resides.
      */
     @Override
     public Seq<String> getPreferredLocations(Partition split) {

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2014, Stratio.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.stratio.deep.util;
 
 import java.io.Serializable;
@@ -138,7 +154,43 @@ public final class Utils {
      * Quoting for working with uppercase
      */
     public static String quote(String identifier) {
-        return "\"" + identifier.replaceAll("\"", "\"\"") + "\"";
+        if (StringUtils.isEmpty(identifier)) {
+            return identifier;
+        }
+
+        identifier = identifier.trim();
+
+        if (!identifier.startsWith("\"")) {
+            identifier = "\"" + identifier;
+        }
+
+        if (!identifier.endsWith("'")) {
+            identifier = identifier + "\"";
+        }
+
+        return identifier;
+
+    }
+
+    /**
+     * Quoting for working with uppercase
+     */
+    public static String singleQuote(String identifier) {
+        if (StringUtils.isEmpty(identifier)) {
+            return identifier;
+        }
+
+        identifier = identifier.trim();
+
+        if (!identifier.startsWith("'")) {
+            identifier = "'" + identifier;
+        }
+
+        if (!identifier.endsWith("'")) {
+            identifier = identifier + "'";
+        }
+
+        return identifier;
     }
 
     public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters) {
@@ -325,7 +377,7 @@ public final class Utils {
      * @param statements
      * @return
      */
-    public static String batchQueryGenerator(List<String> statements){
+    public static String batchQueryGenerator(List<String> statements) {
         StringBuffer sb = new StringBuffer("BEGIN BATCH \n");
 
         for (int i = 0; i < statements.size(); i++) {
@@ -344,21 +396,21 @@ public final class Utils {
      * @param tuple
      * @return
      */
-    public static Tuple2<String[], Object[]> prepareTuple4CqlDriver(Tuple2<Cells, Cells> tuple){
+    public static Tuple2<String[], Object[]> prepareTuple4CqlDriver(Tuple2<Cells, Cells> tuple) {
         Cells keys = tuple._1();
         Cells columns = tuple._2();
 
         String[] names = new String[keys.size() + columns.size()];
-        Object[] values= new Object[keys.size() + columns.size()];
+        Object[] values = new Object[keys.size() + columns.size()];
 
-        for (int k = 0; k < keys.size(); k++){
+        for (int k = 0; k < keys.size(); k++) {
             Cell cell = keys.getCellByIdx(k);
 
             names[k] = quote(cell.getCellName());
             values[k] = cell.getCellValue();
         }
 
-        for (int v = keys.size(); v < (keys.size() + columns.size()); v++){
+        for (int v = keys.size(); v < (keys.size() + columns.size()); v++) {
             Cell cell = columns.getCellByIdx(v - keys.size());
 
             names[v] = quote(cell.getCellName());
@@ -368,14 +420,14 @@ public final class Utils {
         return new Tuple2<String[], Object[]>(names, values);
     }
 
-    public static Method findSetter(String f, Class entityClass, Class valueType){
+    public static Method findSetter(String f, Class entityClass, Class valueType) {
         Method setter;
 
         String setterName = "set" + f.substring(0, 1).toUpperCase() +
             f.substring(1);
 
         try {
-           setter = entityClass.getMethod(setterName, valueType);
+            setter = entityClass.getMethod(setterName, valueType);
         } catch (NoSuchMethodException e) {
             // let's try with scala setter name
             try {

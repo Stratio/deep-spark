@@ -39,6 +39,7 @@ public interface IDeepJobConfig<T> extends Serializable {
 
     /**
      * Sets the cassandra CF from which data will be read from.
+     * Column family name is case sensitive.
      *
      * @param columnFamily
      * @return
@@ -271,6 +272,7 @@ public interface IDeepJobConfig<T> extends Serializable {
 
     /**
      * Returns the name of the configured column family.
+     * Column family name is case sensitive.
      *
      * @return
      */

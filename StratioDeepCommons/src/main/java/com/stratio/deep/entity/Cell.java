@@ -6,14 +6,13 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.UUID;
 
+import com.datastax.driver.core.DataType;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.utils.AnnotationUtils;
-import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.db.marshal.TimeUUIDType;
-import org.apache.cassandra.db.marshal.UTF8Type;
-import org.apache.cassandra.db.marshal.UUIDType;
+import org.apache.cassandra.cql3.CQL3Type;
+import org.apache.cassandra.db.marshal.*;
 
 /**
  * Generic abstraction for cassandra's columns.
@@ -136,7 +135,7 @@ public final class Cell<T extends Serializable> implements Serializable {
      * @param isClusterKey   true if this cell is part of the cassandra's clustering key.
      * @return
      */
-    public static Cell<?> createMetadataCell(String cellName, Class<?> cellType, Boolean isPartitionKey,
+    public static Cell<?> createMetadataCell(String cellName, DataType cellType, Boolean isPartitionKey,
         Boolean isClusterKey) {
         return new Cell(cellName, cellType, isPartitionKey, isClusterKey);
     }
@@ -147,15 +146,35 @@ public final class Cell<T extends Serializable> implements Serializable {
      * to distinguish between an UUID or a TimeUUID because twe don't have the UUID value.
      *
      * @param obj the value class type.
-     * @param <T>
      * @return
      */
-    private static <T extends Serializable> AbstractType<?> getValueType(Class<T> obj) {
+    private static AbstractType<?> getValueType(DataType obj) {
         if (obj == null) {
             return UTF8Type.instance;
         }
 
-        return AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(obj);
+        if (!obj.isCollection()) {
+            return AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(obj.asJavaClass());
+        }
+
+        switch (obj.getName()){
+            case SET:
+                DataType typeArgument = obj.getTypeArguments().get(0);
+                CQL3Type cql3Type = CQL3Type.Native.valueOf(typeArgument.toString().toUpperCase());
+
+                return SetType.getInstance(cql3Type.getType());
+
+            case LIST:
+                break;
+
+            case MAP:
+                break;
+
+            default:
+                throw new DeepGenericException("Cannot determine collection type for " + obj.getName());
+        }
+
+        return null;
     }
 
     /**
@@ -263,7 +282,7 @@ public final class Cell<T extends Serializable> implements Serializable {
     /**
      * Private constructor.
      */
-    private Cell(String cellName, Class<T> cellType, Boolean isPartitionKey, Boolean isClusterKey) {
+    private Cell(String cellName, DataType cellType, Boolean isPartitionKey, Boolean isClusterKey) {
         this.cellName = cellName;
         this.isClusterKey = isClusterKey;
         this.isPartitionKey = isPartitionKey;
@@ -333,7 +352,7 @@ public final class Cell<T extends Serializable> implements Serializable {
         if (this.cellValue != null) {
             return marshaller().decompose(this.cellValue);
         } else {
-      /* if null we propagate an empty array, see CASSANDRA-5885 and CASSANDRA-6180 */
+            /* if null we propagate an empty array, see CASSANDRA-5885 and CASSANDRA-6180 */
             return ByteBuffer.wrap(new byte[0]);
         }
     }
