@@ -40,7 +40,7 @@ object AggregatingData {
 
     def main(args:Array[String]) {
 
-        val job = "deep.examples.scala:aggregatingData"
+        val job = "scala:aggregatingData"
         val keyspaceName = "tutorials"
         val tableName = "tweets"
 
