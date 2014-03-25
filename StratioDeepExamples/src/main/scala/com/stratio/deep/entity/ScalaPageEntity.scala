@@ -15,16 +15,18 @@ Copyright 2014 Stratio.
 */
 package com.stratio.deep.entity
 
-import org.apache.cassandra.db.marshal.{LongType, Int32Type}
+import org.apache.cassandra.db.marshal.{LongType, IntegerType}
 import com.stratio.deep.annotations.{DeepEntity, DeepField}
 import scala.beans.BeanProperty
+import java.math.BigInteger
 
 /**
  * Author: Luca Rosellini
  * Date..: 21-mar-2014
  */
 
-@DeepEntity class ScalaPageEntity extends IDeepType {
+@DeepEntity class
+ScalaPageEntity extends IDeepType {
 
     @BeanProperty @DeepField(isPartOfPartitionKey = true, fieldName = "key")
     var id:String = _
@@ -38,8 +40,8 @@ import scala.beans.BeanProperty
     @BeanProperty @DeepField(validationClass = classOf[LongType], fieldName = "responseTime")
     var responseTime: java.lang.Long = _
 
-    @BeanProperty @DeepField(fieldName = "responseCode", validationClass = classOf[Int32Type])
-    var responseCode: Integer = _
+    @BeanProperty @DeepField(fieldName = "responseCode", validationClass = classOf[IntegerType])
+    var responseCode: BigInteger = _
 
     @BeanProperty @DeepField(validationClass = classOf[LongType], fieldName = "downloadTime")
     var downloadTime: java.lang.Long = _

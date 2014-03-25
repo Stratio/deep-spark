@@ -17,8 +17,10 @@ package com.stratio.deep.entity;
 
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.annotations.DeepField;
-import org.apache.cassandra.db.marshal.Int32Type;
+import org.apache.cassandra.db.marshal.IntegerType;
 import org.apache.cassandra.db.marshal.LongType;
+
+import java.math.BigInteger;
 
 /**
  * Author: Luca Rosellini
@@ -44,16 +46,16 @@ public class PageEntity implements IDeepType {
     @DeepField
     private String content;
 
-    @DeepField(fieldName = "download_time", validationClass = LongType.class)
+    @DeepField(fieldName = "downloadTime", validationClass = LongType.class)
     private Long downloadTime;
 
-    @DeepField(fieldName = "first_download_time", validationClass = LongType.class)
+    @DeepField(fieldName = "firstDownloadTime", validationClass = LongType.class)
     private Long firstDownloadTime;
 
-    @DeepField(fieldName = "response_code", validationClass = Int32Type.class)
-    private Integer responseCode;
+    @DeepField(fieldName = "responseCode", validationClass = IntegerType.class )
+    private BigInteger responseCode;
 
-    @DeepField(fieldName = "response_time", validationClass = LongType.class)
+    @DeepField(fieldName = "responseTime", validationClass = LongType.class)
     private Long responseTime;
 
     public String getCharset() {
@@ -80,7 +82,7 @@ public class PageEntity implements IDeepType {
         return id;
     }
 
-    public Integer getResponseCode() {
+    public BigInteger getResponseCode() {
         return responseCode;
     }
 
@@ -116,7 +118,7 @@ public class PageEntity implements IDeepType {
         this.id = id;
     }
 
-    public void setResponseCode(Integer responseCode) {
+    public void setResponseCode(BigInteger responseCode) {
         this.responseCode = responseCode;
     }
 
