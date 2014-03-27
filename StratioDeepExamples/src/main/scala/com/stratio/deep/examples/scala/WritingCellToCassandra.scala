@@ -32,7 +32,7 @@ import com.stratio.deep.testutils.ContextProperties
 object WritingCellToCassandra {
     def main (args:Array[String]) {
 
-        val job = "deep.examples.scala:writingCellsToCassandra"
+        val job = "scala:writingCellsToCassandra"
 
         val inputKeyspaceName = "crawler"
         val inputTableName = "Page"

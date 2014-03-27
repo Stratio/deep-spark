@@ -30,7 +30,7 @@ object CreatingCellRDD {
 
     def main(args:Array[String]) {
 
-        val job = "deep.examples.scala:creatingCellRDD"
+        val job = "scala:creatingCellRDD"
         val keyspaceName = "tutorials"
         val tableName = "tweets"
 

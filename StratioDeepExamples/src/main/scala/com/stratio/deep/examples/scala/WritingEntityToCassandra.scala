@@ -34,7 +34,7 @@ object WritingEntityToCassandra {
 
     def main (args:Array[String]) {
 
-        val job = "deep.examples.scala:writingEntityToCassandra"
+        val job = "scala:writingEntityToCassandra"
 
         val inputKeyspaceName = "crawler"
         val inputTableName = "Page"

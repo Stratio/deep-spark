@@ -33,7 +33,7 @@ object GroupingByColumn {
 
     def main(args:Array[String]) {
 
-        val job = "deep.examples.scala:groupingByColumn"
+        val job = "scala:groupingByColumn"
         val keyspaceName = "tutorials"
         val tableName = "tweets"
 

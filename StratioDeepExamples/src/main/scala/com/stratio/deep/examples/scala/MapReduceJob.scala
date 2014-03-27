@@ -33,7 +33,7 @@ object MapReduceJob {
 
     def main(args:Array[String]) {
 
-        val job = "deep.examples.scala:mapReduceJob"
+        val job = "scala:mapReduceJob"
 
         val keyspaceName = "tutorials"
         val tableName = "tweets"
