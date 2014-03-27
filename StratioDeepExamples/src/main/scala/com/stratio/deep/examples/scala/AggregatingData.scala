@@ -17,8 +17,8 @@ package com.stratio.deep.examples.scala
 
 // for implicit functions
 import org.apache.spark.rdd.RDD
-import com.stratio.deep.utils.ContextProperties
-import com.stratio.deep.entity.TweetEntity
+import com.stratio.deep.testutils.ContextProperties
+import com.stratio.deep.testentity.TweetEntity
 
 // for deep
 import com.stratio.deep.config._

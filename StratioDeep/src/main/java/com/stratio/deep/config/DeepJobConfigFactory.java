@@ -20,8 +20,8 @@ import java.io.Serializable;
 
 import com.stratio.deep.config.impl.CellDeepJobConfig;
 import com.stratio.deep.config.impl.EntityDeepJobConfig;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.testentity.Cells;
+import com.stratio.deep.testentity.IDeepType;
 
 /**
  * Factory class for deep configuration objects.
@@ -42,7 +42,7 @@ public final class DeepJobConfigFactory implements Serializable {
     }
 
     /**
-     * Creates an entity-based configuration object.
+     * Creates an testentity-based configuration object.
      *
      * @return
      */

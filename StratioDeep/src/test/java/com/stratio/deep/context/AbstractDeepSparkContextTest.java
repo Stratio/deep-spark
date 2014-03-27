@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
-import static com.stratio.deep.util.Utils.quote;
+import static com.stratio.deep.testutils.Utils.quote;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
@@ -51,6 +51,7 @@ public abstract class AbstractDeepSparkContextTest {
     public static final String CQL3_COLUMN_FAMILY = "cql3_cf";
     public static final String CQL3_OUTPUT_COLUMN_FAMILY = "cql3_output_cf";
     public static final String CQL3_COLLECTION_COLUMN_FAMILY = "cql3_collection_cf";
+    public static final String OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY = "cql3_collection_output_cf";
 
     public static final String CQL3_ENTITY_OUTPUT_COLUMN_FAMILY = "cql3_entity_output_cf";
 
@@ -77,7 +78,7 @@ public abstract class AbstractDeepSparkContextTest {
 
     protected String createCql3CollectionsCF =
         "CREATE TABLE " + KEYSPACE_NAME + "." + CQL3_COLLECTION_COLUMN_FAMILY +
-            " ( id int PRIMARY KEY, first_name text, last_name text, emails set<text> );";
+            " ( id int PRIMARY KEY, first_name text, last_name text, emails set<text>, phones list<text>, uuid2id map<uuid,int>);";
 
     protected String buildTestDataInsertBatch() {
         URL testData = Resources.getResource("testdata.csv");
@@ -191,7 +192,7 @@ public abstract class AbstractDeepSparkContextTest {
         }
     }
 
-    protected void executeCustomCQL(String... cqls) {
+    protected static void executeCustomCQL(String... cqls) {
 
         Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
             .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();

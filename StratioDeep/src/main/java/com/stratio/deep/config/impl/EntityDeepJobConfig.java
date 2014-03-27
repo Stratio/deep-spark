@@ -20,21 +20,19 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.AnnotationTypeMismatchException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.annotations.DeepField;
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.testentity.Cell;
+import com.stratio.deep.testentity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
-import com.stratio.deep.util.Utils;
-import com.stratio.deep.utils.AnnotationUtils;
+import com.stratio.deep.testutils.Utils;
+import com.stratio.deep.testutils.AnnotationUtils;
 
 /**
  * Class containing the appropiate configuration for a CassandraEntityRDD.
@@ -96,7 +94,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
     public void validate() {
 
         if (entityClass == null) {
-            throw new IllegalArgumentException("entity class cannot be null");
+            throw new IllegalArgumentException("testentity class cannot be null");
         }
 
         if (!entityClass.isAnnotationPresent(DeepEntity.class)) {
@@ -136,16 +134,29 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         String f = mapDBNameToEntityName.get(dbName);
 
         if (StringUtils.isEmpty(f)) {
-            // DB column is not mapped in the entity
+            // DB column is not mapped in the testentity
             return;
         }
 
         Method setter = Utils.findSetter(f, entityClass, metadataCell.getValueType());
 
         try {
-            setter.invoke(instance, value);
+            setter.invoke(instance, packageCollectionValue(metadataCell, value));
         } catch (Exception e) {
             throw new DeepGenericException(e);
+        }
+    }
+
+    private Object packageCollectionValue(Cell metadataCell, Object value){
+        switch (metadataCell.getCellValidator().validatorKind()){
+            case SET:
+                return new LinkedHashSet((Collection)value);
+            case LIST:
+                return new LinkedList((Collection)value);
+            case MAP:
+                return new LinkedHashMap((Map)value);
+            default:
+                return value;
         }
     }
 }

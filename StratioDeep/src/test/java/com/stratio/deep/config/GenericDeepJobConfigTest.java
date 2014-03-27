@@ -20,9 +20,9 @@ import java.lang.annotation.AnnotationTypeMismatchException;
 
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.entity.TestEntity;
-import com.stratio.deep.entity.WronglyMappedTestEntity;
+import com.stratio.deep.testentity.IDeepType;
+import com.stratio.deep.testentity.TestEntity;
+import com.stratio.deep.testentity.WronglyMappedTestEntity;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.util.Constants;

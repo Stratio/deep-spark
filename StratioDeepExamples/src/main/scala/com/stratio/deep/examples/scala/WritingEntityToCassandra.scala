@@ -19,11 +19,11 @@ import org.apache.spark.SparkContext._
 import com.stratio.deep.config._
 import com.stratio.deep.context._
 import com.stratio.deep.rdd.CassandraRDD
-import com.stratio.deep.entity._
+import com.stratio.deep.testentity._
 import com.stratio.deep.rdd._
 import org.apache.spark.rdd.RDD
-import com.stratio.deep.utils.ContextProperties
-import com.stratio.deep.entity.{PageEntity, DomainEntity}
+import com.stratio.deep.testutils.ContextProperties
+import com.stratio.deep.testentity.{PageEntity, DomainEntity}
 
 /**
  * Author: Emmanuelle Raffenne

@@ -21,11 +21,11 @@ import com.stratio.deep.rdd.CassandraRDD
 import com.stratio.deep.config.DeepJobConfigFactory
 import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.rdd.RDD
-import com.stratio.deep.entity.{ScalaOutputEntity, ScalaPageEntity}
 import scala.math._
-import com.stratio.deep.utils.ContextProperties
 
 import org.apache.spark.SparkContext._
+import com.stratio.deep.testutils.ContextProperties
+import com.stratio.deep.testentity.{ScalaOutputEntity, ScalaPageEntity}
 
 /**
  * Author: Luca Rosellini

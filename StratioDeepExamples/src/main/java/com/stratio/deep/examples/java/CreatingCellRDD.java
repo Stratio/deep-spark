@@ -19,13 +19,17 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.*;
-import com.stratio.deep.utils.ContextProperties;
+import com.stratio.deep.testutils.ContextProperties;
+import org.apache.log4j.Logger;
 
 /**
  * Author: Emmanuelle Raffenne
  * Date..: 19-feb-2014
  */
-public class CreatingCellRDD {
+public final class CreatingCellRDD {
+    private static Logger logger = Logger.getLogger(CreatingCellRDD.class);
+
+    private CreatingCellRDD(){}
 
     public static void main(String[] args) {
 
@@ -49,7 +53,7 @@ public class CreatingCellRDD {
 
         long counts = rdd.count();
 
-        System.out.println("Num of rows: " + counts);
+        logger.info("Num of rows: " + counts);
 
         System.exit(0);
 

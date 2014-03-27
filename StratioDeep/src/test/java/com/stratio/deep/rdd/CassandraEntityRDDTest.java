@@ -27,7 +27,7 @@ import com.datastax.driver.core.Session;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.entity.TestEntity;
+import com.stratio.deep.testentity.TestEntity;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
@@ -104,7 +104,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         assertEquals(row.getString("url"), "http://11870.com/k/es/de");
         assertEquals(row.getInt("response_time"), 421 + 1);
 
-        //TODO: cannot delete a column using CQL, forcing it to null converts it to 0!!! see CASSANDRA-5885 and CASSANDRA-6180
+        //cannot delete a column using CQL, forcing it to null converts it to 0!!! see CASSANDRA-5885 and CASSANDRA-6180
         assertEquals(row.getLong("download_time"), 0);
         session.close();
     }

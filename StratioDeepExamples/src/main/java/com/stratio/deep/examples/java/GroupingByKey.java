@@ -15,23 +15,27 @@ Copyright 2014 Stratio.
 */
 package com.stratio.deep.examples.java;
 
-import com.stratio.deep.entity.TweetEntity;
+import java.util.List;
+
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.rdd.CassandraJavaRDD;
-import com.stratio.deep.utils.ContextProperties;
+import com.stratio.deep.testutils.ContextProperties;
+import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
-
-import java.util.List;
 
 /**
  * Author: Emmanuelle Raffenne
  * Date..: 14-feb-2014
  */
-public class GroupingByKey {
+public final class GroupingByKey {
+    private static Logger logger = Logger.getLogger(GroupingByKey.class);
+
+    private GroupingByKey(){}
 
     public static void main(String[] args) {
 
@@ -56,7 +60,7 @@ public class GroupingByKey {
         // creating a key-value pairs RDD
         JavaPairRDD<String,TweetEntity> pairsRDD = rdd.map(new PairFunction<TweetEntity, String, TweetEntity>() {
             @Override
-            public Tuple2<String, TweetEntity> call(TweetEntity t) throws Exception {
+            public Tuple2<String, TweetEntity> call(TweetEntity t){
                 return new Tuple2<String,TweetEntity>(t.getAuthor(),t);
             }
         });
@@ -67,7 +71,7 @@ public class GroupingByKey {
 // counting elements in groups
         JavaPairRDD<String,Integer> counts = groups.map(new PairFunction<Tuple2<String, List<TweetEntity>>, String, Integer>() {
             @Override
-            public Tuple2<String, Integer> call(Tuple2<String, List<TweetEntity>> t) throws Exception {
+            public Tuple2<String, Integer> call(Tuple2<String, List<TweetEntity>> t) {
                 return new Tuple2<String, Integer>(t._1(), t._2().size());
             }
         });
@@ -81,10 +85,10 @@ public class GroupingByKey {
         for (Tuple2<String, Integer> t : result) {
             total = total + t._2();
             authors = authors + 1;
-            System.out.println( t._1() + ": " + t._2().toString() );
+            logger.info( t._1() + ": " + t._2().toString() );
         }
 
-        System.out.println("Autores: " + authors + " total: " + total);
+        logger.info("Autores: " + authors + " total: " + total);
 
         System.exit(0);
     }

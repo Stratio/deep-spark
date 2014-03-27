@@ -15,12 +15,15 @@ Copyright 2014 Stratio.
 */
 package com.stratio.deep.examples.java;
 
-import com.stratio.deep.entity.TweetEntity;
+import java.util.List;
+
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.rdd.CassandraJavaRDD;
-import com.stratio.deep.utils.ContextProperties;
+import com.stratio.deep.testutils.ContextProperties;
+import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
@@ -28,13 +31,14 @@ import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 import scala.Tuple3;
 
-import java.util.List;
-
 /**
  * Author: Emmanuelle Raffenne
  * Date..: 13-feb-2014
  */
 public class AggregatingData {
+    private static Logger logger = Logger.getLogger(AggregatingData.class);
+
+    private AggregatingData(){}
 
     public static void main(String[] args) {
 
@@ -59,7 +63,7 @@ public class AggregatingData {
         // grouping to get key-value pairs
         JavaPairRDD<String,Integer> groups = rdd.groupBy(new Function<TweetEntity, String>() {
             @Override
-            public String call(TweetEntity tableEntity) throws Exception {
+            public String call(TweetEntity tableEntity) {
                 return tableEntity.getAuthor();
             }
         }).map(new PairFunction<Tuple2<String, List<TweetEntity>>, String, Integer>() {
@@ -75,7 +79,7 @@ public class AggregatingData {
         Tuple3<Double, Double, Double> results = groups.aggregate(initValues,
                 new Function2<Tuple3<Double, Double, Double>, Tuple2<String, Integer>, Tuple3<Double, Double, Double>>() {
                     @Override
-                    public Tuple3<Double, Double, Double> call(Tuple3<Double, Double, Double> n, Tuple2<String, Integer> t) throws Exception {
+                    public Tuple3<Double, Double, Double> call(Tuple3<Double, Double, Double> n, Tuple2<String, Integer> t) {
                         Double sumOfX = n._1() + t._2();
                         Double numOfX = n._2() + 1;
                         Double sumOfSquares = n._3() + Math.pow(t._2(),2);
@@ -83,7 +87,7 @@ public class AggregatingData {
                     }
                 }, new Function2<Tuple3<Double, Double, Double>, Tuple3<Double, Double, Double>, Tuple3<Double, Double, Double>>() {
                     @Override
-                    public Tuple3<Double, Double, Double> call(Tuple3<Double, Double, Double> a, Tuple3<Double, Double, Double> b) throws Exception {
+                    public Tuple3<Double, Double, Double> call(Tuple3<Double, Double, Double> a, Tuple3<Double, Double, Double> b)  {
                         Double sumOfX = a._1() + b._1();
                         Double numOfX = a._2() + b._2();
                         Double sumOfSquares = a._3() + b._3();
@@ -101,10 +105,10 @@ public class AggregatingData {
         Double variance = (sumOfSquares / numOfX) - Math.pow(avg,2);
         Double stddev = Math.sqrt(variance);
 
-        System.out.println("Results: (" + sumOfX.toString() + ", " + numOfX.toString() + ", " + sumOfSquares.toString() + ")" );
-        System.out.println("average: " + avg.toString());
-        System.out.println("variance: " + variance.toString());
-        System.out.println("stddev: " + stddev.toString());
+        logger.info("Results: (" + sumOfX.toString() + ", " + numOfX.toString() + ", " + sumOfSquares.toString() + ")" );
+        logger.info("average: " + avg.toString());
+        logger.info("variance: " + variance.toString());
+        logger.info("stddev: " + stddev.toString());
 
         System.exit(0);
 

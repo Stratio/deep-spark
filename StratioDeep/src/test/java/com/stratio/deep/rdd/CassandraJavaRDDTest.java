@@ -31,10 +31,10 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.StrippedTestEntity;
-import com.stratio.deep.entity.TestEntity;
+import com.stratio.deep.testentity.Cell;
+import com.stratio.deep.testentity.Cells;
+import com.stratio.deep.testentity.StrippedTestEntity;
+import com.stratio.deep.testentity.TestEntity;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.util.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
@@ -326,9 +326,9 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 class WrongSensors2CellsFunction extends Function<Tuple2<String, Double>, Cells> {
     @Override
     public Cells call(Tuple2<String, Double> t) throws Exception {
-        com.stratio.deep.entity.Cell<String> sensorNameCell = com.stratio.deep.entity.Cell.create("name", t._1());
-        com.stratio.deep.entity.Cell<UUID> sensorTimeUUID = com.stratio.deep.entity.Cell.create("time_taken", UUIDGen.getTimeUUID());
-        com.stratio.deep.entity.Cell<Double> sensorDataCell = com.stratio.deep.entity.Cell.create("value", t._2());
+        com.stratio.deep.testentity.Cell<String> sensorNameCell = com.stratio.deep.testentity.Cell.create("name", t._1());
+        com.stratio.deep.testentity.Cell<UUID> sensorTimeUUID = com.stratio.deep.testentity.Cell.create("time_taken", UUIDGen.getTimeUUID());
+        com.stratio.deep.testentity.Cell<Double> sensorDataCell = com.stratio.deep.testentity.Cell.create("value", t._2());
 
         return new Cells(sensorNameCell, sensorTimeUUID, sensorDataCell);
     }
@@ -337,9 +337,9 @@ class WrongSensors2CellsFunction extends Function<Tuple2<String, Double>, Cells>
 class Sensors2CellsFunction extends Function<Tuple2<String, Double>, Cells> {
     @Override
     public Cells call(Tuple2<String, Double> t) throws Exception {
-        com.stratio.deep.entity.Cell<String> sensorNameCell = com.stratio.deep.entity.Cell.create("name", t._1());
-        com.stratio.deep.entity.Cell<UUID> sensorTimeUUID = com.stratio.deep.entity.Cell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
-        com.stratio.deep.entity.Cell<Double> sensorDataCell = com.stratio.deep.entity.Cell.create("value", t._2());
+        com.stratio.deep.testentity.Cell<String> sensorNameCell = com.stratio.deep.testentity.Cell.create("name", t._1());
+        com.stratio.deep.testentity.Cell<UUID> sensorTimeUUID = com.stratio.deep.testentity.Cell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
+        com.stratio.deep.testentity.Cell<Double> sensorDataCell = com.stratio.deep.testentity.Cell.create("value", t._2());
 
         return new Cells(sensorNameCell, sensorTimeUUID, sensorDataCell);
     }

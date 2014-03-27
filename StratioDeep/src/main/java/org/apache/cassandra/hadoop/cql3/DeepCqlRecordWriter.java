@@ -28,10 +28,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.stratio.deep.cql.DeepConfigHelper;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
+import com.stratio.deep.testentity.Cell;
+import com.stratio.deep.testentity.Cells;
 import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.util.Utils;
+import com.stratio.deep.testutils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.db.marshal.LongType;
@@ -52,23 +52,23 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.thrift.TException;
 import org.apache.thrift.transport.TTransport;
 
-import static com.stratio.deep.util.Utils.updateQueryGenerator;
+import static com.stratio.deep.testutils.Utils.updateQueryGenerator;
 
 /**
  * Created by luca on 05/02/14.
  */
 public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells, Cells> {
-    private static final Logger logger = LoggerFactory.getLogger(DeepCqlRecordWriter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DeepCqlRecordWriter.class);
 
     // handles for clients for each range running in the threadpool
-    protected final Map<Range<?>, RangeClient> clients;
+    private final Map<Range<?>, RangeClient> clients;
 
     // host to prepared statement id mappings
-    protected ConcurrentHashMap<Cassandra.Client, Integer> preparedStatements = new ConcurrentHashMap<>();
-    protected AbstractType<?> keyValidator;
-    protected String[] partitionKeyColumns;
+    private ConcurrentHashMap<Cassandra.Client, Integer> preparedStatements = new ConcurrentHashMap<>();
+    private AbstractType<?> keyValidator;
+    private String[] partitionKeyColumns;
 
-    protected List<String> clusterColumns;
+    private List<String> clusterColumns;
 
     private String cql;
 
@@ -85,7 +85,7 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
      * @param context the task attempt context
      * @throws IOException
      */
-    DeepCqlRecordWriter(TaskAttemptContext context) throws IOException {
+    DeepCqlRecordWriter(TaskAttemptContext context) {
         this(context.getConfiguration());
         this.progressable = new Progressable(context);
     }
@@ -172,7 +172,7 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
 
         Column rawPartitionKeys = result.rows.get(0).columns.get(1);
         String keyString = ByteBufferUtil.string(ByteBuffer.wrap(rawPartitionKeys.getValue()));
-        logger.debug("partition keys: " + keyString);
+        LOG.debug("partition keys: " + keyString);
 
         List<String> keys = FBUtilities.fromJsonList(keyString);
         partitionKeyColumns = new String[keys.size()];
@@ -185,7 +185,7 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
         Column rawClusterColumns = result.rows.get(0).columns.get(2);
         String clusterColumnString = ByteBufferUtil.string(ByteBuffer.wrap(rawClusterColumns.getValue()));
 
-        logger.debug("cluster columns: " + clusterColumnString);
+        LOG.debug("cluster columns: " + clusterColumnString);
         clusterColumns = FBUtilities.fromJsonList(clusterColumnString);
     }
 
@@ -197,7 +197,7 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
      * (i.e., null), then the entire key is marked for {@link org.apache.cassandra.thrift.Deletion}.
      * </p>
      *
-     * @throws IOException    13
+     * @throws IOException 13
      */
     @Override
     public void write(Cells keys, Cells values) throws IOException {
@@ -213,7 +213,7 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
         allValues.addAll(keys.getDecomposedCellValues());
 
         // get the client for the given range, or create a new one
-        //synchronized (clients) {
+        synchronized (clients) {
             RangeClient client = clients.get(range);
             if (client == null) {
                 // haven't seen keys for this range: create new client
@@ -224,7 +224,7 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
             if (client.put(localCql, allValues)) {
                 clients.remove(range);
             }
-        //}
+        }
 
         progressable.progress();
     }
@@ -235,7 +235,7 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
      */
     private class RangeClient extends AbstractRangeClient<List<ByteBuffer>> implements Closeable {
 
-        private final int BATCH_SIZE = DeepConfigHelper.getOutputBatchSize(conf);
+        private final int batchSize = DeepConfigHelper.getOutputBatchSize(conf);
         private List<String> batchStatements = new ArrayList<>();
         private List<ByteBuffer> bindVariables = new ArrayList<>();
 
@@ -251,7 +251,7 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
             batchStatements.add(stmt);
             bindVariables.addAll(values);
 
-            boolean res = batchStatements.size() >= BATCH_SIZE;
+            boolean res = batchStatements.size() >= batchSize;
             if (res) {
                 triggerBatch();
             }
@@ -260,7 +260,7 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
 
         private void triggerBatch() throws IOException {
             cql = Utils.batchQueryGenerator(batchStatements);
-            logger.debug("Executing query: "+ cql);
+            LOG.debug("Executing query: " + cql);
             this.start();
         }
 
@@ -282,8 +282,9 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
                 throw new AssertionError(e);
             }
 
-            if (lastException != null)
+            if (lastException != null) {
                 throw lastException;
+            }
         }
 
         /**

@@ -20,13 +20,13 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
+import com.stratio.deep.testentity.Cell;
+import com.stratio.deep.testentity.Cells;
 import org.apache.cassandra.utils.Pair;
 import org.apache.spark.SparkContext;
 
 /**
- * Concrete implementation of a CassandraRDD representing an RDD of {@link com.stratio.deep.entity.Cells} element.<br/>
+ * Concrete implementation of a CassandraRDD representing an RDD of {@link com.stratio.deep.testentity.Cells} element.<br/>
  */
 public class CassandraCellRDD extends CassandraRDD<Cells> {
 
@@ -55,8 +55,7 @@ public class CassandraCellRDD extends CassandraRDD<Cells> {
 
         for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
             Cell cd = columnDefinitions.get(entry.getKey());
-            cells.add(Cell.create(entry.getKey(), entry.getValue(), cd.marshallerClassName(), cd.isPartitionKey(),
-                cd.isClusterKey()));
+            cells.add(Cell.create(cd, entry.getValue()));
         }
 
         for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
@@ -65,8 +64,7 @@ public class CassandraCellRDD extends CassandraRDD<Cells> {
                 continue;
             }
 
-            cells.add(Cell.create(entry.getKey(), entry.getValue(), cd.marshallerClassName(), cd.isPartitionKey(),
-                cd.isClusterKey()));
+            cells.add(Cell.create(cd, entry.getValue()));
         }
 
         return cells;

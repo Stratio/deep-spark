@@ -21,8 +21,8 @@ import java.util.Map;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.impl.CellDeepJobConfig;
 import com.stratio.deep.config.impl.EntityDeepJobConfig;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.testentity.Cells;
+import com.stratio.deep.testentity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.rdd.CassandraCellRDD;
 import com.stratio.deep.rdd.CassandraEntityRDD;
@@ -115,7 +115,7 @@ public class DeepSparkContext extends JavaSparkContext {
     }
 
     /**
-     * Builds a new entity based CassandraEntityRDD.
+     * Builds a new testentity based CassandraEntityRDD.
      *
      * @param config
      * @return

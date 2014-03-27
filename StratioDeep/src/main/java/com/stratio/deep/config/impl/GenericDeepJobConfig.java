@@ -26,8 +26,8 @@ import org.apache.commons.lang.StringUtils;
 import com.datastax.driver.core.*;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.cql.DeepConfigHelper;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
+import com.stratio.deep.testentity.Cell;
+import com.stratio.deep.testentity.Cells;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
@@ -43,7 +43,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
-import static com.stratio.deep.util.Utils.*;
+import static com.stratio.deep.testutils.Utils.*;
 
 /**
  * Base class for all config implementations providing default implementations for methods
@@ -66,7 +66,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     /**
      * name of the columnFamily from which data will be fetched
      */
-    protected String columnFamily;
+    private String columnFamily;
 
     /**
      * hostname of the cassandra server
@@ -167,7 +167,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public void close() throws Exception {
+    public void close() {
         logger.debug("closing " + getClass().getCanonicalName());
         if (session != null) {
             session.close();
@@ -178,7 +178,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    protected void finalize() throws Throwable {
+    protected void finalize() {
         logger.debug("finalizing " + getClass().getCanonicalName());
         close();
     }
@@ -202,13 +202,13 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     private TableMetadata fetchTableMetadata() {
 
         Metadata metadata = getSession().getCluster().getMetadata();
-        KeyspaceMetadata ksMetadata = null;
+        KeyspaceMetadata ksMetadata = metadata.getKeyspace(this.keyspace);
 
-        if (metadata != null && (ksMetadata = metadata.getKeyspace(this.keyspace)) != null) {
+        if (metadata != null && ksMetadata != null) {
             return ksMetadata.getTable(quote(this.columnFamily));
-        } else
+        } else {
             return null;
-
+        }
     }
 
     /**
@@ -246,7 +246,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
 
     /**
      * Fetches table metadata from Casandra and generates a Map<K, V> where the key is the column name, and the value
-     * is the {@link com.stratio.deep.entity.Cell} containing column's metadata.
+     * is the {@link com.stratio.deep.testentity.Cell} containing column's metadata.
      *
      * @return
      */
@@ -274,17 +274,17 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
         List<ColumnMetadata> allColumns = tableMetadata.getColumns();
 
         for (ColumnMetadata key : partitionKeys) {
-            Cell metadata = Cell.createMetadataCell(key.getName(), key.getType(), Boolean.TRUE, Boolean.FALSE);
+            Cell metadata = Cell.create(key.getName(), key.getType(), Boolean.TRUE, Boolean.FALSE);
             columnDefinitionMap.put(key.getName(), metadata);
         }
 
         for (ColumnMetadata key : clusteringKeys) {
-            Cell metadata = Cell.createMetadataCell(key.getName(), key.getType(), Boolean.FALSE, Boolean.TRUE);
+            Cell metadata = Cell.create(key.getName(), key.getType(), Boolean.FALSE, Boolean.TRUE);
             columnDefinitionMap.put(key.getName(), metadata);
         }
 
         for (ColumnMetadata key : allColumns) {
-            Cell metadata = Cell.createMetadataCell(key.getName(), key.getType(), Boolean.FALSE, Boolean.FALSE);
+            Cell metadata = Cell.create(key.getName(), key.getType(), Boolean.FALSE, Boolean.FALSE);
             if (!columnDefinitionMap.containsKey(key.getName())) {
                 columnDefinitionMap.put(key.getName(), metadata);
             }

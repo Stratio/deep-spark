@@ -115,7 +115,7 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     @Test(dependsOnMethods = "testCompute")
     public abstract void testSimpleSaveToCassandra();
 
-    protected void truncateCf(String keyspace, String cf) {
+    protected static void truncateCf(String keyspace, String cf) {
         executeCustomCQL("TRUNCATE  " + keyspace + "." + cf);
 
     }

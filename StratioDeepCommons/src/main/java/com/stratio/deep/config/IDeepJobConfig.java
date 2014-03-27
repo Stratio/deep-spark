@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import com.datastax.driver.core.Session;
-import com.stratio.deep.entity.Cell;
+import com.stratio.deep.testentity.Cell;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.hadoop.conf.Configuration;
 
@@ -71,7 +71,7 @@ public interface IDeepJobConfig<T> extends Serializable {
     public abstract Configuration getConfiguration();
 
     /**
-     * Returns the underlying entity class used to map the Cassandra
+     * Returns the underlying testentity class used to map the Cassandra
      * Column family.
      *
      * @return

@@ -15,27 +15,31 @@ Copyright 2014 Stratio.
 */
 package com.stratio.deep.examples.java;
 
+import java.util.List;
+
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.rdd.CassandraJavaRDD;
-
-// !!Important!!
-import com.stratio.deep.utils.ContextProperties;
+import com.stratio.deep.testutils.ContextProperties;
+import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.Function;
-
-import java.util.List;
-
-import com.stratio.deep.entity.TweetEntity;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
+
+// !!Important!!
 
 /**
  * Author: Emmanuelle Raffenne
  * Date..: 13-feb-2014
  */
-public class GroupingByColumn {
+public final class GroupingByColumn {
+
+    private static Logger logger = Logger.getLogger(GroupingByColumn.class);
+
+    private GroupingByColumn(){}
 
     public static void main(String[] args) {
 
@@ -61,7 +65,7 @@ public class GroupingByColumn {
         // grouping
         JavaPairRDD<String,List<TweetEntity>> groups = rdd.groupBy(new Function<TweetEntity, String>() {
             @Override
-            public String call(TweetEntity tableEntity) throws Exception {
+            public String call(TweetEntity tableEntity)  {
                 return tableEntity.getAuthor();
             }
         });
@@ -69,7 +73,7 @@ public class GroupingByColumn {
 // counting elements in groups
         JavaPairRDD<String,Integer> counts = groups.map(new PairFunction<Tuple2<String, List<TweetEntity>>, String, Integer>() {
             @Override
-            public Tuple2<String, Integer> call(Tuple2<String, List<TweetEntity>> t) throws Exception {
+            public Tuple2<String, Integer> call(Tuple2<String, List<TweetEntity>> t) {
                 return new Tuple2<String,Integer>(t._1(), t._2().size());
             }
         });
@@ -77,9 +81,9 @@ public class GroupingByColumn {
 // fetching the results
         List<Tuple2<String,Integer>> results = counts.collect();
 
-        System.out.println("Este es el resultado con groupBy: ");
+        logger.info("Este es el resultado con groupBy: ");
         for (Tuple2 t : results) {
-            System.out.println(t._1() + ": " + t._2().toString());
+            logger.info(t._1() + ": " + t._2().toString());
         }
 
         System.exit(0);

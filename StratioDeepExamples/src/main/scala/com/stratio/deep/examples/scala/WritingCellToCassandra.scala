@@ -17,12 +17,12 @@ package com.stratio.deep.examples.scala
 
 import com.stratio.deep.context.DeepSparkContext
 import com.stratio.deep.config.DeepJobConfigFactory
-import com.stratio.deep.entity._
+import com.stratio.deep.testentity._
 import com.stratio.deep.rdd.CassandraRDD
 import org.apache.spark.rdd.RDD
 
 import org.apache.spark.SparkContext._
-import com.stratio.deep.utils.ContextProperties
+import com.stratio.deep.testutils.ContextProperties
 
 /**
  * Author: Emmanuelle Raffenne

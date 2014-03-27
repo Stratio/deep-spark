@@ -24,10 +24,6 @@ public class DeepGenericException extends RuntimeException {
         super(message, cause);
     }
 
-    public DeepGenericException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
-
     public DeepGenericException(Throwable cause) {
         super(cause);
     }

@@ -21,8 +21,8 @@ import com.stratio.deep.rdd._
 
 import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
-import com.stratio.deep.utils.ContextProperties
-import com.stratio.deep.entity.TweetEntity
+import com.stratio.deep.testutils.ContextProperties
+import com.stratio.deep.testentity.TweetEntity
 
 /**
  * Author: Emmanuelle Raffenne
