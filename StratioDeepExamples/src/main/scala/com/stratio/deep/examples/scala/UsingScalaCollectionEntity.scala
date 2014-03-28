@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.deep.examples.scala
 
 import com.stratio.deep.context.DeepSparkContext
@@ -21,7 +22,9 @@ import com.stratio.deep.config.DeepJobConfigFactory
 import org.apache.spark.{SparkContext, SparkConf}
 
 import com.stratio.deep.testutils.ContextProperties
-import com.stratio.deep.testentity.ScalaCollectionEntity
+import com.stratio.deep.testentity.{ScalaOutputEntity, ScalaCollectionEntity}
+import com.stratio.deep.rdd.CassandraRDD
+import org.apache.spark.rdd.RDD
 
 /**
  * Author: Luca Rosellini
@@ -29,58 +32,82 @@ import com.stratio.deep.testentity.ScalaCollectionEntity
  */
 
 object UsingScalaCollectionEntity {
-    type T = (String, Int)
-    type U = (Int,Int,Double)
+  type T = (String, Int)
+  type U = (Int, Int, Double)
 
-    def jobName = "scala:usingScalaCollectionEntity";
-    def keyspaceName = "crawler_keyspace";
-    def tableName = "cql3_collection_cf";
-    def outputTableName = "out_cql3_collection_cf";
+  def jobName = "scala:usingScalaCollectionEntity";
 
-    // context properties
-    val p = new ContextProperties;
+  def keyspaceName = "crawler";
 
-    def main(args : Array[String]) {
-        val sparkConf = new SparkConf()
-        sparkConf.setAppName(jobName)
-        sparkConf.setJars(p.jarList)
-        sparkConf.setMaster(p.cluster)
-        sparkConf.setSparkHome(p.sparkHome)
-        val sc = new SparkContext(sparkConf)
-        val deepContext:DeepSparkContext = new DeepSparkContext(sc);
+  def tableName = "cql3_collection_cf";
 
-        try {
-            doMain(args, deepContext)
-        } finally {
-            deepContext.stop
-            System.exit(0)
-        }
+  def outputTableName = "out_cql3_collection_cf";
+
+  // context properties
+  val p = new ContextProperties;
+
+  def main(args: Array[String]) {
+    val sparkConf = new SparkConf()
+    sparkConf.setAppName(jobName)
+    sparkConf.setJars(p.jarList)
+    sparkConf.setMaster(p.cluster)
+    sparkConf.setSparkHome(p.sparkHome)
+    val sc = new SparkContext(sparkConf)
+    val deepContext: DeepSparkContext = new DeepSparkContext(sc);
+
+    try {
+      doMain(args, deepContext)
+    } finally {
+      deepContext.stop
+      System.exit(0)
+    }
+  }
+
+  private def doMain(args: Array[String], deepContext: DeepSparkContext) = {
+
+    // Configuration and initialization
+    val config: IDeepJobConfig[ScalaCollectionEntity] = DeepJobConfigFactory.create(classOf[ScalaCollectionEntity])
+      .host(p.cassandraHost).rpcPort(p.cassandraPort)
+      .keyspace(keyspaceName).table(tableName)
+      .initialize
+
+    // Creating the RDD
+    val rdd = deepContext.cassandraEntityRDD(config)
+
+    val rddCount: Long = rdd.count
+
+    println("rddCount: " + rddCount)
+
+    // group by the first email domain name...
+    val grouped = rdd.groupBy {
+      e: ScalaCollectionEntity =>
+        val firstEmail = e.getEmails.iterator().next()
+        firstEmail.substring(firstEmail.indexOf("@") + 1)
+    } map {
+      t => (t._1, t._2.size)
+    } // ... and then count the number of emails for the same domain
+
+    grouped.collect().sortBy {
+      e => e._2
+    } foreach {
+      e => println(e)
     }
 
-    private def doMain(args: Array[String], deepContext: DeepSparkContext) = {
+    // let's write the result to Cassandra
+    val writeConfig: IDeepJobConfig[ScalaOutputEntity] = DeepJobConfigFactory.create(classOf[ScalaOutputEntity])
+      .host(p.cassandraHost).rpcPort(p.cassandraPort)
+      .keyspace(keyspaceName).table(outputTableName).createTableOnWrite(true)
+      .initialize
 
-        // Configuration and initialization
-        val config: IDeepJobConfig[ScalaCollectionEntity] = DeepJobConfigFactory.create(classOf[ScalaCollectionEntity])
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
-                .keyspace(keyspaceName).table(tableName)
-                .initialize
-
-        // Creating the RDD
-        val rdd = deepContext.cassandraEntityRDD(config)
-
-        val rddCount: Long = rdd.count
-
-        println("rddCount: " + rddCount)
-
-        // group by the first email domain name...
-        val grouped = rdd.groupBy { e:ScalaCollectionEntity =>
-          val firstEmail = e.getEmails.iterator().next()
-          firstEmail.substring(firstEmail.indexOf("@")+1)
-        } map { t => (t._1, t._2.size) } // ... and then count the number of emails for the same domain
-
-        grouped.collect().sortBy{ e => e._2 } foreach{ e => println(e) }
-
-
+    val outputRDD: RDD[ScalaOutputEntity] = grouped map {
+      t: (String, Int) =>
+        val out = new ScalaOutputEntity();
+        out.setKey(t._1);
+        out.setValue(t._2);
+        out
     }
+
+    CassandraRDD.saveRDDToCassandra(outputRDD, writeConfig)
+  }
 
 }
