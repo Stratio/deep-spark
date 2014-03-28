@@ -77,3 +77,4 @@ Scala:
   * com.stratio.deep.examples.scala.GroupingByKey
   * com.stratio.deep.examples.scala.WritingCellToCassandra
   * com.stratio.deep.examples.scala.UsingScalaEntity
+  * com.stratio.deep.examples.scala.UsingScalaCollectionEntity
