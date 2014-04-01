@@ -40,28 +40,34 @@ Configure the development and test environment
 * Install the project in you local maven repository. Enter StratioDeepParent subproject and perform: mvn clean install (add -DskipTests to skip tests)
 * Put Stratio Deep to work on a working cassandra + spark cluster. You have several options:
     * Download a preconfigured Stratio platform VM [Stratio's BigData platform (SDS)](http://www.stratio.com/).
-      This VM will work on both Virtualbox and VMWare, and comes with a fully configured distribution that also includes StratioDeep. We also distribute the VM with several preloaded datasets in Cassandra.
+      This VM will work on both Virtualbox and VMWare, and comes with a fully configured distribution that also includes StratioDeep. We also distribute the VM with several preloaded datasets in Cassandra. This distribution will include Stratio's customized Cassandra distribution containing our powerful open-source lucene-based secondary indexes, see Stratio documentation for further information.
       Once your VM is up and running you can test StratioDeep using the shell. Enter /opt/SDH and run bin/stratio-deep-shell.
     * Install a new Stratio cluster using the Stratio installer. Please refer to Stratio's website to download the installer and its documentation.
-    * You already have a working Cassandra server on your development machine: you need a spark+deep bundle, we suggest to create one by running StratioDeepParent/make-distribution-deep.sh
-      This will build a Spark distribution package with StratioDeep and Cassandra's jars included (depending on your machine this script could take a while, since it will compile Spark from sources).
-      The package will be called spark-deep-distribution-X.Y.Z.tgz, untar it to a folder of your choice, enter that folder and issue a
-    ./stratio-deep-shell
-      this will start an interactive shell where you can test StratioDeep (you may have noticed this is will start a development cluster started with MASTER="local").
+    * You already have a working Cassandra server on your development machine: you need a spark+deep bundle, we suggest to create one by running:
+    
+	    ``cd StratioDeepParent``
+	    
+	    ``./make-distribution-deep.sh``
+	    
+    this will build a Spark distribution package with StratioDeep and Cassandra's jars included (depending on your machine this script could take a while, since it will compile Spark from sources).
+The package will be called ``spark-deep-distribution-X.Y.Z.tgz``, untar it to a folder of your choice, enter that folder and issue a ``./stratio-deep-shell``, this will start an interactive shell where you can test StratioDeep (you may have noticed this is will start a development cluster started with MASTER="local").
 
     * You already have a working installation os Cassandra and Spark on your development machine: this is the most difficult way to start testing StratioDeep, but you know what you're doing  you will have to
-        1. copy the Stratio Deep jars to Spark's 'jars' folder ($SPARK_HOME/jars).
+        1. copy the Stratio Deep jars to Spark's 'jars' folder (``$SPARK_HOME/jars``).
         2. copy Cassandra's jars to Spark's 'jar' folder.
         3. copy Datastax Java Driver jar (v 2.0.0) to Spark's 'jar' folder.
         4. start spark shell and import the following:
-    import com.stratio.deep.config._
-    import com.stratio.deep.entity._
-    import com.stratio.deep.context._
-    import com.stratio.deep.rdd._
+        
+			``import com.stratio.deep.config._``			
+			``import com.stratio.deep.entity._``			
+			``import com.stratio.deep.context._``			
+			``import com.stratideep.rdd._``
+			
 
 First steps
 ===========
 Once you have a working development environment you can finally start testing StratioDeep. This are the basic steps you will always have to perform in order to use StratioDeep:
+
 * __Build an instance of a configuration object__: this will let you tell StratioDeep the Cassandra endpoint, the Cassandra keyspace and table you want to access and much more.
   It will also let you specify which interface to use (the domain entity or the generic interface).
   We have a factory that will help you create a configuration object using a fluent API. Creating a configuration object is an expensive operation.
