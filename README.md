@@ -40,7 +40,7 @@ Configure the development and test environment
 * Install the project in you local maven repository. Enter StratioDeepParent subproject and perform: mvn clean install (add -DskipTests to skip tests)
 * Put Stratio Deep to work on a working cassandra + spark cluster. You have several options:
     * Download a preconfigured Stratio platform VM [Stratio's BigData platform (SDS)](http://www.stratio.com/).
-      This VM will work on both Virtualbox and VMWare, and comes with a fully configured distribution that also includes StratioDeep. We also distribute the VM with several preloaded datasets in Cassandra. This distribution will include Stratio's customized Cassandra distribution containing our powerful open-source lucene-based secondary indexes, see Stratio documentation for further information.
+      This VM will work on both Virtualbox and VMWare, and comes with a fully configured distribution that also includes StratioDeep. We also distribute the VM with several preloaded datasets in Cassandra. This distribution will include Stratio's customized Cassandra distribution containing our powerful [open-source lucene-based secondary indexes](https://github.com/Stratio/stratio-cassandra), see Stratio documentation for further information.
       Once your VM is up and running you can test StratioDeep using the shell. Enter /opt/SDH and run bin/stratio-deep-shell.
     * Install a new Stratio cluster using the Stratio installer. Please refer to Stratio's website to download the installer and its documentation.
     * You already have a working Cassandra server on your development machine: you need a spark+deep bundle, we suggest to create one by running:
