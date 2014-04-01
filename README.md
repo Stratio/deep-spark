@@ -54,10 +54,10 @@ Configure the development and test environment
         2. copy Cassandra's jars to Spark's 'jar' folder.
         3. copy Datastax Java Driver jar (v 2.0.0) to Spark's 'jar' folder.
         4. start spark shell and import the following:
-    __import com.stratio.deep.config._ __
-    __import com.stratio.deep.entity._ __
-    __import com.stratio.deep.context._ __
-    __import com.stratio.deep.rdd._ __
+    import com.stratio.deep.config._
+    import com.stratio.deep.entity._
+    import com.stratio.deep.context._
+    import com.stratio.deep.rdd._
 
 First steps
 ===========
