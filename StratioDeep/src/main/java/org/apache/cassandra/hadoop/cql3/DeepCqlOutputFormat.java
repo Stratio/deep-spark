@@ -16,17 +16,16 @@
 
 package org.apache.cassandra.hadoop.cql3;
 
-import java.io.IOException;
-
-import org.apache.commons.lang.NotImplementedException;
-
 import com.stratio.deep.testentity.Cells;
 import org.apache.cassandra.hadoop.AbstractColumnFamilyOutputFormat;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.util.Progressable;
+
+import java.io.IOException;
 
 /**
  * Custom implementation of Hadoop outformat returning a DeepCqlRecordWriter

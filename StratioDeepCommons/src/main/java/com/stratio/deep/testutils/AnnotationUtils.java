@@ -16,6 +16,15 @@
 
 package com.stratio.deep.testutils;
 
+import com.google.common.collect.ImmutableMap;
+import com.stratio.deep.annotations.DeepField;
+import com.stratio.deep.exception.DeepIOException;
+import com.stratio.deep.testentity.IDeepType;
+import org.apache.cassandra.db.marshal.*;
+import org.apache.cassandra.utils.Pair;
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
+
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -27,16 +36,6 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.util.*;
-
-import com.google.common.collect.ImmutableMap;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
-
-import com.stratio.deep.annotations.DeepField;
-import com.stratio.deep.testentity.IDeepType;
-import com.stratio.deep.exception.DeepIOException;
-import org.apache.cassandra.db.marshal.*;
-import org.apache.cassandra.utils.Pair;
 
 /**
  * Created by luca on 26/02/14.

@@ -16,14 +16,14 @@
 
 package com.stratio.deep.rdd;
 
-import java.nio.ByteBuffer;
-import java.util.Map;
-
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.testentity.Cell;
 import com.stratio.deep.testentity.Cells;
 import org.apache.cassandra.utils.Pair;
 import org.apache.spark.SparkContext;
+
+import java.nio.ByteBuffer;
+import java.util.Map;
 
 /**
  * Concrete implementation of a CassandraRDD representing an RDD of {@link com.stratio.deep.testentity.Cells} element.<br/>

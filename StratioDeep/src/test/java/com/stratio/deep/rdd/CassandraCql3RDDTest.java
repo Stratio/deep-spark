@@ -16,8 +16,6 @@
 
 package com.stratio.deep.rdd;
 
-import java.util.List;
-
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -25,16 +23,18 @@ import com.datastax.driver.core.Session;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.testentity.Cql3TestEntity;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
+import com.stratio.deep.testentity.Cql3TestEntity;
 import com.stratio.deep.util.Constants;
 import org.apache.spark.rdd.RDD;
 import org.testng.annotations.Test;
 import scala.Function1;
 import scala.reflect.ClassTag$;
+
+import java.util.List;
 
 import static org.testng.Assert.*;
 

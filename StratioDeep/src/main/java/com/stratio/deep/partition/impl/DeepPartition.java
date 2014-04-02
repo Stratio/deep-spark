@@ -16,9 +16,8 @@
 
 package com.stratio.deep.partition.impl;
 
-import org.apache.commons.lang.ArrayUtils;
-
 import org.apache.cassandra.hadoop.ColumnFamilySplit;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.hadoop.io.Writable;
 import org.apache.spark.Partition;
 import org.apache.spark.SerializableWritable;

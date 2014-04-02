@@ -16,34 +16,34 @@
 
 package com.stratio.deep.config.impl;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.*;
-
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-
 import com.datastax.driver.core.*;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.cql.DeepConfigHelper;
-import com.stratio.deep.testentity.Cell;
-import com.stratio.deep.testentity.Cells;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
+import com.stratio.deep.testentity.Cell;
+import com.stratio.deep.testentity.Cells;
 import com.stratio.deep.util.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.hadoop.ConfigHelper;
 import org.apache.cassandra.hadoop.cql3.CqlConfigHelper;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
-import static com.stratio.deep.testutils.Utils.*;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.*;
+
+import static com.stratio.deep.testutils.Utils.createTableQueryGenerator;
+import static com.stratio.deep.testutils.Utils.quote;
 
 /**
  * Base class for all config implementations providing default implementations for methods

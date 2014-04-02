@@ -16,19 +16,19 @@
 
 package com.stratio.deep.testentity;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.util.*;
-
 import com.datastax.driver.core.DataType;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepInstantiationException;
 import org.apache.cassandra.db.marshal.*;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.util.*;
 
 import static org.testng.Assert.*;
 

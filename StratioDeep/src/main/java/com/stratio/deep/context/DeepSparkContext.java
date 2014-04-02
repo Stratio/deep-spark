@@ -16,20 +16,20 @@
 
 package com.stratio.deep.context;
 
-import java.util.Map;
-
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.impl.CellDeepJobConfig;
 import com.stratio.deep.config.impl.EntityDeepJobConfig;
-import com.stratio.deep.testentity.Cells;
-import com.stratio.deep.testentity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.rdd.CassandraCellRDD;
 import com.stratio.deep.rdd.CassandraEntityRDD;
 import com.stratio.deep.rdd.CassandraJavaRDD;
 import com.stratio.deep.rdd.CassandraRDD;
+import com.stratio.deep.testentity.Cells;
+import com.stratio.deep.testentity.IDeepType;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaSparkContext;
+
+import java.util.Map;
 
 /**
  * Entry point to the Cassandra-aware Spark context.

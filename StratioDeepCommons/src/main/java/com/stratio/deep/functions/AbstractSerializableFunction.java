@@ -16,9 +16,9 @@
 
 package com.stratio.deep.functions;
 
-import java.io.Serializable;
-
 import scala.runtime.AbstractFunction1;
+
+import java.io.Serializable;
 
 /**
  * Abstract base type to create serializable functions of tipe 1.

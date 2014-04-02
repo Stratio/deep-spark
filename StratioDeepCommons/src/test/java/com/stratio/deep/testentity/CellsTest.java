@@ -16,15 +16,15 @@
 
 package com.stratio.deep.testentity;
 
-import java.nio.ByteBuffer;
-import java.util.Collection;
-import java.util.List;
-
 import com.stratio.deep.exception.DeepGenericException;
 import org.apache.cassandra.db.marshal.Int32Type;
 import org.apache.cassandra.db.marshal.LongType;
 import org.apache.cassandra.db.marshal.UTF8Type;
 import org.testng.annotations.Test;
+
+import java.nio.ByteBuffer;
+import java.util.Collection;
+import java.util.List;
 
 import static org.testng.Assert.*;
 

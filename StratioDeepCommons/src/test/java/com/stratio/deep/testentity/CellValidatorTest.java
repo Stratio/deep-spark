@@ -16,17 +16,17 @@
 
 package com.stratio.deep.testentity;
 
+import com.datastax.driver.core.DataType;
+import org.apache.cassandra.db.marshal.*;
+import org.testng.annotations.Test;
+
+import javax.management.relation.RoleList;
+import javax.management.relation.RoleUnresolvedList;
+import javax.print.attribute.standard.PrinterStateReasons;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
-
-import com.datastax.driver.core.DataType;
-import javax.management.relation.RoleList;
-import javax.management.relation.RoleUnresolvedList;
-import javax.print.attribute.standard.PrinterStateReasons;
-import org.apache.cassandra.db.marshal.*;
-import org.testng.annotations.Test;
 
 import static com.stratio.deep.testentity.CellValidator.Kind;
 import static com.stratio.deep.testentity.CellValidator.cellValidator;

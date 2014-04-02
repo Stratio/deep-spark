@@ -16,15 +16,15 @@
 
 package com.stratio.deep.testentity;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.nio.ByteBuffer;
-
 import com.datastax.driver.core.DataType;
 import com.stratio.deep.annotations.DeepField;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepInstantiationException;
 import org.apache.cassandra.db.marshal.AbstractType;
+
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
 
 import static com.stratio.deep.testutils.AnnotationUtils.*;
 

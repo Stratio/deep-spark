@@ -16,10 +16,6 @@
 
 package com.stratio.deep.rdd;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.CharacterCodingException;
-
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import org.apache.cassandra.exceptions.ConfigurationException;
@@ -28,6 +24,10 @@ import org.apache.spark.Partition;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import scala.collection.Seq;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.CharacterCodingException;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;

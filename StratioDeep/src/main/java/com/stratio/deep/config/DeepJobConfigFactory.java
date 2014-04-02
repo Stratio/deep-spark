@@ -16,12 +16,12 @@
 
 package com.stratio.deep.config;
 
-import java.io.Serializable;
-
 import com.stratio.deep.config.impl.CellDeepJobConfig;
 import com.stratio.deep.config.impl.EntityDeepJobConfig;
 import com.stratio.deep.testentity.Cells;
 import com.stratio.deep.testentity.IDeepType;
+
+import java.io.Serializable;
 
 /**
  * Factory class for deep configuration objects.

@@ -16,20 +16,20 @@
 
 package com.stratio.deep.testutils;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.math.BigInteger;
-import java.util.*;
-
+import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.testentity.Cell;
 import com.stratio.deep.testentity.Cells;
 import com.stratio.deep.testentity.IDeepType;
 import com.stratio.deep.testentity.TestEntity;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepIOException;
 import org.apache.cassandra.utils.Pair;
 import org.testng.annotations.Test;
 import scala.Tuple2;
+
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.math.BigInteger;
+import java.util.*;
 
 import static com.stratio.deep.testutils.Utils.*;
 import static org.testng.Assert.*;

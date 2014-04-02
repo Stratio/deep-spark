@@ -16,7 +16,7 @@
 
 package com.stratio.deep.rdd
 
-import com.stratio.deep.testentity.{DeepScalaPageEntity, TestEntity}
+import com.stratio.deep.testentity.DeepScalaPageEntity
 import com.stratio.deep.config.{DeepJobConfigFactory, IDeepJobConfig}
 import com.stratio.deep.util.Constants
 import com.stratio.deep.embedded.CassandraServer

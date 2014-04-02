@@ -16,14 +16,14 @@
 
 package com.stratio.deep.testentity;
 
+import com.stratio.deep.annotations.DeepEntity;
+import com.stratio.deep.annotations.DeepField;
+import org.apache.cassandra.db.marshal.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import com.stratio.deep.annotations.DeepEntity;
-import com.stratio.deep.annotations.DeepField;
-import org.apache.cassandra.db.marshal.*;
 
 @DeepEntity
 public class TestEntity implements IDeepType {

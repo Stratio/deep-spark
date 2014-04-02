@@ -16,12 +16,12 @@
 
 package com.stratio.deep.context;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.testng.annotations.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by luca on 28/02/14.

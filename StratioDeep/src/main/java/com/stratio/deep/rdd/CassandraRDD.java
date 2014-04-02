@@ -16,12 +16,6 @@
 
 package com.stratio.deep.rdd;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
@@ -30,12 +24,12 @@ import com.stratio.deep.config.impl.GenericDeepJobConfig;
 import com.stratio.deep.cql.DeepCqlPagingInputFormat;
 import com.stratio.deep.cql.DeepCqlPagingRecordReader;
 import com.stratio.deep.cql.DeepTaskAttemptContext;
-import com.stratio.deep.testentity.Cells;
-import com.stratio.deep.testentity.IDeepType;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.functions.CellList2TupleFunction;
 import com.stratio.deep.functions.DeepType2TupleFunction;
 import com.stratio.deep.partition.impl.DeepPartition;
+import com.stratio.deep.testentity.Cells;
+import com.stratio.deep.testentity.IDeepType;
 import com.stratio.deep.testutils.Utils;
 import org.apache.cassandra.hadoop.cql3.DeepCqlOutputFormat;
 import org.apache.cassandra.utils.Pair;
@@ -59,6 +53,12 @@ import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
 import scala.runtime.AbstractFunction0;
 import scala.runtime.BoxedUnit;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import static scala.collection.JavaConversions.asScalaBuffer;
 import static scala.collection.JavaConversions.asScalaIterator;

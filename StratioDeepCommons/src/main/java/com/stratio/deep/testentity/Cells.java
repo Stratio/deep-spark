@@ -16,11 +16,11 @@
 
 package com.stratio.deep.testentity;
 
+import com.stratio.deep.exception.DeepGenericException;
+
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.*;
-
-import com.stratio.deep.exception.DeepGenericException;
 
 /**
  * Represents a tuple inside the Cassandra's datastore.

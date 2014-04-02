@@ -16,13 +16,13 @@
 
 package com.stratio.deep.config;
 
-import java.io.Serializable;
-import java.util.Map;
-
 import com.datastax.driver.core.Session;
 import com.stratio.deep.testentity.Cell;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.hadoop.conf.Configuration;
+
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Defines the public methods that each Stratio Deep configuration object should implement.

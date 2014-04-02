@@ -16,18 +16,18 @@
 
 package com.stratio.deep.rdd;
 
-import java.nio.ByteBuffer;
-import java.util.Map;
-
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.impl.EntityDeepJobConfig;
+import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.testentity.Cell;
 import com.stratio.deep.testentity.IDeepType;
-import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.testutils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.utils.Pair;
 import org.apache.spark.SparkContext;
+
+import java.nio.ByteBuffer;
+import java.util.Map;
 
 /**
  * Stratio's implementation of an RDD reading and writing data from and to

@@ -16,13 +16,6 @@
 
 package com.stratio.deep.rdd;
 
-import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.*;
-
-import com.google.common.io.Resources;
-
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -30,12 +23,13 @@ import com.datastax.driver.core.Session;
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.google.common.io.Resources;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.testentity.Cql3CollectionsTestEntity;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
+import com.stratio.deep.testentity.Cql3CollectionsTestEntity;
 import com.stratio.deep.util.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -44,6 +38,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import scala.Function1;
 import scala.reflect.ClassTag$;
+
+import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
 
 import static org.testng.Assert.*;
 

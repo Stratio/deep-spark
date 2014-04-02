@@ -16,14 +16,14 @@
 
 package com.stratio.deep.cql;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Map;
-
 import org.apache.cassandra.hadoop.cql3.CqlPagingInputFormat;
 import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Map;
 
 /**
  * {@link CqlPagingRecordReader} implementation that returns an instance of a

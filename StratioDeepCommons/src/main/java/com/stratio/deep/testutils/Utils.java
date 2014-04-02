@@ -16,6 +16,19 @@
 
 package com.stratio.deep.testutils;
 
+import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.exception.DeepIOException;
+import com.stratio.deep.testentity.Cell;
+import com.stratio.deep.testentity.Cells;
+import com.stratio.deep.testentity.IDeepType;
+import org.apache.cassandra.db.marshal.AbstractType;
+import org.apache.cassandra.db.marshal.TimeUUIDType;
+import org.apache.cassandra.db.marshal.UUIDType;
+import org.apache.cassandra.utils.Pair;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
+import scala.Tuple2;
+
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -23,20 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
-
-import com.stratio.deep.testentity.Cell;
-import com.stratio.deep.testentity.Cells;
-import com.stratio.deep.testentity.IDeepType;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepIOException;
-import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.db.marshal.TimeUUIDType;
-import org.apache.cassandra.db.marshal.UUIDType;
-import org.apache.cassandra.utils.Pair;
-import scala.Tuple2;
 
 import static com.stratio.deep.testutils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
 

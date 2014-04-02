@@ -16,13 +16,6 @@
 
 package com.stratio.deep.rdd;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.CharacterCodingException;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -31,11 +24,11 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
+import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.testentity.Cell;
 import com.stratio.deep.testentity.Cells;
 import com.stratio.deep.testentity.StrippedTestEntity;
 import com.stratio.deep.testentity.TestEntity;
-import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.util.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.utils.UUIDGen;
@@ -48,6 +41,13 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import scala.Tuple2;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.CharacterCodingException;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.testng.Assert.*;
 

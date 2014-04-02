@@ -16,17 +16,8 @@
 
 package com.stratio.deep.cql;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.nio.ByteBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.util.*;
-
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.testutils.Utils;
@@ -51,6 +42,14 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.thrift.TException;
 import org.apache.thrift.transport.TTransport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.util.*;
 
 /**
  * Extends Cassandra's CqlPagingRecordReader in order to make it

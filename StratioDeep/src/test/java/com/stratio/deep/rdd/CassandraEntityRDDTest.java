@@ -16,10 +16,6 @@
 
 package com.stratio.deep.rdd;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
-
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -27,11 +23,11 @@ import com.datastax.driver.core.Session;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.testentity.TestEntity;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
+import com.stratio.deep.testentity.TestEntity;
 import com.stratio.deep.util.Constants;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.serializer.DeserializationStream;
@@ -42,6 +38,10 @@ import org.testng.annotations.Test;
 import scala.Function1;
 import scala.collection.Iterator;
 import scala.reflect.ClassTag$;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 
 import static org.testng.Assert.*;
 
@@ -236,7 +236,6 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
     @Override
     public void testSaveToCassandra() {
-
         Function1<TestEntity, TestEntity> mappingFunc = new TestEntityAbstractSerializableFunction();
 
         RDD<TestEntity> mappedRDD = getRDD().map(mappingFunc, ClassTag$.MODULE$.<TestEntity>apply(TestEntity.class));
@@ -285,6 +284,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
             writeConfig.createTableOnWrite(Boolean.TRUE);
         }
 
+        assertEquals(getRDD().count(), entityTestDataSize);
         CassandraRDD.saveRDDToCassandra(getRDD(), writeConfig);
 
         checkSimpleTestData();
@@ -292,6 +292,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
     @Override
     public void testCql3SaveToCassandra() {
+
         try {
             executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY);
         } catch (Exception e) {

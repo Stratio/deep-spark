@@ -16,23 +16,22 @@
 
 package com.stratio.deep.config.impl;
 
+import com.stratio.deep.annotations.DeepEntity;
+import com.stratio.deep.annotations.DeepField;
+import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.exception.DeepNoSuchFieldException;
+import com.stratio.deep.testentity.Cell;
+import com.stratio.deep.testentity.IDeepType;
+import com.stratio.deep.testutils.AnnotationUtils;
+import com.stratio.deep.testutils.Utils;
+import org.apache.commons.lang.StringUtils;
+
 import java.lang.annotation.Annotation;
 import java.lang.annotation.AnnotationTypeMismatchException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
-
-import org.apache.commons.lang.StringUtils;
-
-import com.stratio.deep.annotations.DeepEntity;
-import com.stratio.deep.annotations.DeepField;
-import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.testentity.Cell;
-import com.stratio.deep.testentity.IDeepType;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepNoSuchFieldException;
-import com.stratio.deep.testutils.Utils;
-import com.stratio.deep.testutils.AnnotationUtils;
 
 /**
  * Class containing the appropiate configuration for a CassandraEntityRDD.
