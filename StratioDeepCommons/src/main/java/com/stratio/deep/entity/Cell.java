@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.testentity;
+package com.stratio.deep.entity;
 
 import com.datastax.driver.core.DataType;
 import com.stratio.deep.annotations.DeepField;
@@ -26,7 +26,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 
-import static com.stratio.deep.testutils.AnnotationUtils.*;
+import static com.stratio.deep.utils.AnnotationUtils.*;
 
 /**
  * Generic abstraction for cassandra's columns.

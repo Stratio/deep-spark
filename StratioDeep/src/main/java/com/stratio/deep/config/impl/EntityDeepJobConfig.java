@@ -21,10 +21,10 @@ import com.stratio.deep.annotations.DeepField;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
-import com.stratio.deep.testentity.Cell;
-import com.stratio.deep.testentity.IDeepType;
-import com.stratio.deep.testutils.AnnotationUtils;
-import com.stratio.deep.testutils.Utils;
+import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.utils.AnnotationUtils;
+import com.stratio.deep.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 
 import java.lang.annotation.Annotation;

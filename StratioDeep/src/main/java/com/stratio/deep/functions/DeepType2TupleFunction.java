@@ -16,9 +16,9 @@
 
 package com.stratio.deep.functions;
 
-import com.stratio.deep.testentity.Cells;
-import com.stratio.deep.testentity.IDeepType;
-import com.stratio.deep.testutils.Utils;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.utils.Utils;
 import scala.Tuple2;
 
 /**

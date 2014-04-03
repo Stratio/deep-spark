@@ -16,6 +16,8 @@
 
 package com.stratio.deep.testentity;
 
+import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepGenericException;
 import org.apache.cassandra.db.marshal.Int32Type;
 import org.apache.cassandra.db.marshal.LongType;

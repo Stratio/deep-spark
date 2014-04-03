@@ -16,7 +16,7 @@
 
 package com.stratio.deep.config.impl;
 
-import com.stratio.deep.testentity.Cells;
+import com.stratio.deep.entity.Cells;
 
 /**
  * Cell-based configuration object.

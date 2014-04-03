@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.testentity;
+package com.stratio.deep.entity;
 
 import com.stratio.deep.exception.DeepGenericException;
 

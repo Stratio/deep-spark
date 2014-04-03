@@ -17,6 +17,7 @@
 package com.stratio.deep.testentity;
 
 import com.datastax.driver.core.DataType;
+import com.stratio.deep.entity.Cell;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepInstantiationException;
 import org.apache.cassandra.db.marshal.*;

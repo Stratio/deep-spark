@@ -18,8 +18,8 @@ package com.stratio.deep.config;
 
 import com.stratio.deep.config.impl.CellDeepJobConfig;
 import com.stratio.deep.config.impl.EntityDeepJobConfig;
-import com.stratio.deep.testentity.Cells;
-import com.stratio.deep.testentity.IDeepType;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.entity.IDeepType;
 
 import java.io.Serializable;
 

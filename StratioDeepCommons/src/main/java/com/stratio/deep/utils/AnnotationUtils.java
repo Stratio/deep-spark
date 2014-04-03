@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.testutils;
+package com.stratio.deep.utils;
 
 import com.google.common.collect.ImmutableMap;
 import com.stratio.deep.annotations.DeepField;
 import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.testentity.IDeepType;
+import com.stratio.deep.entity.IDeepType;
 import org.apache.cassandra.db.marshal.*;
 import org.apache.cassandra.utils.Pair;
 import org.apache.commons.beanutils.PropertyUtils;
