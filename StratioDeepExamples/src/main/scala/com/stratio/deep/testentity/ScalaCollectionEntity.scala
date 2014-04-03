@@ -20,6 +20,7 @@ import scala.beans.BeanProperty
 import com.stratio.deep.annotations.{DeepEntity, DeepField}
 import org.apache.cassandra.db.marshal.{MapType, ListType, SetType}
 import java.util.UUID
+import com.stratio.deep.entity.IDeepType
 
 /**
  * Created by luca on 27/03/14.

@@ -19,6 +19,7 @@ package com.stratio.deep.testentity
 import com.stratio.deep.annotations.{DeepField, DeepEntity}
 import scala.beans.BeanProperty
 import org.apache.cassandra.db.marshal.{LongType, Int32Type}
+import com.stratio.deep.entity.IDeepType
 
 @DeepEntity class DeepScalaPageEntity extends IDeepType {
 

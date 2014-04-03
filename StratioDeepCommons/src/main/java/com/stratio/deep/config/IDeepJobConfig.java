@@ -17,7 +17,7 @@
 package com.stratio.deep.config;
 
 import com.datastax.driver.core.Session;
-import com.stratio.deep.testentity.Cell;
+import com.stratio.deep.entity.Cell;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.hadoop.conf.Configuration;
 

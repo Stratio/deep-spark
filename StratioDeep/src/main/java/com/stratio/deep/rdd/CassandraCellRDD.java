@@ -17,8 +17,8 @@
 package com.stratio.deep.rdd;
 
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.testentity.Cell;
-import com.stratio.deep.testentity.Cells;
+import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
 import org.apache.cassandra.utils.Pair;
 import org.apache.spark.SparkContext;
 
@@ -26,7 +26,7 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 
 /**
- * Concrete implementation of a CassandraRDD representing an RDD of {@link com.stratio.deep.testentity.Cells} element.<br/>
+ * Concrete implementation of a CassandraRDD representing an RDD of {@link com.stratio.deep.entity.Cells} element.<br/>
  */
 public class CassandraCellRDD extends CassandraRDD<Cells> {
 

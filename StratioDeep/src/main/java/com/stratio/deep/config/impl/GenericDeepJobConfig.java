@@ -23,8 +23,8 @@ import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
-import com.stratio.deep.testentity.Cell;
-import com.stratio.deep.testentity.Cells;
+import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.util.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.cassandra.dht.IPartitioner;
@@ -42,8 +42,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
-import static com.stratio.deep.testutils.Utils.createTableQueryGenerator;
-import static com.stratio.deep.testutils.Utils.quote;
+import static com.stratio.deep.utils.Utils.createTableQueryGenerator;
+import static com.stratio.deep.utils.Utils.quote;
 
 /**
  * Base class for all config implementations providing default implementations for methods
@@ -246,7 +246,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
 
     /**
      * Fetches table metadata from Casandra and generates a Map<K, V> where the key is the column name, and the value
-     * is the {@link com.stratio.deep.testentity.Cell} containing column's metadata.
+     * is the {@link com.stratio.deep.entity.Cell} containing column's metadata.
      *
      * @return
      */

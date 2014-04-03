@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.testutils;
+package com.stratio.deep.utils;
 
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.testentity.Cell;
-import com.stratio.deep.testentity.Cells;
-import com.stratio.deep.testentity.IDeepType;
+import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.entity.IDeepType;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.TimeUUIDType;
 import org.apache.cassandra.db.marshal.UUIDType;
@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.stratio.deep.testutils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
+import static com.stratio.deep.utils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
 
 /**
  * Utility class providing useful methods to manipulate the conversion

@@ -17,6 +17,7 @@
 package com.stratio.deep.testentity;
 
 import com.datastax.driver.core.DataType;
+import com.stratio.deep.entity.CellValidator;
 import org.apache.cassandra.db.marshal.*;
 import org.testng.annotations.Test;
 
@@ -28,8 +29,8 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
 
-import static com.stratio.deep.testentity.CellValidator.Kind;
-import static com.stratio.deep.testentity.CellValidator.cellValidator;
+import static com.stratio.deep.entity.CellValidator.Kind;
+import static com.stratio.deep.entity.CellValidator.cellValidator;
 import static org.testng.Assert.*;
 
 /**

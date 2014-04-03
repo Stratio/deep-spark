@@ -18,6 +18,7 @@ package com.stratio.deep.testentity;
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.annotations.DeepField;
 
+import com.stratio.deep.entity.IDeepType;
 import org.apache.cassandra.db.marshal.BooleanType;
 import org.apache.cassandra.db.marshal.Int32Type;
 import org.apache.cassandra.db.marshal.TimestampType;

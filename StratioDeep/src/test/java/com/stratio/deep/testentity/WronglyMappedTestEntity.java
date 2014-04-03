@@ -18,9 +18,10 @@ package com.stratio.deep.testentity;
 
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.annotations.DeepField;
+import com.stratio.deep.entity.IDeepType;
 
 @DeepEntity
-public class WronglyMappedTestEntity implements  IDeepType{
+public class WronglyMappedTestEntity implements IDeepType {
 
     @DeepField(isPartOfPartitionKey = true)
     private String id;

@@ -23,6 +23,7 @@ import org.apache.spark.rdd.RDD
 
 import org.apache.spark.SparkContext._
 import com.stratio.deep.testutils.ContextProperties
+import com.stratio.deep.entity.{Cell, Cells}
 
 /**
  * Author: Emmanuelle Raffenne

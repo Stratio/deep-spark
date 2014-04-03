@@ -19,9 +19,9 @@ package org.apache.cassandra.hadoop.cql3;
 import com.stratio.deep.cql.DeepConfigHelper;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.testentity.Cell;
-import com.stratio.deep.testentity.Cells;
-import com.stratio.deep.testutils.Utils;
+import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.db.marshal.LongType;
@@ -52,7 +52,7 @@ import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.stratio.deep.testutils.Utils.updateQueryGenerator;
+import static com.stratio.deep.utils.Utils.updateQueryGenerator;
 
 /**
  * Created by luca on 05/02/14.

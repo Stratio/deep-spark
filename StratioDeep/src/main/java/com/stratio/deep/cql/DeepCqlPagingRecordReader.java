@@ -20,7 +20,7 @@ import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
-import com.stratio.deep.testutils.Utils;
+import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.db.marshal.LongType;

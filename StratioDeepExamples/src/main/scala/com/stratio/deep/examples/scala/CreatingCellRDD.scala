@@ -18,8 +18,8 @@ package com.stratio.deep.examples.scala
 import com.stratio.deep.context._
 import com.stratio.deep.config._
 import com.stratio.deep.rdd._
-import com.stratio.deep.testentity.Cells
 import com.stratio.deep.testutils.ContextProperties
+import com.stratio.deep.entity.Cells
 
 /**
  * Author: Emmanuelle Raffenne

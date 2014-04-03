@@ -33,7 +33,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.stratio.deep.testutils.Utils.quote;
+import static com.stratio.deep.utils.Utils.quote;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 

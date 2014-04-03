@@ -24,8 +24,8 @@ import com.stratio.deep.rdd.CassandraCellRDD;
 import com.stratio.deep.rdd.CassandraEntityRDD;
 import com.stratio.deep.rdd.CassandraJavaRDD;
 import com.stratio.deep.rdd.CassandraRDD;
-import com.stratio.deep.testentity.Cells;
-import com.stratio.deep.testentity.IDeepType;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.entity.IDeepType;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaSparkContext;
 
