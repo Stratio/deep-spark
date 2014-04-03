@@ -1,10 +1,20 @@
-package com.stratio.deep.rdd;
+/*
+ * Copyright 2014, Stratio.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+package com.stratio.deep.rdd;
 
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
@@ -14,13 +24,13 @@ import com.stratio.deep.config.impl.GenericDeepJobConfig;
 import com.stratio.deep.cql.DeepCqlPagingInputFormat;
 import com.stratio.deep.cql.DeepCqlPagingRecordReader;
 import com.stratio.deep.cql.DeepTaskAttemptContext;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.functions.CellList2TupleFunction;
 import com.stratio.deep.functions.DeepType2TupleFunction;
 import com.stratio.deep.partition.impl.DeepPartition;
-import com.stratio.deep.util.Utils;
+import com.stratio.deep.testentity.Cells;
+import com.stratio.deep.testentity.IDeepType;
+import com.stratio.deep.testutils.Utils;
 import org.apache.cassandra.hadoop.cql3.DeepCqlOutputFormat;
 import org.apache.cassandra.utils.Pair;
 import org.apache.hadoop.io.Writable;
@@ -28,7 +38,6 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.JobID;
 import org.apache.hadoop.mapreduce.TaskAttemptID;
-import org.apache.log4j.Logger;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
@@ -45,12 +54,18 @@ import scala.reflect.ClassTag$;
 import scala.runtime.AbstractFunction0;
 import scala.runtime.BoxedUnit;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import static scala.collection.JavaConversions.asScalaBuffer;
 import static scala.collection.JavaConversions.asScalaIterator;
 
 /**
  * Base class that abstracts the complexity of interacting with the Cassandra Datastore.<br/>
- * Implementors should only provide a way to convert an object of type T to a {@link com.stratio.deep.entity.Cells} element.
+ * Implementors should only provide a way to convert an object of type T to a {@link com.stratio.deep.testentity.Cells} element.
  */
 public abstract class CassandraRDD<T> extends RDD<T> {
 
@@ -128,13 +143,9 @@ public abstract class CassandraRDD<T> extends RDD<T> {
         final int pageSize = writeConfig.getBatchSize();
         int offset = 0;
 
-        Logger logger = Logger.getLogger(CassandraRDD.class);
-
         List<Tuple2<Cells, Cells>> elements = Arrays.asList((Tuple2<Cells, Cells>[])mappedRDD.collect());
         List<Tuple2<Cells, Cells>> split;
         do {
-            logger.info("Iterating. pageSize: " + pageSize + ", offset: " + offset);
-
             split = elements.subList(pageSize * (offset++), Math.min(pageSize * offset, elements.size()));
 
             Batch batch = QueryBuilder.batch();
@@ -173,7 +184,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
             doCql3SaveToCassandra(r, c, new CellList2TupleFunction());
         } else {
-            throw new IllegalArgumentException("Provided RDD must be an RDD of com.stratio.deep.entity.Cells or an RDD of com.stratio.deep.entity.IDeepType");
+            throw new IllegalArgumentException("Provided RDD must be an RDD of com.stratio.deep.testentity.Cells or an RDD of com.stratio.deep.testentity.IDeepType");
         }
     }
 
@@ -222,7 +233,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
             doSaveToCassandra(r, c, new CellList2TupleFunction());
         } else {
-            throw new IllegalArgumentException("Provided RDD must be an RDD of com.stratio.deep.entity.Cells or an RDD of com.stratio.deep.entity.IDeepType");
+            throw new IllegalArgumentException("Provided RDD must be an RDD of com.stratio.deep.testentity.Cells or an RDD of com.stratio.deep.testentity.IDeepType");
         }
     }
 
@@ -294,7 +305,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     /**
      * Returns the partitions on which this RDD depends on.
      * <p/>
-     * Uses the underlying CqlPagingInputFormat in order to retreive the splits.
+     * Uses the underlying CqlPagingInputFormat in order to retrieve the splits.
      * <p/>
      * The number of splits, and hence the number of partitions equals to the
      * number of tokens configured in cassandra.yaml + 1.
@@ -326,10 +337,6 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
     /**
      * Returns a list of hosts on which the given split resides.
-     * <p/>
-     * TODO: check what happens in an environment where the split is replicated
-     * on N machines. It would be optimum if the RDD were computed only on the
-     * machine(s) where the split resides.
      */
     @Override
     public Seq<String> getPreferredLocations(Partition split) {

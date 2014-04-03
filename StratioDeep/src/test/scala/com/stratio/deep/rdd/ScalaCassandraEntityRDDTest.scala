@@ -1,6 +1,22 @@
+/*
+ * Copyright 2014, Stratio.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.stratio.deep.rdd
 
-import com.stratio.deep.entity.{ScalaPageEntity, TestEntity}
+import com.stratio.deep.testentity.DeepScalaPageEntity
 import com.stratio.deep.config.{DeepJobConfigFactory, IDeepJobConfig}
 import com.stratio.deep.util.Constants
 import com.stratio.deep.embedded.CassandraServer
@@ -14,9 +30,9 @@ import org.apache.spark.Partition
  */
 @Test (suiteName = "cassandraRddTests", dependsOnGroups = Array ("CassandraJavaRDDTest"), groups = Array ("ScalaCassandraEntityRDDTest") )
 class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
-  private var rdd: CassandraRDD[ScalaPageEntity] = _
-  private var rddConfig: IDeepJobConfig[ScalaPageEntity] = _
-  private var writeConfig: IDeepJobConfig[ScalaPageEntity] = _
+  private var rdd: CassandraRDD[DeepScalaPageEntity] = _
+  private var rddConfig: IDeepJobConfig[DeepScalaPageEntity] = _
+  private var writeConfig: IDeepJobConfig[DeepScalaPageEntity] = _
 
   @BeforeClass
   protected def initServerAndRDD {
@@ -29,7 +45,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
   def testCompute {
     val obj: AnyRef = rdd.collect
     assertNotNull(obj)
-    val entities: Array[ScalaPageEntity] = obj.asInstanceOf[Array[ScalaPageEntity]]
+    val entities: Array[DeepScalaPageEntity] = obj.asInstanceOf[Array[DeepScalaPageEntity]]
     checkComputedData(entities)
   }
 
@@ -65,11 +81,11 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
   }
 
 
-  private def initWriteConfig(): IDeepJobConfig[ScalaPageEntity] = {
+  private def initWriteConfig(): IDeepJobConfig[DeepScalaPageEntity] = {
 
     writeConfig =
       DeepJobConfigFactory
-        .create(classOf[ScalaPageEntity])
+        .create(classOf[DeepScalaPageEntity])
         .host(Constants.DEFAULT_CASSANDRA_HOST)
         .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
         .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
@@ -81,10 +97,10 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
     writeConfig.initialize
   }
 
-  private def initReadConfig(): IDeepJobConfig[ScalaPageEntity] = {
+  private def initReadConfig(): IDeepJobConfig[DeepScalaPageEntity] = {
     rddConfig =
       DeepJobConfigFactory
-        .create(classOf[ScalaPageEntity])
+        .create(classOf[DeepScalaPageEntity])
         .host(Constants.DEFAULT_CASSANDRA_HOST)
         .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
         .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
@@ -94,7 +110,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
     rddConfig.initialize()
   }
 
-  private def initRDD(): CassandraRDD[ScalaPageEntity] = {
+  private def initRDD(): CassandraRDD[DeepScalaPageEntity] = {
     super.getContext.cassandraEntityRDD(rddConfig);
   }
 
@@ -102,7 +118,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
 
   }
 
-  private def checkComputedData(entities: Array[ScalaPageEntity]): Unit = {
+  private def checkComputedData(entities: Array[DeepScalaPageEntity]): Unit = {
 
   }
 }

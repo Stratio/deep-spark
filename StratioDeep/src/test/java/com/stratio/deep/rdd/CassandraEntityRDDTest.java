@@ -1,8 +1,20 @@
-package com.stratio.deep.rdd;
+/*
+ * Copyright 2014, Stratio.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
+package com.stratio.deep.rdd;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
@@ -11,11 +23,11 @@ import com.datastax.driver.core.Session;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.entity.TestEntity;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
+import com.stratio.deep.testentity.TestEntity;
 import com.stratio.deep.util.Constants;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.serializer.DeserializationStream;
@@ -26,6 +38,10 @@ import org.testng.annotations.Test;
 import scala.Function1;
 import scala.collection.Iterator;
 import scala.reflect.ClassTag$;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 
 import static org.testng.Assert.*;
 
@@ -88,7 +104,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         assertEquals(row.getString("url"), "http://11870.com/k/es/de");
         assertEquals(row.getInt("response_time"), 421 + 1);
 
-        //TODO: cannot delete a column using CQL, forcing it to null converts it to 0!!! see CASSANDRA-5885 and CASSANDRA-6180
+        //cannot delete a column using CQL, forcing it to null converts it to 0!!! see CASSANDRA-5885 and CASSANDRA-6180
         assertEquals(row.getLong("download_time"), 0);
         session.close();
     }
@@ -220,7 +236,6 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
     @Override
     public void testSaveToCassandra() {
-
         Function1<TestEntity, TestEntity> mappingFunc = new TestEntityAbstractSerializableFunction();
 
         RDD<TestEntity> mappedRDD = getRDD().map(mappingFunc, ClassTag$.MODULE$.<TestEntity>apply(TestEntity.class));
@@ -269,6 +284,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
             writeConfig.createTableOnWrite(Boolean.TRUE);
         }
 
+        assertEquals(getRDD().count(), entityTestDataSize);
         CassandraRDD.saveRDDToCassandra(getRDD(), writeConfig);
 
         checkSimpleTestData();
@@ -276,6 +292,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
     @Override
     public void testCql3SaveToCassandra() {
+
         try {
             executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY);
         } catch (Exception e) {

@@ -1,3 +1,58 @@
+[0.1.1]
+
+commit 34cdebea4b52e11cf4c07bce77a1d930ecbbf6e8
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 2 17:51:50 2014 +0200
+
+    fixed race condition that caused data not to be written correctly (data loss)
+
+commit 92341df58ee75b33127131557ab2b9df2d568b80
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Mar 28 14:24:41 2014 +0100
+
+    Added README.md markdown documentation file
+
+commit a339d7e4c8c14a0ad4b5b6240cff7a729bb9aab1
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Mar 28 14:23:54 2014 +0100
+
+    Added UsingScalaCollectionEntity to the list of scala examples
+
+commit da77647135660e62802aeddca05c619a364342bf
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Mar 28 14:22:41 2014 +0100
+
+    Added Apache 2.0 license header
+
+commit e34b43ad497b3e644d0796c4d6bb1034eae70041
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Mar 28 13:57:43 2014 +0100
+
+    Removed unused projects StratioTestEntity and StratioDeepSSTable
+
+commit 8c33757f0444c4bdf4f0088cd5fe41ee00ab7bfa
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Mar 27 18:26:58 2014 +0100
+
+    - Support for cassandra collection types
+    - Bugfixes
+    - Fixed sonar violations
+    - Improved test coverage
+
+commit 8c3896335c2959be38c96f1025d718fcd3d29202
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon Mar 24 18:09:00 2014 +0100
+
+    * Added Apache2 license header to all files
+    * fixed case sensitivity problem on actions performed by the datastax driver
+    * First refactor to support collections
+
+commit 15c3c71f30fb85316ee1613f964d9625a18a8f7d
+Author: Emmanuelle Raffenne <eraffenne@paradigmatecnologico.com>
+Date:   Mon Mar 24 17:30:40 2014 +0100
+
+    Added StratioDeepExamples module
+
 [0.1.0]
 
 - Changes in Spark:
@@ -162,4 +217,3 @@ Date:   Thu Feb 20 12:56:43 2014 +0100
     - removed unused classes and methods
 
 [release-0.0.21]
-

@@ -1,20 +1,26 @@
-package com.stratio.deep.cql;
+/*
+ * Copyright 2014, Stratio.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.util.*;
+package com.stratio.deep.cql;
 
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
-import com.stratio.deep.util.Utils;
+import com.stratio.deep.testutils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.db.marshal.LongType;
@@ -36,6 +42,14 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.thrift.TException;
 import org.apache.thrift.transport.TTransport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.util.*;
 
 /**
  * Extends Cassandra's CqlPagingRecordReader in order to make it
@@ -47,12 +61,12 @@ import org.apache.thrift.transport.TTransport;
  */
 public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>>
     implements org.apache.hadoop.mapred.RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> {
-    private static final Logger logger = LoggerFactory.getLogger(CqlPagingRecordReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CqlPagingRecordReader.class);
 
     public static final int DEFAULT_CQL_PAGE_LIMIT = 1000; // TODO: find the number large enough but not OOM
 
     private ColumnFamilySplit split;
-    protected RowIterator rowIterator;
+    private RowIterator rowIterator;
 
     private Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> currentRow;
     private int totalRowCount; // total number of rows to fetch
@@ -104,7 +118,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
      * @param context
      * @throws IOException
      */
-    public void initialize(InputSplit split, TaskAttemptContext context) throws IOException {
+    public void initialize(InputSplit split, TaskAttemptContext context) {
         this.split = (ColumnFamilySplit) split;
         Configuration conf = context.getConfiguration();
         totalRowCount = (this.split.getLength() < Long.MAX_VALUE)
@@ -139,7 +153,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
                     break;
                 } catch (Exception e) {
                     lastException = e;
-                    logger.warn("Failed to create authenticated client to {}:{}", location, port);
+                    LOG.warn("Failed to create authenticated client to {}:{}", location, port);
                 }
             }
             if (client == null && lastException != null) {
@@ -151,12 +165,12 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
 
             client.set_keyspace(keyspace);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new DeepGenericException(e);
         }
 
         rowIterator = new RowIterator();
 
-        logger.debug("created {}", rowIterator);
+        LOG.debug("created {}", rowIterator);
     }
 
     /**
@@ -208,7 +222,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
      */
     public boolean nextKeyValue() throws IOException {
         if (!rowIterator.hasNext()) {
-            logger.debug("Finished scanning {} rows (estimate was: {})", rowIterator.totalRead, totalRowCount);
+            LOG.debug("Finished scanning {} rows (estimate was: {})", rowIterator.totalRead, totalRowCount);
             return false;
         }
 
@@ -221,27 +235,6 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
             throw ioe;
         }
         return true;
-    }
-
-    // we don't use endpointsnitch since we are trying to support hadoop nodes that are
-    // not necessarily on Cassandra machines, too.  This should be adequate for single-DC clusters, at least.
-    private String[] getLocations() {
-        Collection<InetAddress> localAddresses = FBUtilities.getAllLocalAddresses();
-
-        for (InetAddress address : localAddresses) {
-            for (String location : split.getLocations()) {
-                InetAddress locationAddress;
-                try {
-                    locationAddress = InetAddress.getByName(location);
-                } catch (UnknownHostException e) {
-                    throw new AssertionError(e);
-                }
-                if (address.equals(locationAddress)) {
-                    return new String[] {location};
-                }
-            }
-        }
-        return split.getLocations();
     }
 
     /**
@@ -296,8 +289,8 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
      * CQL row iterator
      */
     class RowIterator extends AbstractIterator<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> {
-        protected int totalRead = 0;             // total number of cf rows read
-        protected Iterator<CqlRow> rows;
+        private int totalRead = 0;             // total number of cf rows read
+        private Iterator<CqlRow> rows;
         private int pageRows = 0;                // the number of cql rows read of this page
         private String previousRowKey = null;    // previous CF row key
         private String partitionKeyString;       // keys in <key1>, <key2>, <key3> string format
@@ -318,17 +311,17 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
             while (!rows.hasNext()) {
                 // no more data
                 if (index == -1 || emptyPartitionKeyValues()) {
-                    logger.debug("no more data");
+                    LOG.debug("no more data");
                     return endOfData();
                 }
 
                 index = setTailNull(clusterColumns);
-                logger.debug("set tail to null, index: {}", index);
+                LOG.debug("set tail to null, index: {}", index);
                 executeQuery();
                 pageRows = 0;
 
                 if (rows == null || !rows.hasNext() && index < 0) {
-                    logger.debug("no more data");
+                    LOG.debug("no more data");
                     return endOfData();
                 }
             }
@@ -339,7 +332,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
             CqlRow row = rows.next();
             for (Column column : row.columns) {
                 String columnName = stringValue(ByteBuffer.wrap(column.getName()));
-                logger.debug("column: {}", columnName);
+                LOG.debug("column: {}", columnName);
 
                 if (i < partitionBoundColumns.size() + clusterColumns.size()) {
                     keyColumns.put(stringValue(column.name), column.value);
@@ -394,7 +387,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
                 }
             }
 
-            logger.debug("previous RowKey: {}, new row key: {}", previousRowKey, rowKey);
+            LOG.debug("previous RowKey: {}, new row key: {}", previousRowKey, rowKey);
             if (previousRowKey == null) {
                 this.previousRowKey = rowKey;
                 return true;
@@ -424,7 +417,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
                 if (current.value == null) {
                     int index = previousIndex > 0 ? previousIndex : 0;
                     BoundColumn column = values.get(index);
-                    logger.debug("set key {} value to  null", column.name);
+                    LOG.debug("set key {} value to  null", column.name);
                     column.value = null;
                     return previousIndex - 1;
                 }
@@ -433,7 +426,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
             }
 
             BoundColumn column = values.get(previousIndex);
-            logger.debug("set key {} value to  null", column.name);
+            LOG.debug("set key {} value to  null", column.name);
             column.value = null;
             return previousIndex - 1;
         }
@@ -618,7 +611,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
 
             Pair<Integer, String> query = null;
             query = composeQuery(columns);
-            logger.debug("type: {}, query: {}", query.left, query.right);
+            LOG.debug("type: {}, query: {}", query.left, query.right);
             CqlPreparedResult cqlPreparedResult = client.prepare_cql3_query(ByteBufferUtil.bytes(query.right), Compression.NONE);
             preparedQueryIds.put(query.left, cqlPreparedResult.itemId);
             return cqlPreparedResult.itemId;
@@ -636,7 +629,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
          */
         private void executeQuery() {
             Pair<Integer, List<ByteBuffer>> bindValues = preparedQueryBindValues();
-            logger.debug("query type: {}", bindValues.left);
+            LOG.debug("query type: {}", bindValues.left);
 
             // check whether it reach end of range for type 1 query CASSANDRA-5573
             if (bindValues.left == 1 && reachEndRange()) {
@@ -694,7 +687,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
 
         CqlRow cqlRow = result.rows.get(0);
         String keyString = ByteBufferUtil.string(ByteBuffer.wrap(cqlRow.columns.get(0).getValue()));
-        logger.debug("partition keys: {}", keyString);
+        LOG.debug("partition keys: {}", keyString);
         List<String> keys = FBUtilities.fromJsonList(keyString);
 
         for (String key : keys) {
@@ -702,7 +695,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
         }
 
         keyString = ByteBufferUtil.string(ByteBuffer.wrap(cqlRow.columns.get(1).getValue()));
-        logger.debug("cluster columns: {}", keyString);
+        LOG.debug("cluster columns: {}", keyString);
         keys = FBUtilities.fromJsonList(keyString);
 
         for (String key : keys) {
@@ -711,7 +704,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
 
         Column rawKeyValidator = cqlRow.columns.get(2);
         String validator = ByteBufferUtil.string(ByteBuffer.wrap(rawKeyValidator.getValue()));
-        logger.debug("row key validator: {}", validator);
+        LOG.debug("row key validator: {}", validator);
         keyValidator = parseType(validator);
 
         if (keyValidator instanceof CompositeType) {
@@ -743,7 +736,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
 
         String endToken = split.getEndToken();
         String currentToken = partitioner.getToken(rowKey).toString();
-        logger.debug("End token: {}, current token: {}", endToken, currentToken);
+        LOG.debug("End token: {}, current token: {}", endToken, currentToken);
 
         return endToken.equals(currentToken);
     }
@@ -763,9 +756,9 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
     }
 
     private static class BoundColumn {
-        final String name;
-        ByteBuffer value;
-        AbstractType<?> validator;
+        private final String name;
+        private ByteBuffer value;
+        private AbstractType<?> validator;
 
         public BoundColumn(String name) {
             this.name = name;
@@ -779,7 +772,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
         try {
             return ByteBufferUtil.string(value);
         } catch (CharacterCodingException e) {
-            throw new RuntimeException(e);
+            throw new DeepGenericException(e);
         }
     }
 

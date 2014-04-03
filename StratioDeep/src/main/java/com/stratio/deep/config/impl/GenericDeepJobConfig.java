@@ -1,32 +1,49 @@
+/*
+ * Copyright 2014, Stratio.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.stratio.deep.config.impl;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.*;
-
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 
 import com.datastax.driver.core.*;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.cql.DeepConfigHelper;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
+import com.stratio.deep.testentity.Cell;
+import com.stratio.deep.testentity.Cells;
 import com.stratio.deep.util.Constants;
-import com.stratio.deep.util.Utils;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.hadoop.ConfigHelper;
 import org.apache.cassandra.hadoop.cql3.CqlConfigHelper;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.*;
+
+import static com.stratio.deep.testutils.Utils.createTableQueryGenerator;
+import static com.stratio.deep.testutils.Utils.quote;
 
 /**
  * Base class for all config implementations providing default implementations for methods
@@ -49,7 +66,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     /**
      * name of the columnFamily from which data will be fetched
      */
-    protected String columnFamily;
+    private String columnFamily;
 
     /**
      * hostname of the cassandra server
@@ -150,7 +167,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public void close() throws Exception {
+    public void close() {
         logger.debug("closing " + getClass().getCanonicalName());
         if (session != null) {
             session.close();
@@ -161,7 +178,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    protected void finalize() throws Throwable {
+    protected void finalize() {
         logger.debug("finalizing " + getClass().getCanonicalName());
         close();
     }
@@ -185,13 +202,13 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     private TableMetadata fetchTableMetadata() {
 
         Metadata metadata = getSession().getCluster().getMetadata();
-        KeyspaceMetadata ksMetadata = null;
+        KeyspaceMetadata ksMetadata = metadata.getKeyspace(this.keyspace);
 
-        if (metadata != null && (ksMetadata = metadata.getKeyspace(this.keyspace)) != null) {
-            return ksMetadata.getTable(this.columnFamily);
-        } else
+        if (metadata != null && ksMetadata != null) {
+            return ksMetadata.getTable(quote(this.columnFamily));
+        } else {
             return null;
-
+        }
     }
 
     /**
@@ -223,13 +240,13 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
         if (first._1() == null || first._1().size() == 0) {
             throw new DeepNoSuchFieldException("no key structure found on row metadata");
         }
-        String createTableQuery = Utils.createTableQueryGenerator(first._1(), first._2(), getKeyspace(), getColumnFamily());
+        String createTableQuery = createTableQueryGenerator(first._1(), first._2(), getKeyspace(), getColumnFamily());
         getSession().execute(createTableQuery);
     }
 
     /**
      * Fetches table metadata from Casandra and generates a Map<K, V> where the key is the column name, and the value
-     * is the {@link com.stratio.deep.entity.Cell} containing column's metadata.
+     * is the {@link com.stratio.deep.testentity.Cell} containing column's metadata.
      *
      * @return
      */
@@ -242,7 +259,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
         TableMetadata tableMetadata = fetchTableMetadata();
 
         if (tableMetadata == null && !createTableOnWrite) {
-            logger.warn("Canfiguration not suitable for writing RDD: output table does not exists and configuration " +
+            logger.warn("Configuration not suitable for writing RDD: output table does not exists and configuration " +
                 "object has 'createTableOnWrite' = false");
 
             return null;
@@ -257,21 +274,23 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
         List<ColumnMetadata> allColumns = tableMetadata.getColumns();
 
         for (ColumnMetadata key : partitionKeys) {
-            Cell metadata = Cell.createMetadataCell(key.getName(), key.getType().asJavaClass(), Boolean.TRUE, Boolean.FALSE);
+            Cell metadata = Cell.create(key.getName(), key.getType(), Boolean.TRUE, Boolean.FALSE);
             columnDefinitionMap.put(key.getName(), metadata);
         }
 
         for (ColumnMetadata key : clusteringKeys) {
-            Cell metadata = Cell.createMetadataCell(key.getName(), key.getType().asJavaClass(), Boolean.FALSE, Boolean.TRUE);
+            Cell metadata = Cell.create(key.getName(), key.getType(), Boolean.FALSE, Boolean.TRUE);
             columnDefinitionMap.put(key.getName(), metadata);
         }
 
         for (ColumnMetadata key : allColumns) {
-            Cell metadata = Cell.createMetadataCell(key.getName(), key.getType().asJavaClass(), Boolean.FALSE, Boolean.FALSE);
+            Cell metadata = Cell.create(key.getName(), key.getType(), Boolean.FALSE, Boolean.FALSE);
             if (!columnDefinitionMap.containsKey(key.getName())) {
                 columnDefinitionMap.put(key.getName(), metadata);
             }
         }
+
+
 
         columnDefinitionMap = Collections.unmodifiableMap(columnDefinitionMap);
 

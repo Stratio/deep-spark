@@ -1,16 +1,26 @@
+/*
+ * Copyright 2014, Stratio.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.stratio.deep.context;
-
-import java.io.*;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.google.common.io.Resources;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.google.common.io.Resources;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.util.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
@@ -18,6 +28,12 @@ import org.apache.log4j.Logger;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
+import java.io.*;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.stratio.deep.testutils.Utils.quote;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
@@ -28,28 +44,30 @@ public abstract class AbstractDeepSparkContextTest {
 
     private static CassandraServer cassandraServer;
     public static final String KEYSPACE_NAME = "test_keyspace";
-    public static final String COLUMN_FAMILY = "test_page";
+    public static final String COLUMN_FAMILY = "test_Page";
     public static final String OUTPUT_KEYSPACE_NAME = "out_test_keyspace";
     public static final String OUTPUT_COLUMN_FAMILY = "out_test_page";
     public static final String CQL3_COLUMN_FAMILY = "cql3_cf";
     public static final String CQL3_OUTPUT_COLUMN_FAMILY = "cql3_output_cf";
+    public static final String CQL3_COLLECTION_COLUMN_FAMILY = "cql3_collection_cf";
+    public static final String OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY = "cql3_collection_output_cf";
 
     public static final String CQL3_ENTITY_OUTPUT_COLUMN_FAMILY = "cql3_entity_output_cf";
 
     protected static final int entityTestDataSize = 19;
     protected static final int cql3TestDataSize = 20;
 
-    protected String createCF = "CREATE TABLE " + KEYSPACE_NAME + "." + COLUMN_FAMILY + " (id text PRIMARY KEY, " + "url text, "
+    protected String createCF = "CREATE TABLE " + KEYSPACE_NAME + "." + quote(COLUMN_FAMILY) + " (id text PRIMARY KEY, " + "url text, "
         + "domain_name text, " + "response_code int, " + "charset text," + "response_time int,"
         + "download_time bigint," + "first_download_time bigint," + "title text, lucene text ) ;";
 
     protected String createLuceneIndex =
-        "CREATE CUSTOM INDEX page_lucene ON "+KEYSPACE_NAME + "." +COLUMN_FAMILY+" (lucene) USING 'org.apache.cassandra.db.index.stratio.RowIndex' " +
+        "CREATE CUSTOM INDEX page_lucene ON "+KEYSPACE_NAME + "." +quote(COLUMN_FAMILY)+" (lucene) USING 'org.apache.cassandra.db.index.stratio.RowIndex' " +
             "WITH OPTIONS = {'refresh_seconds':'1', 'schema':'{default_analyzer:\"org.apache.lucene.analysis.standard.StandardAnalyzer\", " +
             "fields:{ charset:{type:\"string\"}, url:{type:\"string\"}, domain_name:{type:\"string\"}, " +
             "response_code:{type:\"integer\"}, id:{type:\"string\"}, response_time:{type:\"integer\"} } }'};";
 
-    protected String createCFIndex = "create index idx_" + COLUMN_FAMILY + "_resp_time on " + KEYSPACE_NAME + "." + COLUMN_FAMILY + " (response_time);";
+    protected String createCFIndex = "create index idx_" + COLUMN_FAMILY + "_resp_time on " + KEYSPACE_NAME + "." + quote(COLUMN_FAMILY) + " (response_time);";
 
     protected String createCql3CF = "create table " + KEYSPACE_NAME + "." + CQL3_COLUMN_FAMILY
         + "(name varchar, password varchar, color varchar, gender varchar, food varchar, "
@@ -57,7 +75,11 @@ public abstract class AbstractDeepSparkContextTest {
 
     protected String createCql3CFIndex = "create index idx_" + CQL3_COLUMN_FAMILY + "_food on " + KEYSPACE_NAME + "." + CQL3_COLUMN_FAMILY + "(food);";
 
-    private String buildTestDataInsertBatch() {
+    protected String createCql3CollectionsCF =
+        "CREATE TABLE " + KEYSPACE_NAME + "." + CQL3_COLLECTION_COLUMN_FAMILY +
+            " ( id int PRIMARY KEY, first_name text, last_name text, emails set<text>, phones list<text>, uuid2id map<uuid,int>);";
+
+    protected String buildTestDataInsertBatch() {
         URL testData = Resources.getResource("testdata.csv");
         URL cql3TestData = Resources.getResource("cql3_test_data.csv");
 
@@ -73,7 +95,7 @@ public abstract class AbstractDeepSparkContextTest {
                 + "values (\'%s\', \'%s\', \'%s\', %s, %s, %s, \'%s\');";
 
             while ((line = br.readLine()) != null) {
-                String[] fields = (COLUMN_FAMILY + "," + line).split(",");
+                String[] fields = (quote(COLUMN_FAMILY) + "," + line).split(",");
                 String insert = String.format(rawInsert, (Object[]) fields);
                 inserts.add(insert);
 
@@ -118,12 +140,12 @@ public abstract class AbstractDeepSparkContextTest {
 
         Session session = cluster.connect();
 
-        String command = "select count(*) from " + KEYSPACE_NAME + "." + COLUMN_FAMILY + ";";
+        String command = "select count(*) from " + KEYSPACE_NAME + "." + quote(COLUMN_FAMILY) + ";";
 
         ResultSet rs = session.execute(command);
         assertEquals(rs.one().getLong(0), entityTestDataSize);
 
-        command = "select * from " + KEYSPACE_NAME + "." + COLUMN_FAMILY
+        command = "select * from " + KEYSPACE_NAME + "." + quote(COLUMN_FAMILY)
             + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
 
         rs = session.execute(command);
@@ -169,7 +191,7 @@ public abstract class AbstractDeepSparkContextTest {
         }
     }
 
-    protected void executeCustomCQL(String... cqls) {
+    protected static void executeCustomCQL(String... cqls) {
 
         Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
             .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
@@ -198,7 +220,7 @@ public abstract class AbstractDeepSparkContextTest {
         String initialDataset = buildTestDataInsertBatch();
 
         String[] startupCommands = new String[] {createKeyspace, createOutputKeyspace, useKeyspace, createCF, createCFIndex,createLuceneIndex,
-            createCql3CF, createCql3CFIndex, initialDataset, useOutputKeyspace};
+            createCql3CF, createCql3CFIndex, createCql3CollectionsCF, initialDataset, useOutputKeyspace};
 
         cassandraServer = new CassandraServer();
         cassandraServer.setStartupCommands(startupCommands);

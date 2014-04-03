@@ -1,12 +1,28 @@
+/*
+ * Copyright 2014, Stratio.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.stratio.deep.config;
+
+import com.datastax.driver.core.Session;
+import com.stratio.deep.testentity.Cell;
+import org.apache.cassandra.dht.IPartitioner;
+import org.apache.hadoop.conf.Configuration;
 
 import java.io.Serializable;
 import java.util.Map;
-
-import com.datastax.driver.core.Session;
-import com.stratio.deep.entity.Cell;
-import org.apache.cassandra.dht.IPartitioner;
-import org.apache.hadoop.conf.Configuration;
 
 /**
  * Defines the public methods that each Stratio Deep configuration object should implement.
@@ -39,6 +55,7 @@ public interface IDeepJobConfig<T> extends Serializable {
 
     /**
      * Sets the cassandra CF from which data will be read from.
+     * Column family name is case sensitive.
      *
      * @param columnFamily
      * @return
@@ -70,7 +87,7 @@ public interface IDeepJobConfig<T> extends Serializable {
     public abstract Configuration getConfiguration();
 
     /**
-     * Returns the underlying entity class used to map the Cassandra
+     * Returns the underlying testentity class used to map the Cassandra
      * Column family.
      *
      * @return
@@ -271,6 +288,7 @@ public interface IDeepJobConfig<T> extends Serializable {
 
     /**
      * Returns the name of the configured column family.
+     * Column family name is case sensitive.
      *
      * @return
      */

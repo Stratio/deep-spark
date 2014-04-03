@@ -2,3 +2,4 @@
 */.idea
 spark-deep-distribution*
 */*.versionsBackup
+target/

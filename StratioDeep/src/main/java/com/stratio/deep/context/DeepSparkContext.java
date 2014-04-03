@@ -1,19 +1,35 @@
-package com.stratio.deep.context;
+/*
+ * Copyright 2014, Stratio.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import java.util.Map;
+package com.stratio.deep.context;
 
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.impl.CellDeepJobConfig;
 import com.stratio.deep.config.impl.EntityDeepJobConfig;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.rdd.CassandraCellRDD;
 import com.stratio.deep.rdd.CassandraEntityRDD;
 import com.stratio.deep.rdd.CassandraJavaRDD;
 import com.stratio.deep.rdd.CassandraRDD;
+import com.stratio.deep.testentity.Cells;
+import com.stratio.deep.testentity.IDeepType;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaSparkContext;
+
+import java.util.Map;
 
 /**
  * Entry point to the Cassandra-aware Spark context.
@@ -99,7 +115,7 @@ public class DeepSparkContext extends JavaSparkContext {
     }
 
     /**
-     * Builds a new entity based CassandraEntityRDD.
+     * Builds a new testentity based CassandraEntityRDD.
      *
      * @param config
      * @return

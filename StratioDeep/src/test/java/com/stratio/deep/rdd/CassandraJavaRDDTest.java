@@ -1,11 +1,20 @@
-package com.stratio.deep.rdd;
+/*
+ * Copyright 2014, Stratio.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.CharacterCodingException;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+package com.stratio.deep.rdd;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
@@ -15,11 +24,11 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.StrippedTestEntity;
-import com.stratio.deep.entity.TestEntity;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
+import com.stratio.deep.testentity.Cell;
+import com.stratio.deep.testentity.Cells;
+import com.stratio.deep.testentity.StrippedTestEntity;
+import com.stratio.deep.testentity.TestEntity;
 import com.stratio.deep.util.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.utils.UUIDGen;
@@ -32,6 +41,13 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import scala.Tuple2;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.CharacterCodingException;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.testng.Assert.*;
 
@@ -310,9 +326,9 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 class WrongSensors2CellsFunction extends Function<Tuple2<String, Double>, Cells> {
     @Override
     public Cells call(Tuple2<String, Double> t) throws Exception {
-        com.stratio.deep.entity.Cell<String> sensorNameCell = com.stratio.deep.entity.Cell.create("name", t._1());
-        com.stratio.deep.entity.Cell<UUID> sensorTimeUUID = com.stratio.deep.entity.Cell.create("time_taken", UUIDGen.getTimeUUID());
-        com.stratio.deep.entity.Cell<Double> sensorDataCell = com.stratio.deep.entity.Cell.create("value", t._2());
+        com.stratio.deep.testentity.Cell<String> sensorNameCell = com.stratio.deep.testentity.Cell.create("name", t._1());
+        com.stratio.deep.testentity.Cell<UUID> sensorTimeUUID = com.stratio.deep.testentity.Cell.create("time_taken", UUIDGen.getTimeUUID());
+        com.stratio.deep.testentity.Cell<Double> sensorDataCell = com.stratio.deep.testentity.Cell.create("value", t._2());
 
         return new Cells(sensorNameCell, sensorTimeUUID, sensorDataCell);
     }
@@ -321,9 +337,9 @@ class WrongSensors2CellsFunction extends Function<Tuple2<String, Double>, Cells>
 class Sensors2CellsFunction extends Function<Tuple2<String, Double>, Cells> {
     @Override
     public Cells call(Tuple2<String, Double> t) throws Exception {
-        com.stratio.deep.entity.Cell<String> sensorNameCell = com.stratio.deep.entity.Cell.create("name", t._1());
-        com.stratio.deep.entity.Cell<UUID> sensorTimeUUID = com.stratio.deep.entity.Cell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
-        com.stratio.deep.entity.Cell<Double> sensorDataCell = com.stratio.deep.entity.Cell.create("value", t._2());
+        com.stratio.deep.testentity.Cell<String> sensorNameCell = com.stratio.deep.testentity.Cell.create("name", t._1());
+        com.stratio.deep.testentity.Cell<UUID> sensorTimeUUID = com.stratio.deep.testentity.Cell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
+        com.stratio.deep.testentity.Cell<Double> sensorDataCell = com.stratio.deep.testentity.Cell.create("value", t._2());
 
         return new Cells(sensorNameCell, sensorTimeUUID, sensorDataCell);
     }

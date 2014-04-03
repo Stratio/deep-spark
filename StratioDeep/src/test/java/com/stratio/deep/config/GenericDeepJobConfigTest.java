@@ -1,18 +1,34 @@
-package com.stratio.deep.config;
+/*
+ * Copyright 2014, Stratio.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import java.lang.annotation.AnnotationTypeMismatchException;
+package com.stratio.deep.config;
 
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.entity.TestEntity;
-import com.stratio.deep.entity.WronglyMappedTestEntity;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
+import com.stratio.deep.testentity.IDeepType;
+import com.stratio.deep.testentity.TestEntity;
+import com.stratio.deep.testentity.WronglyMappedTestEntity;
 import com.stratio.deep.util.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
+
+import java.lang.annotation.AnnotationTypeMismatchException;
 
 import static org.testng.Assert.fail;
 
@@ -191,7 +207,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
     public void testWronglyMappedField(){
 
         IDeepJobConfig<WronglyMappedTestEntity> djc = DeepJobConfigFactory.create(WronglyMappedTestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace("test_keyspace").columnFamily("test_page");
+            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY);
 
         try {
             djc.initialize();
