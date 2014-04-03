@@ -317,8 +317,8 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
             return itemId;
         }
 
-        private void handleRunException(Exception e, boolean hasNext) {
-            LOG.error("[" + this + "] failed attempt to connect to a different endpoint", e);
+        private void handleRunException(Exception e, boolean hasNext, String msg) {
+            LOG.error("[" + this + "] " + msg, e);
             closeInternal();
 
             if (!hasNext) {
@@ -340,16 +340,18 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
                 try {
                     client = AbstractColumnFamilyOutputFormat.createAuthenticatedClient(host, port, conf);
                 } catch (Exception e) {
-                    handleRunException(e, iter.hasNext());
+                    handleRunException(e, iter.hasNext(),
+                            "failed attempt to connect to endpoint: " + host + ":" + port +
+                                    ", username: " + ConfigHelper.getOutputKeyspaceUserName(conf));
                     continue;
                 }
 
-                int itemId = -1;
+                int itemId;
                 try {
                     itemId = preparedStatement(client);
                     LOG.debug("[" + this + "] Prepared statement " + cql +" with remote id: " + itemId);
                 } catch (Exception e) {
-                    handleRunException(e, iter.hasNext());
+                    handleRunException(e, iter.hasNext(), "failed attempt to prepare statement: " + cql);
                     continue;
                 }
 
@@ -360,7 +362,8 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
                     LOG.debug("[" + this + "] statement " + itemId + " executed successfully");
                     break;
                 } catch (Exception e) {
-                    handleRunException(e, iter.hasNext());
+                    handleRunException(e, iter.hasNext(),
+                            "failed attempt to execute prepared statement with id: " + itemId + ", cql: "+cql);
                 }
             }
         }
