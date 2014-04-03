@@ -1,3 +1,11 @@
+[0.1.2]
+
+commit cb02a54f62d33ff1d0a2bcfb78f612954aefc7bf
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Apr 3 11:26:23 2014 +0200
+
+    Fixed wrong entities package name bug introduced in v0.1.1 (regression from v0.1.0)
+
 [0.1.1]
 
 commit 34cdebea4b52e11cf4c07bce77a1d930ecbbf6e8
