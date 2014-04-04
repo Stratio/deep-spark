@@ -32,6 +32,10 @@ import java.nio.charset.CharacterCodingException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
+/**
+ * Abstract class defining the common test structure that all concrete subclasses should respect.
+ * @param <W>
+ */
 public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     private Logger logger = Logger.getLogger(getClass());
 

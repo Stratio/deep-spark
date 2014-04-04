@@ -29,7 +29,7 @@ import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.testentity.StrippedTestEntity;
 import com.stratio.deep.testentity.TestEntity;
-import com.stratio.deep.util.Constants;
+import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.utils.UUIDGen;
 import org.apache.log4j.Logger;
@@ -51,6 +51,9 @@ import java.util.UUID;
 
 import static org.testng.Assert.*;
 
+/**
+ * Integration tests for Java RDDs.
+ */
 @Test(suiteName = "cassandraRddTests", dependsOnGroups = {"CassandraCellRDDTest"}, groups = {"CassandraJavaRDDTest"})
 public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     private Logger logger = Logger.getLogger(getClass());

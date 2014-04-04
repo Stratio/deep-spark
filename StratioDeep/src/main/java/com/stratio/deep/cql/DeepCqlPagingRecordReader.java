@@ -19,6 +19,7 @@ package com.stratio.deep.cql;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
@@ -63,7 +64,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
     implements org.apache.hadoop.mapred.RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> {
     private static final Logger LOG = LoggerFactory.getLogger(CqlPagingRecordReader.class);
 
-    public static final int DEFAULT_CQL_PAGE_LIMIT = 1000; // TODO: find the number large enough but not OOM
+    private static final int DEFAULT_CQL_PAGE_LIMIT = 1000; // TODO: find the number large enough but not OOM
 
     private ColumnFamilySplit split;
     private RowIterator rowIterator;
@@ -101,7 +102,6 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
 
     /**
      * public constructor. Takes a list of filters to pass to the underlying datastores.
-     * {@link com.stratio.deep.rdd.CassandraRDD#filterByField(String, java.io.Serializable)}.
      *
      * @param additionalFilters
      */
@@ -144,21 +144,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
             }
 
             // create connection using thrift
-            String[] locations = split.getLocations();
-            Exception lastException = null;
-            for (String location : locations) {
-                int port = ConfigHelper.getInputRpcPort(conf);
-                try {
-                    client = CqlPagingInputFormat.createAuthenticatedClient(location, port, conf);
-                    break;
-                } catch (Exception e) {
-                    lastException = e;
-                    LOG.warn("Failed to create authenticated client to {}:{}", location, port);
-                }
-            }
-            if (client == null && lastException != null) {
-                throw lastException;
-            }
+            createThriftConnection(split, conf);
 
             // retrieve partition keys and cluster keys from system.schema_columnfamilies table
             retrieveKeys();
@@ -171,6 +157,24 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
         rowIterator = new RowIterator();
 
         LOG.debug("created {}", rowIterator);
+    }
+
+    private void createThriftConnection(InputSplit split, Configuration conf) throws Exception {
+        String[] locations = split.getLocations();
+        Exception lastException = null;
+        for (String location : locations) {
+            int port = ConfigHelper.getInputRpcPort(conf);
+            try {
+                client = CqlPagingInputFormat.createAuthenticatedClient(location, port, conf);
+                break;
+            } catch (Exception e) {
+                lastException = e;
+                LOG.warn("Failed to create authenticated client to {}:{}", location, port);
+            }
+        }
+        if (client == null && lastException != null) {
+            throw lastException;
+        }
     }
 
     /**
@@ -220,21 +224,8 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
     /**
      * Checks if the current iterator has a next value, and, if it does, advances the iterator.
      */
-    public boolean nextKeyValue() throws IOException {
-        if (!rowIterator.hasNext()) {
-            LOG.debug("Finished scanning {} rows (estimate was: {})", rowIterator.totalRead, totalRowCount);
-            return false;
-        }
-
-        try {
-            currentRow = rowIterator.next();
-        } catch (Exception e) {
-            // throw it as IOException, so client can catch it and handle it at client side
-            IOException ioe = new IOException(e.getMessage());
-            ioe.initCause(ioe.getCause());
-            throw ioe;
-        }
-        return true;
+    public boolean nextKeyValue() {
+        throw new DeepIllegalAccessException("Calling nextKeyValue() on a DeepCqlPagingRecordReader does not make sense");
     }
 
     /**
@@ -296,11 +287,17 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
         private String partitionKeyString;       // keys in <key1>, <key2>, <key3> string format
         private String partitionKeyMarkers;      // question marks in ? , ? , ? format which matches the number of keys
 
+        /**
+         * Default constructor.
+         */
         public RowIterator() {
             // initial page
             executeQuery();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         protected Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> computeNext() {
             if (rows == null) {
                 return endOfData();

@@ -27,6 +27,12 @@ import org.apache.hadoop.mapreduce.TaskAttemptID;
 public class DeepTaskAttemptContext<T> extends TaskAttemptContext {
     GenericDeepJobConfig<T> conf;
 
+    /**
+     * Public constructor.
+     *
+     * @param conf
+     * @param taskId
+     */
     public DeepTaskAttemptContext(GenericDeepJobConfig<T> conf, TaskAttemptID taskId) {
         super(conf.getConfiguration(), taskId);
 

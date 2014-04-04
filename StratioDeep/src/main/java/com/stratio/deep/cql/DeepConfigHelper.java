@@ -16,7 +16,7 @@
 
 package com.stratio.deep.cql;
 
-import com.stratio.deep.util.Constants;
+import com.stratio.deep.utils.Constants;
 import org.apache.hadoop.conf.Configuration;
 
 /**
@@ -30,6 +30,12 @@ public final class DeepConfigHelper {
     public static final String OUTPUT_BATCH_SIZE = "output.batch.size";
     public static final String CF_METADATA = "cassandra.cf.metadata";
 
+    /**
+     * Returns the configured output batch size.
+     *
+     * @param conf
+     * @return
+     */
     public static int getOutputBatchSize(Configuration conf) {
         return conf.getInt(OUTPUT_BATCH_SIZE, Constants.DEFAULT_BATCH_SIZE);
     }

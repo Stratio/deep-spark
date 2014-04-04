@@ -42,12 +42,12 @@ object WritingEntityToCassandra {
         val outputTableName = "listdomains"
 
         // Creating the Deep Context where args are Spark Master and Job Name
-        val p = new ContextProperties
-        val deepContext: DeepSparkContext = new DeepSparkContext(p.cluster, job, p.sparkHome, p.jarList)
+        val p = new ContextProperties(args)
+        val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, Array(p.getJar))
 
         // --- INPUT RDD
         val inputConfig = DeepJobConfigFactory.create(classOf[PageEntity])
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+          .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
                 .keyspace(inputKeyspaceName).table(inputTableName)
                 .initialize
 
@@ -63,7 +63,7 @@ object WritingEntityToCassandra {
         // Creating a configuration for the output RDD and initialize it
         // --- OUTPUT RDD
         val outputConfig = DeepJobConfigFactory.create(classOf[DomainEntity])
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+          .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
                 .keyspace(outputKeyspaceName).table(outputTableName).createTableOnWrite(true)
                 .initialize
 

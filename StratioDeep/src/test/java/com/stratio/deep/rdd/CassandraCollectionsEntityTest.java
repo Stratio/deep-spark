@@ -30,7 +30,7 @@ import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.testentity.Cql3CollectionsTestEntity;
-import com.stratio.deep.util.Constants;
+import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
@@ -46,6 +46,9 @@ import java.util.*;
 
 import static org.testng.Assert.*;
 
+/**
+ * Integration tests for entity RDDs where cells contain Cassandra's collections.
+ */
 @Test(suiteName = "cassandraRddTests", dependsOnGroups = "ScalaCassandraEntityRDDTest", groups = "CassandraCollectionsEntityTest")
 public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3CollectionsTestEntity> {
 
@@ -172,12 +175,6 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
         List<String> phones = row.getList("phones", String.class);
         Map<UUID, Integer> uuid2id = row.getMap("uuid2id", UUID.class, Integer.class);
 
-        /*assertEquals(firstName, "Gustava_out");
-        assertEquals(lastName, "Palerma_out");
-        assertNotNull(emails);
-        assertEquals(emails.size(), 3);
-        assertTrue(emails.contains("klv@email.com"));*/
-
         assertEquals(firstName, "Gustava");
         assertEquals(lastName, "Palerma");
         assertNotNull(emails);
@@ -186,12 +183,8 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
         assertNotNull(phones);
         assertEquals(phones.size(), 2);
 
-        //assertEquals(phones.size(), 3);
-        //assertTrue(phones.contains("111-111-1111112"));
-
         assertNotNull(uuid2id);
         assertEquals(uuid2id.size(), 1);
-        //assertEquals(uuid2id.get("BAB7F03E-0D9F-4466-BD8A-5F7373802610").intValue() - 10, 351);
         assertEquals(uuid2id.get(UUID.fromString("BAB7F03E-0D9F-4466-BD8A-5F7373802610")).intValue(), 351);
 
         session.close();

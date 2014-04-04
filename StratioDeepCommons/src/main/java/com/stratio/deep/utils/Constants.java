@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.util;
+package com.stratio.deep.utils;
 
 /**
  * Class holding several public Deep constants

@@ -27,7 +27,7 @@ import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.util.Constants;
+import com.stratio.deep.utils.Constants;
 import org.apache.spark.rdd.RDD;
 import org.testng.annotations.Test;
 import scala.Function1;
@@ -38,7 +38,7 @@ import java.util.List;
 import static org.testng.Assert.*;
 
 /**
- * Created by luca on 03/02/14.
+ * Integration tests for generic cell RDDs.
  */
 @Test(suiteName = "cassandraRddTests", dependsOnGroups = {"CassandraCql3RDDTest"}, groups = {"CassandraCellRDDTest"})
 public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {

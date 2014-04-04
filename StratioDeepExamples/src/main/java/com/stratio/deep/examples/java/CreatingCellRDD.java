@@ -29,33 +29,46 @@ import org.apache.log4j.Logger;
 public final class CreatingCellRDD {
     private static Logger logger = Logger.getLogger(CreatingCellRDD.class);
 
-    private CreatingCellRDD(){}
+    public static Long counts;
 
+    private CreatingCellRDD() {
+    }
+
+    /**
+     * Application entry point.
+     *
+     * @param args the arguments passed to the application.
+     */
     public static void main(String[] args) {
 
+        doMain(args);
+
+        System.exit(0);
+    }
+
+    public static void doMain(String[] args) {
         String job = "java:creatingCellRDD";
 
         String keyspaceName = "tutorials";
         String tableName = "tweets";
 
         // Creating the Deep Context
-        ContextProperties p = new ContextProperties();
-        DeepSparkContext deepContext = new DeepSparkContext(p.cluster, job, p.sparkHome, p.jarList);
+        ContextProperties p = new ContextProperties(args);
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), new String[]{p.getJar()});
 
-// Configuration and initialization
+        // Configuration and initialization
         IDeepJobConfig config = DeepJobConfigFactory.create()
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(tableName)
                 .initialize();
 
-// Creating the RDD
+        // Creating the RDD
         CassandraJavaRDD rdd = deepContext.cassandraJavaRDD(config);
 
-        long counts = rdd.count();
+        counts = rdd.count();
 
         logger.info("Num of rows: " + counts);
 
-        System.exit(0);
-
+        deepContext.stop();
     }
 }

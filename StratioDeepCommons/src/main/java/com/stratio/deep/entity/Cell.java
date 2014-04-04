@@ -231,6 +231,10 @@ public final class Cell<T> implements Serializable {
         this.cellValidator = CellValidator.cellValidator(field);
     }
 
+    /**
+     * Returns the validator object associated to this Cell.
+     * @return
+     */
     public CellValidator getCellValidator() {
         return cellValidator;
     }
@@ -267,6 +271,11 @@ public final class Cell<T> implements Serializable {
             cellValidator.equals(cell.getCellValidator());
     }
 
+    /**
+     * Returns the Java type corresponfing to the current Cell.
+     *
+     * @return
+     */
     public Class<?> getValueType() {
         Class valueType = MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE.get(cellValidator.getValidatorClassName());
         if (valueType == null){
@@ -276,10 +285,17 @@ public final class Cell<T> implements Serializable {
         return valueType;
     }
 
+    /**
+     * @return the name of the current cell as defined in the database.
+     */
     public String getCellName() {
         return cellName;
     }
 
+    /**
+     * Returns the composed cell value. The type of T can be obtained by calling {@see Cell#getValueType}
+     * @return
+     */
     public T getCellValue() {
         return cellValue;
     }
@@ -317,26 +333,41 @@ public final class Cell<T> implements Serializable {
         return result;
     }
 
+    /**
+     * @return true if the current cell is part of the clustering key.
+     */
     public Boolean isClusterKey() {
         return isClusterKey;
     }
 
+    /**
+     * @return true if the current cell is part of the partition key.
+     */
     public Boolean isPartitionKey() {
         return isPartitionKey;
     }
 
+    /**
+     * Returns the Cassandra validator instance associated to this cell.
+     * @return
+     */
     public AbstractType<T> marshaller() {
         return (AbstractType<T>) cellValidator.getAbstractType();
     }
 
+    /**
+     * @return the fully qualified class name of the cassandra validator associated to this cell.
+     */
     public String marshallerClassName() {
         return cellValidator.getValidatorClassName();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "Cell{" + "cellName='" + cellName + '\'' + ", cellValue=" + (cellValue!=null?cellValue:"") + ", isPartitionKey="
             + isPartitionKey + ", isClusterKey=" + isClusterKey + ", cellValidator='" + cellValidator + '\'' + '}';
     }
-
 }

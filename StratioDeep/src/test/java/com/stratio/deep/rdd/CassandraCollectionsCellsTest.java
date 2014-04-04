@@ -28,7 +28,7 @@ import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.testentity.Cql3CollectionsTestEntity;
-import com.stratio.deep.util.Constants;
+import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.spark.rdd.RDD;
 import org.testng.annotations.BeforeClass;
@@ -43,7 +43,7 @@ import java.util.*;
 import static org.testng.Assert.*;
 
 /**
- * Created by luca on 25/03/14.
+ * Integration tests for generic cell RDDs where cells contain Cassandra's collections.
  */
 @Test(suiteName = "cassandraRddTests", dependsOnGroups = "CassandraCollectionsEntityTest", groups = "CassandraCollectionsCellsTest" )
 public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells>  {

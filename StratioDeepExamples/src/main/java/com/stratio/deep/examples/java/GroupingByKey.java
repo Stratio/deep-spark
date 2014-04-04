@@ -34,23 +34,38 @@ import scala.Tuple2;
  */
 public final class GroupingByKey {
     private static Logger logger = Logger.getLogger(GroupingByKey.class);
+    public static List<Tuple2<String, Integer>> result;
+    public static int authors;
+    public static int total;
 
     private GroupingByKey(){}
 
+    /**
+     * Application entry point.
+     *
+     * @param args the arguments passed to the application.
+     */
     public static void main(String[] args) {
 
+        doMain(args);
+
+        System.exit(0);
+    }
+
+    public static void doMain(String[] args) {
         String job = "java:groupingByKey";
 
         String keyspaceName = "tutorials";
         String tableName = "tweets";
 
         // Creating the Deep Context where args are Spark Master and Job Name
-        ContextProperties p = new ContextProperties();
-        DeepSparkContext deepContext = new DeepSparkContext(p.cluster, job, p.sparkHome, p.jarList);
+        ContextProperties p = new ContextProperties(args);
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), new String[]{p.getJar()});
+
 
         // Creating a configuration for the RDD and initialize it
         IDeepJobConfig<TweetEntity> config = DeepJobConfigFactory.create(TweetEntity.class)
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(tableName)
                 .initialize();
 
@@ -77,11 +92,11 @@ public final class GroupingByKey {
         });
 
 // fetching results
-        List<Tuple2<String, Integer>> result = counts.collect();
+        result = counts.collect();
 
         System.out.println("Este es el resultado con groupByKey: ");
-        int total = 0;
-        int authors = 0;
+        total = 0;
+        authors = 0;
         for (Tuple2<String, Integer> t : result) {
             total = total + t._2();
             authors = authors + 1;
@@ -90,6 +105,6 @@ public final class GroupingByKey {
 
         logger.info("Autores: " + authors + " total: " + total);
 
-        System.exit(0);
+        deepContext.stop();
     }
 }

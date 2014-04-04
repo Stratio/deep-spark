@@ -39,10 +39,23 @@ public final class GroupingByColumn {
 
     private static Logger logger = Logger.getLogger(GroupingByColumn.class);
 
+    public static List<Tuple2<String,Integer>> results;
+
     private GroupingByColumn(){}
 
+    /**
+     * Application entry point.
+     *
+     * @param args the arguments passed to the application.
+     */
     public static void main(String[] args) {
 
+        doMain(args);
+
+        System.exit(0);
+    }
+
+    public static void doMain(String[] args) {
         String job = "java:groupingByColumn";
 
         String keyspaceName = "tutorials";
@@ -50,12 +63,12 @@ public final class GroupingByColumn {
 
 
         // Creating the Deep Context
-        ContextProperties p = new ContextProperties();
-        DeepSparkContext deepContext = new DeepSparkContext(p.cluster, job, p.sparkHome, p.jarList);
+        ContextProperties p = new ContextProperties(args);
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), new String[]{p.getJar()});
 
 // Create a configuration for the RDD and initialize it
         IDeepJobConfig config = DeepJobConfigFactory.create(TweetEntity.class)
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(tableName)
                 .initialize();
 
@@ -79,13 +92,13 @@ public final class GroupingByColumn {
         });
 
 // fetching the results
-        List<Tuple2<String,Integer>> results = counts.collect();
+        results = counts.collect();
 
         logger.info("Este es el resultado con groupBy: ");
         for (Tuple2 t : results) {
             logger.info(t._1() + ": " + t._2().toString());
         }
 
-        System.exit(0);
+        deepContext.stop();
     }
 }

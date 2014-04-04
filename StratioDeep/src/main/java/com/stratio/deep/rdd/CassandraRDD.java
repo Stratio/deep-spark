@@ -249,6 +249,11 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     }
 
 
+    /**
+     * Public constructor that builds a new Cassandra RDD given the context and the configuration file.
+     * @param sc
+     * @param config
+     */
     @SuppressWarnings("unchecked")
     public CassandraRDD(SparkContext sc, IDeepJobConfig<T> config) {
         super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
@@ -272,10 +277,10 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
         final DeepCqlPagingRecordReader recordReader = initRecordReader(ctx, inputFormat, deepPartition);
 
-	/*
-   * Creates a new anonymous iterator inner class and returns it as a
-	 * scala iterator.
-	 */
+	    /**
+         * Creates a new anonymous iterator inner class and returns it as a
+	     * scala iterator.
+	     */
         java.util.Iterator<T> recordReaderIterator = new java.util.Iterator<T>() {
 
             @Override
@@ -297,6 +302,13 @@ public abstract class CassandraRDD<T> extends RDD<T> {
         return asScalaIterator(recordReaderIterator);
     }
 
+    /**
+     * Gets an instance of the callback that will be used on the completion of the computation of this RDD.
+     *
+     * @param recordReader
+     * @param dp
+     * @return
+     */
     protected AbstractFunction0<BoxedUnit> getComputeCallback(DeepCqlPagingRecordReader recordReader,
         DeepPartition dp) {
         return new OnComputedRDDCallback<>(recordReader, dp);

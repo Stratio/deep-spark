@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by luca on 28/02/14.
+ * Tests DeepSparkContext instantiations.
  */
 @Test(suiteName = "DeepSparkContextTest")
 public class DeepSparkContextTest {

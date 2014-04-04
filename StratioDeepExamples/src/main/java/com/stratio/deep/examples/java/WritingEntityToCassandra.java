@@ -41,6 +41,11 @@ public final class WritingEntityToCassandra {
 
     private WritingEntityToCassandra(){}
 
+    /**
+     * Application entry point.
+     *
+     * @param args the arguments passed to the application.
+     */
     public static void main(String[] args) {
 
         String job = "java:writingEntityToCassandra";
@@ -50,12 +55,13 @@ public final class WritingEntityToCassandra {
         String outputTableName = "listdomains";
 
         // Creating the Deep Context where args are Spark Master and Job Name
-        ContextProperties p = new ContextProperties();
-        DeepSparkContext deepContext = new DeepSparkContext(p.cluster, job, p.sparkHome, p.jarList);
+        ContextProperties p = new ContextProperties(args);
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), new String[]{p.getJar()});
+
 
         // --- INPUT RDD
         IDeepJobConfig inputConfig = DeepJobConfigFactory.create(PageEntity.class)
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
 
@@ -78,7 +84,7 @@ public final class WritingEntityToCassandra {
 
         // --- OUTPUT RDD
         IDeepJobConfig outputConfig = DeepJobConfigFactory.create(DomainEntity.class)
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(outputTableName)
                 .createTableOnWrite(false);
 

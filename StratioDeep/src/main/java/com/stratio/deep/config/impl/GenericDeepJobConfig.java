@@ -25,7 +25,7 @@ import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.util.Constants;
+import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.hadoop.ConfigHelper;
@@ -245,10 +245,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     }
 
     /**
-     * Fetches table metadata from Casandra and generates a Map<K, V> where the key is the column name, and the value
-     * is the {@link com.stratio.deep.entity.Cell} containing column's metadata.
-     *
-     * @return
+     * {@inheritDoc}
      */
     @Override
     public synchronized Map<String, Cell> columnDefinitions() {
@@ -289,9 +286,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
                 columnDefinitionMap.put(key.getName(), metadata);
             }
         }
-
-
-
         columnDefinitionMap = Collections.unmodifiableMap(columnDefinitionMap);
 
         return columnDefinitionMap;
@@ -652,16 +646,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     }
 
     /**
-     * Adds a new filter for the Cassandra underlying datastore.<br/>
-     * Once a new filter has been added, all subsequent queries generated to the underlying datastore
-     * will include the filter on the specified column called <i>filterColumnName</i>.
-     * Before propagating the filter we check if an index exists in Cassandra.
-     *
-     * @param filterColumnName
-     * @param filterValue
-     * @return
-     * @throws DeepIndexNotFoundException                          if the specified field has not been indexed in Cassandra.
-     * @throws com.stratio.deep.exception.DeepNoSuchFieldException if the specified field is not a valid column in Cassandra.
+     * {@inheritDoc}
      */
     @Override
     public IDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue) {

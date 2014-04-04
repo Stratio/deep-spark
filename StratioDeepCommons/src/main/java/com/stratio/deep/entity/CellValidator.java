@@ -54,7 +54,7 @@ import static java.util.Collections.unmodifiableCollection;
  * collection holds.
  */
 public class CellValidator implements Serializable {
-    public static final String DEFAULT_VALIDATOR_CLASSNAME = "org.apache.cassandra.db.marshal.UTF8Type";
+    private static final String DEFAULT_VALIDATOR_CLASSNAME = "org.apache.cassandra.db.marshal.UTF8Type";
 
     private static final Map<Class, CQL3Type.Native> MAP_JAVA_TYPE_TO_CQL_TYPE =
         ImmutableMap.<Class, CQL3Type.Native>builder()
@@ -79,6 +79,22 @@ public class CellValidator implements Serializable {
     public static enum Kind {
         MAP, SET, LIST, NOT_A_COLLECTION;
 
+        /**
+         * Returns the Kind associated to the provided Cassandra validator class.
+         *
+         * <p>
+         *     To be more specific, returns:
+         *     <ul>
+         *         <li>NOT_A_COLLECTION: when the provided type is not a set a list or a map</li>
+         *         <li>MAP: when the provided validator is MapType.class</li>
+         *         <li>LIST: when the provided validator is ListType.class</li>
+         *         <li>SET: when the provided validator is SetType.class</li>
+         *     </ul>
+         * </p>
+         *
+         * @param type
+         * @return
+         */
         public static Kind validatorClassToKind(Class<? extends AbstractType> type) {
             if (type == null){
                 return NOT_A_COLLECTION;
@@ -95,6 +111,22 @@ public class CellValidator implements Serializable {
             }
         }
 
+        /**
+         * Returns the Kind associated to the provided object instance.
+         *
+         * <p>To be more specific, returns:
+         * <ul>
+         *     <li>{@see com.stratio.deep.entity.CellValidator.Kind.SET}: when the provided instance object is an instance of {@see java.util.Set}</li>
+         *     <li>{@see com.stratio.deep.entity.CellValidator.Kind.LIST}: when the provided instance object is an instance of {@see java.util.List}</li>
+         *     <li>{@see com.stratio.deep.entity.CellValidator.Kind.MAP}: when the provided instance object is an instance of {@see java.util.Map}</li>
+         *     <li>{@see com.stratio.deep.entity.CellValidator.Kind.NOT_A_COLLECTION}: otherwise.</li>
+         * </ul>
+         * </p>
+         *
+         * @param object
+         * @param <T>
+         * @return
+         */
         public static <T> Kind objectToKind(T object) {
             if (object == null){
                 return NOT_A_COLLECTION;

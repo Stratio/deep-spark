@@ -22,16 +22,39 @@ import org.apache.hadoop.io.Writable;
 import org.apache.spark.Partition;
 import org.apache.spark.SerializableWritable;
 
+/**
+ * Object that carries spark's partition information.
+ */
 public class DeepPartition implements Partition {
 
     private static final int MAGIC_NUMBER = 41;
 
     private static final long serialVersionUID = 4822039463206513988L;
 
+    /**
+     * Id of the rdd to which this partition belongs to.
+     */
     private final int rddId;
+
+    /**
+     * index of the partition.
+     */
     private final int idx;
+
+    /**
+     * Cassandra's split object, maintains information of
+     * the start and end token of the cassandra split mapped
+     * by this partition and its list of replicas.
+     */
     private final SerializableWritable<ColumnFamilySplit> splitWrapper;
 
+    /**
+     * Public constructor.
+     *
+     * @param rddId
+     * @param idx
+     * @param s
+     */
     public DeepPartition(int rddId, int idx, Writable s) {
 
         this.splitWrapper = new SerializableWritable<>((ColumnFamilySplit) s);
@@ -39,20 +62,35 @@ public class DeepPartition implements Partition {
         this.idx = idx;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         return (MAGIC_NUMBER * (MAGIC_NUMBER + this.rddId) + this.idx);
     }
 
+    /**
+     * Returns the index of the current partition.
+     *
+     * @return
+     */
     @Override
     public int index() {
         return this.idx;
     }
 
+    /**
+     * Returns the Cassandra split
+     * @return
+     */
     public SerializableWritable<ColumnFamilySplit> splitWrapper() {
         return this.splitWrapper;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "DeepPartition [rddId="

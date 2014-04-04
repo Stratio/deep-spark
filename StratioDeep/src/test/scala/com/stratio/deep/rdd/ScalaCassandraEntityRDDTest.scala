@@ -18,17 +18,18 @@ package com.stratio.deep.rdd
 
 import com.stratio.deep.testentity.DeepScalaPageEntity
 import com.stratio.deep.config.{DeepJobConfigFactory, IDeepJobConfig}
-import com.stratio.deep.util.Constants
 import com.stratio.deep.embedded.CassandraServer
 import com.stratio.deep.context.AbstractDeepSparkContextTest
 import org.testng.annotations.{BeforeClass, Test}
 import org.testng.Assert._
 import org.apache.spark.Partition
+import com.datastax.driver.core.{Row, ResultSet, Session, Cluster}
+import com.stratio.deep.utils.Constants
 
 /**
  * Created by luca on 20/03/14.
  */
-@Test (suiteName = "cassandraRddTests", dependsOnGroups = Array ("CassandraJavaRDDTest"), groups = Array ("ScalaCassandraEntityRDDTest") )
+@Test(suiteName = "cassandraRddTests", dependsOnGroups = Array("CassandraJavaRDDTest"), groups = Array("ScalaCassandraEntityRDDTest"))
 class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
   private var rdd: CassandraRDD[DeepScalaPageEntity] = _
   private var rddConfig: IDeepJobConfig[DeepScalaPageEntity] = _
@@ -73,6 +74,17 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
   @Test
   def testSimpleSaveToCassandra(): Unit = {
 
+    try {
+      AbstractDeepSparkContextTest.executeCustomCQL("DROP TABLE " +
+        AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME + "." + AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY)
+    }
+    catch {
+      case e:Exception =>
+
+    };
+
+    CassandraRDD.saveRDDToCassandra(rdd, writeConfig)
+    checkSimpleTestData()
   }
 
   @Test
@@ -115,7 +127,23 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
   }
 
   private def checkSimpleTestData(): Unit = {
-
+    val cluster: Cluster = Cluster.builder.withPort(CassandraServer.CASSANDRA_CQL_PORT).addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build
+    val session: Session = cluster.connect
+    var command: String = "select count(*) from " +
+      AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME + "." +
+      AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY + ";"
+    var rs: ResultSet = session.execute(command)
+    assertEquals(rs.one.getLong(0), AbstractDeepSparkContextTest.entityTestDataSize)
+    command = "select * from " +
+      AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME + "." +
+      AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';"
+    rs = session.execute(command)
+    val row: Row = rs.one
+    assertEquals(row.getString("domain_name"), "11870.com")
+    assertEquals(row.getInt("response_time"), 421)
+    assertEquals(row.getLong("download_time"), 1380802049275L)
+    assertEquals(row.getString("url"), "http://11870.com/k/es/de")
+    session.close
   }
 
   private def checkComputedData(entities: Array[DeepScalaPageEntity]): Unit = {

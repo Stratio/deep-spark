@@ -16,16 +16,95 @@
 package com.stratio.deep.testutils;
 
 /**
+ * Common properties used by the examples.
+ *
  * Author: Emmanuelle Raffenne
  * Date..: 26-feb-2014
  */
 public class ContextProperties {
 
-    public final String cluster = "local";
-    public final String sparkHome = "/opt/SDH/deep";
-    public final String[] jarList = new String[] {"file:/opt/SDH/jars/StratioDeepExamples-0.1.1-SNAPSHOT.jar"};
+    /**
+     * spark cluster endpoint.
+     */
+    private String cluster;
 
-    public final String cassandraHost = "localhost";
-    public final int cassandraPort = 9160;
+    /**
+     * spark home
+     */
+    private String sparkHome;
 
+    /**
+     * The jar to be added to the spark context.
+     */
+    private String jar;
+
+    /**
+     * Endpoint of the cassandra cluster against which the examples will be run. Defaults to 'localhost'.
+     */
+    private String cassandraHost;
+
+    /**
+     * Cassandra's cql port. Defaults to 9042.
+     */
+    private int cassandraCqlPort;
+
+
+
+    /**
+     * Cassandra's cql port. Defaults to 9160.
+     */
+    private int cassandraThriftPort;
+
+    /**
+     * Default constructor
+     */
+    public ContextProperties() {
+        cluster = "local";
+        sparkHome = "/opt/SDH/deep";
+        jar = "file:/Users/luca/Projects/Stratio/stratio-deep/StratioDeepExamples/target/StratioDeepExamples-0.1.3-SNAPSHOT.jar";
+        cassandraHost = "localhost";
+        cassandraCqlPort = 9042;
+        cassandraThriftPort = 9160;
+    }
+
+    /**
+     * Public constructor.
+     */
+    public ContextProperties(String[] args) {
+        this();
+
+        if (args != null && args.length > 0){
+            cluster = args[0];
+            sparkHome = args[1];
+            jar = args[2];
+            cassandraHost = args[3];
+            cassandraCqlPort = Integer.parseInt(args[4]);
+            cassandraThriftPort = Integer.parseInt(args[5]);
+        }
+
+
+    }
+
+    public String getCluster() {
+        return cluster;
+    }
+
+    public String getSparkHome() {
+        return sparkHome;
+    }
+
+    public String getJar() {
+        return jar;
+    }
+
+    public String getCassandraHost() {
+        return cassandraHost;
+    }
+
+    public int getCassandraCqlPort() {
+        return cassandraCqlPort;
+    }
+    public int getCassandraThriftPort() {
+        return cassandraThriftPort;
+    }
 }

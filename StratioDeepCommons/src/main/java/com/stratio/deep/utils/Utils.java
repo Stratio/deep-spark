@@ -160,6 +160,12 @@ public final class Utils {
         return res;
     }
 
+    /**
+     * Generates the part of the query where clause that will hit the Cassandra's secondary indexes.
+     *
+     * @param additionalFilters
+     * @return
+     */
     public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters) {
         if (MapUtils.isEmpty(additionalFilters)) {
             return "";
@@ -184,7 +190,7 @@ public final class Utils {
         return sb.toString();
     }
 
-    static String cleanFilterString(Map.Entry<String, Serializable> entry, String value) {
+    private static String cleanFilterString(Map.Entry<String, Serializable> entry, String value) {
         if (value.contains("\"")) {
             throw new DeepGenericException("value for filter \'" + entry.getKey() + "\' contains double quotes, please check your syntax.");
         }
@@ -381,18 +387,29 @@ public final class Utils {
         return new Tuple2<String[], Object[]>(names, values);
     }
 
-    public static Method findSetter(String f, Class entityClass, Class valueType) {
+    /**
+     * Resolves the setter name for the property whose name is 'propertyName' whose type is 'valueType'
+     * in the entity bean whose class is 'entityClass'.
+     * If we don't find a setter following Java's naming conventions, before throwing an exception we try to
+     * resolve the setter following Scala's naming conventions.
+     *
+     * @param propertyName the field name of the property whose setter we want to resolve.
+     * @param entityClass the bean class object in which we want to search for the setter.
+     * @param valueType the class type of the object that we want to pass to the setter.
+     * @return
+     */
+    public static Method findSetter(String propertyName, Class entityClass, Class valueType) {
         Method setter;
 
-        String setterName = "set" + f.substring(0, 1).toUpperCase() +
-            f.substring(1);
+        String setterName = "set" + propertyName.substring(0, 1).toUpperCase() +
+            propertyName.substring(1);
 
         try {
             setter = entityClass.getMethod(setterName, valueType);
         } catch (NoSuchMethodException e) {
             // let's try with scala setter name
             try {
-                setter = entityClass.getMethod(f + "_$eq", valueType);
+                setter = entityClass.getMethod(propertyName + "_$eq", valueType);
             } catch (NoSuchMethodException e1) {
                 throw new DeepIOException(e1);
             }
@@ -401,6 +418,14 @@ public final class Utils {
         return setter;
     }
 
+    /**
+     * Returns an instance of the Cassandra validator that matches the provided object.
+     *
+     * @param obj
+     * @param <T>
+     * @return an instance of the Cassandra validator that matches the provided object.
+     * @throws com.stratio.deep.exception.DeepGenericException if no validator can be found for the specified object.
+     */
     public static <T> AbstractType<?> marshallerInstance(T obj){
         AbstractType<?> abstractType = MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(obj.getClass());
 
@@ -422,6 +447,9 @@ public final class Utils {
         return abstractType;
     }
 
+    /**
+     * private constructor.
+     */
     private Utils() {
 
     }

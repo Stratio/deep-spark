@@ -38,10 +38,22 @@ import scala.Tuple2;
  */
 public final class WritingCellToCassandra {
     private static Logger logger = Logger.getLogger(WritingCellToCassandra.class);
+    public static List<Tuple2<String,Integer>> results;
 
     private WritingCellToCassandra(){}
 
+    /**
+     * Application entry point.
+     *
+     * @param args the arguments passed to the application.
+     */
     public static void main(String[] args) {
+        doMain(args);
+
+        System.exit(0);
+    }
+
+    public static void doMain(String[] args) {
         String job = "java:writingCellToCassandra";
 
         String keyspaceName = "crawler";
@@ -49,12 +61,13 @@ public final class WritingCellToCassandra {
         String outputTableName = "newlistdomains";
 
         // Creating the Deep Context where args are Spark Master and Job Name
-        ContextProperties p = new ContextProperties();
-        DeepSparkContext deepContext = new DeepSparkContext(p.cluster, job, p.sparkHome, p.jarList);
+        ContextProperties p = new ContextProperties(args);
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), new String[]{p.getJar()});
+
 
         // --- INPUT RDD
         IDeepJobConfig inputConfig = DeepJobConfigFactory.create()
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
 
@@ -76,17 +89,14 @@ public final class WritingCellToCassandra {
                     }
                 });
 
+        results = numPerKey.collect();
+
         // --- OUTPUT RDD
         IDeepJobConfig outputConfig = DeepJobConfigFactory.create()
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(outputTableName)
                 .createTableOnWrite(true);
 
-        if ( args.length > 0 ) {
-                int batchSize = Integer.parseInt(args[0]);
-                logger.info("EMAR WritingCellToCassandra: using batch size: " + batchSize );
-                outputConfig.batchSize( batchSize );
-        }
         outputConfig.initialize();
 
         JavaRDD outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, Cells>() {
@@ -100,6 +110,6 @@ public final class WritingCellToCassandra {
 
         CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig);
 
-        System.exit(0);
+        deepContext.stop();
     }
 }

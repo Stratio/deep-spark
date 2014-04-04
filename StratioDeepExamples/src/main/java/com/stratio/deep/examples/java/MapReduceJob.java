@@ -36,23 +36,36 @@ import scala.Tuple2;
 
 public final class MapReduceJob {
     private static Logger logger = Logger.getLogger(MapReduceJob.class);
+    public static List<Tuple2<String,Integer>> results;
 
     private MapReduceJob(){}
 
+    /**
+     * Application entry point.
+     *
+     * @param args the arguments passed to the application.
+     */
     public static void main(String[] args) {
 
+        doMain(args);
+
+        System.exit(0);
+    }
+
+    public static void doMain(String[] args) {
         String job = "java:mapReduceJob";
 
         String keyspaceName = "tutorials";
         String tableName = "tweets";
 
         // Creating the Deep Context where args are Spark Master and Job Name
-        ContextProperties p = new ContextProperties();
-        DeepSparkContext deepContext = new DeepSparkContext(p.cluster, job, p.sparkHome, p.jarList);
+        ContextProperties p = new ContextProperties(args);
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), new String[]{p.getJar()});
+
 
         // Creating a configuration for the RDD and initialize it
         IDeepJobConfig<TweetEntity> config = DeepJobConfigFactory.create(TweetEntity.class)
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(tableName)
                 .initialize();
 
@@ -67,7 +80,7 @@ public final class MapReduceJob {
             }
         });
 
-// Reduce stage: counting rows
+        // Reduce stage: counting rows
         JavaPairRDD<String, Integer> counts = pairsRDD.reduceByKey(new Function2<Integer, Integer, Integer>() {
             @Override
             public Integer call(Integer a, Integer b) {
@@ -75,13 +88,13 @@ public final class MapReduceJob {
             }
         });
 
-// Fetching the results
-        List<Tuple2<String,Integer>> results = counts.collect();
+        // Fetching the results
+        results = counts.collect();
 
         for (Tuple2<String,Integer> t: results) {
             logger.info(t._1() + ": " + t._2().toString());
         }
 
-        System.exit(0);
+        deepContext.stop();
     }
 }

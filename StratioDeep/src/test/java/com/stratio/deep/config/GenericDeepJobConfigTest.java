@@ -23,7 +23,7 @@ import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.testentity.TestEntity;
 import com.stratio.deep.testentity.WronglyMappedTestEntity;
-import com.stratio.deep.util.Constants;
+import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;

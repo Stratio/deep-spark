@@ -23,8 +23,8 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 /**
- * Represents a tuple inside the Cassandra's datastore.
- * Provides utility methods to access specific cells in the row.
+ * Represents a tuple inside the Cassandra's datastore. A Cells object basically is an
+ * ordered collection of {@see Cell} objects, plus a few utility methods to access specific cells in the row.
  *
  * @author Luca Rosellini <luca@stratio.com>
  */
@@ -33,13 +33,26 @@ public class Cells implements Iterable<Cell<?>>, Serializable {
     private static final long serialVersionUID = 3074521612130550380L;
     private List<Cell<?>> cells = new ArrayList<>();
 
+    /**
+     * Default constructor.
+     */
     public Cells() {
     }
 
+    /**
+     * Builds a new Cells object containing the provided cells.
+     *
+     * @param cells
+     */
     public Cells(Cell<?>... cells) {
         Collections.addAll(this.cells, cells);
     }
 
+    /**
+     * Adds a new Cell object to this Cells instance.
+     * @param c
+     * @return
+     */
     public boolean add(Cell<?> c) {
         if (c == null) {
             throw new DeepGenericException(new IllegalArgumentException("cell parameter cannot be null"));
@@ -48,6 +61,9 @@ public class Cells implements Iterable<Cell<?>>, Serializable {
         return cells.add(c);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
 
@@ -76,10 +92,22 @@ public class Cells implements Iterable<Cell<?>>, Serializable {
         return true;
     }
 
+    /**
+     * Returns the cell at position idx.
+     *
+     * @param idx
+     * @return
+     */
     public Cell<?> getCellByIdx(int idx) {
         return cells.get(idx);
     }
 
+    /**
+     * Returns the Cell whose name is cellName, or null if this Cells object
+     * contains no cell whose name is cellName.
+     * @param cellName
+     * @return
+     */
     public Cell<?> getCellByName(String cellName) {
         for (Cell<?> c : cells) {
             if (c.getCellName().equals(cellName)) {
@@ -89,10 +117,20 @@ public class Cells implements Iterable<Cell<?>>, Serializable {
         return null;
     }
 
+    /**
+     * Returns an inmutable collection of Cell objects contained in this Cells.
+     * @return
+     */
     public Collection<Cell<?>> getCells() {
         return Collections.unmodifiableList(cells);
     }
 
+    /**
+     * Converts every Cell contained in this object to an ArrayBuffer.
+     * In order to perform the conversion we use the appropriate Cassandra marshaller for the Cell.
+     *
+     * @return
+     */
     public Collection<ByteBuffer> getDecomposedCellValues() {
         List<ByteBuffer> res = new ArrayList<>();
 
@@ -103,6 +141,11 @@ public class Cells implements Iterable<Cell<?>>, Serializable {
         return res;
     }
 
+    /**
+     * Extracts from this Cells object the cells marked either as partition key or cluster key.
+     * Returns an empty Cells object if the current object does not contain any Cell marked as key.
+     * @return
+     */
     public Cells getIndexCells() {
         Cells res = new Cells();
         for (Cell<?> cell : cells) {
@@ -115,6 +158,10 @@ public class Cells implements Iterable<Cell<?>>, Serializable {
         return res;
     }
 
+    /**
+     * Extracts from this Cells object the cells _NOT_ marked as partition key and _NOT_ marked as cluster key.
+     * @return
+     */
     public Cells getValueCells() {
         Cells res = new Cells();
         for (Cell<?> cell : cells) {
@@ -127,20 +174,33 @@ public class Cells implements Iterable<Cell<?>>, Serializable {
         return res;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         return cells.hashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Iterator<Cell<?>> iterator() {
         return getCells().iterator();
     }
 
+    /**
+     * Returns the number of cell(s) this object contains.
+     * @return
+     */
     public int size() {
         return cells.size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "Cells{" + "cells=" + cells + '}';

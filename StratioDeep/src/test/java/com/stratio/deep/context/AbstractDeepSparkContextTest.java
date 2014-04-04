@@ -22,7 +22,7 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.google.common.io.Resources;
 import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.util.Constants;
+import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.testng.annotations.AfterSuite;
@@ -37,6 +37,9 @@ import static com.stratio.deep.utils.Utils.quote;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
+/**
+ * Base class for all Deep's integration tests.
+ */
 public abstract class AbstractDeepSparkContextTest {
 
     private Logger logger = Logger.getLogger(getClass());

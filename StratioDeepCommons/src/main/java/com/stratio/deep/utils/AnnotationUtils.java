@@ -38,7 +38,7 @@ import java.net.InetAddress;
 import java.util.*;
 
 /**
- * Created by luca on 26/02/14.
+ * Common utility methods to manipulate beans and fields annotated with @DeepEntity and @DeepField.
  */
 public final class AnnotationUtils {
     /**
@@ -62,6 +62,10 @@ public final class AnnotationUtils {
             .put(UUID.class, UUIDType.instance)
             .build();
 
+    /**
+     * Static map of associations between a cassandra marshaller fully qualified class name and the corresponding
+     * Java class.
+     */
     public static final Map<String, Class> MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE =
         ImmutableMap.<String, Class>builder()
             .put(UTF8Type.class.getCanonicalName(), String.class)
@@ -81,6 +85,9 @@ public final class AnnotationUtils {
             .put(MapType.class.getCanonicalName(), Map.class)
             .build();
 
+    /**
+     * Static map of associations between cassandra marshaller Class objects and their instance.
+     */
     public static final Map<Class<?>, AbstractType<?>> MAP_ABSTRACT_TYPE_CLASS_TO_ABSTRACT_TYPE =
         ImmutableMap.<Class<?>, AbstractType<?>>builder()
             .put(UTF8Type.class, UTF8Type.instance)
@@ -96,9 +103,6 @@ public final class AnnotationUtils {
             .put(UUIDType.class, UUIDType.instance)
             .put(TimeUUIDType.class, TimeUUIDType.instance)
             .build();
-
-
-
 
     /**
      * Returns the field name as known by the datastore.
@@ -184,6 +188,11 @@ public final class AnnotationUtils {
 
     }
 
+    /**
+     * Returns the list of generic types associated to the provided field (if any).
+     * @param f
+     * @return
+     */
     public static Class<?>[] getGenericTypes(Field f){
         try {
             ParameterizedType type = (ParameterizedType) f.getGenericType();
@@ -202,5 +211,8 @@ public final class AnnotationUtils {
         }
     }
 
+    /**
+     * private constructor.
+     */
     private AnnotationUtils(){}
 }

@@ -42,30 +42,31 @@ object UsingScalaEntity {
     def outputTableName = "out_page";
 
     // context properties
-    val p = new ContextProperties;
 
     def main(args : Array[String]) {
-        val sparkConf = new SparkConf()
+      val p = new ContextProperties(args);
+
+      val sparkConf = new SparkConf()
         sparkConf.setAppName(jobName)
-        sparkConf.setJars(p.jarList)
-        sparkConf.setMaster(p.cluster)
-        sparkConf.setSparkHome(p.sparkHome)
+        sparkConf.setJars(Array(p.getJar))
+        sparkConf.setMaster(p.getCluster)
+        sparkConf.setSparkHome(p.getSparkHome)
         val sc = new SparkContext(sparkConf)
         val deepContext:DeepSparkContext = new DeepSparkContext(sc);
 
         try {
-            doMain(args, deepContext)
+            doMain(args, deepContext, p)
         } finally {
             // deepContext.stop
         }
         System.exit(0)
     }
 
-    private def doMain(args: Array[String], deepContext: DeepSparkContext) = {
+    private def doMain(args: Array[String], deepContext: DeepSparkContext, p:ContextProperties) = {
 
         // Configuration and initialization
         val config: IDeepJobConfig[ScalaPageEntity] = DeepJobConfigFactory.create(classOf[ScalaPageEntity])
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+          .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
                 .keyspace(keyspaceName).table(tableName)
                 .initialize
 
@@ -132,7 +133,7 @@ object UsingScalaEntity {
 
         // --- OUTPUT RDD
         val outputConfig = DeepJobConfigFactory.create(classOf[ScalaOutputEntity])
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+                .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort)
                 .keyspace(keyspaceName).table(outputTableName)
                 .createTableOnWrite(true)
                 .initialize

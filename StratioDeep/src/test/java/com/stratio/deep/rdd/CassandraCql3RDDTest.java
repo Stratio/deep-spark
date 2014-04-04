@@ -28,7 +28,7 @@ import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.testentity.Cql3TestEntity;
-import com.stratio.deep.util.Constants;
+import com.stratio.deep.utils.Constants;
 import org.apache.spark.rdd.RDD;
 import org.testng.annotations.Test;
 import scala.Function1;

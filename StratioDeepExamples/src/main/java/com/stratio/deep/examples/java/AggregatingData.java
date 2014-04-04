@@ -38,22 +38,44 @@ import scala.Tuple3;
 public class AggregatingData {
     private static Logger logger = Logger.getLogger(AggregatingData.class);
 
+    /* used to perform external tests */
+    public static Double avg;
+    public static Double variance;
+    public static Double stddev;
+    public static Double count;
+
     private AggregatingData(){}
 
+    /**
+     * Application entry point.
+     *
+     * @param args the arguments passed to the application.
+     */
     public static void main(String[] args) {
 
+        try {
+            doMain(args);
+        } finally {
+
+            System.exit(0);
+        }
+
+
+    }
+
+    public static void doMain(String[] args) {
         String job = "java:aggregatingData";
 
         String keyspaceName = "tutorials";
         String tableName = "tweets";
 
         // Creating the Deep Context where args are Spark Master and Job Name
-        ContextProperties p = new ContextProperties();
-        DeepSparkContext deepContext = new DeepSparkContext(p.cluster, job, p.sparkHome, p.jarList);
+        ContextProperties p = new ContextProperties(args);
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), new String[]{p.getJar()});
 
         // Creating a configuration for the RDD and initialize it
         IDeepJobConfig<TweetEntity> config = DeepJobConfigFactory.create(TweetEntity.class)
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(tableName)
                 .initialize();
 
@@ -101,16 +123,16 @@ public class AggregatingData {
         Double numOfX = results._2();
         Double sumOfSquares = results._3();
 
-        Double avg = sumOfX / numOfX;
-        Double variance = (sumOfSquares / numOfX) - Math.pow(avg,2);
-        Double stddev = Math.sqrt(variance);
+        count = sumOfX;
+        avg = sumOfX / numOfX;
+        variance = (sumOfSquares / numOfX) - Math.pow(avg,2);
+        stddev = Math.sqrt(variance);
 
         logger.info("Results: (" + sumOfX.toString() + ", " + numOfX.toString() + ", " + sumOfSquares.toString() + ")" );
         logger.info("average: " + avg.toString());
         logger.info("variance: " + variance.toString());
         logger.info("stddev: " + stddev.toString());
 
-        System.exit(0);
-
+        deepContext.stop();
     }
 }

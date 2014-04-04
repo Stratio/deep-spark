@@ -72,6 +72,11 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         return this;
     }
 
+    /**
+     * Public constructor. Constructs a job object with the specified entity class.
+     *
+     * @param entityClass
+     */
     public EntityDeepJobConfig(Class<T> entityClass) {
         super();
         this.entityClass = entityClass;
@@ -126,6 +131,18 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         }
     }
 
+    /**
+     * Given an instance of the generic object mapped to this configurtion object,
+     * sets the instance property whose name is the name specified by dbName.
+     * Since the provided dbName is the name of the field in the database, we first try
+     * to resolve the property name using the fieldName property of the DeepField annotation.
+     * If we don't find any property whose DeepField.fieldName.equals(dbName) we fallback to the
+     * name of the Java property.
+     *
+     * @param instance
+     * @param dbName
+     * @param value
+     */
     public void setInstancePropertyFromDbName(T instance, String dbName, Object value) {
         Map<String, Cell> cfs = columnDefinitions();
         Cell metadataCell = cfs.get(dbName);

@@ -28,7 +28,7 @@ import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.testentity.TestEntity;
-import com.stratio.deep.util.Constants;
+import com.stratio.deep.utils.Constants;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.serializer.DeserializationStream;
 import org.apache.spark.serializer.JavaSerializer;
@@ -46,7 +46,7 @@ import java.nio.ByteBuffer;
 import static org.testng.Assert.*;
 
 /**
- * Created by luca on 05/02/14.
+ * Integration tests for entity RDDs.
  */
 @Test(suiteName = "cassandraRddTests", groups = {"CassandraEntityRDDTest"})
 public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {

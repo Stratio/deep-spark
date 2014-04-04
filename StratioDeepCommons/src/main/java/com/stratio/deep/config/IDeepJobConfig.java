@@ -43,6 +43,12 @@ public interface IDeepJobConfig<T> extends Serializable {
      */
     IDeepJobConfig<T> session(Session session);
 
+    /**
+     * Fetches table metadata from Casandra and generates a Map<K, V> where the key is the column name, and the value
+     * is the {@link com.stratio.deep.entity.Cell} containing column's metadata.
+     *
+     * @return
+     */
     Map<String, Cell> columnDefinitions();
 
     /**
@@ -62,6 +68,18 @@ public interface IDeepJobConfig<T> extends Serializable {
      */
     public abstract IDeepJobConfig<T> columnFamily(String columnFamily);
 
+    /**
+     * Adds a new filter for the Cassandra underlying datastore.<br/>
+     * Once a new filter has been added, all subsequent queries generated to the underlying datastore
+     * will include the filter on the specified column called <i>filterColumnName</i>.
+     * Before propagating the filter we check if an index exists in Cassandra.
+     *
+     * @param filterColumnName
+     * @param filterValue
+     * @return
+     * @throws com.stratio.deep.exception.DeepIndexNotFoundException if the specified field has not been indexed in Cassandra.
+     * @throws com.stratio.deep.exception.DeepNoSuchFieldException if the specified field is not a valid column in Cassandra.
+     */
     public abstract IDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue);
 
     /**
@@ -250,6 +268,12 @@ public interface IDeepJobConfig<T> extends Serializable {
      */
     public abstract IDeepJobConfig<T> createTableOnWrite(Boolean createTableOnWrite);
 
+    /**
+     * Returns whether or not in this configuration object we specify to automatically create
+     * the output column family.
+     *
+     * @return
+     */
     public abstract Boolean isCreateTableOnWrite();
 
     /**
