@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.deep.examples.scala
 
 import com.stratio.deep.context.DeepSparkContext
