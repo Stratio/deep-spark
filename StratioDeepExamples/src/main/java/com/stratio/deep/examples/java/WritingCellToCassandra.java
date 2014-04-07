@@ -53,6 +53,11 @@ public final class WritingCellToCassandra {
         System.exit(0);
     }
 
+    /**
+     * This is the method called by both main and tests.
+     *
+     * @param args
+     */
     public static void doMain(String[] args) {
         String job = "java:writingCellToCassandra";
 
@@ -90,6 +95,12 @@ public final class WritingCellToCassandra {
                 });
 
         results = numPerKey.collect();
+
+        for (Tuple2<String, Integer> result : results) {
+            logger.info(result);
+        }
+
+
 
         // --- OUTPUT RDD
         IDeepJobConfig outputConfig = DeepJobConfigFactory.create()

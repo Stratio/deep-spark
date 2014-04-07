@@ -40,7 +40,7 @@ public class DeepCqlPagingInputFormat extends CqlPagingInputFormat {
     public RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> createRecordReader(InputSplit arg0,
         DeepTaskAttemptContext arg1) throws IOException, InterruptedException {
 
-        return new DeepCqlPagingRecordReader(arg1.conf.getAdditionalFilters());
+        return new DeepCqlPagingRecordReader(arg1.getConf().getAdditionalFilters());
     }
 
 }

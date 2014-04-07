@@ -39,10 +39,10 @@ public class AggregatingData {
     private static Logger logger = Logger.getLogger(AggregatingData.class);
 
     /* used to perform external tests */
-    public static Double avg;
-    public static Double variance;
-    public static Double stddev;
-    public static Double count;
+    private static Double avg;
+    private static Double variance;
+    private static Double stddev;
+    private static Double count;
 
     private AggregatingData(){}
 
@@ -56,13 +56,17 @@ public class AggregatingData {
         try {
             doMain(args);
         } finally {
-
             System.exit(0);
         }
 
 
     }
 
+    /**
+     * This is the method called by both main and tests.
+     *
+     * @param args
+     */
     public static void doMain(String[] args) {
         String job = "java:aggregatingData";
 
@@ -134,5 +138,21 @@ public class AggregatingData {
         logger.info("stddev: " + stddev.toString());
 
         deepContext.stop();
+    }
+
+    public static Double getAvg() {
+        return avg;
+    }
+
+    public static Double getVariance() {
+        return variance;
+    }
+
+    public static Double getStddev() {
+        return stddev;
+    }
+
+    public static Double getCount() {
+        return count;
     }
 }

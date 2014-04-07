@@ -34,9 +34,9 @@ import scala.Tuple2;
  */
 public final class GroupingByKey {
     private static Logger logger = Logger.getLogger(GroupingByKey.class);
-    public static List<Tuple2<String, Integer>> result;
-    public static int authors;
-    public static int total;
+    private static List<Tuple2<String, Integer>> result;
+    private static int authors;
+    private static int total;
 
     private GroupingByKey(){}
 
@@ -52,6 +52,11 @@ public final class GroupingByKey {
         System.exit(0);
     }
 
+    /**
+     * This is the method called by both main and tests.
+     *
+     * @param args
+     */
     public static void doMain(String[] args) {
         String job = "java:groupingByKey";
 
@@ -106,5 +111,17 @@ public final class GroupingByKey {
         logger.info("Autores: " + authors + " total: " + total);
 
         deepContext.stop();
+    }
+
+    public static List<Tuple2<String, Integer>> getResult() {
+        return result;
+    }
+
+    public static int getAuthors() {
+        return authors;
+    }
+
+    public static int getTotal() {
+        return total;
     }
 }

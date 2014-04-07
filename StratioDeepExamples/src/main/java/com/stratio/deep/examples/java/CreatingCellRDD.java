@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 public final class CreatingCellRDD {
     private static Logger logger = Logger.getLogger(CreatingCellRDD.class);
 
-    public static Long counts;
+    private static Long counts;
 
     private CreatingCellRDD() {
     }
@@ -46,6 +46,11 @@ public final class CreatingCellRDD {
         System.exit(0);
     }
 
+    /**
+     * This is the method called by both main and tests.
+     *
+     * @param args
+     */
     public static void doMain(String[] args) {
         String job = "java:creatingCellRDD";
 
@@ -70,5 +75,9 @@ public final class CreatingCellRDD {
         logger.info("Num of rows: " + counts);
 
         deepContext.stop();
+    }
+
+    public static Long getCounts() {
+        return counts;
     }
 }

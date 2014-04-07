@@ -80,7 +80,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * We make it transient in order to prevent this to be sent through the wire
      * to slaves.
      */
-    protected final transient JobID hadoopJobId;
+    private final transient JobID hadoopJobId;
 
     /*
      * RDD configuration. This config is broadcasted to all the Sparks machines.

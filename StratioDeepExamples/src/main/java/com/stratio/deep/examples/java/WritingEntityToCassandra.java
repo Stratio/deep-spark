@@ -38,6 +38,7 @@ import scala.Tuple2;
  */
 public final class WritingEntityToCassandra {
     private static Logger logger = Logger.getLogger(WritingEntityToCassandra.class);
+    public static List<Tuple2<String,Integer>> results;
 
     private WritingEntityToCassandra(){}
 
@@ -48,6 +49,17 @@ public final class WritingEntityToCassandra {
      */
     public static void main(String[] args) {
 
+        doMain(args);
+
+        System.exit(0);
+    }
+
+    /**
+     * This is the method called by both main and tests.
+     *
+     * @param args
+     */
+    public static void doMain(String[] args) {
         String job = "java:writingEntityToCassandra";
 
         String keyspaceName = "crawler";
@@ -82,18 +94,17 @@ public final class WritingEntityToCassandra {
                     }
                 });
 
+        results = numPerKey.collect();
+
+        for (Tuple2<String, Integer> result : results) {
+            logger.info(result);
+        }
+
         // --- OUTPUT RDD
         IDeepJobConfig outputConfig = DeepJobConfigFactory.create(DomainEntity.class)
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(outputTableName)
-                .createTableOnWrite(false);
-
-        if ( args.length > 0 ) {
-            int batchSize = Integer.parseInt(args[0]);
-            logger.info("EMAR WritingEntityToCassandra: using batch size: " + batchSize );
-            outputConfig.batchSize( batchSize );
-        }
-        outputConfig.initialize();
+                .createTableOnWrite(true).initialize();
 
         JavaRDD outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, DomainEntity>() {
             @Override
@@ -107,6 +118,6 @@ public final class WritingEntityToCassandra {
 
         CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig);
 
-        System.exit(0);
+        deepContext.stop();
     }
 }

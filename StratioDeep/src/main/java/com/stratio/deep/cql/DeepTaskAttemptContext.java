@@ -25,7 +25,8 @@ import org.apache.hadoop.mapreduce.TaskAttemptID;
  * propagate a deep's own configuration object ({@link com.stratio.deep.config.impl.GenericDeepJobConfig}).
  */
 public class DeepTaskAttemptContext<T> extends TaskAttemptContext {
-    GenericDeepJobConfig<T> conf;
+
+    private GenericDeepJobConfig<T> conf;
 
     /**
      * Public constructor.
@@ -38,4 +39,9 @@ public class DeepTaskAttemptContext<T> extends TaskAttemptContext {
 
         this.conf = conf;
     }
+
+    GenericDeepJobConfig<T> getConf() {
+        return conf;
+    }
+
 }

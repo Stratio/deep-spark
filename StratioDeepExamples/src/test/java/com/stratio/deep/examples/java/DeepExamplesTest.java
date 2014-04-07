@@ -17,12 +17,15 @@
 package com.stratio.deep.examples.java;
 
 
+import com.datastax.driver.core.ResultSet;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.utils.Constants;
 import org.testng.annotations.Test;
 import scala.Tuple2;
 
+import static com.stratio.deep.utils.Utils.quote;
 import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Test for the AggregatingData standalone example.
@@ -40,39 +43,38 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
     public void testAggregatingData(){
         AggregatingData.doMain(args);
 
-        assertEquals(AggregatingData.count, 999.0);
-        assertEquals(AggregatingData.avg, 3.1024844720496896);
-        assertEquals(AggregatingData.variance, 2.526764013734038);
-        assertEquals(AggregatingData.stddev, 1.5895798230142575);
+        assertEquals(AggregatingData.getCount(), 999.0);
+        assertEquals(AggregatingData.getAvg(), 3.1024844720496896);
+        assertEquals(AggregatingData.getVariance(), 2.526764013734038);
+        assertEquals(AggregatingData.getStddev(), 1.5895798230142575);
     }
 
     @Test(dependsOnMethods = "testAggregatingData")
     public void testCreatingCellRDD(){
         CreatingCellRDD.doMain(args);
-        assertEquals(AggregatingData.count, 999.0);
+        assertEquals(AggregatingData.getCount(), 999.0);
     }
 
     @Test(dependsOnMethods = "testCreatingCellRDD")
     public void testGroupingByColumn(){
         GroupingByColumn.doMain(args);
-        assertEquals(GroupingByColumn.results.size(), 322);
-        for (Tuple2 t : GroupingByColumn.results) {
+        assertEquals(GroupingByColumn.getResults().size(), 322);
+        for (Tuple2 t : GroupingByColumn.getResults()) {
             if (t._1().equals("id355")){
                 assertEquals(t._2(), 4);
                 break;
             }
 
         }
-
     }
 
     @Test(dependsOnMethods = "testGroupingByColumn")
     public void testGroupingByKey(){
         GroupingByKey.doMain(args);
-        assertEquals(GroupingByKey.result.size(), 322);
-        assertEquals(GroupingByKey.authors, 322);
-        assertEquals(GroupingByKey.total, 999);
-        for (Tuple2 t : GroupingByKey.result) {
+        assertEquals(GroupingByKey.getResult().size(), 322);
+        assertEquals(GroupingByKey.getAuthors(), 322);
+        assertEquals(GroupingByKey.getTotal(), 999);
+        for (Tuple2 t : GroupingByKey.getResult()) {
             if (t._1().equals("id355")){
                 assertEquals(t._2(), 4);
                 break;
@@ -86,7 +88,7 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
     public void testMapReduceJob(){
         MapReduceJob.doMain(args);
         assertEquals(MapReduceJob.results.size(), 322);
-        for (Tuple2 t : GroupingByKey.result) {
+        for (Tuple2 t : GroupingByKey.getResult()) {
             if (t._1().equals("id498")){
                 assertEquals(t._2(), 10);
                 break;
@@ -96,4 +98,41 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
 
     }
 
+    @Test(dependsOnMethods = "testMapReduceJob")
+    public void testWritingCellToCassandra(){
+        WritingCellToCassandra.doMain(args);
+        assertEquals(WritingCellToCassandra.results.size(), 26);
+
+        for (Tuple2 t : WritingCellToCassandra.results) {
+            if (t._1().equals("blogs.elpais.com")){
+                assertEquals(t._2(), 3);
+            }
+            if (t._1().equals("deportebase.elnortedecastilla.es")){
+                assertEquals(t._2(), 2);
+            }
+        }
+
+        String command = "select count(*) from " + CRAWLER_KEYSPACE_NAME + ".newlistdomains;";
+        ResultSet rs = session.execute(command);
+        assertEquals(rs.one().getLong(0), 26);
+    }
+
+    @Test(dependsOnMethods = "testWritingCellToCassandra")
+    public void testWritingEntityToCassandra(){
+        WritingEntityToCassandra.doMain(args);
+        assertEquals(WritingEntityToCassandra.results.size(), 26);
+
+        for (Tuple2 t : WritingEntityToCassandra.results) {
+            if (t._1().equals("blogs.elpais.com")){
+                assertEquals(t._2(), 3);
+            }
+            if (t._1().equals("deportebase.elnortedecastilla.es")){
+                assertEquals(t._2(), 2);
+            }
+        }
+
+        String command = "select count(*) from " + CRAWLER_KEYSPACE_NAME + ".listdomains;";
+        ResultSet rs = session.execute(command);
+        assertEquals(rs.one().getLong(0), 26);
+    }
 }

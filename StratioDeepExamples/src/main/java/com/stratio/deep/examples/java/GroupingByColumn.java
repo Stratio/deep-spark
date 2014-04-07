@@ -39,9 +39,10 @@ public final class GroupingByColumn {
 
     private static Logger logger = Logger.getLogger(GroupingByColumn.class);
 
-    public static List<Tuple2<String,Integer>> results;
+    private static List<Tuple2<String, Integer>> results;
 
-    private GroupingByColumn(){}
+    private GroupingByColumn() {
+    }
 
     /**
      * Application entry point.
@@ -55,6 +56,11 @@ public final class GroupingByColumn {
         System.exit(0);
     }
 
+    /**
+     * This is the method called by both main and tests.
+     *
+     * @param args
+     */
     public static void doMain(String[] args) {
         String job = "java:groupingByColumn";
 
@@ -76,18 +82,18 @@ public final class GroupingByColumn {
         CassandraJavaRDD rdd = deepContext.cassandraJavaRDD(config);
 
         // grouping
-        JavaPairRDD<String,List<TweetEntity>> groups = rdd.groupBy(new Function<TweetEntity, String>() {
+        JavaPairRDD<String, List<TweetEntity>> groups = rdd.groupBy(new Function<TweetEntity, String>() {
             @Override
-            public String call(TweetEntity tableEntity)  {
+            public String call(TweetEntity tableEntity) {
                 return tableEntity.getAuthor();
             }
         });
 
 // counting elements in groups
-        JavaPairRDD<String,Integer> counts = groups.map(new PairFunction<Tuple2<String, List<TweetEntity>>, String, Integer>() {
+        JavaPairRDD<String, Integer> counts = groups.map(new PairFunction<Tuple2<String, List<TweetEntity>>, String, Integer>() {
             @Override
             public Tuple2<String, Integer> call(Tuple2<String, List<TweetEntity>> t) {
-                return new Tuple2<String,Integer>(t._1(), t._2().size());
+                return new Tuple2<String, Integer>(t._1(), t._2().size());
             }
         });
 
@@ -100,5 +106,9 @@ public final class GroupingByColumn {
         }
 
         deepContext.stop();
+    }
+
+    public static List<Tuple2<String, Integer>> getResults() {
+        return results;
     }
 }

@@ -52,6 +52,11 @@ public final class MapReduceJob {
         System.exit(0);
     }
 
+    /**
+     * This is the method called by both main and tests.
+     *
+     * @param args
+     */
     public static void doMain(String[] args) {
         String job = "java:mapReduceJob";
 
