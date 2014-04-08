@@ -53,14 +53,8 @@ public class AggregatingData {
      * @param args the arguments passed to the application.
      */
     public static void main(String[] args) {
-
-        try {
-            doMain(args);
-        } finally {
-            System.exit(0);
-        }
-
-
+        doMain(args);
+        System.exit(0);
     }
 
     /**

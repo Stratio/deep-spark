@@ -16,6 +16,8 @@
 
 package com.stratio.deep.testutils;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Common properties used by the examples.
  *
@@ -49,8 +51,6 @@ public class ContextProperties {
      */
     private int cassandraCqlPort;
 
-
-
     /**
      * Cassandra's cql port. Defaults to 9160.
      */
@@ -60,12 +60,20 @@ public class ContextProperties {
      * Default constructor
      */
     public ContextProperties() {
-        cluster = "local";
-        sparkHome = "/opt/SDH/deep";
-        jar = "file:/Users/luca/Projects/Stratio/stratio-deep/StratioDeepExamples/target/StratioDeepExamples-0.1.3-SNAPSHOT.jar";
-        cassandraHost = "localhost";
-        cassandraCqlPort = 9042;
-        cassandraThriftPort = 9160;
+
+        String sparkHomeProp = System.getProperty("sparkHome");
+        String sparkMaster = System.getProperty("sparkMaster");
+        String deepVersionProp = StringUtils.isNotEmpty(System.getProperty("deepVersion"))?System.getProperty("deepVersion"):"0.1.1-SNAPSHOT";
+        String cassandraHostProp = System.getProperty("cassandraHost");
+        String cassandraCqlPortProp = System.getProperty("cassandraCqlPort");
+        String cassandraThriftPortProp = System.getProperty("cassandraThriftPort");
+
+        cluster = StringUtils.isNotEmpty(sparkMaster) ? sparkMaster :"local";
+        sparkHome = StringUtils.isNotEmpty(sparkHomeProp) ? sparkHomeProp : "/opt/SDH/deep";
+        jar = "target/StratioDeepExamples-"+deepVersionProp+".jar";
+        cassandraHost = StringUtils.isNotEmpty(cassandraHostProp) ? cassandraHostProp: "localhost";
+        cassandraCqlPort = StringUtils.isNotEmpty(cassandraCqlPortProp) ? Integer.parseInt(cassandraCqlPortProp) : 9042;
+        cassandraThriftPort = StringUtils.isNotEmpty(cassandraThriftPortProp) ? Integer.parseInt(cassandraThriftPortProp) : 9160;
     }
 
     /**
