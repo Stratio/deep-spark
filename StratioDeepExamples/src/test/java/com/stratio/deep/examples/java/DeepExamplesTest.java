@@ -43,25 +43,25 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
     public void testAggregatingData(){
         AggregatingData.doMain(args);
 
-        assertEquals(AggregatingData.getCount(), 999.0);
-        assertEquals(AggregatingData.getAvg(), 3.1024844720496896);
-        assertEquals(AggregatingData.getVariance(), 2.526764013734038);
-        assertEquals(AggregatingData.getStddev(), 1.5895798230142575);
+        assertEquals(AggregatingData.getCount(), 4892.0);
+        assertEquals(AggregatingData.getAvg(), 14.262390670553936);
+        assertEquals(AggregatingData.getVariance(), 14.251850844461075);
+        assertEquals(AggregatingData.getStddev(), 3.775162360013285);
     }
 
     @Test(dependsOnMethods = "testAggregatingData")
     public void testCreatingCellRDD(){
         CreatingCellRDD.doMain(args);
-        assertEquals(AggregatingData.getCount(), 999.0);
+        assertEquals(CreatingCellRDD.getCounts(), Long.valueOf("4892"));
     }
 
     @Test(dependsOnMethods = "testCreatingCellRDD")
     public void testGroupingByColumn(){
         GroupingByColumn.doMain(args);
-        assertEquals(GroupingByColumn.getResults().size(), 322);
+        assertEquals(GroupingByColumn.getResults().size(), 343);
         for (Tuple2 t : GroupingByColumn.getResults()) {
             if (t._1().equals("id355")){
-                assertEquals(t._2(), 4);
+                assertEquals(t._2(), 13);
                 break;
             }
 
@@ -71,12 +71,12 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
     @Test(dependsOnMethods = "testGroupingByColumn")
     public void testGroupingByKey(){
         GroupingByKey.doMain(args);
-        assertEquals(GroupingByKey.getResult().size(), 322);
-        assertEquals(GroupingByKey.getAuthors(), 322);
-        assertEquals(GroupingByKey.getTotal(), 999);
+        assertEquals(GroupingByKey.getResult().size(), 343);
+        assertEquals(GroupingByKey.getAuthors(), 343);
+        assertEquals(GroupingByKey.getTotal(), 4892);
         for (Tuple2 t : GroupingByKey.getResult()) {
             if (t._1().equals("id355")){
-                assertEquals(t._2(), 4);
+                assertEquals(t._2(), 13);
                 break;
             }
 
@@ -87,10 +87,10 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
     @Test(dependsOnMethods = "testGroupingByKey")
     public void testMapReduceJob(){
         MapReduceJob.doMain(args);
-        assertEquals(MapReduceJob.results.size(), 322);
-        for (Tuple2 t : GroupingByKey.getResult()) {
+        assertEquals(MapReduceJob.results.size(), 343);
+        for (Tuple2 t : MapReduceJob.results) {
             if (t._1().equals("id498")){
-                assertEquals(t._2(), 10);
+                assertEquals(t._2(), 12);
                 break;
             }
 

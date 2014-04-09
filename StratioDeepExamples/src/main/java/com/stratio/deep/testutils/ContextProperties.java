@@ -63,14 +63,14 @@ public class ContextProperties {
 
         String sparkHomeProp = System.getProperty("sparkHome");
         String sparkMaster = System.getProperty("sparkMaster");
-        String deepVersionProp = StringUtils.isNotEmpty(System.getProperty("deepVersion"))?System.getProperty("deepVersion"):"0.1.1-SNAPSHOT";
+        String deepVersionProp = StringUtils.isNotEmpty(System.getProperty("deepVersion"))?System.getProperty("deepVersion"):"0.1.3-SNAPSHOT";
         String cassandraHostProp = System.getProperty("cassandraHost");
         String cassandraCqlPortProp = System.getProperty("cassandraCqlPort");
         String cassandraThriftPortProp = System.getProperty("cassandraThriftPort");
 
         cluster = StringUtils.isNotEmpty(sparkMaster) ? sparkMaster :"local";
-        sparkHome = StringUtils.isNotEmpty(sparkHomeProp) ? sparkHomeProp : "/opt/SDH/deep";
-        jar = "target/StratioDeepExamples-"+deepVersionProp+".jar";
+        sparkHome = StringUtils.isNotEmpty(sparkHomeProp) ? sparkHomeProp : "/opt/SDS/deep";
+        jar = "/tmp/StratioDeepExamples-"+deepVersionProp+".jar";
         cassandraHost = StringUtils.isNotEmpty(cassandraHostProp) ? cassandraHostProp: "localhost";
         cassandraCqlPort = StringUtils.isNotEmpty(cassandraCqlPortProp) ? Integer.parseInt(cassandraCqlPortProp) : 9042;
         cassandraThriftPort = StringUtils.isNotEmpty(cassandraThriftPortProp) ? Integer.parseInt(cassandraThriftPortProp) : 9160;

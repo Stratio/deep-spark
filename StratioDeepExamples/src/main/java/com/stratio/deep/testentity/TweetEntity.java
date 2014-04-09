@@ -22,6 +22,7 @@ import com.stratio.deep.annotations.DeepField;
 import com.stratio.deep.entity.IDeepType;
 import org.apache.cassandra.db.marshal.BooleanType;
 import org.apache.cassandra.db.marshal.Int32Type;
+import org.apache.cassandra.db.marshal.SetType;
 import org.apache.cassandra.db.marshal.TimestampType;
 import org.apache.cassandra.db.marshal.UTF8Type;
 import org.apache.cassandra.db.marshal.UUIDType;
@@ -44,8 +45,8 @@ public class TweetEntity implements IDeepType {
 	@DeepField(validationClass = UTF8Type.class)
 	private String author;
 
-	@DeepField(validationClass = UTF8Type.class )
-	private String hashtags;
+	@DeepField(validationClass = SetType.class )
+	private java.util.Set<String> hashtags;
 
 	@DeepField(fieldName = "favorite_count", validationClass = Int32Type.class)
 	private Integer favoriteCount;
@@ -80,11 +81,11 @@ public class TweetEntity implements IDeepType {
 		this.author = author;
 	}
 
-	public String getHashtags() {
+	public java.util.Set<String> getHashtags() {
 		return hashtags;
 	}
 
-	public void setHashtags(String hashtags) {
+	public void setHashtags(java.util.Set<String> hashtags) {
 		this.hashtags = hashtags;
 	}
 

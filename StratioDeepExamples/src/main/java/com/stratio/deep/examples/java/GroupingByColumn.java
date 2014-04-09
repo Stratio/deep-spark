@@ -65,7 +65,7 @@ public final class GroupingByColumn {
     public static void doMain(String[] args) {
         String job = "java:groupingByColumn";
 
-        String keyspaceName = "tutorials";
+        String keyspaceName = "test";
         String tableName = "tweets";
 
 
