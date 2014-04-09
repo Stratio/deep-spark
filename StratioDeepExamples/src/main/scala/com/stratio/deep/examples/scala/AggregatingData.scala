@@ -41,7 +41,7 @@ object AggregatingData {
     def main(args:Array[String]) {
 
         val job = "scala:aggregatingData"
-        val keyspaceName = "tutorials"
+        val keyspaceName = "test"
         val tableName = "tweets"
 
         // Creating the Deep Context where args are Spark Master and Job Name

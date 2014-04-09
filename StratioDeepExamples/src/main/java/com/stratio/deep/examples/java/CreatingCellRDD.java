@@ -55,7 +55,7 @@ public final class CreatingCellRDD {
     public static void doMain(String[] args) {
         String job = "java:creatingCellRDD";
 
-        String keyspaceName = "tutorials";
+        String keyspaceName = "test";
         String tableName = "tweets";
 
         // Creating the Deep Context

@@ -45,8 +45,8 @@ import com.stratio.deep.entity.IDeepType
   var responseTime: java.lang.Long = _
 
   @BeanProperty
-  @DeepField(fieldName = "responseCode", validationClass = classOf[Int32Type])
-  var responseCode: Integer = _
+  @DeepField(fieldName = "responseCode", validationClass = classOf[IntegerType])
+  var responseCode: java.math.BigInteger = _
 
   @BeanProperty
   @DeepField(validationClass = classOf[LongType], fieldName = "downloadTime")

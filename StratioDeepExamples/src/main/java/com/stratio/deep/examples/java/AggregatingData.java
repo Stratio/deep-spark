@@ -65,7 +65,7 @@ public class AggregatingData {
     public static void doMain(String[] args) {
         String job = "java:aggregatingData";
 
-        String keyspaceName = "tutorials";
+        String keyspaceName = "test";
         String tableName = "tweets";
 
         // Creating the Deep Context where args are Spark Master and Job Name

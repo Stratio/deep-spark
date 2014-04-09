@@ -35,7 +35,7 @@ object GroupingByColumn {
     def main(args:Array[String]) {
 
         val job = "scala:groupingByColumn"
-        val keyspaceName = "tutorials"
+        val keyspaceName = "test"
         val tableName = "tweets"
 
         // Creating the Deep Context where args are Spark Master and Job Name
