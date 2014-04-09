@@ -100,6 +100,28 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
 
     private Map<String, Serializable> additionalFilters;
 
+    private static transient Map<String, Cassandra.Client> clientsCache = new HashMap<>();
+
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            @Override
+            public void run() {
+                if (clientsCache != null && !clientsCache.isEmpty()){
+                    for (Map.Entry<String, Cassandra.Client> entry : clientsCache.entrySet()) {
+                        if (entry != null) {
+                            TTransport transport = entry.getValue().getOutputProtocol().getTransport();
+                            if (transport.isOpen()) {
+                                transport.close();
+                            }
+                        }
+                    }
+
+                    clientsCache.clear();
+                }
+            }
+        });
+    }
+
     /**
      * public constructor. Takes a list of filters to pass to the underlying datastores.
      *
@@ -164,8 +186,16 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
         Exception lastException = null;
         for (String location : locations) {
             int port = ConfigHelper.getInputRpcPort(conf);
+
+            String key = location+":"+port;
+            if (clientsCache.containsKey(key)){
+                client = clientsCache.get(key);
+                break;
+            }
+
             try {
                 client = CqlPagingInputFormat.createAuthenticatedClient(location, port, conf);
+                clientsCache.put(key, client);
                 break;
             } catch (Exception e) {
                 lastException = e;
