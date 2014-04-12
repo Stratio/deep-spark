@@ -62,7 +62,7 @@ import java.util.*;
  */
 public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>>
     implements org.apache.hadoop.mapred.RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> {
-    private static final Logger LOG = LoggerFactory.getLogger(CqlPagingRecordReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DeepCqlPagingRecordReader.class);
 
     private static final int DEFAULT_CQL_PAGE_LIMIT = 1000; // TODO: find the number large enough but not OOM
 
