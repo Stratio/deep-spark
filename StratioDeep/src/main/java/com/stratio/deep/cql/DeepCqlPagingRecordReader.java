@@ -16,41 +16,38 @@
 
 package com.stratio.deep.cql;
 
+import com.datastax.driver.core.*;
+import com.datastax.driver.core.exceptions.NoHostAvailableException;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
+import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.config.impl.GenericDeepJobConfig;
+import com.stratio.deep.entity.Cell;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
+import com.stratio.deep.partition.impl.DeepPartitionLocationComparator;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
-import org.apache.cassandra.db.marshal.LongType;
-import org.apache.cassandra.db.marshal.TypeParser;
 import org.apache.cassandra.dht.IPartitioner;
-import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.cassandra.exceptions.SyntaxException;
 import org.apache.cassandra.hadoop.ColumnFamilySplit;
 import org.apache.cassandra.hadoop.ConfigHelper;
 import org.apache.cassandra.hadoop.cql3.CqlConfigHelper;
-import org.apache.cassandra.hadoop.cql3.CqlPagingInputFormat;
-import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
-import org.apache.cassandra.thrift.*;
 import org.apache.cassandra.utils.ByteBufferUtil;
-import org.apache.cassandra.utils.FBUtilities;
 import org.apache.cassandra.utils.Pair;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.thrift.TException;
-import org.apache.thrift.transport.TTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-import java.nio.charset.CharacterCodingException;
 import java.util.*;
+
+import static com.stratio.deep.cql.CassandraClientProvider.getSession;
 
 /**
  * Extends Cassandra's CqlPagingRecordReader in order to make it
@@ -71,19 +68,13 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
 
     private Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> currentRow;
     private int totalRowCount; // total number of rows to fetch
-    private String keyspace;
     private String cfName;
-    private Cassandra.Client client;
-    private ConsistencyLevel consistencyLevel;
 
     // partition keys -- key aliases
-    private List<BoundColumn> partitionBoundColumns = new ArrayList<BoundColumn>();
+    private List<BoundColumn> partitionBoundColumns = new ArrayList<>();
 
     // cluster keys -- column aliases
-    private List<BoundColumn> clusterColumns = new ArrayList<BoundColumn>();
-
-    // map prepared query type to item id
-    private Map<Integer, Integer> preparedQueryIds = new HashMap<Integer, Integer>();
+    private List<BoundColumn> clusterColumns = new ArrayList<>();
 
     // cql query select columns
     private String columns;
@@ -100,35 +91,18 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
 
     private Map<String, Serializable> additionalFilters;
 
-    private static transient Map<String, Cassandra.Client> clientsCache = new HashMap<>();
+    private final DeepPartitionLocationComparator comparator = new DeepPartitionLocationComparator();
 
-    static {
-        Runtime.getRuntime().addShutdownHook(new Thread(){
-            @Override
-            public void run() {
-                if (clientsCache != null && !clientsCache.isEmpty()){
-                    for (Map.Entry<String, Cassandra.Client> entry : clientsCache.entrySet()) {
-                        if (entry != null) {
-                            TTransport transport = entry.getValue().getOutputProtocol().getTransport();
-                            if (transport.isOpen()) {
-                                transport.close();
-                            }
-                        }
-                    }
-
-                    clientsCache.clear();
-                }
-            }
-        });
-    }
+    private final IDeepJobConfig deepJobConfig;
 
     /**
      * public constructor. Takes a list of filters to pass to the underlying datastores.
      *
      * @param additionalFilters
      */
-    public DeepCqlPagingRecordReader(Map<String, Serializable> additionalFilters) {
+    public DeepCqlPagingRecordReader(Map<String, Serializable> additionalFilters, IDeepJobConfig deepJobConfig) {
         super();
+        this.deepJobConfig = deepJobConfig;
         this.additionalFilters = additionalFilters;
     }
 
@@ -138,7 +112,6 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
      *
      * @param split
      * @param context
-     * @throws IOException
      */
     public void initialize(InputSplit split, TaskAttemptContext context) {
         this.split = (ColumnFamilySplit) split;
@@ -147,8 +120,6 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
             ? (int) this.split.getLength()
             : ConfigHelper.getInputSplitSize(conf);
         cfName = ConfigHelper.getInputColumnFamily(conf);
-        consistencyLevel = ConsistencyLevel.valueOf(ConfigHelper.getReadConsistencyLevel(conf));
-        keyspace = ConfigHelper.getInputKeyspace(conf);
         columns = CqlConfigHelper.getInputcolumns(conf);
         userDefinedWhereClauses = CqlConfigHelper.getInputWhereClauses(conf);
 
@@ -161,17 +132,9 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
         partitioner = ConfigHelper.getInputPartitioner(context.getConfiguration());
 
         try {
-            if (client != null) {
-                return;
-            }
+            createConnection();
 
-            // create connection using thrift
-            createThriftConnection(split, conf);
-
-            // retrieve partition keys and cluster keys from system.schema_columnfamilies table
             retrieveKeys();
-
-            client.set_keyspace(keyspace);
         } catch (Exception e) {
             throw new DeepGenericException(e);
         }
@@ -181,43 +144,31 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
         LOG.debug("created {}", rowIterator);
     }
 
-    private void createThriftConnection(InputSplit split, Configuration conf) throws Exception {
+    private Session createConnection() throws Exception {
         String[] locations = split.getLocations();
         Exception lastException = null;
-        for (String location : locations) {
-            int port = ConfigHelper.getInputRpcPort(conf);
 
-            String key = location+":"+port;
-            if (clientsCache.containsKey(key)){
-                client = clientsCache.get(key);
-                break;
-            }
+        /* reorder locations */
+        Arrays.sort(locations, comparator);
+
+        LOG.debug("createConnection for locations: " + Arrays.toString(locations));
+
+        for (String location : locations) {
 
             try {
-                client = CqlPagingInputFormat.createAuthenticatedClient(location, port, conf);
-                clientsCache.put(key, client);
-                break;
+                return getSession(location, deepJobConfig);
             } catch (Exception e) {
                 lastException = e;
-                LOG.warn("Failed to create authenticated client to {}:{}", location, port);
             }
         }
-        if (client == null && lastException != null) {
-            throw lastException;
-        }
+
+        throw lastException;
     }
 
     /**
      * Closes this input reader object.
      */
     public void close() {
-        if (client != null) {
-            TTransport transport = client.getOutputProtocol().getTransport();
-            if (transport.isOpen()) {
-                transport.close();
-            }
-            client = null;
-        }
     }
 
     /**
@@ -311,7 +262,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
      */
     class RowIterator extends AbstractIterator<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> {
         private int totalRead = 0;             // total number of cf rows read
-        private Iterator<CqlRow> rows;
+        private Iterator<Row> rows;
         private int pageRows = 0;                // the number of cql rows read of this page
         private String previousRowKey = null;    // previous CF row key
         private String partitionKeyString;       // keys in <key1>, <key2>, <key3> string format
@@ -355,19 +306,31 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
 
             Map<String, ByteBuffer> valueColumns = createValue();
             Map<String, ByteBuffer> keyColumns = createKey();
-            int i = 0;
-            CqlRow row = rows.next();
-            for (Column column : row.columns) {
-                String columnName = stringValue(ByteBuffer.wrap(column.getName()));
-                LOG.debug("column: {}", columnName);
+            Row row = rows.next();
+            TableMetadata tableMetadata = ((GenericDeepJobConfig)deepJobConfig).fetchTableMetadata();
 
-                if (i < partitionBoundColumns.size() + clusterColumns.size()) {
-                    keyColumns.put(stringValue(column.name), column.value);
-                } else {
-                    valueColumns.put(stringValue(column.name), column.value);
+            List<ColumnMetadata> partitionKeys = tableMetadata.getPartitionKey();
+            List<ColumnMetadata> clusteringKeys = tableMetadata.getClusteringColumns();
+            List<ColumnMetadata> allColumns = tableMetadata.getColumns();
+
+            for (ColumnMetadata key : partitionKeys) {
+                String columnName = key.getName();
+                ByteBuffer bb = row.getBytesUnsafe(columnName);
+                keyColumns.put(columnName, bb);
+            }
+            for (ColumnMetadata key : clusteringKeys) {
+                String columnName = key.getName();
+                ByteBuffer bb = row.getBytesUnsafe(columnName);
+                keyColumns.put(columnName, bb);
+            }
+            for (ColumnMetadata key : allColumns) {
+                String columnName = key.getName();
+                if (keyColumns.containsKey(columnName)){
+                    continue;
                 }
 
-                i++;
+                ByteBuffer bb = row.getBytesUnsafe(columnName);
+                valueColumns.put(columnName, bb);
             }
 
             // increase total CQL row read for this page
@@ -409,6 +372,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
                 rowKey = partitionBoundColumns.get(0).validator.getString(keyColumns.get(partitionBoundColumns.get(0).name));
             } else {
                 Iterator<ByteBuffer> iter = keyColumns.values().iterator();
+
                 for (BoundColumn column : partitionBoundColumns) {
                     rowKey = rowKey + column.validator.getString(ByteBufferUtil.clone(iter.next())) + ":";
                 }
@@ -491,7 +455,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
          * remove key columns from the column string
          */
         private String withoutKeyColumns(String columnString) {
-            Set<String> keyNames = new HashSet<String>();
+            Set<String> keyNames = new HashSet<>();
             for (BoundColumn column : Iterables.concat(partitionBoundColumns, clusterColumns)) {
                 keyNames.add(column.name);
             }
@@ -589,22 +553,26 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
         /**
          * serialize the query binding variables, pair.left is query id, pair.right is the binding variables
          */
-        private Pair<Integer, List<ByteBuffer>> preparedQueryBindValues() {
-            List<ByteBuffer> values = new LinkedList<ByteBuffer>();
+        private Pair<Integer, List<Object>> preparedQueryBindValues() {
+            List<Object> values = new LinkedList<>();
+
+            AbstractType<?> tkValidator = partitioner.getTokenValidator();
+            Object startToken = tkValidator.compose(tkValidator.fromString(split.getStartToken()));
+            Object endToken = tkValidator.compose(tkValidator.fromString(split.getEndToken()));
 
             // initial query token(k) >= start_token and token(k) <= end_token
             if (emptyPartitionKeyValues()) {
-                values.add(partitioner.getTokenValidator().fromString(split.getStartToken()));
-                values.add(partitioner.getTokenValidator().fromString(split.getEndToken()));
+                values.add(startToken);
+                values.add(endToken);
                 return Pair.create(0, values);
             } else {
-                for (BoundColumn partitionBoundColumn1 : partitionBoundColumns) {
-                    values.add(partitionBoundColumn1.value);
+                for (BoundColumn bColumn : partitionBoundColumns) {
+                    values.add(bColumn.validator.compose(bColumn.value));
                 }
 
                 if (clusterColumns.size() == 0 || clusterColumns.get(0).value == null) {
                     // query token(k) > token(pre_partition_key) and token(k) <= end_token
-                    values.add(partitioner.getTokenValidator().fromString(split.getEndToken()));
+                    values.add(endToken);
                     return Pair.create(1, values);
                 } else {
                     // query token(k) = token(pre_partition_key) and m = pre_cluster_key_m and n > pre_cluster_key_n
@@ -617,31 +585,18 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
         /**
          * recursively serialize the query binding variables
          */
-        private int preparedQueryBindValues(List<BoundColumn> column, int position, List<ByteBuffer> bindValues) {
-            if (position == column.size() - 1 || column.get(position + 1).value == null) {
-                bindValues.add(column.get(position).value);
+        private int preparedQueryBindValues(List<BoundColumn> columns, int position, List<Object> bindValues) {
+            AbstractType<?> tkValidator = partitioner.getTokenValidator();
+
+            BoundColumn boundColumn = columns.get(position);
+            Object boundColumnValue = boundColumn.validator.compose(boundColumn.value);
+            if (position == columns.size() - 1 || columns.get(position+1).value == null) {
+                bindValues.add(boundColumnValue);
                 return position + 2;
             } else {
-                bindValues.add(column.get(position).value);
-                return preparedQueryBindValues(column, position + 1, bindValues);
+                bindValues.add(boundColumnValue);
+                return preparedQueryBindValues(columns, position + 1, bindValues);
             }
-        }
-
-        /**
-         * get the prepared query item Id
-         */
-        private int prepareQuery(int type) throws InvalidRequestException, TException {
-            Integer itemId = preparedQueryIds.get(type);
-            if (itemId != null) {
-                return itemId;
-            }
-
-            Pair<Integer, String> query = null;
-            query = composeQuery(columns);
-            LOG.debug("type: {}, query: {}", query.left, query.right);
-            CqlPreparedResult cqlPreparedResult = client.prepare_cql3_query(ByteBufferUtil.bytes(query.right), Compression.NONE);
-            preparedQueryIds.put(query.left, cqlPreparedResult.itemId);
-            return cqlPreparedResult.itemId;
         }
 
         /**
@@ -655,7 +610,14 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
          * execute the prepared query
          */
         private void executeQuery() {
-            Pair<Integer, List<ByteBuffer>> bindValues = preparedQueryBindValues();
+            Pair<Integer, String> query = composeQuery(columns);
+
+            Pair<Integer, List<Object>> bindValues = null;
+            try {
+                bindValues = preparedQueryBindValues();
+            } catch (Exception e) {
+                LOG.error("Exception",e);
+            }
             LOG.debug("query type: {}", bindValues.left);
 
             // check whether it reach end of range for type 1 query CASSANDRA-5573
@@ -665,36 +627,37 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
             }
 
             int retries = 0;
+
+            Exception exception = null;
             // only try three times for TimedOutException and UnavailableException
             while (retries < 3) {
                 try {
-                    CqlResult cqlResult = client.execute_prepared_cql3_query(prepareQuery(bindValues.left), bindValues.right, consistencyLevel);
-                    if (cqlResult != null && cqlResult.rows != null) {
-                        rows = cqlResult.rows.iterator();
+                    Session session = createConnection();
+
+                    Object[] values = bindValues.right.toArray(new Object[bindValues.right.size()]);
+
+                    ResultSet resultSet = session.execute(query.right, values);
+
+                    if (resultSet != null) {
+                        rows = resultSet.iterator();
                     }
                     return;
-                } catch (TimedOutException e) {
-                    retries++;
-                    if (retries >= 3) {
-                        rows = null;
-                        RuntimeException rte = new RuntimeException(e.getMessage());
-                        rte.initCause(e);
-                        throw rte;
-                    }
-                } catch (UnavailableException e) {
-                    retries++;
-                    if (retries >= 3) {
-                        rows = null;
-                        RuntimeException rte = new RuntimeException(e.getMessage());
-                        rte.initCause(e);
-                        throw rte;
-                    }
+                } catch (NoHostAvailableException e){
+                    exception = e;
+
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e1) {}
+
+                    ++retries;
+
                 } catch (Exception e) {
-                    rows = null;
-                    RuntimeException rte = new RuntimeException(e.getMessage());
-                    rte.initCause(e);
-                    throw rte;
+                    throw new DeepIOException(e);
                 }
+            }
+
+            if (exception != null){
+                throw new DeepIOException(exception);
             }
         }
     }
@@ -703,44 +666,33 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
      * retrieve the partition keys and cluster keys from system.schema_columnfamilies table
      */
     private void retrieveKeys() throws Exception {
-        String query = "select key_aliases," +
-            "column_aliases, " +
-            "key_validator, " +
-            "comparator " +
-            "from system.schema_columnfamilies " +
-            "where keyspace_name='%s' and columnfamily_name='%s'";
-        String formatted = String.format(query, keyspace, cfName);
-        CqlResult result = client.execute_cql3_query(ByteBufferUtil.bytes(formatted), Compression.NONE, ConsistencyLevel.ONE);
+        TableMetadata tableMetadata = ((GenericDeepJobConfig)deepJobConfig).fetchTableMetadata();
 
-        CqlRow cqlRow = result.rows.get(0);
-        String keyString = ByteBufferUtil.string(ByteBuffer.wrap(cqlRow.columns.get(0).getValue()));
-        LOG.debug("partition keys: {}", keyString);
-        List<String> keys = FBUtilities.fromJsonList(keyString);
+        List<ColumnMetadata> partitionKeys = tableMetadata.getPartitionKey();
+        List<ColumnMetadata> clusteringKeys = tableMetadata.getClusteringColumns();
 
-        for (String key : keys) {
-            partitionBoundColumns.add(new BoundColumn(key));
+        List<AbstractType<?>> types = new ArrayList<>();
+
+        for (ColumnMetadata key : partitionKeys) {
+            String columnName = key.getName();
+            BoundColumn boundColumn = new BoundColumn(columnName);
+            boundColumn.validator = Cell.getValueType(key.getType()).getAbstractType();
+            partitionBoundColumns.add(boundColumn);
+            types.add(boundColumn.validator);
+        }
+        for (ColumnMetadata key : clusteringKeys) {
+            String columnName = key.getName();
+            BoundColumn boundColumn = new BoundColumn(columnName);
+            boundColumn.validator = Cell.getValueType(key.getType()).getAbstractType();
+            clusterColumns.add(boundColumn);
         }
 
-        keyString = ByteBufferUtil.string(ByteBuffer.wrap(cqlRow.columns.get(1).getValue()));
-        LOG.debug("cluster columns: {}", keyString);
-        keys = FBUtilities.fromJsonList(keyString);
-
-        for (String key : keys) {
-            clusterColumns.add(new BoundColumn(key));
-        }
-
-        Column rawKeyValidator = cqlRow.columns.get(2);
-        String validator = ByteBufferUtil.string(ByteBuffer.wrap(rawKeyValidator.getValue()));
-        LOG.debug("row key validator: {}", validator);
-        keyValidator = parseType(validator);
-
-        if (keyValidator instanceof CompositeType) {
-            List<AbstractType<?>> types = ((CompositeType) keyValidator).types;
-            for (int i = 0; i < partitionBoundColumns.size(); i++) {
-                partitionBoundColumns.get(i).validator = types.get(i);
-            }
-        } else {
-            partitionBoundColumns.get(0).validator = keyValidator;
+        if (types.size()>1){
+            keyValidator = CompositeType.getInstance(types);
+        } else if (types.size() == 1) {
+            keyValidator = types.get(0);
+        } else{
+            throw new DeepGenericException("Cannot determine if keyvalidator is composed or not, partitionKeys: "+ partitionKeys);
         }
     }
 
@@ -750,6 +702,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
     private boolean reachEndRange() {
         // current row key
         ByteBuffer rowKey;
+
         if (keyValidator instanceof CompositeType) {
             ByteBuffer[] keys = new ByteBuffer[partitionBoundColumns.size()];
             for (int i = 0; i < partitionBoundColumns.size(); i++) {
@@ -768,20 +721,6 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
         return endToken.equals(currentToken);
     }
 
-    private static AbstractType<?> parseType(String type) throws IOException {
-        try {
-            // always treat counters like longs, specifically CCT.serialize is not what we need
-            if (type != null && type.equals("org.apache.cassandra.db.marshal.CounterColumnType")) {
-                return LongType.instance;
-            }
-            return TypeParser.parse(type);
-        } catch (ConfigurationException e) {
-            throw new IOException(e);
-        } catch (SyntaxException e) {
-            throw new IOException(e);
-        }
-    }
-
     private static class BoundColumn {
         private final String name;
         private ByteBuffer value;
@@ -789,17 +728,6 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
 
         public BoundColumn(String name) {
             this.name = name;
-        }
-    }
-
-    /**
-     * get string from a ByteBuffer, catch the exception and throw it as runtime exception
-     */
-    private static String stringValue(ByteBuffer value) {
-        try {
-            return ByteBufferUtil.string(value);
-        } catch (CharacterCodingException e) {
-            throw new DeepGenericException(e);
         }
     }
 

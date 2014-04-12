@@ -151,7 +151,7 @@ public final class Cell<T> implements Serializable {
      * @param obj the value class type.
      * @return
      */
-    private static CellValidator getValueType(DataType obj) {
+    public static CellValidator getValueType(DataType obj) {
         return CellValidator.cellValidator(obj);
     }
 

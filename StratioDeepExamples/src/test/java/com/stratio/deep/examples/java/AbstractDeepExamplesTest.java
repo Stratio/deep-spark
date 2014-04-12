@@ -97,10 +97,10 @@ public class AbstractDeepExamplesTest {
         //context = new DeepSparkContext("local", "deepSparkContextTest");
 
         String createKeyspace = "CREATE KEYSPACE " + KEYSPACE_NAME
-                + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 };";
+                + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 2 };";
 
         String createCrawlerKeyspace = "CREATE KEYSPACE " + CRAWLER_KEYSPACE_NAME
-                + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 };";
+                + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 2 };";
 
         String useKeyspace = "USE " + KEYSPACE_NAME + ";";
 
@@ -111,10 +111,16 @@ public class AbstractDeepExamplesTest {
         cassandraServer.setStartupCommands(startupCommands);
         cassandraServer.start();
 
-        Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-                .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+        Cluster cluster = Cluster.builder().withPort(9042)
+                .addContactPoint("denethor").build();
 
         session = cluster.connect();
+
+        session.execute(createKeyspace);
+        session.execute(createCrawlerKeyspace);
+        session.execute(useKeyspace);
+        session.execute(createTweetCF);
+        session.execute(createCrawlerCF);
 
         dataInsertCql();
 

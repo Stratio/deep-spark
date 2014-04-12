@@ -55,8 +55,8 @@ public final class CreatingCellRDD {
     public static void doMain(String[] args) {
         String job = "java:creatingCellRDD";
 
-        String keyspaceName = "test";
-        String tableName = "tweets";
+        String keyspaceName = "crawler";
+        String tableName = "Page";
 
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);

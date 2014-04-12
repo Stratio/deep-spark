@@ -157,7 +157,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
                 .withCredentials(this.username, this.password)
                 .build();
 
-            session = cluster.connect();
+            session = cluster.connect(this.keyspace);
         }
 
         return session;
@@ -199,7 +199,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      *
      * @return
      */
-    private TableMetadata fetchTableMetadata() {
+    public TableMetadata fetchTableMetadata() {
 
         Metadata metadata = getSession().getCluster().getMetadata();
         KeyspaceMetadata ksMetadata = metadata.getKeyspace(this.keyspace);

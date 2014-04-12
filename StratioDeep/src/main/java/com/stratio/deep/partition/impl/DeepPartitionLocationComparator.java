@@ -29,9 +29,14 @@ import java.util.Comparator;
 public class DeepPartitionLocationComparator implements Comparator<String> {
     private InetAddress hostname;
 
+    public InetAddress getHostname() {
+        return hostname;
+    }
+
     public DeepPartitionLocationComparator(){
         try {
-            this.hostname = InetAddress.getByName(System.getenv("HOSTNAME"));
+
+            this.hostname = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
             throw new DeepInstantiationException(e);
         }

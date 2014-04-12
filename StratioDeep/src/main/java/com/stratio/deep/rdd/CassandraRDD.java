@@ -270,7 +270,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     @Override
     public Iterator<T> compute(Partition split, TaskContext ctx) {
 
-        final DeepCqlPagingInputFormat inputFormat = new DeepCqlPagingInputFormat();
+        final DeepCqlPagingInputFormat inputFormat = new DeepCqlPagingInputFormat(config.value());
         DeepPartition deepPartition = (DeepPartition) split;
 
         log().debug("Executing compute for split: " + deepPartition);
@@ -326,7 +326,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     public Partition[] getPartitions() {
         final JobContext hadoopJobContext = new JobContext(config.value().getConfiguration(), hadoopJobId);
 
-        final DeepCqlPagingInputFormat cqlInputFormat = new DeepCqlPagingInputFormat();
+        final DeepCqlPagingInputFormat cqlInputFormat = new DeepCqlPagingInputFormat(config.value());
 
         List<InputSplit> underlyingInputSplits;
         try {

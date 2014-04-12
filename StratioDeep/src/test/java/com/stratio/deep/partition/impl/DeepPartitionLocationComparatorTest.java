@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
  * Created by luca on 09/04/14.
  */
 @Test
-public class DeepPartitionLocationCompatatorTest {
+public class DeepPartitionLocationComparatorTest {
 
 
 
