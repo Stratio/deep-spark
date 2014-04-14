@@ -142,6 +142,22 @@ public class Cells implements Iterable<Cell<?>>, Serializable {
     }
 
     /**
+     * Converts every Cell contained in this object to an ArrayBuffer.
+     * In order to perform the conversion we use the appropriate Cassandra marshaller for the Cell.
+     *
+     * @return
+     */
+    public Collection<Object> getCellValues() {
+        List<Object> res = new ArrayList<>();
+
+        for (Cell<?> c : cells) {
+            res.add(c.getCellValue());
+        }
+
+        return res;
+    }
+
+    /**
      * Extracts from this Cells object the cells marked either as partition key or cluster key.
      * Returns an empty Cells object if the current object does not contain any Cell marked as key.
      * @return

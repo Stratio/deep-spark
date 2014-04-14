@@ -21,15 +21,17 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepGenericException;
 import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.dht.IPartitioner;
+import org.apache.cassandra.dht.*;
 import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
 import org.apache.cassandra.utils.Pair;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 import static com.google.common.collect.Iterables.concat;
@@ -42,24 +44,14 @@ import static com.google.common.collect.Iterables.transform;
  *
  * @author Luca Rosellini <luca@strat.io>
  */
-public class DeepCqlPagingInputFormat<T> {
-    private final IDeepJobConfig<T> deepJobConfig;
-    private final IPartitioner partitioner;
+public class RangeUtils<T> {
 
-    public DeepCqlPagingInputFormat(IDeepJobConfig<T> deepJobConfig) {
-        this.deepJobConfig = deepJobConfig;
-        this.partitioner = getPartitioner();
+    private RangeUtils() {
     }
 
-    /**
-     * Returns a new instance of {@link DeepRecordReader}.
-     */
-    public DeepRecordReader createRecordReader() throws IOException, InterruptedException {
+    private static Map<String, List<Comparable>> fetchSortedTokens(
+            String query, final Pair<Session, InetAddress> sessionWithHost, IPartitioner partitioner) {
 
-        return new DeepRecordReader(deepJobConfig);
-    }
-
-    private Map<String, List<Comparable>> fetchSortedTokens(String query, final Pair<Session, InetAddress> sessionWithHost) {
         ResultSet rSet = sessionWithHost.left.execute(query);
 
         final AbstractType tkValidator = partitioner.getTokenValidator();
@@ -99,7 +91,8 @@ public class DeepCqlPagingInputFormat<T> {
         return tokens;
     }
 
-    private List<DeepTokenRange> mergeTokenRanges(Map<String, List<Comparable>> tokens, final Session session) {
+    private static List<DeepTokenRange> mergeTokenRanges(Map<String, List<Comparable>> tokens, final Session session,
+                                                         final IPartitioner partitioner, final IDeepJobConfig config) {
         final Iterable<Comparable> allRanges = Ordering.natural().sortedCopy(concat(tokens.values()));
         final Comparable maxValue = Ordering.natural().max(allRanges);
         final Comparable minValue = (Comparable) partitioner.minValue(maxValue.getClass()).getToken().token;
@@ -113,7 +106,8 @@ public class DeepCqlPagingInputFormat<T> {
 
                 if (currValue.equals(maxValue)) {
 
-                    result.add(new DeepTokenRange(currValue, minValue, initReplicas(currValue, session)));
+                    result.add(new DeepTokenRange(currValue, minValue,
+                            initReplicas(currValue, session, partitioner, config)));
                     currValue = minValue;
                     nextValue = Iterables.getFirst(allRanges, null);
 
@@ -129,7 +123,7 @@ public class DeepCqlPagingInputFormat<T> {
                     nextValue = Iterables.get(allRanges, nextIdx);
                 }
 
-                result.add(new DeepTokenRange(currValue, nextValue,initReplicas(currValue, session)));
+                result.add(new DeepTokenRange(currValue, nextValue,initReplicas(currValue, session, partitioner, config)));
 
                 return result;
             }
@@ -138,13 +132,14 @@ public class DeepCqlPagingInputFormat<T> {
         return Ordering.natural().sortedCopy(concat(transform(allRanges, map)));
     }
 
-    private String[] initReplicas(final Comparable startToken, final Session session){
+    private static String[] initReplicas(
+            final Comparable startToken, final Session session, final IPartitioner partitioner, final IDeepJobConfig config){
         final AbstractType tkValidator = partitioner.getTokenValidator();
         final Metadata metadata = session.getCluster().getMetadata();
 
         Set<Host> replicas =
                 metadata.getReplicas(
-                        deepJobConfig.getKeyspace(),
+                        config.getKeyspace(),
                         tkValidator.decompose(startToken));
 
         return Iterables.toArray(Iterables.transform(replicas, new Function<Host, String>() {
@@ -157,22 +152,25 @@ public class DeepCqlPagingInputFormat<T> {
         }), String.class);
     }
 
-    public List<DeepTokenRange> getSplits() {
+    public static List<DeepTokenRange> getSplits(IDeepJobConfig config) {
         Map<String, List<Comparable>> tokens = new HashMap<>();
+        IPartitioner partitioner = getPartitioner(config);
 
-        Pair<Session, InetAddress> sessionWithHost = CassandraClientProvider.getUnbalancedSession(
-                deepJobConfig.getHost(),
-                deepJobConfig.getCqlPort(),
-                deepJobConfig.getKeyspace());
+        Pair<Session, InetAddress> sessionWithHost =
+                CassandraClientProvider.getUnbalancedSession(
+                config.getHost(),
+                config.getCqlPort(),
+                config.getKeyspace());
+
 
         try (Session session = sessionWithHost.left) {
             String queryLocal = "select tokens from system.local";
-            tokens.putAll(fetchSortedTokens(queryLocal, sessionWithHost));
+            tokens.putAll(fetchSortedTokens(queryLocal, sessionWithHost, partitioner));
 
             String queryPeers = "select peer, tokens from system.peers";
-            tokens.putAll(fetchSortedTokens(queryPeers, sessionWithHost));
+            tokens.putAll(fetchSortedTokens(queryPeers, sessionWithHost, partitioner));
 
-            return mergeTokenRanges(tokens, session);
+            return mergeTokenRanges(tokens, session, partitioner, config);
 
             /*
             List<DeepTokenRange> hadoopTr = new ArrayList<>();
@@ -193,9 +191,9 @@ public class DeepCqlPagingInputFormat<T> {
 
     }
 
-    private IPartitioner getPartitioner() {
+    public static IPartitioner getPartitioner(IDeepJobConfig config) {
         try {
-            return (IPartitioner) Class.forName(deepJobConfig.getPartitionerClassName()).newInstance();
+            return (IPartitioner) Class.forName(config.getPartitionerClassName()).newInstance();
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             throw new DeepGenericException(e);
         }

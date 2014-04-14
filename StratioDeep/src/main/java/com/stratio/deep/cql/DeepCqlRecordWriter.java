@@ -16,6 +16,8 @@
 
 package com.stratio.deep.cql;
 
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepGenericException;
@@ -27,19 +29,17 @@ import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.db.marshal.LongType;
 import org.apache.cassandra.db.marshal.TypeParser;
+import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.dht.Range;
 import org.apache.cassandra.dht.Token;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.exceptions.SyntaxException;
-import org.apache.cassandra.hadoop.AbstractColumnFamilyOutputFormat;
-import org.apache.cassandra.hadoop.ConfigHelper;
 import org.apache.cassandra.thrift.*;
 import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.TaskContext;
 import org.apache.thrift.TException;
-import org.apache.thrift.transport.TTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,6 @@ import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.stratio.deep.cql.CassandraClientProvider.getSession;
 import static com.stratio.deep.utils.Utils.updateQueryGenerator;
 
 /**
@@ -61,8 +60,8 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(DeepCqlRecordWriter.class);
 
     // handles for clients for each range exhausted in the threadpool
-    private final Map<Range<?>, RangeClient> clients;
-    private final Map<Range<?>, RangeClient> removedClients;
+    private final Map<Token, RangeClient> clients;
+    private final Map<Token, RangeClient> removedClients;
 
     // host to prepared statement id mappings
     private ConcurrentHashMap<Cassandra.Client, Integer> preparedStatements =
@@ -70,9 +69,12 @@ public class DeepCqlRecordWriter implements AutoCloseable {
 
     private AbstractType<?> keyValidator;
     private String[] partitionKeyColumns;
+    private List<String> clusterColumns;
 
     private final TaskContext context;
     private final IDeepJobConfig writeConfig;
+    private final IPartitioner partitioner;
+    private final List<DeepTokenRange> splits;
 
 
     public DeepCqlRecordWriter(TaskContext context, IDeepJobConfig writeConfig) {
@@ -80,6 +82,8 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         this.removedClients = new HashMap<>();
         this.context = context;
         this.writeConfig = writeConfig;
+        this.partitioner = RangeUtils.getPartitioner(writeConfig);
+        this.splits = RangeUtils.getSplits(writeConfig);
         init();
     }
 
@@ -154,17 +158,19 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         String keyspace = writeConfig.getKeyspace();
         String cfName = writeConfig.getColumnFamily();
 
-        String query = "SELECT key_validator,key_aliases,column_aliases FROM system.schema_columnfamilies WHERE keyspace_name='?' and columnfamily_name='%s'";
+        String query =
+                "SELECT key_validator,key_aliases,column_aliases " +
+                        "FROM system.schema_columnfamilies " +
+                        "WHERE keyspace_name='%s' and columnfamily_name='%s' " +
+                        "USING CONSISTENCY ONE";
         String formatted = String.format(query, keyspace, cfName);
-        CqlResult result = client.execute_cql3_query(ByteBufferUtil.bytes(formatted), Compression.NONE,
-                ConsistencyLevel.ONE);
+        ResultSet resultSet = session.execute(formatted);
+        Row row = resultSet.one();
 
-        Column rawKeyValidator = result.rows.get(0).columns.get(0);
-        String validator = ByteBufferUtil.string(ByteBuffer.wrap(rawKeyValidator.getValue()));
+        String validator = row.getString("key_validator");
         keyValidator = parseType(validator);
 
-        Column rawPartitionKeys = result.rows.get(0).columns.get(1);
-        String keyString = ByteBufferUtil.string(ByteBuffer.wrap(rawPartitionKeys.getValue()));
+        String keyString = row.getString("key_aliases");
         LOG.debug("partition keys: " + keyString);
 
         List<String> keys = FBUtilities.fromJsonList(keyString);
@@ -175,8 +181,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
             i++;
         }
 
-        Column rawClusterColumns = result.rows.get(0).columns.get(2);
-        String clusterColumnString = ByteBufferUtil.string(ByteBuffer.wrap(rawClusterColumns.getValue()));
+        String clusterColumnString = row.getString("column_aliases");
 
         LOG.debug("cluster columns: " + clusterColumnString);
         clusterColumns = FBUtilities.fromJsonList(clusterColumnString);
@@ -190,26 +195,24 @@ public class DeepCqlRecordWriter implements AutoCloseable {
      * (i.e., null), then the entire key is marked for {@link org.apache.cassandra.thrift.Deletion}.
      * </p>
      *
-     * @throws IOException 13
+     * @throws IOException
      */
-    @Override
-    public void write(Cells keys, Cells values) throws IOException {
+    public void write(Cells keys, Cells values){
         /* generate SQL */
-        String localCql = updateQueryGenerator(keys, values, ConfigHelper.getOutputKeyspace(conf),
-                ConfigHelper.getOutputColumnFamily(conf));
+        String localCql = updateQueryGenerator(keys, values, writeConfig.getKeyspace(),
+                writeConfig.getColumnFamily());
 
-        @SuppressWarnings("rawtypes")
-        Range<Token> range = ringCache.getRange(getPartitionKey(keys));
+        Token range = partitioner.getToken(getPartitionKey(keys));
 
         // add primary key columns to the bind variables
-        List<ByteBuffer> allValues = new ArrayList<>(values.getDecomposedCellValues());
-        allValues.addAll(keys.getDecomposedCellValues());
+        List<Object> allValues = new ArrayList<>(values.getCellValues());
+        allValues.addAll(keys.getCellValues());
 
         // get the client for the given range, or create a new one
         RangeClient client = clients.get(range);
         if (client == null) {
             // haven't seen keys for this range: create new client
-            client = new RangeClient(ringCache.getEndpoint(range));
+            client = new RangeClient();
             clients.put(range, client);
         }
 
@@ -217,18 +220,17 @@ public class DeepCqlRecordWriter implements AutoCloseable {
             removedClients.put(range, clients.remove(range));
         }
 
-        progressable.progress();
     }
 
     /**
      * A client that runs in a threadpool and connects to the list of endpoints for a particular
      * range. Bound variables for keys in that range are sent to this client via a queue.
      */
-    private class RangeClient extends AbstractRangeClient<List<ByteBuffer>> implements Closeable {
+    private class RangeClient extends Thread implements Closeable {
 
-        private final int batchSize = DeepConfigHelper.getOutputBatchSize(conf);
+        private final int batchSize = writeConfig.getBatchSize();
         private List<String> batchStatements = new ArrayList<>();
-        private List<ByteBuffer> bindVariables = new ArrayList<>();
+        private List<Object> bindVariables = new ArrayList<>();
         private UUID identity = UUID.randomUUID();
         private String cql;
 
@@ -240,7 +242,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
          * @return
          * @throws IOException
          */
-        public synchronized boolean put(String stmt, List<ByteBuffer> values) throws IOException {
+        public synchronized boolean put(String stmt, List<Object> values) throws IOException {
             batchStatements.add(stmt);
             bindVariables.addAll(values);
 
@@ -252,7 +254,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         }
 
         private void triggerBatch() throws IOException {
-            if (getState() != State.NEW){
+            if (getState() != Thread.State.NEW) {
                 return;
             }
 
@@ -263,10 +265,9 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         /**
          * Constructs an {@link RangeClient} for the given endpoints.
          *
-         * @param endpoints the possible endpoints to execute the mutations on
+         *
          */
-        public RangeClient(List<InetAddress> endpoints) {
-            super(endpoints);
+        public RangeClient() {
             LOG.debug("Create client " + this);
         }
 
@@ -277,7 +278,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
 
         @Override
         public void close() throws IOException {
-            LOG.debug("[" + this + "] Called close on client, state: "+this.getState());
+            LOG.debug("[" + this + "] Called close on client, state: " + this.getState());
             triggerBatch();
 
             try {
@@ -288,73 +289,16 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         }
 
         /**
-         * get prepared statement id from cache, otherwise prepare it from Cassandra server
-         */
-        private Integer preparedStatement(Cassandra.Client client) {
-            Integer itemId = preparedStatements.get(client);
-            if (itemId == null) {
-                CqlPreparedResult result;
-                try {
-                    result = client.prepare_cql3_query(ByteBufferUtil.bytes(cql), Compression.NONE);
-                } catch (TException e) {
-                    throw new DeepGenericException("failed to prepare cql query " + cql, e);
-                }
-
-                Integer previousId = preparedStatements.putIfAbsent(client, result.itemId);
-                itemId = previousId == null ? result.itemId : previousId;
-            }
-            return itemId;
-        }
-
-        private void handleRunException(Exception e, boolean hasNext, String msg) {
-            LOG.error("[" + this + "] " + msg, e);
-            closeInternal();
-
-            if (!hasNext) {
-                throw new DeepIOException(e);
-            }
-        }
-
-        /**
          * Loops collecting cql binded variable values from the queue and sending to Cassandra
          */
         @Override
         public void run() {
-            Iterator<InetAddress> iter = endpoints.iterator();
-            while (iter.hasNext()) {
-                LOG.debug("[" + this + "] Initializing cassandra client");
-                InetAddress address = iter.next();
-                String host = address.getHostName();
-                int port = ConfigHelper.getOutputRpcPort(conf);
-                try {
-                    client = AbstractColumnFamilyOutputFormat.createAuthenticatedClient(host, port, conf);
-                } catch (Exception e) {
-                    handleRunException(e, iter.hasNext(),
-                            "failed attempt to connect to endpoint: " + host + ":" + port +
-                                    ", username: " + ConfigHelper.getOutputKeyspaceUserName(conf));
-                    continue;
-                }
+            LOG.debug("[" + this + "] Initializing cassandra client");
+            Session session = CassandraClientProvider.getSession(context.taskMetrics().hostname(), writeConfig);
 
-                int itemId;
-                try {
-                    itemId = preparedStatement(client);
-                    LOG.debug("[" + this + "] Prepared statement " + cql +" with remote id: " + itemId);
-                } catch (Exception e) {
-                    handleRunException(e, iter.hasNext(), "failed attempt to prepare statement: " + cql);
-                    continue;
-                }
+            session.execute(cql, bindVariables);
 
-                try {
-                    client.execute_prepared_cql3_query(itemId, bindVariables,
-                            ConsistencyLevel.valueOf(ConfigHelper.getWriteConsistencyLevel(conf)));
-
-                    LOG.debug("[" + this + "] statement " + itemId + " executed successfully");
-                    break;
-                } catch (Exception e) {
-                    handleRunException(e, iter.hasNext(),
-                            "failed attempt to execute prepared statement with id: " + itemId + ", cql: "+cql);
-                }
-            }
         }
+
     }
 }

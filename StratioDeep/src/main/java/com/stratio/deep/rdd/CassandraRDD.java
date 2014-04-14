@@ -21,12 +21,11 @@ import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.impl.GenericDeepJobConfig;
-import com.stratio.deep.cql.DeepCqlPagingInputFormat;
+import com.stratio.deep.cql.RangeUtils;
 import com.stratio.deep.cql.DeepCqlRecordWriter;
 import com.stratio.deep.cql.DeepRecordReader;
 import com.stratio.deep.cql.DeepTokenRange;
 import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.functions.AbstractSerializableFunction2;
 import com.stratio.deep.functions.CellList2TupleFunction;
 import com.stratio.deep.functions.DeepType2TupleFunction;
@@ -34,16 +33,13 @@ import com.stratio.deep.partition.impl.DeepPartition;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.utils.Utils;
-import org.apache.cassandra.hadoop.cql3.DeepCqlOutputFormat;
 import org.apache.cassandra.utils.Pair;
 import org.apache.hadoop.mapreduce.JobID;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.broadcast.Broadcast;
-import org.apache.spark.rdd.PairRDDFunctions;
 import org.apache.spark.rdd.RDD;
 import scala.Function1;
 import scala.Tuple2;
@@ -109,8 +105,8 @@ public abstract class CassandraRDD<T> extends RDD<T> {
         private final DeepPartition deepPartition;
 
         public OnComputedRDDCallback(
-            DeepRecordReader recordReader,
-            DeepPartition dp) {
+                DeepRecordReader recordReader,
+                DeepPartition dp) {
             super();
             this.recordReader = recordReader;
             this.deepPartition = dp;
@@ -128,19 +124,19 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     }
 
     private static <W> void doCql3SaveToCassandra(RDD<W> rdd, IDeepJobConfig<W> writeConfig,
-        Function1<W, Tuple2<Cells, Cells>> transformer) {
+                                                  Function1<W, Tuple2<Cells, Cells>> transformer) {
 
         Tuple2<Map<String, ByteBuffer>, Map<String, ByteBuffer>> tuple = new Tuple2<>(null, null);
 
         RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
-            ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
+                ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
 
         ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD);
 
         final int pageSize = writeConfig.getBatchSize();
         int offset = 0;
 
-        List<Tuple2<Cells, Cells>> elements = Arrays.asList((Tuple2<Cells, Cells>[])mappedRDD.collect());
+        List<Tuple2<Cells, Cells>> elements = Arrays.asList((Tuple2<Cells, Cells>[]) mappedRDD.collect());
         List<Tuple2<Cells, Cells>> split;
         do {
             split = elements.subList(pageSize * (offset++), Math.min(pageSize * offset, elements.size()));
@@ -151,7 +147,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
                 Tuple2<String[], Object[]> bindVars = Utils.prepareTuple4CqlDriver(t);
 
                 Insert insert = QueryBuilder.insertInto(writeConfig.getKeyspace(), writeConfig.getTable())
-                    .values(bindVars._1(), bindVars._2());
+                        .values(bindVars._1(), bindVars._2());
 
                 batch.add(insert);
             }
@@ -193,13 +189,13 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * @param writeConfig
      * @param transformer
      */
-    private static <W> void doSaveToCassandra(RDD<W> rdd,final IDeepJobConfig<W> writeConfig,
-        Function1<W, Tuple2<Cells, Cells>> transformer) {
+    private static <W> void doSaveToCassandra(RDD<W> rdd, final IDeepJobConfig<W> writeConfig,
+                                              Function1<W, Tuple2<Cells, Cells>> transformer) {
 
         Tuple2<Map<String, ByteBuffer>, Map<String, ByteBuffer>> tuple = new Tuple2<>(null, null);
 
         final RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
-            ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
+                ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
 
         ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD);
 
@@ -208,20 +204,21 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
         //PairRDDFunctions<Cells, Cells> functions = new PairRDDFunctions<>(mappedRDD, keyClassTag, keyClassTag);
         mappedRDD.context().runJob(mappedRDD,
-                new AbstractSerializableFunction2<TaskContext, Iterator<Tuple2<Cells, Cells>>, Integer>(){
+                new AbstractSerializableFunction2<TaskContext, Iterator<Tuple2<Cells, Cells>>, Integer>() {
 
                     @Override
                     public Integer apply(TaskContext context, Iterator<Tuple2<Cells, Cells>> rows) {
                         DeepCqlRecordWriter writer = new DeepCqlRecordWriter(context, writeConfig);
-
-
+                        while (rows.hasNext()) {
+                            Tuple2<Cells, Cells> row = rows.next();
+                            writer.write(row._1(), row._2());
+                        }
 
                         return null;
                     }
-                }, uClassTag);
+                }, uClassTag
+        );
 
-        functions.saveAsNewAPIHadoopFile(writeConfig.getKeyspace(), Cells.class, Cells.class, DeepCqlOutputFormat.class,
-                writeConfig.getConfiguration());
     }
 
     /**
@@ -261,6 +258,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
     /**
      * Public constructor that builds a new Cassandra RDD given the context and the configuration file.
+     *
      * @param sc
      * @param config
      */
@@ -280,17 +278,16 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     @Override
     public Iterator<T> compute(Partition split, TaskContext ctx) {
 
-        final DeepCqlPagingInputFormat inputFormat = new DeepCqlPagingInputFormat(config.value());
         DeepPartition deepPartition = (DeepPartition) split;
 
         log().debug("Executing compute for split: " + deepPartition);
 
-        final DeepRecordReader recordReader = initRecordReader(ctx, inputFormat, deepPartition);
+        final DeepRecordReader recordReader = initRecordReader(ctx, deepPartition);
 
-	    /**
+        /**
          * Creates a new anonymous iterator inner class and returns it as a
-	     * scala iterator.
-	     */
+         * scala iterator.
+         */
         java.util.Iterator<T> recordReaderIterator = new java.util.Iterator<T>() {
 
             @Override
@@ -320,7 +317,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * @return
      */
     protected AbstractFunction0<BoxedUnit> getComputeCallback(DeepRecordReader recordReader,
-        DeepPartition dp) {
+                                                              DeepPartition dp) {
         return new OnComputedRDDCallback<>(recordReader, dp);
     }
 
@@ -334,10 +331,8 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      */
     @Override
     public Partition[] getPartitions() {
-        final DeepCqlPagingInputFormat cqlInputFormat =
-                new DeepCqlPagingInputFormat(config.value());
 
-        List<DeepTokenRange> underlyingInputSplits = cqlInputFormat.getSplits();
+        List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits();
 
         Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
 
@@ -375,23 +370,14 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * 4. Initialized the newly created {@link com.stratio.deep.cql.DeepRecordReader}.
      *
      * @param ctx
-     * @param inputFormat
      * @param dp
      * @return
      */
-    protected DeepRecordReader initRecordReader(TaskContext ctx,
-        final DeepCqlPagingInputFormat inputFormat, final DeepPartition dp) {
-        try {
-            final DeepRecordReader recordReader = inputFormat
-                .createRecordReader();
+    protected DeepRecordReader initRecordReader(TaskContext ctx, final DeepPartition dp) {
 
-            recordReader.initialize(dp.splitWrapper());
+        DeepRecordReader recordReader = new DeepRecordReader(config.value());
+        ctx.addOnCompleteCallback(getComputeCallback(recordReader, dp));
+        return recordReader;
 
-            ctx.addOnCompleteCallback(getComputeCallback(recordReader, dp));
-
-            return recordReader;
-        } catch (IOException | InterruptedException e) {
-            throw new DeepIOException(e);
-        }
     }
 }
