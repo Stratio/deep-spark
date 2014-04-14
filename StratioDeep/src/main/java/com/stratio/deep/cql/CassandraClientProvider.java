@@ -17,6 +17,7 @@
 package com.stratio.deep.cql;
 
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Host;
 import com.datastax.driver.core.PoolingOptions;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.LoadBalancingPolicy;
@@ -25,6 +26,7 @@ import com.stratio.deep.exception.DeepIllegalAccessException;
 import org.apache.cassandra.hadoop.ConfigHelper;
 import org.apache.cassandra.hadoop.cql3.CqlPagingInputFormat;
 import org.apache.cassandra.thrift.Cassandra;
+import org.apache.cassandra.utils.Pair;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.thrift.transport.TTransport;
 import org.slf4j.Logger;
@@ -33,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -43,7 +46,7 @@ class CassandraClientProvider {
     private static final Logger LOG = LoggerFactory.getLogger(CassandraClientProvider.class);
 
     static {
-        Runtime.getRuntime().addShutdownHook(new Thread(){
+        Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
                 synchronized (clientsCache) {
@@ -60,50 +63,52 @@ class CassandraClientProvider {
         });
     }
 
-    static Session getSession(String host, int port, String keyspace){
-        synchronized (clientsCache) {
+    static Pair<Session,InetAddress> getUnbalancedSession(String host, int port, String keyspace) {
+
             final String key = host + ":" + port + ":" + keyspace;
 
-            if (clientsCache.containsKey(key)) {
-                LOG.info(">>>>>>>> Returning cached session for key: "+key);
-                return clientsCache.get(key);
+            LOG.info("$$$$$$$$ Creating NEW session for key: " + key);
+            Cluster cluster = Cluster.builder()
+                    .withPort(port)
+                    .addContactPoint(host)
+                    .build();
+
+            for (Host h : cluster.getMetadata().getAllHosts()) {
+                try {
+                    Cluster realCluster = Cluster.builder()
+                            .withPort(port)
+                            .addContactPoint(h.getAddress().getHostAddress())
+                            .withLoadBalancingPolicy(new LocalMachineLoadBalancingPolicy(h.getAddress()))
+                            .build();
+
+                    Session session = realCluster.connect(keyspace);
+                    return Pair.create(session, h.getAddress());
+
+                } catch (Exception e) {
+                    LOG.warn("Failed to create authenticated client to {}:{}", host, port);
+                    throw new DeepIllegalAccessException("Failed to create authenticated client to {" + host + "}:{" + port + "}");
+                }
+
             }
 
-            try {
-                LOG.info("$$$$$$$$ Creating NEW session for key: "+key);
-                Cluster cluster = Cluster.builder()
-                        .withPort(port)
-                        .addContactPoint(host).withLoadBalancingPolicy(new LocalMachineLoadBalancingPolicy(InetAddress.getByName(host)))
-                        .build();
-
-                Session session = cluster.connect(keyspace);
-                clientsCache.put(key, session);
-                return session;
-            } catch (Exception e) {
-                LOG.warn("Failed to create authenticated client to {}:{}", host, port);
-                throw new DeepIllegalAccessException("Failed to create authenticated client to {" + host + "}:{" + port + "}");
-            }
-        }
+            throw new DeepIllegalAccessException("Cannot open a session to none of the following hosts: " + cluster.getMetadata().getAllHosts());
     }
 
-    static Session getSession(String location, IDeepJobConfig conf){
+    static Session getSession(String location, IDeepJobConfig conf) {
         synchronized (clientsCache) {
             final int port = conf.getCqlPort();
             final String key = location + ":" + port + ":" + conf.getKeyspace();
 
             if (clientsCache.containsKey(key)) {
-                LOG.info(">>>>>>>> Returning cached session for key: "+key);
                 return clientsCache.get(key);
             }
 
-            if (location.equals(conf.getHost())){
-                LOG.info("######## Returning configuration object session for key: "+key);
+            if (location.equals(conf.getHost())) {
                 clientsCache.put(key, conf.getSession());
                 return conf.getSession();
             }
 
             try {
-                LOG.info("$$$$$$$$ Creating NEW session for key: "+key);
                 Cluster cluster = Cluster.builder()
                         .withPort(port)
                         .addContactPoint(location)
@@ -112,7 +117,6 @@ class CassandraClientProvider {
 
                 Session session = cluster.connect(conf.getKeyspace());
                 clientsCache.put(key, session);
-
 
                 return session;
             } catch (Exception e) {

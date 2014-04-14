@@ -31,19 +31,14 @@ import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.dht.IPartitioner;
-import org.apache.cassandra.hadoop.ColumnFamilySplit;
-import org.apache.cassandra.hadoop.ConfigHelper;
-import org.apache.cassandra.hadoop.cql3.CqlConfigHelper;
 import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.cassandra.utils.Pair;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapreduce.InputSplit;
-import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -57,17 +52,14 @@ import static com.stratio.deep.cql.CassandraClientProvider.getSession;
  *
  * @author Luca Rosellini <luca@strat.io>
  */
-public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>>
-    implements org.apache.hadoop.mapred.RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> {
-    private static final Logger LOG = LoggerFactory.getLogger(DeepCqlPagingRecordReader.class);
+public class DeepRecordReader {
+    private static final Logger LOG = LoggerFactory.getLogger(DeepRecordReader.class);
 
-    private static final int DEFAULT_CQL_PAGE_LIMIT = 1000; // TODO: find the number large enough but not OOM
+    private static final int DEFAULT_CQL_PAGE_LIMIT = 1000;
 
-    private ColumnFamilySplit split;
+    private DeepTokenRange split;
     private RowIterator rowIterator;
 
-    private Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> currentRow;
-    private int totalRowCount; // total number of rows to fetch
     private String cfName;
 
     // partition keys -- key aliases
@@ -82,28 +74,22 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
     // the number of cql rows per page
     private int pageRowSize;
 
-    // user defined where clauses
-    private String userDefinedWhereClauses;
-
     private IPartitioner partitioner;
 
     private AbstractType<?> keyValidator;
 
-    private Map<String, Serializable> additionalFilters;
-
     private final DeepPartitionLocationComparator comparator = new DeepPartitionLocationComparator();
 
-    private final IDeepJobConfig deepJobConfig;
+    private final IDeepJobConfig config;
 
     /**
      * public constructor. Takes a list of filters to pass to the underlying datastores.
      *
-     * @param additionalFilters
+     * @param config
      */
-    public DeepCqlPagingRecordReader(Map<String, Serializable> additionalFilters, IDeepJobConfig deepJobConfig) {
+    public DeepRecordReader(IDeepJobConfig config) {
         super();
-        this.deepJobConfig = deepJobConfig;
-        this.additionalFilters = additionalFilters;
+        this.config = config;
     }
 
     /**
@@ -111,25 +97,20 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
      * <p>Creates a new client and row iterator.</p>
      *
      * @param split
-     * @param context
      */
-    public void initialize(InputSplit split, TaskAttemptContext context) {
-        this.split = (ColumnFamilySplit) split;
-        Configuration conf = context.getConfiguration();
-        totalRowCount = (this.split.getLength() < Long.MAX_VALUE)
-            ? (int) this.split.getLength()
-            : ConfigHelper.getInputSplitSize(conf);
-        cfName = ConfigHelper.getInputColumnFamily(conf);
-        columns = CqlConfigHelper.getInputcolumns(conf);
-        userDefinedWhereClauses = CqlConfigHelper.getInputWhereClauses(conf);
+    public void initialize(DeepTokenRange split) {
+        this.split = split;
+        //Configuration conf = context.getConfiguration();
 
-        try {
-            pageRowSize = Integer.parseInt(CqlConfigHelper.getInputPageRowSize(conf));
-        } catch (NumberFormatException e) {
-            pageRowSize = DEFAULT_CQL_PAGE_LIMIT;
+        cfName = config.getTable();
+
+        if (!ArrayUtils.isEmpty(config.getInputColumns())) {
+            columns = StringUtils.join(config.getInputColumns(), ",");
         }
 
-        partitioner = ConfigHelper.getInputPartitioner(context.getConfiguration());
+        pageRowSize = DEFAULT_CQL_PAGE_LIMIT;
+
+        partitioner = Utils.newTypeInstance(config.getPartitionerClassName(), IPartitioner.class);
 
         try {
             createConnection();
@@ -145,7 +126,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
     }
 
     private Session createConnection() throws Exception {
-        String[] locations = split.getLocations();
+        String[] locations = split.getReplicas();
         Exception lastException = null;
 
         /* reorder locations */
@@ -156,7 +137,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
         for (String location : locations) {
 
             try {
-                return getSession(location, deepJobConfig);
+                return getSession(location, config);
             } catch (Exception e) {
                 lastException = e;
             }
@@ -169,74 +150,6 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
      * Closes this input reader object.
      */
     public void close() {
-    }
-
-    /**
-     * Returns the key for the current row.
-     *
-     * @return
-     */
-    public Map<String, ByteBuffer> getCurrentKey() {
-        return currentRow.left;
-    }
-
-    /**
-     * Returns the value of the current row.
-     *
-     * @return
-     */
-    public Map<String, ByteBuffer> getCurrentValue() {
-        return currentRow.right;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public float getProgress() {
-        if (!rowIterator.hasNext()) {
-            return 1.0F;
-        }
-
-        // the progress is likely to be reported slightly off the actual but close enough
-        float progress = ((float) rowIterator.totalRead / totalRowCount);
-        return progress > 1.0F ? 1.0F : progress;
-    }
-
-    /**
-     * Checks if the current iterator has a next value, and, if it does, advances the iterator.
-     */
-    public boolean nextKeyValue() {
-        throw new DeepIllegalAccessException("Calling nextKeyValue() on a DeepCqlPagingRecordReader does not make sense");
-    }
-
-    /**
-     * Because the old Hadoop API wants us to write to the key and value
-     * and the new asks for them, we need to copy the output of the new API
-     * to the old. Thus, expect a small performance hit.
-     * And obviously this wouldn't work for wide rows. But since ColumnFamilyInputFormat
-     * and ColumnFamilyRecordReader don't support them, it should be fine for now.
-     */
-    public boolean next(Map<String, ByteBuffer> keys, Map<String, ByteBuffer> value) throws IOException {
-        if (nextKeyValue()) {
-            value.clear();
-            value.putAll(getCurrentValue());
-
-            keys.clear();
-            keys.putAll(getCurrentKey());
-
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Returns the total number of rows read.
-     *
-     * @return
-     * @throws IOException
-     */
-    public long getPos() throws IOException {
-        return (long) rowIterator.totalRead;
     }
 
     /**
@@ -307,7 +220,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
             Map<String, ByteBuffer> valueColumns = createValue();
             Map<String, ByteBuffer> keyColumns = createKey();
             Row row = rows.next();
-            TableMetadata tableMetadata = ((GenericDeepJobConfig)deepJobConfig).fetchTableMetadata();
+            TableMetadata tableMetadata = ((GenericDeepJobConfig) config).fetchTableMetadata();
 
             List<ColumnMetadata> partitionKeys = tableMetadata.getPartitionKey();
             List<ColumnMetadata> clusteringKeys = tableMetadata.getClusteringColumns();
@@ -440,14 +353,12 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
                     : partitionKey + "," + clusterKey + (columns != null ? ("," + columns) : "");
             }
 
-            String whereStr = userDefinedWhereClauses == null ? "" : " AND " + userDefinedWhereClauses;
             return Pair.create(clause.left,
-                String.format("SELECT %s FROM %s%s%s%s LIMIT %d ALLOW FILTERING",
+                String.format("SELECT %s FROM %s%s%s LIMIT %d ALLOW FILTERING",
                     columns,
                     quote(cfName),
                     clause.right,
-                    whereStr,
-                    Utils.additionalFilterGenerator(additionalFilters),
+                    Utils.additionalFilterGenerator(config.getAdditionalFilters()),
                     pageRowSize));
         }
 
@@ -557,8 +468,8 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
             List<Object> values = new LinkedList<>();
 
             AbstractType<?> tkValidator = partitioner.getTokenValidator();
-            Object startToken = tkValidator.compose(tkValidator.fromString(split.getStartToken()));
-            Object endToken = tkValidator.compose(tkValidator.fromString(split.getEndToken()));
+            Object startToken = split.getStartToken();
+            Object endToken = split.getEndToken();
 
             // initial query token(k) >= start_token and token(k) <= end_token
             if (emptyPartitionKeyValues()) {
@@ -666,7 +577,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
      * retrieve the partition keys and cluster keys from system.schema_columnfamilies table
      */
     private void retrieveKeys() throws Exception {
-        TableMetadata tableMetadata = ((GenericDeepJobConfig)deepJobConfig).fetchTableMetadata();
+        TableMetadata tableMetadata = ((GenericDeepJobConfig) config).fetchTableMetadata();
 
         List<ColumnMetadata> partitionKeys = tableMetadata.getPartitionKey();
         List<ColumnMetadata> clusteringKeys = tableMetadata.getClusteringColumns();
@@ -714,7 +625,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
             rowKey = partitionBoundColumns.get(0).value;
         }
 
-        String endToken = split.getEndToken();
+        String endToken = String.valueOf(split.getEndToken());
         String currentToken = partitioner.getToken(rowKey).toString();
         LOG.debug("End token: {}, current token: {}", endToken, currentToken);
 
@@ -748,7 +659,7 @@ public class DeepCqlPagingRecordReader extends org.apache.hadoop.mapreduce.Recor
      */
     public Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> next() {
         if (!this.hasNext()) {
-            throw new DeepIllegalAccessException("DeepCqlPagingRecordReader exhausted");
+            throw new DeepIllegalAccessException("DeepRecordReader exhausted");
         }
         return rowIterator.next();
     }

@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.hadoop.cql3;
+package com.stratio.deep.cql;
 
-import com.stratio.deep.cql.DeepConfigHelper;
+import com.datastax.driver.core.Session;
+import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.entity.Cell;
@@ -31,15 +32,12 @@ import org.apache.cassandra.dht.Token;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.exceptions.SyntaxException;
 import org.apache.cassandra.hadoop.AbstractColumnFamilyOutputFormat;
-import org.apache.cassandra.hadoop.AbstractColumnFamilyRecordWriter;
 import org.apache.cassandra.hadoop.ConfigHelper;
-import org.apache.cassandra.hadoop.Progressable;
 import org.apache.cassandra.thrift.*;
 import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.spark.TaskContext;
 import org.apache.thrift.TException;
 import org.apache.thrift.transport.TTransport;
 import org.slf4j.Logger;
@@ -52,12 +50,14 @@ import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.stratio.deep.cql.CassandraClientProvider.getSession;
 import static com.stratio.deep.utils.Utils.updateQueryGenerator;
 
 /**
  * Created by luca on 05/02/14.
  */
-public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells, Cells> {
+public class DeepCqlRecordWriter implements AutoCloseable {
+
     private static final Logger LOG = LoggerFactory.getLogger(DeepCqlRecordWriter.class);
 
     // handles for clients for each range exhausted in the threadpool
@@ -65,29 +65,22 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
     private final Map<Range<?>, RangeClient> removedClients;
 
     // host to prepared statement id mappings
-    private ConcurrentHashMap<Cassandra.Client, Integer> preparedStatements = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Cassandra.Client, Integer> preparedStatements =
+            new ConcurrentHashMap<>();
+
     private AbstractType<?> keyValidator;
     private String[] partitionKeyColumns;
 
-    private List<String> clusterColumns;
+    private final TaskContext context;
+    private final IDeepJobConfig writeConfig;
 
-    DeepCqlRecordWriter(Configuration conf) {
-        super(conf);
+
+    public DeepCqlRecordWriter(TaskContext context, IDeepJobConfig writeConfig) {
         this.clients = new HashMap<>();
         this.removedClients = new HashMap<>();
-        init(conf);
-    }
-
-    /**
-     * Upon construction, obtain the map that this writer will use to collect
-     * mutations, and the ring cache for the given keyspace.
-     *
-     * @param context the task attempt context
-     * @throws IOException
-     */
-    DeepCqlRecordWriter(TaskAttemptContext context) {
-        this(context.getConfiguration());
-        this.progressable = new Progressable(context);
+        this.context = context;
+        this.writeConfig = writeConfig;
+        init();
     }
 
     @Override
@@ -98,7 +91,7 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
             try {
                 IOUtils.closeQuietly(client);
             } catch (Exception e) {
-                LOG.error("Catched exception", e);
+                LOG.error("exception", e);
             }
         }
 
@@ -106,7 +99,7 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
             try {
                 IOUtils.closeQuietly(client);
             } catch (Exception e) {
-                LOG.error("Catched exception", e);
+                LOG.error("exception", e);
             }
         }
     }
@@ -131,15 +124,9 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
         return partitionKey;
     }
 
-    protected void init(Configuration conf) {
+    protected void init() {
         try {
-            Cassandra.Client client = ConfigHelper.getClientFromOutputAddressList(conf);
-            retrievePartitionKeyValidator(client);
-
-            TTransport transport = client.getOutputProtocol().getTransport();
-            if (transport.isOpen()) {
-                transport.close();
-            }
+            retrievePartitionKeyValidator();
 
         } catch (Exception e) {
             throw new DeepGenericException(e);
@@ -161,11 +148,13 @@ public class DeepCqlRecordWriter extends AbstractColumnFamilyRecordWriter<Cells,
     /**
      * retrieve the key validator from system.schema_columnfamilies table
      */
-    protected void retrievePartitionKeyValidator(Cassandra.Client client) throws Exception {
-        String keyspace = ConfigHelper.getOutputKeyspace(conf);
-        String cfName = ConfigHelper.getOutputColumnFamily(conf);
+    protected void retrievePartitionKeyValidator() throws Exception {
+        Session session = CassandraClientProvider.getSession(context.taskMetrics().hostname(), writeConfig);
 
-        String query = "SELECT key_validator,key_aliases,column_aliases FROM system.schema_columnfamilies WHERE keyspace_name='%s' and columnfamily_name='%s'";
+        String keyspace = writeConfig.getKeyspace();
+        String cfName = writeConfig.getColumnFamily();
+
+        String query = "SELECT key_validator,key_aliases,column_aliases FROM system.schema_columnfamilies WHERE keyspace_name='?' and columnfamily_name='%s'";
         String formatted = String.format(query, keyspace, cfName);
         CqlResult result = client.execute_cql3_query(ByteBufferUtil.bytes(formatted), Compression.NONE,
                 ConsistencyLevel.ONE);

@@ -118,6 +118,21 @@ public final class Utils {
     }
 
     /**
+     * Creates a new instance of the given class name.
+     *
+     * @param className the class object for which a new instance should be created.
+     * @return the new instance of class clazz.
+     */
+    public static <T> T newTypeInstance(String className, Class<T> returnClass) {
+        try {
+            Class<T> clazz = (Class<T>) Class.forName(className);
+            return clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            throw new DeepGenericException(e);
+        }
+    }
+
+    /**
      * Quoting for working with uppercase
      */
     public static String quote(String identifier) {

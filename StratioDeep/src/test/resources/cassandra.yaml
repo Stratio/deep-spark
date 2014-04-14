@@ -1,4 +1,4 @@
-# Cassandra storage config YAML 
+# Cassandra storage writeConfig YAML
 
 # NOTE:
 #   See http://wiki.apache.org/cassandra/StorageConfiguration for

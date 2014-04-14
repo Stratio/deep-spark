@@ -17,32 +17,32 @@
 package com.stratio.deep.cql;
 
 import com.datastax.driver.core.*;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.*;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepGenericException;
 import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.db.marshal.UTF8Type;
 import org.apache.cassandra.dht.IPartitioner;
-import org.apache.cassandra.hadoop.ColumnFamilySplit;
-import org.apache.cassandra.hadoop.cql3.CqlPagingInputFormat;
 import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
-import org.apache.hadoop.mapreduce.InputSplit;
-import org.apache.hadoop.mapreduce.JobContext;
-import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.cassandra.utils.Pair;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.nio.ByteBuffer;
 import java.util.*;
 
-import static java.util.Collections.sort;
+import static com.google.common.collect.Iterables.concat;
+import static com.google.common.collect.Iterables.indexOf;
+import static com.google.common.collect.Iterables.transform;
 
 /**
  * {@link CqlPagingRecordReader} implementation that returns an instance of a
- * {@link DeepCqlPagingRecordReader}.
+ * {@link DeepRecordReader}.
  *
  * @author Luca Rosellini <luca@strat.io>
  */
-public class DeepCqlPagingInputFormat<T> extends CqlPagingInputFormat {
+public class DeepCqlPagingInputFormat<T> {
     private final IDeepJobConfig<T> deepJobConfig;
     private final IPartitioner partitioner;
 
@@ -52,129 +52,145 @@ public class DeepCqlPagingInputFormat<T> extends CqlPagingInputFormat {
     }
 
     /**
-     * Returns a new instance of {@link DeepCqlPagingRecordReader}.
+     * Returns a new instance of {@link DeepRecordReader}.
      */
-    public RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> createRecordReader(InputSplit arg0,
-                                                                                             DeepTaskAttemptContext arg1) throws IOException, InterruptedException {
+    public DeepRecordReader createRecordReader() throws IOException, InterruptedException {
 
-        return new DeepCqlPagingRecordReader(arg1.getConf().getAdditionalFilters(), deepJobConfig);
+        return new DeepRecordReader(deepJobConfig);
     }
 
-    @Override
-    public List<InputSplit> getSplits(JobContext context) throws IOException {
-        List<InputSplit> splits = super.getSplits(context);
+    private Map<String, List<Comparable>> fetchSortedTokens(String query, final Pair<Session, InetAddress> sessionWithHost) {
+        ResultSet rSet = sessionWithHost.left.execute(query);
 
-        Session session = CassandraClientProvider.getSession(deepJobConfig.getHost(), deepJobConfig.getCqlPort(), "system");
+        final AbstractType tkValidator = partitioner.getTokenValidator();
+        final Map<String, List<Comparable>> tokens = Maps.newHashMap();
 
-        String queryLocal = "select tokens from system.local";
+        Iterable<Pair<String, List<Comparable>>> pairs =
+                transform(rSet.all(), new Function<Row, Pair<String, List<Comparable>>>() {
+                    @Nullable
+                    @Override
+                    public Pair<String, List<Comparable>> apply(final @Nullable Row row) {
+                        assert row != null;
+                        InetAddress host;
+                        try {
+                            host = row.getInet("peer");
+                        } catch (IllegalArgumentException e) {
+                            host = sessionWithHost.right;
+                        }
 
-        ResultSet resultSet = session.execute(queryLocal);
-        Row localRecord = resultSet.one();
+                        List<Comparable> sortedTokens = Ordering.natural().immutableSortedCopy(
+                                transform(row.getSet("tokens", String.class), new Function<String, Comparable>() {
+                                    @Nullable
+                                    @Override
+                                    public Comparable apply(final @Nullable String token) {
+                                        return (Comparable) tkValidator.compose(tkValidator.fromString(token));
+                                    }
+                                })
+                        );
 
-        Map<String, List<Comparable>> tokens = new HashMap<>();
-        Set<String> unsortedTokens = localRecord.getSet("tokens", String.class);
+                        return Pair.create(host.getHostName(), sortedTokens);
+                    }
+                });
 
-        AbstractType tkValidator = partitioner.getTokenValidator();
-
-        for (String token : unsortedTokens) {
-            Comparable convertedToken = (Comparable) tkValidator.compose(tkValidator.fromString(token));
-
-            List<Comparable> sortedTokens = tokens.get(deepJobConfig.getHost());
-            if (sortedTokens == null){
-                sortedTokens = new ArrayList<>();
-                tokens.put(deepJobConfig.getHost(), sortedTokens);
-            }
-
-            sortedTokens.add(convertedToken);
+        for (Pair<String, List<Comparable>> pair : pairs) {
+            tokens.put(pair.left, pair.right);
         }
 
-        Collections.sort(tokens.get(deepJobConfig.getHost()));
+        return tokens;
+    }
 
-        String queryPeers = "select peer, tokens from system.peers";
+    private List<DeepTokenRange> mergeTokenRanges(Map<String, List<Comparable>> tokens, final Session session) {
+        final Iterable<Comparable> allRanges = Ordering.natural().sortedCopy(concat(tokens.values()));
+        final Comparable maxValue = Ordering.natural().max(allRanges);
+        final Comparable minValue = (Comparable) partitioner.minValue(maxValue.getClass()).getToken().token;
 
-        ResultSet peersResultSet = session.execute(queryPeers);
+        Function<Comparable, List<DeepTokenRange>> map = new Function<Comparable, List<DeepTokenRange>>() {
+            public List<DeepTokenRange> apply(final Comparable elem) {
+                Comparable nextValue;
+                Comparable currValue = elem;
 
-        for (Row peersRecord : peersResultSet) {
-            InetAddress host = peersRecord.getInet("peer");
+                List<DeepTokenRange> result = new ArrayList<>();
 
-            unsortedTokens = peersRecord.getSet("tokens", String.class);
+                if (currValue.equals(maxValue)) {
 
-            for (String token : unsortedTokens) {
-                Comparable convertedToken = (Comparable) tkValidator.compose(tkValidator.fromString(token));
+                    result.add(new DeepTokenRange(currValue, minValue, initReplicas(currValue, session)));
+                    currValue = minValue;
+                    nextValue = Iterables.getFirst(allRanges, null);
 
-                List<Comparable> sortedTokens = tokens.get(host.getHostName());
-                if (sortedTokens == null){
-                    sortedTokens = new ArrayList<>();
-                    tokens.put(host.getHostName(), sortedTokens);
+                } else {
+
+                    int nextIdx = 1 + indexOf(allRanges, new Predicate<Comparable>() {
+                        @Override
+                        public boolean apply(@Nullable Comparable input) {
+                            assert input != null;
+                            return input.equals(elem);
+                        }
+                    });
+                    nextValue = Iterables.get(allRanges, nextIdx);
                 }
 
-                sortedTokens.add(convertedToken);
+                result.add(new DeepTokenRange(currValue, nextValue,initReplicas(currValue, session)));
+
+                return result;
+            }
+        };
+
+        return Ordering.natural().sortedCopy(concat(transform(allRanges, map)));
+    }
+
+    private String[] initReplicas(final Comparable startToken, final Session session){
+        final AbstractType tkValidator = partitioner.getTokenValidator();
+        final Metadata metadata = session.getCluster().getMetadata();
+
+        Set<Host> replicas =
+                metadata.getReplicas(
+                        deepJobConfig.getKeyspace(),
+                        tkValidator.decompose(startToken));
+
+        return Iterables.toArray(Iterables.transform(replicas, new Function<Host, String>() {
+            @Nullable
+            @Override
+            public String apply(@Nullable Host input) {
+                assert input != null;
+                return input.getAddress().getHostName();
+            }
+        }), String.class);
+    }
+
+    public List<DeepTokenRange> getSplits() {
+        Map<String, List<Comparable>> tokens = new HashMap<>();
+
+        Pair<Session, InetAddress> sessionWithHost = CassandraClientProvider.getUnbalancedSession(
+                deepJobConfig.getHost(),
+                deepJobConfig.getCqlPort(),
+                deepJobConfig.getKeyspace());
+
+        try (Session session = sessionWithHost.left) {
+            String queryLocal = "select tokens from system.local";
+            tokens.putAll(fetchSortedTokens(queryLocal, sessionWithHost));
+
+            String queryPeers = "select peer, tokens from system.peers";
+            tokens.putAll(fetchSortedTokens(queryPeers, sessionWithHost));
+
+            return mergeTokenRanges(tokens, session);
+
+            /*
+            List<DeepTokenRange> hadoopTr = new ArrayList<>();
+            for (InputSplit split : splits) {
+                Long startToken = Long.parseLong(((ColumnFamilySplit) split).getStartToken());
+                Long endToken = Long.parseLong(((ColumnFamilySplit) split).getEndToken());
+                DeepTokenRange finder = new DeepTokenRange(startToken, endToken);
+                hadoopTr.add(finder);
             }
 
-            Collections.sort(tokens.get(host.getHostName()));
+
+            boolean elementsEquals = Iterables.elementsEqual(
+                    Ordering.natural().sortedCopy(finalTokenRanges),
+                    Ordering.natural().sortedCopy(hadoopTr));
+            System.out.println("elementsEquals: "+elementsEquals);
+            */
         }
 
-        List<Comparable> allRanges = new ArrayList<>();
-
-        for (Map.Entry<String, List<Comparable>> entry : tokens.entrySet()) {
-            allRanges.addAll(entry.getValue());
-        }
-        Collections.sort(allRanges);
-
-        Metadata metadata = session.getCluster().getMetadata();
-
-        System.out.println("Final token ranges:\n");
-        List<TokenRange> finalTokenRanges = new ArrayList<>();
-        for (int idx = 0; idx < allRanges.size(); idx++) {
-            int nextIdx = idx + 1;
-            Comparable currValue = allRanges.get(idx);
-            Comparable nextValue = null;
-
-            if (nextIdx == allRanges.size()){
-                nextIdx = 0;
-                nextValue =
-                        (Comparable) partitioner.minValue(allRanges.get(nextIdx).getClass()).getToken().token;
-                TokenRange tr = new TokenRange(currValue, nextValue);
-                tr.setReplicas(metadata.getReplicas(deepJobConfig.getKeyspace(), tkValidator.decompose(tr.startToken)));
-                finalTokenRanges.add(tr);
-                currValue = nextValue;
-            }
-            nextValue = allRanges.get(nextIdx);
-
-            TokenRange tr = new TokenRange(currValue, nextValue);
-            tr.setReplicas(metadata.getReplicas(deepJobConfig.getKeyspace(), tkValidator.decompose(tr.startToken)));
-            finalTokenRanges.add(tr);
-
-
-        }
-        Collections.sort(finalTokenRanges);
-        for (TokenRange tr : finalTokenRanges) {
-            System.out.println(tr);
-        }
-
-        int k = 0;
-        System.out.println("Hadoop token ranges:\n");
-        List<TokenRange> hadoopTr = new ArrayList<>();
-        for (InputSplit split : splits) {
-            Long startToken = Long.parseLong(((ColumnFamilySplit)split).getStartToken());
-            Long endToken = Long.parseLong(((ColumnFamilySplit)split).getEndToken());
-            TokenRange finder = new TokenRange(startToken, endToken);
-            hadoopTr.add(finder);
-            if (finalTokenRanges.contains(finder)){
-
-
-                k++;
-            }
-
-        }
-        Collections.sort(hadoopTr);
-        for (TokenRange tr : hadoopTr) {
-            System.out.println(tr);
-        }
-
-        System.out.print("Found " + k + " ranges");
-
-        return splits;
     }
 
     private IPartitioner getPartitioner() {
@@ -185,71 +201,4 @@ public class DeepCqlPagingInputFormat<T> extends CqlPagingInputFormat {
         }
     }
 
-    class TokenRange implements Comparable<TokenRange> {
-        private Comparable startToken;
-        private Comparable endToken;
-        private Set<Host> replicas;
-
-        TokenRange(Comparable startToken, Comparable endToken) {
-            this.startToken = startToken;
-            this.endToken = endToken;
-        }
-
-        @Override
-        public String toString() {
-            return "{" +
-                    "start=" + startToken +
-                    ", end=" + endToken +
-                    '}';
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            TokenRange that = (TokenRange) o;
-
-            if (!endToken.equals(that.endToken)) return false;
-            if (!startToken.equals(that.startToken)) return false;
-
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = startToken.hashCode();
-            result = 31 * result + endToken.hashCode();
-            return result;
-        }
-
-        public Comparable getStartToken() {
-            return startToken;
-        }
-
-        public void setStartToken(Comparable startToken) {
-            this.startToken = startToken;
-        }
-
-        public Comparable getEndToken() {
-            return endToken;
-        }
-
-        public void setEndToken(Comparable endToken) {
-            this.endToken = endToken;
-        }
-
-        public Set<Host> getReplicas() {
-            return replicas;
-        }
-
-        public void setReplicas(Set<Host> replicas) {
-            this.replicas = replicas;
-        }
-
-        @Override
-        public int compareTo(TokenRange o) {
-            return startToken.compareTo(o.startToken);
-        }
-    }
 }

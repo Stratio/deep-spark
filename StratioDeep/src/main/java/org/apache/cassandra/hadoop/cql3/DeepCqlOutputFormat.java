@@ -16,6 +16,7 @@
 
 package org.apache.cassandra.hadoop.cql3;
 
+import com.stratio.deep.cql.DeepCqlRecordWriter;
 import com.stratio.deep.entity.Cells;
 import org.apache.cassandra.hadoop.AbstractColumnFamilyOutputFormat;
 import org.apache.commons.lang.NotImplementedException;

@@ -54,10 +54,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     private static final long serialVersionUID = -7179376653643603038L;
     private String partitionerClassName = "org.apache.cassandra.dht.Murmur3Partitioner";
 
-    private transient Job hadoopJob;
-
-    private transient Configuration configuration;
-
     /**
      * keyspace name
      */
@@ -136,11 +132,13 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
 
     private transient Session session;
 
+    private transient boolean isInitialized = Boolean.FALSE;
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> session(Session session){
+    public IDeepJobConfig<T> session(Session session) {
         this.session = session;
         return this;
     }
@@ -152,10 +150,10 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     public synchronized Session getSession() {
         if (session == null) {
             Cluster cluster = Cluster.builder()
-                .withPort(this.cqlPort)
-                .addContactPoint(this.host)
-                .withCredentials(this.username, this.password)
-                .build();
+                    .withPort(this.cqlPort)
+                    .addContactPoint(this.host)
+                    .withCredentials(this.username, this.password)
+                    .build();
 
             session = cluster.connect(this.keyspace);
         }
@@ -189,7 +187,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * @throws com.stratio.deep.exception.DeepIllegalAccessException if not initialized
      */
     protected void checkInitialized() {
-        if (configuration == null) {
+        if (isInitialized) {
             throw new DeepIllegalAccessException("EntityDeepJobConfig has not been initialized!");
         }
     }
@@ -225,7 +223,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     public void createOutputTableIfNeeded(RDD<Tuple2<Cells, Cells>> tupleRDD) {
 
         TableMetadata metadata = getSession().getCluster().getMetadata().getKeyspace(this.keyspace).getTable(this
-            .columnFamily);
+                .columnFamily);
 
         if (metadata == null && !createTableOnWrite) {
             throw new DeepIOException("Cannot write RDD, output table does not exists and configuration object has 'createTableOnWrite' = false");
@@ -257,7 +255,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
 
         if (tableMetadata == null && !createTableOnWrite) {
             logger.warn("Configuration not suitable for writing RDD: output table does not exists and configuration " +
-                "object has 'createTableOnWrite' = false");
+                    "object has 'createTableOnWrite' = false");
 
             return null;
         } else if (tableMetadata == null) {
@@ -334,20 +332,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     }
 
     /* (non-Javadoc)
-     * @see com.stratio.deep.config.IDeepJobConfig#initialize()
-     */
-    @Override
-    public Configuration getConfiguration() {
-        if (configuration != null) {
-            return configuration;
-        }
-
-        initialize();
-
-        return configuration;
-    }
-
-    /* (non-Javadoc)
      * @see com.stratio.deep.config.IDeepJobConfig#getHost()
      */
     @Override
@@ -359,7 +343,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     @Override
     public String[] getInputColumns() {
         checkInitialized();
-        return inputColumns.clone();
+        return inputColumns == null ? new String[0] : inputColumns.clone();
     }
 
     /* (non-Javadoc)
@@ -437,45 +421,15 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      */
     @Override
     public IDeepJobConfig<T> initialize() {
-        if (configuration != null) {
+        if (isInitialized) {
             return this;
         }
 
         validate();
 
-        try {
-            hadoopJob = new Job();
-            Configuration c = hadoopJob.getConfiguration();
+        columnDefinitions();
+        isInitialized = true;
 
-            ConfigHelper.setInputColumnFamily(c, keyspace, columnFamily, false);
-            ConfigHelper.setOutputColumnFamily(c, keyspace, columnFamily);
-            ConfigHelper.setInputInitialAddress(c, host);
-            ConfigHelper.setInputRpcPort(c, String.valueOf(rpcPort));
-            ConfigHelper.setInputPartitioner(c, partitionerClassName);
-
-            if (!ArrayUtils.isEmpty(inputColumns)) {
-                CqlConfigHelper.setInputColumns(c, StringUtils.join(inputColumns, ","));
-            }
-
-            DeepConfigHelper.setOutputBatchSize(c, batchSize);
-
-            ConfigHelper.setOutputInitialAddress(c, host);
-            ConfigHelper.setOutputRpcPort(c, String.valueOf(rpcPort));
-            ConfigHelper.setOutputPartitioner(c, partitionerClassName);
-
-            ConfigHelper.setThriftFramedTransportSizeInMb(c, thriftFramedTransportSizeMB);
-
-            if (readConsistencyLevel != null) {
-                ConfigHelper.setReadConsistencyLevel(c, readConsistencyLevel);
-            }
-
-            configuration = c;
-
-            columnDefinitions();
-
-        } catch (IOException e) {
-            throw new DeepIOException(e);
-        }
         return this;
     }
 
@@ -637,9 +591,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     }
 
     /**
-     * Returns the map of additional filters specified by the user.
-     *
-     * @return
+     * {@inheritDoc}
      */
     public Map<String, Serializable> getAdditionalFilters() {
         return Collections.unmodifiableMap(additionalFilters);

@@ -45,7 +45,6 @@ public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
     private final CopyOnWriteArrayList<Host> liveHosts = new CopyOnWriteArrayList<Host>();
     private final AtomicInteger index = new AtomicInteger();
 
-
     @Override
     public void init(Cluster cluster, Collection<Host> hosts) {
 

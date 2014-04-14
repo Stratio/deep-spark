@@ -100,11 +100,6 @@ public interface IDeepJobConfig<T> extends Serializable {
     public abstract String getColumnFamily();
 
     /**
-     * Validates and initializes this configuration object.
-     */
-    public abstract Configuration getConfiguration();
-
-    /**
      * Returns the underlying testentity class used to map the Cassandra
      * Column family.
      *
@@ -324,4 +319,11 @@ public interface IDeepJobConfig<T> extends Serializable {
      * @return
      */
     int getBatchSize();
+
+    /**
+     * Returns the map of additional filters specified by the user.
+     *
+     * @return
+     */
+    public Map<String, Serializable> getAdditionalFilters();
 }
