@@ -116,11 +116,15 @@ public class AbstractDeepExamplesTest {
 
         session = cluster.connect();
 
-        session.execute(createKeyspace);
-        session.execute(createCrawlerKeyspace);
-        session.execute(useKeyspace);
-        session.execute(createTweetCF);
-        session.execute(createCrawlerCF);
+        /*
+        try {
+
+            session.execute(createKeyspace);
+            session.execute(createCrawlerKeyspace);
+            session.execute(useKeyspace);
+            session.execute(createTweetCF);
+            session.execute(createCrawlerCF);
+        } catch (Exception ex){}*/
 
         dataInsertCql();
 
