@@ -132,7 +132,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
 
     private transient Session session;
 
-    private transient boolean isInitialized = Boolean.FALSE;
+    private Boolean isInitialized = Boolean.FALSE;
 
     /**
      * {@inheritDoc}
@@ -187,8 +187,8 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * @throws com.stratio.deep.exception.DeepIllegalAccessException if not initialized
      */
     protected void checkInitialized() {
-        if (isInitialized) {
-            throw new DeepIllegalAccessException("EntityDeepJobConfig has not been initialized!");
+        if (!isInitialized) {
+            throw new DeepIllegalAccessException("DeepJobConfig has not been initialized!");
         }
     }
 
@@ -428,7 +428,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
         validate();
 
         columnDefinitions();
-        isInitialized = true;
+        isInitialized = Boolean.TRUE;
 
         return this;
     }
