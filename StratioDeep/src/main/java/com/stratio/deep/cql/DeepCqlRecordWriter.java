@@ -83,7 +83,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         LOG.debug("Closing all clients");
         // close all the clients before throwing anything
         for (RangeClient client : clients.values()) {
@@ -286,7 +286,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         public void run() {
             LOG.debug("[" + this + "] Initializing cassandra client");
             Pair<Session, String> sessionWithHost = CassandraClientProvider.getSession(localhost.getHostAddress(), writeConfig, true);
-            sessionWithHost.left.execute(cql, bindVariables);
+            sessionWithHost.left.execute(cql, bindVariables.toArray(new Object[bindVariables.size()]));
 
         }
 

@@ -208,10 +208,12 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
                     @Override
                     public Integer apply(TaskContext context, Iterator<Tuple2<Cells, Cells>> rows) {
-                        DeepCqlRecordWriter writer = new DeepCqlRecordWriter(context, writeConfig);
-                        while (rows.hasNext()) {
-                            Tuple2<Cells, Cells> row = rows.next();
-                            writer.write(row._1(), row._2());
+
+                        try (DeepCqlRecordWriter writer = new DeepCqlRecordWriter(context, writeConfig)) {
+                            while (rows.hasNext()) {
+                                Tuple2<Cells, Cells> row = rows.next();
+                                writer.write(row._1(), row._2());
+                            }
                         }
 
                         return null;
