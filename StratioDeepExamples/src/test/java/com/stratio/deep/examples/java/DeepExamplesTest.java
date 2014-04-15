@@ -36,9 +36,9 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
             "local",
             "",
             "",
-            "denethor",
-            "9042",
-            "9160"};
+            Constants.DEFAULT_CASSANDRA_HOST,
+            ""+ CassandraServer.CASSANDRA_CQL_PORT,
+            ""+ CassandraServer.CASSANDRA_THRIFT_PORT};
     @Test
     public void testAggregatingData(){
         AggregatingData.doMain(args);

@@ -111,8 +111,8 @@ public class AbstractDeepExamplesTest {
         cassandraServer.setStartupCommands(startupCommands);
         cassandraServer.start();
 
-        Cluster cluster = Cluster.builder().withPort(9042)
-                .addContactPoint("denethor").build();
+        Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
 
         session = cluster.connect();
 
