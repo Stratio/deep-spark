@@ -21,34 +21,31 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
+import com.stratio.deep.exception.DeepInstantiationException;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.db.marshal.LongType;
 import org.apache.cassandra.db.marshal.TypeParser;
 import org.apache.cassandra.dht.IPartitioner;
-import org.apache.cassandra.dht.Range;
 import org.apache.cassandra.dht.Token;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.exceptions.SyntaxException;
-import org.apache.cassandra.thrift.*;
-import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.cassandra.utils.FBUtilities;
+import org.apache.cassandra.utils.Pair;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.TaskContext;
-import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static com.stratio.deep.utils.Utils.updateQueryGenerator;
 
@@ -63,19 +60,13 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     private final Map<Token, RangeClient> clients;
     private final Map<Token, RangeClient> removedClients;
 
-    // host to prepared statement id mappings
-    private ConcurrentHashMap<Cassandra.Client, Integer> preparedStatements =
-            new ConcurrentHashMap<>();
-
     private AbstractType<?> keyValidator;
     private String[] partitionKeyColumns;
-    private List<String> clusterColumns;
 
     private final TaskContext context;
     private final IDeepJobConfig writeConfig;
     private final IPartitioner partitioner;
-    private final List<DeepTokenRange> splits;
-
+    private final InetAddress localhost;
 
     public DeepCqlRecordWriter(TaskContext context, IDeepJobConfig writeConfig) {
         this.clients = new HashMap<>();
@@ -83,7 +74,11 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         this.context = context;
         this.writeConfig = writeConfig;
         this.partitioner = RangeUtils.getPartitioner(writeConfig);
-        this.splits = RangeUtils.getSplits(writeConfig);
+        try {
+            this.localhost = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            throw new DeepInstantiationException("Cannot resolve local hostname", e);
+        }
         init();
     }
 
@@ -153,7 +148,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
      * retrieve the key validator from system.schema_columnfamilies table
      */
     protected void retrievePartitionKeyValidator() throws Exception {
-        Session session = CassandraClientProvider.getSession(context.taskMetrics().hostname(), writeConfig);
+        Pair<Session, String> sessionWithHost = CassandraClientProvider.getSessionLocation(localhost.getHostAddress(), writeConfig, false);
 
         String keyspace = writeConfig.getKeyspace();
         String cfName = writeConfig.getColumnFamily();
@@ -161,10 +156,9 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         String query =
                 "SELECT key_validator,key_aliases,column_aliases " +
                         "FROM system.schema_columnfamilies " +
-                        "WHERE keyspace_name='%s' and columnfamily_name='%s' " +
-                        "USING CONSISTENCY ONE";
+                        "WHERE keyspace_name='%s' and columnfamily_name='%s' ";
         String formatted = String.format(query, keyspace, cfName);
-        ResultSet resultSet = session.execute(formatted);
+        ResultSet resultSet = sessionWithHost.left.execute(formatted);
         Row row = resultSet.one();
 
         String validator = row.getString("key_validator");
@@ -184,7 +178,6 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         String clusterColumnString = row.getString("column_aliases");
 
         LOG.debug("cluster columns: " + clusterColumnString);
-        clusterColumns = FBUtilities.fromJsonList(clusterColumnString);
     }
 
     /**
@@ -197,7 +190,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
      *
      * @throws IOException
      */
-    public void write(Cells keys, Cells values){
+    public void write(Cells keys, Cells values) {
         /* generate SQL */
         String localCql = updateQueryGenerator(keys, values, writeConfig.getKeyspace(),
                 writeConfig.getColumnFamily());
@@ -242,7 +235,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
          * @return
          * @throws IOException
          */
-        public synchronized boolean put(String stmt, List<Object> values) throws IOException {
+        public synchronized boolean put(String stmt, List<Object> values) {
             batchStatements.add(stmt);
             bindVariables.addAll(values);
 
@@ -253,7 +246,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
             return res;
         }
 
-        private void triggerBatch() throws IOException {
+        private void triggerBatch() {
             if (getState() != Thread.State.NEW) {
                 return;
             }
@@ -264,8 +257,6 @@ public class DeepCqlRecordWriter implements AutoCloseable {
 
         /**
          * Constructs an {@link RangeClient} for the given endpoints.
-         *
-         *
          */
         public RangeClient() {
             LOG.debug("Create client " + this);
@@ -294,9 +285,8 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         @Override
         public void run() {
             LOG.debug("[" + this + "] Initializing cassandra client");
-            Session session = CassandraClientProvider.getSession(context.taskMetrics().hostname(), writeConfig);
-
-            session.execute(cql, bindVariables);
+            Pair<Session, String> sessionWithHost = CassandraClientProvider.getSession(localhost.getHostAddress(), writeConfig, true);
+            sessionWithHost.left.execute(cql, bindVariables);
 
         }
 

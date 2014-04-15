@@ -77,7 +77,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
             .username("")
             .password("");
 
-        rddConfig.getConfiguration();
+        rddConfig.initialize();
 
         logger.info("Constructed configuration object: " + rddConfig);
         logger.info("Constructiong cassandraRDD");

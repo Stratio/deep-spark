@@ -23,6 +23,7 @@ import com.google.common.collect.*;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.dht.*;
 import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
@@ -50,7 +51,7 @@ public class RangeUtils<T> {
     }
 
     private static Map<String, List<Comparable>> fetchSortedTokens(
-            String query, final Pair<Session, InetAddress> sessionWithHost, IPartitioner partitioner) {
+            String query, final Pair<Session, String> sessionWithHost, IPartitioner partitioner) {
 
         ResultSet rSet = sessionWithHost.left.execute(query);
 
@@ -67,7 +68,7 @@ public class RangeUtils<T> {
                         try {
                             host = row.getInet("peer");
                         } catch (IllegalArgumentException e) {
-                            host = sessionWithHost.right;
+                            host = Utils.inetAddressFromLocation(sessionWithHost.right);
                         }
 
                         List<Comparable> sortedTokens = Ordering.natural().immutableSortedCopy(
@@ -123,7 +124,7 @@ public class RangeUtils<T> {
                     nextValue = Iterables.get(allRanges, nextIdx);
                 }
 
-                result.add(new DeepTokenRange(currValue, nextValue,initReplicas(currValue, session, partitioner, config)));
+                result.add(new DeepTokenRange(currValue, nextValue, initReplicas(currValue, session, partitioner, config)));
 
                 return result;
             }
@@ -133,7 +134,7 @@ public class RangeUtils<T> {
     }
 
     private static String[] initReplicas(
-            final Comparable startToken, final Session session, final IPartitioner partitioner, final IDeepJobConfig config){
+            final Comparable startToken, final Session session, final IPartitioner partitioner, final IDeepJobConfig config) {
         final AbstractType tkValidator = partitioner.getTokenValidator();
         final Metadata metadata = session.getCluster().getMetadata();
 
@@ -156,21 +157,18 @@ public class RangeUtils<T> {
         Map<String, List<Comparable>> tokens = new HashMap<>();
         IPartitioner partitioner = getPartitioner(config);
 
-        Pair<Session, InetAddress> sessionWithHost =
-                CassandraClientProvider.getUnbalancedSession(
-                config.getHost(),
-                config.getCqlPort(),
-                config.getKeyspace());
+        Pair<Session, String> sessionWithHost =
+                CassandraClientProvider.getSession(
+                        config.getHost(),
+                        config, false);
 
+        String queryLocal = "select tokens from system.local";
+        tokens.putAll(fetchSortedTokens(queryLocal, sessionWithHost, partitioner));
 
-        try (Session session = sessionWithHost.left) {
-            String queryLocal = "select tokens from system.local";
-            tokens.putAll(fetchSortedTokens(queryLocal, sessionWithHost, partitioner));
+        String queryPeers = "select peer, tokens from system.peers";
+        tokens.putAll(fetchSortedTokens(queryPeers, sessionWithHost, partitioner));
 
-            String queryPeers = "select peer, tokens from system.peers";
-            tokens.putAll(fetchSortedTokens(queryPeers, sessionWithHost, partitioner));
-
-            return mergeTokenRanges(tokens, session, partitioner, config);
+        return mergeTokenRanges(tokens, sessionWithHost.left, partitioner, config);
 
             /*
             List<DeepTokenRange> hadoopTr = new ArrayList<>();
@@ -187,9 +185,8 @@ public class RangeUtils<T> {
                     Ordering.natural().sortedCopy(hadoopTr));
             System.out.println("elementsEquals: "+elementsEquals);
             */
-        }
-
     }
+
 
     public static IPartitioner getPartitioner(IDeepJobConfig config) {
         try {

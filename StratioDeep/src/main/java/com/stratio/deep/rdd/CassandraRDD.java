@@ -40,6 +40,7 @@ import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.broadcast.Broadcast;
+import org.apache.spark.rdd.PairRDDFunctions;
 import org.apache.spark.rdd.RDD;
 import scala.Function1;
 import scala.Tuple2;
@@ -202,7 +203,6 @@ public abstract class CassandraRDD<T> extends RDD<T> {
         ClassTag<Cells> keyClassTag = ClassTag$.MODULE$.apply(Cells.class);
         ClassTag<Integer> uClassTag = ClassTag$.MODULE$.apply(Integer.class);
 
-        //PairRDDFunctions<Cells, Cells> functions = new PairRDDFunctions<>(mappedRDD, keyClassTag, keyClassTag);
         mappedRDD.context().runJob(mappedRDD,
                 new AbstractSerializableFunction2<TaskContext, Iterator<Tuple2<Cells, Cells>>, Integer>() {
 
@@ -332,7 +332,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     @Override
     public Partition[] getPartitions() {
 
-        List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits();
+        List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits(config.value());
 
         Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
 
@@ -375,7 +375,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      */
     protected DeepRecordReader initRecordReader(TaskContext ctx, final DeepPartition dp) {
 
-        DeepRecordReader recordReader = new DeepRecordReader(config.value());
+        DeepRecordReader recordReader = new DeepRecordReader(config.value(), dp.splitWrapper());
         ctx.addOnCompleteCallback(getComputeCallback(recordReader, dp));
         return recordReader;
 

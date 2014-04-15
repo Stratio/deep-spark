@@ -43,9 +43,8 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
     @Test(dependsOnMethods = "testValidation")
     public void testCorrectInitialisation() {
         IDeepJobConfig<TestEntity> djc = DeepJobConfigFactory.create(TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace("test_keyspace").columnFamily("test_page");
+            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace("test_keyspace").columnFamily("test_page").initialize();
 
-        djc.getConfiguration();
     }
 
     @Test

@@ -214,9 +214,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     protected IDeepJobConfig<TestEntity> initReadConfig() {
         IDeepJobConfig<TestEntity> config = DeepJobConfigFactory.create(TestEntity.class)
             .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY);
-
-        config.getConfiguration();
+            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY).initialize();
 
         return config;
     }

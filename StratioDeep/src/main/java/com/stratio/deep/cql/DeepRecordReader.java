@@ -38,7 +38,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -87,9 +86,9 @@ public class DeepRecordReader {
      *
      * @param config
      */
-    public DeepRecordReader(IDeepJobConfig config) {
-        super();
+    public DeepRecordReader(IDeepJobConfig config, DeepTokenRange split) {
         this.config = config;
+        initialize(split);
     }
 
     /**
@@ -100,7 +99,6 @@ public class DeepRecordReader {
      */
     public void initialize(DeepTokenRange split) {
         this.split = split;
-        //Configuration conf = context.getConfiguration();
 
         cfName = config.getTable();
 
@@ -137,7 +135,7 @@ public class DeepRecordReader {
         for (String location : locations) {
 
             try {
-                return getSession(location, config);
+                return getSession(location, config, true).left;
             } catch (Exception e) {
                 lastException = e;
             }

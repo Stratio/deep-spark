@@ -50,11 +50,6 @@ public class DeepPartitionLocationComparator implements Comparator<String> {
         }
     }
 
-    private Integer getIp(InetAddress addr) {
-        byte[] a = addr.getAddress();
-        return ((a[0] & 0xff) << 24) | ((a[1] & 0xff) << 16) | ((a[2] & 0xff) << 8) | (a[3] & 0xff);
-    }
-
     @Override
     public int compare(String loc1, String loc2) {
         int result = 0;
