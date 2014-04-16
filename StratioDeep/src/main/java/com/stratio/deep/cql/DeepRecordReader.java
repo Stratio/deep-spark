@@ -44,10 +44,8 @@ import java.util.*;
 import static com.stratio.deep.cql.CassandraClientProvider.trySessionForLocation;
 
 /**
- * Extends Cassandra's CqlPagingRecordReader in order to make it
- * more iterator friendly: re-implements the ugly (nextKeyValue() + getCurrentKey() + getCurrentValue())
- * behavior in the more standard hasNext() + next(), with hasNext() not increasing the iterator
- * current position.
+ * Implements a cassandra record reader with pagination capabilities.
+ * Does not rely on Cassandra's Hadoop CqlPagingRecordReader.
  *
  * @author Luca Rosellini <luca@strat.io>
  */

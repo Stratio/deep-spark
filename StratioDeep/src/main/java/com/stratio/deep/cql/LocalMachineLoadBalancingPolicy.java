@@ -31,7 +31,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by luca on 11/04/14.
+ * Load balancing policy that, unlike round robin, sticks to one host.
  */
 public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
     private InetAddress host;
