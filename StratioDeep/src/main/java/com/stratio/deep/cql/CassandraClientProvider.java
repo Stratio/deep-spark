@@ -17,35 +17,26 @@
 package com.stratio.deep.cql;
 
 import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.Host;
-import com.datastax.driver.core.PoolingOptions;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.LoadBalancingPolicy;
 import com.datastax.driver.core.policies.Policies;
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Ordering;
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.exception.DeepIllegalAccessException;
-import com.stratio.deep.partition.impl.DeepPartitionLocationComparator;
-import org.apache.cassandra.hadoop.ConfigHelper;
-import org.apache.cassandra.hadoop.cql3.CqlPagingInputFormat;
-import org.apache.cassandra.thrift.Cassandra;
+import com.stratio.deep.exception.DeepIOException;
 import org.apache.cassandra.utils.Pair;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.thrift.transport.TTransport;
+import org.apache.spark.SparkException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.net.InetAddress;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by luca on 09/04/14.
  */
 class CassandraClientProvider {
-    private static transient Map<String, Session> clientsCache = Collections.synchronizedMap(new HashMap<String, Session>());
+    private static final transient Map<String, Session> clientsCache = Collections.synchronizedMap(new HashMap<String, Session>());
     private static final Logger LOG = LoggerFactory.getLogger(CassandraClientProvider.class);
 
     static {
@@ -66,11 +57,12 @@ class CassandraClientProvider {
         });
     }
 
-    static Pair<Session, String> getSessionLocation(String location, IDeepJobConfig conf, Boolean balanced) {
+    static Pair<Session, String> trySessionForLocation(String location, IDeepJobConfig conf, Boolean balanced) {
         try {
             return getSession(location, conf, balanced);
         } catch (Exception e){
-            return getSession(conf.getHost(), conf, balanced);
+            LOG.warn("Could not connect to {}, possible loss of data-locality. Delegating connection to java driver", location, conf.getHost());
+            return getSession(conf.getHost(), conf, true);
 
         }
     }
@@ -82,13 +74,11 @@ class CassandraClientProvider {
             final int port = conf.getCqlPort();
             final String key = location + ":" + port + ":" + conf.getKeyspace() + ": " + balanced;
 
-
-
             if (clientsCache.containsKey(key)) {
                 return Pair.create(clientsCache.get(key), location);
             }
 
-            if (location.equals(conf.getHost())) {
+            if (balanced && location.equals(conf.getHost())) {
                 clientsCache.put(key, conf.getSession());
                 return Pair.create(clientsCache.get(key), location);
             }
@@ -109,9 +99,7 @@ class CassandraClientProvider {
 
                 return Pair.create(clientsCache.get(key), location);
             } catch (Exception e) {
-
-                LOG.warn("Failed to create authenticated client to {}:{}", location, port);
-                throw new DeepIllegalAccessException("Failed to create authenticated client to {" + location + "}:{" + port + "}");
+                throw new DeepIOException("Failed to create authenticated client to {" + location + "}:{" + port + "}", e);
             }
         }
 

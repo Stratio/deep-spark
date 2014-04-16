@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-import static com.stratio.deep.cql.CassandraClientProvider.getSession;
+import static com.stratio.deep.cql.CassandraClientProvider.trySessionForLocation;
 
 /**
  * Extends Cassandra's CqlPagingRecordReader in order to make it
@@ -54,7 +54,7 @@ import static com.stratio.deep.cql.CassandraClientProvider.getSession;
 public class DeepRecordReader {
     private static final Logger LOG = LoggerFactory.getLogger(DeepRecordReader.class);
 
-    private static final int DEFAULT_CQL_PAGE_LIMIT = 1000;
+    private static final int DEFAULT_CQL_PAGE_LIMIT = 100;
 
     private DeepTokenRange split;
     private RowIterator rowIterator;
@@ -97,7 +97,7 @@ public class DeepRecordReader {
      *
      * @param split
      */
-    public void initialize(DeepTokenRange split) {
+    private void initialize(DeepTokenRange split){
         this.split = split;
 
         cfName = config.getTable();
@@ -115,7 +115,7 @@ public class DeepRecordReader {
 
             retrieveKeys();
         } catch (Exception e) {
-            throw new DeepGenericException(e);
+            throw new DeepIOException(e);
         }
 
         rowIterator = new RowIterator();
@@ -135,8 +135,9 @@ public class DeepRecordReader {
         for (String location : locations) {
 
             try {
-                return getSession(location, config, true).left;
+                return trySessionForLocation(location, config, false).left;
             } catch (Exception e) {
+                LOG.error("Could not get connection for: {}, replicas: {}", location, Arrays.toString(split.getReplicas()));
                 lastException = e;
             }
         }
@@ -545,6 +546,7 @@ public class DeepRecordReader {
 
                     Object[] values = bindValues.right.toArray(new Object[bindValues.right.size()]);
 
+                    LOG.debug("> Executing query {{}}; bind vars {}", query.right, values);
                     ResultSet resultSet = session.execute(query.right, values);
 
                     if (resultSet != null) {
@@ -552,6 +554,7 @@ public class DeepRecordReader {
                     }
                     return;
                 } catch (NoHostAvailableException e){
+                    LOG.error("Could not connect to ");
                     exception = e;
 
                     try {

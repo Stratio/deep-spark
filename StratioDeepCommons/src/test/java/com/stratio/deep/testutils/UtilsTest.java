@@ -291,13 +291,13 @@ public class UtilsTest {
     public void testCellList2Tuple() {
         Cell domainName = Cell.create("domain_name", "");
 
-        Cell<String> id2 = Cell.create("id2", "", false, true);
-        Cell<String> responseTime = Cell.create("response_time", "");
-        Cell<String> url = Cell.create("url", "");
-        Cell<String> id1 = Cell.create("id1", "", true, false);
-        Cell<String> id3 = Cell.create("id3", "", true, false);
-        Cell<String> responseCode = Cell.create("response_code", "");
-        Cell<String> downloadTime = Cell.create("download_time", "");
+        Cell id2 = Cell.create("id2", "", false, true);
+        Cell responseTime = Cell.create("response_time", "");
+        Cell url = Cell.create("url", "");
+        Cell id1 = Cell.create("id1", "", true, false);
+        Cell id3 = Cell.create("id3", "", true, false);
+        Cell responseCode = Cell.create("response_code", "");
+        Cell downloadTime = Cell.create("download_time", "");
 
         Cells cells = new Cells(
             domainName,

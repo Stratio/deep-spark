@@ -20,9 +20,10 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
+import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepInstantiationException;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
@@ -36,6 +37,7 @@ import org.apache.cassandra.exceptions.SyntaxException;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.cassandra.utils.Pair;
 import org.apache.commons.io.IOUtils;
+import org.apache.spark.SparkException;
 import org.apache.spark.TaskContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +70,11 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     private final IPartitioner partitioner;
     private final InetAddress localhost;
 
+    /**
+     * Con
+     * @param context
+     * @param writeConfig
+     */
     public DeepCqlRecordWriter(TaskContext context, IDeepJobConfig writeConfig) {
         this.clients = new HashMap<>();
         this.removedClients = new HashMap<>();
@@ -82,6 +89,9 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         init();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() {
         LOG.debug("Closing all clients");
@@ -103,13 +113,13 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         }
     }
 
-    protected ByteBuffer getPartitionKey(Cells cells) {
+    private ByteBuffer getPartitionKey(Cells cells) {
         ByteBuffer partitionKey;
         if (keyValidator instanceof CompositeType) {
             ByteBuffer[] keys = new ByteBuffer[partitionKeyColumns.length];
 
             for (int i = 0; i < cells.size(); i++) {
-                Cell<?> c = cells.getCellByIdx(i);
+                Cell c = cells.getCellByIdx(i);
 
                 if (c.isPartitionKey()) {
                     keys[i] = c.getDecomposedCellValue();
@@ -123,7 +133,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         return partitionKey;
     }
 
-    protected void init() {
+    private void init() {
         try {
             retrievePartitionKeyValidator();
 
@@ -132,7 +142,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         }
     }
 
-    protected AbstractType<?> parseType(String type) throws ConfigurationException {
+    private AbstractType<?> parseType(String type) throws ConfigurationException {
         try {
             // always treat counters like longs, specifically CCT.serialize is not what we need
             if (type != null && type.equals("org.apache.cassandra.db.marshal.CounterColumnType")) {
@@ -148,7 +158,8 @@ public class DeepCqlRecordWriter implements AutoCloseable {
      * retrieve the key validator from system.schema_columnfamilies table
      */
     protected void retrievePartitionKeyValidator() throws Exception {
-        Pair<Session, String> sessionWithHost = CassandraClientProvider.getSessionLocation(localhost.getHostAddress(), writeConfig, false);
+        Pair<Session, String> sessionWithHost =
+                CassandraClientProvider.trySessionForLocation(localhost.getHostAddress(), writeConfig, false);
 
         String keyspace = writeConfig.getKeyspace();
         String cfName = writeConfig.getColumnFamily();
@@ -246,6 +257,9 @@ public class DeepCqlRecordWriter implements AutoCloseable {
             return res;
         }
 
+        /**
+         * Triggers the execution of the batch
+         */
         private void triggerBatch() {
             if (getState() != Thread.State.NEW) {
                 return;
@@ -262,11 +276,17 @@ public class DeepCqlRecordWriter implements AutoCloseable {
             LOG.debug("Create client " + this);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             return identity.toString();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void close() throws IOException {
             LOG.debug("[" + this + "] Called close on client, state: " + this.getState());
@@ -285,10 +305,8 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         @Override
         public void run() {
             LOG.debug("[" + this + "] Initializing cassandra client");
-            Pair<Session, String> sessionWithHost = CassandraClientProvider.getSession(localhost.getHostAddress(), writeConfig, true);
+            Pair<Session, String> sessionWithHost = CassandraClientProvider.trySessionForLocation(localhost.getHostAddress(), writeConfig, false);
             sessionWithHost.left.execute(cql, bindVariables.toArray(new Object[bindVariables.size()]));
-
         }
-
     }
 }

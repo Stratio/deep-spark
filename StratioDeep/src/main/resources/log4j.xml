@@ -43,6 +43,10 @@
         <priority value="DEBUG"/>
     </category>
 
+    <category name="com.stratio.deep.rdd">
+        <priority value="DEBUG"/>
+    </category>
+
     <root>
         <priority value="info"/>
         <appender-ref ref="console"/>

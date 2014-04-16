@@ -62,7 +62,7 @@ public final class Utils {
         Cells keys = new Cells();
         Cells values = new Cells();
 
-        for (Cell<?> c : cells) {
+        for (Cell c : cells) {
 
             if (c.isPartitionKey() || c.isClusterKey()) {
 
@@ -240,7 +240,7 @@ public final class Utils {
 
         boolean isFirstField = true;
 
-        for (Cell<?> key : keys) {
+        for (Cell key : keys) {
             String cellName = quote(key.getCellName());
 
             if (!isFirstField) {
@@ -259,7 +259,7 @@ public final class Utils {
         }
 
         if (values != null) {
-            for (Cell<?> key : values) {
+            for (Cell key : values) {
                 sb.append(", ");
                 sb.append(quote(key.getCellName())).append(" ").append(key.marshaller().asCQL3Type().toString());
             }
@@ -327,7 +327,7 @@ public final class Utils {
         int k = 0;
 
         StringBuilder keyClause = new StringBuilder(" WHERE ");
-        for (Cell<?> cell : keys.getCells()) {
+        for (Cell cell : keys.getCells()) {
             if (cell.isPartitionKey() || cell.isClusterKey()) {
                 if (k > 0) {
                     keyClause.append(" AND ");
@@ -341,7 +341,7 @@ public final class Utils {
         }
 
         k = 0;
-        for (Cell<?> cell : values.getCells()) {
+        for (Cell cell : values.getCells()) {
             if (k > 0) {
                 sb.append(", ");
             }

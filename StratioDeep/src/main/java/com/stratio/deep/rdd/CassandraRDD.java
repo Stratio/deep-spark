@@ -16,42 +16,27 @@
 
 package com.stratio.deep.rdd;
 
-import com.datastax.driver.core.querybuilder.Batch;
-import com.datastax.driver.core.querybuilder.Insert;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.config.impl.GenericDeepJobConfig;
-import com.stratio.deep.cql.RangeUtils;
-import com.stratio.deep.cql.DeepCqlRecordWriter;
 import com.stratio.deep.cql.DeepRecordReader;
 import com.stratio.deep.cql.DeepTokenRange;
+import com.stratio.deep.cql.RangeUtils;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.functions.AbstractSerializableFunction2;
 import com.stratio.deep.functions.CellList2TupleFunction;
 import com.stratio.deep.functions.DeepType2TupleFunction;
 import com.stratio.deep.partition.impl.DeepPartition;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.utils.Pair;
-import org.apache.hadoop.mapreduce.JobID;
-import org.apache.spark.Partition;
-import org.apache.spark.SparkContext;
-import org.apache.spark.TaskContext;
+import org.apache.spark.*;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.broadcast.Broadcast;
-import org.apache.spark.rdd.PairRDDFunctions;
 import org.apache.spark.rdd.RDD;
-import scala.Function1;
-import scala.Tuple2;
 import scala.collection.Iterator;
 import scala.collection.Seq;
-import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
 import scala.runtime.AbstractFunction0;
 import scala.runtime.BoxedUnit;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
@@ -67,17 +52,6 @@ import static scala.collection.JavaConversions.asScalaIterator;
 public abstract class CassandraRDD<T> extends RDD<T> {
 
     private static final long serialVersionUID = -7338324965474684418L;
-    protected static final String STRATIO_DEEP_JOB_PREFIX = "stratio-deep-job-";
-    protected static final String STRATIO_DEEP_TASK_PREFIX = "stratio-deep-task-";
-
-    /*
-     * An Hadoop Job Id is needed by the underlying cassandra's API.
-     *
-
-     * We make it transient in order to prevent this to be sent through the wire
-     * to slaves.
-     */
-    private final transient JobID hadoopJobId;
 
     /*
      * RDD configuration. This config is broadcasted to all the Sparks machines.
@@ -115,46 +89,13 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
         @Override
         public R apply() {
-            log().debug("Closing context for partition " + deepPartition);
+            //log().debug("Closing context for partition " + deepPartition);
 
             recordReader.close();
 
             return null;
         }
 
-    }
-
-    private static <W> void doCql3SaveToCassandra(RDD<W> rdd, IDeepJobConfig<W> writeConfig,
-                                                  Function1<W, Tuple2<Cells, Cells>> transformer) {
-
-        Tuple2<Map<String, ByteBuffer>, Map<String, ByteBuffer>> tuple = new Tuple2<>(null, null);
-
-        RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
-                ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
-
-        ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD);
-
-        final int pageSize = writeConfig.getBatchSize();
-        int offset = 0;
-
-        List<Tuple2<Cells, Cells>> elements = Arrays.asList((Tuple2<Cells, Cells>[]) mappedRDD.collect());
-        List<Tuple2<Cells, Cells>> split;
-        do {
-            split = elements.subList(pageSize * (offset++), Math.min(pageSize * offset, elements.size()));
-
-            Batch batch = QueryBuilder.batch();
-
-            for (Tuple2<Cells, Cells> t : split) {
-                Tuple2<String[], Object[]> bindVars = Utils.prepareTuple4CqlDriver(t);
-
-                Insert insert = QueryBuilder.insertInto(writeConfig.getKeyspace(), writeConfig.getTable())
-                        .values(bindVars._1(), bindVars._2());
-
-                batch.add(insert);
-            }
-            writeConfig.getSession().execute(batch);
-
-        } while (split.size() > 0 && split.size() == pageSize);
     }
 
     /**
@@ -171,56 +112,15 @@ public abstract class CassandraRDD<T> extends RDD<T> {
             IDeepJobConfig<T> c = (IDeepJobConfig<T>) writeConfig;
             RDD<T> r = (RDD<T>) rdd;
 
-            doCql3SaveToCassandra(r, c, new DeepType2TupleFunction<T>());
+            CassandraRDDUtils.doCql3SaveToCassandra(r, c, new DeepType2TupleFunction<T>());
         } else if (Cells.class.isAssignableFrom(writeConfig.getEntityClass())) {
             IDeepJobConfig<Cells> c = (IDeepJobConfig<Cells>) writeConfig;
             RDD<Cells> r = (RDD<Cells>) rdd;
 
-            doCql3SaveToCassandra(r, c, new CellList2TupleFunction());
+            CassandraRDDUtils.doCql3SaveToCassandra(r, c, new CellList2TupleFunction());
         } else {
             throw new IllegalArgumentException("Provided RDD must be an RDD of Cells or an RDD of IDeepType");
         }
-    }
-
-    /**
-     * Provided the mapping function <i>transformer</i> that transforms a generic RDD to an RDD<Tuple2<Cells, Cells>>,
-     * this generic method persists the RDD to underlying Cassandra datastore.
-     *
-     * @param rdd
-     * @param writeConfig
-     * @param transformer
-     */
-    private static <W> void doSaveToCassandra(RDD<W> rdd, final IDeepJobConfig<W> writeConfig,
-                                              Function1<W, Tuple2<Cells, Cells>> transformer) {
-
-        Tuple2<Map<String, ByteBuffer>, Map<String, ByteBuffer>> tuple = new Tuple2<>(null, null);
-
-        final RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
-                ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
-
-        ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD);
-
-        ClassTag<Cells> keyClassTag = ClassTag$.MODULE$.apply(Cells.class);
-        ClassTag<Integer> uClassTag = ClassTag$.MODULE$.apply(Integer.class);
-
-        mappedRDD.context().runJob(mappedRDD,
-                new AbstractSerializableFunction2<TaskContext, Iterator<Tuple2<Cells, Cells>>, Integer>() {
-
-                    @Override
-                    public Integer apply(TaskContext context, Iterator<Tuple2<Cells, Cells>> rows) {
-
-                        try (DeepCqlRecordWriter writer = new DeepCqlRecordWriter(context, writeConfig)) {
-                            while (rows.hasNext()) {
-                                Tuple2<Cells, Cells> row = rows.next();
-                                writer.write(row._1(), row._2());
-                            }
-                        }
-
-                        return null;
-                    }
-                }, uClassTag
-        );
-
     }
 
     /**
@@ -235,12 +135,12 @@ public abstract class CassandraRDD<T> extends RDD<T> {
             IDeepJobConfig<T> c = (IDeepJobConfig<T>) writeConfig;
             RDD<T> r = (RDD<T>) rdd;
 
-            doSaveToCassandra(r, c, new DeepType2TupleFunction<T>());
+            CassandraRDDUtils.doSaveToCassandra(r, c, new DeepType2TupleFunction<T>());
         } else if (Cells.class.isAssignableFrom(writeConfig.getEntityClass())) {
             IDeepJobConfig<Cells> c = (IDeepJobConfig<Cells>) writeConfig;
             RDD<Cells> r = (RDD<Cells>) rdd;
 
-            doSaveToCassandra(r, c, new CellList2TupleFunction());
+            CassandraRDDUtils.doSaveToCassandra(r, c, new CellList2TupleFunction());
         } else {
             throw new IllegalArgumentException("Provided RDD must be an RDD of Cells or an RDD of IDeepType");
         }
@@ -267,9 +167,6 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     @SuppressWarnings("unchecked")
     public CassandraRDD(SparkContext sc, IDeepJobConfig<T> config) {
         super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
-
-        long timestamp = System.currentTimeMillis();
-        hadoopJobId = new JobID(STRATIO_DEEP_JOB_PREFIX + timestamp, id());
         this.config = sc.broadcast(config);
     }
 
@@ -308,7 +205,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
             }
         };
 
-        return asScalaIterator(recordReaderIterator);
+        return new InterruptibleIterator<T>(ctx, asScalaIterator(recordReaderIterator));
     }
 
     /**
@@ -376,7 +273,6 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * @return
      */
     protected DeepRecordReader initRecordReader(TaskContext ctx, final DeepPartition dp) {
-
         DeepRecordReader recordReader = new DeepRecordReader(config.value(), dp.splitWrapper());
         ctx.addOnCompleteCallback(getComputeCallback(recordReader, dp));
         return recordReader;

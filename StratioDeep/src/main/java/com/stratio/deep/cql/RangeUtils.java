@@ -19,25 +19,23 @@ package com.stratio.deep.cql;
 import com.datastax.driver.core.*;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.*;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.dht.*;
+import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
 import org.apache.cassandra.utils.Pair;
+import org.apache.spark.SparkException;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.net.InetAddress;
-import java.nio.ByteBuffer;
 import java.util.*;
 
-import static com.google.common.collect.Iterables.concat;
-import static com.google.common.collect.Iterables.indexOf;
-import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Iterables.*;
 
 /**
  * {@link CqlPagingRecordReader} implementation that returns an instance of a

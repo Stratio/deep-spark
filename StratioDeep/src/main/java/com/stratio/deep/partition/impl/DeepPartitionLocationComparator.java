@@ -19,7 +19,6 @@ package com.stratio.deep.partition.impl;
 import com.stratio.deep.exception.DeepInstantiationException;
 
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Comparator;
 

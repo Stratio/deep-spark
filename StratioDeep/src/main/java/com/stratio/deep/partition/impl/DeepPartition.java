@@ -17,11 +17,7 @@
 package com.stratio.deep.partition.impl;
 
 import com.stratio.deep.cql.DeepTokenRange;
-import org.apache.cassandra.hadoop.ColumnFamilySplit;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.hadoop.io.Writable;
 import org.apache.spark.Partition;
-import org.apache.spark.SerializableWritable;
 
 /**
  * Object that carries spark's partition information.
@@ -94,15 +90,10 @@ public class DeepPartition implements Partition {
      */
     @Override
     public String toString() {
-        return "DeepPartition [rddId="
-            + rddId
-            + ", idx="
-            + idx
-            + ", "
-            + (splitWrapper != null ? "startToken=" + splitWrapper.getStartToken() : "")
-            + (splitWrapper != null ? ", endToken=" + splitWrapper.getEndToken() : "")
-            + (splitWrapper != null ? ", locations=" + ArrayUtils.toString(splitWrapper.getReplicas())
-            : "") + "]";
+        return "DeepPartition{" +
+                "rddId=" + rddId +
+                ", idx=" + idx +
+                ", splitWrapper=" + splitWrapper +
+                '}';
     }
-
 }

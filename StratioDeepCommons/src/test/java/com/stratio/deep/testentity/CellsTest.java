@@ -90,7 +90,7 @@ public class CellsTest {
             fail();
         }
 
-        Cell<?> c = keys.getCellByIdx(1);
+        Cell c = keys.getCellByIdx(1);
 
         assertNotNull(c);
         assertEquals(c.getCellName(), "id2");
@@ -104,7 +104,7 @@ public class CellsTest {
             "response_time", ""), Cell.create("response_code", ""), Cell.create("download_time", ""));
 
         assertNull(values.getCellByName("notexistingcell"));
-        Cell<?> c = values.getCellByName("domain_name");
+        Cell c = values.getCellByName("domain_name");
         assertNotNull(c);
         assertEquals(c.getCellName(), "domain_name");
         assertEquals(UTF8Type.instance.compose(c.getDecomposedCellValue()), "abc.es");
@@ -116,7 +116,7 @@ public class CellsTest {
         Cells values = new Cells(Cell.create("domain_name", "abc.es"), Cell.create("url", ""), Cell.create(
             "response_time", ""), Cell.create("response_code", ""), Cell.create("download_time", ""));
 
-        Collection<Cell<?>> copy = values.getCells();
+        Collection<Cell> copy = values.getCells();
 
         assertNotNull(copy);
         assertEquals(copy.size(), 5);
@@ -156,7 +156,7 @@ public class CellsTest {
             downloadTime));
 
         int idx = 0;
-        for (Cell<?> cell : values) {
+        for (Cell cell : values) {
             ByteBuffer bb = cell.getDecomposedCellValue();
 
             switch (idx) {

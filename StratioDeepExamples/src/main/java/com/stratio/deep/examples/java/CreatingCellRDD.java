@@ -22,6 +22,8 @@ import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.*;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
+import org.apache.spark.SparkConf;
+import org.apache.spark.SparkContext;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -60,11 +62,17 @@ public final class CreatingCellRDD {
 
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), new String[]{p.getJar()});
+        SparkConf sparkConf = new SparkConf().setMaster(p.getCluster()).setAppName(job).setSparkHome(p.getSparkHome()).setJars(new String[]{p.getJar()})
+                .set("spark.task.maxFailures", "5");
+
+        SparkContext sc = new SparkContext(p.getCluster(), job, sparkConf);
+
+        DeepSparkContext deepContext = new DeepSparkContext(sc);
 
         // Configuration and initialization
         IDeepJobConfig config = DeepJobConfigFactory.create()
-                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
+                .host(p.getCassandraHost())
+                .cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(tableName)
                 .initialize();
 

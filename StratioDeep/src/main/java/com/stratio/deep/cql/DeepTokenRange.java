@@ -16,12 +16,8 @@
 
 package com.stratio.deep.cql;
 
-import com.datastax.driver.core.Host;
-
 import java.io.Serializable;
-import java.net.InetAddress;
-import java.util.Collections;
-import java.util.Set;
+import java.util.Arrays;
 
 /**
 * Created by luca on 14/04/14.
@@ -44,9 +40,10 @@ public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable 
 
     @Override
     public String toString() {
-        return "{" +
-                "start=" + startToken +
-                ", end=" + endToken +
+        return "DeepTokenRange{" +
+                "startToken=" + startToken +
+                ", endToken=" + endToken +
+                ", replicas=" + Arrays.toString(replicas) +
                 '}';
     }
 
