@@ -18,27 +18,20 @@ package com.stratio.deep.config.impl;
 
 import com.datastax.driver.core.*;
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.cql.DeepConfigHelper;
+import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
 import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.cassandra.dht.IPartitioner;
-import org.apache.cassandra.hadoop.ConfigHelper;
-import org.apache.cassandra.hadoop.cql3.CqlConfigHelper;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
@@ -120,9 +113,9 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     private String readConsistencyLevel = ConsistencyLevel.LOCAL_ONE.name();
 
     /**
-     * Default write consistency level. Defaults to LOCAL_ONE.
+     * Default write consistency level. Defaults to QUORUM.
      */
-    private String writeConsistencyLevel = ConsistencyLevel.LOCAL_ONE.name();
+    private String writeConsistencyLevel = ConsistencyLevel.QUORUM.name();
 
     /**
      * Enables/Disables auto-creation of column family when writing to Cassandra.
