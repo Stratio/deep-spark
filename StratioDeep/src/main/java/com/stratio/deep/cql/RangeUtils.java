@@ -19,9 +19,7 @@ package com.stratio.deep.cql;
 import com.datastax.driver.core.*;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
+import com.google.common.collect.*;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.utils.Utils;
@@ -29,7 +27,8 @@ import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
 import org.apache.cassandra.utils.Pair;
-import org.apache.spark.SparkException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.net.InetAddress;
@@ -43,24 +42,34 @@ import static com.google.common.collect.Iterables.*;
  *
  * @author Luca Rosellini <luca@strat.io>
  */
-public class RangeUtils<T> {
+public class RangeUtils {
+    private static final Logger LOG = LoggerFactory.getLogger(RangeUtils.class);
 
     private RangeUtils() {
     }
 
-    private static Map<String, List<Comparable>> fetchSortedTokens(
+    /**
+     * Gets the list of token for each cluster machine.<br/>
+     * The concrete class of the token depends on the partitioner used.<br/>
+     *
+     * @param query           the query to execute against the given session to obtain the list of tokens.
+     * @param sessionWithHost the pair object containing both the session and the name of the machine to which we're connected to.
+     * @param partitioner     the partitioner used in the cluster.
+     * @return a map containing, for each cluster machine, the list of tokens. Tokens are not returned in any particular order.
+     */
+    static Map<String, Iterable<Comparable>> fetchTokens(
             String query, final Pair<Session, String> sessionWithHost, IPartitioner partitioner) {
 
         ResultSet rSet = sessionWithHost.left.execute(query);
 
         final AbstractType tkValidator = partitioner.getTokenValidator();
-        final Map<String, List<Comparable>> tokens = Maps.newHashMap();
+        final Map<String, Iterable<Comparable>> tokens = Maps.newHashMap();
 
-        Iterable<Pair<String, List<Comparable>>> pairs =
-                transform(rSet.all(), new Function<Row, Pair<String, List<Comparable>>>() {
+        Iterable<Pair<String, Iterable<Comparable>>> pairs =
+                transform(rSet.all(), new Function<Row, Pair<String, Iterable<Comparable>>>() {
                     @Nullable
                     @Override
-                    public Pair<String, List<Comparable>> apply(final @Nullable Row row) {
+                    public Pair<String, Iterable<Comparable>> apply(final @Nullable Row row) {
                         assert row != null;
                         InetAddress host;
                         try {
@@ -69,46 +78,63 @@ public class RangeUtils<T> {
                             host = Utils.inetAddressFromLocation(sessionWithHost.right);
                         }
 
-                        List<Comparable> sortedTokens = Ordering.natural().immutableSortedCopy(
+                        Iterable<Comparable> sortedTokens =
                                 transform(row.getSet("tokens", String.class), new Function<String, Comparable>() {
-                                    @Nullable
-                                    @Override
-                                    public Comparable apply(final @Nullable String token) {
-                                        return (Comparable) tkValidator.compose(tkValidator.fromString(token));
-                                    }
-                                })
-                        );
+                                            @Nullable
+                                            @Override
+                                            public Comparable apply(final @Nullable String token) {
+                                                return (Comparable) tkValidator.compose(tkValidator.fromString(token));
+                                            }
+                                        }
+                                );
 
                         return Pair.create(host.getHostName(), sortedTokens);
                     }
                 });
 
-        for (Pair<String, List<Comparable>> pair : pairs) {
+        for (Pair<String, Iterable<Comparable>> pair : pairs) {
             tokens.put(pair.left, pair.right);
         }
 
         return tokens;
     }
 
-    private static List<DeepTokenRange> mergeTokenRanges(Map<String, List<Comparable>> tokens, final Session session,
+    /**
+     * Merges the list of tokens for each cluster machine to a single list of token ranges.
+     *
+     * @param tokens      the map of tokens for each cluster machine.
+     * @param session     the connection to the cluster.
+     * @param partitioner the partitioner used in the cluster.
+     * @param config      the Deep configuration object.
+     * @return the merged lists of tokens transformed to DeepTokenRange(s). The returned collection is shuffled.
+     */
+    private static List<DeepTokenRange> mergeTokenRanges(Map<String, Iterable<Comparable>> tokens, final Session session,
                                                          final IPartitioner partitioner, final IDeepJobConfig config) {
         final Iterable<Comparable> allRanges = Ordering.natural().sortedCopy(concat(tokens.values()));
         final Comparable maxValue = Ordering.natural().max(allRanges);
         final Comparable minValue = (Comparable) partitioner.minValue(maxValue.getClass()).getToken().token;
 
-        Function<Comparable, List<DeepTokenRange>> map = new Function<Comparable, List<DeepTokenRange>>() {
-            public List<DeepTokenRange> apply(final Comparable elem) {
+        Function<Comparable, Set<DeepTokenRange>> map = new Function<Comparable, Set<DeepTokenRange>>() {
+            public Set<DeepTokenRange> apply(final Comparable elem) {
                 Comparable nextValue;
                 Comparable currValue = elem;
 
-                List<DeepTokenRange> result = new ArrayList<>();
+                Set<DeepTokenRange> result = new HashSet<>();
 
                 if (currValue.equals(maxValue)) {
 
                     result.add(new DeepTokenRange(currValue, minValue,
                             initReplicas(currValue, session, partitioner, config)));
                     currValue = minValue;
-                    nextValue = Iterables.getFirst(allRanges, null);
+
+                    nextValue = Iterables.find(allRanges, new Predicate<Comparable>() {
+                        @Override
+                        @SuppressWarnings("unchecked")
+                        public boolean apply(@Nullable Comparable input) {
+                            assert input != null;
+                            return input.compareTo(minValue) > 0;
+                        }
+                    });
 
                 } else {
 
@@ -128,31 +154,43 @@ public class RangeUtils<T> {
             }
         };
 
+        /*
+        List<DeepTokenRange> result =  Lists.newArrayList(concat(transform(allRanges, map)));
+        Collections.shuffle(result);
+        return result;
+        */
         return Ordering.natural().sortedCopy(concat(transform(allRanges, map)));
     }
 
-    private static String[] initReplicas(
-            final Comparable startToken, final Session session, final IPartitioner partitioner, final IDeepJobConfig config) {
+    /**
+     * Given a token, fetches the list of replica machines holding that token.
+     *
+     * @param token the token whose replicas we want to fetch.
+     * @param session the connection to the cluster.
+     * @param partitioner the partitioner used in the cluster.
+     * @param config the Deep configuration object.
+     * @return the list of replica machines holding that token.
+     */
+    private static List<String> initReplicas(
+            final Comparable token, final Session session, final IPartitioner partitioner, final IDeepJobConfig config) {
         final AbstractType tkValidator = partitioner.getTokenValidator();
         final Metadata metadata = session.getCluster().getMetadata();
 
-        Set<Host> replicas =
-                metadata.getReplicas(
-                        config.getKeyspace(),
-                        tkValidator.decompose(startToken));
+        @SuppressWarnings("unchecked")
+        Set<Host> replicas = metadata.getReplicas(config.getKeyspace(), tkValidator.decompose(token));
 
-        return Iterables.toArray(Iterables.transform(replicas, new Function<Host, String>() {
+        return Lists.newArrayList(Iterables.transform(replicas, new Function<Host, String>() {
             @Nullable
             @Override
             public String apply(@Nullable Host input) {
                 assert input != null;
                 return input.getAddress().getHostName();
             }
-        }), String.class);
+        }));
     }
 
     public static List<DeepTokenRange> getSplits(IDeepJobConfig config) {
-        Map<String, List<Comparable>> tokens = new HashMap<>();
+        Map<String, Iterable<Comparable>> tokens = new HashMap<>();
         IPartitioner partitioner = getPartitioner(config);
 
         Pair<Session, String> sessionWithHost =
@@ -161,28 +199,12 @@ public class RangeUtils<T> {
                         config, false);
 
         String queryLocal = "select tokens from system.local";
-        tokens.putAll(fetchSortedTokens(queryLocal, sessionWithHost, partitioner));
+        tokens.putAll(fetchTokens(queryLocal, sessionWithHost, partitioner));
 
         String queryPeers = "select peer, tokens from system.peers";
-        tokens.putAll(fetchSortedTokens(queryPeers, sessionWithHost, partitioner));
+        tokens.putAll(fetchTokens(queryPeers, sessionWithHost, partitioner));
 
         return mergeTokenRanges(tokens, sessionWithHost.left, partitioner, config);
-
-            /*
-            List<DeepTokenRange> hadoopTr = new ArrayList<>();
-            for (InputSplit split : splits) {
-                Long startToken = Long.parseLong(((ColumnFamilySplit) split).getStartToken());
-                Long endToken = Long.parseLong(((ColumnFamilySplit) split).getEndToken());
-                DeepTokenRange finder = new DeepTokenRange(startToken, endToken);
-                hadoopTr.add(finder);
-            }
-
-
-            boolean elementsEquals = Iterables.elementsEqual(
-                    Ordering.natural().sortedCopy(finalTokenRanges),
-                    Ordering.natural().sortedCopy(hadoopTr));
-            System.out.println("elementsEquals: "+elementsEquals);
-            */
     }
 
 

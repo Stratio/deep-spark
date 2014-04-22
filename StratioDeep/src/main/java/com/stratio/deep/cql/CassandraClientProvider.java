@@ -72,18 +72,22 @@ class CassandraClientProvider {
 
         synchronized (clientsCache) {
             final int port = conf.getCqlPort();
-            final String key = location + ":" + port + ":" + conf.getKeyspace() + ": " + balanced;
+            final String key = location + ":" + port + ":" + conf.getKeyspace() + ":" + balanced;
 
             if (clientsCache.containsKey(key)) {
+                LOG.trace("Found cached session at level 1 for key {{}}", key);
                 return Pair.create(clientsCache.get(key), location);
             }
 
             if (balanced && location.equals(conf.getHost())) {
                 clientsCache.put(key, conf.getSession());
+                LOG.trace("Found cached session at level 2 for key {{}}", key);
                 return Pair.create(clientsCache.get(key), location);
             }
 
             try {
+
+                LOG.debug("No cached session found for key {{}}", key);
                 InetAddress locationInet = InetAddress.getByName(location);
                 LoadBalancingPolicy loadBalancingPolicy = balanced ? Policies.defaultLoadBalancingPolicy() : new LocalMachineLoadBalancingPolicy(locationInet);
 

@@ -20,6 +20,8 @@ import com.datastax.driver.core.*;
 import com.datastax.driver.core.exceptions.NoHostAvailableException;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.impl.GenericDeepJobConfig;
 import com.stratio.deep.entity.Cell;
@@ -52,7 +54,7 @@ import static com.stratio.deep.cql.CassandraClientProvider.trySessionForLocation
 public class DeepRecordReader {
     private static final Logger LOG = LoggerFactory.getLogger(DeepRecordReader.class);
 
-    private static final int DEFAULT_CQL_PAGE_LIMIT = 100;
+    private static final int DEFAULT_CQL_PAGE_LIMIT = 1000;
 
     private DeepTokenRange split;
     private RowIterator rowIterator;
@@ -78,6 +80,8 @@ public class DeepRecordReader {
     private final DeepPartitionLocationComparator comparator = new DeepPartitionLocationComparator();
 
     private final IDeepJobConfig config;
+
+    private Session session;
 
     /**
      * public constructor. Takes a list of filters to pass to the underlying datastores.
@@ -109,7 +113,7 @@ public class DeepRecordReader {
         partitioner = Utils.newTypeInstance(config.getPartitionerClassName(), IPartitioner.class);
 
         try {
-            createConnection();
+            session = createConnection();
 
             retrieveKeys();
         } catch (Exception e) {
@@ -122,20 +126,21 @@ public class DeepRecordReader {
     }
 
     private Session createConnection() throws Exception {
-        String[] locations = split.getReplicas();
-        Exception lastException = null;
 
         /* reorder locations */
-        Arrays.sort(locations, comparator);
+        Iterable<String> locations =
+                Ordering.from(new DeepPartitionLocationComparator()).sortedCopy(split.getReplicas());
+        
+        Exception lastException = null;
 
-        LOG.debug("createConnection for locations: " + Arrays.toString(locations));
 
+        LOG.info("createConnection: " + locations);
         for (String location : locations) {
 
             try {
                 return trySessionForLocation(location, config, false).left;
             } catch (Exception e) {
-                LOG.error("Could not get connection for: {}, replicas: {}", location, Arrays.toString(split.getReplicas()));
+                LOG.error("Could not get connection for: {}, replicas: {}", location, locations);
                 lastException = e;
             }
         }
@@ -540,7 +545,7 @@ public class DeepRecordReader {
             // only try three times for TimedOutException and UnavailableException
             while (retries < 3) {
                 try {
-                    Session session = createConnection();
+                    //Session session = createConnection();
 
                     Object[] values = bindValues.right.toArray(new Object[bindValues.right.size()]);
 

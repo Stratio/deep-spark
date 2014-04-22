@@ -18,6 +18,7 @@ package com.stratio.deep.cql;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
 
 /**
 * Created by luca on 14/04/14.
@@ -25,14 +26,14 @@ import java.util.Arrays;
 public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable {
     private Comparable startToken;
     private Comparable endToken;
-    private String[] replicas;
+    private List<String> replicas;
 
     public DeepTokenRange(Comparable startToken, Comparable endToken) {
         this.startToken = startToken;
         this.endToken = endToken;
     }
 
-    public DeepTokenRange(Comparable startToken, Comparable endToken, String[] replicas) {
+    public DeepTokenRange(Comparable startToken, Comparable endToken, List<String> replicas) {
         this.startToken = startToken;
         this.endToken = endToken;
         this.replicas = replicas;
@@ -43,8 +44,8 @@ public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable 
         return "DeepTokenRange{" +
                 "startToken=" + startToken +
                 ", endToken=" + endToken +
-                ", replicas=" + Arrays.toString(replicas) +
-                '}';
+                ", replicas=" + replicas +
+                "}\n";
     }
 
     @Override
@@ -83,12 +84,8 @@ public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable 
         this.endToken = endToken;
     }
 
-    public String[] getReplicas() {
+    public List<String> getReplicas() {
         return replicas;
-    }
-
-    public void setReplicas(String[] replicas) {
-        this.replicas = replicas;
     }
 
     @Override

@@ -26,7 +26,7 @@ import java.util.Comparator;
  * Created by luca on 09/04/14.
  */
 public class DeepPartitionLocationComparator implements Comparator<String> {
-    private InetAddress hostname;
+    private final InetAddress hostname;
 
     public InetAddress getHostname() {
         return hostname;
@@ -34,7 +34,6 @@ public class DeepPartitionLocationComparator implements Comparator<String> {
 
     public DeepPartitionLocationComparator(){
         try {
-
             this.hostname = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
             throw new DeepInstantiationException(e);

@@ -41,6 +41,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static scala.collection.JavaConversions.asScalaBuffer;
 import static scala.collection.JavaConversions.asScalaIterator;
@@ -235,11 +236,13 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
         Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
 
-        for (int i = 0; i < underlyingInputSplits.size(); i++) {
-            DeepTokenRange split = underlyingInputSplits.get(i);
+        int i = 0;
+
+        for (DeepTokenRange split : underlyingInputSplits) {
             partitions[i] = new DeepPartition(id(), i, split);
 
             log().debug("Detected partition: " + partitions[i]);
+            ++i;
         }
 
         return partitions;
@@ -252,10 +255,10 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     public Seq<String> getPreferredLocations(Partition split) {
         DeepPartition p = (DeepPartition) split;
 
-        String[] locations = p.splitWrapper().getReplicas();
+        List<String> locations = p.splitWrapper().getReplicas();
         log().debug("getPreferredLocations: " + p);
 
-        return asScalaBuffer(Arrays.asList(locations));
+        return asScalaBuffer(locations);
     }
 
     /**

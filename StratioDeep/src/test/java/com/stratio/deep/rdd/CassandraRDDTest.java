@@ -19,6 +19,7 @@ package com.stratio.deep.rdd;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import org.apache.cassandra.exceptions.ConfigurationException;
+import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
 import org.apache.log4j.Logger;
 import org.apache.spark.Partition;
 import org.testng.annotations.BeforeClass;
@@ -111,6 +112,8 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     public void testRDDInstantiation() {
         logger.info("testRDDInstantiation()");
         assertNotNull(getRDD());
+
+
     }
 
     @Test(dependsOnMethods = "testSimpleSaveToCassandra")
