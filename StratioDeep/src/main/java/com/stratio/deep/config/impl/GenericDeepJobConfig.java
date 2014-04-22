@@ -33,6 +33,8 @@ import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 
 import static com.stratio.deep.utils.Utils.createTableQueryGenerator;
@@ -60,7 +62,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     /**
      * hostname of the cassandra server
      */
-    private String host = Constants.DEFAULT_CASSANDRA_HOST;
+    private String host;
 
     /**
      * Cassandra server RPC port.
@@ -417,6 +419,16 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
         if (isInitialized) {
             return this;
         }
+
+        if (StringUtils.isEmpty(host)){
+            try {
+                host = InetAddress.getLocalHost().getCanonicalHostName();
+            } catch (UnknownHostException e) {
+                logger.warn("Cannot resolve local host canonical name, using \"localhost\"");
+                host = InetAddress.getLoopbackAddress().getCanonicalHostName();
+            }
+        }
+
 
         validate();
 
