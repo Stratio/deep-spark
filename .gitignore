@@ -3,3 +3,4 @@
 spark-deep-distribution*
 */*.versionsBackup
 target/
+*GitIgnored*
