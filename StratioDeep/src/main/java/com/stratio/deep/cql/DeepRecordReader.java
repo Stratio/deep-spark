@@ -20,6 +20,7 @@ import com.datastax.driver.core.*;
 import com.datastax.driver.core.exceptions.NoHostAvailableException;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.GenericDeepJobConfig;
@@ -123,8 +124,8 @@ public class DeepRecordReader {
     private Session createConnection() throws Exception {
 
         /* reorder locations */
-        Iterable<String> locations =
-                Ordering.from(new DeepPartitionLocationComparator()).sortedCopy(split.getReplicas());
+        List<String> locations = Lists.newArrayList(split.getReplicas());
+        Collections.sort(locations, new DeepPartitionLocationComparator());
 
         Exception lastException = null;
 
