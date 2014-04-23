@@ -28,6 +28,9 @@ public final class Constants {
 
     public static final int DEFAULT_BATCH_SIZE = 100;
 
+    public static final int DEFAULT_PAGE_SIZE = 1000;
+    public static final int DEFAULT_MAX_PAGE_SIZE = 10000;
+
     private Constants() {
     }
 

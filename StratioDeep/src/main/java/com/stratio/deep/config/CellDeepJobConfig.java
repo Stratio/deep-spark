@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.config.impl;
+package com.stratio.deep.config;
 
 import com.stratio.deep.entity.Cells;
 
@@ -27,6 +27,10 @@ public class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
 
     private static final long serialVersionUID = -598862509865396541L;
     private Cells dummyCells;
+
+    CellDeepJobConfig(Boolean isWriteConfig) {
+        this.isWriteConfig = isWriteConfig;
+    }
 
     {
         dummyCells = new Cells();

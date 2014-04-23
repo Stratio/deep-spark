@@ -153,7 +153,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells>  {
 
     @Override
     protected IDeepJobConfig<Cells> initWriteConfig() {
-        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.create()
+        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
             .host(Constants.DEFAULT_CASSANDRA_HOST)
             .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
             .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)

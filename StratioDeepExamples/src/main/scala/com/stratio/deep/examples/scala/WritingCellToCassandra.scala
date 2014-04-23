@@ -64,7 +64,7 @@ object WritingCellToCassandra {
         // -------------------------------- OUTPUT to Cassandra
         // Creating a configuration for the output RDD and initialize it
         // --- OUTPUT RDD
-        val outputConfig = DeepJobConfigFactory.create()
+        val outputConfig = DeepJobConfigFactory.createWriteConfig()
           .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
                 .keyspace(outputKeyspaceName).table(outputTableName).createTableOnWrite(true)
                 .initialize

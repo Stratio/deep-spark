@@ -17,8 +17,8 @@
 package com.stratio.deep.context;
 
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.config.impl.CellDeepJobConfig;
-import com.stratio.deep.config.impl.EntityDeepJobConfig;
+import com.stratio.deep.config.CellDeepJobConfig;
+import com.stratio.deep.config.EntityDeepJobConfig;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;

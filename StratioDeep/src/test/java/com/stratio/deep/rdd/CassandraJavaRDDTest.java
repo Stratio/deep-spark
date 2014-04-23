@@ -221,7 +221,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
         //executeCustomCQL("create table  " + OUTPUT_KEYSPACE_NAME + "." + table + " (domain text, count int, PRIMARY KEY(domain));");
 
-        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.create()
+        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
             .host(Constants.DEFAULT_CASSANDRA_HOST)
             .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
             .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -249,7 +249,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
     @Test(dependsOnMethods = "testSaveToCassandra")
     public void testSaveToCassandra2(){
-        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.create()
+        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
             .host(Constants.DEFAULT_CASSANDRA_HOST)
             .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
             .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)

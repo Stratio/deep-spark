@@ -28,6 +28,7 @@ import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.utils.Constants;
+import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import org.testng.annotations.Test;
 import scala.Function1;
@@ -36,17 +37,15 @@ import scala.reflect.ClassTag$;
 import java.util.List;
 
 import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Integration tests for generic cell RDDs.
  */
 @Test(suiteName = "cassandraRddTests", dependsOnGroups = {"CassandraCql3RDDTest"}, groups = {"CassandraCellRDDTest"})
 public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
+    private Logger logger = Logger.getLogger(CassandraCellRDDTest.class);
     private static class CellsAbstractSerializableFunction extends AbstractSerializableFunction<Cells, Cells> {
-
-        /**
-         *
-         */
         private static final long serialVersionUID = 78298010100204823L;
 
         @Override
@@ -60,6 +59,8 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
     @Override
     protected void checkComputedData(Cells[] entities) {
         boolean found = false;
+
+        assertEquals(entities.length, cql3TestDataSize);
 
         for (Cells cells : entities) {
 
@@ -146,9 +147,32 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
         return rddConfig;
     }
 
+    @Test
+    public void testCountWithInputColumns(){
+        logger.info("testCountWithInputColumns()");
+
+        IDeepJobConfig<Cells> tmpConfig = DeepJobConfigFactory.create().host(Constants.DEFAULT_CASSANDRA_HOST)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .keyspace(KEYSPACE_NAME)
+                .columnFamily(CQL3_COLUMN_FAMILY)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .inputColumns("password")
+                .initialize();
+
+        CassandraRDD<Cells> tmpRdd = context.cassandraGenericRDD(tmpConfig);
+
+        Cells[] cells = (Cells[]) tmpRdd.collect();
+
+        assertEquals(cells.length, cql3TestDataSize);
+
+        for (Cells cell : cells) {
+            assertEquals(cell.size(), 4 + 1);
+        }
+    }
+
     @Override
     protected IDeepJobConfig<Cells> initWriteConfig() {
-        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.create().host(Constants.DEFAULT_CASSANDRA_HOST)
+        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig().host(Constants.DEFAULT_CASSANDRA_HOST)
             .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(OUTPUT_KEYSPACE_NAME)
             .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).columnFamily(CQL3_OUTPUT_COLUMN_FAMILY)
             .createTableOnWrite(Boolean.TRUE)

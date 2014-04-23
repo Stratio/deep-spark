@@ -20,10 +20,9 @@ import com.datastax.driver.core.*;
 import com.datastax.driver.core.exceptions.NoHostAvailableException;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.config.impl.GenericDeepJobConfig;
+import com.stratio.deep.config.GenericDeepJobConfig;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
@@ -71,13 +70,11 @@ public class DeepRecordReader {
     private String columns;
 
     // the number of cql rows per page
-    private int pageRowSize;
+    private int pageSize;
 
     private IPartitioner partitioner;
 
     private AbstractType<?> keyValidator;
-
-    private final DeepPartitionLocationComparator comparator = new DeepPartitionLocationComparator();
 
     private final IDeepJobConfig config;
 
@@ -99,7 +96,7 @@ public class DeepRecordReader {
      *
      * @param split
      */
-    private void initialize(DeepTokenRange split){
+    private void initialize(DeepTokenRange split) {
         this.split = split;
 
         cfName = config.getTable();
@@ -108,7 +105,7 @@ public class DeepRecordReader {
             columns = StringUtils.join(config.getInputColumns(), ",");
         }
 
-        pageRowSize = DEFAULT_CQL_PAGE_LIMIT;
+        pageSize = DEFAULT_CQL_PAGE_LIMIT;
 
         partitioner = Utils.newTypeInstance(config.getPartitionerClassName(), IPartitioner.class);
 
@@ -121,8 +118,6 @@ public class DeepRecordReader {
         }
 
         rowIterator = new RowIterator();
-
-        LOG.debug("created {}", rowIterator);
     }
 
     private Session createConnection() throws Exception {
@@ -130,11 +125,11 @@ public class DeepRecordReader {
         /* reorder locations */
         Iterable<String> locations =
                 Ordering.from(new DeepPartitionLocationComparator()).sortedCopy(split.getReplicas());
-        
+
         Exception lastException = null;
 
 
-        LOG.info("createConnection: " + locations);
+        LOG.debug("createConnection: " + locations);
         for (String location : locations) {
 
             try {
@@ -191,6 +186,11 @@ public class DeepRecordReader {
             executeQuery();
         }
 
+        private boolean isColumnWanted(String columnName) {
+            return ArrayUtils.isEmpty(config.getInputColumns()) ||
+                    ArrayUtils.contains(config.getInputColumns(), columnName);
+        }
+
         /**
          * {@inheritDoc}
          */
@@ -240,7 +240,7 @@ public class DeepRecordReader {
             }
             for (ColumnMetadata key : allColumns) {
                 String columnName = key.getName();
-                if (keyColumns.containsKey(columnName)){
+                if (keyColumns.containsKey(columnName) || !isColumnWanted(columnName)) {
                     continue;
                 }
 
@@ -257,7 +257,7 @@ public class DeepRecordReader {
             }
 
             // read full page
-            if (pageRows >= pageRowSize || !rows.hasNext()) {
+            if (pageRows >= pageSize || !rows.hasNext()) {
                 Iterator<String> newKeys = keyColumns.keySet().iterator();
                 for (BoundColumn column : partitionBoundColumns) {
                     column.value = keyColumns.get(newKeys.next());
@@ -351,17 +351,18 @@ public class DeepRecordReader {
 
                 columns = withoutKeyColumns(columns);
                 columns = (clusterKey == null || "".equals(clusterKey))
-                    ? partitionKey + (columns != null ? ("," + columns) : "")
-                    : partitionKey + "," + clusterKey + (columns != null ? ("," + columns) : "");
+                        ? partitionKey + (columns != null ? ("," + columns) : "")
+                        : partitionKey + "," + clusterKey + (columns != null ? ("," + columns) : "");
             }
 
             return Pair.create(clause.left,
-                String.format("SELECT %s FROM %s%s%s LIMIT %d ALLOW FILTERING",
-                    columns,
-                    quote(cfName),
-                    clause.right,
-                    Utils.additionalFilterGenerator(config.getAdditionalFilters()),
-                    pageRowSize));
+                    String.format("SELECT %s FROM %s%s%s LIMIT %d ALLOW FILTERING",
+                            columns,
+                            quote(cfName),
+                            clause.right,
+                            Utils.additionalFilterGenerator(config.getAdditionalFilters()),
+                            pageSize)
+            );
         }
 
         /**
@@ -406,13 +407,14 @@ public class DeepRecordReader {
             // query token(k) > token(pre_partition_key) and token(k) <= end_token
             if (clusterColumns.size() == 0 || clusterColumns.get(0).value == null) {
                 return Pair.create(1,
-                    String.format(" WHERE token(%s) > token(%s)  AND token(%s) <= ?",
-                        partitionKeyString, partitionKeyMarkers, partitionKeyString));
+                        String.format(" WHERE token(%s) > token(%s)  AND token(%s) <= ?",
+                                partitionKeyString, partitionKeyMarkers, partitionKeyString)
+                );
             }
             // query token(k) = token(pre_partition_key) and m = pre_cluster_key_m and n > pre_cluster_key_n
             Pair<Integer, String> clause = whereClause(clusterColumns, 0);
             return Pair.create(clause.left,
-                String.format(" WHERE token(%s) = token(%s) %s", partitionKeyString, partitionKeyMarkers, clause.right));
+                    String.format(" WHERE token(%s) = token(%s) %s", partitionKeyString, partitionKeyMarkers, clause.right));
         }
 
         /**
@@ -503,7 +505,7 @@ public class DeepRecordReader {
 
             BoundColumn boundColumn = columns.get(position);
             Object boundColumnValue = boundColumn.validator.compose(boundColumn.value);
-            if (position == columns.size() - 1 || columns.get(position+1).value == null) {
+            if (position == columns.size() - 1 || columns.get(position + 1).value == null) {
                 bindValues.add(boundColumnValue);
                 return position + 2;
             } else {
@@ -529,7 +531,7 @@ public class DeepRecordReader {
             try {
                 bindValues = preparedQueryBindValues();
             } catch (Exception e) {
-                LOG.error("Exception",e);
+                LOG.error("Exception", e);
             }
             LOG.debug("query type: {}", bindValues.left);
 
@@ -556,13 +558,14 @@ public class DeepRecordReader {
                         rows = resultSet.iterator();
                     }
                     return;
-                } catch (NoHostAvailableException e){
+                } catch (NoHostAvailableException e) {
                     LOG.error("Could not connect to ");
                     exception = e;
 
                     try {
                         Thread.sleep(100);
-                    } catch (InterruptedException e1) {}
+                    } catch (InterruptedException e1) {
+                    }
 
                     ++retries;
 
@@ -571,7 +574,7 @@ public class DeepRecordReader {
                 }
             }
 
-            if (exception != null){
+            if (exception != null) {
                 throw new DeepIOException(exception);
             }
         }
@@ -602,12 +605,12 @@ public class DeepRecordReader {
             clusterColumns.add(boundColumn);
         }
 
-        if (types.size()>1){
+        if (types.size() > 1) {
             keyValidator = CompositeType.getInstance(types);
         } else if (types.size() == 1) {
             keyValidator = types.get(0);
-        } else{
-            throw new DeepGenericException("Cannot determine if keyvalidator is composed or not, partitionKeys: "+ partitionKeys);
+        } else {
+            throw new DeepGenericException("Cannot determine if keyvalidator is composed or not, partitionKeys: " + partitionKeys);
         }
     }
 

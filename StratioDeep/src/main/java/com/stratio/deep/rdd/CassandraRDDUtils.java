@@ -20,7 +20,7 @@ import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.config.impl.GenericDeepJobConfig;
+import com.stratio.deep.config.GenericDeepJobConfig;
 import com.stratio.deep.cql.DeepCqlRecordWriter;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.functions.AbstractSerializableFunction2;
@@ -44,7 +44,9 @@ import java.util.Map;
 class CassandraRDDUtils {
     static <W> void doCql3SaveToCassandra(RDD<W> rdd, IDeepJobConfig<W> writeConfig,
                                           Function1<W, Tuple2<Cells, Cells>> transformer) {
-
+        if (!writeConfig.getIsWriteConfig()){
+            throw new IllegalArgumentException("Provided configuration object is not suitable for writing");
+        }
         Tuple2<Map<String, ByteBuffer>, Map<String, ByteBuffer>> tuple = new Tuple2<>(null, null);
 
         RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
@@ -85,6 +87,10 @@ class CassandraRDDUtils {
      */
     static <W> void doSaveToCassandra(RDD<W> rdd, final IDeepJobConfig<W> writeConfig,
                                       Function1<W, Tuple2<Cells, Cells>> transformer) {
+
+        if (!writeConfig.getIsWriteConfig()){
+            throw new IllegalArgumentException("Provided configuration object is not suitable for writing");
+        }
 
         Tuple2<Map<String, ByteBuffer>, Map<String, ByteBuffer>> tuple = new Tuple2<>(null, null);
 

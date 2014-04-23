@@ -63,7 +63,7 @@ object WritingEntityToCassandra {
         // -------------------------------- OUTPUT to Cassandra
         // Creating a configuration for the output RDD and initialize it
         // --- OUTPUT RDD
-        val outputConfig = DeepJobConfigFactory.create(classOf[DomainEntity])
+        val outputConfig = DeepJobConfigFactory.createWriteConfig(classOf[DomainEntity])
           .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
                 .keyspace(outputKeyspaceName).table(outputTableName).createTableOnWrite(true)
                 .initialize

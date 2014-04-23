@@ -29,6 +29,7 @@ import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.testentity.TestEntity;
 import com.stratio.deep.utils.Constants;
+import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.serializer.DeserializationStream;
 import org.apache.spark.serializer.JavaSerializer;
@@ -50,6 +51,7 @@ import static org.testng.Assert.*;
  */
 @Test(suiteName = "cassandraRddTests", groups = {"CassandraEntityRDDTest"})
 public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
+    private Logger logger = Logger.getLogger(CassandraEntityRDDTest.class);
 
     private static class TestEntityAbstractSerializableFunction extends
         AbstractSerializableFunction<TestEntity, TestEntity> {
@@ -221,7 +223,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
     @Override
     protected IDeepJobConfig<TestEntity> initWriteConfig() {
-        IDeepJobConfig<TestEntity> writeConfig = DeepJobConfigFactory.create(TestEntity.class)
+        IDeepJobConfig<TestEntity> writeConfig = DeepJobConfigFactory.createWriteConfig(TestEntity.class)
             .host(Constants.DEFAULT_CASSANDRA_HOST)
             .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
             .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
@@ -230,6 +232,38 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
             .batchSize(2)
             .createTableOnWrite(Boolean.TRUE);
         return writeConfig.initialize();
+    }
+
+    @Test
+    public void testCountWithInputColumns(){
+        logger.info("testCountWithInputColumns()");
+
+        IDeepJobConfig<TestEntity> tmpConfig = DeepJobConfigFactory.create(TestEntity.class)
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .keyspace(KEYSPACE_NAME)
+                .columnFamily(COLUMN_FAMILY)
+                .batchSize(2)
+                .inputColumns("domain_name", "response_time")
+                .initialize();
+
+        CassandraRDD<TestEntity> tmpRdd = context.cassandraEntityRDD(tmpConfig);
+
+        TestEntity[] cells = (TestEntity[]) tmpRdd.collect();
+
+        assertEquals(cells.length, entityTestDataSize);
+
+        for (TestEntity e : cells) {
+            assertNotNull(e.getDomain());
+            assertNotNull(e.getResponseTime());
+            assertNotNull(e.getId());
+
+            assertNull(e.getResponseCode());
+            assertNull(e.getDownloadTime());
+            assertNull(e.getNotMappedField());
+            assertNull(e.getUrl());
+        }
     }
 
     @Override
