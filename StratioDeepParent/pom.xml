@@ -25,7 +25,7 @@
     <properties>
         <!-- Cassandra -->
         <cassandra.version>2.0.53-SNAPSHOT</cassandra.version>
-        <datastax.driver.version>2.0.0</datastax.driver.version>
+        <datastax.driver.version>2.0.1</datastax.driver.version>
 
         <!-- Spark version -->
         <spark.version>0.9.1_STRATIO</spark.version>
