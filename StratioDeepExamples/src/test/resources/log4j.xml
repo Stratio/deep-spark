@@ -36,7 +36,7 @@
     </category>
 
     <category name="org.apache.cassandra">
-        <priority value="WARN"/>
+        <priority value="FATAL"/>
     </category>
     <!--
     <category name="org.apache.spark">
