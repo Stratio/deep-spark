@@ -97,7 +97,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
 
     writeConfig =
       DeepJobConfigFactory
-        .create(classOf[DeepScalaPageEntity])
+        .createWriteConfig(classOf[DeepScalaPageEntity])
         .host(Constants.DEFAULT_CASSANDRA_HOST)
         .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
         .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)

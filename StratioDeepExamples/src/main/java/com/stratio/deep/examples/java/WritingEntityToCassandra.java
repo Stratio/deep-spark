@@ -102,7 +102,7 @@ public final class WritingEntityToCassandra {
         }
 
         // --- OUTPUT RDD
-        IDeepJobConfig outputConfig = DeepJobConfigFactory.create(DomainEntity.class)
+        IDeepJobConfig outputConfig = DeepJobConfigFactory.createWriteConfig(DomainEntity.class)
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(outputTableName)
                 .createTableOnWrite(true).initialize();

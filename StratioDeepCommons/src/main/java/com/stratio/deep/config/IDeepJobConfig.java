@@ -83,12 +83,14 @@ public interface IDeepJobConfig<T> extends Serializable {
     public abstract IDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue);
 
     /**
-     * Sets the default thrift frame size.
+     * Sets the number of rows to retrieve for each page of data fetched from Cassandra.<br/>
+     * Defaults to 1000 rows.
      *
-     * @param thriftFramedTransportSizeMB
+     * @param pageSize the number of rows per page
      * @return
      */
-    public abstract IDeepJobConfig<T> framedTransportSize(Integer thriftFramedTransportSizeMB);
+    public abstract IDeepJobConfig<T> pageSize(int pageSize);
+
 
     /* Getters */
 
@@ -98,11 +100,6 @@ public interface IDeepJobConfig<T> extends Serializable {
      * @return
      */
     public abstract String getColumnFamily();
-
-    /**
-     * Validates and initializes this configuration object.
-     */
-    public abstract Configuration getConfiguration();
 
     /**
      * Returns the underlying testentity class used to map the Cassandra
@@ -166,13 +163,6 @@ public interface IDeepJobConfig<T> extends Serializable {
     public abstract Integer getCqlPort();
 
     /**
-     * Returns the thrift frame size.
-     *
-     * @return
-     */
-    public abstract Integer getThriftFramedTransportSizeMB();
-
-    /**
      * Returns the username used to authenticate to the cassandra server.
      * Defaults to the empty string.
      *
@@ -196,9 +186,10 @@ public interface IDeepJobConfig<T> extends Serializable {
     public abstract IDeepJobConfig<T> initialize();
 
     /**
-     * Defines a projection over the CF columns.
+     * Defines a projection over the CF columns. <br/>
+     * Key columns will always be returned, even if not specified in the columns input array.
      *
-     * @param columns
+     * @param columns list of columns we want to retrieve from the datastore.
      * @return this object.
      */
     public abstract IDeepJobConfig<T> inputColumns(String... columns);
@@ -324,4 +315,23 @@ public interface IDeepJobConfig<T> extends Serializable {
      * @return
      */
     int getBatchSize();
+
+    /**
+     * Returns the map of additional filters specified by the user.
+     *
+     * @return
+     */
+    public Map<String, Serializable> getAdditionalFilters();
+
+    /**
+     * Returns the maximum number of rows that will be retrieved when fetching data pages from Cassandra.
+     * @return
+     */
+    public int getPageSize();
+
+    /**
+     * Returns whether this configuration config is suitable for writing out data to the datastore.
+     * @return
+     */
+    public Boolean getIsWriteConfig();
 }

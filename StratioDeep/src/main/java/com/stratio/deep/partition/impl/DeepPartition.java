@@ -16,11 +16,8 @@
 
 package com.stratio.deep.partition.impl;
 
-import org.apache.cassandra.hadoop.ColumnFamilySplit;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.hadoop.io.Writable;
+import com.stratio.deep.cql.DeepTokenRange;
 import org.apache.spark.Partition;
-import org.apache.spark.SerializableWritable;
 
 /**
  * Object that carries spark's partition information.
@@ -46,18 +43,18 @@ public class DeepPartition implements Partition {
      * the start and end token of the cassandra split mapped
      * by this partition and its list of replicas.
      */
-    private final SerializableWritable<ColumnFamilySplit> splitWrapper;
+    private final DeepTokenRange splitWrapper;
 
     /**
      * Public constructor.
      *
      * @param rddId
      * @param idx
-     * @param s
+     * @param range
      */
-    public DeepPartition(int rddId, int idx, Writable s) {
+    public DeepPartition(int rddId, int idx, DeepTokenRange range) {
 
-        this.splitWrapper = new SerializableWritable<>((ColumnFamilySplit) s);
+        this.splitWrapper = range;
         this.rddId = rddId;
         this.idx = idx;
     }
@@ -84,7 +81,7 @@ public class DeepPartition implements Partition {
      * Returns the Cassandra split
      * @return
      */
-    public SerializableWritable<ColumnFamilySplit> splitWrapper() {
+    public DeepTokenRange splitWrapper() {
         return this.splitWrapper;
     }
 
@@ -93,15 +90,10 @@ public class DeepPartition implements Partition {
      */
     @Override
     public String toString() {
-        return "DeepPartition [rddId="
-            + rddId
-            + ", idx="
-            + idx
-            + ", "
-            + (splitWrapper != null ? "startToken=" + splitWrapper.value().getStartToken() : "")
-            + (splitWrapper != null ? ", endToken=" + splitWrapper.value().getEndToken() : "")
-            + (splitWrapper != null ? ", locations=" + ArrayUtils.toString(splitWrapper.value().getLocations())
-            : "") + "]";
+        return "DeepPartition{" +
+                "rddId=" + rddId +
+                ", idx=" + idx +
+                ", splitWrapper=" + splitWrapper +
+                '}';
     }
-
 }

@@ -32,10 +32,9 @@ import scala.Tuple2;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.*;
 
 import static com.stratio.deep.utils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
 
@@ -60,7 +59,7 @@ public final class Utils {
         Cells keys = new Cells();
         Cells values = new Cells();
 
-        for (Cell<?> c : cells) {
+        for (Cell c : cells) {
 
             if (c.isPartitionKey() || c.isClusterKey()) {
 
@@ -84,7 +83,7 @@ public final class Utils {
      */
     public static <T extends IDeepType> Tuple2<Cells, Cells> deepType2tuple(T e) {
 
-        Pair<Field[], Field[]> fields = AnnotationUtils.filterKeyFields(e.getClass().getDeclaredFields());
+        Pair<Field[], Field[]> fields = AnnotationUtils.filterKeyFields(e.getClass());
 
         Field[] keyFields = fields.left;
         Field[] otherFields = fields.right;
@@ -113,6 +112,21 @@ public final class Utils {
         try {
             return clazz.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
+            throw new DeepGenericException(e);
+        }
+    }
+
+    /**
+     * Creates a new instance of the given class name.
+     *
+     * @param className the class object for which a new instance should be created.
+     * @return the new instance of class clazz.
+     */
+    public static <T> T newTypeInstance(String className, Class<T> returnClass) {
+        try {
+            Class<T> clazz = (Class<T>) Class.forName(className);
+            return clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             throw new DeepGenericException(e);
         }
     }
@@ -181,21 +195,13 @@ public final class Utils {
             String value = entry.getValue().toString();
 
             if (entry.getValue() instanceof String) {
-                value = cleanFilterString(entry, value.trim());
+                value = singleQuote(value.trim());
             }
 
             sb.append(" AND ").append(quote(entry.getKey())).append(" = ").append(value);
         }
 
         return sb.toString();
-    }
-
-    private static String cleanFilterString(Map.Entry<String, Serializable> entry, String value) {
-        if (value.contains("\"")) {
-            throw new DeepGenericException("value for filter \'" + entry.getKey() + "\' contains double quotes, please check your syntax.");
-        }
-
-        return singleQuote(value);
     }
 
     /**
@@ -218,12 +224,12 @@ public final class Utils {
         StringBuffer sb = new StringBuffer("CREATE TABLE ").append(outputKeyspace)
             .append(".").append(outputColumnFamily).append(" (");
 
-        List<String> partitionKey = new ArrayList();
-        List<String> clusterKey = new ArrayList();
+        List<String> partitionKey = new ArrayList<>();
+        List<String> clusterKey = new ArrayList<>();
 
         boolean isFirstField = true;
 
-        for (Cell<?> key : keys) {
+        for (Cell key : keys) {
             String cellName = quote(key.getCellName());
 
             if (!isFirstField) {
@@ -242,7 +248,7 @@ public final class Utils {
         }
 
         if (values != null) {
-            for (Cell<?> key : values) {
+            for (Cell key : values) {
                 sb.append(", ");
                 sb.append(quote(key.getCellName())).append(" ").append(key.marshaller().asCQL3Type().toString());
             }
@@ -310,7 +316,7 @@ public final class Utils {
         int k = 0;
 
         StringBuilder keyClause = new StringBuilder(" WHERE ");
-        for (Cell<?> cell : keys.getCells()) {
+        for (Cell cell : keys.getCells()) {
             if (cell.isPartitionKey() || cell.isClusterKey()) {
                 if (k > 0) {
                     keyClause.append(" AND ");
@@ -324,7 +330,7 @@ public final class Utils {
         }
 
         k = 0;
-        for (Cell<?> cell : values.getCells()) {
+        for (Cell cell : values.getCells()) {
             if (k > 0) {
                 sb.append(", ");
             }
@@ -384,7 +390,7 @@ public final class Utils {
             values[v] = cell.getCellValue();
         }
 
-        return new Tuple2<String[], Object[]>(names, values);
+        return new Tuple2<>(names, values);
     }
 
     /**
@@ -445,6 +451,37 @@ public final class Utils {
         }
 
         return abstractType;
+    }
+
+    /**
+     * Returns the inet address for the specified location.
+     *
+     * @param location
+     * @return
+     */
+    public static InetAddress inetAddressFromLocation(String location){
+        try {
+            return InetAddress.getByName(location);
+        } catch (UnknownHostException e) {
+            throw new DeepIOException(e);
+        }
+    }
+
+    /**
+     * Return the set of fields declared at all level of class hierachy
+     */
+    public static Field[] getAllFields(Class clazz) {
+        return getAllFieldsRec(clazz, new ArrayList<Field>());
+    }
+
+    private static Field[] getAllFieldsRec(Class clazz, List<Field> fields) {
+        Class superClazz = clazz.getSuperclass();
+        if(superClazz != null){
+            getAllFieldsRec(superClazz, fields);
+        }
+
+        fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+        return fields.toArray(new Field[fields.size()]);
     }
 
     /**

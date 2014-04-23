@@ -24,9 +24,9 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
+import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.testentity.StrippedTestEntity;
 import com.stratio.deep.testentity.TestEntity;
 import com.stratio.deep.utils.Constants;
@@ -47,7 +47,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.CharacterCodingException;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.testng.Assert.*;
 
@@ -77,7 +76,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
             .username("")
             .password("");
 
-        rddConfig.getConfiguration();
+        rddConfig.initialize();
 
         logger.info("Constructed configuration object: " + rddConfig);
         logger.info("Constructiong cassandraRDD");
@@ -222,7 +221,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
         //executeCustomCQL("create table  " + OUTPUT_KEYSPACE_NAME + "." + table + " (domain text, count int, PRIMARY KEY(domain));");
 
-        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.create()
+        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
             .host(Constants.DEFAULT_CASSANDRA_HOST)
             .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
             .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -250,7 +249,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
     @Test(dependsOnMethods = "testSaveToCassandra")
     public void testSaveToCassandra2(){
-        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.create()
+        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
             .host(Constants.DEFAULT_CASSANDRA_HOST)
             .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
             .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -329,9 +328,9 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 class WrongSensors2CellsFunction extends Function<Tuple2<String, Double>, Cells> {
     @Override
     public Cells call(Tuple2<String, Double> t) throws Exception {
-        Cell<String> sensorNameCell = Cell.create("name", t._1());
-        Cell<UUID> sensorTimeUUID = Cell.create("time_taken", UUIDGen.getTimeUUID());
-        Cell<Double> sensorDataCell = Cell.create("value", t._2());
+        Cell sensorNameCell = Cell.create("name", t._1());
+        Cell sensorTimeUUID = Cell.create("time_taken", UUIDGen.getTimeUUID());
+        Cell sensorDataCell = Cell.create("value", t._2());
 
         return new Cells(sensorNameCell, sensorTimeUUID, sensorDataCell);
     }
@@ -340,9 +339,9 @@ class WrongSensors2CellsFunction extends Function<Tuple2<String, Double>, Cells>
 class Sensors2CellsFunction extends Function<Tuple2<String, Double>, Cells> {
     @Override
     public Cells call(Tuple2<String, Double> t) throws Exception {
-        Cell<String> sensorNameCell = Cell.create("name", t._1());
-        Cell<UUID> sensorTimeUUID = Cell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
-        Cell<Double> sensorDataCell = Cell.create("value", t._2());
+        Cell sensorNameCell = Cell.create("name", t._1());
+        Cell sensorTimeUUID = Cell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
+        Cell sensorDataCell = Cell.create("value", t._2());
 
         return new Cells(sensorNameCell, sensorTimeUUID, sensorDataCell);
     }

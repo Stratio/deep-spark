@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.config.impl;
+package com.stratio.deep.config;
 
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.annotations.DeepField;
-import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.utils.AnnotationUtils;
 import com.stratio.deep.utils.Utils;
 import org.apache.commons.lang.StringUtils;
@@ -36,7 +35,7 @@ import java.util.*;
 /**
  * Class containing the appropiate configuration for a CassandraEntityRDD.
  * <p/>
- * Remember to call {@link #getConfiguration()} after having configured all the
+ * Remember to call {@link #initialize()} after having configured all the
  * properties.
  *
  * @author Luca Rosellini <luca@strat.io>
@@ -58,7 +57,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
 
         Map<String, String> tmpMap = new HashMap<>();
 
-        Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass.getDeclaredFields());
+        Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass);
 
         for (Field f : deepFields) {
             String dbName = AnnotationUtils.deepFieldName(f);
@@ -77,9 +76,10 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
      *
      * @param entityClass
      */
-    public EntityDeepJobConfig(Class<T> entityClass) {
+    public EntityDeepJobConfig(Class<T> entityClass, Boolean isWriteConfig) {
         super();
         this.entityClass = entityClass;
+        this.isWriteConfig = isWriteConfig;
     }
 
     /* (non-Javadoc)
@@ -108,7 +108,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         super.validate();
 
         /* let's validate fieldNames in @DeepField annotations */
-        Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass.getDeclaredFields());
+        Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass);
 
         Map<String, Cell> colDefs = super.columnDefinitions();
 

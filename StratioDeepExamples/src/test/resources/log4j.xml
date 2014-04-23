@@ -35,8 +35,12 @@
         <priority value="ERROR"/>
     </category>
 
+    <category name="org.eclipse">
+        <priority value="ERROR"/>
+    </category>
+
     <category name="org.apache.cassandra">
-        <priority value="WARN"/>
+        <priority value="FATAL"/>
     </category>
     <!--
     <category name="org.apache.spark">

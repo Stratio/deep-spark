@@ -21,7 +21,7 @@
     <parent>
         <groupId>com.stratio.deep</groupId>
         <artifactId>StratioDeepParent</artifactId>
-        <version>0.1.4-SNAPSHOT</version>
+        <version>0.2.1-SNAPSHOT</version>
         <relativePath>../StratioDeepParent</relativePath>
     </parent>
 
@@ -62,7 +62,7 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>6.8.7</version>
-            <scope>test</scope>
+            <!--scope>test</scope-->
             <exclusions>
                 <exclusion>
                     <artifactId>snakeyaml</artifactId>

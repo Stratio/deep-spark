@@ -14,24 +14,15 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.utils;
+package com.stratio.deep.functions;
+
+import scala.runtime.AbstractFunction2;
+
+import java.io.Serializable;
 
 /**
- * Class holding several public Deep constants
- *
- * @author Luca Rosellini <luca@stratio.com>
+ * Created by luca on 14/04/14.
  */
-public final class Constants {
-    public static final String DEFAULT_CASSANDRA_HOST = "localhost";
-    public static final int DEFAULT_CASSANDRA_RPC_PORT = 9160;
-    public static final int DEFAULT_CASSANDRA_CQL_PORT = 9042;
-
-    public static final int DEFAULT_BATCH_SIZE = 100;
-
-    public static final int DEFAULT_PAGE_SIZE = 1000;
-    public static final int DEFAULT_MAX_PAGE_SIZE = 10000;
-
-    private Constants() {
-    }
+public abstract class AbstractSerializableFunction2<T1,T2,R> extends AbstractFunction2<T1,T2,R> implements Serializable {
 
 }

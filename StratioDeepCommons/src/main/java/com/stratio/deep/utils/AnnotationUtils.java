@@ -126,10 +126,11 @@ public final class AnnotationUtils {
      * Utility method that filters out all the fields _not_ annotated
      * with the {@link com.stratio.deep.annotations.DeepField} annotation.
      *
-     * @param fields
+     * @param clazz
      * @return
      */
-    public static Field[] filterDeepFields(Field[] fields) {
+    public static Field[] filterDeepFields(Class clazz) {
+        Field[] fields = Utils.getAllFields(clazz);
         List<Field> filtered = new ArrayList<>();
         for (Field f : fields) {
             if (f.isAnnotationPresent(DeepField.class)) {
@@ -144,11 +145,11 @@ public final class AnnotationUtils {
      * the array of keys fields.
      * The right element contains the array of all other non-key fields.
      *
-     * @param fields
+     * @param clazz
      * @return
      */
-    public static Pair<Field[], Field[]> filterKeyFields(Field[] fields) {
-        Field[] filtered = filterDeepFields(fields);
+    public static Pair<Field[], Field[]> filterKeyFields(Class clazz) {
+        Field[] filtered = filterDeepFields(clazz);
         List<Field> keys = new ArrayList<>();
         List<Field> others = new ArrayList<>();
 

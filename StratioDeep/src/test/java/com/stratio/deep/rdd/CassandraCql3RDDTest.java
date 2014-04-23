@@ -225,7 +225,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
     @Override
     protected IDeepJobConfig<Cql3TestEntity> initWriteConfig() {
 
-        return DeepJobConfigFactory.create(Cql3TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST)
+        return DeepJobConfigFactory.createWriteConfig(Cql3TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST)
             .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(OUTPUT_KEYSPACE_NAME)
             .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).columnFamily(CQL3_ENTITY_OUTPUT_COLUMN_FAMILY)
             .createTableOnWrite(Boolean.TRUE).initialize();

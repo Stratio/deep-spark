@@ -23,7 +23,7 @@
     <parent>
         <groupId>com.stratio.deep</groupId>
         <artifactId>StratioDeepParent</artifactId>
-        <version>0.1.4-SNAPSHOT</version>
+        <version>0.2.1-SNAPSHOT</version>
         <relativePath>../StratioDeepParent</relativePath>
     </parent>
 
@@ -99,6 +99,12 @@
             <artifactId>StratioDeepCommons</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
 

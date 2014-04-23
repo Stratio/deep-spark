@@ -104,7 +104,7 @@ public final class WritingCellToCassandra {
 
 
         // --- OUTPUT RDD
-        IDeepJobConfig outputConfig = DeepJobConfigFactory.create()
+        IDeepJobConfig outputConfig = DeepJobConfigFactory.createWriteConfig()
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(outputTableName)
                 .createTableOnWrite(true);

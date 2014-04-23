@@ -23,10 +23,10 @@ import com.datastax.driver.core.Session;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
+import com.stratio.deep.exception.DeepIOException;
+import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.testentity.Cql3CollectionsTestEntity;
 import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
@@ -153,7 +153,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells>  {
 
     @Override
     protected IDeepJobConfig<Cells> initWriteConfig() {
-        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.create()
+        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
             .host(Constants.DEFAULT_CASSANDRA_HOST)
             .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
             .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)

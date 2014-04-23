@@ -18,9 +18,10 @@ package com.stratio.deep.config;
 
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
-import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.testentity.TestEntity;
 import com.stratio.deep.testentity.WronglyMappedTestEntity;
 import com.stratio.deep.utils.Constants;
@@ -40,12 +41,46 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
 
     private Logger log = Logger.getLogger(getClass());
 
-    @Test(dependsOnMethods = "testValidation")
-    public void testCorrectInitialisation() {
-        IDeepJobConfig<TestEntity> djc = DeepJobConfigFactory.create(TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace("test_keyspace").columnFamily("test_page");
+    @Test
+    public void testWriteConfigValidation() {
+        IDeepJobConfig<TestEntity> djc = DeepJobConfigFactory.createWriteConfig(TestEntity.class);
 
-        djc.getConfiguration();
+        djc.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+        .columnFamily("test_page").keyspace("test_keyspace");
+
+        try {
+            djc.initialize();
+            fail();
+        } catch (IllegalArgumentException iae) {
+            // OK
+            log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
+            djc.createTableOnWrite(true);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+
+        djc.initialize();
+    }
+
+    @Test
+    public void testInputColumnsExist(){
+        IDeepJobConfig<Cells> djc = DeepJobConfigFactory.create();
+
+        djc.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .columnFamily(COLUMN_FAMILY).keyspace(KEYSPACE_NAME).inputColumns("not_existent_col1", "not_existent_col2");
+
+        try {
+            djc.initialize();
+            fail();
+        } catch (DeepNoSuchFieldException iae) {
+            // OK
+            log.info("Correctly catched DeepNoSuchFieldException: " + iae.getLocalizedMessage());
+            djc.inputColumns("domain_name", "response_time", "url");
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+
+        djc.initialize();
     }
 
     @Test
@@ -53,7 +88,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
 
         IDeepJobConfig<TestEntity> djc = DeepJobConfigFactory.create(TestEntity.class);
 
-        djc.host(null).rpcPort(null);
+        djc.host(null).rpcPort(null).pageSize(0);
 
         try {
             djc.getKeyspace();
@@ -110,7 +145,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
         }
 
         try {
-            djc.getEntityClass();
+            djc.getPageSize();
         } catch (DeepIllegalAccessException e) {
             log.info("Correctly catched DeepIllegalAccessException: " + e.getLocalizedMessage());
         } catch (Exception e) {
@@ -118,7 +153,17 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
         }
 
         try {
-            djc.getThriftFramedTransportSizeMB();
+            djc.getPageSize();
+        } catch (DeepIllegalAccessException e) {
+            log.info("Correctly catched DeepIllegalAccessException: " + e.getLocalizedMessage());
+        } catch (Exception e) {
+            fail(e.getMessage());
+
+        }
+
+
+        try {
+            djc.getEntityClass();
         } catch (DeepIllegalAccessException e) {
             log.info("Correctly catched DeepIllegalAccessException: " + e.getLocalizedMessage());
         } catch (Exception e) {
@@ -185,6 +230,31 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
             fail(e.getMessage());
         }
 
+        try {
+            djc.pageSize(0);
+            djc.initialize();
+            fail();
+        } catch (IllegalArgumentException iae) {
+            // OK
+            log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+
+        try {
+            djc.pageSize(1 + Constants.DEFAULT_MAX_PAGE_SIZE);
+            djc.initialize();
+            fail();
+        } catch (IllegalArgumentException iae) {
+            // OK
+            log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
+
+            djc.pageSize(10);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+
+
         djc.readConsistencyLevel(ConsistencyLevel.LOCAL_ONE.name());
 
         try {
@@ -199,6 +269,17 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
         }
 
         djc.writeConsistencyLevel(ConsistencyLevel.LOCAL_ONE.name());
+
+        try {
+            djc.initialize();
+            fail();
+        } catch (IllegalArgumentException iae) {
+            // OK
+            log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
+            djc.columnFamily("test_Page");
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
 
         djc.initialize();
     }

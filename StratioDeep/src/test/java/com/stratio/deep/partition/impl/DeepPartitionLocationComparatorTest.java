@@ -22,16 +22,15 @@ import org.testng.annotations.Test;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.Collections;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.testng.Assert.fail;
-import static org.junit.Assert.*;
 
 /**
  * Created by luca on 09/04/14.
  */
 @Test
-public class DeepPartitionLocationCompatatorTest {
+public class DeepPartitionLocationComparatorTest {
 
 
 

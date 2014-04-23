@@ -207,7 +207,7 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
 
     @Override
     protected IDeepJobConfig<Cql3CollectionsTestEntity> initWriteConfig() {
-        IDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = DeepJobConfigFactory.create(Cql3CollectionsTestEntity.class)
+        IDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = DeepJobConfigFactory.createWriteConfig(Cql3CollectionsTestEntity.class)
             .host(Constants.DEFAULT_CASSANDRA_HOST)
             .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
             .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)

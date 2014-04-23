@@ -35,9 +35,14 @@
         <priority value="ERROR"/>
     </category>
 
-    <category name="org.apache.cassandra">
-        <priority value="WARN"/>
+    <category name="org.eclipse">
+        <priority value="ERROR"/>
     </category>
+
+    <category name="org.apache.cassandra">
+        <priority value="FATAL"/>
+    </category>
+
     <!--
     <category name="org.apache.spark">
         <priority value="DEBUG"/>
@@ -47,6 +52,7 @@
         <priority value="DEBUG"/>
     </category>
     -->
+
     <root>
         <priority value="INFO"/>
         <appender-ref ref="console"/>

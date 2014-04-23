@@ -19,7 +19,6 @@ package com.stratio.deep.partition.impl;
 import com.stratio.deep.exception.DeepInstantiationException;
 
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Comparator;
 
@@ -27,11 +26,15 @@ import java.util.Comparator;
  * Created by luca on 09/04/14.
  */
 public class DeepPartitionLocationComparator implements Comparator<String> {
-    private InetAddress hostname;
+    private final InetAddress hostname;
+
+    public InetAddress getHostname() {
+        return hostname;
+    }
 
     public DeepPartitionLocationComparator(){
         try {
-            this.hostname = InetAddress.getByName(System.getenv("HOSTNAME"));
+            this.hostname = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
             throw new DeepInstantiationException(e);
         }
@@ -43,11 +46,6 @@ public class DeepPartitionLocationComparator implements Comparator<String> {
         } catch (UnknownHostException e) {
             throw new DeepInstantiationException(e);
         }
-    }
-
-    private Integer getIp(InetAddress addr) {
-        byte[] a = addr.getAddress();
-        return ((a[0] & 0xff) << 24) | ((a[1] & 0xff) << 16) | ((a[2] & 0xff) << 8) | (a[3] & 0xff);
     }
 
     @Override
