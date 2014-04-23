@@ -57,7 +57,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
 
         Map<String, String> tmpMap = new HashMap<>();
 
-        Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass.getDeclaredFields());
+        Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass);
 
         for (Field f : deepFields) {
             String dbName = AnnotationUtils.deepFieldName(f);
@@ -108,7 +108,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         super.validate();
 
         /* let's validate fieldNames in @DeepField annotations */
-        Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass.getDeclaredFields());
+        Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass);
 
         Map<String, Cell> colDefs = super.columnDefinitions();
 

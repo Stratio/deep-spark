@@ -34,10 +34,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static com.stratio.deep.utils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
 
@@ -86,7 +83,7 @@ public final class Utils {
      */
     public static <T extends IDeepType> Tuple2<Cells, Cells> deepType2tuple(T e) {
 
-        Pair<Field[], Field[]> fields = AnnotationUtils.filterKeyFields(e.getClass().getDeclaredFields());
+        Pair<Field[], Field[]> fields = AnnotationUtils.filterKeyFields(e.getClass());
 
         Field[] keyFields = fields.left;
         Field[] otherFields = fields.right;
@@ -198,21 +195,13 @@ public final class Utils {
             String value = entry.getValue().toString();
 
             if (entry.getValue() instanceof String) {
-                value = cleanFilterString(entry, value.trim());
+                value = singleQuote(value.trim());
             }
 
             sb.append(" AND ").append(quote(entry.getKey())).append(" = ").append(value);
         }
 
         return sb.toString();
-    }
-
-    private static String cleanFilterString(Map.Entry<String, Serializable> entry, String value) {
-        if (value.contains("\"")) {
-            throw new DeepGenericException("value for filter \'" + entry.getKey() + "\' contains double quotes, please check your syntax.");
-        }
-
-        return singleQuote(value);
     }
 
     /**
@@ -235,8 +224,8 @@ public final class Utils {
         StringBuffer sb = new StringBuffer("CREATE TABLE ").append(outputKeyspace)
             .append(".").append(outputColumnFamily).append(" (");
 
-        List<String> partitionKey = new ArrayList();
-        List<String> clusterKey = new ArrayList();
+        List<String> partitionKey = new ArrayList<>();
+        List<String> clusterKey = new ArrayList<>();
 
         boolean isFirstField = true;
 
@@ -401,7 +390,7 @@ public final class Utils {
             values[v] = cell.getCellValue();
         }
 
-        return new Tuple2<String[], Object[]>(names, values);
+        return new Tuple2<>(names, values);
     }
 
     /**
@@ -464,12 +453,35 @@ public final class Utils {
         return abstractType;
     }
 
+    /**
+     * Returns the inet address for the specified location.
+     *
+     * @param location
+     * @return
+     */
     public static InetAddress inetAddressFromLocation(String location){
         try {
             return InetAddress.getByName(location);
         } catch (UnknownHostException e) {
             throw new DeepIOException(e);
         }
+    }
+
+    /**
+     * Return the set of fields declared at all level of class hierachy
+     */
+    public static Field[] getAllFields(Class clazz) {
+        return getAllFieldsRec(clazz, new ArrayList<Field>());
+    }
+
+    private static Field[] getAllFieldsRec(Class clazz, List<Field> fields) {
+        Class superClazz = clazz.getSuperclass();
+        if(superClazz != null){
+            getAllFieldsRec(superClazz, fields);
+        }
+
+        fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+        return fields.toArray(new Field[fields.size()]);
     }
 
     /**

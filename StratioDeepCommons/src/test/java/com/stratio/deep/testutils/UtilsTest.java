@@ -71,21 +71,19 @@ public class UtilsTest {
 
     @Test
     public void testFilterDeepFields() {
-        Field[] fields = TestEntity.class.getDeclaredFields();
+        Field[] fields = getAllFields(TestEntity.class);
 
         assertTrue(fields.length > 6);
 
-        fields = AnnotationUtils.filterDeepFields(fields);
+        fields = AnnotationUtils.filterDeepFields(TestEntity.class);
 
         assertEquals(fields.length, 9);
     }
 
     @Test
     public void testFilterKeyFields() {
-        Field[] fields = TestEntity.class.getDeclaredFields();
-
         Pair<Field[], Field[]> keyFields =
-            AnnotationUtils.filterKeyFields(AnnotationUtils.filterDeepFields(fields));
+            AnnotationUtils.filterKeyFields(TestEntity.class);
 
         assertNotNull(keyFields);
         assertNotNull(keyFields.left);
@@ -107,7 +105,6 @@ public class UtilsTest {
         map.put("integer", 0L);
         assertEquals(additionalFilterGenerator(map), " AND \"integer\" = 0");
         map.remove("integer");
-
 
         map.put("lucene", null);
 
@@ -136,19 +133,6 @@ public class UtilsTest {
         map.put("lucene", filter);
 
         assertEquals(additionalFilterGenerator(map), " AND \"lucene\" = \'address:* AND NOT address:*uropa*\'");
-
-        filter = "'address:* AND NOT address:\"*uropa*\"'";
-
-        map.put("lucene", filter);
-
-        try {
-            additionalFilterGenerator(map);
-
-            // if there's no error the code is broken
-            fail();
-        } catch (DeepGenericException e) {
-            // ok
-        }
     }
 
     @Test
@@ -392,6 +376,12 @@ public class UtilsTest {
         assertNotNull(findSetter("id", TestSetterClass.class, Integer.class));
         assertNotNull(findSetter("uuid", TestSetterClass.class, UUID.class));
         assertNotNull(findSetter("scalalong", TestSetterClass.class, Long.class));
+    }
+
+    @Test
+    public void testGetAllFields(){
+        Field[] fields  = getAllFields(TestEntity.class);
+        assertEquals(fields.length, 11);
     }
 
     class TestSetterClass implements IDeepType{
