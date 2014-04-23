@@ -197,7 +197,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
             .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
             .keyspace(KEYSPACE_NAME)
             .columnFamily(COLUMN_FAMILY)
-            .filterByField("lucene", "response_time:[160 TO 840]")
+            .filterByField("lucene", "{filter:{type:\"range\",field:\"response_time\",lower:160,upper:840,include_lower:true,include_upper:true}}")
             .initialize();
 
         otherRDD = context.cassandraEntityRDD(config);
