@@ -16,16 +16,16 @@
 
 package com.stratio.deep.context;
 
+import com.stratio.deep.config.CellDeepJobConfig;
+import com.stratio.deep.config.EntityDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.config.impl.CellDeepJobConfig;
-import com.stratio.deep.config.impl.EntityDeepJobConfig;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.rdd.CassandraCellRDD;
 import com.stratio.deep.rdd.CassandraEntityRDD;
 import com.stratio.deep.rdd.CassandraJavaRDD;
 import com.stratio.deep.rdd.CassandraRDD;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.IDeepType;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaSparkContext;
 
@@ -91,7 +91,7 @@ public class DeepSparkContext extends JavaSparkContext {
      * @param environment
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String[] jars,
-        Map<String, String> environment) {
+                            Map<String, String> environment) {
         super(master, appName, sparkHome, jars, environment);
     }
 

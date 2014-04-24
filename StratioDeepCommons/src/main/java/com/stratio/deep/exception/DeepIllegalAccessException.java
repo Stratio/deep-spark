@@ -25,14 +25,23 @@ public class DeepIllegalAccessException extends RuntimeException {
 
     private static final long serialVersionUID = -420912657203318307L;
 
+    /**
+     * Public constructor.
+     */
     public DeepIllegalAccessException(String message) {
         super(message);
     }
 
+    /**
+     * Public constructor.
+     */
     public DeepIllegalAccessException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Public constructor.
+     */
     public DeepIllegalAccessException(Throwable cause) {
         super(cause);
     }

@@ -54,24 +54,24 @@ import static java.util.Collections.unmodifiableCollection;
  * collection holds.
  */
 public class CellValidator implements Serializable {
-    public static final String DEFAULT_VALIDATOR_CLASSNAME = "org.apache.cassandra.db.marshal.UTF8Type";
+    private static final String DEFAULT_VALIDATOR_CLASSNAME = "org.apache.cassandra.db.marshal.UTF8Type";
 
     private static final Map<Class, CQL3Type.Native> MAP_JAVA_TYPE_TO_CQL_TYPE =
-        ImmutableMap.<Class, CQL3Type.Native>builder()
-            .put(String.class, CQL3Type.Native.TEXT)
-            .put(Integer.class, CQL3Type.Native.INT)
-            .put(Boolean.class, CQL3Type.Native.BOOLEAN)
-            .put(Date.class, CQL3Type.Native.TIMESTAMP)
-            .put(BigDecimal.class, CQL3Type.Native.DECIMAL)
-            .put(Long.class, CQL3Type.Native.BIGINT)
-            .put(Double.class, CQL3Type.Native.DOUBLE)
-            .put(Float.class, CQL3Type.Native.FLOAT)
-            .put(InetAddress.class, CQL3Type.Native.INET)
-            .put(Inet4Address.class, CQL3Type.Native.INET)
-            .put(Inet6Address.class, CQL3Type.Native.INET)
-            .put(BigInteger.class, CQL3Type.Native.VARINT)
-            .put(UUID.class, CQL3Type.Native.UUID)
-            .build();
+            ImmutableMap.<Class, CQL3Type.Native>builder()
+                    .put(String.class, CQL3Type.Native.TEXT)
+                    .put(Integer.class, CQL3Type.Native.INT)
+                    .put(Boolean.class, CQL3Type.Native.BOOLEAN)
+                    .put(Date.class, CQL3Type.Native.TIMESTAMP)
+                    .put(BigDecimal.class, CQL3Type.Native.DECIMAL)
+                    .put(Long.class, CQL3Type.Native.BIGINT)
+                    .put(Double.class, CQL3Type.Native.DOUBLE)
+                    .put(Float.class, CQL3Type.Native.FLOAT)
+                    .put(InetAddress.class, CQL3Type.Native.INET)
+                    .put(Inet4Address.class, CQL3Type.Native.INET)
+                    .put(Inet6Address.class, CQL3Type.Native.INET)
+                    .put(BigInteger.class, CQL3Type.Native.VARINT)
+                    .put(UUID.class, CQL3Type.Native.UUID)
+                    .build();
 
     /**
      * Possible types of CellValidator.
@@ -79,8 +79,24 @@ public class CellValidator implements Serializable {
     public static enum Kind {
         MAP, SET, LIST, NOT_A_COLLECTION;
 
+        /**
+         * Returns the Kind associated to the provided Cassandra validator class.
+         * <p/>
+         * <p>
+         * To be more specific, returns:
+         * <ul>
+         * <li>NOT_A_COLLECTION: when the provided type is not a set a list or a map</li>
+         * <li>MAP: when the provided validator is MapType.class</li>
+         * <li>LIST: when the provided validator is ListType.class</li>
+         * <li>SET: when the provided validator is SetType.class</li>
+         * </ul>
+         * </p>
+         *
+         * @param type
+         * @return
+         */
         public static Kind validatorClassToKind(Class<? extends AbstractType> type) {
-            if (type == null){
+            if (type == null) {
                 return NOT_A_COLLECTION;
             }
 
@@ -95,8 +111,27 @@ public class CellValidator implements Serializable {
             }
         }
 
+        /**
+         * Returns the Kind associated to the provided object instance.
+         * <p/>
+         * <p>To be more specific, returns:
+         * <ul>
+         * <li>{@see com.stratio.deep.entity.CellValidator.Kind.SET}: when the provided instance object is an
+         * instance of {@see java.util.Set}</li>
+         * <li>{@see com.stratio.deep.entity.CellValidator.Kind.LIST}: when the provided instance object is an
+         * instance of {@see java.util.List}</li>
+         * <li>{@see com.stratio.deep.entity.CellValidator.Kind.MAP}: when the provided instance object is an
+         * instance of {@see java.util.Map}</li>
+         * <li>{@see com.stratio.deep.entity.CellValidator.Kind.NOT_A_COLLECTION}: otherwise.</li>
+         * </ul>
+         * </p>
+         *
+         * @param object
+         * @param <T>
+         * @return
+         */
         public static <T> Kind objectToKind(T object) {
-            if (object == null){
+            if (object == null) {
                 return NOT_A_COLLECTION;
             }
 
@@ -122,7 +157,7 @@ public class CellValidator implements Serializable {
      */
     private String validatorClassName = DEFAULT_VALIDATOR_CLASSNAME;
 
-        /**
+    /**
      * Only applies to collection types (validatorKind != Kind.NOT_A_COLLECTION), contains the list of
      * types the collection holds. At most, this collection will contain two elements, in the case
      * of validatorKind == Kind.MAP.
@@ -138,19 +173,21 @@ public class CellValidator implements Serializable {
 
     /**
      * Factory method that builds a CellValidator from an IDeepType field.
+     *
      * @param field
      * @return
      */
-    public static CellValidator cellValidator(Field field){
+    public static CellValidator cellValidator(Field field) {
         return new CellValidator(field);
     }
 
     /**
      * Factory method that builds a CellValidator from a DataType object.
+     *
      * @param type
      * @return
      */
-    public static CellValidator cellValidator(DataType type){
+    public static CellValidator cellValidator(DataType type) {
         return new CellValidator(type);
     }
 
@@ -174,7 +211,7 @@ public class CellValidator implements Serializable {
         return new CellValidator(validatorClassName, kind, validatorTypes);
     }
 
-    private CellValidator(String validatorClassName, Kind validatorKind, Collection<String> validatorTypes){
+    private CellValidator(String validatorClassName, Kind validatorKind, Collection<String> validatorTypes) {
         this.validatorClassName = validatorClassName != null ? validatorClassName : DEFAULT_VALIDATOR_CLASSNAME;
         this.validatorKind = validatorKind;
         this.validatorTypes = validatorTypes;
@@ -217,7 +254,8 @@ public class CellValidator implements Serializable {
         }
 
         if (!type.isCollection()) {
-            validatorClassName = AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(type.asJavaClass()).getClass().getName();
+            validatorClassName = AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(type.asJavaClass()).getClass()
+                    .getName();
         } else {
             validatorTypes = new ArrayList<>();
 
@@ -260,7 +298,8 @@ public class CellValidator implements Serializable {
         try {
 
             if (validatorKind == Kind.NOT_A_COLLECTION) {
-                abstractType = AnnotationUtils.MAP_ABSTRACT_TYPE_CLASS_TO_ABSTRACT_TYPE.get(forName(validatorClassName));
+                abstractType = AnnotationUtils.MAP_ABSTRACT_TYPE_CLASS_TO_ABSTRACT_TYPE.get(forName
+                        (validatorClassName));
 
             } else {
                 Iterator<String> types = validatorTypes.iterator();
@@ -340,7 +379,7 @@ public class CellValidator implements Serializable {
             return false;
         }
         if (validatorKind != Kind.NOT_A_COLLECTION &&
-            !CollectionUtils.isEqualCollection(validatorTypes, that.validatorTypes)) {
+                !CollectionUtils.isEqualCollection(validatorTypes, that.validatorTypes)) {
             return false;
         }
 
@@ -361,10 +400,10 @@ public class CellValidator implements Serializable {
     @Override
     public String toString() {
         return "CellValidator{" +
-            "validatorClassName='" + validatorClassName + '\'' +
-            ", validatorTypes=" + (validatorTypes != null ? validatorTypes : "") +
-            ", validatorKind=" + validatorKind +
-            ", abstractType=" + abstractType +
-            '}';
+                "validatorClassName='" + validatorClassName + '\'' +
+                ", validatorTypes=" + (validatorTypes != null ? validatorTypes : "") +
+                ", validatorKind=" + validatorKind +
+                ", abstractType=" + abstractType +
+                '}';
     }
 }

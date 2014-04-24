@@ -38,13 +38,17 @@
     <category name="org.apache.cassandra">
         <priority value="WARN"/>
     </category>
-
+    <!--
     <category name="org.apache.spark">
         <priority value="DEBUG"/>
     </category>
 
+    <category name="com.stratio.deep.rdd">
+        <priority value="DEBUG"/>
+    </category>
+    -->
     <root>
-        <priority value="info"/>
+        <priority value="INFO"/>
         <appender-ref ref="console"/>
         <appender-ref ref="fileAppender"/>
     </root>

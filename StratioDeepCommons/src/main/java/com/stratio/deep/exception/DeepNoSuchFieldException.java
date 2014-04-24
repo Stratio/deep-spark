@@ -24,14 +24,23 @@ package com.stratio.deep.exception;
 public class DeepNoSuchFieldException extends RuntimeException {
     private static final long serialVersionUID = 4552228341917254900L;
 
+    /**
+     * Public constructor.
+     */
     public DeepNoSuchFieldException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Public constructor.
+     */
     public DeepNoSuchFieldException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Public constructor.
+     */
     public DeepNoSuchFieldException(String cause) {
         super(cause);
     }

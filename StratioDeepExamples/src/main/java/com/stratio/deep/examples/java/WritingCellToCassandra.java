@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.deep.examples.java;
 
-import java.util.List;
+package com.stratio.deep.examples.java;
 
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
@@ -32,16 +31,34 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 
+import java.util.List;
+
 /**
  * Author: Emmanuelle Raffenne
  * Date..: 3-mar-2014
  */
 public final class WritingCellToCassandra {
-    private static Logger logger = Logger.getLogger(WritingCellToCassandra.class);
+    private static final Logger LOG = Logger.getLogger(WritingCellToCassandra.class);
+    public static List<Tuple2<String, Integer>> results;
 
-    private WritingCellToCassandra(){}
+    private WritingCellToCassandra() {
+    }
 
+    /**
+     * Application entry point.
+     *
+     * @param args the arguments passed to the application.
+     */
     public static void main(String[] args) {
+        doMain(args);
+    }
+
+    /**
+     * This is the method called by both main and tests.
+     *
+     * @param args
+     */
+    public static void doMain(String[] args) {
         String job = "java:writingCellToCassandra";
 
         String keyspaceName = "crawler";
@@ -49,26 +66,28 @@ public final class WritingCellToCassandra {
         String outputTableName = "newlistdomains";
 
         // Creating the Deep Context where args are Spark Master and Job Name
-        ContextProperties p = new ContextProperties();
-        DeepSparkContext deepContext = new DeepSparkContext(p.cluster, job, p.sparkHome, p.jarList);
+        ContextProperties p = new ContextProperties(args);
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+                new String[]{p.getJar()});
+
 
         // --- INPUT RDD
         IDeepJobConfig inputConfig = DeepJobConfigFactory.create()
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
 
         CassandraJavaRDD inputRDD = deepContext.cassandraJavaRDD(inputConfig);
 
-        JavaPairRDD<String,Cells> pairRDD = inputRDD.map(new PairFunction<Cells,String,Cells>() {
+        JavaPairRDD<String, Cells> pairRDD = inputRDD.map(new PairFunction<Cells, String, Cells>() {
             @Override
-            public Tuple2<String,Cells> call(Cells c) {
+            public Tuple2<String, Cells> call(Cells c) {
                 return new Tuple2<String, Cells>((String) c.getCellByName("domainName")
-                        .getCellValue(),c);
+                        .getCellValue(), c);
             }
         });
 
-        JavaPairRDD<String,Integer> numPerKey = pairRDD.groupByKey()
+        JavaPairRDD<String, Integer> numPerKey = pairRDD.groupByKey()
                 .map(new PairFunction<Tuple2<String, List<Cells>>, String, Integer>() {
                     @Override
                     public Tuple2<String, Integer> call(Tuple2<String, List<Cells>> t) {
@@ -76,30 +95,32 @@ public final class WritingCellToCassandra {
                     }
                 });
 
+        results = numPerKey.collect();
+
+        for (Tuple2<String, Integer> result : results) {
+            LOG.info(result);
+        }
+
+
         // --- OUTPUT RDD
-        IDeepJobConfig outputConfig = DeepJobConfigFactory.create()
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+        IDeepJobConfig outputConfig = DeepJobConfigFactory.createWriteConfig()
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(outputTableName)
                 .createTableOnWrite(true);
 
-        if ( args.length > 0 ) {
-                int batchSize = Integer.parseInt(args[0]);
-                logger.info("EMAR WritingCellToCassandra: using batch size: " + batchSize );
-                outputConfig.batchSize( batchSize );
-        }
         outputConfig.initialize();
 
         JavaRDD outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
             public Cells call(Tuple2<String, Integer> t) {
-                Cell c1 = Cell.create("domain",t._1(),true,false);
-                Cell c2 = Cell.create("num_pages",t._2());
+                Cell c1 = Cell.create("domain", t._1(), true, false);
+                Cell c2 = Cell.create("num_pages", t._2());
                 return new Cells(c1, c2);
             }
         });
 
         CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig);
 
-        System.exit(0);
+        deepContext.stop();
     }
 }

@@ -16,8 +16,6 @@
 
 package com.stratio.deep.config;
 
-import com.stratio.deep.config.impl.CellDeepJobConfig;
-import com.stratio.deep.config.impl.EntityDeepJobConfig;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 
@@ -33,12 +31,27 @@ public final class DeepJobConfigFactory implements Serializable {
     private static final long serialVersionUID = -4559130919203819088L;
 
     /**
+     * private constructor
+     */
+    private DeepJobConfigFactory() {
+    }
+
+    /**
      * Creates a new cell-based job configuration object.
      *
      * @return
      */
     public static IDeepJobConfig<Cells> create() {
-        return new CellDeepJobConfig();
+        return new CellDeepJobConfig(false);
+    }
+
+    /**
+     * Creates a new cell-based write suitable job configuration object.
+     *
+     * @return
+     */
+    public static IDeepJobConfig<Cells> createWriteConfig() {
+        return new CellDeepJobConfig(true);
     }
 
     /**
@@ -47,6 +60,15 @@ public final class DeepJobConfigFactory implements Serializable {
      * @return
      */
     public static <T extends IDeepType> IDeepJobConfig<T> create(Class<T> entityClass) {
-        return new EntityDeepJobConfig<>(entityClass);
+        return new EntityDeepJobConfig<>(entityClass, false);
+    }
+
+    /**
+     * Creates an testentity-based write configuration object.
+     *
+     * @return
+     */
+    public static <T extends IDeepType> IDeepJobConfig<T> createWriteConfig(Class<T> entityClass) {
+        return new EntityDeepJobConfig<>(entityClass, true);
     }
 }

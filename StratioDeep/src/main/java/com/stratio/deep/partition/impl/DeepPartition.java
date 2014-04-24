@@ -16,54 +16,106 @@
 
 package com.stratio.deep.partition.impl;
 
-import org.apache.cassandra.hadoop.ColumnFamilySplit;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.hadoop.io.Writable;
+import com.stratio.deep.cql.DeepTokenRange;
 import org.apache.spark.Partition;
-import org.apache.spark.SerializableWritable;
 
+/**
+ * Object that carries spark's partition information.
+ */
 public class DeepPartition implements Partition {
 
     private static final int MAGIC_NUMBER = 41;
 
     private static final long serialVersionUID = 4822039463206513988L;
 
+    /**
+     * Id of the rdd to which this partition belongs to.
+     */
     private final int rddId;
+
+    /**
+     * index of the partition.
+     */
     private final int idx;
-    private final SerializableWritable<ColumnFamilySplit> splitWrapper;
 
-    public DeepPartition(int rddId, int idx, Writable s) {
+    /**
+     * Cassandra's split object, maintains information of
+     * the start and end token of the cassandra split mapped
+     * by this partition and its list of replicas.
+     */
+    private final DeepTokenRange splitWrapper;
 
-        this.splitWrapper = new SerializableWritable<>((ColumnFamilySplit) s);
+    /**
+     * Public constructor.
+     *
+     * @param rddId
+     * @param idx
+     * @param range
+     */
+    public DeepPartition(int rddId, int idx, DeepTokenRange range) {
+
+        this.splitWrapper = range;
         this.rddId = rddId;
         this.idx = idx;
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DeepPartition that = (DeepPartition) o;
+
+        if (idx != that.idx) {
+            return false;
+        }
+        if (rddId != that.rddId) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int hashCode() {
         return (MAGIC_NUMBER * (MAGIC_NUMBER + this.rddId) + this.idx);
     }
 
+    /**
+     * Returns the index of the current partition.
+     *
+     * @return
+     */
     @Override
     public int index() {
         return this.idx;
     }
 
-    public SerializableWritable<ColumnFamilySplit> splitWrapper() {
+    /**
+     * Returns the Cassandra split
+     *
+     * @return
+     */
+    public DeepTokenRange splitWrapper() {
         return this.splitWrapper;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
-        return "DeepPartition [rddId="
-            + rddId
-            + ", idx="
-            + idx
-            + ", "
-            + (splitWrapper != null ? "startToken=" + splitWrapper.value().getStartToken() : "")
-            + (splitWrapper != null ? ", endToken=" + splitWrapper.value().getEndToken() : "")
-            + (splitWrapper != null ? ", locations=" + ArrayUtils.toString(splitWrapper.value().getLocations())
-            : "") + "]";
+        return "DeepPartition{" +
+                "rddId=" + rddId +
+                ", idx=" + idx +
+                ", splitWrapper=" + splitWrapper +
+                '}';
     }
-
 }

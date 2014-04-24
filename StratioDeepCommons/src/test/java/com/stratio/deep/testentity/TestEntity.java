@@ -18,7 +18,6 @@ package com.stratio.deep.testentity;
 
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.annotations.DeepField;
-import com.stratio.deep.entity.IDeepType;
 import org.apache.cassandra.db.marshal.*;
 
 import java.util.List;
@@ -27,14 +26,8 @@ import java.util.Set;
 import java.util.UUID;
 
 @DeepEntity
-public class TestEntity implements IDeepType {
+public class TestEntity extends BaseTestEntity {
     private static final long serialVersionUID = -6242942929275890323L;
-
-    @DeepField(isPartOfPartitionKey = true)
-    private String id;
-
-    @DeepField(fieldName = "domain_name")
-    private String domain;
 
     @DeepField
     private String url;
@@ -92,9 +85,8 @@ public class TestEntity implements IDeepType {
     }
 
     public TestEntity(String id, String domain, String url, Integer responseTime, Integer responseCode,
-        String notMappedField) {
-        this.id = id;
-        this.domain = domain;
+                      String notMappedField) {
+        super(id, domain);
         this.url = url;
         this.responseTime = responseTime;
         this.responseCode = responseCode;
@@ -102,16 +94,8 @@ public class TestEntity implements IDeepType {
         this.notMappedField = notMappedField;
     }
 
-    public String getDomain() {
-        return domain;
-    }
-
     public Long getDownloadTime() {
         return downloadTime;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public String getNotMappedField() {
@@ -130,16 +114,8 @@ public class TestEntity implements IDeepType {
         return url;
     }
 
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
-
     public void setDownloadTime(Long downloadTime) {
         this.downloadTime = downloadTime;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public void setNotMappedField(String notMappedField) {
@@ -160,11 +136,11 @@ public class TestEntity implements IDeepType {
 
     @Override
     public String toString() {
-        return "TestEntity [" + (id != null ? "id=" + id + ", " : "")
-            + (domain != null ? "domain=" + domain + ", " : "") + (url != null ? "url=" + url + ", " : "")
-            + (responseTime != null ? "responseTime=" + responseTime + ", " : "")
-            + (responseCode != null ? "responseCode=" + responseCode + ", " : "")
-            + (downloadTime != null ? "downloadTime=" + downloadTime + ", " : "")
-            + (notMappedField != null ? "notMappedField=" + notMappedField : "") + "]\n";
+        return "TestEntity [" + (getId() != null ? "id=" + getId() + ", " : "")
+                + (getDomain() != null ? "domain=" + getDomain() + ", " : "") + (url != null ? "url=" + url + ", " : "")
+                + (responseTime != null ? "responseTime=" + responseTime + ", " : "")
+                + (responseCode != null ? "responseCode=" + responseCode + ", " : "")
+                + (downloadTime != null ? "downloadTime=" + downloadTime + ", " : "")
+                + (notMappedField != null ? "notMappedField=" + notMappedField : "") + "]\n";
     }
 }

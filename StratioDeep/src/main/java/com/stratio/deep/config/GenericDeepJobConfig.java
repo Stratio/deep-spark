@@ -14,32 +14,24 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.config.impl;
+package com.stratio.deep.config;
 
 import com.datastax.driver.core.*;
-import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.cql.DeepConfigHelper;
-import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.exception.DeepIllegalAccessException;
-import com.stratio.deep.exception.DeepIndexNotFoundException;
-import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.util.Constants;
+import com.stratio.deep.exception.*;
+import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.cassandra.dht.IPartitioner;
-import org.apache.cassandra.hadoop.ConfigHelper;
-import org.apache.cassandra.hadoop.cql3.CqlConfigHelper;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
-import java.io.IOException;
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 
 import static com.stratio.deep.utils.Utils.createTableQueryGenerator;
@@ -50,13 +42,9 @@ import static com.stratio.deep.utils.Utils.quote;
  * defined in {@link com.stratio.deep.config.IDeepJobConfig}.
  */
 public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, AutoCloseable {
-    private static Logger logger = Logger.getLogger("com.stratio.deep.config.impl.GenericDeepJobConfig");
+    private static final Logger LOG = Logger.getLogger("com.stratio.deep.config.GenericDeepJobConfig");
     private static final long serialVersionUID = -7179376653643603038L;
     private String partitionerClassName = "org.apache.cassandra.dht.Murmur3Partitioner";
-
-    private transient Job hadoopJob;
-
-    private transient Configuration configuration;
 
     /**
      * keyspace name
@@ -71,7 +59,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     /**
      * hostname of the cassandra server
      */
-    private String host = Constants.DEFAULT_CASSANDRA_HOST;
+    private String host;
 
     /**
      * Cassandra server RPC port.
@@ -104,11 +92,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     private String[] inputColumns;
 
     /**
-     * size of thrift frame in MBs.
-     */
-    private Integer thriftFramedTransportSizeMB = 256;
-
-    /**
      * Size of the batch created when writing to Cassandra.
      */
     private int batchSize = Constants.DEFAULT_BATCH_SIZE;
@@ -124,9 +107,9 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     private String readConsistencyLevel = ConsistencyLevel.LOCAL_ONE.name();
 
     /**
-     * Default write consistency level. Defaults to LOCAL_ONE.
+     * Default write consistency level. Defaults to QUORUM.
      */
-    private String writeConsistencyLevel = ConsistencyLevel.LOCAL_ONE.name();
+    private String writeConsistencyLevel = ConsistencyLevel.QUORUM.name();
 
     /**
      * Enables/Disables auto-creation of column family when writing to Cassandra.
@@ -136,11 +119,19 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
 
     private transient Session session;
 
+    private Boolean isInitialized = Boolean.FALSE;
+
+    private int pageSize = Constants.DEFAULT_PAGE_SIZE;
+
+    protected Boolean isWriteConfig = Boolean.FALSE;
+
+    private int bisectFactor = Constants.DEFAULT_BISECT_FACTOR;
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> session(Session session){
+    public IDeepJobConfig<T> session(Session session) {
         this.session = session;
         return this;
     }
@@ -152,12 +143,12 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     public synchronized Session getSession() {
         if (session == null) {
             Cluster cluster = Cluster.builder()
-                .withPort(this.cqlPort)
-                .addContactPoint(this.host)
-                .withCredentials(this.username, this.password)
-                .build();
+                    .withPort(this.cqlPort)
+                    .addContactPoint(this.host)
+                    .withCredentials(this.username, this.password)
+                    .build();
 
-            session = cluster.connect();
+            session = cluster.connect(this.keyspace);
         }
 
         return session;
@@ -168,7 +159,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      */
     @Override
     public void close() {
-        logger.debug("closing " + getClass().getCanonicalName());
+        LOG.debug("closing " + getClass().getCanonicalName());
         if (session != null) {
             session.close();
         }
@@ -176,21 +167,20 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
 
     /**
      * {@inheritDoc}
-     */
-    @Override
-    protected void finalize() {
-        logger.debug("finalizing " + getClass().getCanonicalName());
-        close();
-    }
 
+     @Override protected void finalize() {
+     LOG.debug("finalizing " + getClass().getCanonicalName());
+     close();
+     }
+     */
     /**
      * Checks if this configuration object has been initialized or not.
      *
      * @throws com.stratio.deep.exception.DeepIllegalAccessException if not initialized
      */
     protected void checkInitialized() {
-        if (configuration == null) {
-            throw new DeepIllegalAccessException("EntityDeepJobConfig has not been initialized!");
+        if (!isInitialized) {
+            throw new DeepIllegalAccessException("DeepJobConfig has not been initialized!");
         }
     }
 
@@ -199,7 +189,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      *
      * @return
      */
-    private TableMetadata fetchTableMetadata() {
+    public TableMetadata fetchTableMetadata() {
 
         Metadata metadata = getSession().getCluster().getMetadata();
         KeyspaceMetadata ksMetadata = metadata.getKeyspace(this.keyspace);
@@ -225,10 +215,11 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     public void createOutputTableIfNeeded(RDD<Tuple2<Cells, Cells>> tupleRDD) {
 
         TableMetadata metadata = getSession().getCluster().getMetadata().getKeyspace(this.keyspace).getTable(this
-            .columnFamily);
+                .columnFamily);
 
         if (metadata == null && !createTableOnWrite) {
-            throw new DeepIOException("Cannot write RDD, output table does not exists and configuration object has 'createTableOnWrite' = false");
+            throw new DeepIOException("Cannot write RDD, output table does not exists and configuration object has " +
+                    "'createTableOnWrite' = false");
         }
 
         if (metadata != null) {
@@ -237,7 +228,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
 
         Tuple2<Cells, Cells> first = tupleRDD.first();
 
-        if (first._1() == null || first._1().size() == 0) {
+        if (first._1() == null || first._1().isEmpty()) {
             throw new DeepNoSuchFieldException("no key structure found on row metadata");
         }
         String createTableQuery = createTableQueryGenerator(first._1(), first._2(), getKeyspace(), getColumnFamily());
@@ -245,10 +236,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     }
 
     /**
-     * Fetches table metadata from Casandra and generates a Map<K, V> where the key is the column name, and the value
-     * is the {@link com.stratio.deep.entity.Cell} containing column's metadata.
-     *
-     * @return
+     * {@inheritDoc}
      */
     @Override
     public synchronized Map<String, Cell> columnDefinitions() {
@@ -259,14 +247,20 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
         TableMetadata tableMetadata = fetchTableMetadata();
 
         if (tableMetadata == null && !createTableOnWrite) {
-            logger.warn("Configuration not suitable for writing RDD: output table does not exists and configuration " +
-                "object has 'createTableOnWrite' = false");
+            LOG.warn("Configuration not suitable for writing RDD: output table does not exists and configuration " +
+                    "object has 'createTableOnWrite' = false");
 
             return null;
         } else if (tableMetadata == null) {
             return null;
         }
 
+        initColumnDefinitionMap(tableMetadata);
+
+        return columnDefinitionMap;
+    }
+
+    private void initColumnDefinitionMap(TableMetadata tableMetadata) {
         columnDefinitionMap = new HashMap<>();
 
         List<ColumnMetadata> partitionKeys = tableMetadata.getPartitionKey();
@@ -289,12 +283,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
                 columnDefinitionMap.put(key.getName(), metadata);
             }
         }
-
-
-
         columnDefinitionMap = Collections.unmodifiableMap(columnDefinitionMap);
-
-        return columnDefinitionMap;
     }
 
     /* (non-Javadoc)
@@ -315,13 +304,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
         return columnFamily(table);
     }
 
-    @Override
-    public IDeepJobConfig<T> framedTransportSize(Integer thriftFramedTransportSizeMB) {
-        this.thriftFramedTransportSizeMB = thriftFramedTransportSizeMB;
-
-        return this;
-    }
-
     /* (non-Javadoc)
     * @see com.stratio.deep.config.IDeepJobConfig#getColumnFamily()
     */
@@ -340,20 +322,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     }
 
     /* (non-Javadoc)
-     * @see com.stratio.deep.config.IDeepJobConfig#initialize()
-     */
-    @Override
-    public Configuration getConfiguration() {
-        if (configuration != null) {
-            return configuration;
-        }
-
-        initialize();
-
-        return configuration;
-    }
-
-    /* (non-Javadoc)
      * @see com.stratio.deep.config.IDeepJobConfig#getHost()
      */
     @Override
@@ -365,7 +333,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     @Override
     public String[] getInputColumns() {
         checkInitialized();
-        return inputColumns.clone();
+        return inputColumns == null ? new String[0] : inputColumns.clone();
     }
 
     /* (non-Javadoc)
@@ -414,15 +382,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public Integer getThriftFramedTransportSizeMB() {
-        checkInitialized();
-        return thriftFramedTransportSizeMB;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String getUsername() {
         checkInitialized();
         return username;
@@ -443,45 +402,25 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      */
     @Override
     public IDeepJobConfig<T> initialize() {
-        if (configuration != null) {
+        if (isInitialized) {
             return this;
         }
 
+        if (StringUtils.isEmpty(host)) {
+            try {
+                host = InetAddress.getLocalHost().getCanonicalHostName();
+            } catch (UnknownHostException e) {
+                LOG.warn("Cannot resolve local host canonical name, using \"localhost\"");
+                host = InetAddress.getLoopbackAddress().getCanonicalHostName();
+            }
+        }
+
+
         validate();
 
-        try {
-            hadoopJob = new Job();
-            Configuration c = hadoopJob.getConfiguration();
+        columnDefinitions();
+        isInitialized = Boolean.TRUE;
 
-            ConfigHelper.setInputColumnFamily(c, keyspace, columnFamily, false);
-            ConfigHelper.setOutputColumnFamily(c, keyspace, columnFamily);
-            ConfigHelper.setInputInitialAddress(c, host);
-            ConfigHelper.setInputRpcPort(c, String.valueOf(rpcPort));
-            ConfigHelper.setInputPartitioner(c, partitionerClassName);
-
-            if (!ArrayUtils.isEmpty(inputColumns)) {
-                CqlConfigHelper.setInputColumns(c, StringUtils.join(inputColumns, ","));
-            }
-
-            DeepConfigHelper.setOutputBatchSize(c, batchSize);
-
-            ConfigHelper.setOutputInitialAddress(c, host);
-            ConfigHelper.setOutputRpcPort(c, String.valueOf(rpcPort));
-            ConfigHelper.setOutputPartitioner(c, partitionerClassName);
-
-            ConfigHelper.setThriftFramedTransportSizeInMb(c, thriftFramedTransportSizeMB);
-
-            if (readConsistencyLevel != null) {
-                ConfigHelper.setReadConsistencyLevel(c, readConsistencyLevel);
-            }
-
-            configuration = c;
-
-            columnDefinitions();
-
-        } catch (IOException e) {
-            throw new DeepIOException(e);
-        }
         return this;
     }
 
@@ -501,6 +440,12 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     @Override
     public IDeepJobConfig<T> keyspace(String keyspace) {
         this.keyspace = keyspace;
+        return this;
+    }
+
+    @Override
+    public IDeepJobConfig<T> bisectFactor(int bisectFactor) {
+        this.bisectFactor = bisectFactor;
         return this;
     }
 
@@ -559,6 +504,29 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * properties have not been configured.
      */
     void validate() {
+        validateCassandraParams();
+
+        if (pageSize <= 0) {
+            throw new IllegalArgumentException("pageSize cannot be zero");
+        }
+
+        if (pageSize > Constants.DEFAULT_MAX_PAGE_SIZE) {
+            throw new IllegalArgumentException("pageSize cannot exceed " + Constants.DEFAULT_MAX_PAGE_SIZE);
+        }
+
+        validateConsistencyLevels();
+
+        TableMetadata tableMetadata = fetchTableMetadata();
+
+        validateTableMetadata(tableMetadata);
+        validateAdditionalFilters(tableMetadata);
+
+        if (bisectFactor != Constants.DEFAULT_BISECT_FACTOR && !checkIsPowerOfTwo(bisectFactor)){
+            throw new IllegalArgumentException("Bisect factor should be greater than zero a power of 2");
+        }
+    }
+
+    private void validateCassandraParams() {
         if (StringUtils.isEmpty(host)) {
             throw new IllegalArgumentException("host cannot be null");
         }
@@ -574,45 +542,74 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
         if (StringUtils.isEmpty(columnFamily)) {
             throw new IllegalArgumentException("columnFamily cannot be null");
         }
+    }
 
-        if (readConsistencyLevel != null) {
-            try {
-                org.apache.cassandra.db.ConsistencyLevel.valueOf(readConsistencyLevel);
+    private void validateTableMetadata(TableMetadata tableMetadata) {
 
-            } catch (Exception e) {
-                throw new IllegalArgumentException("readConsistencyLevel not valid, should be one of thos defined in org.apache.cassandra.db.ConsistencyLevel", e);
+        if (tableMetadata == null && !isWriteConfig) {
+            throw new IllegalArgumentException(String.format("Column family {%s.%s} does not exist", keyspace,
+                    columnFamily));
+        }
+
+        if (tableMetadata == null && !createTableOnWrite) {
+            throw new IllegalArgumentException(String.format("Column family {%s.%s} does not exist and " +
+                    "createTableOnWrite = false", keyspace, columnFamily));
+        }
+
+        if (!ArrayUtils.isEmpty(inputColumns)) {
+            for (String column : inputColumns) {
+                ColumnMetadata columnMetadata = tableMetadata.getColumn(column);
+
+                if (columnMetadata == null) {
+                    throw new DeepNoSuchFieldException("No column with name " + column + " has been found on table "
+                            + this.keyspace + "." + this.columnFamily);
+                }
             }
         }
 
-        if (writeConsistencyLevel != null) {
-            try {
-                org.apache.cassandra.db.ConsistencyLevel.valueOf(writeConsistencyLevel);
+    }
 
-            } catch (Exception e) {
-                throw new IllegalArgumentException("writeConsistencyLevel not valid, should be one of thos defined in org.apache.cassandra.db.ConsistencyLevel", e);
-            }
-        }
-
-        TableMetadata tableMetadata = fetchTableMetadata();
-
-        if (tableMetadata == null) {
-            return;
-        }
-
+    private void validateAdditionalFilters(TableMetadata tableMetadata) {
         for (Map.Entry<String, Serializable> entry : additionalFilters.entrySet()) {
             /* check if there's an index specified on the provided column */
             ColumnMetadata columnMetadata = tableMetadata.getColumn(entry.getKey());
 
             if (columnMetadata == null) {
-                throw new DeepNoSuchFieldException("No column with name " + entry.getKey() + " has been found on table " + this.keyspace + "." + this.columnFamily);
+                throw new DeepNoSuchFieldException("No column with name " + entry.getKey() + " has been found on " +
+                        "table " + this.keyspace + "." + this.columnFamily);
             }
 
             if (columnMetadata.getIndex() == null) {
-                throw new DeepIndexNotFoundException("No index has been found on column " + columnMetadata.getName() + " on table " + this.keyspace + "." + this.columnFamily);
+                throw new DeepIndexNotFoundException("No index has been found on column " + columnMetadata.getName()
+                        + " on table " + this.keyspace + "." + this.columnFamily);
+            }
+        }
+    }
+
+    private void validateConsistencyLevels() {
+        if (readConsistencyLevel != null) {
+            try {
+                ConsistencyLevel.valueOf(readConsistencyLevel);
+
+            } catch (Exception e) {
+                throw new IllegalArgumentException("readConsistencyLevel not valid, " +
+                        "should be one of thos defined in org.apache.cassandra.db.ConsistencyLevel", e);
             }
         }
 
+        if (writeConsistencyLevel != null) {
+            try {
+                ConsistencyLevel.valueOf(writeConsistencyLevel);
 
+            } catch (Exception e) {
+                throw new IllegalArgumentException("writeConsistencyLevel not valid, " +
+                        "should be one of thos defined in org.apache.cassandra.db.ConsistencyLevel", e);
+            }
+        }
+    }
+
+    private boolean checkIsPowerOfTwo(int n){
+        return (n > 0) && ((n & (n - 1)) == 0);
     }
 
     /**
@@ -643,30 +640,31 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     }
 
     /**
-     * Returns the map of additional filters specified by the user.
-     *
-     * @return
+     * {@inheritDoc}
      */
     public Map<String, Serializable> getAdditionalFilters() {
         return Collections.unmodifiableMap(additionalFilters);
     }
 
+    @Override
+    public int getPageSize() {
+        checkInitialized();
+        return this.pageSize;
+    }
+
     /**
-     * Adds a new filter for the Cassandra underlying datastore.<br/>
-     * Once a new filter has been added, all subsequent queries generated to the underlying datastore
-     * will include the filter on the specified column called <i>filterColumnName</i>.
-     * Before propagating the filter we check if an index exists in Cassandra.
-     *
-     * @param filterColumnName
-     * @param filterValue
-     * @return
-     * @throws DeepIndexNotFoundException                          if the specified field has not been indexed in Cassandra.
-     * @throws com.stratio.deep.exception.DeepNoSuchFieldException if the specified field is not a valid column in Cassandra.
+     * {@inheritDoc}
      */
     @Override
     public IDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue) {
         /* check if there's an index specified on the provided column */
         additionalFilters.put(filterColumnName, filterValue);
+        return this;
+    }
+
+    @Override
+    public IDeepJobConfig<T> pageSize(int pageSize) {
+        this.pageSize = pageSize;
         return this;
     }
 
@@ -712,4 +710,18 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     public int getBatchSize() {
         return batchSize;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Boolean getIsWriteConfig() {
+        return isWriteConfig;
+    }
+
+    @Override
+    public int getBisectFactor() {
+        return bisectFactor;
+    }
+
 }

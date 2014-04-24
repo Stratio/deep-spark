@@ -44,8 +44,8 @@ public class CellTest {
     public void testCellInstantiationForCollections() throws UnknownHostException, NoSuchFieldException {
         TestEntity te = new TestEntity();
 
-        Set<String> emails = new HashSet(Arrays.asList("DelfinaMarino@superrito.com","GabyCasasVeliz@superrito.com"));
-        List<String> phones = Arrays.asList("401-477-8301","209-845-8841");
+        Set<String> emails = new HashSet(Arrays.asList("DelfinaMarino@superrito.com", "GabyCasasVeliz@superrito.com"));
+        List<String> phones = Arrays.asList("401-477-8301", "209-845-8841");
 
         te.setEmails(emails);
         te.setPhones(phones);
@@ -75,14 +75,15 @@ public class CellTest {
 
         assertNotNull(c3);
         assertEquals(c3.getCellName(), "uuid2id");
-        assertEquals(MapType.getInstance(UUIDType.instance, Int32Type.instance).compose(c3.getDecomposedCellValue()), map);
+        assertEquals(MapType.getInstance(UUIDType.instance, Int32Type.instance).compose(c3.getDecomposedCellValue()),
+                map);
         assertTrue(c3.marshallerClassName().equals(MapType.class.getCanonicalName()));
         assertEquals(c3.getValueType(), Map.class);
     }
 
     @Test
     public void testCellInstantiation() throws UnknownHostException {
-        Cell<?> c1 = Cell.create("name", "Luca");
+        Cell c1 = Cell.create("name", "Luca");
 
         assertNotNull(c1);
         assertEquals(c1.getCellName(), "name");
@@ -90,7 +91,7 @@ public class CellTest {
         assertTrue(c1.marshallerClassName().equals(UTF8Type.class.getCanonicalName()));
         assertEquals(c1.getValueType(), String.class);
 
-        Cell<?> c2 = Cell.create("percent", -1.0f);
+        Cell c2 = Cell.create("percent", -1.0f);
 
         assertNotNull(c2);
         assertEquals(c2.getCellName(), "percent");
@@ -98,7 +99,7 @@ public class CellTest {
         assertTrue(c2.marshallerClassName().equals(FloatType.class.getCanonicalName()));
         assertEquals(c2.getValueType(), Float.class);
 
-        Cell<?> c3 = Cell.create("percent", 4);
+        Cell c3 = Cell.create("percent", 4);
 
         assertNotNull(c3);
         assertEquals(c3.getCellName(), "percent");
@@ -107,7 +108,7 @@ public class CellTest {
         assertEquals(c3.getValueType(), Integer.class);
 
         Date testDate = new Date();
-        Cell<?> c4 = Cell.create("date", testDate);
+        Cell c4 = Cell.create("date", testDate);
 
         assertNotNull(c4);
         assertEquals(c4.getCellName(), "date");
@@ -116,7 +117,7 @@ public class CellTest {
         assertEquals(c4.getValueType(), Date.class);
 
         Long testLong = System.currentTimeMillis();
-        Cell<?> c6 = Cell.create("timeMillis", testLong);
+        Cell c6 = Cell.create("timeMillis", testLong);
 
         assertNotNull(c6);
         assertEquals(c6.getCellName(), "timeMillis");
@@ -124,7 +125,7 @@ public class CellTest {
         assertTrue(c6.marshallerClassName().equals(LongType.class.getCanonicalName()));
         assertEquals(c6.getValueType(), Long.class);
 
-        Cell<?> c7 = Cell.create("booltype", Boolean.TRUE);
+        Cell c7 = Cell.create("booltype", Boolean.TRUE);
 
         assertNotNull(c7);
         assertEquals(c7.getCellName(), "booltype");
@@ -132,7 +133,7 @@ public class CellTest {
         assertEquals(BooleanType.instance.compose(c7.getDecomposedCellValue()), Boolean.TRUE);
         assertEquals(c7.getValueType(), Boolean.class);
 
-        Cell<?> c8 = Cell.create("BigDecimalType", new BigDecimal(testLong));
+        Cell c8 = Cell.create("BigDecimalType", new BigDecimal(testLong));
 
         assertNotNull(c8);
         assertEquals(c8.getCellName(), "BigDecimalType");
@@ -140,7 +141,7 @@ public class CellTest {
         assertTrue(c8.marshallerClassName().equals(DecimalType.class.getCanonicalName()));
         assertEquals(c8.getValueType(), BigDecimal.class);
 
-        Cell<?> c9 = Cell.create("Doubletype", new Double(100.09));
+        Cell c9 = Cell.create("Doubletype", new Double(100.09));
 
         assertNotNull(c9);
         assertEquals(c9.getCellName(), "Doubletype");
@@ -149,7 +150,7 @@ public class CellTest {
         assertEquals(c9.getValueType(), Double.class);
 
         InetAddress testInet = InetAddress.getLocalHost();
-        Cell<?> c10 = Cell.create("InetAddressType", testInet);
+        Cell c10 = Cell.create("InetAddressType", testInet);
 
         assertNotNull(c10);
         assertEquals(c10.getCellName(), "InetAddressType");
@@ -158,7 +159,7 @@ public class CellTest {
         assertEquals(c10.getValueType(), InetAddress.class);
 
         BigInteger testBigInt = new BigInteger("9032809489230884980323498324376012647321674142290");
-        Cell<?> c11 = Cell.create("BigIntegerType", testBigInt);
+        Cell c11 = Cell.create("BigIntegerType", testBigInt);
 
         assertNotNull(c11);
         assertEquals(c11.getCellName(), "BigIntegerType");
@@ -167,7 +168,7 @@ public class CellTest {
         assertEquals(c11.getValueType(), BigInteger.class);
 
         UUID testUUID = UUID.randomUUID();
-        Cell<?> c12 = Cell.create("UUIDType", testUUID);
+        Cell c12 = Cell.create("UUIDType", testUUID);
 
         assertNotNull(c12);
         assertEquals(c12.getCellName(), "UUIDType");
@@ -177,7 +178,7 @@ public class CellTest {
 
         UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
         assertEquals(testTimeUUID.version(), 1);
-        Cell<?> c13 = Cell.create("TimeUUIDType", testTimeUUID);
+        Cell c13 = Cell.create("TimeUUIDType", testTimeUUID);
 
         assertNotNull(c13);
         assertEquals(c13.getCellName(), "TimeUUIDType");
@@ -185,7 +186,7 @@ public class CellTest {
         assertTrue(c13.marshallerClassName().equals(TimeUUIDType.class.getCanonicalName()));
         assertEquals(c13.getValueType(), UUID.class);
 
-        Cell<?> c14 = Cell.create(c13, c13.getDecomposedCellValue());
+        Cell c14 = Cell.create(c13, c13.getDecomposedCellValue());
         assertNotNull(c14);
         assertEquals(c14.getCellName(), "TimeUUIDType");
         assertEquals(TimeUUIDType.instance.compose(c13.getDecomposedCellValue()), testTimeUUID);
@@ -194,23 +195,23 @@ public class CellTest {
         assertEquals(c14.getValueType(), UUID.class);
 
         try {
-            Cell<?> c15 = Cell.create(c13, new CellsTest());
+            Cell c15 = Cell.create(c13, new CellsTest());
             fail();
-        } catch (DeepInstantiationException d){
+        } catch (DeepInstantiationException d) {
             logger.info("correctly catched DeepInstantiationException");
         }
 
         try {
-            Cell<?> c15 = Cell.create("my cell name", new CellsTest());
+            Cell c15 = Cell.create("my cell name", new CellsTest());
             fail();
-        } catch (DeepInstantiationException d){
+        } catch (DeepInstantiationException d) {
             logger.info("correctly catched DeepInstantiationException");
         }
 
         try {
-            Cell<?> c15 = Cell.create("my cell name", new CellsTest(), true, true);
+            Cell c15 = Cell.create("my cell name", new CellsTest(), true, true);
             fail();
-        } catch (DeepInstantiationException d){
+        } catch (DeepInstantiationException d) {
             logger.info("correctly catched DeepInstantiationException");
         }
     }
@@ -221,7 +222,7 @@ public class CellTest {
 
         Cell metadata = Cell.create("id", DataType.text(), false, true);
 
-        Cell<?> c = Cell.create(metadata, bb);
+        Cell c = Cell.create(metadata, bb);
 
         assertEquals(c.getDecomposedCellValue(), UTF8Type.instance.decompose("Test string"));
         assertTrue(c.isClusterKey());
@@ -230,7 +231,7 @@ public class CellTest {
         assertEquals("Test string", c.getCellValue());
         assertTrue(c.hashCode() != 0);
 
-        Cell<?> nullCell = Cell.create("nullCell", DataType.text(), false, true);
+        Cell nullCell = Cell.create("nullCell", DataType.text(), false, true);
         assertNull(nullCell.getCellValue());
         assertEquals(nullCell.getDecomposedCellValue(), ByteBuffer.wrap(new byte[0]));
         assertTrue(nullCell.hashCode() != 0);
@@ -240,7 +241,7 @@ public class CellTest {
     public void testEquality() {
 
         UUID id = UUID.randomUUID();
-        Cell<?> c = Cell.create("id", id, true, false);
+        Cell c = Cell.create("id", id, true, false);
 
         assertFalse(c.equals(new Integer(1)));
         assertTrue(c.equals(c));
@@ -263,9 +264,9 @@ public class CellTest {
 
         try {
             UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
-            Cell<?> c13 = Cell.create("TimeUUIDType", testTimeUUID);
+            Cell c13 = Cell.create("TimeUUIDType", testTimeUUID);
 
-            Cell.create(c13, Int32Type.instance.decompose(Integer.valueOf(456)) );
+            Cell.create(c13, Int32Type.instance.decompose(Integer.valueOf(456)));
 
             fail();
         } catch (Exception e) {

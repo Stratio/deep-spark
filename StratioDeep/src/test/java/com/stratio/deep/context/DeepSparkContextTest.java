@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by luca on 28/02/14.
+ * Tests DeepSparkContext instantiations.
  */
 @Test(suiteName = "DeepSparkContextTest")
 public class DeepSparkContextTest {
@@ -42,13 +42,13 @@ public class DeepSparkContextTest {
 
 
     public void testInstantiationWithJars() {
-        DeepSparkContext sc = new DeepSparkContext("local", "myapp1", "/tmp", new String[] {"", ""});
+        DeepSparkContext sc = new DeepSparkContext("local", "myapp1", "/tmp", new String[]{"", ""});
         sc.stop();
     }
 
     public void testInstantiationWithJarsAndEnv() {
         Map<String, String> env = new HashMap<>();
-        DeepSparkContext sc = new DeepSparkContext("local", "myapp1", "/tmp", new String[] {"", ""}, env);
+        DeepSparkContext sc = new DeepSparkContext("local", "myapp1", "/tmp", new String[]{"", ""}, env);
         sc.stop();
     }
 }

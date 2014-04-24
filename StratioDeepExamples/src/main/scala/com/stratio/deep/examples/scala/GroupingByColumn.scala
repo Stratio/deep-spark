@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.deep.examples.scala
 
-import org.apache.spark.SparkContext._
 import com.stratio.deep.config._
 import com.stratio.deep.context._
 import com.stratio.deep.rdd._
@@ -31,39 +31,43 @@ import com.stratio.deep.testentity.TweetEntity
 
 object GroupingByColumn {
 
-    def main(args:Array[String]) {
+  def main(args: Array[String]) {
 
-        val job = "scala:groupingByColumn"
-        val keyspaceName = "tutorials"
-        val tableName = "tweets"
+    val job = "scala:groupingByColumn"
+    val keyspaceName = "test"
+    val tableName = "tweets"
 
-        // Creating the Deep Context where args are Spark Master and Job Name
-        val p = new ContextProperties
-        val deepContext: DeepSparkContext = new DeepSparkContext(p.cluster, job, p.sparkHome, p.jarList)
+    // Creating the Deep Context where args are Spark Master and Job Name
+    val p = new ContextProperties(args)
+    val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, Array(p.getJar))
 
-        // Configure and initialize the RDD
-        val config = DeepJobConfigFactory.create(classOf[TweetEntity])
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
-                .keyspace(keyspaceName).table(tableName)
-                .initialize
+    // Configure and initialize the RDD
+    val config = DeepJobConfigFactory.create(classOf[TweetEntity])
+      .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
+      .keyspace(keyspaceName).table(tableName)
+      .initialize
 
-        // Create the RDD
-        val rdd :CassandraRDD[TweetEntity] = deepContext.cassandraEntityRDD(config)
+    // Create the RDD
+    val rdd: CassandraRDD[TweetEntity] = deepContext.cassandraEntityRDD(config)
 
-        // grouping
-        val groups: RDD[(String, Seq[TweetEntity])] = rdd groupBy  {t:TweetEntity => t.getAuthor}
-
-        // counting elements in groups
-        val counts: RDD[(String, Int)] = groups map {t:(String, Seq[TweetEntity]) => (t._1, t._2.size)}
-
-        // fetching results
-        val result: Array[(String, Int)] = counts.collect()
-
-        // printing out the result
-        println("GroupBy")
-        result foreach { t:(String, Int) => println( t._1 + ": " + t._2.toString) }
-
-        System.exit(0)
+    // grouping
+    val groups: RDD[(String, Seq[TweetEntity])] = rdd groupBy {
+      t: TweetEntity => t.getAuthor
     }
+
+    // counting elements in groups
+    val counts: RDD[(String, Int)] = groups map {
+      t: (String, Seq[TweetEntity]) => (t._1, t._2.size)
+    }
+
+    // fetching results
+    val result: Array[(String, Int)] = counts.collect()
+
+    // printing out the result
+    println("GroupBy")
+    result foreach {
+      t: (String, Int) => println(t._1 + ": " + t._2.toString)
+    }
+  }
 
 }

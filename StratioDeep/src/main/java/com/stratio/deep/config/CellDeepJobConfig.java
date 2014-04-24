@@ -14,21 +14,32 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.util;
+package com.stratio.deep.config;
+
+import com.stratio.deep.entity.Cells;
 
 /**
- * Class holding several public Deep constants
+ * Cell-based configuration object.
  *
  * @author Luca Rosellini <luca@stratio.com>
  */
-public final class Constants {
-    public static final String DEFAULT_CASSANDRA_HOST = "localhost";
-    public static final int DEFAULT_CASSANDRA_RPC_PORT = 9160;
-    public static final int DEFAULT_CASSANDRA_CQL_PORT = 9042;
+public class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
 
-    public static final int DEFAULT_BATCH_SIZE = 100;
+    private static final long serialVersionUID = -598862509865396541L;
+    private Cells dummyCells;
 
-    private Constants() {
+    CellDeepJobConfig(Boolean isWriteConfig) {
+        this.isWriteConfig = isWriteConfig;
+    }
+
+    {
+        dummyCells = new Cells();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<Cells> getEntityClass() {
+        return (Class<Cells>) dummyCells.getClass();
     }
 
 }

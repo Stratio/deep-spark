@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.config.impl;
+package com.stratio.deep.config;
 
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.annotations.DeepField;
-import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.utils.AnnotationUtils;
 import com.stratio.deep.utils.Utils;
 import org.apache.commons.lang.StringUtils;
@@ -36,7 +35,7 @@ import java.util.*;
 /**
  * Class containing the appropiate configuration for a CassandraEntityRDD.
  * <p/>
- * Remember to call {@link #getConfiguration()} after having configured all the
+ * Remember to call {@link #initialize()} after having configured all the
  * properties.
  *
  * @author Luca Rosellini <luca@strat.io>
@@ -58,7 +57,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
 
         Map<String, String> tmpMap = new HashMap<>();
 
-        Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass.getDeclaredFields());
+        Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass);
 
         for (Field f : deepFields) {
             String dbName = AnnotationUtils.deepFieldName(f);
@@ -72,9 +71,15 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         return this;
     }
 
-    public EntityDeepJobConfig(Class<T> entityClass) {
+    /**
+     * Public constructor. Constructs a job object with the specified entity class.
+     *
+     * @param entityClass
+     */
+    public EntityDeepJobConfig(Class<T> entityClass, Boolean isWriteConfig) {
         super();
         this.entityClass = entityClass;
+        this.isWriteConfig = isWriteConfig;
     }
 
     /* (non-Javadoc)
@@ -103,29 +108,41 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         super.validate();
 
         /* let's validate fieldNames in @DeepField annotations */
-        Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass.getDeclaredFields());
+        Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass);
 
         Map<String, Cell> colDefs = super.columnDefinitions();
 
         /* colDefs is null if table does not exist. I.E. this configuration will be used as an output configuration
          object, and the output table is dynamically created */
-        if (colDefs == null){
+        if (colDefs == null) {
             return;
         }
 
         for (Field field : deepFields) {
-            Annotation annotation = field.getAnnotation(DeepField.class);
             String annotationFieldName = AnnotationUtils.deepFieldName(field);
 
-            if (!colDefs.containsKey(annotationFieldName)){
+            if (!colDefs.containsKey(annotationFieldName)) {
                 throw new DeepNoSuchFieldException("Unknown column name \'" + annotationFieldName + "\' specified for" +
-                    " field " + entityClass.getCanonicalName() + "#" + field.getName() +". Please, " +
-                    "make sure the field name you specify in @DeepField annotation matches _exactly_ the column name " +
-                    "in the database");
+                        " field " + entityClass.getCanonicalName() + "#" + field.getName() + ". Please, " +
+                        "make sure the field name you specify in @DeepField annotation matches _exactly_ the column " +
+                        "name " +
+                        "in the database");
             }
         }
     }
 
+    /**
+     * Given an instance of the generic object mapped to this configurtion object,
+     * sets the instance property whose name is the name specified by dbName.
+     * Since the provided dbName is the name of the field in the database, we first try
+     * to resolve the property name using the fieldName property of the DeepField annotation.
+     * If we don't find any property whose DeepField.fieldName.equals(dbName) we fallback to the
+     * name of the Java property.
+     *
+     * @param instance
+     * @param dbName
+     * @param value
+     */
     public void setInstancePropertyFromDbName(T instance, String dbName, Object value) {
         Map<String, Cell> cfs = columnDefinitions();
         Cell metadataCell = cfs.get(dbName);
@@ -146,14 +163,14 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         }
     }
 
-    private Object packageCollectionValue(Cell metadataCell, Object value){
-        switch (metadataCell.getCellValidator().validatorKind()){
+    private Object packageCollectionValue(Cell metadataCell, Object value) {
+        switch (metadataCell.getCellValidator().validatorKind()) {
             case SET:
-                return new LinkedHashSet((Collection)value);
+                return new LinkedHashSet((Collection) value);
             case LIST:
-                return new LinkedList((Collection)value);
+                return new LinkedList((Collection) value);
             case MAP:
-                return new LinkedHashMap((Map)value);
+                return new LinkedHashMap((Map) value);
             default:
                 return value;
         }

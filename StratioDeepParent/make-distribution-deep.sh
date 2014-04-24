@@ -9,7 +9,7 @@ mkdir -p ${TMPDIR}
 SPARK_REPO="$1"
 
 if [ -z "$1" ]; then
-    SPARK_REPO="git@bitbucket.org:stratio/stratiospark.git"
+    SPARK_REPO="git@github.com:Stratio/spark.git"
 fi
 
 SPARK_BRANCH="$2"
@@ -26,7 +26,7 @@ fi
 
 
 if [ -z "$2" ]; then
-    SPARK_BRANCH="branch-0.9"
+    SPARK_BRANCH="stratio-branch-0.9.1"
 fi
 
 echo "SPARK_REPO: ${SPARK_REPO}"

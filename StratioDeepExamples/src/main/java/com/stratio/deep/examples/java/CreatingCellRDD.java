@@ -13,49 +13,78 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.deep.examples.java;
 
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.rdd.*;
+import com.stratio.deep.rdd.CassandraJavaRDD;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
+import org.apache.spark.SparkConf;
+import org.apache.spark.SparkContext;
 
 /**
  * Author: Emmanuelle Raffenne
  * Date..: 19-feb-2014
  */
 public final class CreatingCellRDD {
-    private static Logger logger = Logger.getLogger(CreatingCellRDD.class);
+    private static final Logger LOG = Logger.getLogger(CreatingCellRDD.class);
 
-    private CreatingCellRDD(){}
+    private static Long counts;
 
+    private CreatingCellRDD() {
+    }
+
+    /**
+     * Application entry point.
+     *
+     * @param args the arguments passed to the application.
+     */
     public static void main(String[] args) {
+        doMain(args);
+    }
 
+    /**
+     * This is the method called by both main and tests.
+     *
+     * @param args
+     */
+    public static void doMain(String[] args) {
         String job = "java:creatingCellRDD";
 
-        String keyspaceName = "tutorials";
+        String keyspaceName = "test";
         String tableName = "tweets";
 
         // Creating the Deep Context
-        ContextProperties p = new ContextProperties();
-        DeepSparkContext deepContext = new DeepSparkContext(p.cluster, job, p.sparkHome, p.jarList);
+        ContextProperties p = new ContextProperties(args);
+        SparkConf sparkConf = new SparkConf().setMaster(p.getCluster()).setAppName(job).setSparkHome(p.getSparkHome()
+        ).setJars(new String[]{p.getJar()})
+                .set("spark.task.maxFailures", "5");
 
-// Configuration and initialization
+        SparkContext sc = new SparkContext(p.getCluster(), job, sparkConf);
+
+        DeepSparkContext deepContext = new DeepSparkContext(sc);
+
+        // Configuration and initialization
         IDeepJobConfig config = DeepJobConfigFactory.create()
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+                .host(p.getCassandraHost())
+                .cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(tableName)
                 .initialize();
 
-// Creating the RDD
+        // Creating the RDD
         CassandraJavaRDD rdd = deepContext.cassandraJavaRDD(config);
 
-        long counts = rdd.count();
+        counts = rdd.count();
 
-        logger.info("Num of rows: " + counts);
+        LOG.info("Num of rows: " + counts);
 
-        System.exit(0);
+        deepContext.stop();
+    }
 
+    public static Long getCounts() {
+        return counts;
     }
 }

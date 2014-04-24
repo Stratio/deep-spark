@@ -22,13 +22,17 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.cql.DeepTokenRange;
+import com.stratio.deep.cql.RangeUtils;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.testentity.TestEntity;
-import com.stratio.deep.util.Constants;
+import com.stratio.deep.utils.Constants;
+import org.apache.cassandra.dht.IPartitioner;
+import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.serializer.DeserializationStream;
 import org.apache.spark.serializer.JavaSerializer;
@@ -42,24 +46,26 @@ import scala.reflect.ClassTag$;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import static org.testng.Assert.*;
 
 /**
- * Created by luca on 05/02/14.
+ * Integration tests for entity RDDs.
  */
 @Test(suiteName = "cassandraRddTests", groups = {"CassandraEntityRDDTest"})
 public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
+    private Logger logger = Logger.getLogger(CassandraEntityRDDTest.class);
 
     private static class TestEntityAbstractSerializableFunction extends
-        AbstractSerializableFunction<TestEntity, TestEntity> {
+            AbstractSerializableFunction<TestEntity, TestEntity> {
 
         private static final long serialVersionUID = -1555102599662015841L;
 
         @Override
         public TestEntity apply(TestEntity e) {
             return new TestEntity(e.getId(), e.getDomain(), e.getUrl(), e.getResponseTime() + 1, e.getResponseCode(),
-                e.getNotMappedField());
+                    e.getNotMappedField());
         }
     }
 
@@ -86,7 +92,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
     protected void checkOutputTestData() {
         Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+                .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
         Session session = cluster.connect();
 
         String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY + ";";
@@ -95,7 +101,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         assertEquals(rs.one().getLong(0), entityTestDataSize);
 
         command = "SELECT * from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY
-            + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
+                + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
 
         rs = session.execute(command);
         Row row = rs.one();
@@ -112,7 +118,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     @Override
     protected void checkSimpleTestData() {
         Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+                .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
         Session session = cluster.connect();
 
         String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY + ";";
@@ -121,7 +127,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         assertEquals(rs.one().getLong(0), entityTestDataSize);
 
         command = "select * from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY
-            + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
+                + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
 
         rs = session.execute(command);
         Row row = rs.one();
@@ -139,14 +145,14 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
         try {
             DeepJobConfigFactory
-                .create(TestEntity.class)
-                .host(Constants.DEFAULT_CASSANDRA_HOST)
-                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-                .keyspace(KEYSPACE_NAME)
-                .columnFamily(COLUMN_FAMILY)
-                .filterByField("notExistentField", "val")
-                .initialize();
+                    .create(TestEntity.class)
+                    .host(Constants.DEFAULT_CASSANDRA_HOST)
+                    .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                    .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                    .keyspace(KEYSPACE_NAME)
+                    .columnFamily(COLUMN_FAMILY)
+                    .filterByField("notExistentField", "val")
+                    .initialize();
 
             fail();
         } catch (DeepNoSuchFieldException e) {
@@ -155,14 +161,14 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
         try {
             DeepJobConfigFactory
-                .create(TestEntity.class)
-                .host(Constants.DEFAULT_CASSANDRA_HOST)
-                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-                .keyspace(KEYSPACE_NAME)
-                .columnFamily(COLUMN_FAMILY)
-                .filterByField("url", "val")
-                .initialize();
+                    .create(TestEntity.class)
+                    .host(Constants.DEFAULT_CASSANDRA_HOST)
+                    .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                    .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                    .keyspace(KEYSPACE_NAME)
+                    .columnFamily(COLUMN_FAMILY)
+                    .filterByField("url", "val")
+                    .initialize();
 
             fail();
         } catch (DeepIndexNotFoundException e) {
@@ -174,14 +180,14 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         assertTrue(allElements > 2);
 
         IDeepJobConfig<TestEntity> config = DeepJobConfigFactory
-            .create(TestEntity.class)
-            .host(Constants.DEFAULT_CASSANDRA_HOST)
-            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .keyspace(KEYSPACE_NAME)
-            .columnFamily(COLUMN_FAMILY)
-            .filterByField("response_time", 371)
-            .initialize();
+                .create(TestEntity.class)
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .keyspace(KEYSPACE_NAME)
+                .columnFamily(COLUMN_FAMILY)
+                .filterByField("response_time", 371)
+                .initialize();
 
         CassandraRDD<TestEntity> otherRDD = context.cassandraEntityRDD(config);
 
@@ -189,14 +195,15 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         assertEquals(entities.length, 2);
 
         config = DeepJobConfigFactory
-            .create(TestEntity.class)
-            .host(Constants.DEFAULT_CASSANDRA_HOST)
-            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .keyspace(KEYSPACE_NAME)
-            .columnFamily(COLUMN_FAMILY)
-            .filterByField("lucene", "response_time:[160 TO 840]")
-            .initialize();
+                .create(TestEntity.class)
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .keyspace(KEYSPACE_NAME)
+                .columnFamily(COLUMN_FAMILY)
+                .filterByField("lucene", "{filter:{type:\"range\",field:\"response_time\",lower:160,upper:840," +
+                        "include_lower:true,include_upper:true}}")
+                .initialize();
 
         otherRDD = context.cassandraEntityRDD(config);
 
@@ -213,25 +220,56 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     @Override
     protected IDeepJobConfig<TestEntity> initReadConfig() {
         IDeepJobConfig<TestEntity> config = DeepJobConfigFactory.create(TestEntity.class)
-            .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY);
-
-        config.getConfiguration();
+                .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY)
+                .bisectFactor(testBisectFactor).initialize();
 
         return config;
     }
 
     @Override
     protected IDeepJobConfig<TestEntity> initWriteConfig() {
-        IDeepJobConfig<TestEntity> writeConfig = DeepJobConfigFactory.create(TestEntity.class)
-            .host(Constants.DEFAULT_CASSANDRA_HOST)
-            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .keyspace(OUTPUT_KEYSPACE_NAME)
-            .columnFamily(OUTPUT_COLUMN_FAMILY)
-            .batchSize(2)
-            .createTableOnWrite(Boolean.TRUE);
+        IDeepJobConfig<TestEntity> writeConfig = DeepJobConfigFactory.createWriteConfig(TestEntity.class)
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .keyspace(OUTPUT_KEYSPACE_NAME)
+                .columnFamily(OUTPUT_COLUMN_FAMILY)
+                .batchSize(2)
+                .createTableOnWrite(Boolean.TRUE);
         return writeConfig.initialize();
+    }
+
+    @Test
+    public void testCountWithInputColumns() {
+        logger.info("testCountWithInputColumns()");
+
+        IDeepJobConfig<TestEntity> tmpConfig = DeepJobConfigFactory.create(TestEntity.class)
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .keyspace(KEYSPACE_NAME)
+                .columnFamily(COLUMN_FAMILY)
+                .batchSize(2)
+                .inputColumns("domain_name", "response_time")
+                .initialize();
+
+        CassandraRDD<TestEntity> tmpRdd = context.cassandraEntityRDD(tmpConfig);
+
+        TestEntity[] cells = (TestEntity[]) tmpRdd.collect();
+
+        assertEquals(cells.length, entityTestDataSize);
+
+        for (TestEntity e : cells) {
+            assertNotNull(e.getDomain());
+            assertNotNull(e.getResponseTime());
+            assertNotNull(e.getId());
+
+            assertNull(e.getResponseCode());
+            assertNull(e.getDownloadTime());
+            assertNull(e.getNotMappedField());
+            assertNull(e.getUrl());
+        }
     }
 
     @Override

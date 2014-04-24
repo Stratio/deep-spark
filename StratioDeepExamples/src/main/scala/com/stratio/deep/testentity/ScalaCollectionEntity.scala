@@ -25,7 +25,7 @@ import com.stratio.deep.entity.IDeepType
 /**
  * Created by luca on 27/03/14.
  */
-@DeepEntity class ScalaCollectionEntity extends IDeepType{
+@DeepEntity class ScalaCollectionEntity extends IDeepType {
   @BeanProperty
   @DeepField(isPartOfPartitionKey = true)
   var id: Integer = _

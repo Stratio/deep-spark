@@ -32,14 +32,23 @@ public class DeepGenericException extends RuntimeException {
         super();
     }
 
+    /**
+     * Public constructor.
+     */
     public DeepGenericException(String message) {
         super(message);
     }
 
+    /**
+     * Public constructor.
+     */
     public DeepGenericException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Public constructor.
+     */
     public DeepGenericException(Throwable cause) {
         super(cause);
     }

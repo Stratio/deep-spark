@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.deep.testentity;
 
 import com.stratio.deep.annotations.DeepEntity;
@@ -53,7 +54,7 @@ public class PageEntity implements IDeepType {
     @DeepField(fieldName = "firstDownloadTime", validationClass = LongType.class)
     private Long firstDownloadTime;
 
-    @DeepField(fieldName = "responseCode", validationClass = IntegerType.class )
+    @DeepField(fieldName = "responseCode", validationClass = IntegerType.class)
     private BigInteger responseCode;
 
     @DeepField(fieldName = "responseTime", validationClass = LongType.class)

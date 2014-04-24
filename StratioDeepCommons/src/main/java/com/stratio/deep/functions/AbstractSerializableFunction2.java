@@ -14,28 +14,16 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.config.impl;
+package com.stratio.deep.functions;
 
-import com.stratio.deep.entity.Cells;
+import scala.runtime.AbstractFunction2;
+
+import java.io.Serializable;
 
 /**
- * Cell-based configuration object.
- *
- * @author Luca Rosellini <luca@stratio.com>
+ * Created by luca on 14/04/14.
  */
-public class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
-
-    private static final long serialVersionUID = -598862509865396541L;
-    private Cells dummyCells;
-
-    {
-        dummyCells = new Cells();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public Class<Cells> getEntityClass() {
-        return (Class<Cells>) dummyCells.getClass();
-    }
+public abstract class AbstractSerializableFunction2<T1, T2, R> extends AbstractFunction2<T1, T2,
+        R> implements Serializable {
 
 }

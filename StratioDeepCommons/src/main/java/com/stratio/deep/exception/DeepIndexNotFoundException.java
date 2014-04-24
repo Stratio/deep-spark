@@ -17,10 +17,14 @@
 package com.stratio.deep.exception;
 
 /**
- * Created by luca on 28/02/14.
+ * Unchecked exception thrown when trying to define a default filter over
+ * a not existent secondary index in Cassandra.
  */
 public class DeepIndexNotFoundException extends RuntimeException {
 
+    /**
+     * Public constructor.
+     */
     public DeepIndexNotFoundException(String cause) {
         super(cause);
     }

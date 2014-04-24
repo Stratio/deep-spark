@@ -32,12 +32,19 @@ import java.nio.charset.CharacterCodingException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
+/**
+ * Abstract class defining the common test structure that all concrete subclasses should respect.
+ *
+ * @param <W>
+ */
 public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     private Logger logger = Logger.getLogger(getClass());
 
     protected CassandraRDD<W> rdd;
     private IDeepJobConfig<W> rddConfig;
     private IDeepJobConfig<W> writeConfig;
+
+    protected int testBisectFactor = 8;
 
     protected abstract void checkComputedData(W[] entities);
 
@@ -61,7 +68,7 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
 
     @BeforeClass
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
-        InterruptedException {
+            InterruptedException {
 
         rddConfig = initReadConfig();
         writeConfig = initWriteConfig();
@@ -90,7 +97,7 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
         Partition[] partitions = getRDD().partitions();
 
         assertNotNull(partitions);
-        assertEquals(partitions.length, 8 + 1);
+        assertEquals(partitions.length, getReadConfig().getBisectFactor() * (8 + 1));
     }
 
     @Test(dependsOnMethods = "testGetPartitions")
@@ -107,6 +114,8 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     public void testRDDInstantiation() {
         logger.info("testRDDInstantiation()");
         assertNotNull(getRDD());
+
+
     }
 
     @Test(dependsOnMethods = "testSimpleSaveToCassandra")

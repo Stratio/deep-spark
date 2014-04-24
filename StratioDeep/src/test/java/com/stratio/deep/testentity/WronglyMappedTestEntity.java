@@ -70,10 +70,10 @@ public class WronglyMappedTestEntity implements IDeepType {
     @Override
     public String toString() {
         return "WronglyMappedTestEntity{" +
-            "id='" + id + '\'' +
-            ", domain='" + domain + '\'' +
-            ", url='" + url + '\'' +
-            ", wronglyMappedField='" + wronglyMappedField + '\'' +
-            '}';
+                "id='" + id + '\'' +
+                ", domain='" + domain + '\'' +
+                ", url='" + url + '\'' +
+                ", wronglyMappedField='" + wronglyMappedField + '\'' +
+                '}';
     }
 }

@@ -18,8 +18,8 @@ package com.stratio.deep.utils;
 
 import com.google.common.collect.ImmutableMap;
 import com.stratio.deep.annotations.DeepField;
-import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.exception.DeepIOException;
 import org.apache.cassandra.db.marshal.*;
 import org.apache.cassandra.utils.Pair;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -38,7 +38,7 @@ import java.net.InetAddress;
 import java.util.*;
 
 /**
- * Created by luca on 26/02/14.
+ * Common utility methods to manipulate beans and fields annotated with @DeepEntity and @DeepField.
  */
 public final class AnnotationUtils {
     /**
@@ -46,59 +46,65 @@ public final class AnnotationUtils {
      * Cassandra marshaller.
      */
     public static final Map<Class, AbstractType<?>> MAP_JAVA_TYPE_TO_ABSTRACT_TYPE =
-        ImmutableMap.<Class, AbstractType<?>>builder()
-            .put(String.class, UTF8Type.instance)
-            .put(Integer.class, Int32Type.instance)
-            .put(Boolean.class, BooleanType.instance)
-            .put(Date.class, TimestampType.instance)
-            .put(BigDecimal.class, DecimalType.instance)
-            .put(Long.class, LongType.instance)
-            .put(Double.class, DoubleType.instance)
-            .put(Float.class, FloatType.instance)
-            .put(InetAddress.class, InetAddressType.instance)
-            .put(Inet4Address.class, InetAddressType.instance)
-            .put(Inet6Address.class, InetAddressType.instance)
-            .put(BigInteger.class, IntegerType.instance)
-            .put(UUID.class, UUIDType.instance)
-            .build();
+            ImmutableMap.<Class, AbstractType<?>>builder()
+                    .put(String.class, UTF8Type.instance)
+                    .put(Integer.class, Int32Type.instance)
+                    .put(Boolean.class, BooleanType.instance)
+                    .put(Date.class, TimestampType.instance)
+                    .put(BigDecimal.class, DecimalType.instance)
+                    .put(Long.class, LongType.instance)
+                    .put(Double.class, DoubleType.instance)
+                    .put(Float.class, FloatType.instance)
+                    .put(InetAddress.class, InetAddressType.instance)
+                    .put(Inet4Address.class, InetAddressType.instance)
+                    .put(Inet6Address.class, InetAddressType.instance)
+                    .put(BigInteger.class, IntegerType.instance)
+                    .put(UUID.class, UUIDType.instance)
+                    .build();
 
+    /**
+     * Static map of associations between a cassandra marshaller fully qualified class name and the corresponding
+     * Java class.
+     */
     public static final Map<String, Class> MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE =
-        ImmutableMap.<String, Class>builder()
-            .put(UTF8Type.class.getCanonicalName(), String.class)
-            .put(Int32Type.class.getCanonicalName(), Integer.class)
-            .put(BooleanType.class.getCanonicalName(), Boolean.class)
-            .put(TimestampType.class.getCanonicalName(), Date.class)
-            .put(DecimalType.class.getCanonicalName(), BigDecimal.class)
-            .put(LongType.class.getCanonicalName(), Long.class)
-            .put(DoubleType.class.getCanonicalName(), Double.class)
-            .put(FloatType.class.getCanonicalName(), Float.class)
-            .put(InetAddressType.class.getCanonicalName(), InetAddress.class)
-            .put(IntegerType.class.getCanonicalName(), BigInteger.class)
-            .put(UUIDType.class.getCanonicalName(), UUID.class)
-            .put(TimeUUIDType.class.getCanonicalName(), UUID.class)
-            .put(SetType.class.getCanonicalName(), Set.class)
-            .put(ListType.class.getCanonicalName(), List.class)
-            .put(MapType.class.getCanonicalName(), Map.class)
-            .build();
+            ImmutableMap.<String, Class>builder()
+                    .put(UTF8Type.class.getCanonicalName(), String.class)
+                    .put(Int32Type.class.getCanonicalName(), Integer.class)
+                    .put(BooleanType.class.getCanonicalName(), Boolean.class)
+                    .put(TimestampType.class.getCanonicalName(), Date.class)
+                    .put(DateType.class.getCanonicalName(), Date.class)
+                    .put(DecimalType.class.getCanonicalName(), BigDecimal.class)
+                    .put(LongType.class.getCanonicalName(), Long.class)
+                    .put(DoubleType.class.getCanonicalName(), Double.class)
+                    .put(FloatType.class.getCanonicalName(), Float.class)
+                    .put(InetAddressType.class.getCanonicalName(), InetAddress.class)
+                    .put(IntegerType.class.getCanonicalName(), BigInteger.class)
+                    .put(UUIDType.class.getCanonicalName(), UUID.class)
+                    .put(TimeUUIDType.class.getCanonicalName(), UUID.class)
+                    .put(SetType.class.getCanonicalName(), Set.class)
+                    .put(ListType.class.getCanonicalName(), List.class)
+                    .put(MapType.class.getCanonicalName(), Map.class)
+                    .build();
 
+    /**
+     * Static map of associations between cassandra marshaller Class objects and their instance.
+     */
     public static final Map<Class<?>, AbstractType<?>> MAP_ABSTRACT_TYPE_CLASS_TO_ABSTRACT_TYPE =
-        ImmutableMap.<Class<?>, AbstractType<?>>builder()
-            .put(UTF8Type.class, UTF8Type.instance)
-            .put(Int32Type.class, Int32Type.instance)
-            .put(BooleanType.class, BooleanType.instance)
-            .put(TimestampType.class, TimestampType.instance)
-            .put(DecimalType.class, DecimalType.instance)
-            .put(LongType.class, LongType.instance)
-            .put(DoubleType.class, DoubleType.instance)
-            .put(FloatType.class, FloatType.instance)
-            .put(InetAddressType.class, InetAddressType.instance)
-            .put(IntegerType.class, IntegerType.instance)
-            .put(UUIDType.class, UUIDType.instance)
-            .put(TimeUUIDType.class, TimeUUIDType.instance)
-            .build();
-
-
-
+            ImmutableMap.<Class<?>, AbstractType<?>>builder()
+                    .put(UTF8Type.class, UTF8Type.instance)
+                    .put(Int32Type.class, Int32Type.instance)
+                    .put(BooleanType.class, BooleanType.instance)
+                    .put(TimestampType.class, TimestampType.instance)
+                    .put(DateType.class, DateType.instance)
+                    .put(DecimalType.class, DecimalType.instance)
+                    .put(LongType.class, LongType.instance)
+                    .put(DoubleType.class, DoubleType.instance)
+                    .put(FloatType.class, FloatType.instance)
+                    .put(InetAddressType.class, InetAddressType.instance)
+                    .put(IntegerType.class, IntegerType.instance)
+                    .put(UUIDType.class, UUIDType.instance)
+                    .put(TimeUUIDType.class, TimeUUIDType.instance)
+                    .build();
 
     /**
      * Returns the field name as known by the datastore.
@@ -120,10 +126,11 @@ public final class AnnotationUtils {
      * Utility method that filters out all the fields _not_ annotated
      * with the {@link com.stratio.deep.annotations.DeepField} annotation.
      *
-     * @param fields
+     * @param clazz
      * @return
      */
-    public static Field[] filterDeepFields(Field[] fields) {
+    public static Field[] filterDeepFields(Class clazz) {
+        Field[] fields = Utils.getAllFields(clazz);
         List<Field> filtered = new ArrayList<>();
         for (Field f : fields) {
             if (f.isAnnotationPresent(DeepField.class)) {
@@ -138,11 +145,11 @@ public final class AnnotationUtils {
      * the array of keys fields.
      * The right element contains the array of all other non-key fields.
      *
-     * @param fields
+     * @param clazz
      * @return
      */
-    public static Pair<Field[], Field[]> filterKeyFields(Field[] fields) {
-        Field[] filtered = filterDeepFields(fields);
+    public static Pair<Field[], Field[]> filterKeyFields(Class clazz) {
+        Field[] filtered = filterDeepFields(clazz);
         List<Field> keys = new ArrayList<>();
         List<Field> others = new ArrayList<>();
 
@@ -184,23 +191,33 @@ public final class AnnotationUtils {
 
     }
 
-    public static Class<?>[] getGenericTypes(Field f){
+    /**
+     * Returns the list of generic types associated to the provided field (if any).
+     *
+     * @param f
+     * @return
+     */
+    public static Class<?>[] getGenericTypes(Field f) {
         try {
             ParameterizedType type = (ParameterizedType) f.getGenericType();
             Type[] types = type.getActualTypeArguments();
 
             Class<?>[] res = new Class<?>[types.length];
 
-            for (int i = 0; i<types.length; i++) {
+            for (int i = 0; i < types.length; i++) {
                 res[i] = (Class<?>) types[i];
             }
 
             return res;
 
         } catch (ClassCastException e) {
-            return new Class<?>[]{(Class<?>)f.getGenericType()};
+            return new Class<?>[]{(Class<?>) f.getGenericType()};
         }
     }
 
-    private AnnotationUtils(){}
+    /**
+     * private constructor.
+     */
+    private AnnotationUtils() {
+    }
 }

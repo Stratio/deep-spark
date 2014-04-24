@@ -19,16 +19,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.stratio.deep</groupId>
     <artifactId>StratioDeepParent</artifactId>
-    <version>0.1.2</version>
+    <version>0.2.1</version>
     <packaging>pom</packaging>
 
     <properties>
         <!-- Cassandra -->
         <cassandra.version>2.0.53-SNAPSHOT</cassandra.version>
-        <datastax.driver.version>2.0.0</datastax.driver.version>
+        <datastax.driver.version>2.0.1</datastax.driver.version>
 
         <!-- Spark version -->
-        <spark.version>0.9.1-incubating-SNAPSHOT</spark.version>
+        <spark.version>0.9.1_STRATIO</spark.version>
 
         <java.version>1.7</java.version>
 
@@ -95,6 +95,12 @@
             <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
             <version>${datastax.driver.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
         </dependency>
     </dependencies>
 

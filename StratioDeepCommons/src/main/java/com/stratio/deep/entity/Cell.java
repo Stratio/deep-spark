@@ -31,10 +31,9 @@ import static com.stratio.deep.utils.AnnotationUtils.*;
 /**
  * Generic abstraction for cassandra's columns.
  *
- * @param <T>
  * @author Luca Rosellini <luca@stratio.com>
  */
-public final class Cell<T> implements Serializable {
+public final class Cell implements Serializable {
 
     private static final long serialVersionUID = 2298549804049316156L;
 
@@ -46,7 +45,7 @@ public final class Cell<T> implements Serializable {
     /**
      * Cell value.
      */
-    private T cellValue;
+    private Object cellValue;
 
     /**
      * flag that tells if this cell is part of the partition key.
@@ -65,26 +64,22 @@ public final class Cell<T> implements Serializable {
     /**
      * Factory method, creates a new Cell from its value and metadata information<br/>
      *
-     * @param metadata       the cell object carrying the metadata for this new cell
-     * @param cellValue      the cell value, provided as a ByteBuffer.
-
-     * @param <T>
-     * @return
+     * @param metadata  the cell object carrying the metadata for this new cell
+     * @param cellValue the cell value, provided as a ByteBuffer.
+     * @return an instance of a Cell object for the provided parameters.
      */
-    public static <T> Cell<T> create(Cell metadata, T cellValue) {
+    public static Cell create(Cell metadata, Object cellValue) {
         return new Cell(metadata, cellValue);
     }
 
     /**
      * Factory method, creates a new Cell from its value and metadata information<br/>
      *
-     * @param metadata       the cell object carrying the metadata for this new cell
-     * @param cellValue      the cell value, provided as a ByteBuffer.
-
-     * @param <T>
-     * @return
+     * @param metadata  the cell object carrying the metadata for this new cell
+     * @param cellValue the cell value, provided as a ByteBuffer.
+     * @return an instance of a Cell object for the provided parameters.
      */
-    public static <T> Cell<T> create(Cell metadata, ByteBuffer cellValue) {
+    public static Cell create(Cell metadata, ByteBuffer cellValue) {
         return new Cell(metadata, cellValue);
     }
 
@@ -94,10 +89,9 @@ public final class Cell<T> implements Serializable {
      *
      * @param cellName  the cell name
      * @param cellValue the cell value, provided as a ByteBuffer.
-     * @param <T>
-     * @return
+     * @return an instance of a Cell object for the provided parameters.
      */
-    public static <T> Cell<T> create(String cellName, T cellValue) {
+    public static Cell create(String cellName, Object cellValue) {
         return create(cellName, cellValue, Boolean.FALSE, Boolean.FALSE);
     }
 
@@ -108,12 +102,11 @@ public final class Cell<T> implements Serializable {
      * @param cellValue      the cell value, provided as a ByteBuffer.
      * @param isPartitionKey true if this cell is part of the cassandra's partition key.
      * @param isClusterKey   true if this cell is part of the cassandra's clustering key.
-     * @param <T>
-     * @return
+     * @return an instance of a Cell object for the provided parameters.
      */
-    public static <T> Cell<T> create(String cellName, T cellValue, Boolean isPartitionKey,
-        Boolean isClusterKey) {
-        return new Cell<T>(cellName, cellValue, isPartitionKey, isClusterKey);
+    public static Cell create(String cellName, Object cellValue, Boolean isPartitionKey,
+                              Boolean isClusterKey) {
+        return new Cell(cellName, cellValue, isPartitionKey, isClusterKey);
     }
 
     /**
@@ -123,23 +116,22 @@ public final class Cell<T> implements Serializable {
      * @param cellType       the cell value type.
      * @param isPartitionKey true if this cell is part of the cassandra's partition key.
      * @param isClusterKey   true if this cell is part of the cassandra's clustering key.
-     * @return
+     * @return an instance of a Cell object for the provided parameters.
      */
-    public static Cell<?> create(String cellName, DataType cellType, Boolean isPartitionKey,
-        Boolean isClusterKey) {
+    public static Cell create(String cellName, DataType cellType, Boolean isPartitionKey,
+                              Boolean isClusterKey) {
         return new Cell(cellName, cellType, isPartitionKey, isClusterKey);
     }
 
     /**
-     * Constructs a Cell from an testentity field.
+     * Constructs a Cell from a {@link @DeepField} property.
      *
-     * @param e instance of the testentity whose field is going to generate a Cell.
+     * @param e     instance of the testentity whose field is going to generate a Cell.
      * @param field field that will generate the Cell.
-     * @param <T>
-     * @param <E>
-     * @return
+     * @param <E>   a subclass of IDeepType.
+     * @return an instance of a Cell object for the provided parameters.
      */
-    public static <T extends Serializable, E extends IDeepType> Cell<T> create(E e, Field field){
+    public static <E extends IDeepType> Cell create(E e, Field field) {
         return new Cell(e, field);
     }
 
@@ -149,9 +141,9 @@ public final class Cell<T> implements Serializable {
      * to distinguish between an UUID or a TimeUUID because twe don't have the UUID value.
      *
      * @param obj the value class type.
-     * @return
+     * @return the CellValidator object associated to this cell.
      */
-    private static CellValidator getValueType(DataType obj) {
+    public static CellValidator getValueType(DataType obj) {
         return CellValidator.cellValidator(obj);
     }
 
@@ -159,19 +151,18 @@ public final class Cell<T> implements Serializable {
      * Calculates the Cassandra marshaller given the cell value.
      *
      * @param obj the cell value.
-     * @param <T>
-     * @return
+     * @return the CellValidator object associated to this cell.
      */
-    private static <T> CellValidator getValueType(T obj) {
+    public static CellValidator getValueType(Object obj) {
         return CellValidator.cellValidator(obj);
     }
 
     /**
      * Private constructor.
      */
-    private Cell(String cellName, T cellValue, Boolean isPartitionKey, Boolean isClusterKey) {
-        if (!(cellValue instanceof Serializable)){
-            throw new DeepInstantiationException("provided cell value "+cellValue+" is not serializable");
+    private Cell(String cellName, Object cellValue, Boolean isPartitionKey, Boolean isClusterKey) {
+        if (!(cellValue instanceof Serializable)) {
+            throw new DeepInstantiationException("provided cell value " + cellValue + " is not serializable");
         }
         this.cellName = cellName;
         this.cellValue = cellValue;
@@ -199,16 +190,16 @@ public final class Cell<T> implements Serializable {
         this.isPartitionKey = metadata.isPartitionKey;
         this.cellValidator = metadata.cellValidator;
         if (cellValue != null) {
-            this.cellValue = (T) metadata.marshaller().compose(cellValue);
+            this.cellValue = metadata.marshaller().compose(cellValue);
         }
     }
 
     /**
      * Private constructor.
      */
-    private Cell(Cell metadata, T cellValue) {
-        if (!(cellValue instanceof Serializable)){
-            throw new DeepInstantiationException("provided cell value "+cellValue+" is not serializable");
+    private Cell(Cell metadata, Object cellValue) {
+        if (!(cellValue instanceof Serializable)) {
+            throw new DeepInstantiationException("provided cell value " + cellValue + " is not serializable");
         }
 
         this.cellName = metadata.getCellName();
@@ -225,12 +216,15 @@ public final class Cell<T> implements Serializable {
 
         DeepField annotation = field.getAnnotation(DeepField.class);
         this.cellName = deepFieldName(field);
-        this.cellValue = (T) getBeanFieldValue(e, field);
+        this.cellValue = getBeanFieldValue(e, field);
         this.isClusterKey = annotation.isPartOfClusterKey();
         this.isPartitionKey = annotation.isPartOfPartitionKey();
         this.cellValidator = CellValidator.cellValidator(field);
     }
 
+    /**
+     * @return Returns the validator object associated to this Cell.
+     */
     public CellValidator getCellValidator() {
         return cellValidator;
     }
@@ -245,8 +239,8 @@ public final class Cell<T> implements Serializable {
      * <li>validator</li>
      * </ol>
      *
-     * @param o
-     * @return
+     * @param o the object instance we want to compare to this object.
+     * @return either true or false if this Cell is equal to the one supplied as an argument.
      */
     @SuppressWarnings("rawtypes")
     @Override
@@ -261,26 +255,41 @@ public final class Cell<T> implements Serializable {
         Cell cell = (Cell) o;
 
         return cellName.equals(cell.cellName) &&
-            (cellValue != null ? cellValue.equals(cell.cellValue) : cell.cellValue != null) &&
-            isClusterKey.equals(cell.isClusterKey) &&
-            isPartitionKey.equals(cell.isPartitionKey) &&
-            cellValidator.equals(cell.getCellValidator());
+                (cellValue != null ? cellValue.equals(cell.cellValue) : cell.cellValue != null) &&
+                isClusterKey.equals(cell.isClusterKey) &&
+                isPartitionKey.equals(cell.isPartitionKey) &&
+                cellValidator.equals(cell.getCellValidator());
     }
 
+    /**
+     * Returns the Java type corresponding to the current Cell.
+     *
+     * @return the Java type corresponding to the current Cell.
+     */
     public Class<?> getValueType() {
         Class valueType = MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE.get(cellValidator.getValidatorClassName());
-        if (valueType == null){
-            throw new DeepGenericException("Cannot find value type for marshaller " + cellValidator.getValidatorClassName());
+        if (valueType == null) {
+            throw new DeepGenericException("Cannot find value type for marshaller " + cellValidator
+                    .getValidatorClassName());
         }
 
         return valueType;
     }
 
+    /**
+     * @return the name of the current cell as defined in the database.
+     */
     public String getCellName() {
         return cellName;
     }
 
-    public T getCellValue() {
+    /**
+     * Returns the composed cell value. The type of the returned object can be obtained by calling {@see
+     * Cell#getValueType}
+     *
+     * @return the composed cell value.
+     */
+    public Object getCellValue() {
         return cellValue;
     }
 
@@ -290,8 +299,9 @@ public final class Cell<T> implements Serializable {
      * <p/>
      * If cell value is null we propagate an empty array, see CASSANDRA-5885 and CASSANDRA-6180.
      *
-     * @return
+     * @return Returns the cell value as a ByteBuffer.
      */
+    @SuppressWarnings("unchecked")
     public ByteBuffer getDecomposedCellValue() {
 
         if (this.cellValue != null) {
@@ -303,9 +313,7 @@ public final class Cell<T> implements Serializable {
     }
 
     /**
-     * calcs the cell hash code.
-     *
-     * @return
+     * {@inheritDoc}
      */
     @Override
     public int hashCode() {
@@ -317,26 +325,41 @@ public final class Cell<T> implements Serializable {
         return result;
     }
 
+    /**
+     * @return true if the current cell is part of the clustering key.
+     */
     public Boolean isClusterKey() {
         return isClusterKey;
     }
 
+    /**
+     * @return true if the current cell is part of the partition key.
+     */
     public Boolean isPartitionKey() {
         return isPartitionKey;
     }
 
-    public AbstractType<T> marshaller() {
-        return (AbstractType<T>) cellValidator.getAbstractType();
+    /**
+     * @return Returns the Cassandra validator instance associated to this cell.
+     */
+    public AbstractType marshaller() {
+        return cellValidator.getAbstractType();
     }
 
+    /**
+     * @return the fully qualified class name of the cassandra validator associated to this cell.
+     */
     public String marshallerClassName() {
         return cellValidator.getValidatorClassName();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
-        return "Cell{" + "cellName='" + cellName + '\'' + ", cellValue=" + (cellValue!=null?cellValue:"") + ", isPartitionKey="
-            + isPartitionKey + ", isClusterKey=" + isClusterKey + ", cellValidator='" + cellValidator + '\'' + '}';
+        return "Cell{" + "cellName='" + cellName + '\'' + ", cellValue=" + (cellValue != null ? cellValue : "") + ", " +
+                "isPartitionKey="
+                + isPartitionKey + ", isClusterKey=" + isClusterKey + ", cellValidator='" + cellValidator + '\'' + '}';
     }
-
 }

@@ -24,16 +24,33 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Maps an object property to a Database column.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface DeepField {
 
+    /**
+     * used to specify an alternative database name for the current property.
+     * If omitted the property name will be used to resolve the database column name.
+     */
     String fieldName() default "";
 
+    /**
+     * Specifies if the current field is part of the clustering key. Defaults to false.
+     */
     boolean isPartOfClusterKey() default false;
 
+    /**
+     * Specifies if the current field is part of the partitioning key. Defaults to false.
+     */
     boolean isPartOfPartitionKey() default false;
 
+    /**
+     * Specifies the cassandra validator class to be used to marshall/unmarshall the field value to the database.
+     * Defaults to org.apache.cassandra.db.marshal.UTF8Type.class
+     */
     Class<? extends AbstractType> validationClass() default UTF8Type.class;
 
 }

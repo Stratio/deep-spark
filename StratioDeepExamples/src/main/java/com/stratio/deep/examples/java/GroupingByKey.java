@@ -13,44 +13,64 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.deep.examples.java;
 
-import java.util.List;
+package com.stratio.deep.examples.java;
 
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.rdd.CassandraJavaRDD;
+import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 
+import java.util.List;
+
 /**
  * Author: Emmanuelle Raffenne
  * Date..: 14-feb-2014
  */
 public final class GroupingByKey {
-    private static Logger logger = Logger.getLogger(GroupingByKey.class);
+    private static final Logger LOG = Logger.getLogger(GroupingByKey.class);
+    private static List<Tuple2<String, Integer>> result;
+    private static int authors;
+    private static int total;
 
-    private GroupingByKey(){}
+    private GroupingByKey() {
+    }
 
+    /**
+     * Application entry point.
+     *
+     * @param args the arguments passed to the application.
+     */
     public static void main(String[] args) {
+        doMain(args);
+    }
 
+    /**
+     * This is the method called by both main and tests.
+     *
+     * @param args
+     */
+    public static void doMain(String[] args) {
         String job = "java:groupingByKey";
 
-        String keyspaceName = "tutorials";
+        String keyspaceName = "test";
         String tableName = "tweets";
 
         // Creating the Deep Context where args are Spark Master and Job Name
-        ContextProperties p = new ContextProperties();
-        DeepSparkContext deepContext = new DeepSparkContext(p.cluster, job, p.sparkHome, p.jarList);
+        ContextProperties p = new ContextProperties(args);
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+                new String[]{p.getJar()});
+
 
         // Creating a configuration for the RDD and initialize it
         IDeepJobConfig<TweetEntity> config = DeepJobConfigFactory.create(TweetEntity.class)
-                .host(p.cassandraHost).rpcPort(p.cassandraPort)
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(tableName)
                 .initialize();
 
@@ -58,18 +78,19 @@ public final class GroupingByKey {
         CassandraJavaRDD<TweetEntity> rdd = deepContext.cassandraJavaRDD(config);
 
         // creating a key-value pairs RDD
-        JavaPairRDD<String,TweetEntity> pairsRDD = rdd.map(new PairFunction<TweetEntity, String, TweetEntity>() {
+        JavaPairRDD<String, TweetEntity> pairsRDD = rdd.map(new PairFunction<TweetEntity, String, TweetEntity>() {
             @Override
-            public Tuple2<String, TweetEntity> call(TweetEntity t){
-                return new Tuple2<String,TweetEntity>(t.getAuthor(),t);
+            public Tuple2<String, TweetEntity> call(TweetEntity t) {
+                return new Tuple2<String, TweetEntity>(t.getAuthor(), t);
             }
         });
 
 // grouping
-        JavaPairRDD<String,List<TweetEntity>> groups = pairsRDD.groupByKey();
+        JavaPairRDD<String, List<TweetEntity>> groups = pairsRDD.groupByKey();
 
 // counting elements in groups
-        JavaPairRDD<String,Integer> counts = groups.map(new PairFunction<Tuple2<String, List<TweetEntity>>, String, Integer>() {
+        JavaPairRDD<String, Integer> counts = groups.map(new PairFunction<Tuple2<String, List<TweetEntity>>, String,
+                Integer>() {
             @Override
             public Tuple2<String, Integer> call(Tuple2<String, List<TweetEntity>> t) {
                 return new Tuple2<String, Integer>(t._1(), t._2().size());
@@ -77,19 +98,31 @@ public final class GroupingByKey {
         });
 
 // fetching results
-        List<Tuple2<String, Integer>> result = counts.collect();
+        result = counts.collect();
 
-        System.out.println("Este es el resultado con groupByKey: ");
-        int total = 0;
-        int authors = 0;
+        LOG.info("Este es el resultado con groupByKey: ");
+        total = 0;
+        authors = 0;
         for (Tuple2<String, Integer> t : result) {
             total = total + t._2();
             authors = authors + 1;
-            logger.info( t._1() + ": " + t._2().toString() );
+            LOG.info(t._1() + ": " + t._2().toString());
         }
 
-        logger.info("Autores: " + authors + " total: " + total);
+        LOG.info("Autores: " + authors + " total: " + total);
 
-        System.exit(0);
+        deepContext.stop();
+    }
+
+    public static List<Tuple2<String, Integer>> getResult() {
+        return result;
+    }
+
+    public static int getAuthors() {
+        return authors;
+    }
+
+    public static int getTotal() {
+        return total;
     }
 }

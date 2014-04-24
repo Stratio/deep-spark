@@ -24,12 +24,12 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
+import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.testentity.StrippedTestEntity;
 import com.stratio.deep.testentity.TestEntity;
-import com.stratio.deep.util.Constants;
+import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.utils.UUIDGen;
 import org.apache.log4j.Logger;
@@ -47,10 +47,12 @@ import java.net.URISyntaxException;
 import java.nio.charset.CharacterCodingException;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.testng.Assert.*;
 
+/**
+ * Integration tests for Java RDDs.
+ */
 @Test(suiteName = "cassandraRddTests", dependsOnGroups = {"CassandraCellRDDTest"}, groups = {"CassandraJavaRDDTest"})
 public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     private Logger logger = Logger.getLogger(getClass());
@@ -63,18 +65,18 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
     @BeforeClass
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
-        InterruptedException {
+            InterruptedException {
 
         rddConfig = DeepJobConfigFactory.create(TestEntity.class)
-            .host(Constants.DEFAULT_CASSANDRA_HOST)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY)
-            .partitioner("org.apache.cassandra.dht.Murmur3Partitioner")
-            .username("")
-            .password("");
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY)
+                .partitioner("org.apache.cassandra.dht.Murmur3Partitioner")
+                .username("")
+                .password("");
 
-        rddConfig.getConfiguration();
+        rddConfig.initialize();
 
         logger.info("Constructed configuration object: " + rddConfig);
         logger.info("Constructiong cassandraRDD");
@@ -217,18 +219,19 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     public void testSaveToCassandra() {
         final String table = "save_java_rdd";
 
-        //executeCustomCQL("create table  " + OUTPUT_KEYSPACE_NAME + "." + table + " (domain text, count int, PRIMARY KEY(domain));");
+        //executeCustomCQL("create table  " + OUTPUT_KEYSPACE_NAME + "." + table + " (domain text, count int,
+        // PRIMARY KEY(domain));");
 
-        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.create()
-            .host(Constants.DEFAULT_CASSANDRA_HOST)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .keyspace(OUTPUT_KEYSPACE_NAME)
-            .columnFamily(table)
-            .username("")
-            .createTableOnWrite(true)
-            .batchSize(1)
-            .password("").initialize();
+        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .keyspace(OUTPUT_KEYSPACE_NAME)
+                .columnFamily(table)
+                .username("")
+                .createTableOnWrite(true)
+                .batchSize(1)
+                .password("").initialize();
 
 	/* 1. I need to define which is the key, let's say it's the domain */
         JavaPairRDD<String, Integer> pairRDD = rdd.map(new DomainCounterPairFunction());
@@ -237,7 +240,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
         JavaPairRDD<String, Integer> reducedRDD = pairRDD.reduceByKey(new IntegerReducer());
 
         JavaRDD<Cells> cells = reducedRDD
-            .map(new Tuple2CellsFunction());
+                .map(new Tuple2CellsFunction());
 
         CassandraRDD.saveRDDToCassandra(cells, writeConfig);
 
@@ -246,16 +249,16 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     }
 
     @Test(dependsOnMethods = "testSaveToCassandra")
-    public void testSaveToCassandra2(){
-        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.create()
-            .host(Constants.DEFAULT_CASSANDRA_HOST)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .keyspace(OUTPUT_KEYSPACE_NAME)
-            .columnFamily("page")
-            .createTableOnWrite(true)
-            .batchSize(2)
-            .password("").initialize();
+    public void testSaveToCassandra2() {
+        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .keyspace(OUTPUT_KEYSPACE_NAME)
+                .columnFamily("page")
+                .createTableOnWrite(true)
+                .batchSize(2)
+                .password("").initialize();
 
         JavaPairRDD<String, Double> pairRDD = rdd.map(new DomainCounterDoublePairFunction());
 
@@ -276,7 +279,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
     private void checkOutputTestData() {
         Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+                .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
         Session session = cluster.connect();
 
         String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + ".save_java_rdd;";
@@ -326,9 +329,9 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 class WrongSensors2CellsFunction extends Function<Tuple2<String, Double>, Cells> {
     @Override
     public Cells call(Tuple2<String, Double> t) throws Exception {
-        Cell<String> sensorNameCell = Cell.create("name", t._1());
-        Cell<UUID> sensorTimeUUID = Cell.create("time_taken", UUIDGen.getTimeUUID());
-        Cell<Double> sensorDataCell = Cell.create("value", t._2());
+        Cell sensorNameCell = Cell.create("name", t._1());
+        Cell sensorTimeUUID = Cell.create("time_taken", UUIDGen.getTimeUUID());
+        Cell sensorDataCell = Cell.create("value", t._2());
 
         return new Cells(sensorNameCell, sensorTimeUUID, sensorDataCell);
     }
@@ -337,9 +340,9 @@ class WrongSensors2CellsFunction extends Function<Tuple2<String, Double>, Cells>
 class Sensors2CellsFunction extends Function<Tuple2<String, Double>, Cells> {
     @Override
     public Cells call(Tuple2<String, Double> t) throws Exception {
-        Cell<String> sensorNameCell = Cell.create("name", t._1());
-        Cell<UUID> sensorTimeUUID = Cell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
-        Cell<Double> sensorDataCell = Cell.create("value", t._2());
+        Cell sensorNameCell = Cell.create("name", t._1());
+        Cell sensorTimeUUID = Cell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
+        Cell sensorDataCell = Cell.create("value", t._2());
 
         return new Cells(sensorNameCell, sensorTimeUUID, sensorDataCell);
     }

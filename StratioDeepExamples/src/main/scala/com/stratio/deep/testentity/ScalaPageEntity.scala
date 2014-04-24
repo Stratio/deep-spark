@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.deep.testentity
 
 import org.apache.cassandra.db.marshal._
 import com.stratio.deep.annotations.{DeepEntity, DeepField}
 import scala.beans.BeanProperty
-import java.util.UUID
 import com.stratio.deep.entity.IDeepType
 
 /**
@@ -44,8 +44,8 @@ import com.stratio.deep.entity.IDeepType
   var responseTime: java.lang.Long = _
 
   @BeanProperty
-  @DeepField(fieldName = "responseCode", validationClass = classOf[Int32Type])
-  var responseCode: Integer = _
+  @DeepField(fieldName = "responseCode", validationClass = classOf[IntegerType])
+  var responseCode: java.math.BigInteger = _
 
   @BeanProperty
   @DeepField(validationClass = classOf[LongType], fieldName = "downloadTime")
