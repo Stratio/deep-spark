@@ -1,3 +1,305 @@
+[0.2.1]
+
+commit de20867d757dbae9a688e56fd63ffc1a8be8185e
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Apr 24 16:19:24 2014 +0200
+
+    [StratioDeep release prepare] preparing for version 0.2.1
+
+commit f86b488f81271cfde6b26744e55cce4a50ace2db
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Apr 24 16:13:50 2014 +0200
+
+    - Added bisectFactor to configuration object and the logic to split cassandra token ranges.
+    - Fixed several Sonar violations
+
+commit efb14ecea78375d22506808d9a35634848e886ef
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 23 18:32:23 2014 +0200
+
+    fixed replica ordering bug
+
+commit d03c096894ccfd1294ed68da5f9cf493c73ccb09
+Merge: e319608 a80f6d2
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 23 14:54:04 2014 +0200
+
+    Merge branch 'no-cassandra-hadoop' into develop
+    
+    Conflicts:
+    	StratioDeep/pom.xml
+    	StratioDeep/src/main/java/com/stratio/deep/cql/DeepRecordReader.java
+    	StratioDeepCommons/pom.xml
+    	StratioDeepExamples/pom.xml
+    	StratioDeepParent/pom.xml
+
+commit a80f6d2cfbce345608c698ab13d132314ed6a51b
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 23 14:45:00 2014 +0200
+
+    fixed bug SDH-9 (entities object inheriting from a base class were not handled correctly)
+
+commit 85307d728c2adba32d5fd8c004029e3441023f89
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 23 14:43:02 2014 +0200
+
+    Updated lucene query following the new stratio-cassandra query syntax
+
+commit 4e42f29a0e11ee642dad6b2d0fdbe0dfb7c5e3b9
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 23 14:42:14 2014 +0200
+
+    Changed log level for classes contained in the 'org.eclipse' package
+
+commit 70b6333fc1e2ef216934ea813dd57b4697430ace
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 23 14:41:05 2014 +0200
+
+    Updated Datastax driver version to 2.0.1
+
+commit 53823a659880a8c592450d9aa81f915e04f7b1bd
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 23 14:18:55 2014 +0200
+
+    Changed log level for classes contained in the 'org.apache.cassandra' package
+
+commit 02e061a3f2e65d2eb99e56c93770f058aa547de8
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 23 14:17:05 2014 +0200
+
+    Updated version number to 0.2.1-SNAPSHOT
+
+commit bdec8c281db9a2bbd4b687878111807309e5b6df
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 23 12:16:46 2014 +0200
+
+    Added an useful ignore pattern, all file names containing 'GitIgnored' (case-sensitive) will be ignored
+
+commit 75190474ffca89c1cf6625474ebee4be2011555a
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 23 12:14:32 2014 +0200
+
+    * Configuration concrete classes constructor  have now package access
+    * We can now differentiate if a configuration object will be used for writes. This lets us perform additional validations on the configuration object.
+    * Added a new 'pageSize' property to configuration object that will let the user change the size of data pages fetched from Cassandra.
+    * Fixed a bug that caused a runtime exception when performing computations over an RDD create using a conf object where the user specified the list of input columns.
+
+commit f4f8171d606873f3568d6e297cd00f6748a946fd
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 23 12:09:11 2014 +0200
+
+    Added log4j configuration file for tests
+
+commit 5b499990682a572bc31e1643424e3853761e5384
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Apr 22 19:37:33 2014 +0200
+
+    - fixed replica ordering bug
+    - several refactors
+
+commit 2bc1fe251eacad33787c8532e344518587604fce
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Apr 22 19:36:02 2014 +0200
+
+    Correctly handled the default host name, now it's not "localhost", it's retrieved using InetAddress
+
+commit f4e1200b3db8a3fe1cdeab45b66d29ca8b373837
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Apr 22 19:34:35 2014 +0200
+
+    Added Mockito test dependency
+
+commit 052570b2db24145bb018b37b319449f307758fc6
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 16 16:57:35 2014 +0200
+
+    Fixed javadoc
+
+commit 00e194817d125467cb709d74a31b7cb350713d99
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 16 16:45:07 2014 +0200
+
+    - Finalized remove of cassandr hadoop interface
+    - Integration test fully working
+    - Performed sever clustered tests that suggest the new implementation works as expected
+    - Code cleanups
+
+commit 3466e360bc9dc3b3b77decbd67e81a8198be1cf2
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 16 16:02:20 2014 +0200
+
+    Changed default write consistency level to QUORUM
+
+commit fda6a3446deae6fe151b1dd2409c82f14f4ff560
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Apr 15 15:16:05 2014 +0200
+
+    debugging code commented out
+
+commit 0c86e32fab478aecb0c1ac13657142160851258f
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Apr 15 14:45:33 2014 +0200
+
+    fix test cassandra endpoints
+
+commit d854e919b27c29aa80eea105c8b1fba45b1babb1
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Apr 15 14:45:15 2014 +0200
+
+    fixed bug that caused DeepCqlRecordWriter no to be closed correctly
+
+commit a58a2d4e65ab5f69f6cf8daa305d9c5465830561
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Apr 15 14:28:37 2014 +0200
+
+    Updated version numbers to 0.2.0-SNAPSHOT
+
+commit e319608ffb9f26b48320bef34a985438966ccb76
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Apr 15 14:20:48 2014 +0200
+
+    Updated version numbers to 0.1.4-SNAPSHOT
+
+commit 8a68539dfc2413ed6a2802cd593225684c47ce29
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Apr 15 14:20:28 2014 +0200
+
+    Removed borked clients cache
+
+commit ff4e82d60b29d2e596e479f05f28e1026117622a
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Apr 15 14:11:56 2014 +0200
+
+    Updated version number to 0.1.4-SNAPSHOT
+
+commit 6b0fb1f61c9ccada646451c041dc3b6b083c136c
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Apr 15 14:11:22 2014 +0200
+
+    reverted keyspace name and table name to its original values
+
+commit d0400841b23309dbf4fda8acd18178bfa2ec6371
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Apr 15 14:06:36 2014 +0200
+
+    Removed all interaction with Cassandra's hadoop interface
+
+commit e8e4ef48a37a59736925e88e2befe310554fc477
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Apr 15 12:15:04 2014 +0200
+
+    fixed setting initialization flag
+
+commit 2101b70db4d66ea0b3b2407a6804089e4b60e11e
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon Apr 14 18:26:06 2014 +0200
+
+    Working reader,
+
+commit 785f345fdbf4a19fc2745f84c5fcdfed9748c5ba
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon Apr 14 16:37:56 2014 +0200
+
+    Working reader,
+
+commit e00facedb2cadc9ab5edc547b4a182d3f9549381
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Sat Apr 12 16:26:34 2014 +0200
+
+    first dirty implementation of retrieving splits and their replicas without using cassandra's hadoop interface.
+
+commit 17450af6736941dbc6de62f6d1f021376ae61931
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Sat Apr 12 16:20:52 2014 +0200
+
+    fixed logger name
+
+commit 70641939a2f5cb03b66fbc7b65d234e43ed36a92
+Merge: 9745ac3 9783603
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 9 15:09:14 2014 +0200
+
+    Merge branch 'develop' of github.com:Stratio/stratio-deep into develop
+
+commit 9745ac37866694b26f2af405b08dd0151405d8f0
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 9 15:08:43 2014 +0200
+
+    Reorders the list of locations foreach split using the newly created DeepPartitionLocationCompatator
+
+commit 1e94104b21d84cf84680fe6a185f599f52bb549c
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 9 15:08:07 2014 +0200
+
+    Added partition comparator that will appropriately reorder the list of locations for each split
+
+commit 01121a43f3b8ecc517e9fc73d498d8069fba56e1
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 9 15:06:47 2014 +0200
+
+    Added client cache in order to reuse already opened connections
+
+commit 3f9d31fe5711335859c8e440c0ed6ee60270788d
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 9 15:05:32 2014 +0200
+
+    changed remote repository to github spark fork
+
+commit 6d4e35c7fdd84a3938c7bc16ae9f575540aea0cc
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 9 15:04:59 2014 +0200
+
+    updated spark version to 0.9.1_STRATIO
+
+commit cb23c006b52caa1ccefb259b17f3b6ed77c685bd
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Apr 9 15:04:30 2014 +0200
+
+    Added handler for DateType
+
+commit 9783603bf5351e7b350de628c8b388f79d3abf30
+Author: Emmanuelle Raffenne <eraffenne@paradigmatecnologico.com>
+Date:   Wed Apr 9 14:59:07 2014 +0200
+
+    Modified tweet schema to include a set of strings. Updated examples and tests accordingly
+
+commit 691ff6d7792156a8d3eb5955be3a751de68e6ee1
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Apr 8 10:45:03 2014 +0200
+
+    StratioDeepExamples refactors
+
+commit e72726e001c5885052004a3c342bec2ae0f8d5f4
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon Apr 7 12:32:43 2014 +0200
+
+    Added license header to StratioDeepExamples source files
+
+commit 3da54f040145fa1c462da59684d29d8193eeb724
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon Apr 7 12:31:08 2014 +0200
+
+    Added fully functional StratioDeepExamples tests
+
+commit 0e76b8a388073497e8a676df3643ecd694a58993
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Apr 4 14:25:21 2014 +0200
+
+    Refactor to add tests to StratioDeepExamples
+
+commit ee34c406866ead3f23d4f0f1767e00fa954c6f73
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Apr 3 11:33:15 2014 +0200
+
+    [StratioDeep release finish] next snapshot version 0.1.3-SNAPSHOT
+
+commit e140caf16f6abb2c4fb530bc59c8c00c77f2ded0
+Merge: cb02a54 f35fcbb
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Apr 3 11:33:07 2014 +0200
+
+    Merge branch 'release/version-0.1.2' into develop
+
 [0.1.2]
 
 commit cb02a54f62d33ff1d0a2bcfb78f612954aefc7bf
