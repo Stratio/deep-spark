@@ -17,13 +17,9 @@
 package com.stratio.deep.config;
 
 import com.datastax.driver.core.*;
-import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.exception.DeepIllegalAccessException;
-import com.stratio.deep.exception.DeepIndexNotFoundException;
-import com.stratio.deep.exception.DeepNoSuchFieldException;
+import com.stratio.deep.exception.*;
 import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.cassandra.dht.IPartitioner;
@@ -46,7 +42,7 @@ import static com.stratio.deep.utils.Utils.quote;
  * defined in {@link com.stratio.deep.config.IDeepJobConfig}.
  */
 public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, AutoCloseable {
-    private static Logger logger = Logger.getLogger("com.stratio.deep.config.GenericDeepJobConfig");
+    private static final Logger LOG = Logger.getLogger("com.stratio.deep.config.GenericDeepJobConfig");
     private static final long serialVersionUID = -7179376653643603038L;
     private String partitionerClassName = "org.apache.cassandra.dht.Murmur3Partitioner";
 
@@ -129,6 +125,8 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
 
     protected Boolean isWriteConfig = Boolean.FALSE;
 
+    private int bisectFactor = Constants.DEFAULT_BISECT_FACTOR;
+
     /**
      * {@inheritDoc}
      */
@@ -161,7 +159,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      */
     @Override
     public void close() {
-        logger.debug("closing " + getClass().getCanonicalName());
+        LOG.debug("closing " + getClass().getCanonicalName());
         if (session != null) {
             session.close();
         }
@@ -169,13 +167,12 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
 
     /**
      * {@inheritDoc}
-     */
-    @Override
-    protected void finalize() {
-        logger.debug("finalizing " + getClass().getCanonicalName());
-        close();
-    }
 
+     @Override protected void finalize() {
+     LOG.debug("finalizing " + getClass().getCanonicalName());
+     close();
+     }
+     */
     /**
      * Checks if this configuration object has been initialized or not.
      *
@@ -221,7 +218,8 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
                 .columnFamily);
 
         if (metadata == null && !createTableOnWrite) {
-            throw new DeepIOException("Cannot write RDD, output table does not exists and configuration object has 'createTableOnWrite' = false");
+            throw new DeepIOException("Cannot write RDD, output table does not exists and configuration object has " +
+                    "'createTableOnWrite' = false");
         }
 
         if (metadata != null) {
@@ -230,7 +228,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
 
         Tuple2<Cells, Cells> first = tupleRDD.first();
 
-        if (first._1() == null || first._1().size() == 0) {
+        if (first._1() == null || first._1().isEmpty()) {
             throw new DeepNoSuchFieldException("no key structure found on row metadata");
         }
         String createTableQuery = createTableQueryGenerator(first._1(), first._2(), getKeyspace(), getColumnFamily());
@@ -249,7 +247,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
         TableMetadata tableMetadata = fetchTableMetadata();
 
         if (tableMetadata == null && !createTableOnWrite) {
-            logger.warn("Configuration not suitable for writing RDD: output table does not exists and configuration " +
+            LOG.warn("Configuration not suitable for writing RDD: output table does not exists and configuration " +
                     "object has 'createTableOnWrite' = false");
 
             return null;
@@ -257,6 +255,12 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
             return null;
         }
 
+        initColumnDefinitionMap(tableMetadata);
+
+        return columnDefinitionMap;
+    }
+
+    private void initColumnDefinitionMap(TableMetadata tableMetadata) {
         columnDefinitionMap = new HashMap<>();
 
         List<ColumnMetadata> partitionKeys = tableMetadata.getPartitionKey();
@@ -280,8 +284,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
             }
         }
         columnDefinitionMap = Collections.unmodifiableMap(columnDefinitionMap);
-
-        return columnDefinitionMap;
     }
 
     /* (non-Javadoc)
@@ -404,11 +406,11 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
             return this;
         }
 
-        if (StringUtils.isEmpty(host)){
+        if (StringUtils.isEmpty(host)) {
             try {
                 host = InetAddress.getLocalHost().getCanonicalHostName();
             } catch (UnknownHostException e) {
-                logger.warn("Cannot resolve local host canonical name, using \"localhost\"");
+                LOG.warn("Cannot resolve local host canonical name, using \"localhost\"");
                 host = InetAddress.getLoopbackAddress().getCanonicalHostName();
             }
         }
@@ -438,6 +440,12 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     @Override
     public IDeepJobConfig<T> keyspace(String keyspace) {
         this.keyspace = keyspace;
+        return this;
+    }
+
+    @Override
+    public IDeepJobConfig<T> bisectFactor(int bisectFactor) {
+        this.bisectFactor = bisectFactor;
         return this;
     }
 
@@ -496,6 +504,29 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * properties have not been configured.
      */
     void validate() {
+        validateCassandraParams();
+
+        if (pageSize <= 0) {
+            throw new IllegalArgumentException("pageSize cannot be zero");
+        }
+
+        if (pageSize > Constants.DEFAULT_MAX_PAGE_SIZE) {
+            throw new IllegalArgumentException("pageSize cannot exceed " + Constants.DEFAULT_MAX_PAGE_SIZE);
+        }
+
+        validateConsistencyLevels();
+
+        TableMetadata tableMetadata = fetchTableMetadata();
+
+        validateTableMetadata(tableMetadata);
+        validateAdditionalFilters(tableMetadata);
+
+        if (bisectFactor != Constants.DEFAULT_BISECT_FACTOR && !checkIsPowerOfTwo(bisectFactor)){
+            throw new IllegalArgumentException("Bisect factor should be greater than zero a power of 2");
+        }
+    }
+
+    private void validateCassandraParams() {
         if (StringUtils.isEmpty(host)) {
             throw new IllegalArgumentException("host cannot be null");
         }
@@ -511,67 +542,74 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
         if (StringUtils.isEmpty(columnFamily)) {
             throw new IllegalArgumentException("columnFamily cannot be null");
         }
+    }
 
-        if (pageSize <= 0){
-            throw new IllegalArgumentException("pageSize cannot be zero");
-        }
+    private void validateTableMetadata(TableMetadata tableMetadata) {
 
-        if (pageSize > Constants.DEFAULT_MAX_PAGE_SIZE){
-            throw new IllegalArgumentException("pageSize cannot exceed " + Constants.DEFAULT_MAX_PAGE_SIZE);
-        }
-
-        if (readConsistencyLevel != null) {
-            try {
-                org.apache.cassandra.db.ConsistencyLevel.valueOf(readConsistencyLevel);
-
-            } catch (Exception e) {
-                throw new IllegalArgumentException("readConsistencyLevel not valid, should be one of thos defined in org.apache.cassandra.db.ConsistencyLevel", e);
-            }
-        }
-
-        if (writeConsistencyLevel != null) {
-            try {
-                org.apache.cassandra.db.ConsistencyLevel.valueOf(writeConsistencyLevel);
-
-            } catch (Exception e) {
-                throw new IllegalArgumentException("writeConsistencyLevel not valid, should be one of thos defined in org.apache.cassandra.db.ConsistencyLevel", e);
-            }
-        }
-
-        TableMetadata tableMetadata = fetchTableMetadata();
-
-        if (tableMetadata == null && !isWriteConfig){
-            throw new IllegalArgumentException(String.format("Column family {%s.%s} does not exist", keyspace, columnFamily));
+        if (tableMetadata == null && !isWriteConfig) {
+            throw new IllegalArgumentException(String.format("Column family {%s.%s} does not exist", keyspace,
+                    columnFamily));
         }
 
         if (tableMetadata == null && !createTableOnWrite) {
-            throw new IllegalArgumentException(String.format("Column family {%s.%s} does not exist and createTableOnWrite = false", keyspace, columnFamily));
+            throw new IllegalArgumentException(String.format("Column family {%s.%s} does not exist and " +
+                    "createTableOnWrite = false", keyspace, columnFamily));
         }
 
-        if (!ArrayUtils.isEmpty(inputColumns)){
+        if (!ArrayUtils.isEmpty(inputColumns)) {
             for (String column : inputColumns) {
                 ColumnMetadata columnMetadata = tableMetadata.getColumn(column);
 
                 if (columnMetadata == null) {
-                    throw new DeepNoSuchFieldException("No column with name " + column + " has been found on table " + this.keyspace + "." + this.columnFamily);
+                    throw new DeepNoSuchFieldException("No column with name " + column + " has been found on table "
+                            + this.keyspace + "." + this.columnFamily);
                 }
             }
         }
 
+    }
+
+    private void validateAdditionalFilters(TableMetadata tableMetadata) {
         for (Map.Entry<String, Serializable> entry : additionalFilters.entrySet()) {
             /* check if there's an index specified on the provided column */
             ColumnMetadata columnMetadata = tableMetadata.getColumn(entry.getKey());
 
             if (columnMetadata == null) {
-                throw new DeepNoSuchFieldException("No column with name " + entry.getKey() + " has been found on table " + this.keyspace + "." + this.columnFamily);
+                throw new DeepNoSuchFieldException("No column with name " + entry.getKey() + " has been found on " +
+                        "table " + this.keyspace + "." + this.columnFamily);
             }
 
             if (columnMetadata.getIndex() == null) {
-                throw new DeepIndexNotFoundException("No index has been found on column " + columnMetadata.getName() + " on table " + this.keyspace + "." + this.columnFamily);
+                throw new DeepIndexNotFoundException("No index has been found on column " + columnMetadata.getName()
+                        + " on table " + this.keyspace + "." + this.columnFamily);
+            }
+        }
+    }
+
+    private void validateConsistencyLevels() {
+        if (readConsistencyLevel != null) {
+            try {
+                ConsistencyLevel.valueOf(readConsistencyLevel);
+
+            } catch (Exception e) {
+                throw new IllegalArgumentException("readConsistencyLevel not valid, " +
+                        "should be one of thos defined in org.apache.cassandra.db.ConsistencyLevel", e);
             }
         }
 
+        if (writeConsistencyLevel != null) {
+            try {
+                ConsistencyLevel.valueOf(writeConsistencyLevel);
 
+            } catch (Exception e) {
+                throw new IllegalArgumentException("writeConsistencyLevel not valid, " +
+                        "should be one of thos defined in org.apache.cassandra.db.ConsistencyLevel", e);
+            }
+        }
+    }
+
+    private boolean checkIsPowerOfTwo(int n){
+        return (n > 0) && ((n & (n - 1)) == 0);
     }
 
     /**
@@ -679,6 +717,11 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     @Override
     public Boolean getIsWriteConfig() {
         return isWriteConfig;
+    }
+
+    @Override
+    public int getBisectFactor() {
+        return bisectFactor;
     }
 
 }

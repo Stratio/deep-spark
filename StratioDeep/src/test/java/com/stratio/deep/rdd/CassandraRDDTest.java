@@ -19,7 +19,6 @@ package com.stratio.deep.rdd;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
 import org.apache.log4j.Logger;
 import org.apache.spark.Partition;
 import org.testng.annotations.BeforeClass;
@@ -35,6 +34,7 @@ import static org.testng.Assert.assertNotNull;
 
 /**
  * Abstract class defining the common test structure that all concrete subclasses should respect.
+ *
  * @param <W>
  */
 public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
@@ -43,6 +43,8 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     protected CassandraRDD<W> rdd;
     private IDeepJobConfig<W> rddConfig;
     private IDeepJobConfig<W> writeConfig;
+
+    protected int testBisectFactor = 8;
 
     protected abstract void checkComputedData(W[] entities);
 
@@ -66,7 +68,7 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
 
     @BeforeClass
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
-        InterruptedException {
+            InterruptedException {
 
         rddConfig = initReadConfig();
         writeConfig = initWriteConfig();
@@ -95,7 +97,7 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
         Partition[] partitions = getRDD().partitions();
 
         assertNotNull(partitions);
-        assertEquals(partitions.length, 8 + 1);
+        assertEquals(partitions.length, getReadConfig().getBisectFactor() * (8 + 1));
     }
 
     @Test(dependsOnMethods = "testGetPartitions")

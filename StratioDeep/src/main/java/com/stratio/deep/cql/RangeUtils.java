@@ -19,12 +19,15 @@ package com.stratio.deep.cql;
 import com.datastax.driver.core.*;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.*;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.dht.IPartitioner;
+import org.apache.cassandra.dht.*;
 import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
 import org.apache.cassandra.utils.Pair;
 import org.slf4j.Logger;
@@ -43,8 +46,9 @@ import static com.google.common.collect.Iterables.*;
  * @author Luca Rosellini <luca@strat.io>
  */
 public class RangeUtils {
-    private static final Logger LOG = LoggerFactory.getLogger(RangeUtils.class);
-
+    /**
+     * private constructor.
+     */
     private RangeUtils() {
     }
 
@@ -53,9 +57,11 @@ public class RangeUtils {
      * The concrete class of the token depends on the partitioner used.<br/>
      *
      * @param query           the query to execute against the given session to obtain the list of tokens.
-     * @param sessionWithHost the pair object containing both the session and the name of the machine to which we're connected to.
+     * @param sessionWithHost the pair object containing both the session and the name of the machine to which we're
+     *                        connected to.
      * @param partitioner     the partitioner used in the cluster.
-     * @return a map containing, for each cluster machine, the list of tokens. Tokens are not returned in any particular order.
+     * @return a map containing, for each cluster machine, the list of tokens. Tokens are not returned in any
+     * particular order.
      */
     static Map<String, Iterable<Comparable>> fetchTokens(
             String query, final Pair<Session, String> sessionWithHost, IPartitioner partitioner) {
@@ -108,7 +114,8 @@ public class RangeUtils {
      * @param config      the Deep configuration object.
      * @return the merged lists of tokens transformed to DeepTokenRange(s). The returned collection is shuffled.
      */
-    private static List<DeepTokenRange> mergeTokenRanges(Map<String, Iterable<Comparable>> tokens, final Session session,
+    private static List<DeepTokenRange> mergeTokenRanges(Map<String, Iterable<Comparable>> tokens,
+                                                         final Session session,
                                                          final IPartitioner partitioner, final IDeepJobConfig config) {
         final Iterable<Comparable> allRanges = Ordering.natural().sortedCopy(concat(tokens.values()));
         final Comparable maxValue = Ordering.natural().max(allRanges);
@@ -148,31 +155,28 @@ public class RangeUtils {
                     nextValue = Iterables.get(allRanges, nextIdx);
                 }
 
-                result.add(new DeepTokenRange(currValue, nextValue, initReplicas(currValue, session, partitioner, config)));
+                result.add(new DeepTokenRange(currValue, nextValue, initReplicas(currValue, session, partitioner,
+                        config)));
 
                 return result;
             }
         };
 
-        /*
-        List<DeepTokenRange> result =  Lists.newArrayList(concat(transform(allRanges, map)));
-        Collections.shuffle(result);
-        return result;
-        */
         return Ordering.natural().sortedCopy(concat(transform(allRanges, map)));
     }
 
     /**
      * Given a token, fetches the list of replica machines holding that token.
      *
-     * @param token the token whose replicas we want to fetch.
-     * @param session the connection to the cluster.
+     * @param token       the token whose replicas we want to fetch.
+     * @param session     the connection to the cluster.
      * @param partitioner the partitioner used in the cluster.
-     * @param config the Deep configuration object.
+     * @param config      the Deep configuration object.
      * @return the list of replica machines holding that token.
      */
     private static List<String> initReplicas(
-            final Comparable token, final Session session, final IPartitioner partitioner, final IDeepJobConfig config) {
+            final Comparable token, final Session session, final IPartitioner partitioner,
+            final IDeepJobConfig config) {
         final AbstractType tkValidator = partitioner.getTokenValidator();
         final Metadata metadata = session.getCluster().getMetadata();
 
@@ -189,6 +193,12 @@ public class RangeUtils {
         }));
     }
 
+    /**
+     * Returns the token ranges that will be mapped to Spark partitions.
+     *
+     * @param config the Deep configuration object.
+     * @return
+     */
     public static List<DeepTokenRange> getSplits(IDeepJobConfig config) {
         Map<String, Iterable<Comparable>> tokens = new HashMap<>();
         IPartitioner partitioner = getPartitioner(config);
@@ -204,10 +214,56 @@ public class RangeUtils {
         String queryPeers = "select peer, tokens from system.peers";
         tokens.putAll(fetchTokens(queryPeers, sessionWithHost, partitioner));
 
-        return mergeTokenRanges(tokens, sessionWithHost.left, partitioner, config);
+        return splitRanges(mergeTokenRanges(tokens, sessionWithHost.left, partitioner, config), partitioner, config.getBisectFactor());
     }
 
+    private static List<DeepTokenRange> splitRanges(final List<DeepTokenRange> ranges, final IPartitioner partitioner, final int bisectFactor){
+        if (bisectFactor == 1){
+            return ranges;
+        }
 
+        Iterable<DeepTokenRange> bisectedRanges =
+                concat(transform(ranges, new Function<DeepTokenRange, List<DeepTokenRange>>() {
+            @Nullable
+            @Override
+            public List<DeepTokenRange> apply(@Nullable DeepTokenRange input) {
+                final List<DeepTokenRange> splittedRanges = new ArrayList<>();
+                bisectTokeRange(input, partitioner, bisectFactor, splittedRanges);
+                return splittedRanges;
+            }
+        }));
+
+        return Lists.newArrayList(bisectedRanges);
+    }
+
+    private static void bisectTokeRange(
+            DeepTokenRange range, final IPartitioner partitioner, final int bisectFactor, final List<DeepTokenRange> accumulator){
+
+        final AbstractType tkValidator = partitioner.getTokenValidator();
+
+        Token leftToken = partitioner.getTokenFactory().fromByteArray(tkValidator.decompose(range.getStartToken()));
+        Token rightToken = partitioner.getTokenFactory().fromByteArray(tkValidator.decompose(range.getEndToken()));
+        Token midToken = partitioner.midpoint(leftToken, rightToken);
+
+        Comparable midpoint = (Comparable) tkValidator.compose(tkValidator.fromString(midToken.toString()));
+
+        DeepTokenRange left = new DeepTokenRange(range.getStartToken(), midpoint, range.getReplicas());
+        DeepTokenRange right = new DeepTokenRange(midpoint, range.getEndToken(), range.getReplicas());
+
+        if (bisectFactor / 2 <= 1) {
+            accumulator.add(left);
+            accumulator.add(right);
+        } else {
+            bisectTokeRange(left, partitioner, bisectFactor / 2, accumulator);
+            bisectTokeRange(right, partitioner, bisectFactor / 2, accumulator);
+        }
+    }
+
+    /**
+     * Creates a new instance of the cassandra partitioner configured in the configuration object.
+     * @param config the Deep configuration object.
+     * @return
+     */
     public static IPartitioner getPartitioner(IDeepJobConfig config) {
         try {
             return (IPartitioner) Class.forName(config.getPartitionerClassName()).newInstance();

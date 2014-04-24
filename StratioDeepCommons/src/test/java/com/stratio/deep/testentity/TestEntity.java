@@ -18,7 +18,6 @@ package com.stratio.deep.testentity;
 
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.annotations.DeepField;
-import com.stratio.deep.entity.IDeepType;
 import org.apache.cassandra.db.marshal.*;
 
 import java.util.List;
@@ -86,7 +85,7 @@ public class TestEntity extends BaseTestEntity {
     }
 
     public TestEntity(String id, String domain, String url, Integer responseTime, Integer responseCode,
-        String notMappedField) {
+                      String notMappedField) {
         super(id, domain);
         this.url = url;
         this.responseTime = responseTime;
@@ -138,10 +137,10 @@ public class TestEntity extends BaseTestEntity {
     @Override
     public String toString() {
         return "TestEntity [" + (getId() != null ? "id=" + getId() + ", " : "")
-            + (getDomain() != null ? "domain=" + getDomain() + ", " : "") + (url != null ? "url=" + url + ", " : "")
-            + (responseTime != null ? "responseTime=" + responseTime + ", " : "")
-            + (responseCode != null ? "responseCode=" + responseCode + ", " : "")
-            + (downloadTime != null ? "downloadTime=" + downloadTime + ", " : "")
-            + (notMappedField != null ? "notMappedField=" + notMappedField : "") + "]\n";
+                + (getDomain() != null ? "domain=" + getDomain() + ", " : "") + (url != null ? "url=" + url + ", " : "")
+                + (responseTime != null ? "responseTime=" + responseTime + ", " : "")
+                + (responseCode != null ? "responseCode=" + responseCode + ", " : "")
+                + (downloadTime != null ? "downloadTime=" + downloadTime + ", " : "")
+                + (notMappedField != null ? "notMappedField=" + notMappedField : "") + "]\n";
     }
 }

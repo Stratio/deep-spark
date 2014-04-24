@@ -44,8 +44,8 @@ public class CellTest {
     public void testCellInstantiationForCollections() throws UnknownHostException, NoSuchFieldException {
         TestEntity te = new TestEntity();
 
-        Set<String> emails = new HashSet(Arrays.asList("DelfinaMarino@superrito.com","GabyCasasVeliz@superrito.com"));
-        List<String> phones = Arrays.asList("401-477-8301","209-845-8841");
+        Set<String> emails = new HashSet(Arrays.asList("DelfinaMarino@superrito.com", "GabyCasasVeliz@superrito.com"));
+        List<String> phones = Arrays.asList("401-477-8301", "209-845-8841");
 
         te.setEmails(emails);
         te.setPhones(phones);
@@ -75,7 +75,8 @@ public class CellTest {
 
         assertNotNull(c3);
         assertEquals(c3.getCellName(), "uuid2id");
-        assertEquals(MapType.getInstance(UUIDType.instance, Int32Type.instance).compose(c3.getDecomposedCellValue()), map);
+        assertEquals(MapType.getInstance(UUIDType.instance, Int32Type.instance).compose(c3.getDecomposedCellValue()),
+                map);
         assertTrue(c3.marshallerClassName().equals(MapType.class.getCanonicalName()));
         assertEquals(c3.getValueType(), Map.class);
     }
@@ -196,21 +197,21 @@ public class CellTest {
         try {
             Cell c15 = Cell.create(c13, new CellsTest());
             fail();
-        } catch (DeepInstantiationException d){
+        } catch (DeepInstantiationException d) {
             logger.info("correctly catched DeepInstantiationException");
         }
 
         try {
             Cell c15 = Cell.create("my cell name", new CellsTest());
             fail();
-        } catch (DeepInstantiationException d){
+        } catch (DeepInstantiationException d) {
             logger.info("correctly catched DeepInstantiationException");
         }
 
         try {
             Cell c15 = Cell.create("my cell name", new CellsTest(), true, true);
             fail();
-        } catch (DeepInstantiationException d){
+        } catch (DeepInstantiationException d) {
             logger.info("correctly catched DeepInstantiationException");
         }
     }
@@ -265,7 +266,7 @@ public class CellTest {
             UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
             Cell c13 = Cell.create("TimeUUIDType", testTimeUUID);
 
-            Cell.create(c13, Int32Type.instance.decompose(Integer.valueOf(456)) );
+            Cell.create(c13, Int32Type.instance.decompose(Integer.valueOf(456)));
 
             fail();
         } catch (Exception e) {

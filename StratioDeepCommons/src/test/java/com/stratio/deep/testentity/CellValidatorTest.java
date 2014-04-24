@@ -88,7 +88,7 @@ public class CellValidatorTest {
 
     public void testDataTypeListInstantiation() {
         try {
-            assertNull(cellValidator((DataType)null));
+            assertNull(cellValidator((DataType) null));
             fail();
         } catch (Exception e) {
             //ok
@@ -141,7 +141,7 @@ public class CellValidatorTest {
         assertEquals(cv.getAbstractType(), MapType.getInstance(UTF8Type.instance, LongType.instance));
     }
 
-    public void testEquality(){
+    public void testEquality() {
         DataType type = DataType.map(DataType.text(), DataType.bigint());
 
         CellValidator cv = cellValidator(type);
@@ -155,25 +155,25 @@ public class CellValidatorTest {
 
     public void testCellValidatorMethod() throws NoSuchFieldException {
 
-        assertNull(cellValidator((Object)null));
+        assertNull(cellValidator((Object) null));
 
         UUID uuid = UUID.fromString("AE47FBFD-A086-47C2-8C73-77D8A8E99F35");
         CellValidator cv = cellValidator(uuid);
-        assertEquals(cv.getAbstractType(), UUIDType.instance );
+        assertEquals(cv.getAbstractType(), UUIDType.instance);
         assertNull(cv.getValidatorTypes());
         assertEquals(cv.validatorKind(), Kind.NOT_A_COLLECTION);
 
 
         UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
         cv = cellValidator(testTimeUUID);
-        assertEquals(cv.getAbstractType(),TimeUUIDType.instance);
+        assertEquals(cv.getAbstractType(), TimeUUIDType.instance);
         assertNull(cv.getValidatorTypes());
         assertEquals(cv.validatorKind(), Kind.NOT_A_COLLECTION);
 
         BigInteger testBigInt = new BigInteger("9032809489230884980323498324376012647321674142290");
         cv = cellValidator(testBigInt);
 
-        assertEquals(cv.getAbstractType(),IntegerType.instance);
+        assertEquals(cv.getAbstractType(), IntegerType.instance);
         assertNull(cv.getValidatorTypes());
         assertEquals(cv.validatorKind(), Kind.NOT_A_COLLECTION);
 
@@ -184,7 +184,7 @@ public class CellValidatorTest {
         assertEquals(cv.getValidatorClassName(), SetType.class.getCanonicalName());
         assertEquals(cv.validatorKind(), CellValidator.Kind.SET);
         assertNotNull(cv.getValidatorTypes());
-        assertEquals(cv.getValidatorTypes().size(),1);
+        assertEquals(cv.getValidatorTypes().size(), 1);
 
         Iterator<String> iter = cv.getValidatorTypes().iterator();
         assertEquals(iter.next(), "text");
@@ -196,7 +196,7 @@ public class CellValidatorTest {
         assertEquals(cv.getValidatorClassName(), ListType.class.getCanonicalName());
         assertEquals(cv.validatorKind(), Kind.LIST);
         assertNotNull(cv.getValidatorTypes());
-        assertEquals(cv.getValidatorTypes().size(),1);
+        assertEquals(cv.getValidatorTypes().size(), 1);
 
         iter = cv.getValidatorTypes().iterator();
         assertEquals(iter.next(), "text");
@@ -208,14 +208,14 @@ public class CellValidatorTest {
         assertEquals(cv.getValidatorClassName(), MapType.class.getCanonicalName());
         assertEquals(cv.validatorKind(), Kind.MAP);
         assertNotNull(cv.getValidatorTypes());
-        assertEquals(cv.getValidatorTypes().size(),2);
+        assertEquals(cv.getValidatorTypes().size(), 2);
 
         iter = cv.getValidatorTypes().iterator();
         assertEquals(iter.next(), "uuid");
         assertEquals(iter.next(), "int");
     }
 
-    public void testValidatorClassToKind(){
+    public void testValidatorClassToKind() {
         assertEquals(Kind.validatorClassToKind(null), Kind.NOT_A_COLLECTION);
         assertEquals(Kind.validatorClassToKind(TimeUUIDType.class), Kind.NOT_A_COLLECTION);
         assertEquals(Kind.validatorClassToKind(UTF8Type.class), Kind.NOT_A_COLLECTION);
@@ -237,7 +237,7 @@ public class CellValidatorTest {
         assertEquals(Kind.validatorClassToKind(MapType.class), Kind.MAP);
     }
 
-    public void testObjectToKind(){
+    public void testObjectToKind() {
         assertEquals(Kind.objectToKind(null), Kind.NOT_A_COLLECTION);
 
         /* let's try with some set implementation */
@@ -268,7 +268,6 @@ public class CellValidatorTest {
         assertEquals(Kind.objectToKind(new TreeMap<>()), Kind.MAP);
         assertEquals(Kind.objectToKind(new WeakHashMap<>()), Kind.MAP);
     }
-
 
 
 }

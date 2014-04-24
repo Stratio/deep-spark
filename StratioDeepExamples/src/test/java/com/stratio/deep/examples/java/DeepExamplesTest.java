@@ -23,8 +23,6 @@ import com.stratio.deep.utils.Constants;
 import org.testng.annotations.Test;
 import scala.Tuple2;
 
-import static com.stratio.deep.utils.Utils.quote;
-import static org.testng.Assert.*;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -37,10 +35,11 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
             "",
             "",
             Constants.DEFAULT_CASSANDRA_HOST,
-            ""+ CassandraServer.CASSANDRA_CQL_PORT,
-            ""+ CassandraServer.CASSANDRA_THRIFT_PORT};
+            "" + CassandraServer.CASSANDRA_CQL_PORT,
+            "" + CassandraServer.CASSANDRA_THRIFT_PORT};
+
     @Test
-    public void testAggregatingData(){
+    public void testAggregatingData() {
         AggregatingData.doMain(args);
 
         assertEquals(AggregatingData.getCount(), 4892.0);
@@ -50,17 +49,17 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
     }
 
     @Test(dependsOnMethods = "testAggregatingData")
-    public void testCreatingCellRDD(){
+    public void testCreatingCellRDD() {
         CreatingCellRDD.doMain(args);
         assertEquals(CreatingCellRDD.getCounts(), Long.valueOf("4892"));
     }
 
     @Test(dependsOnMethods = "testCreatingCellRDD")
-    public void testGroupingByColumn(){
+    public void testGroupingByColumn() {
         GroupingByColumn.doMain(args);
         assertEquals(GroupingByColumn.getResults().size(), 343);
         for (Tuple2 t : GroupingByColumn.getResults()) {
-            if (t._1().equals("id355")){
+            if (t._1().equals("id355")) {
                 assertEquals(t._2(), 13);
                 break;
             }
@@ -69,13 +68,13 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
     }
 
     @Test(dependsOnMethods = "testGroupingByColumn")
-    public void testGroupingByKey(){
+    public void testGroupingByKey() {
         GroupingByKey.doMain(args);
         assertEquals(GroupingByKey.getResult().size(), 343);
         assertEquals(GroupingByKey.getAuthors(), 343);
         assertEquals(GroupingByKey.getTotal(), 4892);
         for (Tuple2 t : GroupingByKey.getResult()) {
-            if (t._1().equals("id355")){
+            if (t._1().equals("id355")) {
                 assertEquals(t._2(), 13);
                 break;
             }
@@ -85,11 +84,11 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
     }
 
     @Test(dependsOnMethods = "testGroupingByKey")
-    public void testMapReduceJob(){
+    public void testMapReduceJob() {
         MapReduceJob.doMain(args);
         assertEquals(MapReduceJob.results.size(), 343);
         for (Tuple2 t : MapReduceJob.results) {
-            if (t._1().equals("id498")){
+            if (t._1().equals("id498")) {
                 assertEquals(t._2(), 12);
                 break;
             }
@@ -99,15 +98,15 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
     }
 
     @Test(dependsOnMethods = "testMapReduceJob")
-    public void testWritingCellToCassandra(){
+    public void testWritingCellToCassandra() {
         WritingCellToCassandra.doMain(args);
         assertEquals(WritingCellToCassandra.results.size(), 26);
 
         for (Tuple2 t : WritingCellToCassandra.results) {
-            if (t._1().equals("blogs.elpais.com")){
+            if (t._1().equals("blogs.elpais.com")) {
                 assertEquals(t._2(), 3);
             }
-            if (t._1().equals("deportebase.elnortedecastilla.es")){
+            if (t._1().equals("deportebase.elnortedecastilla.es")) {
                 assertEquals(t._2(), 2);
             }
         }
@@ -118,15 +117,15 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
     }
 
     @Test(dependsOnMethods = "testWritingCellToCassandra")
-    public void testWritingEntityToCassandra(){
+    public void testWritingEntityToCassandra() {
         WritingEntityToCassandra.doMain(args);
         assertEquals(WritingEntityToCassandra.results.size(), 26);
 
         for (Tuple2 t : WritingEntityToCassandra.results) {
-            if (t._1().equals("blogs.elpais.com")){
+            if (t._1().equals("blogs.elpais.com")) {
                 assertEquals(t._2(), 3);
             }
-            if (t._1().equals("deportebase.elnortedecastilla.es")){
+            if (t._1().equals("deportebase.elnortedecastilla.es")) {
                 assertEquals(t._2(), 2);
             }
         }

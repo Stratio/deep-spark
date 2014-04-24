@@ -153,7 +153,7 @@ public class CassandraServer {
             return;
         }
         Cluster cluster = Cluster.builder().withPort(CASSANDRA_CQL_PORT)
-            .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+                .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
 
         try (Session session = cluster.connect()) {
             for (String command : startupCommands) {

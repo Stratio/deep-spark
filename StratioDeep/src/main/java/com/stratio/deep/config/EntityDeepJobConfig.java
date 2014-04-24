@@ -114,19 +114,19 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
 
         /* colDefs is null if table does not exist. I.E. this configuration will be used as an output configuration
          object, and the output table is dynamically created */
-        if (colDefs == null){
+        if (colDefs == null) {
             return;
         }
 
         for (Field field : deepFields) {
-            Annotation annotation = field.getAnnotation(DeepField.class);
             String annotationFieldName = AnnotationUtils.deepFieldName(field);
 
-            if (!colDefs.containsKey(annotationFieldName)){
+            if (!colDefs.containsKey(annotationFieldName)) {
                 throw new DeepNoSuchFieldException("Unknown column name \'" + annotationFieldName + "\' specified for" +
-                    " field " + entityClass.getCanonicalName() + "#" + field.getName() +". Please, " +
-                    "make sure the field name you specify in @DeepField annotation matches _exactly_ the column name " +
-                    "in the database");
+                        " field " + entityClass.getCanonicalName() + "#" + field.getName() + ". Please, " +
+                        "make sure the field name you specify in @DeepField annotation matches _exactly_ the column " +
+                        "name " +
+                        "in the database");
             }
         }
     }
@@ -163,14 +163,14 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         }
     }
 
-    private Object packageCollectionValue(Cell metadataCell, Object value){
-        switch (metadataCell.getCellValidator().validatorKind()){
+    private Object packageCollectionValue(Cell metadataCell, Object value) {
+        switch (metadataCell.getCellValidator().validatorKind()) {
             case SET:
-                return new LinkedHashSet((Collection)value);
+                return new LinkedHashSet((Collection) value);
             case LIST:
-                return new LinkedList((Collection)value);
+                return new LinkedList((Collection) value);
             case MAP:
-                return new LinkedHashMap((Map)value);
+                return new LinkedHashMap((Map) value);
             default:
                 return value;
         }

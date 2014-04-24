@@ -21,9 +21,8 @@ import com.datastax.driver.core.exceptions.NoHostAvailableException;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
-import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.GenericDeepJobConfig;
+import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
@@ -121,14 +120,17 @@ public class DeepRecordReader {
         rowIterator = new RowIterator();
     }
 
-    private Session createConnection() throws Exception {
+    /**
+     * Creates a new connection. Reuses a cached connection if possible.
+     * @return the new session
+     */
+    private Session createConnection() {
 
         /* reorder locations */
         List<String> locations = Lists.newArrayList(split.getReplicas());
         Collections.sort(locations, new DeepPartitionLocationComparator());
 
         Exception lastException = null;
-
 
         LOG.debug("createConnection: " + locations);
         for (String location : locations) {
@@ -141,13 +143,14 @@ public class DeepRecordReader {
             }
         }
 
-        throw lastException;
+        throw new DeepIOException(lastException);
     }
 
     /**
      * Closes this input reader object.
      */
     public void close() {
+        /* dummy close method, no need to close any resource here */
     }
 
     /**
@@ -200,28 +203,68 @@ public class DeepRecordReader {
                 return endOfData();
             }
 
-            int index = -2;
-            //check there are more page to read
-            while (!rows.hasNext()) {
-                // no more data
-                if (index == -1 || emptyPartitionKeyValues()) {
-                    LOG.debug("no more data");
-                    return endOfData();
-                }
-
-                index = setTailNull(clusterColumns);
-                LOG.debug("set tail to null, index: {}", index);
-                executeQuery();
-                pageRows = 0;
-
-                if (rows == null || !rows.hasNext() && index < 0) {
-                    LOG.debug("no more data");
-                    return endOfData();
-                }
+            if (checkNoMorePagesToRead()) {
+                return endOfData();
             }
 
             Map<String, ByteBuffer> valueColumns = createValue();
             Map<String, ByteBuffer> keyColumns = createKey();
+
+
+            initColumns(valueColumns, keyColumns);
+
+            // increase total CQL row read for this page
+            pageRows++;
+
+            // increase total CF row read
+            if (newRow(keyColumns, previousRowKey)) {
+                totalRead++;
+            }
+
+            // read full page
+            readFullPage(keyColumns);
+
+            return Pair.create(keyColumns, valueColumns);
+        }
+
+        private void readFullPage(Map<String, ByteBuffer> keyColumns) {
+            if (pageRows >= pageSize || !rows.hasNext()) {
+                Iterator<String> newKeys = keyColumns.keySet().iterator();
+                for (BoundColumn column : partitionBoundColumns) {
+                    column.value = keyColumns.get(newKeys.next());
+                }
+
+                for (BoundColumn column : clusterColumns) {
+                    column.value = keyColumns.get(newKeys.next());
+                }
+
+                executeQuery();
+                pageRows = 0;
+            }
+        }
+
+        private boolean checkNoMorePagesToRead() {
+            int index = -2;
+
+            //check there are more page to read
+            while (!rows.hasNext()) {
+                // no more data
+                if (index == -1 || emptyPartitionKeyValues()) {
+                    return true;
+                }
+
+                index = setTailNull(clusterColumns);
+                executeQuery();
+                pageRows = 0;
+
+                if (rows == null || !rows.hasNext() && index < 0) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void initColumns(Map<String, ByteBuffer> valueColumns, Map<String, ByteBuffer> keyColumns) {
             Row row = rows.next();
             TableMetadata tableMetadata = ((GenericDeepJobConfig) config).fetchTableMetadata();
 
@@ -248,31 +291,6 @@ public class DeepRecordReader {
                 ByteBuffer bb = row.getBytesUnsafe(columnName);
                 valueColumns.put(columnName, bb);
             }
-
-            // increase total CQL row read for this page
-            pageRows++;
-
-            // increase total CF row read
-            if (newRow(keyColumns, previousRowKey)) {
-                totalRead++;
-            }
-
-            // read full page
-            if (pageRows >= pageSize || !rows.hasNext()) {
-                Iterator<String> newKeys = keyColumns.keySet().iterator();
-                for (BoundColumn column : partitionBoundColumns) {
-                    column.value = keyColumns.get(newKeys.next());
-                }
-
-                for (BoundColumn column : clusterColumns) {
-                    column.value = keyColumns.get(newKeys.next());
-                }
-
-                executeQuery();
-                pageRows = 0;
-            }
-
-            return Pair.create(keyColumns, valueColumns);
         }
 
         /**
@@ -285,7 +303,8 @@ public class DeepRecordReader {
 
             String rowKey = "";
             if (keyColumns.size() == 1) {
-                rowKey = partitionBoundColumns.get(0).validator.getString(keyColumns.get(partitionBoundColumns.get(0).name));
+                rowKey = partitionBoundColumns.get(0).validator.getString(keyColumns.get(partitionBoundColumns.get(0)
+                        .name));
             } else {
                 Iterator<ByteBuffer> iter = keyColumns.values().iterator();
 
@@ -294,7 +313,6 @@ public class DeepRecordReader {
                 }
             }
 
-            LOG.debug("previous RowKey: {}, new row key: {}", previousRowKey, rowKey);
             if (previousRowKey == null) {
                 this.previousRowKey = rowKey;
                 return true;
@@ -324,7 +342,6 @@ public class DeepRecordReader {
                 if (current.value == null) {
                     int index = previousIndex > 0 ? previousIndex : 0;
                     BoundColumn column = values.get(index);
-                    LOG.debug("set key {} value to  null", column.name);
                     column.value = null;
                     return previousIndex - 1;
                 }
@@ -333,7 +350,6 @@ public class DeepRecordReader {
             }
 
             BoundColumn column = values.get(previousIndex);
-            LOG.debug("set key {} value to  null", column.name);
             column.value = null;
             return previousIndex - 1;
         }
@@ -341,24 +357,25 @@ public class DeepRecordReader {
         /**
          * serialize the prepared query, pair.left is query id, pair.right is query
          */
-        private Pair<Integer, String> composeQuery(String columns) {
+        private Pair<Integer, String> composeQuery(String cols) {
+            String generatedColumns = cols;
             Pair<Integer, String> clause = whereClause();
-            if (columns == null) {
-                columns = "*";
+            if (generatedColumns == null) {
+                generatedColumns = "*";
             } else {
                 // add keys in the front in order
                 String partitionKey = keyString(partitionBoundColumns);
                 String clusterKey = keyString(clusterColumns);
 
-                columns = withoutKeyColumns(columns);
-                columns = (clusterKey == null || "".equals(clusterKey))
-                        ? partitionKey + (columns != null ? ("," + columns) : "")
-                        : partitionKey + "," + clusterKey + (columns != null ? ("," + columns) : "");
+                generatedColumns = withoutKeyColumns(generatedColumns);
+                generatedColumns = (clusterKey == null || "".equals(clusterKey))
+                        ? partitionKey + (generatedColumns != null ? ("," + generatedColumns) : "")
+                        : partitionKey + "," + clusterKey + (generatedColumns != null ? ("," + generatedColumns) : "");
             }
 
             return Pair.create(clause.left,
                     String.format("SELECT %s FROM %s%s%s LIMIT %d ALLOW FILTERING",
-                            columns,
+                            generatedColumns,
                             quote(cfName),
                             clause.right,
                             Utils.additionalFilterGenerator(config.getAdditionalFilters()),
@@ -375,9 +392,9 @@ public class DeepRecordReader {
                 keyNames.add(column.name);
             }
 
-            String[] columns = columnString.split(",");
+            String[] cols = columnString.split(",");
             String result = null;
-            for (String column : columns) {
+            for (String column : cols) {
                 String trimmed = column.trim();
                 if (keyNames.contains(trimmed)) {
                     continue;
@@ -402,11 +419,12 @@ public class DeepRecordReader {
             }
             // initial query token(k) >= start_token and token(k) <= end_token
             if (emptyPartitionKeyValues()) {
-                return Pair.create(0, String.format(" WHERE token(%s) > ? AND token(%s) <= ?", partitionKeyString, partitionKeyString));
+                return Pair.create(0, String.format(" WHERE token(%s) > ? AND token(%s) <= ?", partitionKeyString,
+                        partitionKeyString));
             }
 
             // query token(k) > token(pre_partition_key) and token(k) <= end_token
-            if (clusterColumns.size() == 0 || clusterColumns.get(0).value == null) {
+            if (clusterColumns.isEmpty() || clusterColumns.get(0).value == null) {
                 return Pair.create(1,
                         String.format(" WHERE token(%s) > token(%s)  AND token(%s) <= ?",
                                 partitionKeyString, partitionKeyMarkers, partitionKeyString)
@@ -415,7 +433,8 @@ public class DeepRecordReader {
             // query token(k) = token(pre_partition_key) and m = pre_cluster_key_m and n > pre_cluster_key_n
             Pair<Integer, String> clause = whereClause(clusterColumns, 0);
             return Pair.create(clause.left,
-                    String.format(" WHERE token(%s) = token(%s) %s", partitionKeyString, partitionKeyMarkers, clause.right));
+                    String.format(" WHERE token(%s) = token(%s) %s", partitionKeyString, partitionKeyMarkers,
+                            clause.right));
         }
 
         /**
@@ -427,7 +446,8 @@ public class DeepRecordReader {
             }
 
             Pair<Integer, String> clause = whereClause(column, position + 1);
-            return Pair.create(clause.left, String.format(" AND %s = ? %s", quote(column.get(position).name), clause.right));
+            return Pair.create(clause.left, String.format(" AND %s = ? %s", quote(column.get(position).name),
+                    clause.right));
         }
 
         /**
@@ -472,7 +492,6 @@ public class DeepRecordReader {
         private Pair<Integer, List<Object>> preparedQueryBindValues() {
             List<Object> values = new LinkedList<>();
 
-            AbstractType<?> tkValidator = partitioner.getTokenValidator();
             Object startToken = split.getStartToken();
             Object endToken = split.getEndToken();
 
@@ -486,7 +505,7 @@ public class DeepRecordReader {
                     values.add(bColumn.validator.compose(bColumn.value));
                 }
 
-                if (clusterColumns.size() == 0 || clusterColumns.get(0).value == null) {
+                if (clusterColumns.isEmpty() || clusterColumns.get(0).value == null) {
                     // query token(k) > token(pre_partition_key) and token(k) <= end_token
                     values.add(endToken);
                     return Pair.create(1, values);
@@ -502,8 +521,6 @@ public class DeepRecordReader {
          * recursively serialize the query binding variables
          */
         private int preparedQueryBindValues(List<BoundColumn> columns, int position, List<Object> bindValues) {
-            AbstractType<?> tkValidator = partitioner.getTokenValidator();
-
             BoundColumn boundColumn = columns.get(position);
             Object boundColumnValue = boundColumn.validator.compose(boundColumn.value);
             if (position == columns.size() - 1 || columns.get(position + 1).value == null) {
@@ -534,7 +551,6 @@ public class DeepRecordReader {
             } catch (Exception e) {
                 LOG.error("Exception", e);
             }
-            LOG.debug("query type: {}", bindValues.left);
 
             // check whether it reach end of range for type 1 query CASSANDRA-5573
             if (bindValues.left == 1 && reachEndRange()) {
@@ -548,11 +564,8 @@ public class DeepRecordReader {
             // only try three times for TimedOutException and UnavailableException
             while (retries < 3) {
                 try {
-                    //Session session = createConnection();
-
                     Object[] values = bindValues.right.toArray(new Object[bindValues.right.size()]);
 
-                    LOG.debug("> Executing query {{}}; bind vars {}", query.right, values);
                     ResultSet resultSet = session.execute(query.right, values);
 
                     if (resultSet != null) {
@@ -566,6 +579,7 @@ public class DeepRecordReader {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e1) {
+                        LOG.error("sleep exception",e1);
                     }
 
                     ++retries;
@@ -584,7 +598,7 @@ public class DeepRecordReader {
     /**
      * retrieve the partition keys and cluster keys from system.schema_columnfamilies table
      */
-    private void retrieveKeys() throws Exception {
+    private void retrieveKeys() {
         TableMetadata tableMetadata = ((GenericDeepJobConfig) config).fetchTableMetadata();
 
         List<ColumnMetadata> partitionKeys = tableMetadata.getPartitionKey();
@@ -611,7 +625,8 @@ public class DeepRecordReader {
         } else if (types.size() == 1) {
             keyValidator = types.get(0);
         } else {
-            throw new DeepGenericException("Cannot determine if keyvalidator is composed or not, partitionKeys: " + partitionKeys);
+            throw new DeepGenericException("Cannot determine if keyvalidator is composed or not, " +
+                    "partitionKeys: " + partitionKeys);
         }
     }
 
@@ -635,7 +650,6 @@ public class DeepRecordReader {
 
         String endToken = String.valueOf(split.getEndToken());
         String currentToken = partitioner.getToken(rowKey).toString();
-        LOG.debug("End token: {}, current token: {}", endToken, currentToken);
 
         return endToken.equals(currentToken);
     }

@@ -29,30 +29,27 @@ import com.stratio.deep.entity.Cells
 
 object CreatingCellRDD {
 
-    def main(args:Array[String]) {
+  def main(args: Array[String]) {
 
-        val job = "scala:creatingCellRDD"
-        val keyspaceName = "test"
-        val tableName = "tweets"
+    val job = "scala:creatingCellRDD"
+    val keyspaceName = "test"
+    val tableName = "tweets"
 
-        // Creating the Deep Context where args are Spark Master and Job Name
-        val p = new ContextProperties(args)
-        val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job)
+    // Creating the Deep Context where args are Spark Master and Job Name
+    val p = new ContextProperties(args)
+    val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job)
 
-        // Configuration and initialization
-        val config :IDeepJobConfig[Cells] = DeepJobConfigFactory.create()
-                .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
-                .keyspace(keyspaceName).table(tableName)
-                .initialize
+    // Configuration and initialization
+    val config: IDeepJobConfig[Cells] = DeepJobConfigFactory.create()
+      .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
+      .keyspace(keyspaceName).table(tableName)
+      .initialize
 
-        // Creating the RDD
-        val rdd: CassandraRDD[Cells] = deepContext.cassandraGenericRDD(config)
+    // Creating the RDD
+    val rdd: CassandraRDD[Cells] = deepContext.cassandraGenericRDD(config)
 
-        val counts = rdd.count()
+    val counts = rdd.count()
 
-        println("Num of rows: " + counts.toString)
-
-        System.exit(0)
-
-    }
+    println("Num of rows: " + counts.toString)
+  }
 }

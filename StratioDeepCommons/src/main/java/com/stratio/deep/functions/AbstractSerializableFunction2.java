@@ -23,6 +23,7 @@ import java.io.Serializable;
 /**
  * Created by luca on 14/04/14.
  */
-public abstract class AbstractSerializableFunction2<T1,T2,R> extends AbstractFunction2<T1,T2,R> implements Serializable {
+public abstract class AbstractSerializableFunction2<T1, T2, R> extends AbstractFunction2<T1, T2,
+        R> implements Serializable {
 
 }

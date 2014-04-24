@@ -19,8 +19,6 @@ package com.stratio.deep.examples.scala
 import org.apache.spark.SparkContext._
 import com.stratio.deep.config._
 import com.stratio.deep.context._
-import com.stratio.deep.rdd.CassandraRDD
-import com.stratio.deep.testentity._
 import com.stratio.deep.rdd._
 import org.apache.spark.rdd.RDD
 import com.stratio.deep.testutils.ContextProperties
@@ -33,51 +31,56 @@ import com.stratio.deep.testentity.{PageEntity, DomainEntity}
 
 object WritingEntityToCassandra {
 
-    def main (args:Array[String]) {
+  def main(args: Array[String]) {
 
-        val job = "scala:writingEntityToCassandra"
+    val job = "scala:writingEntityToCassandra"
 
-        val inputKeyspaceName = "crawler"
-        val inputTableName = "Page"
-        val outputKeyspaceName = "crawler"
-        val outputTableName = "listdomains"
+    val inputKeyspaceName = "crawler"
+    val inputTableName = "Page"
+    val outputKeyspaceName = "crawler"
+    val outputTableName = "listdomains"
 
-        // Creating the Deep Context where args are Spark Master and Job Name
-        val p = new ContextProperties(args)
-        val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, Array(p.getJar))
+    // Creating the Deep Context where args are Spark Master and Job Name
+    val p = new ContextProperties(args)
+    val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, Array(p.getJar))
 
-        // --- INPUT RDD
-        val inputConfig = DeepJobConfigFactory.create(classOf[PageEntity])
-          .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
-                .keyspace(inputKeyspaceName).table(inputTableName)
-                .initialize
+    // --- INPUT RDD
+    val inputConfig = DeepJobConfigFactory.create(classOf[PageEntity])
+      .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
+      .keyspace(inputKeyspaceName).table(inputTableName)
+      .initialize
 
-        val inputRDD: CassandraRDD[PageEntity] = deepContext.cassandraEntityRDD(inputConfig)
+    val inputRDD: CassandraRDD[PageEntity] = deepContext.cassandraEntityRDD(inputConfig)
 
-        val pairRDD: RDD[(String, PageEntity)] = inputRDD map {e:PageEntity => (e.getDomainName, e)}
-
-        val numPerKey: RDD[(String, Int)] = pairRDD.groupByKey
-                .map { t:(String, Seq[PageEntity]) => (t._1, t._2.size)}
-
-
-        // -------------------------------- OUTPUT to Cassandra
-        // Creating a configuration for the output RDD and initialize it
-        // --- OUTPUT RDD
-        val outputConfig = DeepJobConfigFactory.createWriteConfig(classOf[DomainEntity])
-          .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
-                .keyspace(outputKeyspaceName).table(outputTableName).createTableOnWrite(true)
-                .initialize
-
-        val outputRDD: RDD[DomainEntity] = numPerKey map { t: (String, Int) =>
-            val out = new DomainEntity();
-            out.setDomain(t._1);
-            out.setNumPages(t._2);
-            out
-        }
-
-        CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig)
-
-        System.exit(0)
+    val pairRDD: RDD[(String, PageEntity)] = inputRDD map {
+      e: PageEntity => (e.getDomainName, e)
     }
+
+    val numPerKey: RDD[(String, Int)] = pairRDD.groupByKey
+      .map {
+      t: (String, Seq[PageEntity]) => (t._1, t._2.size)
+    }
+
+
+    // -------------------------------- OUTPUT to Cassandra
+    // Creating a configuration for the output RDD and initialize it
+    // --- OUTPUT RDD
+    val outputConfig = DeepJobConfigFactory.createWriteConfig(classOf[DomainEntity])
+      .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
+      .keyspace(outputKeyspaceName).table(outputTableName).createTableOnWrite(true)
+      .initialize
+
+    val outputRDD: RDD[DomainEntity] = numPerKey map {
+      t: (String, Int) =>
+        val out = new DomainEntity();
+        out.setDomain(t._1);
+        out.setNumPages(t._2);
+        out
+    }
+
+    CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig)
+
+    deepContext.stop
+  }
 
 }

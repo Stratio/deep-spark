@@ -17,28 +17,43 @@
 package com.stratio.deep.cql;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
 
 /**
-* Created by luca on 14/04/14.
-*/
+ * Wrapper class holding information of a computed token range.
+ */
 public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable {
     private Comparable startToken;
     private Comparable endToken;
     private List<String> replicas;
 
+    /**
+     * Construct a new token range with no replica information.
+     *
+     * @param startToken first token of this range.
+     * @param endToken last token of this range.
+     */
     public DeepTokenRange(Comparable startToken, Comparable endToken) {
         this.startToken = startToken;
         this.endToken = endToken;
     }
 
+    /**
+     * Construct a new token range with replica information.
+     *
+     * @param startToken first token of this range.
+     * @param endToken last token of this range.
+     * @param replicas the list of replica machines holding this range of tokens.
+     */
     public DeepTokenRange(Comparable startToken, Comparable endToken, List<String> replicas) {
         this.startToken = startToken;
         this.endToken = endToken;
         this.replicas = replicas;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "DeepTokenRange{" +
@@ -48,19 +63,33 @@ public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable 
                 "}\n";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         DeepTokenRange that = (DeepTokenRange) o;
 
-        if (!endToken.equals(that.endToken)) return false;
-        if (!startToken.equals(that.startToken)) return false;
+        if (!endToken.equals(that.endToken)) {
+            return false;
+        }
+        if (!startToken.equals(that.startToken)) {
+            return false;
+        }
 
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int result = startToken.hashCode();
@@ -88,6 +117,9 @@ public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable 
         return replicas;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int compareTo(DeepTokenRange o) {
         return startToken.compareTo(o.startToken);

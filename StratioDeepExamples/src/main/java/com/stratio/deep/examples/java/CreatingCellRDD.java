@@ -19,7 +19,7 @@ package com.stratio.deep.examples.java;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.rdd.*;
+import com.stratio.deep.rdd.CassandraJavaRDD;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
@@ -30,7 +30,7 @@ import org.apache.spark.SparkContext;
  * Date..: 19-feb-2014
  */
 public final class CreatingCellRDD {
-    private static Logger logger = Logger.getLogger(CreatingCellRDD.class);
+    private static final Logger LOG = Logger.getLogger(CreatingCellRDD.class);
 
     private static Long counts;
 
@@ -43,10 +43,7 @@ public final class CreatingCellRDD {
      * @param args the arguments passed to the application.
      */
     public static void main(String[] args) {
-
         doMain(args);
-
-        System.exit(0);
     }
 
     /**
@@ -62,7 +59,8 @@ public final class CreatingCellRDD {
 
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
-        SparkConf sparkConf = new SparkConf().setMaster(p.getCluster()).setAppName(job).setSparkHome(p.getSparkHome()).setJars(new String[]{p.getJar()})
+        SparkConf sparkConf = new SparkConf().setMaster(p.getCluster()).setAppName(job).setSparkHome(p.getSparkHome()
+        ).setJars(new String[]{p.getJar()})
                 .set("spark.task.maxFailures", "5");
 
         SparkContext sc = new SparkContext(p.getCluster(), job, sparkConf);
@@ -81,7 +79,7 @@ public final class CreatingCellRDD {
 
         counts = rdd.count();
 
-        logger.info("Num of rows: " + counts);
+        LOG.info("Num of rows: " + counts);
 
         deepContext.stop();
     }

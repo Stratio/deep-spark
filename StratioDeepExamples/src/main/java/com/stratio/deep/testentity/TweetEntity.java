@@ -18,14 +18,8 @@ package com.stratio.deep.testentity;
 
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.annotations.DeepField;
-
 import com.stratio.deep.entity.IDeepType;
-import org.apache.cassandra.db.marshal.BooleanType;
-import org.apache.cassandra.db.marshal.Int32Type;
-import org.apache.cassandra.db.marshal.SetType;
-import org.apache.cassandra.db.marshal.TimestampType;
-import org.apache.cassandra.db.marshal.UTF8Type;
-import org.apache.cassandra.db.marshal.UUIDType;
+import org.apache.cassandra.db.marshal.*;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -34,82 +28,82 @@ import org.apache.cassandra.db.marshal.UUIDType;
 @DeepEntity
 public class TweetEntity implements IDeepType {
 
-	private static final long serialVersionUID = 7743109162467182820L;
-	
-	@DeepField(fieldName="tweet_id", isPartOfPartitionKey = true, validationClass = UUIDType.class)
-	private java.util.UUID tweetID;
-	
-	@DeepField(fieldName="tweet_date", validationClass = TimestampType.class)
-	private java.util.Date tweetDate;
+    private static final long serialVersionUID = 7743109162467182820L;
 
-	@DeepField(validationClass = UTF8Type.class)
-	private String author;
+    @DeepField(fieldName = "tweet_id", isPartOfPartitionKey = true, validationClass = UUIDType.class)
+    private java.util.UUID tweetID;
 
-	@DeepField(validationClass = SetType.class )
-	private java.util.Set<String> hashtags;
+    @DeepField(fieldName = "tweet_date", validationClass = TimestampType.class)
+    private java.util.Date tweetDate;
 
-	@DeepField(fieldName = "favorite_count", validationClass = Int32Type.class)
-	private Integer favoriteCount;
+    @DeepField(validationClass = UTF8Type.class)
+    private String author;
 
-	@DeepField(validationClass = UTF8Type.class)
-	private String content;
+    @DeepField(validationClass = SetType.class)
+    private java.util.Set<String> hashtags;
 
-	@DeepField(fieldName = "truncated", validationClass = BooleanType.class)
-	private Boolean isTruncated;
+    @DeepField(fieldName = "favorite_count", validationClass = Int32Type.class)
+    private Integer favoriteCount;
 
-	public java.util.UUID getTweetID() {
-		return tweetID;
-	}
+    @DeepField(validationClass = UTF8Type.class)
+    private String content;
 
-	public void setTweetID(java.util.UUID tweetID) {
-		this.tweetID = tweetID;
-	}
+    @DeepField(fieldName = "truncated", validationClass = BooleanType.class)
+    private Boolean isTruncated;
 
-	public java.util.Date getTweetDate() {
-		return tweetDate;
-	}
+    public java.util.UUID getTweetID() {
+        return tweetID;
+    }
 
-	public void setTweetDate(java.util.Date tweetDate) {
-		this.tweetDate = tweetDate;
-	}
+    public void setTweetID(java.util.UUID tweetID) {
+        this.tweetID = tweetID;
+    }
 
-	public String getAuthor() {
-		return author;
-	}
+    public java.util.Date getTweetDate() {
+        return tweetDate;
+    }
 
-	public void setAuthor(String author) {
-		this.author = author;
-	}
+    public void setTweetDate(java.util.Date tweetDate) {
+        this.tweetDate = tweetDate;
+    }
 
-	public java.util.Set<String> getHashtags() {
-		return hashtags;
-	}
+    public String getAuthor() {
+        return author;
+    }
 
-	public void setHashtags(java.util.Set<String> hashtags) {
-		this.hashtags = hashtags;
-	}
+    public void setAuthor(String author) {
+        this.author = author;
+    }
 
-	public Integer getFavoriteCount() {
-		return favoriteCount;
-	}
+    public java.util.Set<String> getHashtags() {
+        return hashtags;
+    }
 
-	public void setFavoriteCount(Integer favoriteCount) {
-		this.favoriteCount = favoriteCount;
-	}
+    public void setHashtags(java.util.Set<String> hashtags) {
+        this.hashtags = hashtags;
+    }
 
-	public String getContent() {
-		return content;
-	}
+    public Integer getFavoriteCount() {
+        return favoriteCount;
+    }
 
-	public void setContent(String content) {
-		this.content = content;
-	}
+    public void setFavoriteCount(Integer favoriteCount) {
+        this.favoriteCount = favoriteCount;
+    }
 
-	public Boolean getIsTruncated() {
-		return isTruncated;
-	}
+    public String getContent() {
+        return content;
+    }
 
-	public void setIsTruncated(Boolean isTruncated) {
-		this.isTruncated = isTruncated;
-	}
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Boolean getIsTruncated() {
+        return isTruncated;
+    }
+
+    public void setIsTruncated(Boolean isTruncated) {
+        this.isTruncated = isTruncated;
+    }
 }

@@ -33,7 +33,8 @@ import java.lang.annotation.AnnotationTypeMismatchException;
 
 import static org.testng.Assert.fail;
 
-@Test(suiteName = "cassandraRddTests", groups = {"GenericDeepJobConfigTest"}, dependsOnGroups = {"CassandraJavaRDDTest"})
+@Test(suiteName = "cassandraRddTests", groups = {"GenericDeepJobConfigTest"},
+        dependsOnGroups = {"CassandraJavaRDDTest"})
 public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
     class NotAnnotatedTestEntity implements IDeepType {
         private static final long serialVersionUID = -2603126590709315326L;
@@ -46,7 +47,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
         IDeepJobConfig<TestEntity> djc = DeepJobConfigFactory.createWriteConfig(TestEntity.class);
 
         djc.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-        .columnFamily("test_page").keyspace("test_keyspace");
+                .columnFamily("test_page").keyspace("test_keyspace");
 
         try {
             djc.initialize();
@@ -63,11 +64,12 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
     }
 
     @Test
-    public void testInputColumnsExist(){
+    public void testInputColumnsExist() {
         IDeepJobConfig<Cells> djc = DeepJobConfigFactory.create();
 
         djc.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-                .columnFamily(COLUMN_FAMILY).keyspace(KEYSPACE_NAME).inputColumns("not_existent_col1", "not_existent_col2");
+                .columnFamily(COLUMN_FAMILY).keyspace(KEYSPACE_NAME).inputColumns("not_existent_col1",
+                "not_existent_col2");
 
         try {
             djc.initialize();
@@ -88,7 +90,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
 
         IDeepJobConfig<TestEntity> djc = DeepJobConfigFactory.create(TestEntity.class);
 
-        djc.host(null).rpcPort(null).pageSize(0);
+        djc.host(null).rpcPort(null).pageSize(0).bisectFactor(3);
 
         try {
             djc.getKeyspace();
@@ -193,7 +195,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
         }
 
         djc.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT);
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT);
 
         try {
             djc.initialize();
@@ -281,20 +283,32 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
             fail(e.getMessage());
         }
 
+        try {
+            djc.initialize();
+            fail();
+        } catch (IllegalArgumentException iae) {
+            // OK
+            log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
+            djc.bisectFactor(4);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+
         djc.initialize();
     }
 
     @Test
-    public void testWronglyMappedField(){
+    public void testWronglyMappedField() {
 
-        IDeepJobConfig<WronglyMappedTestEntity> djc = DeepJobConfigFactory.create(WronglyMappedTestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY);
+        IDeepJobConfig<WronglyMappedTestEntity> djc = DeepJobConfigFactory.create(WronglyMappedTestEntity.class).host
+                (Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY);
 
         try {
             djc.initialize();
 
             fail();
-        } catch (DeepNoSuchFieldException e){
+        } catch (DeepNoSuchFieldException e) {
             // ok
             log.info("Correctly catched DeepNoSuchFieldException: " + e.getLocalizedMessage());
         }
@@ -303,7 +317,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
     @Test
     public void testValidationNotAnnotadedTestEntity() {
         IDeepJobConfig<NotAnnotatedTestEntity> djc = DeepJobConfigFactory.create(NotAnnotatedTestEntity.class)
-            .keyspace("a").columnFamily("cf");
+                .keyspace("a").columnFamily("cf");
         try {
             djc.initialize();
 

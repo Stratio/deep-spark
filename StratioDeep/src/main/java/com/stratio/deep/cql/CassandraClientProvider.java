@@ -23,7 +23,6 @@ import com.datastax.driver.core.policies.Policies;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepIOException;
 import org.apache.cassandra.utils.Pair;
-import org.apache.spark.SparkException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +35,8 @@ import java.util.Map;
  * Created by luca on 09/04/14.
  */
 class CassandraClientProvider {
-    private static final transient Map<String, Session> clientsCache = Collections.synchronizedMap(new HashMap<String, Session>());
+    private static final transient Map<String, Session> clientsCache = Collections.synchronizedMap(new
+            HashMap<String, Session>());
     private static final Logger LOG = LoggerFactory.getLogger(CassandraClientProvider.class);
 
     static {
@@ -57,11 +57,16 @@ class CassandraClientProvider {
         });
     }
 
+    CassandraClientProvider() {
+    }
+
     static Pair<Session, String> trySessionForLocation(String location, IDeepJobConfig conf, Boolean balanced) {
         try {
             return getSession(location, conf, balanced);
-        } catch (Exception e){
-            LOG.warn("Could not connect to {}, possible loss of data-locality. Delegating connection to java driver", location, conf.getHost());
+        } catch (Exception e) {
+
+            LOG.warn("Could not connect to {}, possible loss of data-locality. Delegating connection to java driver",
+                    location, conf.getHost());
             return getSession(conf.getHost(), conf, true);
 
         }
@@ -89,7 +94,8 @@ class CassandraClientProvider {
 
                 LOG.debug("No cached session found for key {{}}", key);
                 InetAddress locationInet = InetAddress.getByName(location);
-                LoadBalancingPolicy loadBalancingPolicy = balanced ? Policies.defaultLoadBalancingPolicy() : new LocalMachineLoadBalancingPolicy(locationInet);
+                LoadBalancingPolicy loadBalancingPolicy = balanced ? Policies.defaultLoadBalancingPolicy() : new
+                        LocalMachineLoadBalancingPolicy(locationInet);
 
                 Cluster cluster = Cluster.builder()
                         .withPort(port)
@@ -103,7 +109,8 @@ class CassandraClientProvider {
 
                 return Pair.create(clientsCache.get(key), location);
             } catch (Exception e) {
-                throw new DeepIOException("Failed to create authenticated client to {" + location + "}:{" + port + "}", e);
+                throw new DeepIOException("Failed to create authenticated client to {" + location + "}:{" + port +
+                        "}", e);
             }
         }
 

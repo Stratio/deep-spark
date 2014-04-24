@@ -23,7 +23,6 @@ import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepInstantiationException;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
@@ -37,7 +36,6 @@ import org.apache.cassandra.exceptions.SyntaxException;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.cassandra.utils.Pair;
 import org.apache.commons.io.IOUtils;
-import org.apache.spark.SparkException;
 import org.apache.spark.TaskContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +70,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
 
     /**
      * Con
+     *
      * @param context
      * @param writeConfig
      */
@@ -157,7 +156,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     /**
      * retrieve the key validator from system.schema_columnfamilies table
      */
-    protected void retrievePartitionKeyValidator() throws Exception {
+    protected void retrievePartitionKeyValidator() throws ConfigurationException {
         Pair<Session, String> sessionWithHost =
                 CassandraClientProvider.trySessionForLocation(localhost.getHostAddress(), writeConfig, false);
 
@@ -305,7 +304,8 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         @Override
         public void run() {
             LOG.debug("[" + this + "] Initializing cassandra client");
-            Pair<Session, String> sessionWithHost = CassandraClientProvider.trySessionForLocation(localhost.getHostAddress(), writeConfig, false);
+            Pair<Session, String> sessionWithHost = CassandraClientProvider.trySessionForLocation(localhost
+                    .getHostAddress(), writeConfig, false);
             sessionWithHost.left.execute(cql, bindVariables.toArray(new Object[bindVariables.size()]));
         }
     }

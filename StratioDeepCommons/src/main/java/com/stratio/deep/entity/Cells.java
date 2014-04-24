@@ -50,6 +50,7 @@ public class Cells implements Iterable<Cell>, Serializable {
 
     /**
      * Adds a new Cell object to this Cells instance.
+     *
      * @param c the Cell we want to add to this Cells object.
      * @return either true/false if the Cell has been added successfully or not.
      */
@@ -105,8 +106,10 @@ public class Cells implements Iterable<Cell>, Serializable {
     /**
      * Returns the Cell whose name is cellName, or null if this Cells object
      * contains no cell whose name is cellName.
+     *
      * @param cellName the name of the Cell we want to retrieve from this Cells object.
-     * @return the Cell whose name is cellName contained in this Cells object. null if no cell named cellName is present.
+     * @return the Cell whose name is cellName contained in this Cells object. null if no cell named cellName is
+     * present.
      */
     public Cell getCellByName(String cellName) {
         for (Cell c : cells) {
@@ -159,6 +162,7 @@ public class Cells implements Iterable<Cell>, Serializable {
     /**
      * Extracts from this Cells object the cells marked either as partition key or cluster key.
      * Returns an empty Cells object if the current object does not contain any Cell marked as key.
+     *
      * @return
      */
     public Cells getIndexCells() {
@@ -175,6 +179,7 @@ public class Cells implements Iterable<Cell>, Serializable {
 
     /**
      * Extracts from this Cells object the cells _NOT_ marked as partition key and _NOT_ marked as cluster key.
+     *
      * @return
      */
     public Cells getValueCells() {
@@ -207,10 +212,18 @@ public class Cells implements Iterable<Cell>, Serializable {
 
     /**
      * Returns the number of cell(s) this object contains.
+     *
      * @return
      */
     public int size() {
         return cells.size();
+    }
+
+    /**
+     * @return true if this object contains no cells.
+     */
+    public boolean isEmpty(){
+        return cells.isEmpty();
     }
 
     /**

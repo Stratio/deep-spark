@@ -45,11 +45,12 @@ import static org.testng.Assert.*;
 /**
  * Integration tests for generic cell RDDs where cells contain Cassandra's collections.
  */
-@Test(suiteName = "cassandraRddTests", dependsOnGroups = "CassandraCollectionsEntityTest", groups = "CassandraCollectionsCellsTest" )
-public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells>  {
+@Test(suiteName = "cassandraRddTests", dependsOnGroups = "CassandraCollectionsEntityTest",
+        groups = "CassandraCollectionsCellsTest")
+public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
     @BeforeClass
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
-        InterruptedException {
+            InterruptedException {
         super.initServerAndRDD();
 
         CassandraCollectionsEntityTest.loadCollectionsData();
@@ -79,7 +80,8 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells>  {
                 assertEquals(emails.size(), 2);
                 assertEquals(phones.size(), 2);
                 assertEquals(uuid2id.size(), 1);
-                assertEquals(uuid2id.get(UUID.fromString("AE47FBFD-A086-47C2-8C73-77D8A8E99F35")), Integer.valueOf(470));
+                assertEquals(uuid2id.get(UUID.fromString("AE47FBFD-A086-47C2-8C73-77D8A8E99F35")),
+                        Integer.valueOf(470));
 
                 Iterator<String> emailsIter = emails.iterator();
                 Iterator<String> phonesIter = phones.iterator();
@@ -102,16 +104,17 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells>  {
     @Override
     protected void checkSimpleTestData() {
         Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+                .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
         Session session = cluster.connect();
 
-        String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY + ";";
+        String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY
+                + ";";
 
         ResultSet rs = session.execute(command);
         assertEquals(rs.one().getLong(0), 500);
 
         command = "select * from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY
-            + " WHERE \"id\" = 351;";
+                + " WHERE \"id\" = 351;";
 
         rs = session.execute(command);
         Row row = rs.one();
@@ -145,8 +148,9 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells>  {
     @Override
     protected IDeepJobConfig<Cells> initReadConfig() {
         IDeepJobConfig<Cells> config = DeepJobConfigFactory.create()
-            .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(CQL3_COLLECTION_COLUMN_FAMILY);
+                .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).bisectFactor(testBisectFactor)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily
+                        (CQL3_COLLECTION_COLUMN_FAMILY);
 
         return config.initialize();
     }
@@ -154,23 +158,23 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells>  {
     @Override
     protected IDeepJobConfig<Cells> initWriteConfig() {
         IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
-            .host(Constants.DEFAULT_CASSANDRA_HOST)
-            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .keyspace(OUTPUT_KEYSPACE_NAME)
-            .columnFamily(OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY)
-            .batchSize(2)
-            .createTableOnWrite(Boolean.TRUE);
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .keyspace(OUTPUT_KEYSPACE_NAME)
+                .columnFamily(OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY)
+                .batchSize(2)
+                .createTableOnWrite(Boolean.TRUE);
         return writeConfig.initialize();
     }
 
     @Override
     public void testSaveToCassandra() {
         Function1<Cells, Cells> mappingFunc =
-            new TestEntityAbstractSerializableFunction();
+                new TestEntityAbstractSerializableFunction();
 
         RDD<Cells> mappedRDD =
-            getRDD().map(mappingFunc, ClassTag$.MODULE$.<Cells>apply(Cql3CollectionsTestEntity.class));
+                getRDD().map(mappingFunc, ClassTag$.MODULE$.<Cells>apply(Cql3CollectionsTestEntity.class));
 
         try {
             executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
@@ -198,16 +202,17 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells>  {
 
     protected void checkOutputTestData() {
         Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+                .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
         Session session = cluster.connect();
 
-        String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY + ";";
+        String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY
+                + ";";
 
         ResultSet rs = session.execute(command);
         assertEquals(rs.one().getLong(0), 500);
 
         command = "select * from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY
-            + " WHERE \"id\" = 351;";
+                + " WHERE \"id\" = 351;";
 
         rs = session.execute(command);
         Row row = rs.one();
@@ -273,7 +278,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells>  {
     }
 
     private static class TestEntityAbstractSerializableFunction extends
-        AbstractSerializableFunction<Cells, Cells> {
+            AbstractSerializableFunction<Cells, Cells> {
 
         private static final long serialVersionUID = -1555102599662015841L;
 

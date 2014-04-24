@@ -65,16 +65,16 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
     @BeforeClass
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
-        InterruptedException {
+            InterruptedException {
 
         rddConfig = DeepJobConfigFactory.create(TestEntity.class)
-            .host(Constants.DEFAULT_CASSANDRA_HOST)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY)
-            .partitioner("org.apache.cassandra.dht.Murmur3Partitioner")
-            .username("")
-            .password("");
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY)
+                .partitioner("org.apache.cassandra.dht.Murmur3Partitioner")
+                .username("")
+                .password("");
 
         rddConfig.initialize();
 
@@ -219,18 +219,19 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     public void testSaveToCassandra() {
         final String table = "save_java_rdd";
 
-        //executeCustomCQL("create table  " + OUTPUT_KEYSPACE_NAME + "." + table + " (domain text, count int, PRIMARY KEY(domain));");
+        //executeCustomCQL("create table  " + OUTPUT_KEYSPACE_NAME + "." + table + " (domain text, count int,
+        // PRIMARY KEY(domain));");
 
         IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
-            .host(Constants.DEFAULT_CASSANDRA_HOST)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .keyspace(OUTPUT_KEYSPACE_NAME)
-            .columnFamily(table)
-            .username("")
-            .createTableOnWrite(true)
-            .batchSize(1)
-            .password("").initialize();
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .keyspace(OUTPUT_KEYSPACE_NAME)
+                .columnFamily(table)
+                .username("")
+                .createTableOnWrite(true)
+                .batchSize(1)
+                .password("").initialize();
 
 	/* 1. I need to define which is the key, let's say it's the domain */
         JavaPairRDD<String, Integer> pairRDD = rdd.map(new DomainCounterPairFunction());
@@ -239,7 +240,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
         JavaPairRDD<String, Integer> reducedRDD = pairRDD.reduceByKey(new IntegerReducer());
 
         JavaRDD<Cells> cells = reducedRDD
-            .map(new Tuple2CellsFunction());
+                .map(new Tuple2CellsFunction());
 
         CassandraRDD.saveRDDToCassandra(cells, writeConfig);
 
@@ -248,16 +249,16 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     }
 
     @Test(dependsOnMethods = "testSaveToCassandra")
-    public void testSaveToCassandra2(){
+    public void testSaveToCassandra2() {
         IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
-            .host(Constants.DEFAULT_CASSANDRA_HOST)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-            .keyspace(OUTPUT_KEYSPACE_NAME)
-            .columnFamily("page")
-            .createTableOnWrite(true)
-            .batchSize(2)
-            .password("").initialize();
+                .host(Constants.DEFAULT_CASSANDRA_HOST)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+                .keyspace(OUTPUT_KEYSPACE_NAME)
+                .columnFamily("page")
+                .createTableOnWrite(true)
+                .batchSize(2)
+                .password("").initialize();
 
         JavaPairRDD<String, Double> pairRDD = rdd.map(new DomainCounterDoublePairFunction());
 
@@ -278,7 +279,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
     private void checkOutputTestData() {
         Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+                .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
         Session session = cluster.connect();
 
         String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + ".save_java_rdd;";

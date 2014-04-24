@@ -28,28 +28,27 @@ import org.apache.cassandra.db.marshal.Int32Type;
 @DeepEntity
 public class DomainEntity implements IDeepType {
 
-	private static final long serialVersionUID = 7262854550753855586L;
+    private static final long serialVersionUID = 7262854550753855586L;
 
-	@DeepField(fieldName = "domain", isPartOfPartitionKey = true)
-	private String domain;
+    @DeepField(fieldName = "domain", isPartOfPartitionKey = true)
+    private String domain;
 
-    @DeepField(fieldName="num_pages", validationClass = Int32Type.class)
+    @DeepField(fieldName = "num_pages", validationClass = Int32Type.class)
     private Integer numPages;
 
-	public String getDomain() {
-
+    public String getDomain() {
 
 
         return domain;
-	}
+    }
 
     public int getNumPages() {
         return numPages;
     }
 
-	public void setDomain(String domain) {
-		this.domain = domain;
-	}
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
 
     public void setNumPages(Integer numPages) {
         this.numPages = numPages;

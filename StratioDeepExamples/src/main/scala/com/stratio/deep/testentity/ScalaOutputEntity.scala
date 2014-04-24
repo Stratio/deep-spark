@@ -26,12 +26,14 @@ import com.stratio.deep.entity.IDeepType
  * Date..: 21-mar-2014
  */
 
-@DeepEntity class ScalaOutputEntity  extends IDeepType {
+@DeepEntity class ScalaOutputEntity extends IDeepType {
 
-    @BeanProperty @DeepField(isPartOfPartitionKey = true)
-    var key:String = _
+  @BeanProperty
+  @DeepField(isPartOfPartitionKey = true)
+  var key: String = _
 
-    @BeanProperty @DeepField(validationClass = classOf[Int32Type])
-    var value:Integer = _
+  @BeanProperty
+  @DeepField(validationClass = classOf[Int32Type])
+  var value: Integer = _
 }
 

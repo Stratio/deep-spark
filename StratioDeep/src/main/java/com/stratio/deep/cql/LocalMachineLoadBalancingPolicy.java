@@ -47,7 +47,7 @@ public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
     public void init(Cluster cluster, Collection<Host> hosts) {
 
         for (Host h : hosts) {
-            if (h.getAddress().equals(host)){
+            if (h.getAddress().equals(host)) {
                 this.liveHosts.add(h);
                 this.index.set(0);
                 break;
@@ -57,7 +57,7 @@ public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
 
     /**
      * Return the HostDistance for the provided host.
-     * <p>
+     * <p/>
      * This policy consider all nodes as local. This is generally the right
      * thing to do in a single datacenter deployment. If you use multiple
      * datacenter, see {@link com.datastax.driver.core.policies.DCAwareRoundRobinPolicy} instead.
@@ -72,14 +72,14 @@ public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
 
     /**
      * Returns the hosts to use for a new query.
-     * <p>
+     * <p/>
      * The returned plan will try each known host of the cluster. Upon each
      * call to this method, the {@code i}th host of the plans returned will cycle
      * over all the hosts of the cluster in a round-robin fashion.
      *
      * @param loggedKeyspace the keyspace currently logged in on for this
-     * query.
-     * @param statement the query for which to build the plan.
+     *                       query.
+     * @param statement      the query for which to build the plan.
      * @return a new query plan, i.e. an iterator indicating which host to
      * try first for querying, which one to use as failover, etc...
      */
@@ -91,12 +91,13 @@ public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
         // would be racy). We use clone() as it don't involve a copy of the
         // underlying array (and thus we rely on liveHosts being a CopyOnWriteArrayList).
         @SuppressWarnings("unchecked")
-        final List<Host> hosts = (List<Host>)liveHosts.clone();
+        final List<Host> hosts = (List<Host>) liveHosts.clone();
         final int startIdx = index.getAndIncrement();
 
         // Overflow protection; not theoretically thread safe but should be good enough
-        if (startIdx > Integer.MAX_VALUE - 10000)
+        if (startIdx > Integer.MAX_VALUE - 10000) {
             index.set(0);
+        }
 
         return new AbstractIterator<Host>() {
 
@@ -105,13 +106,15 @@ public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
 
             @Override
             protected Host computeNext() {
-                if (remaining <= 0)
+                if (remaining <= 0) {
                     return endOfData();
+                }
 
                 remaining--;
                 int c = idx++ % hosts.size();
-                if (c < 0)
+                if (c < 0) {
                     c += hosts.size();
+                }
                 return hosts.get(c);
             }
         };
@@ -129,8 +132,9 @@ public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
 
     @Override
     public void onAdd(Host host) {
-        if (liveHosts.size() == 0)
+        if (liveHosts.isEmpty()) {
             onUp(host);
+        }
     }
 
     @Override

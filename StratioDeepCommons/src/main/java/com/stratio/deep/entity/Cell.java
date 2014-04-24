@@ -64,8 +64,8 @@ public final class Cell implements Serializable {
     /**
      * Factory method, creates a new Cell from its value and metadata information<br/>
      *
-     * @param metadata       the cell object carrying the metadata for this new cell
-     * @param cellValue      the cell value, provided as a ByteBuffer.
+     * @param metadata  the cell object carrying the metadata for this new cell
+     * @param cellValue the cell value, provided as a ByteBuffer.
      * @return an instance of a Cell object for the provided parameters.
      */
     public static Cell create(Cell metadata, Object cellValue) {
@@ -75,8 +75,8 @@ public final class Cell implements Serializable {
     /**
      * Factory method, creates a new Cell from its value and metadata information<br/>
      *
-     * @param metadata       the cell object carrying the metadata for this new cell
-     * @param cellValue      the cell value, provided as a ByteBuffer.
+     * @param metadata  the cell object carrying the metadata for this new cell
+     * @param cellValue the cell value, provided as a ByteBuffer.
      * @return an instance of a Cell object for the provided parameters.
      */
     public static Cell create(Cell metadata, ByteBuffer cellValue) {
@@ -105,7 +105,7 @@ public final class Cell implements Serializable {
      * @return an instance of a Cell object for the provided parameters.
      */
     public static Cell create(String cellName, Object cellValue, Boolean isPartitionKey,
-        Boolean isClusterKey) {
+                              Boolean isClusterKey) {
         return new Cell(cellName, cellValue, isPartitionKey, isClusterKey);
     }
 
@@ -119,19 +119,19 @@ public final class Cell implements Serializable {
      * @return an instance of a Cell object for the provided parameters.
      */
     public static Cell create(String cellName, DataType cellType, Boolean isPartitionKey,
-        Boolean isClusterKey) {
+                              Boolean isClusterKey) {
         return new Cell(cellName, cellType, isPartitionKey, isClusterKey);
     }
 
     /**
      * Constructs a Cell from a {@link @DeepField} property.
      *
-     * @param e instance of the testentity whose field is going to generate a Cell.
+     * @param e     instance of the testentity whose field is going to generate a Cell.
      * @param field field that will generate the Cell.
-     * @param <E> a subclass of IDeepType.
+     * @param <E>   a subclass of IDeepType.
      * @return an instance of a Cell object for the provided parameters.
      */
-    public static <E extends IDeepType> Cell create(E e, Field field){
+    public static <E extends IDeepType> Cell create(E e, Field field) {
         return new Cell(e, field);
     }
 
@@ -161,8 +161,8 @@ public final class Cell implements Serializable {
      * Private constructor.
      */
     private Cell(String cellName, Object cellValue, Boolean isPartitionKey, Boolean isClusterKey) {
-        if (!(cellValue instanceof Serializable)){
-            throw new DeepInstantiationException("provided cell value "+cellValue+" is not serializable");
+        if (!(cellValue instanceof Serializable)) {
+            throw new DeepInstantiationException("provided cell value " + cellValue + " is not serializable");
         }
         this.cellName = cellName;
         this.cellValue = cellValue;
@@ -198,8 +198,8 @@ public final class Cell implements Serializable {
      * Private constructor.
      */
     private Cell(Cell metadata, Object cellValue) {
-        if (!(cellValue instanceof Serializable)){
-            throw new DeepInstantiationException("provided cell value "+cellValue+" is not serializable");
+        if (!(cellValue instanceof Serializable)) {
+            throw new DeepInstantiationException("provided cell value " + cellValue + " is not serializable");
         }
 
         this.cellName = metadata.getCellName();
@@ -255,10 +255,10 @@ public final class Cell implements Serializable {
         Cell cell = (Cell) o;
 
         return cellName.equals(cell.cellName) &&
-            (cellValue != null ? cellValue.equals(cell.cellValue) : cell.cellValue != null) &&
-            isClusterKey.equals(cell.isClusterKey) &&
-            isPartitionKey.equals(cell.isPartitionKey) &&
-            cellValidator.equals(cell.getCellValidator());
+                (cellValue != null ? cellValue.equals(cell.cellValue) : cell.cellValue != null) &&
+                isClusterKey.equals(cell.isClusterKey) &&
+                isPartitionKey.equals(cell.isPartitionKey) &&
+                cellValidator.equals(cell.getCellValidator());
     }
 
     /**
@@ -268,8 +268,9 @@ public final class Cell implements Serializable {
      */
     public Class<?> getValueType() {
         Class valueType = MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE.get(cellValidator.getValidatorClassName());
-        if (valueType == null){
-            throw new DeepGenericException("Cannot find value type for marshaller " + cellValidator.getValidatorClassName());
+        if (valueType == null) {
+            throw new DeepGenericException("Cannot find value type for marshaller " + cellValidator
+                    .getValidatorClassName());
         }
 
         return valueType;
@@ -283,7 +284,9 @@ public final class Cell implements Serializable {
     }
 
     /**
-     * Returns the composed cell value. The type of the returned object can be obtained by calling {@see Cell#getValueType}
+     * Returns the composed cell value. The type of the returned object can be obtained by calling {@see
+     * Cell#getValueType}
+     *
      * @return the composed cell value.
      */
     public Object getCellValue() {
@@ -355,7 +358,8 @@ public final class Cell implements Serializable {
      */
     @Override
     public String toString() {
-        return "Cell{" + "cellName='" + cellName + '\'' + ", cellValue=" + (cellValue!=null?cellValue:"") + ", isPartitionKey="
-            + isPartitionKey + ", isClusterKey=" + isClusterKey + ", cellValidator='" + cellValidator + '\'' + '}';
+        return "Cell{" + "cellName='" + cellName + '\'' + ", cellValue=" + (cellValue != null ? cellValue : "") + ", " +
+                "isPartitionKey="
+                + isPartitionKey + ", isClusterKey=" + isClusterKey + ", cellValidator='" + cellValidator + '\'' + '}';
     }
 }

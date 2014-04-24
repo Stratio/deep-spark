@@ -19,7 +19,6 @@ package com.stratio.deep.config;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.entity.Cell;
 import org.apache.cassandra.dht.IPartitioner;
-import org.apache.hadoop.conf.Configuration;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -33,12 +32,14 @@ public interface IDeepJobConfig<T> extends Serializable {
 
     /**
      * Returns the session opened to the cassandra server.
+     *
      * @return
      */
     Session getSession();
 
     /**
      * Sets the session to use. If a session is not provided, this object will open a new one.
+     *
      * @param session
      */
     IDeepJobConfig<T> session(Session session);
@@ -77,8 +78,10 @@ public interface IDeepJobConfig<T> extends Serializable {
      * @param filterColumnName
      * @param filterValue
      * @return
-     * @throws com.stratio.deep.exception.DeepIndexNotFoundException if the specified field has not been indexed in Cassandra.
-     * @throws com.stratio.deep.exception.DeepNoSuchFieldException if the specified field is not a valid column in Cassandra.
+     * @throws com.stratio.deep.exception.DeepIndexNotFoundException if the specified field has not been indexed in
+     * Cassandra.
+     * @throws com.stratio.deep.exception.DeepNoSuchFieldException   if the specified field is not a valid column in
+     * Cassandra.
      */
     public abstract IDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue);
 
@@ -203,6 +206,14 @@ public interface IDeepJobConfig<T> extends Serializable {
     public abstract IDeepJobConfig<T> keyspace(String keyspace);
 
     /**
+     * Sets the token range bisect factor. Defaults to 1.
+     *
+     * @param bisectFactor
+     * @return
+     */
+    public abstract IDeepJobConfig<T> bisectFactor(int bisectFactor);
+
+    /**
      * Let's the user specify an alternative partitioner class. The default partitioner is
      * org.apache.cassandra.dht.Murmur3Partitioner.
      *
@@ -235,7 +246,7 @@ public interface IDeepJobConfig<T> extends Serializable {
     public abstract IDeepJobConfig<T> cqlPort(Integer port);
 
     /**
-    /**
+     * /**
      * Sets the username to use to login to Cassandra. Leave empty if you do not need authentication.
      *
      * @return this object.
@@ -325,13 +336,20 @@ public interface IDeepJobConfig<T> extends Serializable {
 
     /**
      * Returns the maximum number of rows that will be retrieved when fetching data pages from Cassandra.
+     *
      * @return
      */
     public int getPageSize();
 
     /**
      * Returns whether this configuration config is suitable for writing out data to the datastore.
+     *
      * @return
      */
     public Boolean getIsWriteConfig();
+
+    /**
+     * @return the configured bisect factor.
+     */
+    public int getBisectFactor();
 }

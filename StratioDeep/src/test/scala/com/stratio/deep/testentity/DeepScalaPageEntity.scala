@@ -23,21 +23,27 @@ import com.stratio.deep.entity.IDeepType
 
 @DeepEntity class DeepScalaPageEntity extends IDeepType {
 
-  @BeanProperty @DeepField(isPartOfPartitionKey = true)
-  var id:String = null
+  @BeanProperty
+  @DeepField(isPartOfPartitionKey = true)
+  var id: String = null
 
-  @BeanProperty @DeepField(fieldName = "domain_name")
+  @BeanProperty
+  @DeepField(fieldName = "domain_name")
   var domain: String = null
 
-  @BeanProperty @DeepField
+  @BeanProperty
+  @DeepField
   var url: String = null
 
-  @BeanProperty @DeepField(validationClass = classOf[Int32Type], fieldName = "response_time")
+  @BeanProperty
+  @DeepField(validationClass = classOf[Int32Type], fieldName = "response_time")
   var responseTime: Integer = _
 
-  @BeanProperty @DeepField(fieldName = "response_code", validationClass = classOf[Int32Type])
+  @BeanProperty
+  @DeepField(fieldName = "response_code", validationClass = classOf[Int32Type])
   var responseCode: Integer = _
 
-  @BeanProperty @DeepField(validationClass = classOf[LongType], fieldName = "download_time")
+  @BeanProperty
+  @DeepField(validationClass = classOf[LongType], fieldName = "download_time")
   var downloadTime: java.lang.Long = _
 }

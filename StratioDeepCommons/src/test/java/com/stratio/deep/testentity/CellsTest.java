@@ -43,7 +43,7 @@ public class CellsTest {
         assertEquals(keys.size(), 2);
 
         Cells values = new Cells(Cell.create("domain_name", ""), Cell.create("url", ""), Cell.create("response_time",
-            ""), Cell.create("response_code", ""), Cell.create("download_time", ""));
+                ""), Cell.create("response_code", ""), Cell.create("download_time", ""));
 
         assertEquals(values.size(), 5);
 
@@ -70,7 +70,8 @@ public class CellsTest {
 
     @Test
     public void testGetCellByIdx() {
-        Cells keys = new Cells(Cell.create("id1", "payload1", true, false), Cell.create("id2", "payload2", false, true));
+        Cells keys = new Cells(Cell.create("id1", "payload1", true, false), Cell.create("id2", "payload2", false,
+                true));
 
         try {
             keys.getCellByIdx(-1);
@@ -101,7 +102,7 @@ public class CellsTest {
     @Test
     public void testGetCellByName() {
         Cells values = new Cells(Cell.create("domain_name", "abc.es"), Cell.create("url", ""), Cell.create(
-            "response_time", ""), Cell.create("response_code", ""), Cell.create("download_time", ""));
+                "response_time", ""), Cell.create("response_code", ""), Cell.create("download_time", ""));
 
         assertNull(values.getCellByName("notexistingcell"));
         Cell c = values.getCellByName("domain_name");
@@ -114,7 +115,7 @@ public class CellsTest {
     @Test
     public void testGetCells() {
         Cells values = new Cells(Cell.create("domain_name", "abc.es"), Cell.create("url", ""), Cell.create(
-            "response_time", ""), Cell.create("response_code", ""), Cell.create("download_time", ""));
+                "response_time", ""), Cell.create("response_code", ""), Cell.create("download_time", ""));
 
         Collection<Cell> copy = values.getCells();
 
@@ -126,8 +127,9 @@ public class CellsTest {
     public void testGetDecomposedCellValues() {
         long downloadTime = System.currentTimeMillis();
         Cells values = new Cells(Cell.create("domain_name", "abc.es"), Cell.create("url", "http://www.abc.es"),
-            Cell.create("response_time", 102), Cell.create("response_code", 200), Cell.create("download_time",
-            downloadTime));
+                Cell.create("response_time", 102), Cell.create("response_code", 200), Cell.create("download_time",
+                downloadTime)
+        );
 
         List<ByteBuffer> dcv = (List<ByteBuffer>) values.getDecomposedCellValues();
         ByteBuffer bb0 = dcv.get(0);
@@ -152,8 +154,9 @@ public class CellsTest {
         long downloadTime = System.currentTimeMillis();
 
         Cells values = new Cells(Cell.create("domain_name", "abc.es"), Cell.create("url", "http://www.abc.es"),
-            Cell.create("response_time", 102), Cell.create("response_code", 200), Cell.create("download_time",
-            downloadTime));
+                Cell.create("response_time", 102), Cell.create("response_code", 200), Cell.create("download_time",
+                downloadTime)
+        );
 
         int idx = 0;
         for (Cell cell : values) {
@@ -188,8 +191,8 @@ public class CellsTest {
     public void testSplitCells() {
 
         Cells cells = new Cells(Cell.create("domain_name", ""), Cell.create("id2", "", false, true), Cell.create(
-            "response_time", ""), Cell.create("url", ""), Cell.create("id1", "", true, false), Cell.create(
-            "response_code", ""), Cell.create("download_time", ""));
+                "response_time", ""), Cell.create("url", ""), Cell.create("id1", "", true, false), Cell.create(
+                "response_code", ""), Cell.create("download_time", ""));
 
         Cells keys = cells.getIndexCells();
         assertNotNull(keys);
@@ -198,14 +201,15 @@ public class CellsTest {
         Cells values = cells.getValueCells();
         assertNotNull(values);
         assertTrue(values.equals(
-            new Cells(Cell.create("domain_name", ""), Cell.create("response_time", ""), Cell.create("url", ""),
-                Cell.create("response_code", ""), Cell.create("download_time", ""))));
+                new Cells(Cell.create("domain_name", ""), Cell.create("response_time", ""), Cell.create("url", ""),
+                        Cell.create("response_code", ""), Cell.create("download_time", ""))
+        ));
     }
 
     public void testNotEquals() {
         Cells cells = new Cells(Cell.create("domain_name", ""), Cell.create("id2", "", false, true), Cell.create(
-            "response_time", ""), Cell.create("url", ""), Cell.create("id1", "", true, false), Cell.create(
-            "response_code", ""), Cell.create("download_time", ""));
+                "response_time", ""), Cell.create("url", ""), Cell.create("id1", "", true, false), Cell.create(
+                "response_code", ""), Cell.create("download_time", ""));
 
         assertFalse(cells.equals(new Integer(1)));
 

@@ -22,7 +22,7 @@ import com.stratio.deep.entity.IDeepType;
 /**
  * Created by luca on 23/04/14.
  */
-public class BaseTestEntity  implements IDeepType {
+public class BaseTestEntity implements IDeepType {
     @DeepField(isPartOfPartitionKey = true)
     protected String id;
     @DeepField(fieldName = "domain_name")

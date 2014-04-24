@@ -16,6 +16,7 @@
 
 package com.stratio.deep.partition.impl;
 
+import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepInstantiationException;
 
 import java.net.InetAddress;
@@ -23,16 +24,16 @@ import java.net.UnknownHostException;
 import java.util.Comparator;
 
 /**
- * Created by luca on 09/04/14.
+ * Given a list of names of machines, this comparator tries as much as he can
+ * to put the hostname of the local machine on the first position of the list.
  */
 public class DeepPartitionLocationComparator implements Comparator<String> {
     private final InetAddress hostname;
 
-    public InetAddress getHostname() {
-        return hostname;
-    }
-
-    public DeepPartitionLocationComparator(){
+    /**
+     * Default constructor. Automatically tries to resolve the name of the local machine.
+     */
+    public DeepPartitionLocationComparator() {
         try {
             this.hostname = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
@@ -40,6 +41,10 @@ public class DeepPartitionLocationComparator implements Comparator<String> {
         }
     }
 
+    /**
+     * Constucts a comparator using as the name of the local machine the hostname provided.
+     * @param hostname the host name of the current machine.
+     */
     public DeepPartitionLocationComparator(String hostname) {
         try {
             this.hostname = InetAddress.getByName(hostname);
@@ -48,6 +53,9 @@ public class DeepPartitionLocationComparator implements Comparator<String> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int compare(String loc1, String loc2) {
         int result = 0;
@@ -58,20 +66,27 @@ public class DeepPartitionLocationComparator implements Comparator<String> {
 
             if (addr1 == addr2) {
                 result = 0;
-            } else if (addr1.isLoopbackAddress()){
+            } else if (addr1.isLoopbackAddress()) {
                 result = -1;
-            } else if (addr2.isLoopbackAddress()){
+            } else if (addr2.isLoopbackAddress()) {
                 result = 1;
-            } else if (addr1.getHostAddress().equals(hostname.getHostAddress())){
+            } else if (addr1.getHostAddress().equals(hostname.getHostAddress())) {
                 result = -1;
-            } else if (addr2.getHostAddress().equals(hostname.getHostAddress())){
+            } else if (addr2.getHostAddress().equals(hostname.getHostAddress())) {
                 result = 1;
             }
 
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            throw new DeepIOException(e);
         }
 
         return result;
+    }
+
+    /**
+     * @return the host name of the local machine.
+     */
+    public InetAddress getHostname() {
+        return hostname;
     }
 }

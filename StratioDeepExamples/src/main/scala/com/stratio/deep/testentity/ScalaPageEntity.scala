@@ -19,7 +19,6 @@ package com.stratio.deep.testentity
 import org.apache.cassandra.db.marshal._
 import com.stratio.deep.annotations.{DeepEntity, DeepField}
 import scala.beans.BeanProperty
-import java.util.UUID
 import com.stratio.deep.entity.IDeepType
 
 /**

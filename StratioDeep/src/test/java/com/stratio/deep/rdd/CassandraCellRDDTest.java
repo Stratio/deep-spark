@@ -37,7 +37,6 @@ import scala.reflect.ClassTag$;
 import java.util.List;
 
 import static org.testng.Assert.*;
-import static org.testng.Assert.assertEquals;
 
 /**
  * Integration tests for generic cell RDDs.
@@ -45,14 +44,15 @@ import static org.testng.Assert.assertEquals;
 @Test(suiteName = "cassandraRddTests", dependsOnGroups = {"CassandraCql3RDDTest"}, groups = {"CassandraCellRDDTest"})
 public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
     private Logger logger = Logger.getLogger(CassandraCellRDDTest.class);
+
     private static class CellsAbstractSerializableFunction extends AbstractSerializableFunction<Cells, Cells> {
         private static final long serialVersionUID = 78298010100204823L;
 
         @Override
         public Cells apply(Cells e) {
             return new Cells(e.getCellByName("name"), e.getCellByName("gender"), Cell.create("age", 15, false, true),
-                e.getCellByName("animal"), e.getCellByName("password"), e.getCellByName("color"),
-                e.getCellByName("lucene"), e.getCellByName("food"));
+                    e.getCellByName("animal"), e.getCellByName("password"), e.getCellByName("color"),
+                    e.getCellByName("lucene"), e.getCellByName("food"));
         }
     }
 
@@ -68,7 +68,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
             Cells valueCells = cells.getValueCells();
 
             if (indexCells.equals(new Cells(Cell.create("name", "pepito_3", true, false), Cell.create("gender", "male",
-                true, false), Cell.create("age", -2, false, true), Cell.create("animal", "monkey", false, true)))) {
+                    true, false), Cell.create("age", -2, false, true), Cell.create("animal", "monkey", false, true)))) {
                 assertEquals(valueCells.getCellByName("password").getCellValue(), "abc");
                 assertNull(valueCells.getCellByName("color").getCellValue());
                 assertEquals(valueCells.getCellByName("food").getCellValue(), "donuts");
@@ -87,7 +87,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
 
     protected void checkOutputTestData() {
         Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+                .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
         Session session = cluster.connect();
 
         String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + CQL3_OUTPUT_COLUMN_FAMILY + ";";
@@ -108,7 +108,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
     @Override
     protected void checkSimpleTestData() {
         Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-            .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+                .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
         Session session = cluster.connect();
 
         String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + CQL3_OUTPUT_COLUMN_FAMILY + ";";
@@ -116,7 +116,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
         assertEquals(rs.one().getLong(0), 20);
 
         command = "select * from " + OUTPUT_KEYSPACE_NAME + "." + CQL3_OUTPUT_COLUMN_FAMILY
-            + " WHERE name = 'pepito_1' and gender = 'male' and age = 0  and animal = 'monkey';";
+                + " WHERE name = 'pepito_1' and gender = 'male' and age = 0  and animal = 'monkey';";
         rs = session.execute(command);
 
         List<Row> rows = rs.all();
@@ -141,14 +141,14 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
     @Override
     protected IDeepJobConfig<Cells> initReadConfig() {
         IDeepJobConfig<Cells> rddConfig = DeepJobConfigFactory.create().host(Constants.DEFAULT_CASSANDRA_HOST)
-            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(KEYSPACE_NAME).columnFamily(CQL3_COLUMN_FAMILY)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).initialize();
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(KEYSPACE_NAME).columnFamily(CQL3_COLUMN_FAMILY)
+                .bisectFactor(testBisectFactor).cqlPort(CassandraServer.CASSANDRA_CQL_PORT).initialize();
 
         return rddConfig;
     }
 
     @Test
-    public void testCountWithInputColumns(){
+    public void testCountWithInputColumns() {
         logger.info("testCountWithInputColumns()");
 
         IDeepJobConfig<Cells> tmpConfig = DeepJobConfigFactory.create().host(Constants.DEFAULT_CASSANDRA_HOST)
@@ -172,11 +172,12 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
 
     @Override
     protected IDeepJobConfig<Cells> initWriteConfig() {
-        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig().host(Constants.DEFAULT_CASSANDRA_HOST)
-            .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(OUTPUT_KEYSPACE_NAME)
-            .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).columnFamily(CQL3_OUTPUT_COLUMN_FAMILY)
-            .createTableOnWrite(Boolean.TRUE)
-            .initialize();
+        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig().host(Constants
+                .DEFAULT_CASSANDRA_HOST)
+                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(OUTPUT_KEYSPACE_NAME)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).columnFamily(CQL3_OUTPUT_COLUMN_FAMILY)
+                .createTableOnWrite(Boolean.TRUE)
+                .initialize();
 
         return writeConfig;
     }
@@ -240,7 +241,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
         IDeepJobConfig<Cells> writeConfig = getWriteConfig();
 
         CassandraRDD.cql3SaveRDDToCassandra(
-            getRDD(), writeConfig);
+                getRDD(), writeConfig);
         checkSimpleTestData();
     }
 

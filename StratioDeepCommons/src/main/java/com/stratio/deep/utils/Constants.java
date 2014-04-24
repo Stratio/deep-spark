@@ -31,6 +31,8 @@ public final class Constants {
     public static final int DEFAULT_PAGE_SIZE = 1000;
     public static final int DEFAULT_MAX_PAGE_SIZE = 10000;
 
+    public static final int DEFAULT_BISECT_FACTOR = 1;
+
     private Constants() {
     }
 

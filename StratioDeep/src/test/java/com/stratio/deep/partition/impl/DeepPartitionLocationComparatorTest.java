@@ -33,7 +33,6 @@ import static org.testng.Assert.fail;
 public class DeepPartitionLocationComparatorTest {
 
 
-
     public void testComparator() throws UnknownHostException {
         DeepPartitionLocationComparator comparator = null;
         try {
@@ -46,7 +45,7 @@ public class DeepPartitionLocationComparatorTest {
 
         comparator = new DeepPartitionLocationComparator("localhost");
 
-        String[] locations = new String[] {"google.com", "localhost", "edition.cnn.com" };
+        String[] locations = new String[]{"google.com", "localhost", "edition.cnn.com"};
 
         Arrays.sort(locations, comparator);
 
@@ -56,21 +55,21 @@ public class DeepPartitionLocationComparatorTest {
 
         Arrays.sort(locations, comparator);
 
-        assertArrayEquals(new String[]{ "localhost","edition.cnn.com", "google.com"}, locations);
+        assertArrayEquals(new String[]{"localhost", "edition.cnn.com", "google.com"}, locations);
 
         comparator = new DeepPartitionLocationComparator("edition.cnn.com");
 
-        locations = new String[] {"google.com", "edition.cnn.com", "localhost"};
+        locations = new String[]{"google.com", "edition.cnn.com", "localhost"};
         Arrays.sort(locations, comparator);
 
-        assertArrayEquals(new String[]{ "localhost","edition.cnn.com", "google.com"}, locations);
+        assertArrayEquals(new String[]{"localhost", "edition.cnn.com", "google.com"}, locations);
 
         comparator = new DeepPartitionLocationComparator();
 
         String hostname = InetAddress.getLocalHost().getHostName();
-        locations = new String[] { "google.com", "edition.cnn.com", hostname };
+        locations = new String[]{"google.com", "edition.cnn.com", hostname};
         Arrays.sort(locations, comparator);
 
-        assertArrayEquals(new String[]{ hostname,"google.com", "edition.cnn.com"}, locations);
+        assertArrayEquals(new String[]{hostname, "google.com", "edition.cnn.com"}, locations);
     }
 }

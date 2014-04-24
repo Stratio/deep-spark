@@ -42,7 +42,6 @@ import java.util.zip.GZIPInputStream;
 
 import static com.stratio.deep.utils.Utils.quote;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
 
 /**
  * Base class for all Deep Examples integration tests.
@@ -62,34 +61,36 @@ public class AbstractDeepExamplesTest {
 
     private static final String createTweetCF = String.format(
             "CREATE TABLE %s (" +
-            "  tweet_id uuid PRIMARY KEY," +
-            "  tweet_date timestamp," +
-            "  author text," +
-            "  hashtags set<text>," +
-            "  favorite_count int," +
-            "  content text," +
-            "  truncated boolean" +
-            ");", TWEETS_COLUMN_FAMILY);
+                    "  tweet_id uuid PRIMARY KEY," +
+                    "  tweet_date timestamp," +
+                    "  author text," +
+                    "  hashtags set<text>," +
+                    "  favorite_count int," +
+                    "  content text," +
+                    "  truncated boolean" +
+                    ");", TWEETS_COLUMN_FAMILY
+    );
 
     private static final String createCrawlerCF = String.format(
-            "CREATE TABLE %s.\"%s\" (\n"+
-            " key text,\n"+
-            " \"___class\" text,\n"+
-            " charset text,\n"+
-            " content text,\n"+
-            " \"domainName\" text,\n"+
-            " \"downloadTime\" bigint,\n"+
-            " \"enqueuedForTransforming\" bigint,\n"+
-            " etag text,\n"+
-            " \"firstDownloadTime\" bigint,\n"+
-            " \"lastModified\" text,\n"+
-            " \"responseCode\" varint,\n"+
-            " \"responseTime\" bigint,\n"+
-            " \"timeTransformed\" bigint,\n"+
-            " title text,\n"+
-            " url text,\n"+
-            " PRIMARY KEY (key)\n"+
-            ");", CRAWLER_KEYSPACE_NAME, CRAWLER_COLUMN_FAMILY);
+            "CREATE TABLE %s.\"%s\" (\n" +
+                    " key text,\n" +
+                    " \"___class\" text,\n" +
+                    " charset text,\n" +
+                    " content text,\n" +
+                    " \"domainName\" text,\n" +
+                    " \"downloadTime\" bigint,\n" +
+                    " \"enqueuedForTransforming\" bigint,\n" +
+                    " etag text,\n" +
+                    " \"firstDownloadTime\" bigint,\n" +
+                    " \"lastModified\" text,\n" +
+                    " \"responseCode\" varint,\n" +
+                    " \"responseTime\" bigint,\n" +
+                    " \"timeTransformed\" bigint,\n" +
+                    " title text,\n" +
+                    " url text,\n" +
+                    " PRIMARY KEY (key)\n" +
+                    ");", CRAWLER_KEYSPACE_NAME, CRAWLER_COLUMN_FAMILY
+    );
 
     @BeforeSuite
     protected void initContextAndServer() throws ConfigurationException, IOException, InterruptedException {
@@ -105,7 +106,7 @@ public class AbstractDeepExamplesTest {
         String useKeyspace = "USE " + KEYSPACE_NAME + ";";
 
         String[] startupCommands =
-                new String[] {createKeyspace, createCrawlerKeyspace, useKeyspace, createTweetCF, createCrawlerCF};
+                new String[]{createKeyspace, createCrawlerKeyspace, useKeyspace, createTweetCF, createCrawlerCF};
 
         cassandraServer = new CassandraServer();
         cassandraServer.setStartupCommands(startupCommands);
@@ -133,7 +134,7 @@ public class AbstractDeepExamplesTest {
 
     @AfterSuite
     protected void disposeServerAndRdd() throws IOException {
-        if (session != null){
+        if (session != null) {
             session.close();
         }
 
@@ -153,7 +154,8 @@ public class AbstractDeepExamplesTest {
         List<Insert> inserts = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String[] names = new String[]{"tweet_id", "tweet_date", "author", "hashtags", "favorite_count", "content", "truncated"};
+        String[] names = new String[]{"tweet_id", "tweet_date", "author", "hashtags", "favorite_count", "content",
+                "truncated"};
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(
                 new File(tweetsTestData.toURI()))))) {
 
@@ -167,7 +169,7 @@ public class AbstractDeepExamplesTest {
                 values[0] = UUID.fromString(fields[0]);
                 values[1] = sdf.parse(fields[1]);
                 values[2] = fields[2];
-                if ( fields[3].length() > 2 ) {
+                if (fields[3].length() > 2) {
                     String[] hashtags = fields[3].substring(1, fields[3].length() - 2).split(",");
                     values[3] = new HashSet<String>(Arrays.asList(hashtags));
                 } else {
@@ -177,7 +179,7 @@ public class AbstractDeepExamplesTest {
                 values[5] = fields[5];
                 values[6] = Boolean.parseBoolean(fields[6]);
 
-                Insert insert = QueryBuilder.insertInto(KEYSPACE_NAME,TWEETS_COLUMN_FAMILY)
+                Insert insert = QueryBuilder.insertInto(KEYSPACE_NAME, TWEETS_COLUMN_FAMILY)
                         .values(names, values);
 
                 inserts.add(insert);
@@ -195,7 +197,8 @@ public class AbstractDeepExamplesTest {
                 "\"downloadTime\"", "\"enqueuedForTransforming\"", "etag", "\"firstDownloadTime\"",
                 "\"lastModified\"", "\"responseCode\"", "\"responseTime\"", "\"timeTransformed\"", "title", "url"};
 
-        try (CSVReader reader = new CSVReader(new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(
+        try (CSVReader reader = new CSVReader(new BufferedReader(new InputStreamReader(new GZIPInputStream(new
+                FileInputStream(
                 new File(crawlerTestData.toURI()))))))) {
 
             String[] fields;
@@ -222,12 +225,12 @@ public class AbstractDeepExamplesTest {
                     values[13] = ne(fields[13]);
                     values[14] = ne(fields[14]);
 
-                    Insert insert = QueryBuilder.insertInto(CRAWLER_KEYSPACE_NAME,quote(CRAWLER_COLUMN_FAMILY))
+                    Insert insert = QueryBuilder.insertInto(CRAWLER_KEYSPACE_NAME, quote(CRAWLER_COLUMN_FAMILY))
                             .values(names, values);
 
                     inserts.add(insert);
                 } catch (NumberFormatException e) {
-                    logger.error("Cannot parse line: "+fields);
+                    logger.error("Cannot parse line: " + fields);
                 }
             }
 
@@ -240,8 +243,8 @@ public class AbstractDeepExamplesTest {
 
     }
 
-    private String ne(String val){
-        if (StringUtils.isEmpty(val)){
+    private String ne(String val) {
+        if (StringUtils.isEmpty(val)) {
             return null;
         }
         return val.trim();

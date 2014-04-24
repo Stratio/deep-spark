@@ -27,7 +27,10 @@ import com.stratio.deep.functions.CellList2TupleFunction;
 import com.stratio.deep.functions.DeepType2TupleFunction;
 import com.stratio.deep.partition.impl.DeepPartition;
 import org.apache.cassandra.utils.Pair;
-import org.apache.spark.*;
+import org.apache.spark.InterruptibleIterator;
+import org.apache.spark.Partition;
+import org.apache.spark.SparkContext;
+import org.apache.spark.TaskContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.rdd.RDD;
@@ -38,17 +41,16 @@ import scala.runtime.AbstractFunction0;
 import scala.runtime.BoxedUnit;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static scala.collection.JavaConversions.asScalaBuffer;
 import static scala.collection.JavaConversions.asScalaIterator;
 
 /**
  * Base class that abstracts the complexity of interacting with the Cassandra Datastore.<br/>
- * Implementors should only provide a way to convert an object of type T to a {@link com.stratio.deep.entity.Cells} element.
+ * Implementors should only provide a way to convert an object of type T to a {@link com.stratio.deep.entity.Cells}
+ * element.
  */
 public abstract class CassandraRDD<T> extends RDD<T> {
 
@@ -90,8 +92,6 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
         @Override
         public R apply() {
-            //log().debug("Closing context for partition " + deepPartition);
-
             recordReader.close();
 
             return null;
@@ -101,7 +101,8 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
     /**
      * Persists the given RDD to the underlying Cassandra datastore using the java cql3 driver.<br/>
-     * Beware: this method does not perform a distributed write as {@link  #saveRDDToCassandra(org.apache.spark.rdd.RDD, com.stratio.deep.config.IDeepJobConfig)}
+     * Beware: this method does not perform a distributed write as {@link  #saveRDDToCassandra(org.apache.spark.rdd
+     * .RDD, com.stratio.deep.config.IDeepJobConfig)}
      * does, uses the Datastax Java Driver to perform a batch write to the Cassandra server.<br/>
      * This currently scans the partitions one by one, so it will be slow if a lot of partitions are required.
      *

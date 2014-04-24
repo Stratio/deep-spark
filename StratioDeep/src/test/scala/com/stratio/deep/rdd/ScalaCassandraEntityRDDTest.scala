@@ -79,7 +79,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
         AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME + "." + AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY)
     }
     catch {
-      case e:Exception =>
+      case e: Exception =>
 
     };
 

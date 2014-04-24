@@ -16,30 +16,31 @@
 
 package com.stratio.deep.examples.java;
 
-import java.util.List;
-
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.rdd.CassandraJavaRDD;
+import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 
+import java.util.List;
+
 /**
  * Author: Emmanuelle Raffenne
  * Date..: 14-feb-2014
  */
 public final class GroupingByKey {
-    private static Logger logger = Logger.getLogger(GroupingByKey.class);
+    private static final Logger LOG = Logger.getLogger(GroupingByKey.class);
     private static List<Tuple2<String, Integer>> result;
     private static int authors;
     private static int total;
 
-    private GroupingByKey(){}
+    private GroupingByKey() {
+    }
 
     /**
      * Application entry point.
@@ -47,10 +48,7 @@ public final class GroupingByKey {
      * @param args the arguments passed to the application.
      */
     public static void main(String[] args) {
-
         doMain(args);
-
-        System.exit(0);
     }
 
     /**
@@ -66,7 +64,8 @@ public final class GroupingByKey {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), new String[]{p.getJar()});
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+                new String[]{p.getJar()});
 
 
         // Creating a configuration for the RDD and initialize it
@@ -79,18 +78,19 @@ public final class GroupingByKey {
         CassandraJavaRDD<TweetEntity> rdd = deepContext.cassandraJavaRDD(config);
 
         // creating a key-value pairs RDD
-        JavaPairRDD<String,TweetEntity> pairsRDD = rdd.map(new PairFunction<TweetEntity, String, TweetEntity>() {
+        JavaPairRDD<String, TweetEntity> pairsRDD = rdd.map(new PairFunction<TweetEntity, String, TweetEntity>() {
             @Override
-            public Tuple2<String, TweetEntity> call(TweetEntity t){
-                return new Tuple2<String,TweetEntity>(t.getAuthor(),t);
+            public Tuple2<String, TweetEntity> call(TweetEntity t) {
+                return new Tuple2<String, TweetEntity>(t.getAuthor(), t);
             }
         });
 
 // grouping
-        JavaPairRDD<String,List<TweetEntity>> groups = pairsRDD.groupByKey();
+        JavaPairRDD<String, List<TweetEntity>> groups = pairsRDD.groupByKey();
 
 // counting elements in groups
-        JavaPairRDD<String,Integer> counts = groups.map(new PairFunction<Tuple2<String, List<TweetEntity>>, String, Integer>() {
+        JavaPairRDD<String, Integer> counts = groups.map(new PairFunction<Tuple2<String, List<TweetEntity>>, String,
+                Integer>() {
             @Override
             public Tuple2<String, Integer> call(Tuple2<String, List<TweetEntity>> t) {
                 return new Tuple2<String, Integer>(t._1(), t._2().size());
@@ -100,16 +100,16 @@ public final class GroupingByKey {
 // fetching results
         result = counts.collect();
 
-        System.out.println("Este es el resultado con groupByKey: ");
+        LOG.info("Este es el resultado con groupByKey: ");
         total = 0;
         authors = 0;
         for (Tuple2<String, Integer> t : result) {
             total = total + t._2();
             authors = authors + 1;
-            logger.info( t._1() + ": " + t._2().toString() );
+            LOG.info(t._1() + ": " + t._2().toString());
         }
 
-        logger.info("Autores: " + authors + " total: " + total);
+        LOG.info("Autores: " + authors + " total: " + total);
 
         deepContext.stop();
     }

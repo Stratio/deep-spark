@@ -59,6 +59,27 @@ public class DeepPartition implements Partition {
         this.idx = idx;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DeepPartition that = (DeepPartition) o;
+
+        if (idx != that.idx) {
+            return false;
+        }
+        if (rddId != that.rddId) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -79,6 +100,7 @@ public class DeepPartition implements Partition {
 
     /**
      * Returns the Cassandra split
+     *
      * @return
      */
     public DeepTokenRange splitWrapper() {

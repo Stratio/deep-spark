@@ -31,6 +31,12 @@ public final class DeepJobConfigFactory implements Serializable {
     private static final long serialVersionUID = -4559130919203819088L;
 
     /**
+     * private constructor
+     */
+    private DeepJobConfigFactory() {
+    }
+
+    /**
      * Creates a new cell-based job configuration object.
      *
      * @return

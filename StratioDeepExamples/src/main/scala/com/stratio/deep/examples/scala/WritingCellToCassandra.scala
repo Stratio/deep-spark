@@ -18,7 +18,6 @@ package com.stratio.deep.examples.scala
 
 import com.stratio.deep.context.DeepSparkContext
 import com.stratio.deep.config.DeepJobConfigFactory
-import com.stratio.deep.testentity._
 import com.stratio.deep.rdd.CassandraRDD
 import org.apache.spark.rdd.RDD
 
@@ -32,52 +31,55 @@ import com.stratio.deep.entity.{Cell, Cells}
  */
 
 object WritingCellToCassandra {
-    def main (args:Array[String]) {
+  def main(args: Array[String]) {
 
-        val job = "scala:writingCellsToCassandra"
+    val job = "scala:writingCellsToCassandra"
 
-        val inputKeyspaceName = "crawler"
-        val inputTableName = "Page"
-        val outputKeyspaceName = "crawler"
-        val outputTableName = "newlistdomains"
+    val inputKeyspaceName = "crawler"
+    val inputTableName = "Page"
+    val outputKeyspaceName = "crawler"
+    val outputTableName = "newlistdomains"
 
-        // Creating the Deep Context where args are Spark Master and Job Name
-        val p = new ContextProperties(args)
-        val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, Array(p.getJar))
+    // Creating the Deep Context where args are Spark Master and Job Name
+    val p = new ContextProperties(args)
+    val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, Array(p.getJar))
 
-        // --- INPUT RDD
-        val inputConfig = DeepJobConfigFactory.create()
-          .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
-                .keyspace(inputKeyspaceName).table(inputTableName)
-                .initialize
+    // --- INPUT RDD
+    val inputConfig = DeepJobConfigFactory.create()
+      .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
+      .keyspace(inputKeyspaceName).table(inputTableName)
+      .initialize
 
-        val inputRDD: CassandraRDD[Cells] = deepContext.cassandraGenericRDD(inputConfig)
+    val inputRDD: CassandraRDD[Cells] = deepContext.cassandraGenericRDD(inputConfig)
 
-        val pairRDD: RDD[(String, Cells)] = inputRDD map {
-            c:Cells => (c.getCellByName("domainName").getCellValue.asInstanceOf[String], c)
-        }
-
-        val numPerKey: RDD[(String, Integer)] = pairRDD.groupByKey
-                .map { t:(String, Seq[Cells]) => (t._1, t._2.size)}
-
-
-        // -------------------------------- OUTPUT to Cassandra
-        // Creating a configuration for the output RDD and initialize it
-        // --- OUTPUT RDD
-        val outputConfig = DeepJobConfigFactory.createWriteConfig()
-          .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
-                .keyspace(outputKeyspaceName).table(outputTableName).createTableOnWrite(true)
-                .initialize
-
-        val outputRDD: RDD[Cells] = numPerKey map { t: (String, Integer) =>
-            val c1 = Cell.create("domain", t._1, true, false);
-            val c2 = Cell.create("num_pages", t._2);
-            new Cells(c1, c2)
-        }
-
-        CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig)
-
-        System.exit(0)
+    val pairRDD: RDD[(String, Cells)] = inputRDD map {
+      c: Cells => (c.getCellByName("domainName").getCellValue.asInstanceOf[String], c)
     }
+
+    val numPerKey: RDD[(String, Integer)] = pairRDD.groupByKey
+      .map {
+      t: (String, Seq[Cells]) => (t._1, t._2.size)
+    }
+
+
+    // -------------------------------- OUTPUT to Cassandra
+    // Creating a configuration for the output RDD and initialize it
+    // --- OUTPUT RDD
+    val outputConfig = DeepJobConfigFactory.createWriteConfig()
+      .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
+      .keyspace(outputKeyspaceName).table(outputTableName).createTableOnWrite(true)
+      .initialize
+
+    val outputRDD: RDD[Cells] = numPerKey map {
+      t: (String, Integer) =>
+        val c1 = Cell.create("domain", t._1, true, false);
+        val c2 = Cell.create("num_pages", t._2);
+        new Cells(c1, c2)
+    }
+
+    CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig)
+
+    System.exit(0)
+  }
 
 }

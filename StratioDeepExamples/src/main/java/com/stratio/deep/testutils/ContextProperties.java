@@ -20,7 +20,7 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * Common properties used by the examples.
- *
+ * <p/>
  * Author: Emmanuelle Raffenne
  * Date..: 26-feb-2014
  */
@@ -63,17 +63,19 @@ public class ContextProperties {
 
         String sparkHomeProp = System.getProperty("sparkHome");
         String sparkMaster = System.getProperty("sparkMaster");
-        String deepVersionProp = StringUtils.isNotEmpty(System.getProperty("deepVersion"))?System.getProperty("deepVersion"):"0.1.3-SNAPSHOT";
+        String deepVersionProp = StringUtils.isNotEmpty(System.getProperty("deepVersion")) ? System.getProperty
+                ("deepVersion") : "0.1.3-SNAPSHOT";
         String cassandraHostProp = System.getProperty("cassandraHost");
         String cassandraCqlPortProp = System.getProperty("cassandraCqlPort");
         String cassandraThriftPortProp = System.getProperty("cassandraThriftPort");
 
-        cluster = StringUtils.isNotEmpty(sparkMaster) ? sparkMaster :"local";
+        cluster = StringUtils.isNotEmpty(sparkMaster) ? sparkMaster : "local";
         sparkHome = StringUtils.isNotEmpty(sparkHomeProp) ? sparkHomeProp : "/opt/SDS/deep";
-        jar = "/tmp/StratioDeepExamples-"+deepVersionProp+".jar";
-        cassandraHost = StringUtils.isNotEmpty(cassandraHostProp) ? cassandraHostProp: "localhost";
+        jar = "/tmp/StratioDeepExamples-" + deepVersionProp + ".jar";
+        cassandraHost = StringUtils.isNotEmpty(cassandraHostProp) ? cassandraHostProp : "localhost";
         cassandraCqlPort = StringUtils.isNotEmpty(cassandraCqlPortProp) ? Integer.parseInt(cassandraCqlPortProp) : 9042;
-        cassandraThriftPort = StringUtils.isNotEmpty(cassandraThriftPortProp) ? Integer.parseInt(cassandraThriftPortProp) : 9160;
+        cassandraThriftPort = StringUtils.isNotEmpty(cassandraThriftPortProp) ? Integer.parseInt
+                (cassandraThriftPortProp) : 9160;
     }
 
     /**
@@ -82,7 +84,7 @@ public class ContextProperties {
     public ContextProperties(String[] args) {
         this();
 
-        if (args != null && args.length > 0){
+        if (args != null && args.length > 0) {
             cluster = args[0];
             sparkHome = args[1];
             jar = args[2];
@@ -113,6 +115,7 @@ public class ContextProperties {
     public int getCassandraCqlPort() {
         return cassandraCqlPort;
     }
+
     public int getCassandraThriftPort() {
         return cassandraThriftPort;
     }

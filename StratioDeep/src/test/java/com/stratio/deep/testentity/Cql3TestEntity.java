@@ -61,7 +61,7 @@ public class Cql3TestEntity implements IDeepType {
     }
 
     public Cql3TestEntity(String name, String password, String color, String gender, String food, String animal,
-        String lucene) {
+                          String lucene) {
         this.name = name;
         this.password = password;
         this.color = color;

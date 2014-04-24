@@ -16,11 +16,11 @@
 
 package com.stratio.deep.utils;
 
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.exception.DeepIOException;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.TimeUUIDType;
 import org.apache.cassandra.db.marshal.UUIDType;
@@ -49,7 +49,8 @@ public final class Utils {
 
     /**
      * Utility method that converts an IDeepType to tuple of two Cells.<br/>
-     * The first Cells element contains the list of Cell elements that represent the key (partition + cluster key). <br/>
+     * The first Cells element contains the list of Cell elements that represent the key (partition + cluster key).
+     * <br/>
      * The second Cells element contains all the other columns.
      *
      * @param cells
@@ -214,15 +215,15 @@ public final class Utils {
      * @return
      */
     public static String createTableQueryGenerator(Cells keys, Cells values, String outputKeyspace,
-        String outputColumnFamily) {
+                                                   String outputColumnFamily) {
 
         if (keys == null || StringUtils.isEmpty(outputKeyspace)
-            || StringUtils.isEmpty(outputColumnFamily)) {
+                || StringUtils.isEmpty(outputColumnFamily)) {
             throw new DeepGenericException("keys, outputKeyspace and outputColumnFamily cannot be null");
         }
 
-        StringBuffer sb = new StringBuffer("CREATE TABLE ").append(outputKeyspace)
-            .append(".").append(outputColumnFamily).append(" (");
+        StringBuilder sb = new StringBuilder("CREATE TABLE ").append(outputKeyspace)
+                .append(".").append(outputColumnFamily).append(" (");
 
         List<String> partitionKey = new ArrayList<>();
         List<String> clusterKey = new ArrayList<>();
@@ -254,7 +255,7 @@ public final class Utils {
             }
         }
 
-        StringBuffer partitionKeyToken = new StringBuffer("(");
+        StringBuilder partitionKeyToken = new StringBuilder("(");
 
         isFirstField = true;
         for (String s : partitionKey) {
@@ -267,7 +268,7 @@ public final class Utils {
 
         partitionKeyToken.append(")");
 
-        StringBuffer clusterKeyToken = new StringBuffer("");
+        StringBuilder clusterKeyToken = new StringBuilder("");
 
         isFirstField = true;
         for (String s : clusterKey) {
@@ -278,15 +279,15 @@ public final class Utils {
             isFirstField = false;
         }
 
-        StringBuffer keyPart = new StringBuffer(", PRIMARY KEY ");
+        StringBuilder keyPart = new StringBuilder(", PRIMARY KEY ");
 
-        if (clusterKey.size() > 0) {
+        if (!clusterKey.isEmpty()) {
             keyPart.append("(");
         }
 
         keyPart.append(partitionKeyToken);
 
-        if (clusterKey.size() > 0) {
+        if (!clusterKey.isEmpty()) {
             keyPart.append(", ");
             keyPart.append(clusterKeyToken);
             keyPart.append(")");
@@ -308,10 +309,10 @@ public final class Utils {
      * @return
      */
     public static String updateQueryGenerator(Cells keys, Cells values, String outputKeyspace,
-        String outputColumnFamily) {
+                                              String outputColumnFamily) {
 
         StringBuilder sb = new StringBuilder("UPDATE ").append(outputKeyspace).append(".").append(outputColumnFamily)
-            .append(" SET ");
+                .append(" SET ");
 
         int k = 0;
 
@@ -351,7 +352,7 @@ public final class Utils {
      * @return
      */
     public static String batchQueryGenerator(List<String> statements) {
-        StringBuffer sb = new StringBuffer("BEGIN BATCH \n");
+        StringBuilder sb = new StringBuilder("BEGIN BATCH \n");
 
         for (int i = 0; i < statements.size(); i++) {
             String statement = statements.get(i);
@@ -400,15 +401,15 @@ public final class Utils {
      * resolve the setter following Scala's naming conventions.
      *
      * @param propertyName the field name of the property whose setter we want to resolve.
-     * @param entityClass the bean class object in which we want to search for the setter.
-     * @param valueType the class type of the object that we want to pass to the setter.
+     * @param entityClass  the bean class object in which we want to search for the setter.
+     * @param valueType    the class type of the object that we want to pass to the setter.
      * @return
      */
     public static Method findSetter(String propertyName, Class entityClass, Class valueType) {
         Method setter;
 
         String setterName = "set" + propertyName.substring(0, 1).toUpperCase() +
-            propertyName.substring(1);
+                propertyName.substring(1);
 
         try {
             setter = entityClass.getMethod(setterName, valueType);
@@ -432,7 +433,7 @@ public final class Utils {
      * @return an instance of the Cassandra validator that matches the provided object.
      * @throws com.stratio.deep.exception.DeepGenericException if no validator can be found for the specified object.
      */
-    public static <T> AbstractType<?> marshallerInstance(T obj){
+    public static <T> AbstractType<?> marshallerInstance(T obj) {
         AbstractType<?> abstractType = MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(obj.getClass());
 
         if (obj instanceof UUID) {
@@ -447,7 +448,8 @@ public final class Utils {
         }
 
         if (abstractType == null) {
-            throw new DeepGenericException("parameter class " + obj.getClass().getCanonicalName() + " does not have a Cassandra marshaller");
+            throw new DeepGenericException("parameter class " + obj.getClass().getCanonicalName() + " does not have a" +
+                    " Cassandra marshaller");
         }
 
         return abstractType;
@@ -459,7 +461,7 @@ public final class Utils {
      * @param location
      * @return
      */
-    public static InetAddress inetAddressFromLocation(String location){
+    public static InetAddress inetAddressFromLocation(String location) {
         try {
             return InetAddress.getByName(location);
         } catch (UnknownHostException e) {
@@ -476,7 +478,7 @@ public final class Utils {
 
     private static Field[] getAllFieldsRec(Class clazz, List<Field> fields) {
         Class superClazz = clazz.getSuperclass();
-        if(superClazz != null){
+        if (superClazz != null) {
             getAllFieldsRec(superClazz, fields);
         }
 

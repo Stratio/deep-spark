@@ -16,13 +16,11 @@
 
 package com.stratio.deep.examples.java;
 
-import java.util.List;
-
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.rdd.CassandraJavaRDD;
+import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -32,12 +30,14 @@ import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 import scala.Tuple3;
 
+import java.util.List;
+
 /**
  * Author: Emmanuelle Raffenne
  * Date..: 13-feb-2014
  */
 public class AggregatingData {
-    private static Logger logger = Logger.getLogger(AggregatingData.class);
+    private static final Logger LOG = Logger.getLogger(AggregatingData.class);
 
     /* used to perform external tests */
     private static Double avg;
@@ -45,7 +45,8 @@ public class AggregatingData {
     private static Double stddev;
     private static Double count;
 
-    private AggregatingData(){}
+    private AggregatingData() {
+    }
 
     /**
      * Application entry point.
@@ -54,7 +55,6 @@ public class AggregatingData {
      */
     public static void main(String[] args) {
         doMain(args);
-        System.exit(0);
     }
 
     /**
@@ -70,7 +70,8 @@ public class AggregatingData {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), new String[]{p.getJar()});
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+                new String[]{p.getJar()});
 
         // Creating a configuration for the RDD and initialize it
         IDeepJobConfig<TweetEntity> config = DeepJobConfigFactory.create(TweetEntity.class)
@@ -82,7 +83,7 @@ public class AggregatingData {
         CassandraJavaRDD<TweetEntity> rdd = deepContext.cassandraJavaRDD(config);
 
         // grouping to get key-value pairs
-        JavaPairRDD<String,Integer> groups = rdd.groupBy(new Function<TweetEntity, String>() {
+        JavaPairRDD<String, Integer> groups = rdd.groupBy(new Function<TweetEntity, String>() {
             @Override
             public String call(TweetEntity tableEntity) {
                 return tableEntity.getAuthor();
@@ -96,23 +97,27 @@ public class AggregatingData {
 
         // aggregating
         Double zero = new Double(0);
-        Tuple3<Double, Double, Double> initValues = new Tuple3<Double, Double, Double>(zero,zero,zero);
+        Tuple3<Double, Double, Double> initValues = new Tuple3<Double, Double, Double>(zero, zero, zero);
         Tuple3<Double, Double, Double> results = groups.aggregate(initValues,
-                new Function2<Tuple3<Double, Double, Double>, Tuple2<String, Integer>, Tuple3<Double, Double, Double>>() {
+                new Function2<Tuple3<Double, Double, Double>, Tuple2<String, Integer>, Tuple3<Double, Double,
+                        Double>>() {
                     @Override
-                    public Tuple3<Double, Double, Double> call(Tuple3<Double, Double, Double> n, Tuple2<String, Integer> t) {
+                    public Tuple3<Double, Double, Double> call(Tuple3<Double, Double, Double> n, Tuple2<String,
+                            Integer> t) {
                         Double sumOfX = n._1() + t._2();
                         Double numOfX = n._2() + 1;
-                        Double sumOfSquares = n._3() + Math.pow(t._2(),2);
+                        Double sumOfSquares = n._3() + Math.pow(t._2(), 2);
                         return new Tuple3<Double, Double, Double>(sumOfX, numOfX, sumOfSquares);
                     }
-                }, new Function2<Tuple3<Double, Double, Double>, Tuple3<Double, Double, Double>, Tuple3<Double, Double, Double>>() {
+                }, new Function2<Tuple3<Double, Double, Double>, Tuple3<Double, Double, Double>, Tuple3<Double,
+                        Double, Double>>() {
                     @Override
-                    public Tuple3<Double, Double, Double> call(Tuple3<Double, Double, Double> a, Tuple3<Double, Double, Double> b)  {
+                    public Tuple3<Double, Double, Double> call(Tuple3<Double, Double, Double> a, Tuple3<Double,
+                            Double, Double> b) {
                         Double sumOfX = a._1() + b._1();
                         Double numOfX = a._2() + b._2();
                         Double sumOfSquares = a._3() + b._3();
-                        return new Tuple3<Double, Double, Double>(sumOfX,numOfX, sumOfSquares);
+                        return new Tuple3<Double, Double, Double>(sumOfX, numOfX, sumOfSquares);
                     }
                 }
         );
@@ -124,13 +129,13 @@ public class AggregatingData {
 
         count = sumOfX;
         avg = sumOfX / numOfX;
-        variance = (sumOfSquares / numOfX) - Math.pow(avg,2);
+        variance = (sumOfSquares / numOfX) - Math.pow(avg, 2);
         stddev = Math.sqrt(variance);
 
-        logger.info("Results: (" + sumOfX.toString() + ", " + numOfX.toString() + ", " + sumOfSquares.toString() + ")" );
-        logger.info("average: " + avg.toString());
-        logger.info("variance: " + variance.toString());
-        logger.info("stddev: " + stddev.toString());
+        LOG.info("Results: (" + sumOfX.toString() + ", " + numOfX.toString() + ", " + sumOfSquares.toString() + ")");
+        LOG.info("average: " + avg.toString());
+        LOG.info("variance: " + variance.toString());
+        LOG.info("stddev: " + stddev.toString());
 
         deepContext.stop();
     }

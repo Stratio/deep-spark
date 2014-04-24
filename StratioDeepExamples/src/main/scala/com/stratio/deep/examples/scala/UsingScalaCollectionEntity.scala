@@ -59,11 +59,10 @@ object UsingScalaCollectionEntity {
       doMain(args, deepContext, p)
     } finally {
       deepContext.stop
-      System.exit(0)
     }
   }
 
-  private def doMain(args: Array[String], deepContext: DeepSparkContext, p:ContextProperties) = {
+  private def doMain(args: Array[String], deepContext: DeepSparkContext, p: ContextProperties) = {
 
     // Configuration and initialization
     val config: IDeepJobConfig[ScalaCollectionEntity] = DeepJobConfigFactory.create(classOf[ScalaCollectionEntity])

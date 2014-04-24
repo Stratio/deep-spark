@@ -16,8 +16,8 @@
 
 package com.stratio.deep.rdd;
 
-import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.EntityDeepJobConfig;
+import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
