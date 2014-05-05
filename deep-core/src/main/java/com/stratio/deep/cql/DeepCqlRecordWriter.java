@@ -171,7 +171,9 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         ResultSet resultSet = sessionWithHost.left.execute(formatted);
         Row row = resultSet.one();
 
-        LOG.info("Obtained resultset, is row null?: " + (row==null));
+        if (row == null){
+            throw new IllegalArgumentException(String.format("cannot find metadata for %s.%s", keyspace, cfName));
+        }
 
         String validator = row.getString("key_validator");
         keyValidator = parseType(validator);
