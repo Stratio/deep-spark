@@ -22,18 +22,18 @@ import com.stratio.deep.entity.IDeepType;
 /**
  * Created by luca on 23/04/14.
  */
-public class BaseTestEntity implements IDeepType {
+public class CommonsBaseTestEntity implements IDeepType {
     @DeepField(isPartOfPartitionKey = true)
     protected String id;
     @DeepField(fieldName = "domain_name")
     protected String domain;
 
-    public BaseTestEntity(String id, String domain) {
+    public CommonsBaseTestEntity(String id, String domain) {
         this.id = id;
         this.domain = domain;
     }
 
-    public BaseTestEntity() {
+    public CommonsBaseTestEntity() {
 
     }
 

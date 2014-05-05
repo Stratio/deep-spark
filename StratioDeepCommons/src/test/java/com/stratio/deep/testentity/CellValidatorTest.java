@@ -177,7 +177,7 @@ public class CellValidatorTest {
         assertNull(cv.getValidatorTypes());
         assertEquals(cv.validatorKind(), Kind.NOT_A_COLLECTION);
 
-        Field emails = TestEntity.class.getDeclaredField("emails");
+        Field emails = CommonsTestEntity.class.getDeclaredField("emails");
 
         cv = CellValidator.cellValidator(emails);
         assertNotNull(cv);
@@ -189,7 +189,7 @@ public class CellValidatorTest {
         Iterator<String> iter = cv.getValidatorTypes().iterator();
         assertEquals(iter.next(), "text");
 
-        Field phones = TestEntity.class.getDeclaredField("phones");
+        Field phones = CommonsTestEntity.class.getDeclaredField("phones");
 
         cv = CellValidator.cellValidator(phones);
         assertNotNull(cv);
@@ -201,7 +201,7 @@ public class CellValidatorTest {
         iter = cv.getValidatorTypes().iterator();
         assertEquals(iter.next(), "text");
 
-        Field uuid2id = TestEntity.class.getDeclaredField("uuid2id");
+        Field uuid2id = CommonsTestEntity.class.getDeclaredField("uuid2id");
 
         cv = CellValidator.cellValidator(uuid2id);
         assertNotNull(cv);

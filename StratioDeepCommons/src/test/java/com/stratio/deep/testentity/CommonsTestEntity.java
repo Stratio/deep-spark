@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @DeepEntity
-public class TestEntity extends BaseTestEntity {
+public class CommonsTestEntity extends CommonsBaseTestEntity {
     private static final long serialVersionUID = -6242942929275890323L;
 
     @DeepField
@@ -80,12 +80,12 @@ public class TestEntity extends BaseTestEntity {
     @DeepField(validationClass = MapType.class)
     private Map<UUID, Integer> uuid2id;
 
-    public TestEntity() {
+    public CommonsTestEntity() {
         super();
     }
 
-    public TestEntity(String id, String domain, String url, Integer responseTime, Integer responseCode,
-                      String notMappedField) {
+    public CommonsTestEntity(String id, String domain, String url, Integer responseTime, Integer responseCode,
+                             String notMappedField) {
         super(id, domain);
         this.url = url;
         this.responseTime = responseTime;

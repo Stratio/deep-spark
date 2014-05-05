@@ -21,7 +21,7 @@ import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.testentity.TestEntity;
+import com.stratio.deep.testentity.CommonsTestEntity;
 import com.stratio.deep.utils.AnnotationUtils;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.utils.Pair;
@@ -49,7 +49,7 @@ public class UtilsTest {
     @Test
     public void testDeepType2Pair() {
 
-        TestEntity te = new TestEntity();
+        CommonsTestEntity te = new CommonsTestEntity();
         te.setDomain("abc.es");
         te.setId("43274632");
         te.setResponseCode(312);
@@ -71,11 +71,11 @@ public class UtilsTest {
 
     @Test
     public void testFilterDeepFields() {
-        Field[] fields = getAllFields(TestEntity.class);
+        Field[] fields = getAllFields(CommonsTestEntity.class);
 
         assertTrue(fields.length > 6);
 
-        fields = AnnotationUtils.filterDeepFields(TestEntity.class);
+        fields = AnnotationUtils.filterDeepFields(CommonsTestEntity.class);
 
         assertEquals(fields.length, 9);
     }
@@ -83,7 +83,7 @@ public class UtilsTest {
     @Test
     public void testFilterKeyFields() {
         Pair<Field[], Field[]> keyFields =
-                AnnotationUtils.filterKeyFields(TestEntity.class);
+                AnnotationUtils.filterKeyFields(CommonsTestEntity.class);
 
         assertNotNull(keyFields);
         assertNotNull(keyFields.left);
@@ -147,7 +147,7 @@ public class UtilsTest {
             fail();
         }
 
-        Utils.newTypeInstance(TestEntity.class);
+        Utils.newTypeInstance(CommonsTestEntity.class);
     }
 
     @Test
@@ -382,7 +382,7 @@ public class UtilsTest {
 
     @Test
     public void testGetAllFields() {
-        Field[] fields = getAllFields(TestEntity.class);
+        Field[] fields = getAllFields(CommonsTestEntity.class);
         assertTrue(fields.length >= 11);
     }
 

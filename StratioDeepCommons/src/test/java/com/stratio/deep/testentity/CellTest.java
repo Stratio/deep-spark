@@ -42,7 +42,7 @@ public class CellTest {
 
     @Test
     public void testCellInstantiationForCollections() throws UnknownHostException, NoSuchFieldException {
-        TestEntity te = new TestEntity();
+        CommonsTestEntity te = new CommonsTestEntity();
 
         Set<String> emails = new HashSet(Arrays.asList("DelfinaMarino@superrito.com", "GabyCasasVeliz@superrito.com"));
         List<String> phones = Arrays.asList("401-477-8301", "209-845-8841");
@@ -55,7 +55,7 @@ public class CellTest {
         map.put(UUID.fromString("A0C6954F-E576-44C8-94B3-89C9A52BBC7E"), 3213);
         te.setUuid2id(map);
 
-        Cell c1 = Cell.create(te, TestEntity.class.getDeclaredField("emails"));
+        Cell c1 = Cell.create(te, CommonsTestEntity.class.getDeclaredField("emails"));
 
         assertNotNull(c1);
         assertEquals(c1.getCellName(), "emails");
@@ -63,7 +63,7 @@ public class CellTest {
         assertTrue(c1.marshallerClassName().equals(SetType.class.getCanonicalName()));
         assertEquals(c1.getValueType(), Set.class);
 
-        Cell c2 = Cell.create(te, TestEntity.class.getDeclaredField("phones"));
+        Cell c2 = Cell.create(te, CommonsTestEntity.class.getDeclaredField("phones"));
 
         assertNotNull(c2);
         assertEquals(c2.getCellName(), "phones");
@@ -71,7 +71,7 @@ public class CellTest {
         assertTrue(c2.marshallerClassName().equals(ListType.class.getCanonicalName()));
         assertEquals(c2.getValueType(), List.class);
 
-        Cell c3 = Cell.create(te, TestEntity.class.getDeclaredField("uuid2id"));
+        Cell c3 = Cell.create(te, CommonsTestEntity.class.getDeclaredField("uuid2id"));
 
         assertNotNull(c3);
         assertEquals(c3.getCellName(), "uuid2id");
