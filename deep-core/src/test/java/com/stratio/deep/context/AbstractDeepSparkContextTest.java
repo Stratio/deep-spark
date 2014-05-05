@@ -65,6 +65,7 @@ public abstract class AbstractDeepSparkContextTest {
             + "domain_name text, " + "response_code int, " + "charset text," + "response_time int,"
             + "download_time bigint," + "first_download_time bigint," + "title text, lucene text ) ;";
 
+    /*
     protected String createLuceneIndex =
             "CREATE CUSTOM INDEX page_lucene ON " + KEYSPACE_NAME + "." + quote(COLUMN_FAMILY) + " (lucene) USING " +
                     "'org.apache.cassandra.db.index.stratio.RowIndex' " +
@@ -72,6 +73,7 @@ public abstract class AbstractDeepSparkContextTest {
                     ".standard.StandardAnalyzer\", " +
                     "fields:{ charset:{type:\"string\"}, url:{type:\"string\"}, domain_name:{type:\"string\"}, " +
                     "response_code:{type:\"integer\"}, id:{type:\"string\"}, response_time:{type:\"integer\"} } }'};";
+    */
 
     protected String createCFIndex = "create index idx_" + COLUMN_FAMILY + "_resp_time on " + KEYSPACE_NAME + "." +
             quote(COLUMN_FAMILY) + " (response_time);";
@@ -229,7 +231,7 @@ public abstract class AbstractDeepSparkContextTest {
         String initialDataset = buildTestDataInsertBatch();
 
         String[] startupCommands = new String[]{createKeyspace, createOutputKeyspace, useKeyspace, createCF,
-                createCFIndex, createLuceneIndex,
+                createCFIndex, /*createLuceneIndex,*/
                 createCql3CF, createCql3CFIndex, createCql3CollectionsCF, initialDataset, useOutputKeyspace};
 
         cassandraServer = new CassandraServer();

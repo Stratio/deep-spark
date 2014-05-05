@@ -22,11 +22,10 @@
         <groupId>com.stratio.deep</groupId>
         <artifactId>StratioDeepParent</artifactId>
         <version>0.2.2-SNAPSHOT</version>
-        <relativePath>../StratioDeepParent</relativePath>
+        <relativePath>../deep-parent</relativePath>
     </parent>
 
-    <groupId>com.stratio.deep</groupId>
-    <artifactId>StratioDeepExamples</artifactId>
+    <artifactId>deep-examples</artifactId>
 
     <licenses>
         <license>
@@ -58,19 +57,7 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>6.8.7</version>
-            <!--scope>test</scope-->
-            <exclusions>
-                <exclusion>
-                    <artifactId>snakeyaml</artifactId>
-                    <groupId>org.yaml</groupId>
 
-                </exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
             <groupId>com.stratio.deep</groupId>
             <artifactId>StratioDeepCommons</artifactId>

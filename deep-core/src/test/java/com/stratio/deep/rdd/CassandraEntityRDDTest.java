@@ -194,6 +194,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         entities = (TestEntity[]) otherRDD.collect();
         assertEquals(entities.length, 2);
 
+        /*
         config = DeepJobConfigFactory
                 .create(TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
@@ -209,6 +210,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
         entities = (TestEntity[]) otherRDD.collect();
         assertEquals(entities.length, 9);
+        */
     }
 
     @Override

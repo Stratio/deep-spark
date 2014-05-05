@@ -18,43 +18,21 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>StratioDeep</artifactId>
+    <artifactId>deep-core</artifactId>
 
     <parent>
         <groupId>com.stratio.deep</groupId>
-        <artifactId>StratioDeepParent</artifactId>
+        <artifactId>deep-parent</artifactId>
         <version>0.2.2-SNAPSHOT</version>
-        <relativePath>../StratioDeepParent</relativePath>
+        <relativePath>../deep-parent</relativePath>
     </parent>
-
-    <properties>
-
-        <!-- Generic properties -->
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-        <!-- Spring -->
-        <spring-framework.version>3.2.3.RELEASE</spring-framework.version>
-
-        <!-- Logging -->
-        <logback.version>1.0.13</logback.version>
-        <slf4j.version>1.7.5</slf4j.version>
-
-        <!-- Test -->
-        <junit.version>4.11</junit.version>
-
-        <proguard.version>4.10</proguard.version>
-
-        <lucene.version>4.6.1</lucene.version>
-    </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.stratio.deep</groupId>
-            <artifactId>StratioDeepCommons</artifactId>
+            <artifactId>deep-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
-
 
         <!-- Logging with SLF4J & LogBack -->
         <dependency>
@@ -62,13 +40,8 @@
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
         </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>apache-log4j-extras</artifactId>
-            <version>1.1</version>
-        </dependency>
 
-
+        <!--
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
@@ -79,83 +52,14 @@
             <artifactId>scala-reflect</artifactId>
             <version>2.10.3</version>
         </dependency>
+        -->
 
-        <!-- test -->
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>6.8.7</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>snakeyaml</artifactId>
-                    <groupId>org.yaml</groupId>
-
-                </exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
             <groupId>com.stratio.deep</groupId>
             <artifactId>StratioDeepCommons</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- spark artifact -->
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.10</artifactId>
-            <version>${spark.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>avro</artifactId>
-                    <groupId>org.apache.avro</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>${lucene.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-common</artifactId>
-            <version>${lucene.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-codecs</artifactId>
-            <version>${lucene.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-misc</artifactId>
-            <version>${lucene.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-queries</artifactId>
-            <version>${lucene.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-queryparser</artifactId>
-            <version>${lucene.version}</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -203,6 +107,32 @@
                         <phase>process-test-resources</phase>
                         <goals>
                             <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>

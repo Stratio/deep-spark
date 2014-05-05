@@ -126,9 +126,6 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
         quickPages = rdd.filter(new FilterQuickPagesFunction());
         assertEquals(quickPages.count(), 6L);
 
-        logger.info("slowPages:\n" + slowPages.collect());
-        logger.info("quickPages:\n" + quickPages.collect());
-
         slowPages.cache();
         quickPages.cache();
     }
