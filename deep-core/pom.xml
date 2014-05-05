@@ -19,6 +19,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>deep-core</artifactId>
+    <packaging>jar</packaging>
+    <name>deep core</name>
+    <description>Project containing the actual implementation of the RDD integrating Apache Spark and Apache Cassandra</description>
 
     <parent>
         <groupId>com.stratio.deep</groupId>
@@ -41,22 +44,9 @@
             <version>1.2.17</version>
         </dependency>
 
-        <!--
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>2.10.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-reflect</artifactId>
-            <version>2.10.3</version>
-        </dependency>
-        -->
-
         <dependency>
             <groupId>com.stratio.deep</groupId>
-            <artifactId>StratioDeepCommons</artifactId>
+            <artifactId>deep-commons</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>

@@ -19,10 +19,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>deep-commons</artifactId>
+    <packaging>jar</packaging>
+    <name>deep commons</name>
+    <description>stratio deep common utility classes</description>
 
     <parent>
         <groupId>com.stratio.deep</groupId>
-        <artifactId>StratioDeepParent</artifactId>
+        <artifactId>deep-parent</artifactId>
         <version>0.2.2-SNAPSHOT</version>
         <relativePath>../deep-parent</relativePath>
     </parent>
