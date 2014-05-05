@@ -21,6 +21,7 @@
     <artifactId>deep-commons</artifactId>
     <packaging>jar</packaging>
     <name>deep commons</name>
+    <url>http://www.stratio.com</url>
     <description>stratio deep common utility classes</description>
 
     <parent>

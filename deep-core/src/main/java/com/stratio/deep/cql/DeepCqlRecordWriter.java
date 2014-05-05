@@ -50,7 +50,8 @@ import java.util.*;
 import static com.stratio.deep.utils.Utils.updateQueryGenerator;
 
 /**
- * Created by luca on 05/02/14.
+ * Handles the distributed write to cassandra in batch.
+ *
  */
 public class DeepCqlRecordWriter implements AutoCloseable {
 
