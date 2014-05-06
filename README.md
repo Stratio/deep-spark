@@ -8,27 +8,27 @@ Stratio Deep is one of the core modules on which [Stratio's BigData platform (SD
 StratioDeep comes with an user friendly API that lets developers create Spark RDDs mapped to Cassandra column families.
 We provide two different interfaces:
 
-  * The first one will let you map your Cassandra's tables to object entities (POJOs), just like if you were using any other ORM.
+  * The first one will let developers map Cassandra tables to object entities (POJOs), just like if you were using any other ORM.
     This abstraction is quite handy, it will let you work on RDD<YourEntityHere> (under the hood StratioDeep will map columns to entity properties).
     Your domain entities must be correctly annotated using StratioDeep annotations (see StratioDeepExample example entities in package com.stratio.deep.testentity).
 
-  * The second one is a more generic 'cell' API, that will let you work on RDD<Cells> where Cells is a collection of Cell object.
-    Column metadata is automatically fetched from the datastore. This interface is a little bit more cumbersome to work with (see the example below),
-    but has the advantage that it not requires the definition of additional entity classes.
-    Example: you have a table called 'users' and you decide to use the 'Cells' StratioDeep interface. Once you get an instance 'c' of the Cells object,
+  * The second one is a more generic 'cell' API, that will let devs work on RDD<com.stratio.deep.entity.Cells> where a Cells object is a collection of com.stratio.deep.entity.Cell object.
+    Column metadata is automatically fetched from the data store. This interface is a little bit more cumbersome to work with (see the example below),
+    but has the advantage that it doesn't require the definition of additional entity classes.
+    Example: you have a table called 'users' and you decide to use the 'Cells' interface. Once you get an instance 'c' of the Cells object,
     to get the value of column 'address' you can issue a c.getCellByName("address").getCellValue().
-    Please, refer to the StratioDeep API documentation to know more about the Cells and Cell objects.
+    Please, refer to the Deep API documentation to know more about the Cells and Cell objects.
 
 We encourage you to read the more comprehensive documentation hosted on the [Stratio website](http://wordpress.dev.strat.io/examples/).
 
-StratioDeep comes with an example sub project called StratioDeepExamples containing a set of working examples on how to use StratioDeep, both from Java and Scala.
+Stratio Deep comes with an example sub project called StratioDeepExamples containing a set of working examples, both in Java and Scala.
 Please, refer to StratioDeepExample README for further information on how to setup a working environment.
 
 Requirements
 ============
 
   * Cassandra 2.0.5
-  * Spark 0.9.0
+  * Spark 0.9.1
   * Apache Maven >= 3.0.4
   * Java 1.7
   * Scala 2.10.3
@@ -36,16 +36,16 @@ Requirements
 Configure the development and test environment
 ==============================================
 * Clone the project
-* To configure a development environment in Eclipse: import as Maven project. In IntelliJ: open the project by selecting the StratioDeepParent POM file
-* Install the project in you local maven repository. Enter StratioDeepParent subproject and perform: mvn clean install (add -DskipTests to skip tests)
+* To configure a development environment in Eclipse: import as Maven project. In IntelliJ: open the project by selecting the deep-parent POM file
+* Install the project in you local maven repository. Enter deep-parent subproject and perform: mvn clean install (add -DskipTests to skip tests)
 * Put Stratio Deep to work on a working cassandra + spark cluster. You have several options:
-    * Download a preconfigured Stratio platform VM [Stratio's BigData platform (SDS)](http://www.stratio.com/).
-      This VM will work on both Virtualbox and VMWare, and comes with a fully configured distribution that also includes StratioDeep. We also distribute the VM with several preloaded datasets in Cassandra. This distribution will include Stratio's customized Cassandra distribution containing our powerful [open-source lucene-based secondary indexes](https://github.com/Stratio/stratio-cassandra), see Stratio documentation for further information.
-      Once your VM is up and running you can test StratioDeep using the shell. Enter /opt/SDH and run bin/stratio-deep-shell.
+    * Download a pre-configured Stratio platform VM [Stratio's BigData platform (SDS)](http://www.stratio.com/).
+      This VM will work on both Virtualbox and VMWare, and comes with a fully configured distribution that also includes Stratio Deep. We also distribute the VM with several preloaded datasets in Cassandra. This distribution will include Stratio's customized Cassandra distribution containing our powerful [open-source lucene-based secondary indexes](https://github.com/Stratio/stratio-cassandra), see Stratio documentation for further information.
+      Once your VM is up and running you can test Deep using the shell. Enter /opt/sds and run bin/stratio-deep-shell.
     * Install a new Stratio cluster using the Stratio installer. Please refer to Stratio's website to download the installer and its documentation.
     * You already have a working Cassandra server on your development machine: you need a spark+deep bundle, we suggest to create one by running:
     
-	    ``cd StratioDeepParent``
+	    ``cd deep-parent``
 	    
 	    ``./make-distribution-deep.sh``
 	    
@@ -55,7 +55,7 @@ The package will be called ``spark-deep-distribution-X.Y.Z.tgz``, untar it to a 
     * You already have a working installation os Cassandra and Spark on your development machine: this is the most difficult way to start testing StratioDeep, but you know what you're doing  you will have to
         1. copy the Stratio Deep jars to Spark's 'jars' folder (``$SPARK_HOME/jars``).
         2. copy Cassandra's jars to Spark's 'jar' folder.
-        3. copy Datastax Java Driver jar (v 2.0.0) to Spark's 'jar' folder.
+        3. copy Datastax Java Driver jar (v 2.0.x) to Spark's 'jar' folder.
         4. start spark shell and import the following:
         
 			``import com.stratio.deep.config._``			
