@@ -17,7 +17,6 @@
 package com.stratio.deep.config;
 
 import com.stratio.deep.annotations.DeepEntity;
-import com.stratio.deep.annotations.DeepField;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
@@ -26,7 +25,6 @@ import com.stratio.deep.utils.AnnotationUtils;
 import com.stratio.deep.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 
-import java.lang.annotation.Annotation;
 import java.lang.annotation.AnnotationTypeMismatchException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -74,7 +72,8 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
     /**
      * Public constructor. Constructs a job object with the specified entity class.
      *
-     * @param entityClass
+     * @param entityClass IDeepType entity Class object
+     * @param isWriteConfig boolean specifing if the constructed object is suitable for writes.
      */
     public EntityDeepJobConfig(Class<T> entityClass, Boolean isWriteConfig) {
         super();
@@ -139,9 +138,9 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
      * If we don't find any property whose DeepField.fieldName.equals(dbName) we fallback to the
      * name of the Java property.
      *
-     * @param instance
-     * @param dbName
-     * @param value
+     * @param instance instance object.
+     * @param dbName name of the field as known by the data store.
+     * @param value value to set in the property field of the provided instance object.
      */
     public void setInstancePropertyFromDbName(T instance, String dbName, Object value) {
         Map<String, Cell> cfs = columnDefinitions();
@@ -163,6 +162,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         }
     }
 
+    @SuppressWarnings("unchecked")
     private Object packageCollectionValue(Cell metadataCell, Object value) {
         switch (metadataCell.getCellValidator().validatorKind()) {
             case SET:
