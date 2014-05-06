@@ -24,7 +24,7 @@ import java.util.*;
 
 /**
  * Represents a tuple inside the Cassandra's datastore. A Cells object basically is an
- * ordered collection of {@see Cell} objects, plus a few utility methods to access specific cells in the row.
+ * ordered collection of {@link com.stratio.deep.entity.Cell} objects, plus a few utility methods to access specific cells in the row.
  *
  * @author Luca Rosellini <luca@stratio.com>
  */
