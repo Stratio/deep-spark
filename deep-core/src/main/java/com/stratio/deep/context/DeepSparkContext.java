@@ -41,7 +41,7 @@ public class DeepSparkContext extends JavaSparkContext {
     /**
      * Overridden superclass constructor.
      *
-     * @param sc
+     * @param sc an already created spark context.
      */
     public DeepSparkContext(SparkContext sc) {
         super(sc);
@@ -50,8 +50,8 @@ public class DeepSparkContext extends JavaSparkContext {
     /**
      * Overridden superclass constructor.
      *
-     * @param master
-     * @param appName
+     * @param master the url of the master node.
+     * @param appName the name of the application.
      */
     public DeepSparkContext(String master, String appName) {
         super(master, appName);
@@ -60,10 +60,10 @@ public class DeepSparkContext extends JavaSparkContext {
     /**
      * Overridden superclass constructor.
      *
-     * @param master
-     * @param appName
-     * @param sparkHome
-     * @param jarFile
+     * @param master the url of the master node.
+     * @param appName the name of the application.
+     * @param sparkHome the spark home folder.
+     * @param jarFile the jar file to serialize and send to all the cluster nodes.
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String jarFile) {
         super(master, appName, sparkHome, jarFile);
@@ -72,10 +72,10 @@ public class DeepSparkContext extends JavaSparkContext {
     /**
      * Overridden superclass constructor.
      *
-     * @param master
-     * @param appName
-     * @param sparkHome
-     * @param jars
+     * @param master the url of the master node.
+     * @param appName the name of the application.
+     * @param sparkHome the spark home folder.
+     * @param jars the jar file(s) to serialize and send to all the cluster nodes.
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String[] jars) {
         super(master, appName, sparkHome, jars);
@@ -84,11 +84,11 @@ public class DeepSparkContext extends JavaSparkContext {
     /**
      * Overridden superclass constructor.
      *
-     * @param master
-     * @param appName
-     * @param sparkHome
-     * @param jars
-     * @param environment
+     * @param master the url of the master node.
+     * @param appName the name of the application.
+     * @param sparkHome the spark home folder.
+     * @param jars the jar file(s) to serialize and send to all the cluster nodes.
+     * @param environment a map of environment variables.
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String[] jars,
                             Map<String, String> environment) {
@@ -96,10 +96,10 @@ public class DeepSparkContext extends JavaSparkContext {
     }
 
     /**
-     * Builds a new CassandraEntityRDD.
+     * Builds a new CassandraJavaRDD.
      *
-     * @param config
-     * @return
+     * @param config the deep configuration object to use to create the new RDD.
+     * @return a new CassandraJavaRDD
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> CassandraJavaRDD<T> cassandraJavaRDD(IDeepJobConfig<T> config) {
@@ -117,18 +117,18 @@ public class DeepSparkContext extends JavaSparkContext {
     /**
      * Builds a new testentity based CassandraEntityRDD.
      *
-     * @param config
-     * @return
+     * @param config the deep configuration object to use to create the new RDD.
+     * @return a new entity-based CassandraRDD
      */
     public <T extends IDeepType> CassandraRDD<T> cassandraEntityRDD(IDeepJobConfig<T> config) {
         return new CassandraEntityRDD<T>(sc(), config);
     }
 
     /**
-     * Builds a new generic (cell based) CassandraEntityRDD.
+     * Builds a new generic (cell based) CassandraGenericRDD.
      *
-     * @param config
-     * @return
+     * @param config the deep configuration object to use to create the new RDD.
+     * @return a new generic CassandraRDD.
      */
     public CassandraRDD<Cells> cassandraGenericRDD(IDeepJobConfig<Cells> config) {
         return new CassandraCellRDD(sc(), config);

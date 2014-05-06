@@ -107,10 +107,12 @@ public final class AnnotationUtils {
                     .build();
 
     /**
-     * Returns the field name as known by the datastore.
+     * Returns the field name as known by the datastore. If the provided field object DeepField annotation
+     * specifies the fieldName property, the value of this property will be returned, otherwise the java field name
+     * will be returned.
      *
-     * @param field
-     * @return
+     * @param field the Field object associated to the property for which we want to resolve the name.
+     * @return the field name.
      */
     public static String deepFieldName(Field field) {
 
@@ -126,8 +128,8 @@ public final class AnnotationUtils {
      * Utility method that filters out all the fields _not_ annotated
      * with the {@link com.stratio.deep.annotations.DeepField} annotation.
      *
-     * @param clazz
-     * @return
+     * @param clazz the Class object for which we want to resolve deep fields.
+     * @return an array of deep Field(s).
      */
     public static Field[] filterDeepFields(Class clazz) {
         Field[] fields = Utils.getAllFields(clazz);
@@ -145,8 +147,8 @@ public final class AnnotationUtils {
      * the array of keys fields.
      * The right element contains the array of all other non-key fields.
      *
-     * @param clazz
-     * @return
+     * @param clazz the Class object
+     * @return a pair object whose first element contains key fields, and whose second element contains all other columns.
      */
     public static Pair<Field[], Field[]> filterKeyFields(Class clazz) {
         Field[] filtered = filterDeepFields(clazz);
@@ -167,23 +169,23 @@ public final class AnnotationUtils {
     /**
      * Returns true is given field is part of the table key.
      *
-     * @param field
-     * @return
+     * @param field the Field object we want to process.
+     * @return true if the field is part of the cluster key or the partition key, false otherwise.
      */
     public static boolean isKey(DeepField field) {
         return field.isPartOfClusterKey() || field.isPartOfPartitionKey();
     }
 
     /**
-     * Returns the value of the fields <i>f</i> in the instance <i>e</i> of type T.
+     * Returns the value of the fields <i>deepField</i> in the instance <i>entity</i> of type T.
      *
-     * @param e
-     * @param f
-     * @return
+     * @param entity the entity to process.
+     * @param deepField the Field to process belonging to <i>entity</i>
+     * @return the property value.
      */
-    public static Serializable getBeanFieldValue(IDeepType e, Field f) {
+    public static Serializable getBeanFieldValue(IDeepType entity, Field deepField) {
         try {
-            return (Serializable) PropertyUtils.getProperty(e, f.getName());
+            return (Serializable) PropertyUtils.getProperty(entity, deepField.getName());
 
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
             throw new DeepIOException(e1);
@@ -194,12 +196,12 @@ public final class AnnotationUtils {
     /**
      * Returns the list of generic types associated to the provided field (if any).
      *
-     * @param f
-     * @return
+     * @param field the field instance to process.
+     * @return the list of generic types associated to the provided field (if any).
      */
-    public static Class<?>[] getGenericTypes(Field f) {
+    public static Class<?>[] getGenericTypes(Field field) {
         try {
-            ParameterizedType type = (ParameterizedType) f.getGenericType();
+            ParameterizedType type = (ParameterizedType) field.getGenericType();
             Type[] types = type.getActualTypeArguments();
 
             Class<?>[] res = new Class<?>[types.length];
@@ -211,7 +213,7 @@ public final class AnnotationUtils {
             return res;
 
         } catch (ClassCastException e) {
-            return new Class<?>[]{(Class<?>) f.getGenericType()};
+            return new Class<?>[]{(Class<?>) field.getGenericType()};
         }
     }
 

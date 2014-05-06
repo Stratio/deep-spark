@@ -64,7 +64,6 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     private AbstractType<?> keyValidator;
     private String[] partitionKeyColumns;
 
-    private final TaskContext context;
     private final IDeepJobConfig writeConfig;
     private final IPartitioner partitioner;
     private final InetAddress localhost;
@@ -78,7 +77,6 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     public DeepCqlRecordWriter(TaskContext context, IDeepJobConfig writeConfig) {
         this.clients = new HashMap<>();
         this.removedClients = new HashMap<>();
-        this.context = context;
         this.writeConfig = writeConfig;
         this.partitioner = RangeUtils.getPartitioner(writeConfig);
         try {
@@ -196,14 +194,11 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     }
 
     /**
-     * If the key is to be associated with a valid value, a mutation is created
-     * for it with the given column family and columns. In the event the value
-     * in the column is missing (i.e., null), then it is marked for
-     * {@link org.apache.cassandra.thrift.Deletion}. Similarly, if the entire value for a key is missing
-     * (i.e., null), then the entire key is marked for {@link org.apache.cassandra.thrift.Deletion}.
-     * </p>
+     * Adds the provided row to a batch. If the batch size reaches the threshold configured in IDeepJobConfig.getBatchSize
+     * the batch will be sent to the data store.
      *
-     * @throws IOException
+     * @param keys the Cells object containing the row keys.
+     * @param values the Cells object containing all the other row  columns.
      */
     public void write(Cells keys, Cells values) {
         /* generate SQL */
@@ -245,10 +240,9 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         /**
          * Returns true if adding the current element triggers the batch execution.
          *
-         * @param stmt
-         * @param values
-         * @return
-         * @throws IOException
+         * @param stmt the query to add to the batch.
+         * @param values the list of binding values.
+         * @return a boolean indicating if the batch has been triggered or not.
          */
         public synchronized boolean put(String stmt, List<Object> values) {
             batchStatements.add(stmt);

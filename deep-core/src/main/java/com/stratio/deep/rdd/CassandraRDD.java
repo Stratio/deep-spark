@@ -65,8 +65,8 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * Transform a row coming from the Cassandra's API to an element of
      * type <T>.
      *
-     * @param elem
-     * @return
+     * @param elem the element to transform.
+     * @return the transformed element.
      */
     protected abstract T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem);
 
@@ -101,14 +101,15 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
     /**
      * Persists the given RDD to the underlying Cassandra datastore using the java cql3 driver.<br/>
-     * Beware: this method does not perform a distributed write as {@link  #saveRDDToCassandra(org.apache.spark.rdd
-     * .RDD, com.stratio.deep.config.IDeepJobConfig)}
+     * Beware: this method does not perform a distributed write as
+     * {@link com.stratio.deep.rdd.CassandraRDD#saveRDDToCassandra}
      * does, uses the Datastax Java Driver to perform a batch write to the Cassandra server.<br/>
      * This currently scans the partitions one by one, so it will be slow if a lot of partitions are required.
      *
-     * @param rdd
-     * @param writeConfig
+     * @param rdd the RDD to persist.
+     * @param writeConfig the write configuration object.
      */
+    @SuppressWarnings("unchecked")
     public static <W, T extends IDeepType> void cql3SaveRDDToCassandra(RDD<W> rdd, IDeepJobConfig<W> writeConfig) {
         if (IDeepType.class.isAssignableFrom(writeConfig.getEntityClass())) {
             IDeepJobConfig<T> c = (IDeepJobConfig<T>) writeConfig;
@@ -129,9 +130,10 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * Persists the given RDD of Cells to the underlying Cassandra datastore, using configuration
      * options provided by <i>writeConfig</i>.
      *
-     * @param rdd
-     * @param writeConfig
+     * @param rdd the RDD to persist.
+     * @param writeConfig the write configuration object.
      */
+    @SuppressWarnings("unchecked")
     public static <W, T extends IDeepType> void saveRDDToCassandra(RDD<W> rdd, IDeepJobConfig<W> writeConfig) {
         if (IDeepType.class.isAssignableFrom(writeConfig.getEntityClass())) {
             IDeepJobConfig<T> c = (IDeepJobConfig<T>) writeConfig;
@@ -151,9 +153,9 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     /**
      * Persists the given JavaRDD to the underlying Cassandra datastore.
      *
-     * @param rdd
-     * @param writeConfig
-     * @param <W>
+     * @param rdd the RDD to persist.
+     * @param writeConfig the write configuration object.
+     * @param <W> the generic type associated to the provided configuration object.
      */
     public static <W> void saveRDDToCassandra(JavaRDD<W> rdd, IDeepJobConfig<W> writeConfig) {
         saveRDDToCassandra(rdd.rdd(), writeConfig);
@@ -163,8 +165,8 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     /**
      * Public constructor that builds a new Cassandra RDD given the context and the configuration file.
      *
-     * @param sc
-     * @param config
+     * @param sc the spark context to which the RDD will be bound to.
+     * @param config the deep configuration object.
      */
     @SuppressWarnings("unchecked")
     public CassandraRDD(SparkContext sc, IDeepJobConfig<T> config) {
@@ -213,9 +215,9 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     /**
      * Gets an instance of the callback that will be used on the completion of the computation of this RDD.
      *
-     * @param recordReader
-     * @param dp
-     * @return
+     * @param recordReader the deep record reader.
+     * @param dp the spark deep partition.
+     * @return an instance of the callback that will be used on the completion of the computation of this RDD.
      */
     protected AbstractFunction0<BoxedUnit> getComputeCallback(DeepRecordReader recordReader,
                                                               DeepPartition dp) {
@@ -263,20 +265,13 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     }
 
     /**
-     * Initializes a {@link org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader} using Cassandra's Hadoop API.
-     * <p/>
-     * 1. Constructs a {@link org.apache.hadoop.mapreduce.TaskAttemptID}
-     * 2. Constructs a {@link org.apache.hadoop.mapreduce.TaskAttemptContext} using the newly constructed
-     * {@link org.apache.hadoop.mapreduce.TaskAttemptID} and the hadoop configuration contained
-     * inside this RDD configuration object.
-     * 3. Creates a new {@link com.stratio.deep.cql.DeepRecordReader}.
-     * 4. Initialized the newly created {@link com.stratio.deep.cql.DeepRecordReader}.
+     * Instantiates a new deep record reader object associated to the provided partition.
      *
-     * @param ctx
-     * @param dp
-     * @return
+     * @param ctx the spark task context.
+     * @param dp a spark deep partition
+     * @return the deep record reader associated to the provided partition.
      */
-    protected DeepRecordReader initRecordReader(TaskContext ctx, final DeepPartition dp) {
+    private DeepRecordReader initRecordReader(TaskContext ctx, final DeepPartition dp) {
         DeepRecordReader recordReader = new DeepRecordReader(config.value(), dp.splitWrapper());
         ctx.addOnCompleteCallback(getComputeCallback(recordReader, dp));
         return recordReader;

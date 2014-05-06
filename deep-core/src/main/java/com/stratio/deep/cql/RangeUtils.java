@@ -197,7 +197,7 @@ public class RangeUtils {
      * Returns the token ranges that will be mapped to Spark partitions.
      *
      * @param config the Deep configuration object.
-     * @return
+     * @return the list of computed token ranges.
      */
     public static List<DeepTokenRange> getSplits(IDeepJobConfig config) {
         Map<String, Iterable<Comparable>> tokens = new HashMap<>();
@@ -262,7 +262,7 @@ public class RangeUtils {
     /**
      * Creates a new instance of the cassandra partitioner configured in the configuration object.
      * @param config the Deep configuration object.
-     * @return
+     * @return an instance of the cassandra partitioner configured in the configuration object.
      */
     public static IPartitioner getPartitioner(IDeepJobConfig config) {
         try {

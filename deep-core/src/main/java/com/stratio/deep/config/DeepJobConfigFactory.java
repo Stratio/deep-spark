@@ -39,7 +39,7 @@ public final class DeepJobConfigFactory implements Serializable {
     /**
      * Creates a new cell-based job configuration object.
      *
-     * @return
+     * @return a new cell-based job configuration object.
      */
     public static IDeepJobConfig<Cells> create() {
         return new CellDeepJobConfig(false);
@@ -48,25 +48,25 @@ public final class DeepJobConfigFactory implements Serializable {
     /**
      * Creates a new cell-based write suitable job configuration object.
      *
-     * @return
+     * @return a new cell-based write suitable job configuration object.
      */
     public static IDeepJobConfig<Cells> createWriteConfig() {
         return new CellDeepJobConfig(true);
     }
 
     /**
-     * Creates an testentity-based configuration object.
+     * Creates an entity-based configuration object.
      *
-     * @return
+     * @return a new an entity-based configuration object.
      */
     public static <T extends IDeepType> IDeepJobConfig<T> create(Class<T> entityClass) {
         return new EntityDeepJobConfig<>(entityClass, false);
     }
 
     /**
-     * Creates an testentity-based write configuration object.
+     * Creates an entity-based write configuration object.
      *
-     * @return
+     * @return an entity-based write configuration object.
      */
     public static <T extends IDeepType> IDeepJobConfig<T> createWriteConfig(Class<T> entityClass) {
         return new EntityDeepJobConfig<>(entityClass, true);

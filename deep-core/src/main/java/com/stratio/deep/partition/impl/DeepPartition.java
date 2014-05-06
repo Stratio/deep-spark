@@ -48,9 +48,9 @@ public class DeepPartition implements Partition {
     /**
      * Public constructor.
      *
-     * @param rddId
-     * @param idx
-     * @param range
+     * @param rddId the rdd id.
+     * @param idx the index of the new partition (relative to the provided rdd id).
+     * @param range the deep token range to wrap.
      */
     public DeepPartition(int rddId, int idx, DeepTokenRange range) {
 
@@ -59,6 +59,9 @@ public class DeepPartition implements Partition {
         this.idx = idx;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -70,14 +73,8 @@ public class DeepPartition implements Partition {
 
         DeepPartition that = (DeepPartition) o;
 
-        if (idx != that.idx) {
-            return false;
-        }
-        if (rddId != that.rddId) {
-            return false;
-        }
+        return idx == that.idx && rddId == that.rddId;
 
-        return true;
     }
 
     /**
@@ -91,7 +88,7 @@ public class DeepPartition implements Partition {
     /**
      * Returns the index of the current partition.
      *
-     * @return
+     * @return the index of the current parition.
      */
     @Override
     public int index() {
@@ -101,7 +98,7 @@ public class DeepPartition implements Partition {
     /**
      * Returns the Cassandra split
      *
-     * @return
+     * @return the wrapped token range.
      */
     public DeepTokenRange splitWrapper() {
         return this.splitWrapper;

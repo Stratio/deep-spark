@@ -131,7 +131,7 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Converts every Cell contained in this object to an ArrayBuffer.
      * In order to perform the conversion we use the appropriate Cassandra marshaller for the Cell.
      *
-     * @return
+     * @return a collection of Cell(s) values converted to byte buffers using the appropriate marshaller.
      */
     public Collection<ByteBuffer> getDecomposedCellValues() {
         List<ByteBuffer> res = new ArrayList<>();
@@ -147,7 +147,7 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Converts every Cell contained in this object to an ArrayBuffer.
      * In order to perform the conversion we use the appropriate Cassandra marshaller for the Cell.
      *
-     * @return
+     * @return a collection of Cell(s) values.
      */
     public Collection<Object> getCellValues() {
         List<Object> res = new ArrayList<>();
@@ -163,7 +163,7 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Extracts from this Cells object the cells marked either as partition key or cluster key.
      * Returns an empty Cells object if the current object does not contain any Cell marked as key.
      *
-     * @return
+     * @return the Cells object containing the subset of this Cells object of only the Cell(s) part of the key.
      */
     public Cells getIndexCells() {
         Cells res = new Cells();
@@ -180,7 +180,7 @@ public class Cells implements Iterable<Cell>, Serializable {
     /**
      * Extracts from this Cells object the cells _NOT_ marked as partition key and _NOT_ marked as cluster key.
      *
-     * @return
+     * @return the Cells object containing the subset of this Cells object of only the Cell(s) that are NOT part of the key.
      */
     public Cells getValueCells() {
         Cells res = new Cells();
@@ -213,7 +213,7 @@ public class Cells implements Iterable<Cell>, Serializable {
     /**
      * Returns the number of cell(s) this object contains.
      *
-     * @return
+     * @return the number os Cell objects contained in this Cells object.
      */
     public int size() {
         return cells.size();

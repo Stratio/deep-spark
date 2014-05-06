@@ -26,21 +26,21 @@ import java.util.Map;
 /**
  * Defines the public methods that each Stratio Deep configuration object should implement.
  *
- * @param <T>
+ * @param <T> the generic type associated to this configuration object.
  */
 public interface IDeepJobConfig<T> extends Serializable {
 
     /**
      * Returns the session opened to the cassandra server.
      *
-     * @return
+     * @return the Session opened by this configuration object to the cassandra server.
      */
     Session getSession();
 
     /**
      * Sets the session to use. If a session is not provided, this object will open a new one.
      *
-     * @param session
+     * @param session the session to use.
      */
     IDeepJobConfig<T> session(Session session);
 
@@ -48,15 +48,15 @@ public interface IDeepJobConfig<T> extends Serializable {
      * Fetches table metadata from Casandra and generates a Map<K, V> where the key is the column name, and the value
      * is the {@link com.stratio.deep.entity.Cell} containing column's metadata.
      *
-     * @return
+     * @return the map of column names and the corresponding Cell object containing its metadata.
      */
     Map<String, Cell> columnDefinitions();
 
     /**
      * Sets the cassandra CF from which data will be read from.
      *
-     * @param table
-     * @return
+     * @param table the table name.
+     * @return this configuration object.
      */
     public abstract IDeepJobConfig<T> table(String table);
 
@@ -64,8 +64,8 @@ public interface IDeepJobConfig<T> extends Serializable {
      * Sets the cassandra CF from which data will be read from.
      * Column family name is case sensitive.
      *
-     * @param columnFamily
-     * @return
+     * @param columnFamily the table name data will be fetched from.
+     * @return this configuration object.
      */
     public abstract IDeepJobConfig<T> columnFamily(String columnFamily);
 
@@ -75,9 +75,9 @@ public interface IDeepJobConfig<T> extends Serializable {
      * will include the filter on the specified column called <i>filterColumnName</i>.
      * Before propagating the filter we check if an index exists in Cassandra.
      *
-     * @param filterColumnName
-     * @param filterValue
-     * @return
+     * @param filterColumnName the name of the columns (as known by the datastore) to filter on.
+     * @param filterValue the value of the filter to use. May be any expression, depends on the actual index implementation.
+     * @return this configuration object.
      * @throws com.stratio.deep.exception.DeepIndexNotFoundException if the specified field has not been indexed in
      * Cassandra.
      * @throws com.stratio.deep.exception.DeepNoSuchFieldException   if the specified field is not a valid column in
@@ -90,7 +90,7 @@ public interface IDeepJobConfig<T> extends Serializable {
      * Defaults to 1000 rows.
      *
      * @param pageSize the number of rows per page
-     * @return
+     * @return this configuration object.
      */
     public abstract IDeepJobConfig<T> pageSize(int pageSize);
 
@@ -100,7 +100,7 @@ public interface IDeepJobConfig<T> extends Serializable {
     /**
      * Returns the name of the configured column family.
      *
-     * @return
+     * @return the configured column family.
      */
     public abstract String getColumnFamily();
 
@@ -108,14 +108,14 @@ public interface IDeepJobConfig<T> extends Serializable {
      * Returns the underlying testentity class used to map the Cassandra
      * Column family.
      *
-     * @return
+     * @return the entity class object associated to this configuration object.
      */
     public abstract Class<T> getEntityClass();
 
     /**
      * Returns the hostname of the cassandra server.
      *
-     * @return
+     * @return the endpoint of the cassandra server.
      */
     public abstract String getHost();
 
@@ -123,21 +123,21 @@ public interface IDeepJobConfig<T> extends Serializable {
      * Returns the list of column names that will
      * be fetched from the underlying datastore.
      *
-     * @return
+     * @return the array of column names that will be retrieved from the data store.
      */
     public abstract String[] getInputColumns();
 
     /**
      * Returns the name of the keyspace.
      *
-     * @return
+     * @return the name of the configured keyspace.
      */
     public abstract String getKeyspace();
 
     /**
      * Returns the partitioner class name.
      *
-     * @return
+     * @return the partitioner class name.
      */
     public abstract String getPartitionerClassName();
 
@@ -145,7 +145,7 @@ public interface IDeepJobConfig<T> extends Serializable {
      * Returns the password needed to authenticate
      * to the remote cassandra cluster.
      *
-     * @return
+     * @return the password used to login to the remote cluster.
      */
     public abstract String getPassword();
 
@@ -153,7 +153,7 @@ public interface IDeepJobConfig<T> extends Serializable {
      * RPC port where the remote Cassandra cluster is listening to.
      * Defaults to 9160.
      *
-     * @return
+     * @return the thrift port.
      */
     public abstract Integer getRpcPort();
 
@@ -161,7 +161,7 @@ public interface IDeepJobConfig<T> extends Serializable {
      * CQL port where the remote Cassandra cluster is listening to.
      * Defaults to 9042.
      *
-     * @return
+     * @return the cql port.
      */
     public abstract Integer getCqlPort();
 
@@ -169,14 +169,14 @@ public interface IDeepJobConfig<T> extends Serializable {
      * Returns the username used to authenticate to the cassandra server.
      * Defaults to the empty string.
      *
-     * @return
+     * @return the username to use to login to the remote server.
      */
     public abstract String getUsername();
 
     /**
      * Sets the cassandra's hostname
      *
-     * @param hostname
+     * @param hostname the cassandra server endpoint.
      * @return this object.
      */
     public abstract IDeepJobConfig<T> host(String hostname);
@@ -200,16 +200,18 @@ public interface IDeepJobConfig<T> extends Serializable {
     /**
      * Sets Cassandra Keyspace.
      *
-     * @param keyspace
+     * @param keyspace the keyspace to use.
      * @return this object.
      */
     public abstract IDeepJobConfig<T> keyspace(String keyspace);
 
     /**
-     * Sets the token range bisect factor. Defaults to 1.
+     * Sets the token range bisect factor.
+     * The provided number must be a power of two.
+     * Defaults to 1.
      *
-     * @param bisectFactor
-     * @return
+     * @param bisectFactor the bisect factor to use.
+     * @return this configuration object.
      */
     public abstract IDeepJobConfig<T> bisectFactor(int bisectFactor);
 
@@ -217,10 +219,10 @@ public interface IDeepJobConfig<T> extends Serializable {
      * Let's the user specify an alternative partitioner class. The default partitioner is
      * org.apache.cassandra.dht.Murmur3Partitioner.
      *
-     * @param partitionerClassName
+     * @param partitionerClassName the partitioner class name.
      * @return this object.
      */
-    public abstract <P extends IPartitioner<?>> IDeepJobConfig<T> partitioner(String partitionerClassName);
+    public abstract IDeepJobConfig<T> partitioner(String partitionerClassName);
 
     /**
      * Sets the password to use to login to Cassandra. Leave empty if you do not need authentication.
@@ -232,7 +234,7 @@ public interface IDeepJobConfig<T> extends Serializable {
     /**
      * Sets cassandra host rpcPort.
      *
-     * @param port
+     * @param port the thrift port number.
      * @return this object.
      */
     public abstract IDeepJobConfig<T> rpcPort(Integer port);
@@ -240,7 +242,7 @@ public interface IDeepJobConfig<T> extends Serializable {
     /**
      * Sets cassandra host rpcPort.
      *
-     * @param port
+     * @param port the cql port number.
      * @return this object.
      */
     public abstract IDeepJobConfig<T> cqlPort(Integer port);
@@ -265,8 +267,8 @@ public interface IDeepJobConfig<T> extends Serializable {
      * <p/>
      * Defaults to FALSE.
      *
-     * @param createTableOnWrite
-     * @return
+     * @param createTableOnWrite a boolean that tells this configuration obj to create missing tables on write.
+     * @return this configuration object.
      */
     public abstract IDeepJobConfig<T> createTableOnWrite(Boolean createTableOnWrite);
 
@@ -274,21 +276,21 @@ public interface IDeepJobConfig<T> extends Serializable {
      * Returns whether or not in this configuration object we specify to automatically create
      * the output column family.
      *
-     * @return
+     * @return true if this configuration object has been configured to create missing tables on writes.
      */
     public abstract Boolean isCreateTableOnWrite();
 
     /**
      * Returns the configured read consistency level.
      *
-     * @return
+     * @return the read consistency level.
      */
     public abstract String getReadConsistencyLevel();
 
     /**
      * Returns the configured write consistency level.
      *
-     * @return
+     * @return the write consistency level.
      */
     public abstract String getWriteConsistencyLevel();
 
@@ -297,8 +299,8 @@ public interface IDeepJobConfig<T> extends Serializable {
      * Can be one of those consistency levels defined in {@link org.apache.cassandra.db.ConsistencyLevel}.<br/>
      * Defaults to {@link org.apache.cassandra.db.ConsistencyLevel#LOCAL_ONE}.
      *
-     * @param level
-     * @return
+     * @param level the read consistency level to use.
+     * @return this configuration object.
      */
     public abstract IDeepJobConfig<T> readConsistencyLevel(String level);
 
@@ -307,8 +309,8 @@ public interface IDeepJobConfig<T> extends Serializable {
      * Can be one of those consistency levels defined in {@link org.apache.cassandra.db.ConsistencyLevel}.<br/>
      * Defaults to {@link org.apache.cassandra.db.ConsistencyLevel#LOCAL_ONE}.
      *
-     * @param level
-     * @return
+     * @param level the write consistency level to use.
+     * @return this configuration object.
      */
     public abstract IDeepJobConfig<T> writeConsistencyLevel(String level);
 
@@ -316,35 +318,35 @@ public interface IDeepJobConfig<T> extends Serializable {
      * Returns the name of the configured column family.
      * Column family name is case sensitive.
      *
-     * @return
+     * @return the table name.
      */
     public abstract String getTable();
 
     /**
      * Returns the batch size used for writing objects to the underying Cassandra datastore.
      *
-     * @return
+     * @return the batch size.
      */
     int getBatchSize();
 
     /**
      * Returns the map of additional filters specified by the user.
      *
-     * @return
+     * @return the map of configured additional filters.
      */
     public Map<String, Serializable> getAdditionalFilters();
 
     /**
      * Returns the maximum number of rows that will be retrieved when fetching data pages from Cassandra.
      *
-     * @return
+     * @return the page size
      */
     public int getPageSize();
 
     /**
      * Returns whether this configuration config is suitable for writing out data to the datastore.
      *
-     * @return
+     * @return true if this configuratuon object is suitable for writing to cassandra, false otherwise.
      */
     public Boolean getIsWriteConfig();
 

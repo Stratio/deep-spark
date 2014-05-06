@@ -22,7 +22,6 @@ import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.*;
 import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
-import org.apache.cassandra.dht.IPartitioner;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -187,14 +186,14 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     /**
      * Fetches table metadata from the underlying datastore, using DataStax java driver.
      *
-     * @return
+     * @return the table metadata as returned by the driver.
      */
     public TableMetadata fetchTableMetadata() {
 
         Metadata metadata = getSession().getCluster().getMetadata();
         KeyspaceMetadata ksMetadata = metadata.getKeyspace(this.keyspace);
 
-        if (metadata != null && ksMetadata != null) {
+        if (ksMetadata != null) {
             return ksMetadata.getTable(quote(this.columnFamily));
         } else {
             return null;
@@ -210,7 +209,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * we need to get at least one element of the output RDD.
      * </p>
      *
-     * @param tupleRDD
+     * @param tupleRDD the pair RDD.
      */
     public void createOutputTableIfNeeded(RDD<Tuple2<Cells, Cells>> tupleRDD) {
 
@@ -453,7 +452,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public <P extends IPartitioner<?>> IDeepJobConfig<T> partitioner(String partitionerClassName) {
+    public IDeepJobConfig<T> partitioner(String partitionerClassName) {
         this.partitionerClassName = partitionerClassName;
         return this;
     }
@@ -558,6 +557,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
 
         if (!ArrayUtils.isEmpty(inputColumns)) {
             for (String column : inputColumns) {
+                assert tableMetadata != null;
                 ColumnMetadata columnMetadata = tableMetadata.getColumn(column);
 
                 if (columnMetadata == null) {

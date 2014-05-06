@@ -124,7 +124,7 @@ public final class Cell implements Serializable {
     }
 
     /**
-     * Constructs a Cell from a {@link @DeepField} property.
+     * Constructs a Cell from a {@link com.stratio.deep.annotations.DeepField} property.
      *
      * @param e     instance of the testentity whose field is going to generate a Cell.
      * @param field field that will generate the Cell.
@@ -284,8 +284,8 @@ public final class Cell implements Serializable {
     }
 
     /**
-     * Returns the composed cell value. The type of the returned object can be obtained by calling {@see
-     * Cell#getValueType}
+     * Returns the composed cell value. The type of the returned object can be obtained by calling
+     * {@link com.stratio.deep.entity.Cell#getValueType}
      *
      * @return the composed cell value.
      */

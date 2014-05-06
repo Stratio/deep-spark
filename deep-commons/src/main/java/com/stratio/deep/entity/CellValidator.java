@@ -47,7 +47,7 @@ import static java.util.Collections.unmodifiableCollection;
  * Defines a serializable CellValidator. <br/>
  * <p/>
  * This object wraps the complexity of obtaining the Cassandra's AbstractType
- * associated to a {@see Cell}.
+ * associated to a {@link com.stratio.deep.entity.Cell}.
  * <p/>
  * In the case of collection types, a simple cassandra marshaller qualified name
  * is not enough to fully generate an AbstractType, we also need the type(s) the
@@ -92,8 +92,8 @@ public class CellValidator implements Serializable {
          * </ul>
          * </p>
          *
-         * @param type
-         * @return
+         * @param type the marshaller Class object.
+         * @return the Kind associated to the provided marhaller Class object.
          */
         public static Kind validatorClassToKind(Class<? extends AbstractType> type) {
             if (type == null) {
@@ -116,19 +116,19 @@ public class CellValidator implements Serializable {
          * <p/>
          * <p>To be more specific, returns:
          * <ul>
-         * <li>{@see com.stratio.deep.entity.CellValidator.Kind.SET}: when the provided instance object is an
-         * instance of {@see java.util.Set}</li>
-         * <li>{@see com.stratio.deep.entity.CellValidator.Kind.LIST}: when the provided instance object is an
-         * instance of {@see java.util.List}</li>
-         * <li>{@see com.stratio.deep.entity.CellValidator.Kind.MAP}: when the provided instance object is an
-         * instance of {@see java.util.Map}</li>
-         * <li>{@see com.stratio.deep.entity.CellValidator.Kind.NOT_A_COLLECTION}: otherwise.</li>
+         * <li>{@link com.stratio.deep.entity.CellValidator.Kind#SET}: when the provided instance object is an
+         * instance of {@link java.util.Set}</li>
+         * <li>{@link com.stratio.deep.entity.CellValidator.Kind#LIST}: when the provided instance object is an
+         * instance of {@link java.util.List}</li>
+         * <li>{@link com.stratio.deep.entity.CellValidator.Kind#MAP}: when the provided instance object is an
+         * instance of {@link java.util.Map}</li>
+         * <li>{@link com.stratio.deep.entity.CellValidator.Kind#NOT_A_COLLECTION}: otherwise.</li>
          * </ul>
          * </p>
          *
-         * @param object
-         * @param <T>
-         * @return
+         * @param object an object instance.
+         * @param <T> the generic type of the provided object instance.
+         * @return the Kind associated to the provided object.
          */
         public static <T> Kind objectToKind(T object) {
             if (object == null) {
@@ -174,8 +174,8 @@ public class CellValidator implements Serializable {
     /**
      * Factory method that builds a CellValidator from an IDeepType field.
      *
-     * @param field
-     * @return
+     * @param field the IDeepType field.
+     * @return a new CellValidator associated to the provided object.
      */
     public static CellValidator cellValidator(Field field) {
         return new CellValidator(field);
@@ -184,8 +184,8 @@ public class CellValidator implements Serializable {
     /**
      * Factory method that builds a CellValidator from a DataType object.
      *
-     * @param type
-     * @return
+     * @param type the data type coming from the driver.
+     * @return a new CellValidator associated to the provided object.
      */
     public static CellValidator cellValidator(DataType type) {
         return new CellValidator(type);
@@ -195,9 +195,9 @@ public class CellValidator implements Serializable {
      * Generates a CellValidator for a generic instance of an object.
      * We need the actual instance in order to differentiate between an UUID and a TimeUUID.
      *
-     * @param obj
-     * @param <T>
-     * @return
+     * @param obj an instance to use to build the new CellValidator.
+     * @param <T> the generic type of the provided object instance.
+     * @return a new CellValidator associated to the provided object.
      */
     public static <T> CellValidator cellValidator(T obj) {
         if (obj == null) {
@@ -211,17 +211,24 @@ public class CellValidator implements Serializable {
         return new CellValidator(validatorClassName, kind, validatorTypes);
     }
 
+    /**
+     * private constructor.
+     */
     private CellValidator(String validatorClassName, Kind validatorKind, Collection<String> validatorTypes) {
         this.validatorClassName = validatorClassName != null ? validatorClassName : DEFAULT_VALIDATOR_CLASSNAME;
         this.validatorKind = validatorKind;
         this.validatorTypes = validatorTypes;
     }
-
+    /**
+     * private constructor.
+     */
     private static String getCollectionInnerType(Class<?> type) {
         CQL3Type.Native nativeType = MAP_JAVA_TYPE_TO_CQL_TYPE.get(type);
         return nativeType.name().toLowerCase();
     }
-
+    /**
+     * private constructor.
+     */
     private CellValidator(Field field) {
         Class<?>[] types = AnnotationUtils.getGenericTypes(field);
         DeepField annotation = field.getAnnotation(DeepField.class);
@@ -244,9 +251,9 @@ public class CellValidator implements Serializable {
     }
 
     /**
-     * Public constructor.
+     * private constructor.
      *
-     * @param type a {@see com.datastax.driver.core.DataType} coming from the underlying Java driver.
+     * @param type a {@link com.datastax.driver.core.DataType} coming from the underlying Java driver.
      */
     private CellValidator(DataType type) {
         if (type == null) {
@@ -259,8 +266,8 @@ public class CellValidator implements Serializable {
         } else {
             validatorTypes = new ArrayList<>();
 
-            for (Iterator<DataType> types = type.getTypeArguments().iterator(); types.hasNext(); ) {
-                validatorTypes.add(types.next().toString());
+            for (DataType dataType : type.getTypeArguments()) {
+                validatorTypes.add(dataType.toString());
             }
 
             switch (type.getName()) {
@@ -286,9 +293,9 @@ public class CellValidator implements Serializable {
 
 
     /**
-     * Generates the cassandra marshaller ({@see org.apache.cassandra.db.marshal.AbstractType}) for this CellValidator.
+     * Generates the cassandra marshaller ({@link org.apache.cassandra.db.marshal.AbstractType}) for this CellValidator.
      *
-     * @return
+     * @return an instance of the cassandra marshaller for this CellValidator.
      */
     public AbstractType<?> getAbstractType() {
         if (abstractType != null) {
@@ -334,7 +341,7 @@ public class CellValidator implements Serializable {
     /**
      * Getter for validatorClassName.
      *
-     * @return
+     * @return the cassandra marshaller class name.
      */
     public String getValidatorClassName() {
         return validatorClassName;
@@ -343,7 +350,7 @@ public class CellValidator implements Serializable {
     /**
      * Getter for validatorTypes.
      *
-     * @return
+     * @return a collection of validator type names.
      */
     public Collection<String> getValidatorTypes() {
         return validatorTypes;
@@ -352,7 +359,7 @@ public class CellValidator implements Serializable {
     /**
      * Getter for validatorKind.
      *
-     * @return
+     * @return the Kind associated to this CellValidator.
      */
     public Kind validatorKind() {
         return validatorKind;
@@ -397,6 +404,9 @@ public class CellValidator implements Serializable {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "CellValidator{" +

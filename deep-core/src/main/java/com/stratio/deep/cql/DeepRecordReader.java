@@ -81,24 +81,23 @@ public class DeepRecordReader {
     private Session session;
 
     /**
-     * public constructor. Takes a list of filters to pass to the underlying datastores.
+     * public constructor. Takes a list of filters to pass to the underlying data stores.
      *
-     * @param config
+     * @param config the deep configuration object.
+     * @param split the token range on which the new reader will be based.
      */
     public DeepRecordReader(IDeepJobConfig config, DeepTokenRange split) {
         this.config = config;
-        initialize(split);
+        this.split = split;
+        initialize();
     }
 
     /**
      * Initialized this object.
      * <p>Creates a new client and row iterator.</p>
      *
-     * @param split
      */
-    private void initialize(DeepTokenRange split) {
-        this.split = split;
-
+    private void initialize() {
         cfName = config.getTable();
 
         if (!ArrayUtils.isEmpty(config.getInputColumns())) {
@@ -156,7 +155,7 @@ public class DeepRecordReader {
     /**
      * Creates a new key map.
      *
-     * @return
+     * @return the map of associations between row key names and their values.
      */
     public Map<String, ByteBuffer> createKey() {
         return new LinkedHashMap<String, ByteBuffer>();
@@ -165,7 +164,7 @@ public class DeepRecordReader {
     /**
      * Creates a new value map.
      *
-     * @return
+     * @return the map of associations between row column names and their values.
      */
     public Map<String, ByteBuffer> createValue() {
         return new LinkedHashMap<String, ByteBuffer>();
@@ -668,7 +667,7 @@ public class DeepRecordReader {
      * Returns a boolean indicating if the underlying rowIterator has a new element or not.
      * DOES NOT advance the iterator to the next element.
      *
-     * @return
+     * @return a boolean indicating if the underlying rowIterator has a new element or not.
      */
     public boolean hasNext() {
         return rowIterator.hasNext();
@@ -677,7 +676,7 @@ public class DeepRecordReader {
     /**
      * Returns the next element in the underlying rowIterator.
      *
-     * @return
+     * @return the next element in the underlying rowIterator.
      */
     public Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> next() {
         if (!this.hasNext()) {

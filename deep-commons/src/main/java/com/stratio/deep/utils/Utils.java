@@ -53,8 +53,8 @@ public final class Utils {
      * <br/>
      * The second Cells element contains all the other columns.
      *
-     * @param cells
-     * @return
+     * @param cells the Cells object to process.
+     * @return a pair whose first element is a Cells object containing key Cell(s) and whose second element contains all of the other Cell(s).
      */
     public static Tuple2<Cells, Cells> cellList2tuple(Cells cells) {
         Cells keys = new Cells();
@@ -78,9 +78,9 @@ public final class Utils {
      * The first map contains the key column names and the corresponding values.
      * The ByteBuffer list contains the value of the columns that will be bounded to CQL query parameters.
      *
-     * @param e
-     * @param <T>
-     * @return
+     * @param e the entity object to process.
+     * @param <T> the entity object generic type.
+     * @return a pair whose first element is a Cells object containing key Cell(s) and whose second element contains all of the other Cell(s).
      */
     public static <T extends IDeepType> Tuple2<Cells, Cells> deepType2tuple(T e) {
 
@@ -123,6 +123,7 @@ public final class Utils {
      * @param className the class object for which a new instance should be created.
      * @return the new instance of class clazz.
      */
+    @SuppressWarnings("unchecked")
     public static <T> T newTypeInstance(String className, Class<T> returnClass) {
         try {
             Class<T> clazz = (Class<T>) Class.forName(className);
@@ -178,8 +179,8 @@ public final class Utils {
     /**
      * Generates the part of the query where clause that will hit the Cassandra's secondary indexes.
      *
-     * @param additionalFilters
-     * @return
+     * @param additionalFilters the map of filters names and values.
+     * @return the query subpart corresponding to the provided additional filters.
      */
     public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters) {
         if (MapUtils.isEmpty(additionalFilters)) {
@@ -208,11 +209,11 @@ public final class Utils {
     /**
      * Generates a create table cql statement from the given Cells description.
      *
-     * @param keys
-     * @param values
-     * @param outputKeyspace
-     * @param outputColumnFamily
-     * @return
+     * @param keys the row  keys wrapped inside a Cells object.
+     * @param values all the other row columns wrapped inside a Cells object.
+     * @param outputKeyspace the output keyspace.
+     * @param outputColumnFamily the output column family.
+     * @return the create table statement.
      */
     public static String createTableQueryGenerator(Cells keys, Cells values, String outputKeyspace,
                                                    String outputColumnFamily) {
@@ -304,9 +305,11 @@ public final class Utils {
      * We do not generate the key part of the update query. The provided query will be concatenated with the key part
      * by CqlRecordWriter.
      *
-     * @param outputKeyspace
-     * @param outputColumnFamily
-     * @return
+     * @param keys the row  keys wrapped inside a Cells object.
+     * @param values all the other row columns wrapped inside a Cells object.
+     * @param outputKeyspace the output keyspace.
+     * @param outputColumnFamily the output column family.
+     * @return the update query statement.
      */
     public static String updateQueryGenerator(Cells keys, Cells values, String outputKeyspace,
                                               String outputColumnFamily) {
@@ -348,14 +351,13 @@ public final class Utils {
     /**
      * Returns a CQL batch query wrapping the given statements.
      *
-     * @param statements
-     * @return
+     * @param statements the list of statements to use to generate the batch statement.
+     * @return the batch statement.
      */
     public static String batchQueryGenerator(List<String> statements) {
         StringBuilder sb = new StringBuilder("BEGIN BATCH \n");
 
-        for (int i = 0; i < statements.size(); i++) {
-            String statement = statements.get(i);
+        for (String statement : statements) {
             sb.append(statement).append("\n");
         }
 
@@ -367,8 +369,8 @@ public final class Utils {
     /**
      * Splits columns names and values as required by Datastax java driver to generate an Insert query.
      *
-     * @param tuple
-     * @return
+     * @param tuple an object containing the key Cell(s) as the first element and all the other columns as the second element.
+     * @return an object containing an array of column names as the first element and an array of column values as the second element.
      */
     public static Tuple2<String[], Object[]> prepareTuple4CqlDriver(Tuple2<Cells, Cells> tuple) {
         Cells keys = tuple._1();
@@ -403,8 +405,9 @@ public final class Utils {
      * @param propertyName the field name of the property whose setter we want to resolve.
      * @param entityClass  the bean class object in which we want to search for the setter.
      * @param valueType    the class type of the object that we want to pass to the setter.
-     * @return
+     * @return the resolved setter.
      */
+    @SuppressWarnings("unchecked")
     public static Method findSetter(String propertyName, Class entityClass, Class valueType) {
         Method setter;
 
@@ -428,8 +431,8 @@ public final class Utils {
     /**
      * Returns an instance of the Cassandra validator that matches the provided object.
      *
-     * @param obj
-     * @param <T>
+     * @param obj the object to use to resolve the cassandra marshaller.
+     * @param <T> the generic object type.
      * @return an instance of the Cassandra validator that matches the provided object.
      * @throws com.stratio.deep.exception.DeepGenericException if no validator can be found for the specified object.
      */
@@ -458,8 +461,8 @@ public final class Utils {
     /**
      * Returns the inet address for the specified location.
      *
-     * @param location
-     * @return
+     * @param location the address as String
+     * @return the InetAddress object associated to the provided address.
      */
     public static InetAddress inetAddressFromLocation(String location) {
         try {
