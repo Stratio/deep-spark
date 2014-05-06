@@ -23,6 +23,7 @@ import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepInstantiationException;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
@@ -162,16 +163,10 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         String keyspace = writeConfig.getKeyspace();
         String cfName = writeConfig.getColumnFamily();
 
-        String query =
-                "SELECT key_validator,key_aliases,column_aliases " +
-                        "FROM system.schema_columnfamilies " +
-                        "WHERE keyspace_name='%s' and columnfamily_name='%s' ";
-        String formatted = String.format(query, keyspace, cfName);
-        ResultSet resultSet = sessionWithHost.left.execute(formatted);
-        Row row = resultSet.one();
+        Row row = getRowMetadata(sessionWithHost, keyspace, cfName);
 
         if (row == null){
-            throw new IllegalArgumentException(String.format("cannot find metadata for %s.%s", keyspace, cfName));
+            throw new DeepIOException(String.format("cannot find metadata for %s.%s", keyspace, cfName));
         }
 
         String validator = row.getString("key_validator");
@@ -191,6 +186,24 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         String clusterColumnString = row.getString("column_aliases");
 
         LOG.debug("cluster columns: " + clusterColumnString);
+    }
+
+    /**
+     * Fetches row metadata for the given column family.
+     *
+     * @param sessionWithHost the connection to the DB.
+     * @param keyspace the keyspace name
+     * @param cfName the column family
+     * @return the Row object
+     */
+    private static Row getRowMetadata(Pair<Session, String> sessionWithHost, String keyspace, String cfName) {
+        String query =
+                "SELECT key_validator,key_aliases,column_aliases " +
+                        "FROM system.schema_columnfamilies " +
+                        "WHERE keyspace_name='%s' and columnfamily_name='%s' ";
+        String formatted = String.format(query, keyspace, cfName);
+        ResultSet resultSet = sessionWithHost.left.execute(formatted);
+        return resultSet.one();
     }
 
     /**
