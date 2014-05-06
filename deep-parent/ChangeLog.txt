@@ -1,3 +1,138 @@
+[0.2.2]
+
+commit 3792e7360016a39c16669dbdc989b0ab681f9169
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue May 6 14:14:37 2014 +0200
+
+    [stratio-deep release prepare] preparing for version 0.2.2
+
+commit c7105fcce44ae0b1091d590eac6bdc711b0125bb
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue May 6 14:13:42 2014 +0200
+
+    fixed dependency to deep-core
+
+commit da443e6805b92b2960874937fd6b7018b2f7bfe1
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue May 6 14:13:23 2014 +0200
+
+    fixed javadoc
+
+commit e18489e184f835bd2ab6bf17ed81407cf1a59a13
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue May 6 14:05:00 2014 +0200
+
+    wait for table metadata once the new table has been created
+
+commit 4a5643e03d184fa6369019a699fa682745feb379
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue May 6 14:04:12 2014 +0200
+
+    Row metadata fetch refactored out to a method
+
+commit d8fdf293b20a6be235b4e174be7c36d9ed067ea7
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue May 6 12:51:21 2014 +0200
+
+    fixed typo in validation message
+
+commit d6752850eacb66ab9240d49f7df19d4beb26f4bc
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue May 6 12:14:41 2014 +0200
+
+    some README corrections
+
+commit ddcb9d7152e9a4ece1d4fcfa52c60a22b2fc8e8b
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue May 6 12:14:15 2014 +0200
+
+    deploy script moved to a deploy project
+
+commit 663c903c156845d3ec1c3952ea7980ce62334d84
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue May 6 12:02:39 2014 +0200
+
+    Fixed missing javadocs.
+
+commit 6a34b4e2ac7337fc937f5087c359ff52990619dc
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue May 6 12:02:24 2014 +0200
+
+    Added log message
+
+commit d4e21226368183347f52f41cdd5aabf2c8c80483
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue May 6 12:02:10 2014 +0200
+
+    Added sonatype required tags
+
+commit dc84b869199529650ca7cac9c85053b704c69c33
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue May 6 12:01:35 2014 +0200
+
+    changed compile dependency to Spark 0.9.1 vanilla
+
+commit b83f53176905fdbb8d8a1c1f8bd331d48864f37a
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue May 6 11:46:58 2014 +0200
+
+    Fixed missing javadocs.
+
+commit fa38b12e7851a1e4c484bb73de02de7fc8d32123
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon May 5 18:18:27 2014 +0200
+
+    Added mandatory tags to successfully deploy artifacts to sonatype
+
+commit b112fb5aec954653fdcc41ffadbf9f585c401bed
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon May 5 18:00:50 2014 +0200
+
+    Added log message to debug tests failing in jenkins
+
+commit bf13544ea6c58274827187dd290c787c7df468f2
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon May 5 17:56:57 2014 +0200
+
+    Added mandatory tags to successfully deploy artifacts to sonatype
+
+commit 4fc343a29adb16694a071fadf514c6404b72f31b
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon May 5 17:45:12 2014 +0200
+
+    Added log message to debug tests failing in jenkins
+
+commit 3fc06843ef0e97df63671f6ada48a83600457912
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon May 5 16:42:50 2014 +0200
+
+    changed artifactId(s) and folder names to follow maven naming conventions
+
+commit 2a83dc0f1efc73fb322773fdf28c9972072827bd
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon May 5 11:49:26 2014 +0200
+
+    fixed test entities name clash between projects
+
+commit 957c0b0d831909e0ba99e944efd17b4f803c3a7a
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon May 5 11:48:29 2014 +0200
+
+    changed spark production branch to stratio-branch-0.9.1
+
+commit 089171546bf64ea0cd29d37899d9ecbf33f3c0dd
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Apr 24 16:22:42 2014 +0200
+
+    [StratioDeep release finish] next snapshot version 0.2.2-SNAPSHOT
+
+commit 277065b966b167536710cfe517df15e753cdca2a
+Merge: f86b488 6265c71
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Apr 24 16:22:33 2014 +0200
+
+    Merge branch 'release/version-0.2.1' into develop
+
 [0.2.1]
 
 commit de20867d757dbae9a688e56fd63ffc1a8be8185e
