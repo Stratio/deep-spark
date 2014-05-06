@@ -521,7 +521,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
         validateAdditionalFilters(tableMetadata);
 
         if (bisectFactor != Constants.DEFAULT_BISECT_FACTOR && !checkIsPowerOfTwo(bisectFactor)){
-            throw new IllegalArgumentException("Bisect factor should be greater than zero a power of 2");
+            throw new IllegalArgumentException("Bisect factor should be greater than zero and a power of 2");
         }
     }
 
