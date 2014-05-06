@@ -249,6 +249,7 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
             fail();
         } catch (DeepIOException e) {
             // ok
+            logger.info("Correctly catched DeepIOException: " + e.getMessage());
             writeConfig.createTableOnWrite(Boolean.TRUE);
         }
 
@@ -313,6 +314,7 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
             fail();
         } catch (Exception e) {
             // ok
+            logger.info("Correctly catched Exception: " + e.getMessage());
             writeConfig.createTableOnWrite(Boolean.TRUE);
         }
 
