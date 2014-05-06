@@ -22,6 +22,7 @@ import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.*;
 import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -232,6 +233,34 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
         }
         String createTableQuery = createTableQueryGenerator(first._1(), first._2(), getKeyspace(), getColumnFamily());
         getSession().execute(createTableQuery);
+        waitForNewTableMetadata();
+    }
+    /** waits until table metadata is not null */
+    private void waitForNewTableMetadata() {
+        TableMetadata metadata;
+        int retries = 0;
+        final int waitTime = 100;
+        do {
+            metadata = getSession().getCluster().getMetadata().getKeyspace(this.keyspace).getTable(this
+                    .columnFamily);
+
+            if (metadata != null){
+                continue;
+            }
+
+            LOG.warn(String.format("Metadata for new table %s.%s NOT FOUND, waiting %d millis", this.keyspace, this.columnFamily, waitTime));
+            try {
+                Thread.sleep(waitTime);
+            } catch (InterruptedException e) {
+                LOG.error("Sleep interrupted",e);
+            }
+
+            retries++;
+
+            if (retries >= 10){
+                throw new DeepIOException("Cannot retrieve metadata for the newly created CF ");
+            }
+        } while (metadata == null);
     }
 
     /**
