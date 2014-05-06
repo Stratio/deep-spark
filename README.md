@@ -1,8 +1,7 @@
 Stratio Deep
 =====================
 
-Stratio Deep is a thin integration layer between Apache Spark and Apache Cassandra. The integration is currently
-based on the Cassandra's Hadoop interface.
+Stratio Deep is a thin integration layer between Apache Spark and Apache Cassandra. The integration is _not_ based on the Cassandra's Hadoop interface.
 Stratio Deep is one of the core modules on which [Stratio's BigData platform (SDS)](http://www.stratio.com/) is based.
 
 StratioDeep comes with an user friendly API that lets developers create Spark RDDs mapped to Cassandra column families.
