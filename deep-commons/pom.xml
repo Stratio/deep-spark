@@ -31,6 +31,52 @@
         <relativePath>../deep-parent</relativePath>
     </parent>
 
+    <developers>
+        <developer>
+            <id>lucarosellini</id>
+            <name>Luca Rosellini</name>
+            <email>luca@stratio.com</email>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+                <role>maintainer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>aagea</id>
+            <name>Álvaro Agea</name>
+            <email>alvaro@stratio.com</email>
+            <roles>
+                <role>architect</role>
+                <role>contributor</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>eraffenne</id>
+            <name>Emmanuelle Raffenne</name>
+            <email>eraffenne@stratio.com</email>
+            <roles>
+                <role>tester</role>
+                <role>documentation</role>
+                <role>contributor</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:Stratio/stratio-deep.git</connection>
+        <developerConnection>scm:git:git@github.com:Stratio/stratio-deep.git</developerConnection>
+        <url>https://github.com/Stratio/stratio-deep</url>
+    </scm>
+
     <build>
         <plugins>
             <plugin>
