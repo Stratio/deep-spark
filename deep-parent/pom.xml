@@ -22,6 +22,8 @@
     <version>0.2.3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>http://www.stratio.com</url>
+    <name>deep parent</name>
+    <description>Stratio deep parent project</description>
 
     <properties>
         <!-- Cassandra -->
