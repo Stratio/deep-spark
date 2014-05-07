@@ -88,13 +88,13 @@
     <distributionManagement>
 
         <repository>
-            <id>stratio-releases</id>
-            <url>http://nexus.strat.io:8081/nexus/content/repositories/releases</url>
+            <id>sonatype-nexus-staging</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
 
         <snapshotRepository>
-            <id>stratio-snapshots</id>
-            <url>http://nexus.strat.io:8081/nexus/content/repositories/snapshots</url>
+            <id>sonatype-nexus-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
 
     </distributionManagement>
