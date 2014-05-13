@@ -27,8 +27,8 @@
 
     <properties>
         <!-- Cassandra -->
-        <cassandra.version>2.0.5</cassandra.version>
-        <datastax.driver.version>2.0.1</datastax.driver.version>
+        <cassandra.version>2.0.7</cassandra.version>
+        <datastax.driver.version>2.0.2</datastax.driver.version>
 
         <!-- Spark version -->
         <spark.version>0.9.1</spark.version>
@@ -149,7 +149,6 @@
                     <artifactId>avro</artifactId>
                     <groupId>org.apache.avro</groupId>
                 </exclusion>
-
             </exclusions>
         </dependency>
 
