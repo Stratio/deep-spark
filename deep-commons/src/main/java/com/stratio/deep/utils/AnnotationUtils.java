@@ -21,7 +21,7 @@ import com.stratio.deep.annotations.DeepField;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepIOException;
 import org.apache.cassandra.db.marshal.*;
-import org.apache.cassandra.utils.Pair;
+import com.stratio.deep.utils.Pair;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 

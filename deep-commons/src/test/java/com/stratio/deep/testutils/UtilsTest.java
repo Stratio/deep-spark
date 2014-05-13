@@ -24,7 +24,7 @@ import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.testentity.CommonsTestEntity;
 import com.stratio.deep.utils.AnnotationUtils;
 import com.stratio.deep.utils.Utils;
-import org.apache.cassandra.utils.Pair;
+import com.stratio.deep.utils.Pair;
 import org.testng.annotations.Test;
 import scala.Tuple2;
 
