@@ -29,7 +29,7 @@ import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.dht.*;
 import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
-import org.apache.cassandra.utils.Pair;
+import com.stratio.deep.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

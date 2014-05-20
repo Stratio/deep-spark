@@ -19,7 +19,7 @@ package com.stratio.deep.rdd;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
-import org.apache.cassandra.utils.Pair;
+import com.stratio.deep.utils.Pair;
 import org.apache.spark.SparkContext;
 
 import java.nio.ByteBuffer;

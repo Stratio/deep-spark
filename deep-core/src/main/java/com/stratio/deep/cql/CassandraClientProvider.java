@@ -22,7 +22,7 @@ import com.datastax.driver.core.policies.LoadBalancingPolicy;
 import com.datastax.driver.core.policies.Policies;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepIOException;
-import org.apache.cassandra.utils.Pair;
+import com.stratio.deep.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

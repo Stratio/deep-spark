@@ -23,7 +23,7 @@ import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.utils.Pair;
+import com.stratio.deep.utils.Pair;
 import org.apache.spark.SparkContext;
 
 import java.nio.ByteBuffer;

@@ -26,7 +26,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import org.apache.cassandra.dht.Murmur3Partitioner;
-import org.apache.cassandra.utils.Pair;
+import com.stratio.deep.utils.Pair;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;

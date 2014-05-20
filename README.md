@@ -1,6 +1,8 @@
 Stratio Deep
 =====================
 
+[![Build Status](https://drone.io/github.com/Stratio/stratio-deep/status.png)](https://drone.io/github.com/Stratio/stratio-deep/latest)
+
 Stratio Deep is a thin integration layer between Apache Spark and Apache Cassandra. The integration is _not_ based on the Cassandra's Hadoop interface.
 Stratio Deep is one of the core modules on which [Stratio's BigData platform (SDS)](http://www.stratio.com/) is based.
 

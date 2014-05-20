@@ -27,7 +27,7 @@
     <parent>
         <groupId>com.stratio.deep</groupId>
         <artifactId>deep-parent</artifactId>
-        <version>0.2.2</version>
+        <version>0.2.3</version>
         <relativePath>../deep-parent</relativePath>
     </parent>
 
@@ -223,11 +223,5 @@
 
         </plugins>
     </build>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>scala-tools.org</id>
-            <name>Scala-tools Maven2 Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </pluginRepository>
-    </pluginRepositories>
+
 </project>
