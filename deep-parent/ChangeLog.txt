@@ -1,3 +1,12 @@
+[0.2.3]
+
+* fixed RDD serializationNumber error
+* Added drone.io build status in README.md
+* removed b0rked pluginRepository configuration accessing dead scala-tools.org repo
+* removed reference to Stratio's private repos from parent pom
+* Updated dependency to Cassandra 2.0.7 and Datastax driver 2.0.2
+* removed dependency to cassandra's Pair object
+
 [0.2.2]
 
 commit 3792e7360016a39c16669dbdc989b0ab681f9169
