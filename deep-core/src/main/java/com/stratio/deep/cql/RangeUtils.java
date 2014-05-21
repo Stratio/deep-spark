@@ -19,10 +19,7 @@ package com.stratio.deep.cql;
 import com.datastax.driver.core.*;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
+import com.google.common.collect.*;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.utils.Utils;
@@ -162,7 +159,11 @@ public class RangeUtils {
             }
         };
 
-        return Ordering.natural().sortedCopy(concat(transform(allRanges, map)));
+        Iterable<DeepTokenRange> concatenated = concat(transform(allRanges, map));
+
+        Set<DeepTokenRange> dedup = Sets.newHashSet(concatenated);
+
+        return Ordering.natural().sortedCopy(dedup);
     }
 
     /**

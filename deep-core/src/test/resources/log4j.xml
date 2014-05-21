@@ -39,6 +39,10 @@
         <priority value="ERROR"/>
     </category>
 
+    <category name="com.datastax">
+        <priority value="ERROR"/>
+    </category>
+
     <category name="org.apache.cassandra">
         <priority value="FATAL"/>
     </category>
