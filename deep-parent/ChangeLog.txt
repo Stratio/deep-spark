@@ -1,3 +1,7 @@
+[0.2.6]
+
+* deploy script now removes source and javadoc jars from the final distribution .tgz 
+
 [0.2.5]
 
 * fixed token range duplication bug
