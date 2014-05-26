@@ -91,6 +91,10 @@ DISTDIR=spark-deep-distribution-${RELEASE_VER}
 DISTFILENAME=${DISTDIR}.tgz
 
 cp ${TMPDIR}/lib/*.jar ${STRATIOSPARKDIR}/dist/jars/
+rm -f ${STRATIOSPARKDIR}/dist/jars/*-sources.jar
+rm -f ${STRATIOSPARKDIR}/dist/jars/*-javadoc.jar
+rm -f ${STRATIOSPARKDIR}/dist/jars/*-tests.jar
+
 mv ${STRATIOSPARKDIR}/dist/ ${DISTDIR}
 cp ${TMPDIR}/ChangeLog.txt ${DISTDIR}/
 
