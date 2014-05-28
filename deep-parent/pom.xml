@@ -179,6 +179,18 @@
                         <localCheckout>true</localCheckout>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>cobertura-maven-plugin</artifactId>
+                    <version>2.6</version>
+                    <configuration>
+                        <aggregate>true</aggregate>
+                        <formats>
+                            <format>xml</format>
+                        </formats>
+
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
