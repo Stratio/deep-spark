@@ -58,6 +58,7 @@ public class CellValidatorTest {
         assertEquals(cv.getValidatorClassName(), InetAddressType.class.getCanonicalName());
         assertNull(cv.getValidatorTypes());
         assertEquals(cv.validatorKind(), Kind.NOT_A_COLLECTION);
+        assertEquals(DataType.Name.INET, cv.getCqlTypeName());
 
         assertNotNull(cv.getAbstractType());
         assertEquals(cv.getAbstractType(), InetAddressType.instance);
@@ -73,6 +74,7 @@ public class CellValidatorTest {
         assertEquals(cv.validatorKind(), Kind.SET);
         assertEquals(cv.getValidatorTypes().size(), 1);
         assertEquals(cv.getValidatorTypes().iterator().next(), "text");
+        assertEquals(DataType.Name.SET, cv.getCqlTypeName());
 
         try {
             Collection<String> types = cv.getValidatorTypes();
@@ -103,6 +105,7 @@ public class CellValidatorTest {
         assertEquals(cv.validatorKind(), Kind.LIST);
         assertEquals(cv.getValidatorTypes().size(), 1);
         assertEquals(cv.getValidatorTypes().iterator().next(), "timeuuid");
+        assertEquals(DataType.Name.LIST, cv.getCqlTypeName());
 
         try {
             Collection<String> types = cv.getValidatorTypes();
@@ -128,6 +131,7 @@ public class CellValidatorTest {
         Iterator<String> types = cv.getValidatorTypes().iterator();
         assertEquals(types.next(), "text");
         assertEquals(types.next(), "bigint");
+        assertEquals(DataType.Name.MAP, cv.getCqlTypeName());
 
         try {
             Collection<String> ctypes = cv.getValidatorTypes();
@@ -151,6 +155,7 @@ public class CellValidatorTest {
         assertFalse(cv.equals(cellValidator(DataType.timeuuid())));
         assertFalse(cv.equals(cellValidator(DataType.map(DataType.timestamp(), DataType.uuid()))));
         assertTrue(cv.equals(cellValidator(DataType.map(DataType.text(), DataType.bigint()))));
+        assertEquals(DataType.Name.MAP, cv.getCqlTypeName());
     }
 
     public void testCellValidatorMethod() throws NoSuchFieldException {
