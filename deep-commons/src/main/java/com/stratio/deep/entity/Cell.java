@@ -96,6 +96,17 @@ public final class Cell implements Serializable {
     }
 
     /**
+     * Factory method, builds a new Cell (isPartitionKey = false and isClusterKey = false) with value = null.
+     * The validator will be automatically calculated using the value object type.
+     *
+     * @param cellName  the cell name
+     * @return an instance of a Cell object for the provided parameters.
+     */
+    public static Cell create(String cellName) {
+        return create(cellName, (Object)null, Boolean.FALSE, Boolean.FALSE);
+    }
+
+    /**
      * Factory method, creates a new Cell.<br/>
      *
      * @param cellName       the cell name
@@ -161,7 +172,7 @@ public final class Cell implements Serializable {
      * Private constructor.
      */
     private Cell(String cellName, Object cellValue, Boolean isPartitionKey, Boolean isClusterKey) {
-        if (!(cellValue instanceof Serializable)) {
+        if (cellValue != null && !(cellValue instanceof Serializable)) {
             throw new DeepInstantiationException("provided cell value " + cellValue + " is not serializable");
         }
         this.cellName = cellName;
@@ -343,14 +354,22 @@ public final class Cell implements Serializable {
      * @return Returns the Cassandra validator instance associated to this cell.
      */
     public AbstractType marshaller() {
-        return cellValidator.getAbstractType();
+        if (cellValidator != null) {
+            return cellValidator.getAbstractType();
+        } else {
+            return null;
+        }
     }
 
     /**
      * @return the fully qualified class name of the cassandra validator associated to this cell.
      */
     public String marshallerClassName() {
-        return cellValidator.getValidatorClassName();
+        if (cellValidator != null) {
+            return cellValidator.getValidatorClassName();
+        } else {
+            return null;
+        }
     }
 
     /**

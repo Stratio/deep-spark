@@ -171,6 +171,8 @@ public class CellValidator implements Serializable {
 
     private transient AbstractType<?> abstractType;
 
+    private DataType.Name cqlTypeName;
+
     /**
      * Factory method that builds a CellValidator from an IDeepType field.
      *
@@ -259,6 +261,8 @@ public class CellValidator implements Serializable {
         if (type == null) {
             throw new DeepInstantiationException("input DataType cannot be null");
         }
+
+        cqlTypeName = type.getName();
 
         if (!type.isCollection()) {
             validatorClassName = AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(type.asJavaClass()).getClass()
@@ -415,5 +419,13 @@ public class CellValidator implements Serializable {
                 ", validatorKind=" + validatorKind +
                 ", abstractType=" + abstractType +
                 '}';
+    }
+
+
+    /**
+     * @return the original CQL3 type name (if known, null otherwise)
+     */
+    public DataType.Name getCqlTypeName() {
+        return cqlTypeName;
     }
 }

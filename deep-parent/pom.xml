@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.stratio.deep</groupId>
     <artifactId>deep-parent</artifactId>
-    <version>0.2.6</version>
+    <version>0.2.7</version>
     <packaging>pom</packaging>
     <url>http://www.stratio.com</url>
     <name>deep parent</name>
@@ -177,6 +177,18 @@
                         <preparationGoals>clean verify install</preparationGoals>
                         <pushChanges>false</pushChanges>
                         <localCheckout>true</localCheckout>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>cobertura-maven-plugin</artifactId>
+                    <version>2.6</version>
+                    <configuration>
+                        <aggregate>true</aggregate>
+                        <formats>
+                            <format>xml</format>
+                        </formats>
+
                     </configuration>
                 </plugin>
             </plugins>

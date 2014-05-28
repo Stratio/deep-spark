@@ -1,3 +1,9 @@
+[0.2.7]
+
+* Improved support for Cell objects with null value
+* Added cobertura plugin
+* Added original cqlTypeName to CellValidator
+
 [0.2.6]
 
 * deploy script now removes source and javadoc jars from the final distribution .tgz 
