@@ -44,7 +44,7 @@ public class CellTest {
     public void testCellInstantiationForCollections() throws UnknownHostException, NoSuchFieldException {
         CommonsTestEntity te = new CommonsTestEntity();
 
-        Set<String> emails = new HashSet(Arrays.asList("DelfinaMarino@superrito.com", "GabyCasasVeliz@superrito.com"));
+        Set<String> emails = new HashSet<>(Arrays.asList("DelfinaMarino@superrito.com", "GabyCasasVeliz@superrito.com"));
         List<String> phones = Arrays.asList("401-477-8301", "209-845-8841");
 
         te.setEmails(emails);
@@ -214,6 +214,21 @@ public class CellTest {
         } catch (DeepInstantiationException d) {
             logger.info("correctly catched DeepInstantiationException");
         }
+
+
+        Cell c16 = Cell.create("no_value_cell");
+
+        assertNotNull(c16);
+        assertEquals(c16.getCellName(), "no_value_cell");
+        assertNull(c16.getCellValue());
+        assertFalse(c16.equals(c8));
+        assertFalse(c8.equals(c16));
+        assertNull(c16.getCellValidator());
+        assertEquals(c16.getDecomposedCellValue(), ByteBuffer.wrap(new byte[0]));
+        assertFalse(c16.isPartitionKey());
+        assertFalse(c16.isClusterKey());
+        assertNull(c16.marshallerClassName());
+        assertNull(c16.marshaller());
     }
 
     @Test
