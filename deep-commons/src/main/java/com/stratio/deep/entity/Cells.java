@@ -70,7 +70,7 @@ public class Cells implements Iterable<Cell>, Serializable {
    * @param c the Cell to replace the one in the Cells object.
    * @return either true/false if the Cell has been successfully replace or not.
    */
-  public boolean replace(Cell c) {
+  public boolean replaceByName(Cell c) {
 
     if (c == null) {
       throw new DeepGenericException(new IllegalArgumentException("cell parameter cannot be null"));
