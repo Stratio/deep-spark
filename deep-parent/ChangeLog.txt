@@ -1,3 +1,7 @@
+[0.2.8]
+
+* fixed NPE in Cell hasCode() function
+
 [0.2.7]
 
 * Improved support for Cell objects with null value
