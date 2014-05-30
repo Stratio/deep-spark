@@ -16,6 +16,7 @@
 
 package com.stratio.deep.examples.java;
 
+import com.google.common.collect.Lists;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
@@ -78,7 +79,7 @@ public final class GroupingByKey {
         CassandraJavaRDD<TweetEntity> rdd = deepContext.cassandraJavaRDD(config);
 
         // creating a key-value pairs RDD
-        JavaPairRDD<String, TweetEntity> pairsRDD = rdd.map(new PairFunction<TweetEntity, String, TweetEntity>() {
+        JavaPairRDD<String, TweetEntity> pairsRDD = rdd.mapToPair(new PairFunction<TweetEntity, String, TweetEntity>() {
             @Override
             public Tuple2<String, TweetEntity> call(TweetEntity t) {
                 return new Tuple2<String, TweetEntity>(t.getAuthor(), t);
@@ -86,14 +87,15 @@ public final class GroupingByKey {
         });
 
 // grouping
-        JavaPairRDD<String, List<TweetEntity>> groups = pairsRDD.groupByKey();
+        JavaPairRDD<String, Iterable<TweetEntity>> groups = pairsRDD.groupByKey();
 
 // counting elements in groups
-        JavaPairRDD<String, Integer> counts = groups.map(new PairFunction<Tuple2<String, List<TweetEntity>>, String,
+        JavaPairRDD<String, Integer> counts = groups.mapToPair(new PairFunction<Tuple2<String,
+                Iterable<TweetEntity>>, String,
                 Integer>() {
             @Override
-            public Tuple2<String, Integer> call(Tuple2<String, List<TweetEntity>> t) {
-                return new Tuple2<String, Integer>(t._1(), t._2().size());
+            public Tuple2<String, Integer> call(Tuple2<String, Iterable<TweetEntity>> t) {
+                return new Tuple2<String, Integer>(t._1(), Lists.newArrayList(t._2()).size());
             }
         });
 

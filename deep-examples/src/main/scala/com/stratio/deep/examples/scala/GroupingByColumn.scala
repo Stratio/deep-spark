@@ -51,13 +51,13 @@ object GroupingByColumn {
     val rdd: CassandraRDD[TweetEntity] = deepContext.cassandraEntityRDD(config)
 
     // grouping
-    val groups: RDD[(String, Seq[TweetEntity])] = rdd groupBy {
+    val groups: RDD[(String, Iterable[TweetEntity])] = rdd groupBy {
       t: TweetEntity => t.getAuthor
     }
 
     // counting elements in groups
     val counts: RDD[(String, Int)] = groups map {
-      t: (String, Seq[TweetEntity]) => (t._1, t._2.size)
+      t: (String, Iterable[TweetEntity]) => (t._1, t._2.size)
     }
 
     // fetching results

@@ -65,7 +65,7 @@ object AggregatingData {
       t: TweetEntity => t.getAuthor
     }
       .map {
-      t: (String, Seq[TweetEntity]) => (t._1, t._2.size)
+      t: (String, Iterable[TweetEntity]) => (t._1, t._2.size)
     }
 
     // aggregating

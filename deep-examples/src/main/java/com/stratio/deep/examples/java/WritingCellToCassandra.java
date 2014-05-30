@@ -16,6 +16,7 @@
 
 package com.stratio.deep.examples.java;
 
+import com.google.common.collect.Lists;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
@@ -79,7 +80,7 @@ public final class WritingCellToCassandra {
 
         CassandraJavaRDD inputRDD = deepContext.cassandraJavaRDD(inputConfig);
 
-        JavaPairRDD<String, Cells> pairRDD = inputRDD.map(new PairFunction<Cells, String, Cells>() {
+        JavaPairRDD<String, Cells> pairRDD = inputRDD.mapToPair(new PairFunction<Cells, String, Cells>() {
             @Override
             public Tuple2<String, Cells> call(Cells c) {
                 return new Tuple2<String, Cells>((String) c.getCellByName("domainName")
@@ -88,10 +89,10 @@ public final class WritingCellToCassandra {
         });
 
         JavaPairRDD<String, Integer> numPerKey = pairRDD.groupByKey()
-                .map(new PairFunction<Tuple2<String, List<Cells>>, String, Integer>() {
+                .mapToPair(new PairFunction<Tuple2<String, Iterable<Cells>>, String, Integer>() {
                     @Override
-                    public Tuple2<String, Integer> call(Tuple2<String, List<Cells>> t) {
-                        return new Tuple2<String, Integer>(t._1(), t._2().size());
+                    public Tuple2<String, Integer> call(Tuple2<String, Iterable<Cells>> t) {
+                        return new Tuple2<String, Integer>(t._1(), Lists.newArrayList(t._2()).size());
                     }
                 });
 

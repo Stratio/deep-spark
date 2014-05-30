@@ -76,13 +76,13 @@ object UsingScalaEntity {
     println("rddCount: " + rddCount)
 
     // grouping
-    val groups: RDD[(String, Seq[ScalaPageEntity])] = rdd groupBy {
+    val groups: RDD[(String, Iterable[ScalaPageEntity])] = rdd groupBy {
       t: ScalaPageEntity => t.getDomain
     }
 
     // counting elements in groups
     val counts: RDD[T] = groups map {
-      t: (String, Seq[ScalaPageEntity]) => (t._1, t._2.size)
+      t: (String, Iterable[ScalaPageEntity]) => (t._1, t._2.size)
     }
 
     // fetching results
@@ -98,11 +98,11 @@ object UsingScalaEntity {
     }
 
     // grouping by key
-    val groups2: RDD[(String, Seq[ScalaPageEntity])] = pairsRDD.groupByKey
+    val groups2: RDD[(String, Iterable[ScalaPageEntity])] = pairsRDD.groupByKey
 
     // counting elements in groups
     val counts2: RDD[T] = groups2 map {
-      t: (String, Seq[ScalaPageEntity]) => (t._1, t._2.size)
+      t: (String, Iterable[ScalaPageEntity]) => (t._1, t._2.size)
     }
 
     // fetching results

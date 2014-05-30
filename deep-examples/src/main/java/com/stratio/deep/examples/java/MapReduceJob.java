@@ -78,7 +78,7 @@ public final class MapReduceJob {
         CassandraJavaRDD<TweetEntity> rdd = deepContext.cassandraJavaRDD(config);
 
         // Map stage: Getting key-value pairs from the RDD
-        JavaPairRDD<String, Integer> pairsRDD = rdd.map(new PairFunction<TweetEntity, String, Integer>() {
+        JavaPairRDD<String, Integer> pairsRDD = rdd.mapToPair(new PairFunction<TweetEntity, String, Integer>() {
             @Override
             public Tuple2<String, Integer> call(TweetEntity t) {
                 return new Tuple2<String, Integer>(t.getAuthor(), 1);
