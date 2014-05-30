@@ -138,6 +138,9 @@
                             <goal>add-source</goal>
                             <goal>compile</goal>
                         </goals>
+                        <configuration>
+                            <scalaVersion>2.10.3</scalaVersion>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>scala-test-compile</id>
@@ -145,6 +148,9 @@
                         <goals>
                             <goal>testCompile</goal>
                         </goals>
+                        <configuration>
+                            <scalaVersion>2.10.3</scalaVersion>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
