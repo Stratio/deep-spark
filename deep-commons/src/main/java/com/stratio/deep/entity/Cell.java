@@ -332,7 +332,7 @@ public final class Cell implements Serializable {
         result = 31 * result + (cellValue != null ? cellValue.hashCode() : 0);
         result = 31 * result + isPartitionKey.hashCode();
         result = 31 * result + isClusterKey.hashCode();
-        result = 31 * result + cellValidator.hashCode();
+        result = 31 * result + (cellValidator != null ? cellValidator.hashCode() : 0);
         return result;
     }
 

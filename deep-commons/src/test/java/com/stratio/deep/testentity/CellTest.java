@@ -214,8 +214,12 @@ public class CellTest {
         } catch (DeepInstantiationException d) {
             logger.info("correctly catched DeepInstantiationException");
         }
+    }
 
-
+    @Test
+    public void testCellWithNullValues(){
+        Long testLong = System.currentTimeMillis();
+        Cell c8 = Cell.create("BigDecimalType", new BigDecimal(testLong));
         Cell c16 = Cell.create("no_value_cell");
 
         assertNotNull(c16);
@@ -229,6 +233,7 @@ public class CellTest {
         assertFalse(c16.isClusterKey());
         assertNull(c16.marshallerClassName());
         assertNull(c16.marshaller());
+        assertTrue(c16.hashCode() != 0);
     }
 
     @Test
