@@ -1,5 +1,9 @@
 *.iml
 */.idea
+*/.classpath
+*/.project
+*/.settings
+*/.cache
 spark-deep-distribution*
 */*.versionsBackup
 target/
