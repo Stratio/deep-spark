@@ -72,9 +72,9 @@ Once you have a working development environment you can finally start testing St
 * __Build an instance of a configuration object__: this will let you tell StratioDeep the Cassandra endpoint, the Cassandra keyspace and table you want to access and much more.
   It will also let you specify which interface to use (the domain entity or the generic interface).
   We have a factory that will help you create a configuration object using a fluent API. Creating a configuration object is an expensive operation.
-  Please take the time to read the java and scala examples provided in StratioDeepExamples subproject and to read the comprehensive Stratio Deep documentation at [Stratio website](http://wordpress.dev.strat.io/examples/).
+  Please take the time to read the java and scala examples provided in StratioDeepExamples subproject and to read the comprehensive Stratio Deep documentation at [Stratio website](http://www.openstratio.org/examples/using-stratio-deep/).
 * __Create an RDD__: using the DeepSparkContext helper methods and providing the configuration object you've just instantiated.
 * __Perform some computation over this RDD(s)__: this is up to you, we only help you fetching the data efficiently from Cassandra, you can use the powerful [Spark API](https://spark.apache.org/docs/0.9.0/api/core/index.html#org.apache.spark.package).
 * __(optional) write the computation results out to Cassandra__: we provide a way to efficiently save the result of your computation to Cassandra.
   In order to do that you must have another configuration object where you specify the output keyspace/column family. We can create the output column family for you if needed.
-  Please, refer to the comprehensive Stratio Deep documentation at [Stratio website](http://wordpress.dev.strat.io/examples/).
+  Please, refer to the comprehensive Stratio Deep documentation at [Stratio website](http://www.openstratio.org/examples/using-stratio-deep/).
