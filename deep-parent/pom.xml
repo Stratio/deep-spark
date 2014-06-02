@@ -27,7 +27,7 @@
 
     <properties>
         <!-- Cassandra -->
-        <cassandra.version>2.0.5</cassandra.version>
+        <cassandra.version>2.0.8</cassandra.version>
         <datastax.driver.version>2.0.2</datastax.driver.version>
 
         <!-- Spark version -->
@@ -188,7 +188,6 @@
                         <formats>
                             <format>xml</format>
                         </formats>
-
                     </configuration>
                 </plugin>
             </plugins>
