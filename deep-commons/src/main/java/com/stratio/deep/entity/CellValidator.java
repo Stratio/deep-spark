@@ -23,10 +23,7 @@ import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepInstantiationException;
 import com.stratio.deep.utils.AnnotationUtils;
 import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.db.marshal.ListType;
-import org.apache.cassandra.db.marshal.MapType;
-import org.apache.cassandra.db.marshal.SetType;
+import org.apache.cassandra.db.marshal.*;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.io.Serializable;
@@ -36,6 +33,7 @@ import java.math.BigInteger;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 import static com.stratio.deep.utils.Utils.marshallerInstance;
@@ -71,6 +69,27 @@ public class CellValidator implements Serializable {
                     .put(Inet6Address.class, CQL3Type.Native.INET)
                     .put(BigInteger.class, CQL3Type.Native.VARINT)
                     .put(UUID.class, CQL3Type.Native.UUID)
+                    .build();
+
+    private static final Map<String, DataType.Name> MAP_JAVA_TYPE_TO_DATA_TYPE_NAME =
+            ImmutableMap.<String, DataType.Name>builder()
+                    .put(UTF8Type.class.getCanonicalName(), DataType.Name.TEXT)
+                    .put(Int32Type.class.getCanonicalName(), DataType.Name.INT)
+                    .put(BooleanType.class.getCanonicalName(), DataType.Name.BOOLEAN)
+                    .put(TimestampType.class.getCanonicalName(), DataType.Name.TIMESTAMP)
+                    .put(DateType.class.getCanonicalName(), DataType.Name.TIMESTAMP)
+                    .put(DecimalType.class.getCanonicalName(), DataType.Name.DECIMAL)
+                    .put(LongType.class.getCanonicalName(), DataType.Name.BIGINT)
+                    .put(DoubleType.class.getCanonicalName(), DataType.Name.DOUBLE)
+                    .put(FloatType.class.getCanonicalName(), DataType.Name.FLOAT)
+                    .put(InetAddressType.class.getCanonicalName(), DataType.Name.INET)
+                    .put(IntegerType.class.getCanonicalName(), DataType.Name.VARINT)
+                    .put(UUIDType.class.getCanonicalName(), DataType.Name.UUID)
+                    .put(TimeUUIDType.class.getCanonicalName(), DataType.Name.TIMEUUID)
+                    .put(MapType.class.getCanonicalName(), DataType.Name.MAP)
+                    .put(SetType.class.getCanonicalName(), DataType.Name.SET)
+                    .put(ListType.class.getCanonicalName(), DataType.Name.LIST)
+                    .put(BytesType.class.getCanonicalName(), DataType.Name.BLOB)
                     .build();
 
     /**
@@ -207,19 +226,22 @@ public class CellValidator implements Serializable {
         }
 
         Kind kind = Kind.objectToKind(obj);
-        String validatorClassName = marshallerInstance(obj).getClass().getCanonicalName();
+        AbstractType<?> tAbstractType = marshallerInstance(obj);
+        String validatorClassName = tAbstractType.getClass().getCanonicalName();
         Collection<String> validatorTypes = null;
+        DataType.Name cqlTypeName = MAP_JAVA_TYPE_TO_DATA_TYPE_NAME.get(validatorClassName);// tAbstractType.get
 
-        return new CellValidator(validatorClassName, kind, validatorTypes);
+        return new CellValidator(validatorClassName, kind, validatorTypes, cqlTypeName);
     }
 
     /**
      * private constructor.
      */
-    private CellValidator(String validatorClassName, Kind validatorKind, Collection<String> validatorTypes) {
+    private CellValidator(String validatorClassName, Kind validatorKind, Collection<String> validatorTypes, DataType.Name cqlTypeName) {
         this.validatorClassName = validatorClassName != null ? validatorClassName : DEFAULT_VALIDATOR_CLASSNAME;
         this.validatorKind = validatorKind;
         this.validatorTypes = validatorTypes;
+        this.cqlTypeName = cqlTypeName;
     }
     /**
      * private constructor.
@@ -239,6 +261,7 @@ public class CellValidator implements Serializable {
 
         this.validatorClassName = annotation.validationClass().getCanonicalName();
         this.validatorKind = Kind.validatorClassToKind(clazz);
+        cqlTypeName = MAP_JAVA_TYPE_TO_DATA_TYPE_NAME.get(this.validatorClassName);
 
         switch (this.validatorKind) {
             case SET:
