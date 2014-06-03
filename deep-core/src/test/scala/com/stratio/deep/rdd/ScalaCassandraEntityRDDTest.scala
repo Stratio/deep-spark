@@ -34,6 +34,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
   private var rdd: CassandraRDD[DeepScalaPageEntity] = _
   private var rddConfig: IDeepJobConfig[DeepScalaPageEntity] = _
   private var writeConfig: IDeepJobConfig[DeepScalaPageEntity] = _
+  private val OUTPUT_COLUMN_FAMILY: String = "out_scalatest_page"
 
   @BeforeClass
   protected def initServerAndRDD {
@@ -76,7 +77,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
 
     try {
       AbstractDeepSparkContextTest.executeCustomCQL("DROP TABLE " +
-        AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME + "." + AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY)
+        AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY)
     }
     catch {
       case e: Exception =>
@@ -87,12 +88,6 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
     checkSimpleTestData()
   }
 
-  @Test
-  def testSaveToCassandra(): Unit = {
-
-  }
-
-
   private def initWriteConfig(): IDeepJobConfig[DeepScalaPageEntity] = {
 
     writeConfig =
@@ -102,7 +97,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
         .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
         .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
         .keyspace(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME)
-        .columnFamily(AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY)
+        .columnFamily(OUTPUT_COLUMN_FAMILY)
         .batchSize(2)
         .createTableOnWrite(true)
 
