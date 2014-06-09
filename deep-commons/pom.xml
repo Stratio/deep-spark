@@ -63,6 +63,14 @@
         </developer>
     </developers>
 
+    <dependencies>
+        <dependency>
+            <groupId>de.javakaffee</groupId>
+            <artifactId>kryo-serializers</artifactId>
+            <version>0.26</version>
+        </dependency>
+    </dependencies>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -128,6 +136,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 </project>
