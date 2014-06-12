@@ -18,6 +18,7 @@ package com.stratio.deep.context;
 
 import com.stratio.deep.config.CellDeepJobConfig;
 import com.stratio.deep.config.EntityDeepJobConfig;
+import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
@@ -26,6 +27,8 @@ import com.stratio.deep.rdd.CassandraCellRDD;
 import com.stratio.deep.rdd.CassandraEntityRDD;
 import com.stratio.deep.rdd.CassandraJavaRDD;
 import com.stratio.deep.rdd.CassandraRDD;
+import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
+import com.stratio.deep.rdd.mongodb.MongoRDD;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaSparkContext;
 
@@ -133,4 +136,11 @@ public class DeepSparkContext extends JavaSparkContext {
     public CassandraRDD<Cells> cassandraGenericRDD(IDeepJobConfig<Cells> config) {
         return new CassandraCellRDD(sc(), config);
     }
+
+
+    public <T> MongoJavaRDD<T> mongoJavaRDD(GenericDeepJobConfigMongoDB<T> config) {
+        return new MongoJavaRDD(new MongoRDD(this.sc(), config));
+
+    }
+
 }

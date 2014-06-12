@@ -60,7 +60,6 @@ public class ContextProperties {
      * Default constructor
      */
     public ContextProperties() {
-
         String sparkHomeProp = System.getProperty("sparkHome");
         String sparkMaster = System.getProperty("sparkMaster");
         String deepVersionProp = StringUtils.isNotEmpty(System.getProperty("deepVersion")) ? System.getProperty
@@ -71,7 +70,7 @@ public class ContextProperties {
 
         cluster = StringUtils.isNotEmpty(sparkMaster) ? sparkMaster : "local";
         sparkHome = StringUtils.isNotEmpty(sparkHomeProp) ? sparkHomeProp : "/opt/SDS/deep";
-        jar = "/tmp/StratioDeepExamples-" + deepVersionProp + ".jar";
+        jar = "/home/rcrespo/desarrollo/git/stratio-deep/deep-examples/target/deep-examples-0.3.0-SNAPSHOT.jar";
         cassandraHost = StringUtils.isNotEmpty(cassandraHostProp) ? cassandraHostProp : "localhost";
         cassandraCqlPort = StringUtils.isNotEmpty(cassandraCqlPortProp) ? Integer.parseInt(cassandraCqlPortProp) : 9042;
         cassandraThriftPort = StringUtils.isNotEmpty(cassandraThriftPortProp) ? Integer.parseInt

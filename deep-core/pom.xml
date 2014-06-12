@@ -98,6 +98,24 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+
+        <!-- MongoDB-->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>2.11.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-hadoop-core_0.20.205.0</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-hadoop_0.20.205.0</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 
     <build>

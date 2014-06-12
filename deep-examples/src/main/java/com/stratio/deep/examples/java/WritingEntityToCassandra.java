@@ -119,7 +119,7 @@ public final class WritingEntityToCassandra {
         });
 
         CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig);
-
+        System.out.println("todo guay");
         deepContext.stop();
     }
 }
