@@ -15,9 +15,15 @@
  */
 
 package com.stratio.deep.rdd.mongodb;
+import com.mongodb.hadoop.MongoInputFormat;
 import com.mongodb.hadoop.MongoOutputFormat;
 import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
+import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.utils.Pair;
+import org.apache.spark.InterruptibleIterator;
+import org.apache.spark.Partition;
+import org.apache.spark.TaskContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function2;
@@ -30,12 +36,8 @@ import org.apache.spark.broadcast.Broadcast;
 import org.bson.BasicBSONObject;
 import scala.Tuple2;
 import java.lang.Iterable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-
+import java.nio.ByteBuffer;
+import java.util.*;
 
 
 /**
@@ -43,31 +45,34 @@ import java.util.List;
  * Implementors should only provide a way to convert an object of type T to a {@link com.stratio.deep.entity.Cells}
  * element.
  */
-public class MongoRDD<T> extends NewHadoopRDD<Object, BSONObject> {
+public abstract class MongoRDD<T> extends NewHadoopRDD<Object, BSONObject> {
 
 
     private static final long serialVersionUID = -7338324965474684418L;
 
+    /**
+     * Transform a row coming from the Cassandra's API to an element of
+     * type <T>.
+     *
+     * @param elem the element to transform.
+     * @return the transformed element.
+     */
+    protected abstract T transformElement(Pair<Object, BSONObject> elem);
+
     /*
      * RDD configuration. This config is broadcasted to all the Sparks machines.
+     *
      */
-    protected  Broadcast<GenericDeepJobConfigMongoDB<T>> config;
+    protected Broadcast<IDeepJobConfig<T>> config;
 
-
-
-
-
-
-    public MongoRDD(SparkContext sc, GenericDeepJobConfigMongoDB<T> genericDeepJobConfigMongoDB) {
-        super(sc, com.mongodb.hadoop.MongoInputFormat.class, Object.class, BSONObject.class, genericDeepJobConfigMongoDB.configHadoop);
-
-//        this.config = sc.broadcast(deepJobConfigMongoDB);
+    public MongoRDD(SparkContext sc, IDeepJobConfig<T> config) {
+        super(sc, MongoInputFormat.class, Object.class, BSONObject.class,
+                ((GenericDeepJobConfigMongoDB)config).configHadoop);
     }
 
-
-    public static <K> void saveRDDPrueba(MongoRDD<K> rdd, GenericDeepJobConfigMongoDB<K> writeConfig) {
-
-        System.out.println("imrpimo esto antes de |" +writeConfig.configHadoop.get("mongo.output.uri")+"|");
+    public static <K> void saveRDDPrueba(MongoRDD<K> rdd, IDeepJobConfig<K> writeConfig) {
+        GenericDeepJobConfigMongoDB<K> mongoConfig = ((GenericDeepJobConfigMongoDB<K>)writeConfig);
+        System.out.println("imrpimo esto antes de |" +mongoConfig.configHadoop.get("mongo.output.uri")+"|");
         
 //        rdd.toJavaRDD().fl/
         JavaRDD<String> words = rdd.toJavaRDD().flatMap(new FlatMapFunction<Tuple2<Object, BSONObject>, String>() {
@@ -106,10 +111,7 @@ public class MongoRDD<T> extends NewHadoopRDD<Object, BSONObject> {
                 return new Tuple2<>(null, bson);
             }
         });
-        save.saveAsNewAPIHadoopFile("file:///bogus", Object.class, Object.class, MongoOutputFormat.class, writeConfig.configHadoop);
-
-
-
+        save.saveAsNewAPIHadoopFile("file:///bogus", Object.class, Object.class, MongoOutputFormat.class, mongoConfig.configHadoop);
     }
 
     public static <T> void saveRDD(MongoRDD<T> rdd, GenericDeepJobConfigMongoDB<T> writeConfig) {
@@ -139,9 +141,6 @@ public class MongoRDD<T> extends NewHadoopRDD<Object, BSONObject> {
 
     public static <Object,V extends IDeepType> JavaPairRDD<Object,V> getEntities(MongoRDD<V> rdd, final GenericDeepJobConfigMongoDB<V> genericDeepJobConfigMongoDB){
 
-
-
-
         JavaRDD<BSONObject> javaRDD = rdd.toJavaRDD().flatMap(new FlatMapFunction<Tuple2<java.lang.Object, BSONObject>, BSONObject>() {
             @Override
             public Iterable<BSONObject> call(Tuple2<java.lang.Object, BSONObject> arg) {
@@ -169,4 +168,8 @@ public class MongoRDD<T> extends NewHadoopRDD<Object, BSONObject> {
         return getEntities( (MongoRDD) javaRDD.toRDD(javaRDD), genericDeepJobConfigMongoDB);
     }
 
+    @Override
+    public InterruptibleIterator<Tuple2<Object, BSONObject>> compute(Partition theSplit, TaskContext context) {
+        return super.compute(theSplit, context);
+    }
 }

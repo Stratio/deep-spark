@@ -61,13 +61,6 @@ public final class EntityDeepJobConfigMongoDB<T extends IDeepType> extends Gener
         return this;
     }
 
-    public Class<T> getEntityClass() {
-        return entityClass;
-    }
-
-    public void setEntityClass(Class<T> entityClass) {
-        this.entityClass = entityClass;
-    }
 
     public Map<String, String> getMapDBNameToEntityName() {
         return mapDBNameToEntityName;

@@ -20,6 +20,7 @@ import com.mongodb.hadoop.MongoOutputFormat;
 import com.stratio.deep.config.EntityDeepJobConfig;
 import com.stratio.deep.config.EntityDeepJobConfigMongoDB;
 import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
+import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
@@ -49,49 +50,53 @@ import java.util.Map;
  *
  * @author Luca Rosellini <luca@strat.io>
  */
-public final class MongoEntityRDD<T extends IDeepType> extends MongoJavaRDD<T> {
+public final class MongoEntityRDD<T extends IDeepType> extends MongoRDD<T> {
 
     private static final long serialVersionUID = -3208994171892747470L;
 
 
 
-    public MongoEntityRDD(MongoRDD<T> rdd) {
-        super(rdd);
+    public MongoEntityRDD(SparkContext sc, IDeepJobConfig<T> config) {
+        super(sc, config);
     }
+
     /**
      * {@inheritDoc}
      */
+    @Override
+    protected T transformElement(Pair<Object, BSONObject> elem){
+        // TODO: rcrespo, implement with transformation code.
 
-//    @Override
-    protected T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem) {
-//        Map<String, Cell> columnDefinitions = config.value().columnDefinitions();
-//
-//        Class<T> entityClass = config.value().getEntityClass();
-//
-//        EntityDeepJobConfigMongoDB<T> edjc = (EntityDeepJobConfigMongoDB) config.value();
-//        T instance = Utils.newTypeInstance(entityClass);
-//
-//        for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
-//            Cell metadata = columnDefinitions.get(entry.getKey());
-//            AbstractType<?> marshaller = metadata.marshaller();
-//            edjc.setInstancePropertyFromDbName(instance, entry.getKey(), marshaller.compose(entry.getValue()));
-//        }
-//
-//        for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
-//            if (entry.getValue() == null) {
-//                continue;
-//            }
-//
-//            Cell metadata = columnDefinitions.get(entry.getKey());
-//            AbstractType<?> marshaller = metadata.marshaller();
-//            try {
-//                edjc.setInstancePropertyFromDbName(instance, entry.getKey(), marshaller.compose(entry.getValue()));
-//            } catch (DeepNoSuchFieldException e) {
-//                log().debug(e.getMessage());
-//            }
-//        }
-//
-//        return instance;
+        /*
+        Map<String, Cell> columnDefinitions = config.value().columnDefinitions();
+
+        Class<T> entityClass = config.value().getEntityClass();
+
+        EntityDeepJobConfigMongoDB<T> edjc = (EntityDeepJobConfigMongoDB) config.value();
+        T instance = Utils.newTypeInstance(entityClass);
+
+        for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
+            Cell metadata = columnDefinitions.get(entry.getKey());
+            AbstractType<?> marshaller = metadata.marshaller();
+            edjc.setInstancePropertyFromDbName(instance, entry.getKey(), marshaller.compose(entry.getValue()));
+        }
+
+        for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
+            if (entry.getValue() == null) {
+                continue;
+            }
+
+            Cell metadata = columnDefinitions.get(entry.getKey());
+            AbstractType<?> marshaller = metadata.marshaller();
+            try {
+                edjc.setInstancePropertyFromDbName(instance, entry.getKey(), marshaller.compose(entry.getValue()));
+            } catch (DeepNoSuchFieldException e) {
+                log().debug(e.getMessage());
+            }
+        }
+
+        return instance;
+        */
         return null;
     }
 
