@@ -78,7 +78,7 @@ public final class WritingCellToCassandra {
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
 
-        CassandraJavaRDD inputRDD = deepContext.cassandraJavaRDD(inputConfig);
+        CassandraJavaRDD<Cells> inputRDD = deepContext.cassandraJavaRDD(inputConfig);
 
         JavaPairRDD<String, Cells> pairRDD = inputRDD.mapToPair(new PairFunction<Cells, String, Cells>() {
             @Override

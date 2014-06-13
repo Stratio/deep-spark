@@ -78,7 +78,7 @@ public final class WritingEntityToCassandra {
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
 
-        CassandraJavaRDD inputRDD = deepContext.cassandraJavaRDD(inputConfig);
+        CassandraJavaRDD<PageEntity> inputRDD = deepContext.cassandraJavaRDD(inputConfig);
 
         JavaPairRDD<String, PageEntity> pairRDD = inputRDD.mapToPair(new PairFunction<PageEntity, String,
                 PageEntity>() {
@@ -108,7 +108,7 @@ public final class WritingEntityToCassandra {
                 .keyspace(keyspaceName).table(outputTableName)
                 .createTableOnWrite(true).initialize();
 
-        JavaRDD outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, DomainEntity>() {
+        JavaRDD<DomainEntity> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, DomainEntity>() {
             @Override
             public DomainEntity call(Tuple2<String, Integer> t) throws Exception {
                 DomainEntity e = new DomainEntity();
