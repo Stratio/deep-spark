@@ -28,8 +28,8 @@ Please, refer to StratioDeepExample README for further information on how to set
 Requirements
 ============
 
-  * Cassandra 2.0.5
-  * Spark 0.9.1
+  * Cassandra 2.0.8
+  * Spark 1.0.0
   * Apache Maven >= 3.0.4
   * Java 1.7
   * Scala 2.10.3
