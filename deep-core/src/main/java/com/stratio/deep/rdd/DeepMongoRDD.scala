@@ -54,8 +54,9 @@ private[spark] class NewHadoopPartition(
 @DeveloperApi
 class DeepMongoRDD[T](sc: SparkContext,
                           entityClass: Class[T],
+                          inputFormatClass: Class[_ <: InputFormat[Object, BSONObject]],
                           @transient conf: Configuration)
-  extends RDD[T](sc, Nil)
+  extends RDD[(Object, BSONObject)](sc, Nil)
   with SparkHadoopMapReduceUtil
   with Logging {
 
@@ -71,7 +72,7 @@ class DeepMongoRDD[T](sc: SparkContext,
   @transient protected val jobId = new JobID(jobTrackerId, id)
 
   override def getPartitions: Array[Partition] = {
-    val inputFormat = inputFormatClass.newInstance
+    val inputFormat  = inputFormatClass.newInstance
     inputFormat match {
       case configurable: Configurable =>
         configurable.setConf(conf)
@@ -87,14 +88,14 @@ class DeepMongoRDD[T](sc: SparkContext,
   }
 
   def transform(tuple: (Object, BSONObject) ) : T = {
-    // lo que sea
+    entityClass.newInstance()
   }
 
   override def compute(theSplit: Partition, context: TaskContext): InterruptibleIterator[T] = {
     val iter = new Iterator[T] {
       val split = theSplit.asInstanceOf[NewHadoopPartition]
       logInfo("Input split: " + split.serializableHadoopSplit)
-      val inputFormatClass : Class[com.mongodb.hadoop.MongoInputFormat] = classOf(com.mongodb.hadoop.MongoInputFormat)
+//      val inputFormatClass : Class[com.mongodb.hadoop.MongoInputFormat] = classOf(com.mongodb.hadoop.MongoInputFormat)
       val conf = confBroadcast.value.value
       val attemptId = newTaskAttemptID(jobTrackerId, id, isMap = true, split.index, 0)
       val hadoopAttemptContext = newTaskAttemptContext(conf, attemptId)
