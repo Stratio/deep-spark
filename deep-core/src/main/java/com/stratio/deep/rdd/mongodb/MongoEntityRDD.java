@@ -27,13 +27,16 @@ import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.rdd.DeepMongoRDD;
 import org.bson.BSONObject;
 import scala.Tuple2;
+import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
 
 import java.nio.ByteBuffer;
@@ -50,21 +53,27 @@ import java.util.Map;
  *
  * @author Luca Rosellini <luca@strat.io>
  */
-public final class MongoEntityRDD<T extends IDeepType> extends MongoRDD<T> {
+public final class MongoEntityRDD<T extends IDeepType> extends DeepMongoRDD<T> {
 
     private static final long serialVersionUID = -3208994171892747470L;
 
 
-
-    public MongoEntityRDD(SparkContext sc, IDeepJobConfig<T> config) {
-        super(sc, config);
+    /**
+     * Public constructor that builds a new Cassandra RDD given the context and the configuration file.
+     *
+     * @param sc the spark context to which the RDD will be bound to.
+     * @param config the deep configuration object.
+     */
+    @SuppressWarnings("unchecked")
+    public MongoEntityRDD(SparkContext sc, GenericDeepJobConfigMongoDB<T> config) {
+        super(sc,config, ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected T transformElement(Pair<Object, BSONObject> elem){
+    public T transformElement(Tuple2<Object, BSONObject> tuple) {
         // TODO: rcrespo, implement with transformation code.
 
         /*

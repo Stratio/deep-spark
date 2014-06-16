@@ -31,7 +31,7 @@ public class GenericDeepJobConfigMongoDB<T>  implements Serializable {
     private static final Logger LOG = Logger.getLogger("com.stratio.deep.config.GenericDeepJobConfigMongoDB");
     private static final long serialVersionUID = -7179376653643603038L;
 
-    public transient Configuration configHadoop;
+    public Configuration configHadoop;
 
 
     /**
@@ -116,8 +116,6 @@ public class GenericDeepJobConfigMongoDB<T>  implements Serializable {
         this.port=port;
         this.database=database;
         this.collection=collection;
-
-
     }
 
     public GenericDeepJobConfigMongoDB<T> initialize() {
@@ -149,5 +147,10 @@ public class GenericDeepJobConfigMongoDB<T>  implements Serializable {
 
     public void setEntityClass(Class<T> entityClass) {
         this.entityClass = entityClass;
+    }
+
+
+    public Configuration getHadoopConfiguration(){
+        return configHadoop;
     }
 }

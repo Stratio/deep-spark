@@ -20,13 +20,15 @@ package org.apache.spark.rdd
 import java.text.SimpleDateFormat
 import java.util.Date
 
+import com.stratio.deep.config.GenericDeepJobConfigMongoDB
 import org.apache.hadoop.conf.{Configurable, Configuration}
 import org.apache.hadoop.io.Writable
 import org.apache.hadoop.mapreduce._
 import org.apache.spark.annotation.DeveloperApi
-import org.apache.spark.input.WholeTextFileInputFormat
 import org.apache.spark.{InterruptibleIterator, Logging, Partition, SerializableWritable, SparkContext, TaskContext}
 import org.bson.BSONObject
+
+import scala.reflect.ClassTag
 
 private[spark] class NewHadoopPartition(
                                          rddId: Int,
@@ -48,20 +50,17 @@ private[spark] class NewHadoopPartition(
  * [[org.apache.spark.SparkContext.newAPIHadoopRDD( )]]
  *
  * @param sc The SparkContext to associate the RDD with.
- * @param entityClass Class of the key associated with the inputFormatClass.
- * @param conf The Hadoop configuration.
+ * @param config The Deep MongoDB configuration.
  */
 @DeveloperApi
-class DeepMongoRDD[T](sc: SparkContext,
-                          entityClass: Class[T],
-                          inputFormatClass: Class[_ <: InputFormat[Object, BSONObject]],
-                          @transient conf: Configuration)
-  extends RDD[(Object, BSONObject)](sc, Nil)
+abstract class DeepMongoRDD[T : ClassTag](sc: SparkContext,
+                          @transient config: GenericDeepJobConfigMongoDB[T])
+  extends RDD[T](sc, Nil)
   with SparkHadoopMapReduceUtil
   with Logging {
 
   // A Hadoop Configuration can be about 10 KB, which is pretty big, so broadcast it
-  private val confBroadcast = sc.broadcast(new SerializableWritable(conf))
+  private val confBroadcast = sc.broadcast(config)
   // private val serializableConf = new SerializableWritable(conf)
 
   private val jobTrackerId: String = {
@@ -72,13 +71,14 @@ class DeepMongoRDD[T](sc: SparkContext,
   @transient protected val jobId = new JobID(jobTrackerId, id)
 
   override def getPartitions: Array[Partition] = {
+    val inputFormatClass : Class[com.mongodb.hadoop.MongoInputFormat] = classOf[com.mongodb.hadoop.MongoInputFormat]
     val inputFormat  = inputFormatClass.newInstance
     inputFormat match {
       case configurable: Configurable =>
-        configurable.setConf(conf)
+        configurable.setConf(config.getHadoopConfiguration)
       case _ =>
     }
-    val jobContext = newJobContext(conf, jobId)
+    val jobContext = newJobContext(config.getHadoopConfiguration, jobId)
     val rawSplits = inputFormat.getSplits(jobContext).toArray
     val result = new Array[Partition](rawSplits.size)
     for (i <- 0 until rawSplits.size) {
@@ -87,16 +87,14 @@ class DeepMongoRDD[T](sc: SparkContext,
     result
   }
 
-  def transform(tuple: (Object, BSONObject) ) : T = {
-    entityClass.newInstance()
-  }
+  def transformElement(tuple: (Object, BSONObject) ) : T
 
   override def compute(theSplit: Partition, context: TaskContext): InterruptibleIterator[T] = {
     val iter = new Iterator[T] {
       val split = theSplit.asInstanceOf[NewHadoopPartition]
       logInfo("Input split: " + split.serializableHadoopSplit)
-//      val inputFormatClass : Class[com.mongodb.hadoop.MongoInputFormat] = classOf(com.mongodb.hadoop.MongoInputFormat)
-      val conf = confBroadcast.value.value
+      val inputFormatClass : Class[com.mongodb.hadoop.MongoInputFormat] = classOf[com.mongodb.hadoop.MongoInputFormat]
+      val conf = confBroadcast.value.getHadoopConfiguration
       val attemptId = newTaskAttemptID(jobTrackerId, id, isMap = true, split.index, 0)
       val hadoopAttemptContext = newTaskAttemptContext(conf, attemptId)
       val format = inputFormatClass.newInstance
@@ -129,7 +127,7 @@ class DeepMongoRDD[T](sc: SparkContext,
         havePair = false
 
         val tuple = (reader.getCurrentKey, reader.getCurrentValue)
-        transform(tuple)
+        transformElement(tuple)
       }
 
       private def close() {
@@ -148,33 +146,7 @@ class DeepMongoRDD[T](sc: SparkContext,
     theSplit.serializableHadoopSplit.value.getLocations.filter(_ != "localhost")
   }
 
-  def getConf: Configuration = confBroadcast.value.value
+  def getConf: GenericDeepJobConfigMongoDB[T] = confBroadcast.value
 }
 
-private[spark] class WholeTextFileRDD(
-                                       sc: SparkContext,
-                                       inputFormatClass: Class[_ <: WholeTextFileInputFormat],
-                                       keyClass: Class[String],
-                                       valueClass: Class[String],
-                                       @transient conf: Configuration,
-                                       minPartitions: Int)
-  extends NewHadoopRDD[String, String](sc, inputFormatClass, keyClass, valueClass, conf) {
-
-  override def getPartitions: Array[Partition] = {
-    val inputFormat = inputFormatClass.newInstance
-    inputFormat match {
-      case configurable: Configurable =>
-        configurable.setConf(conf)
-      case _ =>
-    }
-    val jobContext = newJobContext(conf, jobId)
-    inputFormat.setMaxSplitSize(jobContext, minPartitions)
-    val rawSplits = inputFormat.getSplits(jobContext).toArray
-    val result = new Array[Partition](rawSplits.size)
-    for (i <- 0 until rawSplits.size) {
-      result(i) = new NewHadoopPartition(id, i, rawSplits(i).asInstanceOf[InputSplit with Writable])
-    }
-    result
-  }
-}
 

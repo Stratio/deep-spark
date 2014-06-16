@@ -17,6 +17,7 @@
 package com.stratio.deep.rdd.mongodb;
 
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.rdd.DeepMongoRDD;
 import org.bson.BSONObject;
 import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
@@ -31,8 +32,8 @@ public class MongoJavaRDD<W> extends JavaRDD<W> {
      *
      * @param rdd
      */
-    public MongoJavaRDD(MongoRDD<W> rdd) {
-        super((org.apache.spark.rdd.RDD) rdd, ClassTag$.MODULE$.<W>apply(rdd.config.value().getEntityClass()));
+    public MongoJavaRDD(DeepMongoRDD<W> rdd) {
+        super(rdd, ClassTag$.MODULE$.<W>apply(rdd.getConf().getEntityClass()));
     }
 
     /**
@@ -40,6 +41,6 @@ public class MongoJavaRDD<W> extends JavaRDD<W> {
      */
     @Override
     public ClassTag<W> classTag() {
-        return ClassTag$.MODULE$.<W>apply(((MongoRDD<W>) this.rdd()).config.value().getEntityClass());
+        return ClassTag$.MODULE$.<W>apply(((DeepMongoRDD<W>) this.rdd()).getConf().getEntityClass());
     }
 }
