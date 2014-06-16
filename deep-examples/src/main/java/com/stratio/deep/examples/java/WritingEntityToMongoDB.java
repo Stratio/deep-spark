@@ -20,8 +20,8 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.mongodb.DomainEntity;
+import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
-import com.stratio.deep.rdd.mongodb.MongoRDD;
 import com.stratio.deep.rdd.mongodb.UtilMongoDB;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
@@ -78,71 +78,6 @@ public final class WritingEntityToMongoDB {
                 new String[]{p.getJar()});
 
 
-        // --- INPUT RDD
-        GenericDeepJobConfigMongoDB inputConfig = DeepJobConfigFactory.createMongoDB().host("localhost").port("27017").database("beowulf").collection("input").readPreference("nearest").initialize();
-
-        System.out.println("****************************************************************************");
-        JavaRDD inputRDD = deepContext.mongoJavaRDD(inputConfig);
-
-        System.out.println("imprimo el tamaño guay " + inputRDD.count());
-        JavaRDD<String> words = inputRDD.flatMap(new FlatMapFunction<Tuple2<Object, BSONObject>, String>() {
-            @Override
-            public Iterable<String> call(Tuple2<Object, BSONObject> arg) {
-                Object o = arg._2().get("text");
-                if (o instanceof String) {
-                    String str = (String) o;
-                    str = str.toLowerCase().replaceAll("[.,!?\n]", " ");
-                    System.out.println("imprimo el text " + str);
-                    return Arrays.asList(str.split(" "));
-                } else {
-                    System.out.println("imprimo no es text " );
-                    return Collections.emptyList();
-                }
-            }
-        });
-
-        JavaRDD<BSONObject> words2 = inputRDD.flatMap(new FlatMapFunction<Tuple2<Object, BSONObject>, BSONObject>() {
-            @Override
-            public Iterable<BSONObject> call(Tuple2<Object, BSONObject> arg) {
-                List<BSONObject> lista = new ArrayList<>();
-                lista.add(arg._2());
-                return lista;
-            }
-        });
-        JavaPairRDD<Object, BSONObject> ones = words2.mapToPair(new PairFunction<BSONObject, Object, BSONObject>() {
-
-            @Override
-            public Tuple2<Object, BSONObject> call(BSONObject s) throws Exception {
-
-                return  new Tuple2<>(null, s);
-            }
-        });
-
-
-
-        GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(DomainEntity.class).host("localhost").port("27017").database("beowulf").collection("input").readPreference("nearest").initialize();
-
-        JavaRDD inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
-
-        JavaRDD<BSONObject> entityPrueba = inputRDDEntity.flatMap(new FlatMapFunction<Tuple2<Object, BSONObject>, BSONObject>() {
-            @Override
-            public Iterable<BSONObject> call(Tuple2<Object, BSONObject> arg) {
-                List<BSONObject> lista = new ArrayList<>();
-                lista.add(arg._2());
-                return lista;
-            }
-        });
-        JavaPairRDD<Object, DomainEntity> entityPrueba2 = entityPrueba.mapToPair(new PairFunction<BSONObject, Object, DomainEntity>() {
-
-            @Override
-            public Tuple2<Object, DomainEntity> call(BSONObject s) throws Exception {
-
-                return  new Tuple2<>(null, UtilMongoDB.getObjectFromBson(DomainEntity.class, s));
-            }
-        });
-
-//       System.out.println(entityPrueba2.first()._2());
-
         DomainEntity domainEntity1 = new DomainEntity();
 
         domainEntity1.setId(new ObjectId());
@@ -163,24 +98,11 @@ public final class WritingEntityToMongoDB {
         GenericDeepJobConfigMongoDB outputConfigEntityPruebaGuardado = DeepJobConfigFactory.createMongoDB(DomainEntity.class).host("localhost").port("27017").database("beowulf").collection("output.generated").readPreference("nearest").initialize();
 
 
-
-        inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
-
-        MongoRDD.saveRDD((MongoRDD) inputRDDEntity.toRDD(inputRDDEntity), outputConfigEntityPruebaGuardado);
-//        MongoEntityRDD.saveEntity(inputRDDEntity, outputConfigEntityPruebaGuardado);
+        MongoJavaRDD<DomainEntity> outputRDDEntity = deepContext.mongoJavaRDD(outputConfigEntityPruebaGuardado);
 
 
-        MongoJavaRDD<DomainEntity> outputRDDEntityPruebaGuardado = deepContext.mongoJavaRDD(outputConfigEntityPruebaGuardado);
 
-
-        JavaPairRDD<Object, DomainEntity>  pu = MongoRDD.getEntities(outputRDDEntityPruebaGuardado, outputConfigEntityPruebaGuardado);
-
-        List<Tuple2<Object, DomainEntity >> prueba = pu.collect();
-
-
-        for(Tuple2 tuple : prueba){
-            System.out.println("imprimo la segunda parte de la tupla "+tuple._2());
-        }
+        MongoEntityRDD.saveEntity(outputRDDEntity, outputConfigEntityPruebaGuardado);
 
 
 

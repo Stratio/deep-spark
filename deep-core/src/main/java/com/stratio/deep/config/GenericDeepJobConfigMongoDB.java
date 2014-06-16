@@ -16,6 +16,7 @@
 
 package com.stratio.deep.config;
 
+import com.datastax.driver.core.Session;
 import com.stratio.deep.entity.Cell;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
@@ -27,7 +28,7 @@ import java.util.Map;
  * Base class for all config implementations providing default implementations for methods
  * defined in {@link GenericDeepJobConfigMongoDB}.
  */
-public class GenericDeepJobConfigMongoDB<T>  implements Serializable {
+public class GenericDeepJobConfigMongoDB<T>  implements Serializable, IDeepJobConfig {
     private static final Logger LOG = Logger.getLogger("com.stratio.deep.config.GenericDeepJobConfigMongoDB");
     private static final long serialVersionUID = -7179376653643603038L;
 
@@ -72,8 +73,88 @@ public class GenericDeepJobConfigMongoDB<T>  implements Serializable {
     }
 
 
+    @Override
+    public Session getSession() {
+        return null;
+    }
+
+    @Override
+    public IDeepJobConfig session(Session session) {
+        return null;
+    }
+
+    @Override
+    public Map<String, Cell> columnDefinitions() {
+        return null;
+    }
+
+    @Override
+    public IDeepJobConfig table(String table) {
+        return null;
+    }
+
+    @Override
+    public IDeepJobConfig columnFamily(String columnFamily) {
+        return null;
+    }
+
+    @Override
+    public IDeepJobConfig filterByField(String filterColumnName, Serializable filterValue) {
+        return null;
+    }
+
+    @Override
+    public IDeepJobConfig pageSize(int pageSize) {
+        return null;
+    }
+
+    @Override
+    public String getColumnFamily() {
+        return null;
+    }
+
     public Class<T> getEntityClass(){
     return entityClass;
+    }
+
+    @Override
+    public String getHost() {
+        return null;
+    }
+
+    @Override
+    public String[] getInputColumns() {
+        return new String[0];
+    }
+
+    @Override
+    public String getKeyspace() {
+        return null;
+    }
+
+    @Override
+    public String getPartitionerClassName() {
+        return null;
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
+    }
+
+    @Override
+    public Integer getRpcPort() {
+        return null;
+    }
+
+    @Override
+    public Integer getCqlPort() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return null;
     }
 
     public GenericDeepJobConfigMongoDB<T> host(String host) {
@@ -101,9 +182,84 @@ public class GenericDeepJobConfigMongoDB<T>  implements Serializable {
         return this;
     }
 
+    @Override
+    public IDeepJobConfig batchSize(int batchSize) {
+        return null;
+    }
+
+    @Override
+    public IDeepJobConfig createTableOnWrite(Boolean createTableOnWrite) {
+        return null;
+    }
+
+    @Override
+    public Boolean isCreateTableOnWrite() {
+        return null;
+    }
+
+    @Override
+    public String getReadConsistencyLevel() {
+        return null;
+    }
+
+    @Override
+    public String getWriteConsistencyLevel() {
+        return null;
+    }
+
+    @Override
+    public IDeepJobConfig readConsistencyLevel(String level) {
+        return null;
+    }
+
+    @Override
+    public IDeepJobConfig writeConsistencyLevel(String level) {
+        return null;
+    }
+
+    @Override
+    public String getTable() {
+        return null;
+    }
+
+    @Override
+    public int getBatchSize() {
+        return 0;
+    }
+
+    @Override
+    public Map<String, Serializable> getAdditionalFilters() {
+        return null;
+    }
+
+    @Override
+    public int getPageSize() {
+        return 0;
+    }
+
+    @Override
+    public Boolean getIsWriteConfig() {
+        return null;
+    }
+
+    @Override
+    public int getBisectFactor() {
+        return 0;
+    }
+
     public GenericDeepJobConfigMongoDB<T> password(String password) {
         this.password=password;
         return this;
+    }
+
+    @Override
+    public IDeepJobConfig rpcPort(Integer port) {
+        return null;
+    }
+
+    @Override
+    public IDeepJobConfig cqlPort(Integer port) {
+        return null;
     }
 
     public GenericDeepJobConfigMongoDB<T> readPreference(String readPreference) {
@@ -140,9 +296,27 @@ public class GenericDeepJobConfigMongoDB<T>  implements Serializable {
         configHadoop.set("mongo.input.uri", connection.toString());
         configHadoop.set("mongo.output.uri", connection.toString());
 
-        System.out.println(connection.toString());
-
         return this;
+    }
+
+    @Override
+    public IDeepJobConfig inputColumns(String... columns) {
+        return null;
+    }
+
+    @Override
+    public IDeepJobConfig keyspace(String keyspace) {
+        return null;
+    }
+
+    @Override
+    public IDeepJobConfig bisectFactor(int bisectFactor) {
+        return null;
+    }
+
+    @Override
+    public IDeepJobConfig partitioner(String partitionerClassName) {
+        return null;
     }
 
     public void setEntityClass(Class<T> entityClass) {

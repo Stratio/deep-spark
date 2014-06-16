@@ -35,7 +35,6 @@ public class UtilMongoDB {
         }
 
 
-        System.out.println(t);
         return t;
     }
 
@@ -72,5 +71,28 @@ public class UtilMongoDB {
         BSONObject b = getBsonFromObject(domainEntity);
 
         System.out.println(b);
-}
+    }
+
+
+    public static <T extends IDeepType> Object getId (T t) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+
+
+        Field[] fields = AnnotationUtils.filterDeepFields(t.getClass());
+
+
+
+        int count =fields.length;
+
+
+        for (int i = 0 ; i< count ; i++){
+            if(AnnotationUtils.deepFieldName(fields[i]).equals("_id")){
+                System.out.println("encuentro el valor del campo " + fields [i].getName());
+                return  Utils.findGetter(fields[i].getName(), t.getClass()).invoke(t);
+            }
+
+        }
+
+        return null;
+    }
+
 }

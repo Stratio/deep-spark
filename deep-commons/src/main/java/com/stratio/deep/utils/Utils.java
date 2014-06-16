@@ -445,7 +445,6 @@ public final class Utils {
 
         String getterName = "get" + propertyName.substring(0, 1).toUpperCase() +
                 propertyName.substring(1);
-    System.out.println(getterName);
         try {
             getter = entityClass.getMethod(getterName);
         } catch (NoSuchMethodException e) {

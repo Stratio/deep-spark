@@ -21,21 +21,11 @@ import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.mongodb.DomainEntity;
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
-import com.stratio.deep.rdd.mongodb.MongoRDD;
-import com.stratio.deep.rdd.mongodb.UtilMongoDB;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.PairFunction;
-import org.bson.BSONObject;
-import org.bson.types.ObjectId;
+
 import scala.Tuple2;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -69,13 +59,11 @@ public final class ReadingEntityFromMongoDB {
 
 
 
-        JavaPairRDD<Object, DomainEntity>  pair = MongoRDD.getEntities(inputRDDEntity, inputConfigEntity);
-
-        List<Tuple2<Object, DomainEntity >> entities = pair.collect();
+        List<DomainEntity> dominios = inputRDDEntity.collect();
 
 
-        for(Tuple2 tuple : entities){
-            System.out.println(tuple._2());
+        for(DomainEntity tuple : dominios){
+            System.out.println(tuple);
         }
 
 
