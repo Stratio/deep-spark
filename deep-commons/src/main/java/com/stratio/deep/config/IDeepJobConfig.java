@@ -356,4 +356,7 @@ public interface IDeepJobConfig<T> extends Serializable {
      */
     public int getBisectFactor();
 
-}
+    public Configuration getHadoopConfiguration();
+
+
+    }

@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.rdd.mongodb;
+package com.stratio.deep.testentity;
 
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.annotations.DeepField;
 import com.stratio.deep.entity.IDeepType;
-import org.apache.cassandra.db.marshal.Int32Type;
 import org.bson.types.ObjectId;
 
 
 @DeepEntity
-public class DomainEntity implements IDeepType {
+public class TextEntity implements IDeepType {
 
     private static final long serialVersionUID = 7262854550753855586L;
 

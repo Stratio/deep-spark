@@ -19,23 +19,15 @@ package com.stratio.deep.examples.java;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
 import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.rdd.mongodb.DomainEntity;
 import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
-import com.stratio.deep.rdd.mongodb.UtilMongoDB;
+import com.stratio.deep.testentity.TextEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.PairFunction;
-import org.bson.BSONObject;
 import org.bson.types.ObjectId;
 import scala.Tuple2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -78,33 +70,29 @@ public final class WritingEntityToMongoDB {
                 new String[]{p.getJar()});
 
 
-        DomainEntity domainEntity1 = new DomainEntity();
+        TextEntity TextEntity1 = new TextEntity();
 
-        domainEntity1.setId(new ObjectId());
-        domainEntity1.setText("Texto1");
+        TextEntity1.setId(new ObjectId());
+        TextEntity1.setText("Texto1");
 
-        DomainEntity domainEntity2 = new DomainEntity();
+        TextEntity TextEntity2 = new TextEntity();
 
-        domainEntity2.setId(new ObjectId());
-        domainEntity2.setText("Texto1");
-
-
-        List<DomainEntity> entities = new ArrayList<>();
-        entities.add(domainEntity1);
-        entities.add(domainEntity2);
+        TextEntity2.setId(new ObjectId());
+        TextEntity2.setText("Texto1");
 
 
+        List<TextEntity> entities = new ArrayList<>();
+        entities.add(TextEntity1);
+        entities.add(TextEntity2);
 
-        GenericDeepJobConfigMongoDB outputConfigEntityPruebaGuardado = DeepJobConfigFactory.createMongoDB(DomainEntity.class).host("localhost").port("27017").database("beowulf").collection("output.generated").readPreference("nearest").initialize();
+
+        GenericDeepJobConfigMongoDB outputConfigEntityPruebaGuardado = DeepJobConfigFactory.createMongoDB(TextEntity.class).host("localhost").port("27017").database("beowulf").collection("output.generated").readPreference("nearest").initialize();
 
 
-        MongoJavaRDD<DomainEntity> outputRDDEntity = deepContext.mongoJavaRDD(outputConfigEntityPruebaGuardado);
-
+        MongoJavaRDD<TextEntity> outputRDDEntity = deepContext.mongoJavaRDD(outputConfigEntityPruebaGuardado);
 
 
         MongoEntityRDD.saveEntity(outputRDDEntity, outputConfigEntityPruebaGuardado);
-
-
 
 
         deepContext.stop();

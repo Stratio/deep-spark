@@ -20,16 +20,10 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.mongodb.*;
+import com.stratio.deep.testentity.TextEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
-import org.apache.spark.api.java.JavaRDD;
-
 import scala.Tuple2;
-
-import javax.swing.text.html.parser.Entity;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -63,12 +57,12 @@ public final class WritingEntityFromMongoDBToMongoDB {
 
 
 
-        GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(DomainEntity.class).host("localhost").port("27017").database("beowulf").collection("input").readPreference("nearest").initialize();
+        GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(TextEntity.class).host("localhost").port("27017").database("beowulf").collection("input").readPreference("nearest").initialize();
 
-        MongoJavaRDD<DomainEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
+        MongoJavaRDD<TextEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
 
 
-        GenericDeepJobConfigMongoDB outputConfigEntityPruebaGuardado = DeepJobConfigFactory.createMongoDB(DomainEntity.class).host("localhost").port("27017").database("beowulf").collection("output").readPreference("nearest").initialize();
+        GenericDeepJobConfigMongoDB outputConfigEntityPruebaGuardado = DeepJobConfigFactory.createMongoDB(TextEntity.class).host("localhost").port("27017").database("beowulf").collection("output").readPreference("nearest").initialize();
 
 
 

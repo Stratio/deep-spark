@@ -19,8 +19,9 @@ package com.stratio.deep.examples.java;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
 import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.rdd.mongodb.DomainEntity;
+
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
+import com.stratio.deep.testentity.TextEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 
@@ -53,16 +54,16 @@ public final class ReadingEntityFromMongoDB {
 
 
 
-        GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(DomainEntity.class).host("localhost").port("27017").database("beowulf").collection("input").readPreference("nearest").initialize();
+        GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(TextEntity.class).host("localhost").port("27017").database("beowulf").collection("input").readPreference("nearest").initialize();
 
-        MongoJavaRDD<DomainEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
-
-
-
-        List<DomainEntity> dominios = inputRDDEntity.collect();
+        MongoJavaRDD<TextEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
 
 
-        for(DomainEntity tuple : dominios){
+
+        List<TextEntity> dominios = inputRDDEntity.collect();
+
+
+        for(TextEntity tuple : dominios){
             System.out.println(tuple);
         }
 
