@@ -24,7 +24,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.PairFunction;
-import com.stratio.deep.rdd.mongodb.DeepMongoRDD;
+import org.apache.spark.rdd.DeepMongoRDD;
 import org.bson.BSONObject;
 import scala.Tuple2;
 import scala.reflect.ClassTag$;

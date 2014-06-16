@@ -17,7 +17,7 @@
 package com.stratio.deep.rdd.mongodb;
 
 import org.apache.spark.api.java.JavaRDD;
-import com.stratio.deep.rdd.mongodb.DeepMongoRDD;
+import org.apache.spark.rdd.DeepMongoRDD;
 import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
 
