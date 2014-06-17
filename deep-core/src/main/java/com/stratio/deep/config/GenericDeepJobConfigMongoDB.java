@@ -17,58 +17,85 @@
 package com.stratio.deep.config;
 
 import com.datastax.driver.core.Session;
+import com.mongodb.hadoop.util.MongoConfigUtil;
 import com.stratio.deep.entity.Cell;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+
 /**
- * Base class for all config implementations providing default implementations for methods
- * defined in {@link GenericDeepJobConfigMongoDB}.
+ *
+ * @param <T>
  */
-public class GenericDeepJobConfigMongoDB<T>  implements Serializable, IDeepJobConfig {
+
+public class GenericDeepJobConfigMongoDB<T> implements Serializable, IDeepJobConfig {
     private static final Logger LOG = Logger.getLogger("com.stratio.deep.config.GenericDeepJobConfigMongoDB");
     private static final long serialVersionUID = -7179376653643603038L;
 
+    /**
+     *
+     */
     public Configuration configHadoop;
 
-
     /**
-     * hostname of the cassandra server
+     * A list of mongodb host to connect
      */
-    private String host;
+    private List<String> hostList = new ArrayList<>();
 
 
     /**
-     * Cassandra username. Leave empty if you do not need authentication.
+     * MongoDB username
      */
     private String username;
 
     /**
-     * Cassandra password. Leave empty if you do not need authentication.
+     * MongoDB password
      */
+
     private String password;
 
+    /**
+     * Indicates the replica set's name
+     */
+    private String replicaSet;
 
-    private String port;
-
+    /**
+     * Collection to get or insert data
+     */
     private String collection;
 
+    /**
+     * Database to connect
+     */
     private String database;
 
+    /**
+     * Read Preference
+     */
     private String readPreference;
+
+    /**
+     * Entity class to map BSONObject
+     */
+    protected Class<T> entityClass;
+
 
     private transient Map<String, Cell> columnDefinitionMap;
 
-    public Map<String, Cell> getColumnDefinitions(){
+    public Map<String, Cell> getColumnDefinitions() {
         return columnDefinitionMap;
     }
 
-    protected Class<T> entityClass;
 
-    public GenericDeepJobConfigMongoDB(){
+    /**
+     * Default constructor
+     */
+    public GenericDeepJobConfigMongoDB() {
 
     }
 
@@ -113,8 +140,8 @@ public class GenericDeepJobConfigMongoDB<T>  implements Serializable, IDeepJobCo
         return null;
     }
 
-    public Class<T> getEntityClass(){
-    return entityClass;
+    public Class<T> getEntityClass() {
+        return entityClass;
     }
 
     @Override
@@ -158,27 +185,33 @@ public class GenericDeepJobConfigMongoDB<T>  implements Serializable, IDeepJobCo
     }
 
     public GenericDeepJobConfigMongoDB<T> host(String host) {
-        this.host=host;
+        this.hostList.add(host);
         return this;
     }
 
-    public GenericDeepJobConfigMongoDB<T> port(String port) {
-        this.port=port;
+    public GenericDeepJobConfigMongoDB<T> host(List<String> host) {
+        this.hostList.addAll(host);
         return this;
     }
+
+    public GenericDeepJobConfigMongoDB<T> replicaSet(String replicaSet) {
+        this.replicaSet = replicaSet;
+        return this;
+    }
+
 
     public GenericDeepJobConfigMongoDB<T> database(String database) {
-        this.database=database;
+        this.database = database;
         return this;
     }
 
     public GenericDeepJobConfigMongoDB<T> collection(String collection) {
-        this.collection=collection;
+        this.collection = collection;
         return this;
     }
 
     public GenericDeepJobConfigMongoDB<T> username(String username) {
-        this.username=username;
+        this.username = username;
         return this;
     }
 
@@ -248,7 +281,7 @@ public class GenericDeepJobConfigMongoDB<T>  implements Serializable, IDeepJobCo
     }
 
     public GenericDeepJobConfigMongoDB<T> password(String password) {
-        this.password=password;
+        this.password = password;
         return this;
     }
 
@@ -263,38 +296,70 @@ public class GenericDeepJobConfigMongoDB<T>  implements Serializable, IDeepJobCo
     }
 
     public GenericDeepJobConfigMongoDB<T> readPreference(String readPreference) {
-        this.readPreference=readPreference;
+        this.readPreference = readPreference;
         return this;
     }
 
-    public GenericDeepJobConfigMongoDB(String host, String port, String database, String collection){
-        this.host=host;
-        this.port=port;
-        this.database=database;
-        this.collection=collection;
-    }
 
+    /**
+     * Creates necesary config to access mongoDB
+     * @return
+     */
     public GenericDeepJobConfigMongoDB<T> initialize() {
 
         configHadoop = new Configuration();
         StringBuilder connection = new StringBuilder();
 
-
         connection.append("mongodb").append(":").append("//");
 
-        if(username!=null&&password!=null){
+        if (username != null && password != null) {
             connection.append(username).append(":").append(password).append("@");
         }
-        connection.append(host).append(":").append(port).append("/").append(database).append(".").append(collection);
 
-
-
-        if(readPreference!=null){
-            connection.append("?readPreference=").append(readPreference);
+        boolean firstHost = true;
+        for (String host : hostList) {
+            if (!firstHost) {
+                connection.append(",");
+            }
+            connection.append(host);
+            firstHost = false;
         }
 
-        configHadoop.set("mongo.input.uri", connection.toString());
-        configHadoop.set("mongo.output.uri", connection.toString());
+
+        connection.append("/").append(database).append(".").append(collection);
+
+
+        StringBuilder options = new StringBuilder();
+        boolean asignado = false;
+
+
+        if (readPreference != null) {
+            asignado = true;
+            options.append("?readPreference=").append(readPreference);
+        }
+
+        if (replicaSet != null) {
+            if (asignado) {
+                options.append("&");
+            } else {
+                options.append("?");
+            }
+            options.append("replicaSet=").append(replicaSet);
+        }
+
+        connection.append(options);
+
+        System.out.println("imrpimo la url " + connection.toString());
+        configHadoop.set(MongoConfigUtil.INPUT_URI, connection.toString());
+        configHadoop.set(MongoConfigUtil.OUTPUT_URI, connection.toString());
+
+
+        configHadoop.set(MongoConfigUtil.CREATE_INPUT_SPLITS, "false");
+
+        if (username != null && password != null) {
+            //TODO: In release mongo -hadoop will be a new feature with mongos process.
+//            configHadoop.set(MongoConfigUtil.AUTH_URI , connection.toString());
+        }
 
         return this;
     }
@@ -324,7 +389,7 @@ public class GenericDeepJobConfigMongoDB<T>  implements Serializable, IDeepJobCo
     }
 
 
-    public Configuration getHadoopConfiguration(){
+    public Configuration getHadoopConfiguration() {
         return configHadoop;
     }
 }

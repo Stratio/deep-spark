@@ -30,7 +30,8 @@ public class TextEntity implements IDeepType {
     @DeepField(fieldName = "_id", isPartOfPartitionKey = true)
     private ObjectId id;
 
-    @DeepField(fieldName = "text")
+
+    @DeepField(fieldName = "mensaje")
     private String text;
 
     public ObjectId getId() {
@@ -50,9 +51,10 @@ public class TextEntity implements IDeepType {
     }
 
 
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("DomainEntity{");
+        final StringBuffer sb = new StringBuffer("TextEntity{");
         sb.append("id=").append(id);
         sb.append(", text='").append(text).append('\'');
         sb.append('}');

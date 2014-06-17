@@ -46,6 +46,10 @@ public final class ReadingEntityFromMongoDB {
     public static void doMain(String[] args) {
         String job = "java:readingEntityFromCassandra";
 
+        String host = "localhost:27017";
+
+        String database = "test";
+        String inputCollection = "input";
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -53,19 +57,12 @@ public final class ReadingEntityFromMongoDB {
                 new String[]{p.getJar()});
 
 
-
-        GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(TextEntity.class).host("localhost").port("27017").database("beowulf").collection("input").readPreference("nearest").initialize();
+        GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(TextEntity.class).host(host).database(database).collection(inputCollection).initialize();
 
         MongoJavaRDD<TextEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
 
 
-
-        List<TextEntity> dominios = inputRDDEntity.collect();
-
-
-        for(TextEntity tuple : dominios){
-            System.out.println(tuple);
-        }
+        System.out.println("count : "+ inputRDDEntity.cache().count());
 
 
 
