@@ -57,21 +57,28 @@ public final class CreatingCellRDD {
         String keyspaceName = "test";
         String tableName = "tweets";
 
+        String master = System.getProperty("spark.master");
+        LOG.info("spark.master: "+ master);
+        LOG.info("spark.home: "+ System.getProperty("spark.home"));
+
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
-        SparkConf sparkConf = new SparkConf().setMaster(p.getCluster()).setAppName(job).setSparkHome(p.getSparkHome()
-        ).setJars(new String[]{p.getJar()})
-                .set("spark.task.maxFailures", "5");
+        SparkConf sparkConf = new SparkConf().setMaster(master).setAppName(job).setJars(p.getJars()).setSparkHome(p.getSparkHome());
 
         SparkContext sc = new SparkContext(p.getCluster(), job, sparkConf);
+
+        LOG.info("spark.serializer: "+ System.getProperty("spark.serializer"));
+        LOG.info("spark.kryo.registrator: "+ System.getProperty("spark.kryo.registrator"));
 
         DeepSparkContext deepContext = new DeepSparkContext(sc);
 
         // Configuration and initialization
         IDeepJobConfig config = DeepJobConfigFactory.create()
                 .host(p.getCassandraHost())
-                .cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
-                .keyspace(keyspaceName).table(tableName)
+                .cqlPort(p.getCassandraCqlPort())
+                .rpcPort(p.getCassandraThriftPort())
+                .keyspace(keyspaceName)
+                .table(tableName)
                 .initialize();
 
         // Creating the RDD

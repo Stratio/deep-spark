@@ -52,7 +52,7 @@ object UsingScalaEntity {
 
     val sparkConf = new SparkConf()
     sparkConf.setAppName(jobName)
-    sparkConf.setJars(Array(p.getJar))
+    sparkConf.setJars(p.getJars)
     sparkConf.setMaster(p.getCluster)
     sparkConf.setSparkHome(p.getSparkHome)
     val sc = new SparkContext(sparkConf)

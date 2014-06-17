@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.entity;
+package com.stratio.deep.serializer;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.entity.IDeepType;
 import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
 import org.apache.spark.serializer.KryoRegistrator;
 
