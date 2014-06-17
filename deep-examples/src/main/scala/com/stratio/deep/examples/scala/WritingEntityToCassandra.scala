@@ -58,7 +58,7 @@ object WritingEntityToCassandra {
 
     val numPerKey: RDD[(String, Int)] = pairRDD.groupByKey
       .map {
-      t: (String, Seq[PageEntity]) => (t._1, t._2.size)
+      t: (String, Iterable[PageEntity]) => (t._1, t._2.size)
     }
 
 

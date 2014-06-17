@@ -41,6 +41,7 @@ import org.apache.spark.serializer.SerializerInstance;
 import org.testng.annotations.Test;
 import scala.Function1;
 import scala.collection.Iterator;
+import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
 
 import java.io.ByteArrayInputStream;
@@ -350,15 +351,16 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         JavaSerializer ser = new JavaSerializer(context.getConf());
 
         SerializerInstance instance = ser.newInstance();
+        ClassTag<CassandraRDD<TestEntity>> classTag = ClassTag$.MODULE$.<CassandraRDD<TestEntity>>apply(rdd.getClass());
 
-        ByteBuffer serializedRDD = instance.serialize(rdd);
+        ByteBuffer serializedRDD = instance.serialize(rdd, classTag);
 
-        CassandraRDD deserializedRDD = instance.deserialize(serializedRDD);
+        CassandraRDD deserializedRDD = instance.deserialize(serializedRDD, classTag);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         SerializationStream serializationStream = instance.serializeStream(baos);
-        serializationStream = serializationStream.writeObject(rdd);
+        serializationStream = serializationStream.writeObject(rdd, classTag);
 
         serializationStream.flush();
         serializationStream.close();

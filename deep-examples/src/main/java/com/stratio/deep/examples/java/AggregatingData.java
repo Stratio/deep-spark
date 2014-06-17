@@ -16,6 +16,7 @@
 
 package com.stratio.deep.examples.java;
 
+import com.google.common.collect.Lists;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
@@ -88,10 +89,10 @@ public class AggregatingData {
             public String call(TweetEntity tableEntity) {
                 return tableEntity.getAuthor();
             }
-        }).map(new PairFunction<Tuple2<String, List<TweetEntity>>, String, Integer>() {
+        }).mapToPair(new PairFunction<Tuple2<String, Iterable<TweetEntity>>, String, Integer>() {
             @Override
-            public Tuple2<String, Integer> call(Tuple2<String, List<TweetEntity>> t) throws Exception {
-                return new Tuple2<String, Integer>(t._1(), t._2().size());
+            public Tuple2<String, Integer> call(Tuple2<String, Iterable<TweetEntity>> t) throws Exception {
+                return new Tuple2<String, Integer>(t._1(), Lists.newArrayList(t._2()).size());
             }
         });
 
