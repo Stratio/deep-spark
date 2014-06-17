@@ -25,6 +25,7 @@ import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.conf.*;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
@@ -752,5 +753,11 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     public int getBisectFactor() {
         return bisectFactor;
     }
+
+    @Override
+    public org.apache.hadoop.conf.Configuration getHadoopConfiguration(){
+        return null;
+    }
+
 
 }
