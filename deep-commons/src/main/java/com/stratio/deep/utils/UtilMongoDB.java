@@ -64,7 +64,6 @@ public class UtilMongoDB {
 
         for (int i = 0; i < count; i++) {
             if (AnnotationUtils.deepFieldName(fields[i]).equals("_id")) {
-                System.out.println("encuentro el valor del campo " + fields[i].getName());
                 return Utils.findGetter(fields[i].getName(), t.getClass()).invoke(t);
             }
 

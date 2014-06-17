@@ -349,7 +349,6 @@ public class GenericDeepJobConfigMongoDB<T> implements Serializable, IDeepJobCon
 
         connection.append(options);
 
-        System.out.println("imrpimo la url " + connection.toString());
         configHadoop.set(MongoConfigUtil.INPUT_URI, connection.toString());
         configHadoop.set(MongoConfigUtil.OUTPUT_URI, connection.toString());
 
