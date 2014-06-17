@@ -19,6 +19,7 @@ package com.stratio.deep.config;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.entity.Cell;
 import org.apache.cassandra.dht.IPartitioner;
+import org.apache.hadoop.conf.Configuration;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -354,4 +355,8 @@ public interface IDeepJobConfig<T> extends Serializable {
      * @return the configured bisect factor.
      */
     public int getBisectFactor();
-}
+
+    public Configuration getHadoopConfiguration();
+
+
+    }

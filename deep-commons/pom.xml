@@ -69,7 +69,13 @@
             <artifactId>kryo-serializers</artifactId>
             <version>0.26</version>
         </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>2.12.2</version>
+        </dependency>
     </dependencies>
+
 
     <licenses>
         <license>
