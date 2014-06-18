@@ -1,11 +1,8 @@
 package com.stratio.deep.utils;
 
 import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.utils.AnnotationUtils;
-import com.stratio.deep.utils.Utils;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
-import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -16,7 +13,17 @@ import java.lang.reflect.Method;
  */
 public class UtilMongoDB {
 
-
+    /**
+     * converts from BsonObject to and entity class with deep's anotations
+     *
+     * @param classEntity
+     * @param bsonObject
+     * @param <T>
+     * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws InvocationTargetException
+     */
     public static <T> T getObjectFromBson(Class<T> classEntity, BSONObject bsonObject) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         T t = classEntity.newInstance();
 
@@ -35,6 +42,16 @@ public class UtilMongoDB {
         return t;
     }
 
+    /**
+     * converts from and entity class with deep's anotations to BsonObject
+     *
+     * @param t
+     * @param <T>
+     * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws InvocationTargetException
+     */
     public static <T extends IDeepType> BSONObject getBsonFromObject(T t) throws IllegalAccessException, InstantiationException, InvocationTargetException {
 
 
@@ -52,7 +69,16 @@ public class UtilMongoDB {
         return bson;
     }
 
-
+    /**
+     * returns the id value annotated with @DeepField(fieldName = "_id")
+     *
+     * @param t
+     * @param <T>
+     * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws InvocationTargetException
+     */
     public static <T extends IDeepType> Object getId(T t) throws IllegalAccessException, InstantiationException, InvocationTargetException {
 
 

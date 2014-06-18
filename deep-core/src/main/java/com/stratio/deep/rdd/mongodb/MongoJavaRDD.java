@@ -17,12 +17,15 @@
 package com.stratio.deep.rdd.mongodb;
 
 import org.apache.spark.api.java.JavaRDD;
-
 import org.apache.spark.rdd.DeepMongoRDD;
 import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
 
-
+/**
+ * Commodity RDD implementation that should be used as a
+ * Java Wrapper for {@link MongoEntityRDD}.
+ * @param <W>
+ */
 public class MongoJavaRDD<W> extends JavaRDD<W> {
     private static final long serialVersionUID = -3208994171892747470L;
 

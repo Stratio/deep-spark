@@ -19,16 +19,20 @@ package com.stratio.deep.examples.java;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
 import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.rdd.mongodb.*;
+import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
+import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
 import com.stratio.deep.testentity.TextEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import scala.Tuple2;
+
 import java.util.List;
 
-
+/**
+ * Example class to write an entity to mongoDB
+ */
 public final class WritingEntityToMongoDB {
-    private static final Logger LOG = Logger.getLogger(WritingEntityToMongoDB.class);
+    private static final Logger LOG = Logger.getLogger(com.stratio.deep.examples.scala.WritingEntityToMongoDB.class);
     public static List<Tuple2<String, Integer>> results;
 
     private WritingEntityToMongoDB() {
@@ -44,11 +48,11 @@ public final class WritingEntityToMongoDB {
     }
 
     public static void doMain(String[] args) {
-        String job = "java:writingEntityToCassandra";
+        String job = "java:writingEntityToMongoDB";
 
         String host = "localhost:27017";
 
-        String database = "beowulf";
+        String database = "test";
         String inputCollection = "input";
         String outputCollection = "output";
 
@@ -56,8 +60,8 @@ public final class WritingEntityToMongoDB {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),p.getJars());
-
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+                p.getJars());
 
 
         GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(TextEntity.class).host(host).database(database).collection(inputCollection).readPreference(readPreference).initialize();
@@ -68,9 +72,7 @@ public final class WritingEntityToMongoDB {
         GenericDeepJobConfigMongoDB outputConfigEntityPruebaGuardado = DeepJobConfigFactory.createMongoDB(TextEntity.class).host(host).database(database).collection(outputCollection).readPreference(readPreference).initialize();
 
 
-
-        MongoEntityRDD.saveEntity ( inputRDDEntity, outputConfigEntityPruebaGuardado);
-
+        MongoEntityRDD.saveEntity(inputRDDEntity, outputConfigEntityPruebaGuardado);
 
 
         deepContext.stop();

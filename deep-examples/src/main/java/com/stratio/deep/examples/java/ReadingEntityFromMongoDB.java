@@ -19,19 +19,19 @@ package com.stratio.deep.examples.java;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
 import com.stratio.deep.context.DeepSparkContext;
-
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
 import com.stratio.deep.testentity.TextEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
-
 import scala.Tuple2;
 
 import java.util.List;
 
-
+/**
+ * Example class to read an entity from mongoDB
+ */
 public final class ReadingEntityFromMongoDB {
-    private static final Logger LOG = Logger.getLogger(ReadingEntityFromMongoDB.class);
+    private static final Logger LOG = Logger.getLogger(com.stratio.deep.examples.scala.ReadingEntityFromMongoDB.class);
     public static List<Tuple2<String, Integer>> results;
 
     private ReadingEntityFromMongoDB() {
@@ -44,16 +44,17 @@ public final class ReadingEntityFromMongoDB {
 
 
     public static void doMain(String[] args) {
-        String job = "java:readingEntityFromCassandra";
+        String job = "java:readingEntityFromMongoDB";
 
         String host = "localhost:27017";
 
         String database = "test";
-        String inputCollection = "input";
+        String inputCollection = "entrada";
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),p.getJars());
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+                p.getJars());
 
 
         GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(TextEntity.class).host(host).database(database).collection(inputCollection).initialize();
@@ -61,9 +62,7 @@ public final class ReadingEntityFromMongoDB {
         MongoJavaRDD<TextEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
 
 
-        System.out.println("count : "+ inputRDDEntity.cache().count());
-
-
+        System.out.println("count : " + inputRDDEntity.cache().count());
 
 
         deepContext.stop();

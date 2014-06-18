@@ -19,6 +19,7 @@ package com.stratio.deep.config;
 import com.datastax.driver.core.Session;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import com.stratio.deep.entity.Cell;
+import com.stratio.deep.utils.Constants;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
 
@@ -29,7 +30,6 @@ import java.util.Map;
 
 
 /**
- *
  * @param <T>
  */
 
@@ -302,11 +302,12 @@ public class GenericDeepJobConfigMongoDB<T> implements Serializable, IDeepJobCon
 
 
     /**
-     * Creates necesary config to access mongoDB
+     * Creates necessary config to access mongoDB
+     *
      * @return
      */
     public GenericDeepJobConfigMongoDB<T> initialize() {
-
+        validate();
         configHadoop = new Configuration();
         StringBuilder connection = new StringBuilder();
 
@@ -352,17 +353,31 @@ public class GenericDeepJobConfigMongoDB<T> implements Serializable, IDeepJobCon
         configHadoop.set(MongoConfigUtil.INPUT_URI, connection.toString());
         configHadoop.set(MongoConfigUtil.OUTPUT_URI, connection.toString());
 
-
+        // it allows hadoop to make data split
         configHadoop.set(MongoConfigUtil.CREATE_INPUT_SPLITS, "false");
 
         if (username != null && password != null) {
-            //TODO: In release mongo -hadoop will be a new feature with mongos process.
+            //TODO: In release 1.2.1 mongo-hadoop will have a new feature with mongos process.
 //            configHadoop.set(MongoConfigUtil.AUTH_URI , connection.toString());
         }
 
         return this;
     }
 
+    /**
+     * validates connection parameters
+     */
+    private void validate(){
+        if(hostList.isEmpty()){
+            throw new IllegalArgumentException("host cannot be null");
+        }
+        if(database==null){
+            throw new IllegalArgumentException("database cannot be null");
+        }
+        if(collection==null){
+            throw new IllegalArgumentException("collection cannot be null");
+        }
+    }
     @Override
     public IDeepJobConfig inputColumns(String... columns) {
         return null;
