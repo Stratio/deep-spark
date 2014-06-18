@@ -31,11 +31,13 @@ import static org.testng.Assert.assertEquals;
 @Test(suiteName = "deepExamplesTests", groups = {"DeepExamplesTest"})
 public class DeepExamplesTest extends AbstractDeepExamplesTest {
     String[] args = new String[]{
+            "-m",
             "local",
-            "",
-            "",
+            "-cassandraHost",
             Constants.DEFAULT_CASSANDRA_HOST,
+            "-cassandraCqlPort",
             "" + CassandraServer.CASSANDRA_CQL_PORT,
+            "-cassandraThriftPort",
             "" + CassandraServer.CASSANDRA_THRIFT_PORT};
 
     @Test

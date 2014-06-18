@@ -16,9 +16,11 @@
 
 package com.stratio.deep.testutils;
 
+import com.stratio.deep.utils.Constants;
 import org.apache.commons.cli.*;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+
+import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 
 /**
  * Common properties used by the examples.
@@ -92,11 +94,11 @@ public class ContextProperties {
             }
 
             jar = (line.hasOption("jars") ? line.getOptionValues("jars") : new String[]{});
-            cluster = line.getOptionValue ("master", System.getProperty("spark.master"));
-            sparkHome = line.getOptionValue ("sparkHome", System.getProperty("spark.home"));
-            cassandraHost = line.getOptionValue ("cassandraHost", "localhost");
-            cassandraCqlPort = line.hasOption ("cassandraCqlPort") ? (Integer)line.getOptionObject("cassandraCqlPort"): 9042;
-            cassandraThriftPort = line.hasOption ("cassandraThriftPort") ? (Integer)line.getOptionObject("cassandraThriftPort"): 9160;
+            cluster = line.getOptionValue ("master", defaultIfEmpty(System.getProperty("spark.master"), "local"));
+            sparkHome = line.getOptionValue ("sparkHome", defaultIfEmpty(System.getProperty("spark.home"), ""));
+            cassandraHost = line.getOptionValue ("cassandraHost", Constants.DEFAULT_CASSANDRA_HOST);
+            cassandraCqlPort = line.hasOption ("cassandraCqlPort") ? Integer.parseInt(line.getOptionValue("cassandraCqlPort")): Constants.DEFAULT_CASSANDRA_RPC_PORT;
+            cassandraThriftPort = line.hasOption ("cassandraThriftPort") ? Integer.parseInt(line.getOptionValue("cassandraThriftPort")): Constants.DEFAULT_CASSANDRA_CQL_PORT;
 
         } catch (ParseException e) {
             formatter.printHelp( "", options );

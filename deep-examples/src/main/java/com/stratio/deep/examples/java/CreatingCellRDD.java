@@ -57,13 +57,9 @@ public final class CreatingCellRDD {
         String keyspaceName = "test";
         String tableName = "tweets";
 
-        String master = System.getProperty("spark.master");
-        LOG.info("spark.master: "+ master);
-        LOG.info("spark.home: "+ System.getProperty("spark.home"));
-
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
-        SparkConf sparkConf = new SparkConf().setMaster(master).setAppName(job).setJars(p.getJars()).setSparkHome(p.getSparkHome());
+        SparkConf sparkConf = new SparkConf().setMaster(p.getCluster()).setAppName(job).setJars(p.getJars()).setSparkHome(p.getSparkHome());
 
         SparkContext sc = new SparkContext(p.getCluster(), job, sparkConf);
 
