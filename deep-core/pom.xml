@@ -107,6 +107,12 @@
             <version>2.12.2</version>
         </dependency>
 
+        <!-- mongodb embedded -->
+        <dependency>
+            <groupId>de.flapdoodle.embed</groupId>
+            <artifactId>de.flapdoodle.embed.mongo</artifactId>
+            <version>1.46.0</version>
+        </dependency>
         <!--
         <dependency>
             <groupId>org.mongodb.mongo-hadoop</groupId>
