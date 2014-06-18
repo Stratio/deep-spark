@@ -20,7 +20,6 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.google.common.collect.Lists;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
@@ -133,34 +132,34 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
     @Test(dependsOnMethods = "testFilter")
     public void testGroupByKey() {
-        /* 1. I need to define which is the key, let's say it's the domain */
-        JavaPairRDD<String, TestEntity> pairRDD = rdd.mapToPair(new DomainEntityPairFunction());
+  /* 1. I need to define which is the key, let's say it's the domain */
+        JavaPairRDD<String, TestEntity> pairRDD = rdd.map(new DomainEntityPairFunction());
 
-	    /* 2. Not I can group by domain */
-        JavaPairRDD<String, Iterable<TestEntity>> groupedPairRDD = pairRDD.groupByKey();
+	/* 2. Not I can group by domain */
+        JavaPairRDD<String, List<TestEntity>> groupedPairRDD = pairRDD.groupByKey();
 
         assertNotNull(groupedPairRDD);
 
-        Map<String, Iterable<TestEntity>> groupedPairAsMap = groupedPairRDD.collectAsMap();
+        Map<String, List<TestEntity>> groupedPairAsMap = groupedPairRDD.collectAsMap();
 
         assertEquals(groupedPairAsMap.keySet().size(), 8);
 
-        Iterable<TestEntity> domainWickedin = groupedPairAsMap.get("wickedin.es");
-        assertEquals(Lists.newArrayList(domainWickedin).size(), 2);
+        List<TestEntity> domainWickedin = groupedPairAsMap.get("wickedin.es");
+        assertEquals(domainWickedin.size(), 2);
 
-        Iterable<TestEntity> domain11870 = groupedPairAsMap.get("11870.com");
-        assertEquals(Lists.newArrayList(domain11870).size(), 3);
+        List<TestEntity> domain11870 = groupedPairAsMap.get("11870.com");
+        assertEquals(domain11870.size(), 3);
 
-        Iterable<TestEntity> domainAlicanteconfidencial = groupedPairAsMap.get("alicanteconfidencial.blogspot.com.es");
-        assertEquals(Lists.newArrayList(domainAlicanteconfidencial).size(), 3);
+        List<TestEntity> domainAlicanteconfidencial = groupedPairAsMap.get("alicanteconfidencial.blogspot.com.es");
+        assertEquals(domainAlicanteconfidencial.size(), 3);
     }
 
     @Test(dependsOnMethods = "testGroupByKey")
     public void testJoin() {
         verifyRDD();
 
-        JavaPairRDD<String, TestEntity> slowPagesPairRDD = slowPages.mapToPair(new DomainEntityPairFunction());
-        JavaPairRDD<String, TestEntity> quickPagesPairRDD = quickPages.mapToPair(new DomainEntityPairFunction());
+        JavaPairRDD<String, TestEntity> slowPagesPairRDD = slowPages.map(new DomainEntityPairFunction());
+        JavaPairRDD<String, TestEntity> quickPagesPairRDD = quickPages.map(new DomainEntityPairFunction());
 
         JavaPairRDD<String, Tuple2<TestEntity, TestEntity>> joinedRDD = slowPagesPairRDD.join(quickPagesPairRDD);
         List<Tuple2<String, Tuple2<TestEntity, TestEntity>>> joinedRDDElems = joinedRDD.collect();
@@ -182,7 +181,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     @Test(dependsOnMethods = "testMap")
     public void testReduceByKey() {
   /* 1. I need to define which is the key, let's say it's the domain */
-        JavaPairRDD<String, Integer> pairRDD = rdd.mapToPair(new DomainCounterPairFunction());
+        JavaPairRDD<String, Integer> pairRDD = rdd.map(new DomainCounterPairFunction());
 
 	/* 2. Not I can group by domain */
         JavaPairRDD<String, Integer> reducedRDD = pairRDD.reduceByKey(new IntegerReducer());
@@ -232,7 +231,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
                 .password("").initialize();
 
 	/* 1. I need to define which is the key, let's say it's the domain */
-        JavaPairRDD<String, Integer> pairRDD = rdd.mapToPair(new DomainCounterPairFunction());
+        JavaPairRDD<String, Integer> pairRDD = rdd.map(new DomainCounterPairFunction());
 
 	/* 2. Not I can group by domain */
         JavaPairRDD<String, Integer> reducedRDD = pairRDD.reduceByKey(new IntegerReducer());
@@ -258,7 +257,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
                 .batchSize(2)
                 .password("").initialize();
 
-        JavaPairRDD<String, Double> pairRDD = rdd.mapToPair(new DomainCounterDoublePairFunction());
+        JavaPairRDD<String, Double> pairRDD = rdd.map(new DomainCounterDoublePairFunction());
 
         JavaRDD<Cells> outRDD = pairRDD.map(new WrongSensors2CellsFunction());
 
@@ -324,7 +323,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
 }
 
-class WrongSensors2CellsFunction implements Function<Tuple2<String, Double>, Cells> {
+class WrongSensors2CellsFunction extends Function<Tuple2<String, Double>, Cells> {
     @Override
     public Cells call(Tuple2<String, Double> t) throws Exception {
         Cell sensorNameCell = Cell.create("name", t._1());
@@ -335,7 +334,7 @@ class WrongSensors2CellsFunction implements Function<Tuple2<String, Double>, Cel
     }
 }
 
-class Sensors2CellsFunction implements Function<Tuple2<String, Double>, Cells> {
+class Sensors2CellsFunction extends Function<Tuple2<String, Double>, Cells> {
     @Override
     public Cells call(Tuple2<String, Double> t) throws Exception {
         Cell sensorNameCell = Cell.create("name", t._1());
@@ -346,14 +345,14 @@ class Sensors2CellsFunction implements Function<Tuple2<String, Double>, Cells> {
     }
 }
 
-class Tuple2CellsFunction implements Function<Tuple2<String, Integer>, Cells> {
+class Tuple2CellsFunction extends Function<Tuple2<String, Integer>, Cells> {
     @Override
     public Cells call(Tuple2<String, Integer> t) throws Exception {
         return new Cells(Cell.create("domain", t._1(), true, false), Cell.create("count", t._2()));
     }
 }
 
-class DomainCounterPairFunction implements PairFunction<TestEntity, String, Integer> {
+class DomainCounterPairFunction extends PairFunction<TestEntity, String, Integer> {
 
     private static final long serialVersionUID = -2323312377056863436L;
 
@@ -364,7 +363,7 @@ class DomainCounterPairFunction implements PairFunction<TestEntity, String, Inte
 
 }
 
-class DomainCounterDoublePairFunction implements PairFunction<TestEntity, String, Double> {
+class DomainCounterDoublePairFunction extends PairFunction<TestEntity, String, Double> {
 
     private static final long serialVersionUID = -2323312377056863436L;
 
@@ -375,7 +374,7 @@ class DomainCounterDoublePairFunction implements PairFunction<TestEntity, String
 
 }
 
-class DomainEntityPairFunction implements PairFunction<TestEntity, String, TestEntity> {
+class DomainEntityPairFunction extends PairFunction<TestEntity, String, TestEntity> {
 
     private static final long serialVersionUID = -2323312377056863436L;
 
@@ -386,7 +385,7 @@ class DomainEntityPairFunction implements PairFunction<TestEntity, String, TestE
 
 }
 
-class FilterQuickPagesFunction implements org.apache.spark.api.java.function.Function<TestEntity, Boolean> {
+class FilterQuickPagesFunction extends org.apache.spark.api.java.function.Function<TestEntity, Boolean> {
 
     private static final long serialVersionUID = -3435107153980765475L;
 
@@ -396,7 +395,7 @@ class FilterQuickPagesFunction implements org.apache.spark.api.java.function.Fun
     }
 }
 
-class FilterSlowPagesFunction implements org.apache.spark.api.java.function.Function<TestEntity, Boolean> {
+class FilterSlowPagesFunction extends org.apache.spark.api.java.function.Function<TestEntity, Boolean> {
 
     private static final long serialVersionUID = -3435107153980765475L;
 
@@ -406,7 +405,7 @@ class FilterSlowPagesFunction implements org.apache.spark.api.java.function.Func
     }
 }
 
-class IntegerReducer implements Function2<Integer, Integer, Integer> {
+class IntegerReducer extends Function2<Integer, Integer, Integer> {
 
     private static final long serialVersionUID = 1997328240613872736L;
 
@@ -417,7 +416,7 @@ class IntegerReducer implements Function2<Integer, Integer, Integer> {
 
 }
 
-class StrippedEntityMapFunction implements Function<TestEntity, StrippedTestEntity> {
+class StrippedEntityMapFunction extends Function<TestEntity, StrippedTestEntity> {
 
     private static final long serialVersionUID = 1L;
 

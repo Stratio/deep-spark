@@ -428,36 +428,6 @@ public final class Utils {
         return setter;
     }
 
-
-    /**
-     * Resolves the getter name for the property whose name is 'propertyName' whose type is 'valueType'
-     * in the entity bean whose class is 'entityClass'.
-     * If we don't find a setter following Java's naming conventions, before throwing an exception we try to
-     * resolve the setter following Scala's naming conventions.
-     *
-     * @param propertyName the field name of the property whose getter we want to resolve.
-     * @param entityClass  the bean class object in which we want to search for the getter.
-     * @return the resolved getter.
-     */
-    @SuppressWarnings("unchecked")
-    public static Method findGetter(String propertyName, Class entityClass) {
-        Method getter;
-
-        String getterName = "get" + propertyName.substring(0, 1).toUpperCase() +
-                propertyName.substring(1);
-        try {
-            getter = entityClass.getMethod(getterName);
-        } catch (NoSuchMethodException e) {
-            // let's try with scala setter name
-            try {
-                getter = entityClass.getMethod(propertyName + "_$eq");
-            } catch (NoSuchMethodException e1) {
-                throw new DeepIOException(e1);
-            }
-        }
-
-        return getter;
-    }
     /**
      * Returns an instance of the Cassandra validator that matches the provided object.
      *

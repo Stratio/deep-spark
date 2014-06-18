@@ -58,7 +58,7 @@ object WritingCellToCassandra {
 
     val numPerKey: RDD[(String, Integer)] = pairRDD.groupByKey
       .map {
-      t: (String, Iterable[Cells]) => (t._1, t._2.size)
+      t: (String, Seq[Cells]) => (t._1, t._2.size)
     }
 
 

@@ -171,7 +171,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     @SuppressWarnings("unchecked")
     public CassandraRDD(SparkContext sc, IDeepJobConfig<T> config) {
         super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
-        this.config = sc.broadcast(config, ClassTag$.MODULE$.<IDeepJobConfig<T>>apply(config.getClass()));
+        this.config = sc.broadcast(config);
     }
 
     /**
