@@ -20,20 +20,32 @@ import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.utils.AnnotationUtils;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-
+/**
+ * Class containing the appropiate configuration for a MongoEntityRDD.
+ * <p/>
+ * Remember to call {@link #initialize()} after having configured all the
+ * properties.
+ *
+ * @param <T>
+ */
 public final class EntityDeepJobConfigMongoDB<T extends IDeepType> extends GenericDeepJobConfigMongoDB<T> {
 
     private static final long serialVersionUID = 123;
 
-
-
+    /**
+     *
+     */
     private Map<String, String> mapDBNameToEntityName;
 
-
-
-    public EntityDeepJobConfigMongoDB(Class<T> entityClass){
+    /**
+     *
+     * @param entityClass
+     */
+    public EntityDeepJobConfigMongoDB(Class<T> entityClass) {
         super();
         this.entityClass = entityClass;
     }

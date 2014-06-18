@@ -31,8 +31,10 @@ import scala.reflect.ClassTag$;
 
 import java.lang.reflect.InvocationTargetException;
 
-
-
+/**
+ * EntityRDD to interact with mongoDB
+ * @param <T>
+ */
 public final class MongoEntityRDD<T extends IDeepType> extends DeepMongoRDD<T> {
 
     private static final long serialVersionUID = -3208994171892747470L;
@@ -69,6 +71,12 @@ public final class MongoEntityRDD<T extends IDeepType> extends DeepMongoRDD<T> {
     }
 
 
+    /**
+     * Save a RDD to MongoDB
+     * @param rdd
+     * @param config
+     * @param <T>
+     */
     public static <T extends IDeepType> void saveEntity(MongoJavaRDD<T> rdd, GenericDeepJobConfigMongoDB<T> config) {
 
         JavaPairRDD<Object, BSONObject> save = rdd.mapToPair(new PairFunction<T, Object, BSONObject>() {

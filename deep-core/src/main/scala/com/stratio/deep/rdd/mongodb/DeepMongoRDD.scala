@@ -17,13 +17,15 @@
 
 package org.apache.spark.rdd
 
+//package com.stratio.deep.rdd.mongodb
+
 import java.text.SimpleDateFormat
 import java.util.Date
 
-import com.stratio.deep.config.{IDeepJobConfig, GenericDeepJobConfigMongoDB}
-import org.apache.hadoop.conf.{Configurable, Configuration}
+import com.stratio.deep.config.IDeepJobConfig
+import org.apache.hadoop.conf.Configurable
 import org.apache.hadoop.io.Writable
-import org.apache.hadoop.mapreduce._
+import  org.apache.hadoop.mapreduce._
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.{InterruptibleIterator, Logging, Partition, SerializableWritable, SparkContext, TaskContext}
 import org.bson.BSONObject
@@ -54,7 +56,7 @@ private[spark] class NewHadoopPartition(
  */
 @DeveloperApi
 abstract class DeepMongoRDD[T : ClassTag](sc: SparkContext,
-                          @transient config: IDeepJobConfig[T])
+                                          @transient config: IDeepJobConfig[T])
   extends RDD[T](sc, Nil)
   with SparkHadoopMapReduceUtil
   with Logging {
