@@ -97,8 +97,8 @@ public class ContextProperties {
             cluster = line.getOptionValue ("master", defaultIfEmpty(System.getProperty("spark.master"), "local"));
             sparkHome = line.getOptionValue ("sparkHome", defaultIfEmpty(System.getProperty("spark.home"), ""));
             cassandraHost = line.getOptionValue ("cassandraHost", Constants.DEFAULT_CASSANDRA_HOST);
-            cassandraCqlPort = line.hasOption ("cassandraCqlPort") ? Integer.parseInt(line.getOptionValue("cassandraCqlPort")): Constants.DEFAULT_CASSANDRA_RPC_PORT;
-            cassandraThriftPort = line.hasOption ("cassandraThriftPort") ? Integer.parseInt(line.getOptionValue("cassandraThriftPort")): Constants.DEFAULT_CASSANDRA_CQL_PORT;
+            cassandraCqlPort = line.hasOption ("cassandraCqlPort") ? Integer.parseInt(line.getOptionValue("cassandraCqlPort")): Constants.DEFAULT_CASSANDRA_CQL_PORT;
+            cassandraThriftPort = line.hasOption ("cassandraThriftPort") ? Integer.parseInt(line.getOptionValue("cassandraThriftPort")): Constants.DEFAULT_CASSANDRA_RPC_PORT;
 
         } catch (ParseException e) {
             formatter.printHelp( "", options );
