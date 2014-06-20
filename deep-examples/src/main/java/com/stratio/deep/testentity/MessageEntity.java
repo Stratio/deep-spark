@@ -23,7 +23,7 @@ import org.bson.types.ObjectId;
 
 
 @DeepEntity
-public class TextEntity implements IDeepType {
+public class MessageEntity implements IDeepType {
 
     private static final long serialVersionUID = 7262854550753855586L;
 
@@ -31,7 +31,7 @@ public class TextEntity implements IDeepType {
     private ObjectId id;
 
 
-    @DeepField(fieldName = "mensaje")
+    @DeepField(fieldName = "text")
     private String text;
 
     public ObjectId getId() {
@@ -54,7 +54,7 @@ public class TextEntity implements IDeepType {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("TextEntity{");
+        final StringBuffer sb = new StringBuffer("MessageEntity{");
         sb.append("id=").append(id);
         sb.append(", text='").append(text).append('\'');
         sb.append('}');

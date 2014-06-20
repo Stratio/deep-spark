@@ -16,10 +16,7 @@
 
 package com.stratio.deep.context;
 
-import com.stratio.deep.config.CellDeepJobConfig;
-import com.stratio.deep.config.EntityDeepJobConfig;
-import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
-import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.config.*;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
@@ -144,7 +141,7 @@ public class DeepSparkContext extends JavaSparkContext {
      * @return
      */
     public <T> MongoJavaRDD<T> mongoJavaRDD(GenericDeepJobConfigMongoDB<T> config) {
-        return new MongoJavaRDD(new MongoEntityRDD(this.sc(), config));
+        return new MongoJavaRDD<T>(new MongoEntityRDD(this.sc(), (EntityDeepJobConfigMongoDB)config));
 
     }
 

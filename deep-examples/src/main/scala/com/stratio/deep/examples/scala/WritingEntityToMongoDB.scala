@@ -20,7 +20,7 @@ import java.util.List
 import com.stratio.deep.config.{DeepJobConfigFactory, GenericDeepJobConfigMongoDB}
 import com.stratio.deep.context.DeepSparkContext
 import com.stratio.deep.rdd.mongodb.{MongoEntityRDD, MongoJavaRDD}
-import com.stratio.deep.testentity.TextEntity
+import com.stratio.deep.testentity.MessageEntity
 import com.stratio.deep.testutils.ContextProperties
 import org.apache.log4j.Logger
 
@@ -49,11 +49,11 @@ object WritingEntityToMongoDB {
 
     val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
 
-    val inputConfigEntity: GenericDeepJobConfigMongoDB[TextEntity] = DeepJobConfigFactory.createMongoDB(classOf[TextEntity]).host(host).database(database).collection(inputCollection).readPreference(readPreference).initialize
+    val inputConfigEntity: GenericDeepJobConfigMongoDB[MessageEntity] = DeepJobConfigFactory.createMongoDB(classOf[MessageEntity]).host(host).database(database).collection(inputCollection).readPreference(readPreference).initialize
 
-    val inputRDDEntity: MongoJavaRDD[TextEntity] = deepContext.mongoJavaRDD(inputConfigEntity)
+    val inputRDDEntity: MongoJavaRDD[MessageEntity] = deepContext.mongoJavaRDD(inputConfigEntity)
 
-    val outputConfigEntityPruebaGuardado: GenericDeepJobConfigMongoDB[TextEntity] = DeepJobConfigFactory.createMongoDB(classOf[TextEntity]).host(host).database(database).collection(outputCollection).readPreference(readPreference).initialize
+    val outputConfigEntityPruebaGuardado: GenericDeepJobConfigMongoDB[MessageEntity] = DeepJobConfigFactory.createMongoDB(classOf[MessageEntity]).host(host).database(database).collection(outputCollection).readPreference(readPreference).initialize
 
     MongoEntityRDD.saveEntity(inputRDDEntity, outputConfigEntityPruebaGuardado)
 

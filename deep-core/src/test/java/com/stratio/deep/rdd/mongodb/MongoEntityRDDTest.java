@@ -8,13 +8,16 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.testentity.MesageTestEntity;
+import de.flapdoodle.embed.mongo.Command;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodProcess;
 import de.flapdoodle.embed.mongo.MongodStarter;
-import de.flapdoodle.embed.mongo.config.IMongodConfig;
-import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
-import de.flapdoodle.embed.mongo.config.Net;
+import de.flapdoodle.embed.mongo.config.*;
 import de.flapdoodle.embed.mongo.distribution.Version;
+import de.flapdoodle.embed.process.config.IRuntimeConfig;
+import de.flapdoodle.embed.process.extract.UserTempNaming;
+import de.flapdoodle.embed.process.io.directories.FixedPath;
+import de.flapdoodle.embed.process.io.directories.IDirectory;
 import de.flapdoodle.embed.process.runtime.Network;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -55,6 +58,19 @@ public class MongoEntityRDDTest  {
     public void  init() throws IOException {
         MongodStarter starter = MongodStarter.getDefaultInstance();
 
+        Command command = Command.MongoD;
+
+        IDirectory artifactStorePath = new FixedPath(System.getProperty("user.home") + "/.embeddedMongodbCustomPath");
+
+        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder()
+                .defaults(command)
+                .artifactStore(new ArtifactStoreBuilder()
+                        .defaults(command)
+                        .download(new DownloadConfigBuilder()
+                                .defaultsForCommand(command).downloadPath(System.getProperty("user.home")))
+                        .tempDir(artifactStorePath)
+                        .executableNaming(new UserTempNaming()))
+                .build();
 
         IMongodConfig mongodConfig = new MongodConfigBuilder()
                 .version(Version.Main.PRODUCTION)

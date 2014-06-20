@@ -80,6 +80,6 @@ public final class DeepJobConfigFactory implements Serializable {
 
 
     public static <T extends IDeepType> GenericDeepJobConfigMongoDB<T> createMongoDB(Class<T> entityClass) {
-        return new EntityDeepJobConfigMongoDB<>(entityClass);
+        return new EntityDeepJobConfigMongoDB<T>(entityClass);
     }
 }
