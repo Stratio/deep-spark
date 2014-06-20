@@ -14,13 +14,16 @@ import de.flapdoodle.embed.mongo.MongodStarter;
 import de.flapdoodle.embed.mongo.config.IMongodConfig;
 import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
 import de.flapdoodle.embed.mongo.config.Net;
+import de.flapdoodle.embed.mongo.config.Storage;
 import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.process.runtime.Network;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Date;
 
 import static org.testng.Assert.assertEquals;
@@ -55,9 +58,14 @@ public class MongoEntityRDDTest  {
     public void  init() throws IOException {
         MongodStarter starter = MongodStarter.getDefaultInstance();
 
+        String tmpFolderName = System.getProperty("user.home") +
+                File.separator + "mongoEntityRDDTest";
+
+        new File(tmpFolderName).mkdirs();
 
         IMongodConfig mongodConfig = new MongodConfigBuilder()
                 .version(Version.Main.PRODUCTION)
+                .replication(new Storage(tmpFolderName, null, 0))
                 .net(new Net(port, Network.localhostIsIPv6()))
                 .build();
 
