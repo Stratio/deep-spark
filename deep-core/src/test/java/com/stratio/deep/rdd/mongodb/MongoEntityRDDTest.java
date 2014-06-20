@@ -57,7 +57,7 @@ public class MongoEntityRDDTest  {
 
 
         IMongodConfig mongodConfig = new MongodConfigBuilder()
-                .version(Version.Main.DEVELOPMENT)
+                .version(Version.Main.PRODUCTION)
                 .net(new Net(port, Network.localhostIsIPv6()))
                 .build();
 
