@@ -266,10 +266,10 @@ public final class Cell implements Serializable {
         Cell cell = (Cell) o;
 
         return cellName.equals(cell.cellName) &&
-                (cellValue != null ? cellValue.equals(cell.cellValue) : cell.cellValue != null) &&
+                (cellValue != null ? cellValue.equals(cell.cellValue) : cell.cellValue == null) &&
                 isClusterKey.equals(cell.isClusterKey) &&
                 isPartitionKey.equals(cell.isPartitionKey) &&
-                cellValidator.equals(cell.getCellValidator());
+                (cellValidator != null ? cellValidator.equals(cell.cellValidator) : cell.cellValidator == null);
     }
 
     /**
