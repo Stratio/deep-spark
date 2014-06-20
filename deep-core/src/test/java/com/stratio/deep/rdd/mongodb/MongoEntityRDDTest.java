@@ -34,8 +34,9 @@ public class MongoEntityRDDTest  {
     static MongodExecutable mongodExecutable = null;
     static MongoClient mongo = null;
 
-    DBCollection col = null;
+    private DBCollection col = null;
 
+//    static  context = null;
 
     private static final String MESSAGE_TEST = "new message test";
 
@@ -46,6 +47,9 @@ public class MongoEntityRDDTest  {
     private static final String database = "test";
 
     private static final String collection = "input";
+
+    private static final String collectionOutput = "output";
+
 
     @BeforeClass
     public void  init() throws IOException {
@@ -71,13 +75,13 @@ public class MongoEntityRDDTest  {
     }
 
     @Test
-    public void test1(){
+    public void testReadingRDD(){
 
-        String job = "java:testMongoDB";
 
         String hostConcat = host.concat(":").concat(port.toString());
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
+
 
         GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class).host(hostConcat).database(database).collection(collection).initialize();
 
@@ -89,13 +93,46 @@ public class MongoEntityRDDTest  {
 
         assertEquals(col.findOne().get("message"), inputRDDEntity.first().getMessage());
 
+        context.stop();
+
+    }
+
+    @Test
+    public void testWritingRDD(){
+
+
+        String hostConcat = host.concat(":").concat(port.toString());
+
+        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
+
+        GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class).host(hostConcat).database(database).collection(collection).initialize();
+
+        MongoJavaRDD<MesageTestEntity> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
+
+
+        GenericDeepJobConfigMongoDB outputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class).host(hostConcat).database(database).collection(collectionOutput).initialize();
+
+
+        //Save RDD in MongoDB
+        MongoEntityRDD.saveEntity(inputRDDEntity, outputConfigEntity);
+
+        MongoJavaRDD<MesageTestEntity> outputRDDEntity = context.mongoJavaRDD(outputConfigEntity);
+
+
+        assertEquals(mongo.getDB(database).getCollection(collectionOutput).findOne().get("message"), outputRDDEntity.first().getMessage());
+
+
+        context.stop();
+
 
     }
 
     @AfterClass
     public void end(){
-        if (mongodExecutable != null)
+        if (mongodExecutable != null){
             mongodExecutable.stop();
+        }
+
     }
 
 
