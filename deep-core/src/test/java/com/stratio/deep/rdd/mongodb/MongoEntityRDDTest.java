@@ -8,23 +8,22 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.testentity.MesageTestEntity;
-import de.flapdoodle.embed.mongo.Command;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodProcess;
 import de.flapdoodle.embed.mongo.MongodStarter;
-import de.flapdoodle.embed.mongo.config.*;
+import de.flapdoodle.embed.mongo.config.IMongodConfig;
+import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
+import de.flapdoodle.embed.mongo.config.Net;
+import de.flapdoodle.embed.mongo.config.Storage;
 import de.flapdoodle.embed.mongo.distribution.Version;
-import de.flapdoodle.embed.process.config.IRuntimeConfig;
-import de.flapdoodle.embed.process.extract.UserTempNaming;
-import de.flapdoodle.embed.process.io.directories.FixedPath;
-import de.flapdoodle.embed.process.io.directories.IDirectory;
+import de.flapdoodle.embed.process.io.file.Files;
 import de.flapdoodle.embed.process.runtime.Network;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 
 import static org.testng.Assert.assertEquals;
 
@@ -32,7 +31,7 @@ import static org.testng.Assert.assertEquals;
  * Created by rcrespo on 18/06/14.
  */
 @Test
-public class MongoEntityRDDTest  {
+public class MongoEntityRDDTest {
 
     static MongodExecutable mongodExecutable = null;
     static MongoClient mongo = null;
@@ -53,60 +52,50 @@ public class MongoEntityRDDTest  {
 
     private static final String collectionOutput = "output";
 
+    private final static String DB_FOLDER_NAME = System.getProperty("user.home") +
+            File.separator + "mongoEntityRDDTest";
 
     @BeforeClass
-    public void  init() throws IOException {
+    public void init() throws IOException {
         MongodStarter starter = MongodStarter.getDefaultInstance();
 
-        Command command = Command.MongoD;
-
-        IDirectory artifactStorePath = new FixedPath(System.getProperty("user.home") + "/.embeddedMongodbCustomPath");
-
-        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder()
-                .defaults(command)
-                .artifactStore(new ArtifactStoreBuilder()
-                        .defaults(command)
-                        .download(new DownloadConfigBuilder()
-                                .defaultsForCommand(command).downloadPath(System.getProperty("user.home")))
-                        .tempDir(artifactStorePath)
-                        .executableNaming(new UserTempNaming()))
-                .build();
+        new File(DB_FOLDER_NAME).mkdirs();
 
         IMongodConfig mongodConfig = new MongodConfigBuilder()
                 .version(Version.Main.PRODUCTION)
+                .replication(new Storage(DB_FOLDER_NAME, null, 0))
                 .net(new Net(port, Network.localhostIsIPv6()))
                 .build();
 
+        mongodExecutable = starter.prepare(mongodConfig);
 
-            mongodExecutable = starter.prepare(mongodConfig);
-            MongodProcess mongod = mongodExecutable.start();
+        Files.forceDelete(new File(System.getProperty("user.home") +
+                File.separator + ".embedmongo"));
 
-            mongo = new MongoClient(host, port);
-            DB db = mongo.getDB(database);
-            col = db.createCollection(collection, new BasicDBObject());
-            col.save(new BasicDBObject("message", MESSAGE_TEST));
+        MongodProcess mongod = mongodExecutable.start();
 
+        mongo = new MongoClient(host, port);
+        DB db = mongo.getDB(database);
+        col = db.createCollection(collection, new BasicDBObject());
+        col.save(new BasicDBObject("message", MESSAGE_TEST));
+    }
 
-
+    @AfterClass
+    public void cleanup() {
+        Files.forceDelete(new File(DB_FOLDER_NAME));
     }
 
     @Test
-    public void testReadingRDD(){
-
-
+    public void testReadingRDD() {
         String hostConcat = host.concat(":").concat(port.toString());
-
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
-
-        GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class).host(hostConcat).database(database).collection(collection).initialize();
+        GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
+                .host(hostConcat).database(database).collection(collection).initialize();
 
         MongoJavaRDD<MesageTestEntity> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
 
-
-
         assertEquals(col.count(), inputRDDEntity.cache().count());
-
         assertEquals(col.findOne().get("message"), inputRDDEntity.first().getMessage());
 
         context.stop();
@@ -114,19 +103,21 @@ public class MongoEntityRDDTest  {
     }
 
     @Test
-    public void testWritingRDD(){
+    public void testWritingRDD() {
 
 
         String hostConcat = host.concat(":").concat(port.toString());
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
-        GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class).host(hostConcat).database(database).collection(collection).initialize();
+        GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
+                .host(hostConcat).database(database).collection(collection).initialize();
 
         MongoJavaRDD<MesageTestEntity> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
 
 
-        GenericDeepJobConfigMongoDB outputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class).host(hostConcat).database(database).collection(collectionOutput).initialize();
+        GenericDeepJobConfigMongoDB outputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
+                .host(hostConcat).database(database).collection(collectionOutput).initialize();
 
 
         //Save RDD in MongoDB
@@ -135,7 +126,8 @@ public class MongoEntityRDDTest  {
         MongoJavaRDD<MesageTestEntity> outputRDDEntity = context.mongoJavaRDD(outputConfigEntity);
 
 
-        assertEquals(mongo.getDB(database).getCollection(collectionOutput).findOne().get("message"), outputRDDEntity.first().getMessage());
+        assertEquals(mongo.getDB(database).getCollection(collectionOutput).findOne().get("message"),
+                outputRDDEntity.first().getMessage());
 
 
         context.stop();
@@ -144,8 +136,8 @@ public class MongoEntityRDDTest  {
     }
 
     @AfterClass
-    public void end(){
-        if (mongodExecutable != null){
+    public void end() {
+        if (mongodExecutable != null) {
             mongodExecutable.stop();
         }
 
