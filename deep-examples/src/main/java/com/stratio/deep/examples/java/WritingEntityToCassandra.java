@@ -17,6 +17,7 @@
 package com.stratio.deep.examples.java;
 
 import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.CassandraJavaRDD;
@@ -67,8 +68,7 @@ public final class WritingEntityToCassandra {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
-                new String[]{p.getJar()});
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
 
         // --- INPUT RDD
@@ -77,7 +77,7 @@ public final class WritingEntityToCassandra {
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
 
-        CassandraJavaRDD inputRDD = deepContext.cassandraJavaRDD(inputConfig);
+        CassandraJavaRDD<PageEntity> inputRDD = deepContext.cassandraJavaRDD(inputConfig);
 
         JavaPairRDD<String, PageEntity> pairRDD = inputRDD.map(new PairFunction<PageEntity, String, PageEntity>() {
             @Override
@@ -101,12 +101,12 @@ public final class WritingEntityToCassandra {
         }
 
         // --- OUTPUT RDD
-        IDeepJobConfig outputConfig = DeepJobConfigFactory.createWriteConfig(DomainEntity.class)
+        ICassandraDeepJobConfig<DomainEntity> outputConfig = DeepJobConfigFactory.createWriteConfig(DomainEntity.class)
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(outputTableName)
                 .createTableOnWrite(true).initialize();
 
-        JavaRDD outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, DomainEntity>() {
+        JavaRDD<DomainEntity> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, DomainEntity>() {
             @Override
             public DomainEntity call(Tuple2<String, Integer> t) throws Exception {
                 DomainEntity e = new DomainEntity();

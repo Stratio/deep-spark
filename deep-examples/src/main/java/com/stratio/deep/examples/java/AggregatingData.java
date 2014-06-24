@@ -30,8 +30,6 @@ import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 import scala.Tuple3;
 
-import java.util.List;
-
 /**
  * Author: Emmanuelle Raffenne
  * Date..: 13-feb-2014
@@ -70,8 +68,7 @@ public class AggregatingData {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
-                new String[]{p.getJar()});
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // Creating a configuration for the RDD and initialize it
         IDeepJobConfig<TweetEntity> config = DeepJobConfigFactory.create(TweetEntity.class)
@@ -90,13 +87,18 @@ public class AggregatingData {
             }
         }).map(new PairFunction<Tuple2<String, List<TweetEntity>>, String, Integer>() {
             @Override
+<<<<<<< HEAD
             public Tuple2<String, Integer> call(Tuple2<String, List<TweetEntity>> t) throws Exception {
                 return new Tuple2<String, Integer>(t._1(), t._2().size());
+=======
+            public Tuple2<String, Integer> call(Tuple2<String, Iterable<TweetEntity>> t) throws Exception {
+                return new Tuple2<>(t._1(), Lists.newArrayList(t._2()).size());
+>>>>>>> develop
             }
         });
 
         // aggregating
-        Double zero = new Double(0);
+        Double zero = 0.0;
         Tuple3<Double, Double, Double> initValues = new Tuple3<Double, Double, Double>(zero, zero, zero);
         Tuple3<Double, Double, Double> results = groups.aggregate(initValues,
                 new Function2<Tuple3<Double, Double, Double>, Tuple2<String, Integer>, Tuple3<Double, Double,
@@ -107,7 +109,7 @@ public class AggregatingData {
                         Double sumOfX = n._1() + t._2();
                         Double numOfX = n._2() + 1;
                         Double sumOfSquares = n._3() + Math.pow(t._2(), 2);
-                        return new Tuple3<Double, Double, Double>(sumOfX, numOfX, sumOfSquares);
+                        return new Tuple3<>(sumOfX, numOfX, sumOfSquares);
                     }
                 }, new Function2<Tuple3<Double, Double, Double>, Tuple3<Double, Double, Double>, Tuple3<Double,
                         Double, Double>>() {
@@ -117,7 +119,7 @@ public class AggregatingData {
                         Double sumOfX = a._1() + b._1();
                         Double numOfX = a._2() + b._2();
                         Double sumOfSquares = a._3() + b._3();
-                        return new Tuple3<Double, Double, Double>(sumOfX, numOfX, sumOfSquares);
+                        return new Tuple3<>(sumOfX, numOfX, sumOfSquares);
                     }
                 }
         );

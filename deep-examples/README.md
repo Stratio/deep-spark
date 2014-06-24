@@ -9,7 +9,7 @@ specific datamodels have been rewritten in a generic form.
 Requirements
 ============
 
-  * Cassandra 2.0.5
+  * Cassandra 2.0.8
   * Stratio Deep 0.1.0
   * Apache Maven >= 3.0.4
   * Java7

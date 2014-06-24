@@ -22,7 +22,8 @@
     <packaging>jar</packaging>
     <name>deep core</name>
     <url>http://www.stratio.com</url>
-    <description>Project containing the actual implementation of the RDD integrating Apache Spark and Apache Cassandra</description>
+    <description>Project containing the actual implementation of the RDD integrating Apache Spark and Apache Cassandra
+    </description>
 
     <parent>
         <groupId>com.stratio.deep</groupId>
@@ -98,6 +99,55 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+<<<<<<< HEAD
+=======
+
+        <!-- MongoDB-->
+        <dependency>
+
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>2.12.2</version>
+        </dependency>
+
+        <!-- mongodb embedded -->
+        <dependency>
+            <groupId>de.flapdoodle.embed</groupId>
+            <artifactId>de.flapdoodle.embed.mongo</artifactId>
+            <version>1.46.0</version>
+        </dependency>
+        <!--
+        <dependency>
+            <groupId>org.mongodb.mongo-hadoop</groupId>
+            <artifactId>mongo-hadoop-core</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+            <classifier>hadoop_1.0</classifier>
+<type>jar</type>
+        </dependency>
+
+-->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-hadoop-core_0.20.205.0</artifactId>
+            <version>1.0.0</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mongo-java-driver</artifactId>
+                    <groupId>org.mongodb</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-hadoop_0.20.205.0</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+>>>>>>> develop
     </dependencies>
 
     <build>

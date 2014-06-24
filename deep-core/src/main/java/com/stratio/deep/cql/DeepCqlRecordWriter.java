@@ -19,12 +19,13 @@ package com.stratio.deep.cql;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepInstantiationException;
+import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
@@ -35,7 +36,6 @@ import org.apache.cassandra.dht.Token;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.exceptions.SyntaxException;
 import org.apache.cassandra.utils.FBUtilities;
-import com.stratio.deep.utils.Pair;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.TaskContext;
 import org.slf4j.Logger;
@@ -52,7 +52,6 @@ import static com.stratio.deep.utils.Utils.updateQueryGenerator;
 
 /**
  * Handles the distributed write to cassandra in batch.
- *
  */
 public class DeepCqlRecordWriter implements AutoCloseable {
 
@@ -65,7 +64,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     private AbstractType<?> keyValidator;
     private String[] partitionKeyColumns;
 
-    private final IDeepJobConfig writeConfig;
+    private final ICassandraDeepJobConfig writeConfig;
     private final IPartitioner partitioner;
     private final InetAddress localhost;
 
@@ -75,7 +74,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
      * @param context
      * @param writeConfig
      */
-    public DeepCqlRecordWriter(TaskContext context, IDeepJobConfig writeConfig) {
+    public DeepCqlRecordWriter(TaskContext context, ICassandraDeepJobConfig writeConfig) {
         this.clients = new HashMap<>();
         this.removedClients = new HashMap<>();
         this.writeConfig = writeConfig;
@@ -165,7 +164,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
 
         Row row = getRowMetadata(sessionWithHost, keyspace, cfName);
 
-        if (row == null){
+        if (row == null) {
             throw new DeepIOException(String.format("cannot find metadata for %s.%s", keyspace, cfName));
         }
 
@@ -192,8 +191,8 @@ public class DeepCqlRecordWriter implements AutoCloseable {
      * Fetches row metadata for the given column family.
      *
      * @param sessionWithHost the connection to the DB.
-     * @param keyspace the keyspace name
-     * @param cfName the column family
+     * @param keyspace        the keyspace name
+     * @param cfName          the column family
      * @return the Row object
      */
     private static Row getRowMetadata(Pair<Session, String> sessionWithHost, String keyspace, String cfName) {
@@ -210,7 +209,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
      * Adds the provided row to a batch. If the batch size reaches the threshold configured in IDeepJobConfig.getBatchSize
      * the batch will be sent to the data store.
      *
-     * @param keys the Cells object containing the row keys.
+     * @param keys   the Cells object containing the row keys.
      * @param values the Cells object containing all the other row  columns.
      */
     public void write(Cells keys, Cells values) {
@@ -253,7 +252,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         /**
          * Returns true if adding the current element triggers the batch execution.
          *
-         * @param stmt the query to add to the batch.
+         * @param stmt   the query to add to the batch.
          * @param values the list of binding values.
          * @return a boolean indicating if the batch has been triggered or not.
          */

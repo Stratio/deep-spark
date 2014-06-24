@@ -41,7 +41,7 @@ public final class DeepJobConfigFactory implements Serializable {
      *
      * @return a new cell-based job configuration object.
      */
-    public static IDeepJobConfig<Cells> create() {
+    public static ICassandraDeepJobConfig<Cells> create() {
         return new CellDeepJobConfig(false);
     }
 
@@ -50,7 +50,7 @@ public final class DeepJobConfigFactory implements Serializable {
      *
      * @return a new cell-based write suitable job configuration object.
      */
-    public static IDeepJobConfig<Cells> createWriteConfig() {
+    public static ICassandraDeepJobConfig<Cells> createWriteConfig() {
         return new CellDeepJobConfig(true);
     }
 
@@ -59,7 +59,7 @@ public final class DeepJobConfigFactory implements Serializable {
      *
      * @return a new an entity-based configuration object.
      */
-    public static <T extends IDeepType> IDeepJobConfig<T> create(Class<T> entityClass) {
+    public static <T extends IDeepType> ICassandraDeepJobConfig<T> create(Class<T> entityClass) {
         return new EntityDeepJobConfig<>(entityClass, false);
     }
 
@@ -68,7 +68,20 @@ public final class DeepJobConfigFactory implements Serializable {
      *
      * @return an entity-based write configuration object.
      */
-    public static <T extends IDeepType> IDeepJobConfig<T> createWriteConfig(Class<T> entityClass) {
+    public static <T extends IDeepType> ICassandraDeepJobConfig<T> createWriteConfig(Class<T> entityClass) {
         return new EntityDeepJobConfig<>(entityClass, true);
     }
+<<<<<<< HEAD
+=======
+
+
+    public static IMongoDeepJobConfig<Object> createMongoDB() {
+        return new GenericDeepJobConfigMongoDB<Object>();
+    }
+
+
+    public static <T extends IDeepType> IMongoDeepJobConfig<T> createMongoDB(Class<T> entityClass) {
+        return new EntityDeepJobConfigMongoDB<T>(entityClass);
+    }
+>>>>>>> develop
 }

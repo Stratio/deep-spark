@@ -20,15 +20,14 @@ import com.datastax.driver.core.*;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
-import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.dht.*;
+import org.apache.cassandra.dht.IPartitioner;
+import org.apache.cassandra.dht.Token;
 import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
-import com.stratio.deep.utils.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.net.InetAddress;
@@ -113,7 +112,7 @@ public class RangeUtils {
      */
     private static List<DeepTokenRange> mergeTokenRanges(Map<String, Iterable<Comparable>> tokens,
                                                          final Session session,
-                                                         final IPartitioner partitioner, final IDeepJobConfig config) {
+                                                         final IPartitioner partitioner, final ICassandraDeepJobConfig config) {
         final Iterable<Comparable> allRanges = Ordering.natural().sortedCopy(concat(tokens.values()));
         final Comparable maxValue = Ordering.natural().max(allRanges);
         final Comparable minValue = (Comparable) partitioner.minValue(maxValue.getClass()).getToken().token;
@@ -177,7 +176,7 @@ public class RangeUtils {
      */
     private static List<String> initReplicas(
             final Comparable token, final Session session, final IPartitioner partitioner,
-            final IDeepJobConfig config) {
+            final ICassandraDeepJobConfig config) {
         final AbstractType tkValidator = partitioner.getTokenValidator();
         final Metadata metadata = session.getCluster().getMetadata();
 
@@ -200,7 +199,7 @@ public class RangeUtils {
      * @param config the Deep configuration object.
      * @return the list of computed token ranges.
      */
-    public static List<DeepTokenRange> getSplits(IDeepJobConfig config) {
+    public static List<DeepTokenRange> getSplits(ICassandraDeepJobConfig config) {
         Map<String, Iterable<Comparable>> tokens = new HashMap<>();
         IPartitioner partitioner = getPartitioner(config);
 
@@ -218,27 +217,27 @@ public class RangeUtils {
         return splitRanges(mergeTokenRanges(tokens, sessionWithHost.left, partitioner, config), partitioner, config.getBisectFactor());
     }
 
-    private static List<DeepTokenRange> splitRanges(final List<DeepTokenRange> ranges, final IPartitioner partitioner, final int bisectFactor){
-        if (bisectFactor == 1){
+    private static List<DeepTokenRange> splitRanges(final List<DeepTokenRange> ranges, final IPartitioner partitioner, final int bisectFactor) {
+        if (bisectFactor == 1) {
             return ranges;
         }
 
         Iterable<DeepTokenRange> bisectedRanges =
                 concat(transform(ranges, new Function<DeepTokenRange, List<DeepTokenRange>>() {
-            @Nullable
-            @Override
-            public List<DeepTokenRange> apply(@Nullable DeepTokenRange input) {
-                final List<DeepTokenRange> splittedRanges = new ArrayList<>();
-                bisectTokeRange(input, partitioner, bisectFactor, splittedRanges);
-                return splittedRanges;
-            }
-        }));
+                    @Nullable
+                    @Override
+                    public List<DeepTokenRange> apply(@Nullable DeepTokenRange input) {
+                        final List<DeepTokenRange> splittedRanges = new ArrayList<>();
+                        bisectTokeRange(input, partitioner, bisectFactor, splittedRanges);
+                        return splittedRanges;
+                    }
+                }));
 
         return Lists.newArrayList(bisectedRanges);
     }
 
     private static void bisectTokeRange(
-            DeepTokenRange range, final IPartitioner partitioner, final int bisectFactor, final List<DeepTokenRange> accumulator){
+            DeepTokenRange range, final IPartitioner partitioner, final int bisectFactor, final List<DeepTokenRange> accumulator) {
 
         final AbstractType tkValidator = partitioner.getTokenValidator();
 
@@ -262,10 +261,11 @@ public class RangeUtils {
 
     /**
      * Creates a new instance of the cassandra partitioner configured in the configuration object.
+     *
      * @param config the Deep configuration object.
      * @return an instance of the cassandra partitioner configured in the configuration object.
      */
-    public static IPartitioner getPartitioner(IDeepJobConfig config) {
+    public static IPartitioner getPartitioner(ICassandraDeepJobConfig config) {
         try {
             return (IPartitioner) Class.forName(config.getPartitionerClassName()).newInstance();
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {

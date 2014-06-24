@@ -141,11 +141,11 @@ public class CellTest {
         assertTrue(c8.marshallerClassName().equals(DecimalType.class.getCanonicalName()));
         assertEquals(c8.getValueType(), BigDecimal.class);
 
-        Cell c9 = Cell.create("Doubletype", new Double(100.09));
+        Cell c9 = Cell.create("Doubletype", 100.09);
 
         assertNotNull(c9);
         assertEquals(c9.getCellName(), "Doubletype");
-        assertEquals(DoubleType.instance.compose(c9.getDecomposedCellValue()), new Double(100.09));
+        assertEquals(DoubleType.instance.compose(c9.getDecomposedCellValue()), 100.09);
         assertTrue(c9.marshallerClassName().equals(DoubleType.class.getCanonicalName()));
         assertEquals(c9.getValueType(), Double.class);
 
@@ -217,7 +217,7 @@ public class CellTest {
     }
 
     @Test
-    public void testCellWithNullValues(){
+    public void testCellWithNullValues() {
         Long testLong = System.currentTimeMillis();
         Cell c8 = Cell.create("BigDecimalType", new BigDecimal(testLong));
         Cell c16 = Cell.create("no_value_cell");
@@ -268,7 +268,15 @@ public class CellTest {
         assertFalse(c.equals(Cell.create("id", id, false, false)));
         assertFalse(c.equals(Cell.create("id", id, true, true)));
         assertTrue(c.equals(Cell.create("id", id, true, false)));
+    }
 
+    @Test
+    public void testNullCellEquality() {
+
+        Cell nullCell1 = Cell.create("nullCell1");
+        Cell nullCell2 = Cell.create("nullCell1");
+
+        assertTrue(nullCell1.equals(nullCell2));
     }
 
     @Test
@@ -286,7 +294,7 @@ public class CellTest {
             UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
             Cell c13 = Cell.create("TimeUUIDType", testTimeUUID);
 
-            Cell.create(c13, Int32Type.instance.decompose(Integer.valueOf(456)));
+            Cell.create(c13, Int32Type.instance.decompose(456));
 
             fail();
         } catch (Exception e) {

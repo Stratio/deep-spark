@@ -15,20 +15,21 @@
  */
 
 package com.stratio.deep.utils;
+
 import com.google.common.base.Objects;
 
 
 /**
  * Common utility class wrapping a pair of objects.
  */
-public class Pair<L, R>{
+public class Pair<L, R> {
     public final L left;
     public final R right;
 
     /**
      * private constructor.
      *
-     * @param left left element
+     * @param left  left element
      * @param right right element
      */
     private Pair(L left, R right) {
@@ -39,14 +40,13 @@ public class Pair<L, R>{
     /**
      * Creates a new immutable pair of objects.
      *
-     * @param left the left element.
+     * @param left  the left element.
      * @param right the right element.
-     * @param <L> the type of the left element.
-     * @param <R> the type of the right element.
+     * @param <L>   the type of the left element.
+     * @param <R>   the type of the right element.
      * @return a new pair.
      */
-    public static <L, R> Pair<L, R> create(L left, R right)
-    {
+    public static <L, R> Pair<L, R> create(L left, R right) {
         return new Pair<>(left, right);
     }
 
@@ -54,21 +54,19 @@ public class Pair<L, R>{
      * {@inheritDoc}
      */
     @Override
-    public final int hashCode()
-    {
+    public final int hashCode() {
         int hashCode = 31 + (left == null ? 0 : left.hashCode());
-        return 31*hashCode + (right == null ? 0 : right.hashCode());
+        return 31 * hashCode + (right == null ? 0 : right.hashCode());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final boolean equals(Object o)
-    {
-        if(!(o instanceof Pair))
+    public final boolean equals(Object o) {
+        if (!(o instanceof Pair))
             return false;
-        Pair that = (Pair)o;
+        Pair that = (Pair) o;
         // handles nulls properly
         return Objects.equal(left, that.left) && Objects.equal(right, that.right);
     }

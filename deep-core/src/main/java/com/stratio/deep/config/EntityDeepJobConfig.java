@@ -50,7 +50,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> initialize() {
+    public ICassandraDeepJobConfig<T> initialize() {
         super.initialize();
 
         Map<String, String> tmpMap = new HashMap<>();
@@ -72,7 +72,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
     /**
      * Public constructor. Constructs a job object with the specified entity class.
      *
-     * @param entityClass IDeepType entity Class object
+     * @param entityClass   IDeepType entity Class object
      * @param isWriteConfig boolean specifing if the constructed object is suitable for writes.
      */
     public EntityDeepJobConfig(Class<T> entityClass, Boolean isWriteConfig) {
@@ -139,8 +139,8 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
      * name of the Java property.
      *
      * @param instance instance object.
-     * @param dbName name of the field as known by the data store.
-     * @param value value to set in the property field of the provided instance object.
+     * @param dbName   name of the field as known by the data store.
+     * @param value    value to set in the property field of the provided instance object.
      */
     public void setInstancePropertyFromDbName(T instance, String dbName, Object value) {
         Map<String, Cell> cfs = columnDefinitions();

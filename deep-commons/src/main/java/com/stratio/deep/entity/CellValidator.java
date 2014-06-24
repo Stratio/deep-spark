@@ -33,7 +33,6 @@ import java.math.BigInteger;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.nio.ByteBuffer;
 import java.util.*;
 
 import static com.stratio.deep.utils.Utils.marshallerInstance;
@@ -146,7 +145,7 @@ public class CellValidator implements Serializable {
          * </p>
          *
          * @param object an object instance.
-         * @param <T> the generic type of the provided object instance.
+         * @param <T>    the generic type of the provided object instance.
          * @return the Kind associated to the provided object.
          */
         public static <T> Kind objectToKind(T object) {
@@ -243,6 +242,7 @@ public class CellValidator implements Serializable {
         this.validatorTypes = validatorTypes;
         this.cqlTypeName = cqlTypeName;
     }
+
     /**
      * private constructor.
      */
@@ -250,6 +250,7 @@ public class CellValidator implements Serializable {
         CQL3Type.Native nativeType = MAP_JAVA_TYPE_TO_CQL_TYPE.get(type);
         return nativeType.name().toLowerCase();
     }
+
     /**
      * private constructor.
      */

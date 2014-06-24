@@ -21,6 +21,7 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
@@ -219,7 +220,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
         //executeCustomCQL("create table  " + OUTPUT_KEYSPACE_NAME + "." + table + " (domain text, count int,
         // PRIMARY KEY(domain));");
 
-        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
+        ICassandraDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -247,7 +248,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
     @Test(dependsOnMethods = "testSaveToCassandra")
     public void testSaveToCassandra2() {
-        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
+        ICassandraDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)

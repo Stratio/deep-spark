@@ -17,6 +17,7 @@
 package com.stratio.deep.examples.java;
 
 import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.entity.Cell;
@@ -67,8 +68,7 @@ public final class WritingCellToCassandra {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
-                new String[]{p.getJar()});
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
 
         // --- INPUT RDD
@@ -77,7 +77,7 @@ public final class WritingCellToCassandra {
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
 
-        CassandraJavaRDD inputRDD = deepContext.cassandraJavaRDD(inputConfig);
+        CassandraJavaRDD<Cells> inputRDD = deepContext.cassandraJavaRDD(inputConfig);
 
         JavaPairRDD<String, Cells> pairRDD = inputRDD.map(new PairFunction<Cells, String, Cells>() {
             @Override
@@ -103,14 +103,14 @@ public final class WritingCellToCassandra {
 
 
         // --- OUTPUT RDD
-        IDeepJobConfig outputConfig = DeepJobConfigFactory.createWriteConfig()
+        ICassandraDeepJobConfig<Cells> outputConfig = DeepJobConfigFactory.createWriteConfig()
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(outputTableName)
                 .createTableOnWrite(true);
 
         outputConfig.initialize();
 
-        JavaRDD outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, Cells>() {
+        JavaRDD<Cells> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
             public Cells call(Tuple2<String, Integer> t) {
                 Cell c1 = Cell.create("domain", t._1(), true, false);

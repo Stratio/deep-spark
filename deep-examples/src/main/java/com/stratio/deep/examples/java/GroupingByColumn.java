@@ -68,8 +68,7 @@ public final class GroupingByColumn {
 
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
-                new String[]{p.getJar()});
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
 // Create a configuration for the RDD and initialize it
         IDeepJobConfig config = DeepJobConfigFactory.create(TweetEntity.class)

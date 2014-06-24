@@ -22,18 +22,18 @@ import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.stratio.deep.config.GenericDeepJobConfig;
-import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.partition.impl.DeepPartitionLocationComparator;
+import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.utils.ByteBufferUtil;
-import com.stratio.deep.utils.Pair;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -76,7 +76,7 @@ public class DeepRecordReader {
 
     private AbstractType<?> keyValidator;
 
-    private final IDeepJobConfig config;
+    private final ICassandraDeepJobConfig config;
 
     private Session session;
 
@@ -84,9 +84,9 @@ public class DeepRecordReader {
      * public constructor. Takes a list of filters to pass to the underlying data stores.
      *
      * @param config the deep configuration object.
-     * @param split the token range on which the new reader will be based.
+     * @param split  the token range on which the new reader will be based.
      */
-    public DeepRecordReader(IDeepJobConfig config, DeepTokenRange split) {
+    public DeepRecordReader(ICassandraDeepJobConfig config, DeepTokenRange split) {
         this.config = config;
         this.split = split;
         initialize();
@@ -95,7 +95,6 @@ public class DeepRecordReader {
     /**
      * Initialized this object.
      * <p>Creates a new client and row iterator.</p>
-     *
      */
     private void initialize() {
         cfName = config.getTable();
@@ -121,6 +120,7 @@ public class DeepRecordReader {
 
     /**
      * Creates a new connection. Reuses a cached connection if possible.
+     *
      * @return the new session
      */
     private Session createConnection() {
@@ -578,7 +578,7 @@ public class DeepRecordReader {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e1) {
-                        LOG.error("sleep exception",e1);
+                        LOG.error("sleep exception", e1);
                     }
 
                     ++retries;
