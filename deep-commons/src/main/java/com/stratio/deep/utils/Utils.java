@@ -24,7 +24,6 @@ import com.stratio.deep.exception.DeepIOException;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.TimeUUIDType;
 import org.apache.cassandra.db.marshal.UUIDType;
-import com.stratio.deep.utils.Pair;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import scala.Tuple2;
@@ -78,7 +77,7 @@ public final class Utils {
      * The first map contains the key column names and the corresponding values.
      * The ByteBuffer list contains the value of the columns that will be bounded to CQL query parameters.
      *
-     * @param e the entity object to process.
+     * @param e   the entity object to process.
      * @param <T> the entity object generic type.
      * @return a pair whose first element is a Cells object containing key Cell(s) and whose second element contains all of the other Cell(s).
      */
@@ -209,9 +208,9 @@ public final class Utils {
     /**
      * Generates a create table cql statement from the given Cells description.
      *
-     * @param keys the row  keys wrapped inside a Cells object.
-     * @param values all the other row columns wrapped inside a Cells object.
-     * @param outputKeyspace the output keyspace.
+     * @param keys               the row  keys wrapped inside a Cells object.
+     * @param values             all the other row columns wrapped inside a Cells object.
+     * @param outputKeyspace     the output keyspace.
      * @param outputColumnFamily the output column family.
      * @return the create table statement.
      */
@@ -305,9 +304,9 @@ public final class Utils {
      * We do not generate the key part of the update query. The provided query will be concatenated with the key part
      * by CqlRecordWriter.
      *
-     * @param keys the row  keys wrapped inside a Cells object.
-     * @param values all the other row columns wrapped inside a Cells object.
-     * @param outputKeyspace the output keyspace.
+     * @param keys               the row  keys wrapped inside a Cells object.
+     * @param values             all the other row columns wrapped inside a Cells object.
+     * @param outputKeyspace     the output keyspace.
      * @param outputColumnFamily the output column family.
      * @return the update query statement.
      */
@@ -458,6 +457,7 @@ public final class Utils {
 
         return getter;
     }
+
     /**
      * Returns an instance of the Cassandra validator that matches the provided object.
      *

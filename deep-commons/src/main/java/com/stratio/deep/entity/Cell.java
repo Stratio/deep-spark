@@ -99,11 +99,11 @@ public final class Cell implements Serializable {
      * Factory method, builds a new Cell (isPartitionKey = false and isClusterKey = false) with value = null.
      * The validator will be automatically calculated using the value object type.
      *
-     * @param cellName  the cell name
+     * @param cellName the cell name
      * @return an instance of a Cell object for the provided parameters.
      */
     public static Cell create(String cellName) {
-        return create(cellName, (Object)null, Boolean.FALSE, Boolean.FALSE);
+        return create(cellName, (Object) null, Boolean.FALSE, Boolean.FALSE);
     }
 
     /**

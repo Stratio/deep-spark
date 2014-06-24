@@ -25,7 +25,6 @@ import org.apache.spark.serializer.KryoRegistrator;
 
 /**
  * Generic kryo registrator we provide to end users.
- *
  */
 public class DeepKryoRegistrator implements KryoRegistrator {
     /**

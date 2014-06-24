@@ -22,10 +22,10 @@ package org.apache.spark.rdd
 import java.text.SimpleDateFormat
 import java.util.Date
 
-import com.stratio.deep.config.{IMongoDeepJobConfig, IDeepJobConfig}
+import com.stratio.deep.config.{IDeepJobConfig, IMongoDeepJobConfig}
 import org.apache.hadoop.conf.Configurable
 import org.apache.hadoop.io.Writable
-import  org.apache.hadoop.mapreduce._
+import org.apache.hadoop.mapreduce._
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.{InterruptibleIterator, Logging, Partition, SerializableWritable, SparkContext, TaskContext}
 import org.bson.BSONObject
@@ -55,8 +55,8 @@ private[spark] class NewHadoopPartition(
  * @param config The Deep MongoDB configuration.
  */
 @DeveloperApi
-abstract class DeepMongoRDD[T : ClassTag](sc: SparkContext,
-                                          @transient config: IMongoDeepJobConfig[T])
+abstract class DeepMongoRDD[T: ClassTag](sc: SparkContext,
+                                         @transient config: IMongoDeepJobConfig[T])
   extends RDD[T](sc, Nil)
   with SparkHadoopMapReduceUtil
   with Logging {
@@ -73,8 +73,8 @@ abstract class DeepMongoRDD[T : ClassTag](sc: SparkContext,
   @transient protected val jobId = new JobID(jobTrackerId, id)
 
   override def getPartitions: Array[Partition] = {
-    val inputFormatClass : Class[com.mongodb.hadoop.MongoInputFormat] = classOf[com.mongodb.hadoop.MongoInputFormat]
-    val inputFormat  = inputFormatClass.newInstance
+    val inputFormatClass: Class[com.mongodb.hadoop.MongoInputFormat] = classOf[com.mongodb.hadoop.MongoInputFormat]
+    val inputFormat = inputFormatClass.newInstance
     inputFormat match {
       case configurable: Configurable =>
         configurable.setConf(config.getHadoopConfiguration)
@@ -89,13 +89,13 @@ abstract class DeepMongoRDD[T : ClassTag](sc: SparkContext,
     result
   }
 
-  def transformElement(tuple: (Object, BSONObject) ) : T
+  def transformElement(tuple: (Object, BSONObject)): T
 
   override def compute(theSplit: Partition, context: TaskContext): InterruptibleIterator[T] = {
     val iter = new Iterator[T] {
       val split = theSplit.asInstanceOf[NewHadoopPartition]
       logInfo("Input split: " + split.serializableHadoopSplit)
-      val inputFormatClass : Class[com.mongodb.hadoop.MongoInputFormat] = classOf[com.mongodb.hadoop.MongoInputFormat]
+      val inputFormatClass: Class[com.mongodb.hadoop.MongoInputFormat] = classOf[com.mongodb.hadoop.MongoInputFormat]
       val conf = confBroadcast.value.getHadoopConfiguration
       val attemptId = newTaskAttemptID(jobTrackerId, id, isMap = true, split.index, 0)
       val hadoopAttemptContext = newTaskAttemptContext(conf, attemptId)

@@ -217,7 +217,7 @@ public class CellTest {
     }
 
     @Test
-    public void testCellWithNullValues(){
+    public void testCellWithNullValues() {
         Long testLong = System.currentTimeMillis();
         Cell c8 = Cell.create("BigDecimalType", new BigDecimal(testLong));
         Cell c16 = Cell.create("no_value_cell");

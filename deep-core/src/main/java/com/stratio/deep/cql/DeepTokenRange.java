@@ -31,7 +31,7 @@ public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable 
      * Construct a new token range with no replica information.
      *
      * @param startToken first token of this range.
-     * @param endToken last token of this range.
+     * @param endToken   last token of this range.
      */
     public DeepTokenRange(Comparable startToken, Comparable endToken) {
         this.startToken = startToken;
@@ -42,8 +42,8 @@ public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable 
      * Construct a new token range with replica information.
      *
      * @param startToken first token of this range.
-     * @param endToken last token of this range.
-     * @param replicas the list of replica machines holding this range of tokens.
+     * @param endToken   last token of this range.
+     * @param replicas   the list of replica machines holding this range of tokens.
      */
     public DeepTokenRange(Comparable startToken, Comparable endToken, List<String> replicas) {
         this.startToken = startToken;

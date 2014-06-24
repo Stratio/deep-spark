@@ -15,53 +15,42 @@
  */
 package com.stratio.deep.examples.scala
 
-import java.util.List
-
-import com.stratio.deep.config.{IMongoDeepJobConfig, DeepJobConfigFactory, GenericDeepJobConfigMongoDB}
+import com.stratio.deep.config.{DeepJobConfigFactory, IMongoDeepJobConfig}
 import com.stratio.deep.context.DeepSparkContext
-import com.stratio.deep.rdd.mongodb.{MongoEntityRDD, MongoJavaRDD}
+import com.stratio.deep.rdd.mongodb.MongoJavaRDD
 import com.stratio.deep.testentity.MessageEntity
 import com.stratio.deep.testutils.ContextProperties
 import org.apache.log4j.Logger
 
 /**
- * Example class to write an entity to mongoDB
+ * Example class to read an entity from a mongoDB replica set
  */
-object WritingEntityToMongoDB {
-  /**
-   * Application entry point.
-   *
-   * @param args the arguments passed to the application.
-   */
+final object ReadingEntityFromMongoDBReplicaSet {
   def main(args: Array[String]) {
     doMain(args)
   }
 
   def doMain(args: Array[String]) {
-    val job: String = "scala:writingEntityToMongoDB"
-    val host: String = "localhost:27017"
+    val job: String = "scala:readingEntityFromMongoDBReplicaSet"
+    val host1: String = "localhost:47017"
+    val host2: String = "localhost:47018"
+    val host3: String = "localhost:47019"
     val database: String = "test"
     val inputCollection: String = "input"
-    val outputCollection: String = "output"
-    val readPreference: String = "nearest"
+    val replicaSet: String = "s1"
+    val readPreference: String = "primaryPreferred"
 
     val p: ContextProperties = new ContextProperties(args)
 
     val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
 
-    val inputConfigEntity: IMongoDeepJobConfig[MessageEntity] = DeepJobConfigFactory.createMongoDB(classOf[MessageEntity]).host(host).database(database).collection(inputCollection).readPreference(readPreference).initialize
+    val inputConfigEntity: IMongoDeepJobConfig[MessageEntity] = DeepJobConfigFactory.createMongoDB(classOf[MessageEntity]).host(host1).host(host2).host(host3).database(database).collection(inputCollection).replicaSet(replicaSet).readPreference(readPreference).initialize
 
     val inputRDDEntity: MongoJavaRDD[MessageEntity] = deepContext.mongoJavaRDD(inputConfigEntity)
 
-    val outputConfigEntity: IMongoDeepJobConfig[MessageEntity] = DeepJobConfigFactory.createMongoDB(classOf[MessageEntity]).host(host).database(database).collection(outputCollection).readPreference(readPreference).initialize
-
-    MongoEntityRDD.saveEntity(inputRDDEntity, outputConfigEntity)
-
+    System.out.println("count : " + inputRDDEntity.cache.count)
     deepContext.stop
   }
-
-
-
 
 
 }

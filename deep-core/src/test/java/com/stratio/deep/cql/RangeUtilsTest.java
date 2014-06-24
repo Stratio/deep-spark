@@ -25,8 +25,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import org.apache.cassandra.dht.Murmur3Partitioner;
 import com.stratio.deep.utils.Pair;
+import org.apache.cassandra.dht.Murmur3Partitioner;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
@@ -261,12 +261,12 @@ public class RangeUtilsTest {
 
         Iterable sortedLocalTokens1 = Ordering.natural().immutableSortedCopy(Iterables.transform(localTokens1,
                 new Function<String, Long>() {
-            @Nullable
-            @Override
-            public Long apply(@Nullable String input) {
-                return Long.parseLong(input);
-            }
-        }));
+                    @Nullable
+                    @Override
+                    public Long apply(@Nullable String input) {
+                        return Long.parseLong(input);
+                    }
+                }));
         boolean elementsEquals = Iterables.elementsEqual(
                 Ordering.natural().sortedCopy(localTokens),
                 sortedLocalTokens1);
@@ -279,12 +279,12 @@ public class RangeUtilsTest {
 
         Iterable sortedRemoteTokens1 = Ordering.natural().immutableSortedCopy(Iterables.transform(remoteTokens1,
                 new Function<String, Long>() {
-            @Nullable
-            @Override
-            public Long apply(@Nullable String input) {
-                return Long.parseLong(input);
-            }
-        }));
+                    @Nullable
+                    @Override
+                    public Long apply(@Nullable String input) {
+                        return Long.parseLong(input);
+                    }
+                }));
 
         elementsEquals = Iterables.elementsEqual(
                 Ordering.natural().sortedCopy(sortedRemoteTokens1),
@@ -307,12 +307,12 @@ public class RangeUtilsTest {
 
         Iterable sortedLocalTokens1 = Ordering.natural().immutableSortedCopy(Iterables.transform(localTokens2,
                 new Function<String, Long>() {
-            @Nullable
-            @Override
-            public Long apply(@Nullable String input) {
-                return Long.parseLong(input);
-            }
-        }));
+                    @Nullable
+                    @Override
+                    public Long apply(@Nullable String input) {
+                        return Long.parseLong(input);
+                    }
+                }));
         boolean elementsEquals = Iterables.elementsEqual(
                 Ordering.natural().sortedCopy(localTokens),
                 sortedLocalTokens1);
@@ -325,12 +325,12 @@ public class RangeUtilsTest {
 
         Iterable sortedRemoteTokens1 = Ordering.natural().immutableSortedCopy(Iterables.transform(remoteTokens2,
                 new Function<String, Long>() {
-            @Nullable
-            @Override
-            public Long apply(@Nullable String input) {
-                return Long.parseLong(input);
-            }
-        }));
+                    @Nullable
+                    @Override
+                    public Long apply(@Nullable String input) {
+                        return Long.parseLong(input);
+                    }
+                }));
 
         elementsEquals = Iterables.elementsEqual(
                 Ordering.natural().sortedCopy(sortedRemoteTokens1),

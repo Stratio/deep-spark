@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Class containing the appropiate configuration for a MongoEntityRDD.
+ * Class containing the appropriate configuration for a MongoEntityRDD.
  * <p/>
  * Remember to call {@link #initialize()} after having configured all the
  * properties.
@@ -42,7 +42,6 @@ public final class EntityDeepJobConfigMongoDB<T extends IDeepType> extends Gener
     private Map<String, String> mapDBNameToEntityName;
 
     /**
-     *
      * @param entityClass
      */
     public EntityDeepJobConfigMongoDB(Class<T> entityClass) {

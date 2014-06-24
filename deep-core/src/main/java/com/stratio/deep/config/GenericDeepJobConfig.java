@@ -19,13 +19,14 @@ package com.stratio.deep.config;
 import com.datastax.driver.core.*;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.exception.*;
+import com.stratio.deep.exception.DeepIOException;
+import com.stratio.deep.exception.DeepIllegalAccessException;
+import com.stratio.deep.exception.DeepIndexNotFoundException;
+import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.conf.*;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
@@ -235,7 +236,10 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
         getSession().execute(createTableQuery);
         waitForNewTableMetadata();
     }
-    /** waits until table metadata is not null */
+
+    /**
+     * waits until table metadata is not null
+     */
     private void waitForNewTableMetadata() {
         TableMetadata metadata;
         int retries = 0;
@@ -244,7 +248,7 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
             metadata = getSession().getCluster().getMetadata().getKeyspace(this.keyspace).getTable(this
                     .columnFamily);
 
-            if (metadata != null){
+            if (metadata != null) {
                 continue;
             }
 
@@ -252,12 +256,12 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
             try {
                 Thread.sleep(waitTime);
             } catch (InterruptedException e) {
-                LOG.error("Sleep interrupted",e);
+                LOG.error("Sleep interrupted", e);
             }
 
             retries++;
 
-            if (retries >= 10){
+            if (retries >= 10) {
                 throw new DeepIOException("Cannot retrieve metadata for the newly created CF ");
             }
         } while (metadata == null);
@@ -549,7 +553,7 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
         validateTableMetadata(tableMetadata);
         validateAdditionalFilters(tableMetadata);
 
-        if (bisectFactor != Constants.DEFAULT_BISECT_FACTOR && !checkIsPowerOfTwo(bisectFactor)){
+        if (bisectFactor != Constants.DEFAULT_BISECT_FACTOR && !checkIsPowerOfTwo(bisectFactor)) {
             throw new IllegalArgumentException("Bisect factor should be greater than zero and a power of 2");
         }
     }
@@ -637,7 +641,7 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
         }
     }
 
-    private boolean checkIsPowerOfTwo(int n){
+    private boolean checkIsPowerOfTwo(int n) {
         return (n > 0) && ((n & (n - 1)) == 0);
     }
 

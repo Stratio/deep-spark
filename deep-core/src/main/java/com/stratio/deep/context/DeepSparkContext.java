@@ -50,7 +50,7 @@ public class DeepSparkContext extends JavaSparkContext {
     /**
      * Overridden superclass constructor.
      *
-     * @param master the url of the master node.
+     * @param master  the url of the master node.
      * @param appName the name of the application.
      */
     public DeepSparkContext(String master, String appName) {
@@ -60,10 +60,10 @@ public class DeepSparkContext extends JavaSparkContext {
     /**
      * Overridden superclass constructor.
      *
-     * @param master the url of the master node.
-     * @param appName the name of the application.
+     * @param master    the url of the master node.
+     * @param appName   the name of the application.
      * @param sparkHome the spark home folder.
-     * @param jarFile the jar file to serialize and send to all the cluster nodes.
+     * @param jarFile   the jar file to serialize and send to all the cluster nodes.
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String jarFile) {
         super(master, appName, sparkHome, jarFile);
@@ -72,10 +72,10 @@ public class DeepSparkContext extends JavaSparkContext {
     /**
      * Overridden superclass constructor.
      *
-     * @param master the url of the master node.
-     * @param appName the name of the application.
+     * @param master    the url of the master node.
+     * @param appName   the name of the application.
      * @param sparkHome the spark home folder.
-     * @param jars the jar file(s) to serialize and send to all the cluster nodes.
+     * @param jars      the jar file(s) to serialize and send to all the cluster nodes.
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String[] jars) {
         super(master, appName, sparkHome, jars);
@@ -84,10 +84,10 @@ public class DeepSparkContext extends JavaSparkContext {
     /**
      * Overridden superclass constructor.
      *
-     * @param master the url of the master node.
-     * @param appName the name of the application.
-     * @param sparkHome the spark home folder.
-     * @param jars the jar file(s) to serialize and send to all the cluster nodes.
+     * @param master      the url of the master node.
+     * @param appName     the name of the application.
+     * @param sparkHome   the spark home folder.
+     * @param jars        the jar file(s) to serialize and send to all the cluster nodes.
      * @param environment a map of environment variables.
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String[] jars,
@@ -136,12 +136,13 @@ public class DeepSparkContext extends JavaSparkContext {
 
     /**
      * Builds a new entity based MongoEntityRDD
+     *
      * @param config
      * @param <T>
      * @return
      */
     public <T> MongoJavaRDD<T> mongoJavaRDD(IMongoDeepJobConfig<T> config) {
-        return new MongoJavaRDD<T>(new MongoEntityRDD(this.sc(), (EntityDeepJobConfigMongoDB)config));
+        return new MongoJavaRDD<T>(new MongoEntityRDD(this.sc(), (EntityDeepJobConfigMongoDB) config));
 
     }
 

@@ -11,7 +11,7 @@ import org.bson.types.ObjectId;
 @DeepEntity
 public class MesageTestEntity implements IDeepType {
 
-    @DeepField( fieldName = "_id")
+    @DeepField(fieldName = "_id")
     private ObjectId id;
 
     @DeepField

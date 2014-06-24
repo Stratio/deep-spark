@@ -16,9 +16,7 @@
 
 package com.stratio.deep.config;
 
-import com.datastax.driver.core.Session;
 import com.stratio.deep.entity.Cell;
-import org.apache.hadoop.conf.Configuration;
 
 import java.io.Serializable;
 import java.util.Map;

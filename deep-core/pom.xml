@@ -22,7 +22,8 @@
     <packaging>jar</packaging>
     <name>deep core</name>
     <url>http://www.stratio.com</url>
-    <description>Project containing the actual implementation of the RDD integrating Apache Spark and Apache Cassandra</description>
+    <description>Project containing the actual implementation of the RDD integrating Apache Spark and Apache Cassandra
+    </description>
 
     <parent>
         <groupId>com.stratio.deep</groupId>

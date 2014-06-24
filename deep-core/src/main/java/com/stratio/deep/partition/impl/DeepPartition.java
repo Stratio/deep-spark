@@ -49,7 +49,7 @@ public class DeepPartition implements Partition {
      * Public constructor.
      *
      * @param rddId the rdd id.
-     * @param idx the index of the new partition (relative to the provided rdd id).
+     * @param idx   the index of the new partition (relative to the provided rdd id).
      * @param range the deep token range to wrap.
      */
     public DeepPartition(int rddId, int idx, DeepTokenRange range) {

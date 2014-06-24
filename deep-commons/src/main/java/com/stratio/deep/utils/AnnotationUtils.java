@@ -21,7 +21,6 @@ import com.stratio.deep.annotations.DeepField;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepIOException;
 import org.apache.cassandra.db.marshal.*;
-import com.stratio.deep.utils.Pair;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -179,7 +178,7 @@ public final class AnnotationUtils {
     /**
      * Returns the value of the fields <i>deepField</i> in the instance <i>entity</i> of type T.
      *
-     * @param entity the entity to process.
+     * @param entity    the entity to process.
      * @param deepField the Field to process belonging to <i>entity</i>
      * @return the property value.
      */
