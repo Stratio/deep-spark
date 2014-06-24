@@ -1,3 +1,389 @@
+[0.3.0]
+
+commit 06a4d45e3f5fcc7c123afcc3cda2b501393fe2bf
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 24 18:15:00 2014 +0200
+
+    [stratio-deep release prepare] preparing for version 0.3.0
+
+commit 2151793395ac967b2c361c8c444b2b421659923a
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 24 17:48:09 2014 +0200
+
+    removed unused dependency
+
+commit fc5b867ea58158e714772274dea9f97c484ed8c7
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 24 17:23:36 2014 +0200
+
+    temporarily removed link to drone.io build server
+
+commit 4304524cfa052cf36608031a39a00506b513ae5e
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 24 17:21:26 2014 +0200
+
+    fixed typo
+
+commit fdd21f42bca18fc22ba72892dcb00e560ca309b6
+Merge: 015df7f cb6e59d
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Tue Jun 24 16:55:36 2014 +0200
+
+    Merge branch 'develop-spark-1.0' of github.com:Stratio/stratio-deep into develop-spark-1.0
+
+commit 015df7f4840b37b800adcdefed3c9c649cc30a50
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Tue Jun 24 16:54:50 2014 +0200
+
+    doc
+
+commit 3a5ff76bac8c07ed07f04b2317ab6691f71ff3fd
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Tue Jun 24 16:46:29 2014 +0200
+
+    added copyright
+
+commit cb6e59d7740790a8e6639172d446c333b532ede1
+Merge: 24a32b8 f521209
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 24 16:38:44 2014 +0200
+
+    Merge branch 'develop-spark-1.0' of github.com:Stratio/stratio-deep into develop-spark-1.0
+    
+    # By rcrespodelosreyes
+    # Via rcrespodelosreyes
+    * 'develop-spark-1.0' of github.com:Stratio/stratio-deep:
+      added doc and more examples
+
+commit 24a32b80c168af446e7cffd06e93281bcb259cde
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 24 16:37:42 2014 +0200
+
+    Updated path to spark 1.0 branch in deploy script
+
+commit f521209a71d66f2dfd4cd8a7e280cc0c083f4580
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Tue Jun 24 16:23:03 2014 +0200
+
+    added doc and more examples
+
+commit fb0cbd7dfa9707b1a67805cb7ab7f9854bc22197
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 24 12:28:14 2014 +0200
+
+    Created IDeepJobConfig sub interfaces
+
+commit 3f90db244c28fdad95be3a976862c9c322e8ae6c
+Merge: 660cc3c 4398e6f
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Mon Jun 23 16:22:06 2014 +0200
+
+    Merge branch 'develop-spark-1.0' of github.com:Stratio/stratio-deep into develop-spark-1.0
+    
+    Conflicts:
+    	deep-core/src/test/java/com/stratio/deep/rdd/mongodb/MongoEntityRDDTest.java
+
+commit 660cc3cca84fd899aa674f83e2f4e0745ef3cff9
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Fri Jun 20 14:49:33 2014 +0200
+
+    custom path for mongodb embedded
+
+commit 4398e6f9bc7fbc8158692656eb7671180a94c7bc
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Jun 20 14:31:47 2014 +0200
+
+    deleting embedded mongo tgz after unpacking
+
+commit 946334f6a5c477feac4cd994cd26c86ebea3cebd
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Jun 20 13:53:59 2014 +0200
+
+    changed MongoDB db folder
+
+commit d4a55e334c64e1faec3259f1d7ad920bcfa23cb5
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Jun 20 13:29:55 2014 +0200
+
+    reverted mongo version to PRODUCTION
+
+commit 94052861361513395606a20e48daa5643dcda9e8
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Jun 20 13:14:07 2014 +0200
+
+    changed mongos config to DEVELOPMENT
+
+commit a53a335f0fbd2461f5db77d49310b68149874fa8
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Jun 20 12:58:18 2014 +0200
+
+    fixed behavior of null value cells equality
+
+commit a24133436ad4be3f4735bc95cabb4850b428cbfb
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Fri Jun 20 09:48:18 2014 +0200
+
+    added writing test
+
+commit 1e3dea115b98086a05dd06bc20748e6fe8f8d6ea
+Merge: 4551229 bb0a3f9
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Wed Jun 18 18:57:45 2014 +0200
+
+    Merge branch 'develop-spark-1.0' of github.com:Stratio/stratio-deep into develop-spark-1.0
+
+commit 45512293fe75cd0a6e5caaa6652385853815c8d6
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Wed Jun 18 18:57:05 2014 +0200
+
+    test mongodb embedded
+
+commit bb0a3f9bb56f3faef4af2311eec8c129d3154d99
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Jun 18 18:47:52 2014 +0200
+
+    added reference to MongoDB support, needs to be developed more
+
+commit 738fba5d614e681273bc4b6b1291a61e34da7065
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Jun 18 18:36:49 2014 +0200
+
+    fixed typo
+
+commit f2c37abdb6b669cacc1bed3c8e5386431c1b0be2
+Merge: 86ecea0 649e858
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Jun 18 18:17:41 2014 +0200
+
+    Merge branch 'develop-spark-1.0' of github.com:Stratio/stratio-deep into develop-spark-1.0
+    
+    # By rcrespodelosreyes
+    # Via rcrespodelosreyes
+    * 'develop-spark-1.0' of github.com:Stratio/stratio-deep:
+      merged with branch mongodb-deep
+
+commit 86ecea0ca28d4fe421d7aa2f245af147e43c3f45
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Jun 18 18:17:19 2014 +0200
+
+    fix cql and thrift default ports
+
+commit 649e8585ee7123a4f69540d51998777f2a2a69b3
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Wed Jun 18 16:56:52 2014 +0200
+
+    merged with branch mongodb-deep
+
+commit d4a253be9308a7509d37fa0c3f8536fd98a29e09
+Merge: dfc88c6 880f4d5
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Jun 18 12:36:51 2014 +0200
+
+    added commons-cli to distribution include artifacts
+
+commit dfc88c624339ad95ede8f58e29a6f695b7bbcac3
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Jun 18 12:01:24 2014 +0200
+
+    fixed deep-examples tests broken by the previously committed ContextProperties refactor
+
+commit d2212cbfbf2a35ea82ee8aac6c5d3710a7f05f9a
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Jun 18 12:00:40 2014 +0200
+
+    fixed dependency conflict
+
+commit e3cf555d6a222fe1cc6c5d6a88fe06a7c148c82b
+Merge: 60d1761 84f64ea
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 17 18:28:39 2014 +0200
+
+    Merge branch 'develop-spark-1.0' of github.com:Stratio/stratio-deep into develop-spark-1.0
+    
+    # By rcrespodelosreyes
+    # Via rcrespodelosreyes
+    * 'develop-spark-1.0' of github.com:Stratio/stratio-deep:
+      fixed System.out.println
+      mongodb integration with deep
+
+commit 60d176174da3f188853566905bce0b1a315b2991
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 17 18:28:21 2014 +0200
+
+    ContextProperties now parses command line options using commons-cli
+
+commit 84f64eadae355a9a3ec60128aac834c9b9a9b271
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Tue Jun 17 17:44:31 2014 +0200
+
+    fixed System.out.println
+
+commit 742b9844fbcdf3c99e7f0b9a45f2f1e6a2ffb991
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Tue Jun 17 17:41:48 2014 +0200
+
+    mongodb integration with deep
+
+commit 880f4d59699290692a2708b4b5c0de9375df82d1
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Tue Jun 17 17:15:23 2014 +0200
+
+    added tests
+
+commit afb323c946f76f86a96d084e36af12abe74d58fb
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Tue Jun 17 16:57:35 2014 +0200
+
+    added compatibility with sharding
+
+commit f3e23630c9c110ae711fd84915fead1303719e0d
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Mon Jun 16 12:59:41 2014 +0200
+
+    add compatibility with IDeepJobConfig
+
+commit eaf92ba89323b4dd3fd8a6f72d9d9537bb057952
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Mon Jun 16 12:38:28 2014 +0200
+
+    solved compilation problems
+
+commit 8d083acefbe4d0bb062070be2c9ed40f7ecfada6
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Mon Jun 16 12:32:30 2014 +0200
+
+    compatibility with newHadoopRDD
+
+commit 51bb35dc8e76e2de34c27ea61c8e2335d76d8e08
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon Jun 16 10:50:16 2014 +0200
+
+    Refactored RDD hierarchy to inherit from the new DeepMongoRDD
+
+commit 1bcde00f795d7996fcbe84c08a467e1d72c25143
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Mon Jun 16 09:53:53 2014 +0200
+
+    pequeños cambios
+
+commit 3c77550bce5cca3f13cbfaf00dfee66163fe5760
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Jun 13 14:14:08 2014 +0200
+
+    First DeepMongoRDD implementation (does not compile)
+
+commit 0cc8f703acdb9712a27c907b45a7d2d4c0873bc1
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Jun 13 12:15:35 2014 +0200
+
+    added missing type information
+
+commit 0319202028714becf3c3854f1c8386acd12c9afe
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Jun 13 12:15:19 2014 +0200
+
+    added non-default constructor accepting domain and numPages
+
+commit b0647bd7c4809e17b18b8c59109c3c3b81c44cb4
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri Jun 13 12:14:33 2014 +0200
+
+    updated readme
+
+commit 2a8bd18dfc54f392d0e03010023edb93e1516b59
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Fri Jun 13 11:51:54 2014 +0200
+
+    MongoDB context is eliminated, It was unnecesary
+
+commit 44e67760e60be41df305706061a933fdd29e757b
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Thu Jun 12 18:35:44 2014 +0200
+
+    mongodb integration with deep
+
+commit 3465b0fa80f2d44dde04dee39f66bb8d2c1313d6
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon Jun 9 14:47:30 2014 +0200
+
+    spark 1.0 + kryo serializer
+
+commit 6867b93c9706ec8471a8d6cdb7888e8cbd0c0b9d
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 3 12:25:54 2014 +0200
+
+    * Updated Spark version number to 1.0.0
+    * updated contributors list
+
+commit 05f57932ee39d01ef0df50b73dcb9be31441da95
+Merge: 5e7f168 0b59c07
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 3 12:18:48 2014 +0200
+
+    Merge branch 'develop' into develop-spark-1.0
+    
+    * develop:
+      [stratio-deep release finish] next snapshot version 0.2.10-SNAPSHOT
+      [Updated ChangeLog.txt for release 0.2.9]
+      [stratio-deep release prepare] preparing for version 0.2.9
+      fixed time-dependent ScalaCassandraEntityRDDTest failure
+      Update links to Stratio Deep docs
+      cqlTypeName is not initialized even when Cell object does not come from Cassandra
+    
+    Resolved Conflicts:
+    	deep-commons/pom.xml
+    	deep-core/pom.xml
+    	deep-examples/pom.xml
+    	deep-parent/pom.xml
+
+commit 0b59c07e69968d88f7f926d17ce111e0bd562a40
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 3 11:16:40 2014 +0200
+
+    [stratio-deep release finish] next snapshot version 0.2.10-SNAPSHOT
+
+commit c4b9c4e8ca621e260f7ef241600adbd152cb2517
+Merge: a782d78 4964449
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 3 11:16:28 2014 +0200
+
+    Merge branch 'release/version-0.2.9' into develop
+
+commit 5e7f1687d6ae2c6d92cf0adb91e67c11d6c228f1
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon Jun 2 11:09:21 2014 +0200
+
+    cqlTypeName is not initialized even when Cell object does not come from Cassandra
+
+commit 5cbda78ad3d848bd1203ba9437d1ca02f99e1c8b
+Merge: b3ee83c 30d63b8
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon Jun 2 10:25:44 2014 +0200
+
+    Merge branch 'develop' into develop-spark-1.0
+    
+    * develop:
+      Changed the replaceByName method signature to make it clearer
+      Added replace and remove methods
+
+commit b3ee83cf10aaa017d18aa12e301b5ba60dcbbfec
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Mon Jun 2 10:23:44 2014 +0200
+
+    Updated Cassandra version to 2.0.8
+
+commit 9cd32b3045554a53ceb21d58bb376f7257f6a672
+Author: Emmanuelle Raffenne <eraffenne@paradigmatecnologico.com>
+Date:   Fri May 30 13:51:30 2014 +0200
+
+    Added scala version to maven-scala-plugin configuration
+
+commit 47cf6dd20778ce5717f44ccd17fd8e629ddafd0b
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Fri May 30 12:39:50 2014 +0200
+
+    First port of deep to Spark 1.0.x
+
 [0.2.9]
 
 * fixed time-dependent ScalaCassandraEntityRDDTest failure
