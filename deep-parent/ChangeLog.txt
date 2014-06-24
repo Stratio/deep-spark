@@ -1,3 +1,17 @@
+[0.3.1]
+
+commit ac43a0a435cbc58e130abfcdf88e2b6ae55dfa16
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 24 18:53:27 2014 +0200
+
+    [stratio-deep release prepare] preparing for version 0.3.1
+
+commit 7155df13d0668b437bd24c5ba16e9b2e2d6e18ee
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 24 18:52:08 2014 +0200
+
+    updated version number to 0.3.1-SNAPSHOT
+
 [0.2.9]
 
 * fixed time-dependent ScalaCassandraEntityRDDTest failure
