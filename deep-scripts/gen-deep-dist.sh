@@ -45,7 +45,7 @@ mvn -version >/dev/null || { echo "Cannot find Maven in path, aborting"; exit 1;
 #### Create Stratio Deep jars from bitbucket (master tag) through maven release plugin
 
 # Clone Stratio Deep (master tag) from bitbucket
-git clone ${STRATIO_DEEP_REPO} ${TMPDIR} || { echo "Cannot clone stratio deep project from bitbucket"; exit 1; }
+git clone ${STRATIO_DEEP_REPO} ${TMPDIR} || { echo "Cannot clone stratio deep project from github"; exit 1; }
 cd ${TMPDIR}
 
 git checkout develop
