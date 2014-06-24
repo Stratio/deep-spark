@@ -116,6 +116,9 @@ echo "Finishing release"
 git flow release finish -k -mFinishing_Release_$RELEASE_VER version-$RELEASE_VER || { echo "Cannot finish Stratio Deep ${next_version}"; exit 1; }
 git push --tags
 
+git checkout master
+git push origin || { echo "Cannot push to master"; exit 1; }
+
 git checkout develop
 
 cd deep-parent
