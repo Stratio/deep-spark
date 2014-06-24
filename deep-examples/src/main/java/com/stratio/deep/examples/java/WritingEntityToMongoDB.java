@@ -18,6 +18,7 @@ package com.stratio.deep.examples.java;
 
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
+import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
@@ -64,12 +65,14 @@ public final class WritingEntityToMongoDB {
                 p.getJars());
 
 
-        GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(inputCollection).readPreference(readPreference).initialize();
+        IMongoDeepJobConfig<MessageEntity> inputConfigEntity =
+                DeepJobConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(inputCollection).readPreference(readPreference).initialize();
 
         MongoJavaRDD<MessageEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
 
 
-        GenericDeepJobConfigMongoDB outputConfigEntityPruebaGuardado = DeepJobConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(outputCollection).readPreference(readPreference).initialize();
+        IMongoDeepJobConfig<MessageEntity> outputConfigEntityPruebaGuardado =
+                DeepJobConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(outputCollection).readPreference(readPreference).initialize();
 
 
         MongoEntityRDD.saveEntity(inputRDDEntity, outputConfigEntityPruebaGuardado);

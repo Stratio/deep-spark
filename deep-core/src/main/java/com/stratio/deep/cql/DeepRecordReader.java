@@ -22,6 +22,7 @@ import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.stratio.deep.config.GenericDeepJobConfig;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.exception.DeepGenericException;
@@ -76,7 +77,7 @@ public class DeepRecordReader {
 
     private AbstractType<?> keyValidator;
 
-    private final IDeepJobConfig config;
+    private final ICassandraDeepJobConfig config;
 
     private Session session;
 
@@ -86,7 +87,7 @@ public class DeepRecordReader {
      * @param config the deep configuration object.
      * @param split the token range on which the new reader will be based.
      */
-    public DeepRecordReader(IDeepJobConfig config, DeepTokenRange split) {
+    public DeepRecordReader(ICassandraDeepJobConfig config, DeepTokenRange split) {
         this.config = config;
         this.split = split;
         initialize();

@@ -17,9 +17,8 @@
 package com.stratio.deep.examples.scala
 
 import com.stratio.deep.context.DeepSparkContext
-import com.stratio.deep.config.IDeepJobConfig
+import com.stratio.deep.config.{ICassandraDeepJobConfig, IDeepJobConfig, DeepJobConfigFactory}
 import com.stratio.deep.rdd.CassandraRDD
-import com.stratio.deep.config.DeepJobConfigFactory
 import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.rdd.RDD
 import scala.math._
@@ -63,7 +62,7 @@ object UsingScalaEntity {
   private def doMain(args: Array[String], deepContext: DeepSparkContext, p: ContextProperties) = {
 
     // Configuration and initialization
-    val config: IDeepJobConfig[ScalaPageEntity] = DeepJobConfigFactory.create(classOf[ScalaPageEntity])
+    val config: ICassandraDeepJobConfig[ScalaPageEntity] = DeepJobConfigFactory.create(classOf[ScalaPageEntity])
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(keyspaceName).table(tableName)
       .initialize

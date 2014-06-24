@@ -17,7 +17,7 @@ package com.stratio.deep.examples.scala
 
 import java.util.List
 
-import com.stratio.deep.config.{DeepJobConfigFactory, GenericDeepJobConfigMongoDB}
+import com.stratio.deep.config.{IMongoDeepJobConfig, DeepJobConfigFactory, GenericDeepJobConfigMongoDB}
 import com.stratio.deep.context.DeepSparkContext
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD
 import com.stratio.deep.testentity.MessageEntity
@@ -42,7 +42,7 @@ import org.apache.log4j.Logger
 
     val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
 
-    val inputConfigEntity: GenericDeepJobConfigMongoDB[MessageEntity] = DeepJobConfigFactory.createMongoDB(classOf[MessageEntity]).host(host).database(database).collection(inputCollection).initialize
+    val inputConfigEntity: IMongoDeepJobConfig[MessageEntity] = DeepJobConfigFactory.createMongoDB(classOf[MessageEntity]).host(host).database(database).collection(inputCollection).initialize
 
     val inputRDDEntity: MongoJavaRDD[MessageEntity] = deepContext.mongoJavaRDD(inputConfigEntity)
 

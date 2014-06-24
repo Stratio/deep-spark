@@ -44,7 +44,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
 
     @Test
     public void testWriteConfigValidation() {
-        IDeepJobConfig<TestEntity> djc = DeepJobConfigFactory.createWriteConfig(TestEntity.class);
+        ICassandraDeepJobConfig<TestEntity> djc = DeepJobConfigFactory.createWriteConfig(TestEntity.class);
 
         djc.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
                 .columnFamily("test_page").keyspace("test_keyspace");
@@ -65,7 +65,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
 
     @Test
     public void testInputColumnsExist() {
-        IDeepJobConfig<Cells> djc = DeepJobConfigFactory.create();
+        ICassandraDeepJobConfig<Cells> djc = DeepJobConfigFactory.create();
 
         djc.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
                 .columnFamily(COLUMN_FAMILY).keyspace(KEYSPACE_NAME).inputColumns("not_existent_col1",
@@ -88,7 +88,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
     @Test
     public void testValidation() {
 
-        IDeepJobConfig<TestEntity> djc = DeepJobConfigFactory.create(TestEntity.class);
+        ICassandraDeepJobConfig<TestEntity> djc = DeepJobConfigFactory.create(TestEntity.class);
 
         djc.host(null).rpcPort(null).pageSize(0).bisectFactor(3);
 

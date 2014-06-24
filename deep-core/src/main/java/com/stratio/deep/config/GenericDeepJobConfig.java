@@ -42,7 +42,7 @@ import static com.stratio.deep.utils.Utils.quote;
  * Base class for all config implementations providing default implementations for methods
  * defined in {@link com.stratio.deep.config.IDeepJobConfig}.
  */
-public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, AutoCloseable {
+public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig<T>, AutoCloseable {
     private static final Logger LOG = Logger.getLogger("com.stratio.deep.config.GenericDeepJobConfig");
     private static final long serialVersionUID = -7179376653643603038L;
     private String partitionerClassName = "org.apache.cassandra.dht.Murmur3Partitioner";
@@ -131,7 +131,6 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     /**
      * {@inheritDoc}
      */
-    @Override
     public IDeepJobConfig<T> session(Session session) {
         this.session = session;
         return this;
@@ -319,7 +318,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * @see com.stratio.deep.config.IDeepJobConfig#columnFamily(java.lang.String)
      */
     @Override
-    public IDeepJobConfig<T> columnFamily(String columnFamily) {
+    public ICassandraDeepJobConfig<T> columnFamily(String columnFamily) {
         this.columnFamily = columnFamily;
 
         return this;
@@ -329,7 +328,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * @see com.stratio.deep.config.IDeepJobConfig#columnFamily(java.lang.String)
      */
     @Override
-    public IDeepJobConfig<T> table(String table) {
+    public ICassandraDeepJobConfig<T> table(String table) {
         return columnFamily(table);
     }
 
@@ -420,7 +419,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> host(String hostname) {
+    public ICassandraDeepJobConfig<T> host(String hostname) {
         this.host = hostname;
 
         return this;
@@ -430,7 +429,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> initialize() {
+    public ICassandraDeepJobConfig<T> initialize() {
         if (isInitialized) {
             return this;
         }
@@ -457,7 +456,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> inputColumns(String... columns) {
+    public ICassandraDeepJobConfig<T> inputColumns(String... columns) {
         this.inputColumns = columns;
 
         return this;
@@ -467,13 +466,13 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> keyspace(String keyspace) {
+    public ICassandraDeepJobConfig<T> keyspace(String keyspace) {
         this.keyspace = keyspace;
         return this;
     }
 
     @Override
-    public IDeepJobConfig<T> bisectFactor(int bisectFactor) {
+    public ICassandraDeepJobConfig<T> bisectFactor(int bisectFactor) {
         this.bisectFactor = bisectFactor;
         return this;
     }
@@ -482,7 +481,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> partitioner(String partitionerClassName) {
+    public ICassandraDeepJobConfig<T> partitioner(String partitionerClassName) {
         this.partitionerClassName = partitionerClassName;
         return this;
     }
@@ -491,7 +490,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> password(String password) {
+    public ICassandraDeepJobConfig<T> password(String password) {
         this.password = password;
 
         return this;
@@ -501,7 +500,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> rpcPort(Integer port) {
+    public ICassandraDeepJobConfig<T> rpcPort(Integer port) {
         this.rpcPort = port;
 
         return this;
@@ -511,7 +510,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> cqlPort(Integer port) {
+    public ICassandraDeepJobConfig<T> cqlPort(Integer port) {
         this.cqlPort = port;
 
         return this;
@@ -521,7 +520,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> username(String username) {
+    public ICassandraDeepJobConfig<T> username(String username) {
         this.username = username;
 
         return this;
@@ -646,7 +645,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> batchSize(int batchSize) {
+    public ICassandraDeepJobConfig<T> batchSize(int batchSize) {
         this.batchSize = batchSize;
         return this;
     }
@@ -663,7 +662,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> createTableOnWrite(Boolean createTableOnWrite) {
+    public ICassandraDeepJobConfig<T> createTableOnWrite(Boolean createTableOnWrite) {
         this.createTableOnWrite = createTableOnWrite;
 
         return this;
@@ -686,14 +685,14 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue) {
+    public ICassandraDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue) {
         /* check if there's an index specified on the provided column */
         additionalFilters.put(filterColumnName, filterValue);
         return this;
     }
 
     @Override
-    public IDeepJobConfig<T> pageSize(int pageSize) {
+    public ICassandraDeepJobConfig<T> pageSize(int pageSize) {
         this.pageSize = pageSize;
         return this;
     }
@@ -718,7 +717,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> readConsistencyLevel(String level) {
+    public ICassandraDeepJobConfig<T> readConsistencyLevel(String level) {
         this.readConsistencyLevel = level;
 
         return this;
@@ -728,7 +727,7 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
      * {@inheritDoc}
      */
     @Override
-    public IDeepJobConfig<T> writeConsistencyLevel(String level) {
+    public ICassandraDeepJobConfig<T> writeConsistencyLevel(String level) {
         this.writeConsistencyLevel = level;
         return this;
     }
@@ -753,11 +752,4 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T>, Auto
     public int getBisectFactor() {
         return bisectFactor;
     }
-
-    @Override
-    public org.apache.hadoop.conf.Configuration getHadoopConfiguration(){
-        return null;
-    }
-
-
 }

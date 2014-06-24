@@ -19,6 +19,7 @@ package com.stratio.deep.cql;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
@@ -65,7 +66,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     private AbstractType<?> keyValidator;
     private String[] partitionKeyColumns;
 
-    private final IDeepJobConfig writeConfig;
+    private final ICassandraDeepJobConfig writeConfig;
     private final IPartitioner partitioner;
     private final InetAddress localhost;
 
@@ -75,7 +76,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
      * @param context
      * @param writeConfig
      */
-    public DeepCqlRecordWriter(TaskContext context, IDeepJobConfig writeConfig) {
+    public DeepCqlRecordWriter(TaskContext context, ICassandraDeepJobConfig writeConfig) {
         this.clients = new HashMap<>();
         this.removedClients = new HashMap<>();
         this.writeConfig = writeConfig;

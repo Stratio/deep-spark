@@ -19,6 +19,7 @@ package com.stratio.deep.rdd.mongodb;
 import com.mongodb.hadoop.MongoOutputFormat;
 import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
 import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.utils.UtilMongoDB;
 import org.apache.spark.SparkContext;
@@ -47,7 +48,7 @@ public final class MongoEntityRDD<T extends IDeepType> extends DeepMongoRDD<T> {
      * @param config the deep configuration object.
      */
     @SuppressWarnings("unchecked")
-    public MongoEntityRDD(SparkContext sc, IDeepJobConfig<T> config) {
+    public MongoEntityRDD(SparkContext sc, IMongoDeepJobConfig<T> config) {
         super(sc, config, ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
     }
 
@@ -77,7 +78,7 @@ public final class MongoEntityRDD<T extends IDeepType> extends DeepMongoRDD<T> {
      * @param config
      * @param <T>
      */
-    public static <T extends IDeepType> void saveEntity(MongoJavaRDD<T> rdd, GenericDeepJobConfigMongoDB<T> config) {
+    public static <T extends IDeepType> void saveEntity(MongoJavaRDD<T> rdd, IMongoDeepJobConfig<T> config) {
 
         JavaPairRDD<Object, BSONObject> save = rdd.mapToPair(new PairFunction<T, Object, BSONObject>() {
 
@@ -90,7 +91,7 @@ public final class MongoEntityRDD<T extends IDeepType> extends DeepMongoRDD<T> {
 
 
         // Only MongoOutputFormat and config are relevant
-        save.saveAsNewAPIHadoopFile("file:///bogus", Object.class, Object.class, MongoOutputFormat.class, config.configHadoop);
+        save.saveAsNewAPIHadoopFile("file:///bogus", Object.class, Object.class, MongoOutputFormat.class, config.getHadoopConfiguration());
     }
 
 }

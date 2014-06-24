@@ -18,6 +18,7 @@ package com.stratio.deep.examples.java;
 
 import com.google.common.collect.Lists;
 import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.entity.Cell;
@@ -103,14 +104,14 @@ public final class WritingCellToCassandra {
 
 
         // --- OUTPUT RDD
-        IDeepJobConfig outputConfig = DeepJobConfigFactory.createWriteConfig()
+        ICassandraDeepJobConfig<Cells> outputConfig = DeepJobConfigFactory.createWriteConfig()
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(outputTableName)
                 .createTableOnWrite(true);
 
         outputConfig.initialize();
 
-        JavaRDD outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, Cells>() {
+        JavaRDD<Cells> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
             public Cells call(Tuple2<String, Integer> t) {
                 Cell c1 = Cell.create("domain", t._1(), true, false);

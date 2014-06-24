@@ -16,6 +16,7 @@
 
 package com.stratio.deep.rdd;
 
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.cql.DeepRecordReader;
 import com.stratio.deep.cql.DeepTokenRange;
@@ -59,7 +60,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     /*
      * RDD configuration. This config is broadcasted to all the Sparks machines.
      */
-    protected final Broadcast<IDeepJobConfig<T>> config;
+    protected final Broadcast<ICassandraDeepJobConfig<T>> config;
 
     /**
      * Transform a row coming from the Cassandra's API to an element of
@@ -110,14 +111,14 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * @param writeConfig the write configuration object.
      */
     @SuppressWarnings("unchecked")
-    public static <W, T extends IDeepType> void cql3SaveRDDToCassandra(RDD<W> rdd, IDeepJobConfig<W> writeConfig) {
+    public static <W, T extends IDeepType> void cql3SaveRDDToCassandra(RDD<W> rdd, ICassandraDeepJobConfig<W> writeConfig) {
         if (IDeepType.class.isAssignableFrom(writeConfig.getEntityClass())) {
-            IDeepJobConfig<T> c = (IDeepJobConfig<T>) writeConfig;
+            ICassandraDeepJobConfig<T> c = (ICassandraDeepJobConfig<T>) writeConfig;
             RDD<T> r = (RDD<T>) rdd;
 
             CassandraRDDUtils.doCql3SaveToCassandra(r, c, new DeepType2TupleFunction<T>());
         } else if (Cells.class.isAssignableFrom(writeConfig.getEntityClass())) {
-            IDeepJobConfig<Cells> c = (IDeepJobConfig<Cells>) writeConfig;
+            ICassandraDeepJobConfig<Cells> c = (ICassandraDeepJobConfig<Cells>) writeConfig;
             RDD<Cells> r = (RDD<Cells>) rdd;
 
             CassandraRDDUtils.doCql3SaveToCassandra(r, c, new CellList2TupleFunction());
@@ -134,14 +135,14 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * @param writeConfig the write configuration object.
      */
     @SuppressWarnings("unchecked")
-    public static <W, T extends IDeepType> void saveRDDToCassandra(RDD<W> rdd, IDeepJobConfig<W> writeConfig) {
+    public static <W, T extends IDeepType> void saveRDDToCassandra(RDD<W> rdd, ICassandraDeepJobConfig<W> writeConfig) {
         if (IDeepType.class.isAssignableFrom(writeConfig.getEntityClass())) {
-            IDeepJobConfig<T> c = (IDeepJobConfig<T>) writeConfig;
+            ICassandraDeepJobConfig<T> c = (ICassandraDeepJobConfig<T>) writeConfig;
             RDD<T> r = (RDD<T>) rdd;
 
             CassandraRDDUtils.doSaveToCassandra(r, c, new DeepType2TupleFunction<T>());
         } else if (Cells.class.isAssignableFrom(writeConfig.getEntityClass())) {
-            IDeepJobConfig<Cells> c = (IDeepJobConfig<Cells>) writeConfig;
+            ICassandraDeepJobConfig<Cells> c = (ICassandraDeepJobConfig<Cells>) writeConfig;
             RDD<Cells> r = (RDD<Cells>) rdd;
 
             CassandraRDDUtils.doSaveToCassandra(r, c, new CellList2TupleFunction());
@@ -157,7 +158,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * @param writeConfig the write configuration object.
      * @param <W> the generic type associated to the provided configuration object.
      */
-    public static <W> void saveRDDToCassandra(JavaRDD<W> rdd, IDeepJobConfig<W> writeConfig) {
+    public static <W> void saveRDDToCassandra(JavaRDD<W> rdd, ICassandraDeepJobConfig<W> writeConfig) {
         saveRDDToCassandra(rdd.rdd(), writeConfig);
     }
 
@@ -169,9 +170,9 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * @param config the deep configuration object.
      */
     @SuppressWarnings("unchecked")
-    public CassandraRDD(SparkContext sc, IDeepJobConfig<T> config) {
+    public CassandraRDD(SparkContext sc, ICassandraDeepJobConfig<T> config) {
         super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
-        this.config = sc.broadcast(config, ClassTag$.MODULE$.<IDeepJobConfig<T>>apply(config.getClass()));
+        this.config = sc.broadcast(config, ClassTag$.MODULE$.<ICassandraDeepJobConfig<T>>apply(config.getClass()));
     }
 
     /**

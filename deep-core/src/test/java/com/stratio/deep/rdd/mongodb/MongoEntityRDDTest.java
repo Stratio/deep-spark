@@ -6,6 +6,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
+import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.testentity.MesageTestEntity;
 import de.flapdoodle.embed.mongo.MongodExecutable;
@@ -90,7 +91,7 @@ public class MongoEntityRDDTest {
         String hostConcat = host.concat(":").concat(port.toString());
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
-        GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
+        IMongoDeepJobConfig<MesageTestEntity> inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
                 .host(hostConcat).database(database).collection(collection).initialize();
 
         MongoJavaRDD<MesageTestEntity> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
@@ -110,13 +111,12 @@ public class MongoEntityRDDTest {
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
-        GenericDeepJobConfigMongoDB inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
+        IMongoDeepJobConfig<MesageTestEntity> inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
                 .host(hostConcat).database(database).collection(collection).initialize();
 
         MongoJavaRDD<MesageTestEntity> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
 
-
-        GenericDeepJobConfigMongoDB outputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
+        IMongoDeepJobConfig<MesageTestEntity> outputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
                 .host(hostConcat).database(database).collection(collectionOutput).initialize();
 
 

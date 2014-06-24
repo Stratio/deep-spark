@@ -22,7 +22,7 @@ package org.apache.spark.rdd
 import java.text.SimpleDateFormat
 import java.util.Date
 
-import com.stratio.deep.config.IDeepJobConfig
+import com.stratio.deep.config.{IMongoDeepJobConfig, IDeepJobConfig}
 import org.apache.hadoop.conf.Configurable
 import org.apache.hadoop.io.Writable
 import  org.apache.hadoop.mapreduce._
@@ -56,7 +56,7 @@ private[spark] class NewHadoopPartition(
  */
 @DeveloperApi
 abstract class DeepMongoRDD[T : ClassTag](sc: SparkContext,
-                                          @transient config: IDeepJobConfig[T])
+                                          @transient config: IMongoDeepJobConfig[T])
   extends RDD[T](sc, Nil)
   with SparkHadoopMapReduceUtil
   with Logging {

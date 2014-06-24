@@ -20,6 +20,7 @@ import com.datastax.driver.core.*;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.utils.Utils;
@@ -113,7 +114,7 @@ public class RangeUtils {
      */
     private static List<DeepTokenRange> mergeTokenRanges(Map<String, Iterable<Comparable>> tokens,
                                                          final Session session,
-                                                         final IPartitioner partitioner, final IDeepJobConfig config) {
+                                                         final IPartitioner partitioner, final ICassandraDeepJobConfig config) {
         final Iterable<Comparable> allRanges = Ordering.natural().sortedCopy(concat(tokens.values()));
         final Comparable maxValue = Ordering.natural().max(allRanges);
         final Comparable minValue = (Comparable) partitioner.minValue(maxValue.getClass()).getToken().token;
@@ -177,7 +178,7 @@ public class RangeUtils {
      */
     private static List<String> initReplicas(
             final Comparable token, final Session session, final IPartitioner partitioner,
-            final IDeepJobConfig config) {
+            final ICassandraDeepJobConfig config) {
         final AbstractType tkValidator = partitioner.getTokenValidator();
         final Metadata metadata = session.getCluster().getMetadata();
 
@@ -200,7 +201,7 @@ public class RangeUtils {
      * @param config the Deep configuration object.
      * @return the list of computed token ranges.
      */
-    public static List<DeepTokenRange> getSplits(IDeepJobConfig config) {
+    public static List<DeepTokenRange> getSplits(ICassandraDeepJobConfig config) {
         Map<String, Iterable<Comparable>> tokens = new HashMap<>();
         IPartitioner partitioner = getPartitioner(config);
 
@@ -265,7 +266,7 @@ public class RangeUtils {
      * @param config the Deep configuration object.
      * @return an instance of the cassandra partitioner configured in the configuration object.
      */
-    public static IPartitioner getPartitioner(IDeepJobConfig config) {
+    public static IPartitioner getPartitioner(ICassandraDeepJobConfig config) {
         try {
             return (IPartitioner) Class.forName(config.getPartitionerClassName()).newInstance();
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {

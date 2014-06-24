@@ -18,6 +18,7 @@ package com.stratio.deep.examples.java;
 
 import com.google.common.collect.Lists;
 import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.CassandraJavaRDD;
@@ -102,7 +103,7 @@ public final class WritingEntityToCassandra {
         }
 
         // --- OUTPUT RDD
-        IDeepJobConfig outputConfig = DeepJobConfigFactory.createWriteConfig(DomainEntity.class)
+        ICassandraDeepJobConfig<DomainEntity> outputConfig = DeepJobConfigFactory.createWriteConfig(DomainEntity.class)
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(outputTableName)
                 .createTableOnWrite(true).initialize();

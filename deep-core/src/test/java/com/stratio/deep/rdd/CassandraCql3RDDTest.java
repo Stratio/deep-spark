@@ -21,6 +21,7 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.exception.DeepIOException;
@@ -119,7 +120,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
         int allElements = entities.length;
         assertTrue(allElements > 1);
 
-        IDeepJobConfig<Cql3TestEntity> config = DeepJobConfigFactory
+        ICassandraDeepJobConfig<Cql3TestEntity> config = DeepJobConfigFactory
                 .create(Cql3TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -216,7 +217,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
     }
 
     @Override
-    protected IDeepJobConfig<Cql3TestEntity> initReadConfig() {
+    protected ICassandraDeepJobConfig<Cql3TestEntity> initReadConfig() {
         return DeepJobConfigFactory.create(Cql3TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST).bisectFactor(testBisectFactor)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace
                         (KEYSPACE_NAME).columnFamily(CQL3_COLUMN_FAMILY)
@@ -224,7 +225,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
     }
 
     @Override
-    protected IDeepJobConfig<Cql3TestEntity> initWriteConfig() {
+    protected ICassandraDeepJobConfig<Cql3TestEntity> initWriteConfig() {
 
         return DeepJobConfigFactory.createWriteConfig(Cql3TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(OUTPUT_KEYSPACE_NAME)
@@ -244,7 +245,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
 
         assertTrue(mappedRDD.count() > 0);
 
-        IDeepJobConfig<Cql3TestEntity> writeConfig = getWriteConfig();
+        ICassandraDeepJobConfig<Cql3TestEntity> writeConfig = getWriteConfig();
         writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
@@ -266,7 +267,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
         } catch (Exception e) {
         }
 
-        IDeepJobConfig<Cql3TestEntity> writeConfig = getWriteConfig();
+        ICassandraDeepJobConfig<Cql3TestEntity> writeConfig = getWriteConfig();
         writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
@@ -290,7 +291,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
         } catch (Exception e) {
         }
 
-        IDeepJobConfig<Cql3TestEntity> writeConfig = getWriteConfig();
+        ICassandraDeepJobConfig<Cql3TestEntity> writeConfig = getWriteConfig();
 
         CassandraRDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
         checkSimpleTestData();

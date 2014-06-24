@@ -21,6 +21,7 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.entity.Cell;
@@ -146,8 +147,8 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
     }
 
     @Override
-    protected IDeepJobConfig<Cells> initReadConfig() {
-        IDeepJobConfig<Cells> config = DeepJobConfigFactory.create()
+    protected ICassandraDeepJobConfig<Cells> initReadConfig() {
+        ICassandraDeepJobConfig<Cells> config = DeepJobConfigFactory.create()
                 .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).bisectFactor(testBisectFactor)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily
                         (CQL3_COLLECTION_COLUMN_FAMILY);
@@ -156,8 +157,8 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
     }
 
     @Override
-    protected IDeepJobConfig<Cells> initWriteConfig() {
-        IDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
+    protected ICassandraDeepJobConfig<Cells> initWriteConfig() {
+        ICassandraDeepJobConfig<Cells> writeConfig = DeepJobConfigFactory.createWriteConfig()
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
@@ -183,7 +184,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
 
         assertTrue(mappedRDD.count() > 0);
 
-        IDeepJobConfig<Cells> writeConfig = getWriteConfig();
+        ICassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
         writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
@@ -242,7 +243,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
 
     @Override
     public void testSimpleSaveToCassandra() {
-        IDeepJobConfig<Cells> writeConfig = getWriteConfig();
+        ICassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
         writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
@@ -271,7 +272,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
         } catch (Exception e) {
         }
 
-        IDeepJobConfig<Cells> writeConfig = getWriteConfig();
+        ICassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
 
         CassandraRDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
         checkSimpleTestData();

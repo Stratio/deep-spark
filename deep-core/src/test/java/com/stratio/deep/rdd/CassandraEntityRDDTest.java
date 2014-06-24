@@ -21,6 +21,7 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.cql.DeepTokenRange;
 import com.stratio.deep.cql.RangeUtils;
@@ -180,7 +181,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         int allElements = entities.length;
         assertTrue(allElements > 2);
 
-        IDeepJobConfig<TestEntity> config = DeepJobConfigFactory
+        ICassandraDeepJobConfig<TestEntity> config = DeepJobConfigFactory
                 .create(TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -221,8 +222,8 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     }
 
     @Override
-    protected IDeepJobConfig<TestEntity> initReadConfig() {
-        IDeepJobConfig<TestEntity> config = DeepJobConfigFactory.create(TestEntity.class)
+    protected ICassandraDeepJobConfig<TestEntity> initReadConfig() {
+        ICassandraDeepJobConfig<TestEntity> config = DeepJobConfigFactory.create(TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY)
                 .bisectFactor(testBisectFactor).initialize();
@@ -231,8 +232,8 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     }
 
     @Override
-    protected IDeepJobConfig<TestEntity> initWriteConfig() {
-        IDeepJobConfig<TestEntity> writeConfig = DeepJobConfigFactory.createWriteConfig(TestEntity.class)
+    protected ICassandraDeepJobConfig<TestEntity> initWriteConfig() {
+        ICassandraDeepJobConfig<TestEntity> writeConfig = DeepJobConfigFactory.createWriteConfig(TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
@@ -247,7 +248,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     public void testCountWithInputColumns() {
         logger.info("testCountWithInputColumns()");
 
-        IDeepJobConfig<TestEntity> tmpConfig = DeepJobConfigFactory.create(TestEntity.class)
+        ICassandraDeepJobConfig<TestEntity> tmpConfig = DeepJobConfigFactory.create(TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
@@ -288,7 +289,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
         assertTrue(mappedRDD.count() > 0);
 
-        IDeepJobConfig<TestEntity> writeConfig = getWriteConfig();
+        ICassandraDeepJobConfig<TestEntity> writeConfig = getWriteConfig();
         writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
@@ -308,7 +309,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
     @Override
     public void testSimpleSaveToCassandra() {
-        IDeepJobConfig<TestEntity> writeConfig = getWriteConfig();
+        ICassandraDeepJobConfig<TestEntity> writeConfig = getWriteConfig();
         writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
@@ -339,7 +340,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         } catch (Exception e) {
         }
 
-        IDeepJobConfig<TestEntity> writeConfig = getWriteConfig();
+        ICassandraDeepJobConfig<TestEntity> writeConfig = getWriteConfig();
 
         CassandraRDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
         checkSimpleTestData();

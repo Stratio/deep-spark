@@ -120,7 +120,7 @@ public class DeepSparkContext extends JavaSparkContext {
      * @param config the deep configuration object to use to create the new RDD.
      * @return a new entity-based CassandraRDD
      */
-    public <T extends IDeepType> CassandraRDD<T> cassandraEntityRDD(IDeepJobConfig<T> config) {
+    public <T extends IDeepType> CassandraRDD<T> cassandraEntityRDD(ICassandraDeepJobConfig<T> config) {
         return new CassandraEntityRDD<T>(sc(), config);
     }
 
@@ -130,7 +130,7 @@ public class DeepSparkContext extends JavaSparkContext {
      * @param config the deep configuration object to use to create the new RDD.
      * @return a new generic CassandraRDD.
      */
-    public CassandraRDD<Cells> cassandraGenericRDD(IDeepJobConfig<Cells> config) {
+    public CassandraRDD<Cells> cassandraGenericRDD(ICassandraDeepJobConfig<Cells> config) {
         return new CassandraCellRDD(sc(), config);
     }
 
@@ -140,7 +140,7 @@ public class DeepSparkContext extends JavaSparkContext {
      * @param <T>
      * @return
      */
-    public <T> MongoJavaRDD<T> mongoJavaRDD(GenericDeepJobConfigMongoDB<T> config) {
+    public <T> MongoJavaRDD<T> mongoJavaRDD(IMongoDeepJobConfig<T> config) {
         return new MongoJavaRDD<T>(new MongoEntityRDD(this.sc(), (EntityDeepJobConfigMongoDB)config));
 
     }
