@@ -24,7 +24,6 @@ import com.stratio.deep.exception.DeepIOException;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.TimeUUIDType;
 import org.apache.cassandra.db.marshal.UUIDType;
-import com.stratio.deep.utils.Pair;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import scala.Tuple2;
@@ -78,7 +77,7 @@ public final class Utils {
      * The first map contains the key column names and the corresponding values.
      * The ByteBuffer list contains the value of the columns that will be bounded to CQL query parameters.
      *
-     * @param e the entity object to process.
+     * @param e   the entity object to process.
      * @param <T> the entity object generic type.
      * @return a pair whose first element is a Cells object containing key Cell(s) and whose second element contains all of the other Cell(s).
      */
@@ -209,9 +208,9 @@ public final class Utils {
     /**
      * Generates a create table cql statement from the given Cells description.
      *
-     * @param keys the row  keys wrapped inside a Cells object.
-     * @param values all the other row columns wrapped inside a Cells object.
-     * @param outputKeyspace the output keyspace.
+     * @param keys               the row  keys wrapped inside a Cells object.
+     * @param values             all the other row columns wrapped inside a Cells object.
+     * @param outputKeyspace     the output keyspace.
      * @param outputColumnFamily the output column family.
      * @return the create table statement.
      */
@@ -305,9 +304,9 @@ public final class Utils {
      * We do not generate the key part of the update query. The provided query will be concatenated with the key part
      * by CqlRecordWriter.
      *
-     * @param keys the row  keys wrapped inside a Cells object.
-     * @param values all the other row columns wrapped inside a Cells object.
-     * @param outputKeyspace the output keyspace.
+     * @param keys               the row  keys wrapped inside a Cells object.
+     * @param values             all the other row columns wrapped inside a Cells object.
+     * @param outputKeyspace     the output keyspace.
      * @param outputColumnFamily the output column family.
      * @return the update query statement.
      */
@@ -426,6 +425,37 @@ public final class Utils {
         }
 
         return setter;
+    }
+
+
+    /**
+     * Resolves the getter name for the property whose name is 'propertyName' whose type is 'valueType'
+     * in the entity bean whose class is 'entityClass'.
+     * If we don't find a setter following Java's naming conventions, before throwing an exception we try to
+     * resolve the setter following Scala's naming conventions.
+     *
+     * @param propertyName the field name of the property whose getter we want to resolve.
+     * @param entityClass  the bean class object in which we want to search for the getter.
+     * @return the resolved getter.
+     */
+    @SuppressWarnings("unchecked")
+    public static Method findGetter(String propertyName, Class entityClass) {
+        Method getter;
+
+        String getterName = "get" + propertyName.substring(0, 1).toUpperCase() +
+                propertyName.substring(1);
+        try {
+            getter = entityClass.getMethod(getterName);
+        } catch (NoSuchMethodException e) {
+            // let's try with scala setter name
+            try {
+                getter = entityClass.getMethod(propertyName + "_$eq");
+            } catch (NoSuchMethodException e1) {
+                throw new DeepIOException(e1);
+            }
+        }
+
+        return getter;
     }
 
     /**

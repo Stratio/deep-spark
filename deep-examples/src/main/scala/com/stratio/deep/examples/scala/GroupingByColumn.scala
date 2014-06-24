@@ -39,7 +39,7 @@ object GroupingByColumn {
 
     // Creating the Deep Context where args are Spark Master and Job Name
     val p = new ContextProperties(args)
-    val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, Array(p.getJar))
+    val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
 
     // Configure and initialize the RDD
     val config = DeepJobConfigFactory.create(classOf[TweetEntity])
@@ -51,13 +51,13 @@ object GroupingByColumn {
     val rdd: CassandraRDD[TweetEntity] = deepContext.cassandraEntityRDD(config)
 
     // grouping
-    val groups: RDD[(String, Seq[TweetEntity])] = rdd groupBy {
+    val groups: RDD[(String, Iterable[TweetEntity])] = rdd groupBy {
       t: TweetEntity => t.getAuthor
     }
 
     // counting elements in groups
     val counts: RDD[(String, Int)] = groups map {
-      t: (String, Seq[TweetEntity]) => (t._1, t._2.size)
+      t: (String, Iterable[TweetEntity]) => (t._1, t._2.size)
     }
 
     // fetching results

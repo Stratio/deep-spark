@@ -43,6 +43,7 @@ public class DeepPartitionLocationComparator implements Comparator<String> {
 
     /**
      * Constucts a comparator using as the name of the local machine the hostname provided.
+     *
      * @param hostname the host name of the current machine.
      */
     public DeepPartitionLocationComparator(String hostname) {

@@ -25,7 +25,7 @@ import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.google.common.io.Resources;
 import com.stratio.deep.config.DeepJobConfigFactory;
-import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
@@ -200,8 +200,8 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
     }
 
     @Override
-    protected IDeepJobConfig<Cql3CollectionsTestEntity> initReadConfig() {
-        IDeepJobConfig<Cql3CollectionsTestEntity> config = DeepJobConfigFactory.create(Cql3CollectionsTestEntity.class)
+    protected ICassandraDeepJobConfig<Cql3CollectionsTestEntity> initReadConfig() {
+        ICassandraDeepJobConfig<Cql3CollectionsTestEntity> config = DeepJobConfigFactory.create(Cql3CollectionsTestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).bisectFactor(testBisectFactor)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily
                         (CQL3_COLLECTION_COLUMN_FAMILY);
@@ -210,8 +210,8 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
     }
 
     @Override
-    protected IDeepJobConfig<Cql3CollectionsTestEntity> initWriteConfig() {
-        IDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = DeepJobConfigFactory.createWriteConfig
+    protected ICassandraDeepJobConfig<Cql3CollectionsTestEntity> initWriteConfig() {
+        ICassandraDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = DeepJobConfigFactory.createWriteConfig
                 (Cql3CollectionsTestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -240,7 +240,7 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
 
         assertTrue(mappedRDD.count() > 0);
 
-        IDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = getWriteConfig();
+        ICassandraDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = getWriteConfig();
         writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
@@ -300,7 +300,7 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
 
     @Override
     public void testSimpleSaveToCassandra() {
-        IDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = getWriteConfig();
+        ICassandraDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = getWriteConfig();
         writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
@@ -331,7 +331,7 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
         } catch (Exception e) {
         }
 
-        IDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = getWriteConfig();
+        ICassandraDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = getWriteConfig();
 
         CassandraRDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
         checkSimpleTestData();

@@ -17,9 +17,8 @@
 package com.stratio.deep.examples.scala
 
 import com.stratio.deep.context.DeepSparkContext
-import com.stratio.deep.config.IDeepJobConfig
+import com.stratio.deep.config.{ICassandraDeepJobConfig, IDeepJobConfig, DeepJobConfigFactory}
 import com.stratio.deep.rdd.CassandraRDD
-import com.stratio.deep.config.DeepJobConfigFactory
 import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.rdd.RDD
 import scala.math._
@@ -52,7 +51,7 @@ object UsingScalaEntity {
 
     val sparkConf = new SparkConf()
     sparkConf.setAppName(jobName)
-    sparkConf.setJars(Array(p.getJar))
+    sparkConf.setJars(p.getJars)
     sparkConf.setMaster(p.getCluster)
     sparkConf.setSparkHome(p.getSparkHome)
     val sc = new SparkContext(sparkConf)
@@ -63,7 +62,7 @@ object UsingScalaEntity {
   private def doMain(args: Array[String], deepContext: DeepSparkContext, p: ContextProperties) = {
 
     // Configuration and initialization
-    val config: IDeepJobConfig[ScalaPageEntity] = DeepJobConfigFactory.create(classOf[ScalaPageEntity])
+    val config: ICassandraDeepJobConfig[ScalaPageEntity] = DeepJobConfigFactory.create(classOf[ScalaPageEntity])
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(keyspaceName).table(tableName)
       .initialize
@@ -76,13 +75,13 @@ object UsingScalaEntity {
     println("rddCount: " + rddCount)
 
     // grouping
-    val groups: RDD[(String, Seq[ScalaPageEntity])] = rdd groupBy {
+    val groups: RDD[(String, Iterable[ScalaPageEntity])] = rdd groupBy {
       t: ScalaPageEntity => t.getDomain
     }
 
     // counting elements in groups
     val counts: RDD[T] = groups map {
-      t: (String, Seq[ScalaPageEntity]) => (t._1, t._2.size)
+      t: (String, Iterable[ScalaPageEntity]) => (t._1, t._2.size)
     }
 
     // fetching results
@@ -98,11 +97,11 @@ object UsingScalaEntity {
     }
 
     // grouping by key
-    val groups2: RDD[(String, Seq[ScalaPageEntity])] = pairsRDD.groupByKey
+    val groups2: RDD[(String, Iterable[ScalaPageEntity])] = pairsRDD.groupByKey
 
     // counting elements in groups
     val counts2: RDD[T] = groups2 map {
-      t: (String, Seq[ScalaPageEntity]) => (t._1, t._2.size)
+      t: (String, Iterable[ScalaPageEntity]) => (t._1, t._2.size)
     }
 
     // fetching results

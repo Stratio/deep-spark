@@ -14,290 +14,287 @@
 
 package com.stratio.deep.entity;
 
+import com.stratio.deep.exception.DeepGenericException;
+
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
-import com.stratio.deep.exception.DeepGenericException;
+import java.util.*;
 
 /**
  * Represents a tuple inside the Cassandra's datastore. A Cells object basically is an ordered
  * collection of {@link com.stratio.deep.entity.Cell} objects, plus a few utility methods to access
  * specific cells in the row.
- * 
+ *
  * @author Luca Rosellini <luca@stratio.com>
  */
 public class Cells implements Iterable<Cell>, Serializable {
 
-  private static final long serialVersionUID = 3074521612130550380L;
-  private List<Cell> cells = new ArrayList<>();
+    private static final long serialVersionUID = 3074521612130550380L;
+    private List<Cell> cells = new ArrayList<>();
 
-  /**
-   * Default constructor.
-   */
-  public Cells() {}
-
-  /**
-   * Builds a new Cells object containing the provided cells.
-   * 
-   * @param cells the array of Cells we want to use to create the Cells object.
-   */
-  public Cells(Cell... cells) {
-    Collections.addAll(this.cells, cells);
-  }
-
-  /**
-   * Adds a new Cell object to this Cells instance.
-   * 
-   * @param c the Cell we want to add to this Cells object.
-   * @return either true/false if the Cell has been added successfully or not.
-   */
-  public boolean add(Cell c) {
-    if (c == null) {
-      throw new DeepGenericException(new IllegalArgumentException("cell parameter cannot be null"));
+    /**
+     * Default constructor.
+     */
+    public Cells() {
     }
 
-    return cells.add(c);
-  }
-
-  /**
-   * Replaces the cell having the same name that the given one with the given Cell object.
-   * 
-   * @param c the Cell to replace the one in the Cells object.
-   * @return either true/false if the Cell has been successfully replace or not.
-   */
-  public boolean replaceByName(Cell c) {
-
-    if (c == null) {
-      throw new DeepGenericException(new IllegalArgumentException("cell parameter cannot be null"));
+    /**
+     * Builds a new Cells object containing the provided cells.
+     *
+     * @param cells the array of Cells we want to use to create the Cells object.
+     */
+    public Cells(Cell... cells) {
+        Collections.addAll(this.cells, cells);
     }
 
-    boolean cellFound = false;
-    int position = 0;
+    /**
+     * Adds a new Cell object to this Cells instance.
+     *
+     * @param c the Cell we want to add to this Cells object.
+     * @return either true/false if the Cell has been added successfully or not.
+     */
+    public boolean add(Cell c) {
+        if (c == null) {
+            throw new DeepGenericException(new IllegalArgumentException("cell parameter cannot be null"));
+        }
 
-    Iterator<Cell> cellsIt = cells.iterator();
-    while (!cellFound && cellsIt.hasNext()) {
-      Cell currentCell = cellsIt.next();
-
-      if (currentCell.getCellName().equals(c.getCellName())) {
-        cellFound = true;
-      } else {
-        position++;
-      }
+        return cells.add(c);
     }
 
-    if (cellFound) {
-      cells.remove(position);
+    /**
+     * Replaces the cell having the same name that the given one with the given Cell object.
+     *
+     * @param c the Cell to replace the one in the Cells object.
+     * @return either true/false if the Cell has been successfully replace or not.
+     */
+    public boolean replaceByName(Cell c) {
 
-      return cells.add(c);
-    }
+        if (c == null) {
+            throw new DeepGenericException(new IllegalArgumentException("cell parameter cannot be null"));
+        }
 
-    return false;
-  }
+        boolean cellFound = false;
+        int position = 0;
 
-  /**
-   * Removes the cell with the given cell name.
-   * 
-   * @param cellName the name of the cell to be removed.
-   * @return either true/false if the Cell has been successfully removed or not.
-   */
-  public boolean remove(String cellName) {
+        Iterator<Cell> cellsIt = cells.iterator();
+        while (!cellFound && cellsIt.hasNext()) {
+            Cell currentCell = cellsIt.next();
 
-    if (cellName == null) {
-      throw new DeepGenericException(new IllegalArgumentException(
-          "cell name parameter cannot be null"));
-    }
+            if (currentCell.getCellName().equals(c.getCellName())) {
+                cellFound = true;
+            } else {
+                position++;
+            }
+        }
 
-    Iterator<Cell> cellsIt = cells.iterator();
+        if (cellFound) {
+            cells.remove(position);
 
-    while (cellsIt.hasNext()) {
-      Cell currentCell = cellsIt.next();
+            return cells.add(c);
+        }
 
-      if (currentCell.getCellName().equals(cellName)) {
-        return cells.remove(currentCell);
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean equals(Object obj) {
-
-    if (!(obj instanceof Cells)) {
-      return false;
-    }
-
-    Cells o = (Cells) obj;
-
-    if (cells.size() != this.size()) {
-      return false;
-    }
-
-    for (Cell cell : cells) {
-      Cell otherCell = o.getCellByName(cell.getCellName());
-
-      if (otherCell == null) {
         return false;
-      }
+    }
 
-      if (!otherCell.equals(cell)) {
+    /**
+     * Removes the cell with the given cell name.
+     *
+     * @param cellName the name of the cell to be removed.
+     * @return either true/false if the Cell has been successfully removed or not.
+     */
+    public boolean remove(String cellName) {
+
+        if (cellName == null) {
+            throw new DeepGenericException(new IllegalArgumentException(
+                    "cell name parameter cannot be null"));
+        }
+
+        Iterator<Cell> cellsIt = cells.iterator();
+
+        while (cellsIt.hasNext()) {
+            Cell currentCell = cellsIt.next();
+
+            if (currentCell.getCellName().equals(cellName)) {
+                return cells.remove(currentCell);
+            }
+        }
+
         return false;
-      }
     }
 
-    return true;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
 
-  /**
-   * Returns the cell at position idx.
-   * 
-   * @param idx the index position of the Cell we want to retrieve.
-   * @return Returns the cell at position idx.
-   */
-  public Cell getCellByIdx(int idx) {
-    return cells.get(idx);
-  }
+        if (!(obj instanceof Cells)) {
+            return false;
+        }
 
-  /**
-   * Returns the Cell whose name is cellName, or null if this Cells object contains no cell whose
-   * name is cellName.
-   * 
-   * @param cellName the name of the Cell we want to retrieve from this Cells object.
-   * @return the Cell whose name is cellName contained in this Cells object. null if no cell named
-   *         cellName is present.
-   */
-  public Cell getCellByName(String cellName) {
-    for (Cell c : cells) {
-      if (c.getCellName().equals(cellName)) {
-        return c;
-      }
-    }
-    return null;
-  }
+        Cells o = (Cells) obj;
 
-  /**
-   * @return Returns an immutable collection of Cell objects contained in this Cells.
-   */
-  public Collection<Cell> getCells() {
-    return Collections.unmodifiableList(cells);
-  }
+        if (cells.size() != this.size()) {
+            return false;
+        }
 
-  /**
-   * Converts every Cell contained in this object to an ArrayBuffer. In order to perform the
-   * conversion we use the appropriate Cassandra marshaller for the Cell.
-   * 
-   * @return a collection of Cell(s) values converted to byte buffers using the appropriate
-   *         marshaller.
-   */
-  public Collection<ByteBuffer> getDecomposedCellValues() {
-    List<ByteBuffer> res = new ArrayList<>();
+        for (Cell cell : cells) {
+            Cell otherCell = o.getCellByName(cell.getCellName());
 
-    for (Cell c : cells) {
-      res.add(c.getDecomposedCellValue());
+            if (otherCell == null) {
+                return false;
+            }
+
+            if (!otherCell.equals(cell)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
-    return res;
-  }
-
-  /**
-   * Converts every Cell contained in this object to an ArrayBuffer. In order to perform the
-   * conversion we use the appropriate Cassandra marshaller for the Cell.
-   * 
-   * @return a collection of Cell(s) values.
-   */
-  public Collection<Object> getCellValues() {
-    List<Object> res = new ArrayList<>();
-
-    for (Cell c : cells) {
-      res.add(c.getCellValue());
+    /**
+     * Returns the cell at position idx.
+     *
+     * @param idx the index position of the Cell we want to retrieve.
+     * @return Returns the cell at position idx.
+     */
+    public Cell getCellByIdx(int idx) {
+        return cells.get(idx);
     }
 
-    return res;
-  }
-
-  /**
-   * Extracts from this Cells object the cells marked either as partition key or cluster key.
-   * Returns an empty Cells object if the current object does not contain any Cell marked as key.
-   * 
-   * @return the Cells object containing the subset of this Cells object of only the Cell(s) part of
-   *         the key.
-   */
-  public Cells getIndexCells() {
-    Cells res = new Cells();
-    for (Cell cell : cells) {
-      if (cell.isPartitionKey() || cell.isClusterKey()) {
-        res.add(cell);
-      }
-
+    /**
+     * Returns the Cell whose name is cellName, or null if this Cells object contains no cell whose
+     * name is cellName.
+     *
+     * @param cellName the name of the Cell we want to retrieve from this Cells object.
+     * @return the Cell whose name is cellName contained in this Cells object. null if no cell named
+     * cellName is present.
+     */
+    public Cell getCellByName(String cellName) {
+        for (Cell c : cells) {
+            if (c.getCellName().equals(cellName)) {
+                return c;
+            }
+        }
+        return null;
     }
 
-    return res;
-  }
-
-  /**
-   * Extracts from this Cells object the cells _NOT_ marked as partition key and _NOT_ marked as
-   * cluster key.
-   * 
-   * @return the Cells object containing the subset of this Cells object of only the Cell(s) that
-   *         are NOT part of the key.
-   */
-  public Cells getValueCells() {
-    Cells res = new Cells();
-    for (Cell cell : cells) {
-      if (!cell.isPartitionKey() && !cell.isClusterKey()) {
-        res.add(cell);
-      }
-
+    /**
+     * @return Returns an immutable collection of Cell objects contained in this Cells.
+     */
+    public Collection<Cell> getCells() {
+        return Collections.unmodifiableList(cells);
     }
 
-    return res;
-  }
+    /**
+     * Converts every Cell contained in this object to an ArrayBuffer. In order to perform the
+     * conversion we use the appropriate Cassandra marshaller for the Cell.
+     *
+     * @return a collection of Cell(s) values converted to byte buffers using the appropriate
+     * marshaller.
+     */
+    public Collection<ByteBuffer> getDecomposedCellValues() {
+        List<ByteBuffer> res = new ArrayList<>();
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public int hashCode() {
-    return cells.hashCode();
-  }
+        for (Cell c : cells) {
+            res.add(c.getDecomposedCellValue());
+        }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Iterator<Cell> iterator() {
-    return getCells().iterator();
-  }
+        return res;
+    }
 
-  /**
-   * Returns the number of cell(s) this object contains.
-   * 
-   * @return the number os Cell objects contained in this Cells object.
-   */
-  public int size() {
-    return cells.size();
-  }
+    /**
+     * Converts every Cell contained in this object to an ArrayBuffer. In order to perform the
+     * conversion we use the appropriate Cassandra marshaller for the Cell.
+     *
+     * @return a collection of Cell(s) values.
+     */
+    public Collection<Object> getCellValues() {
+        List<Object> res = new ArrayList<>();
 
-  /**
-   * @return true if this object contains no cells.
-   */
-  public boolean isEmpty() {
-    return cells.isEmpty();
-  }
+        for (Cell c : cells) {
+            res.add(c.getCellValue());
+        }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String toString() {
-    return "Cells{" + "cells=" + cells + '}';
-  }
+        return res;
+    }
+
+    /**
+     * Extracts from this Cells object the cells marked either as partition key or cluster key.
+     * Returns an empty Cells object if the current object does not contain any Cell marked as key.
+     *
+     * @return the Cells object containing the subset of this Cells object of only the Cell(s) part of
+     * the key.
+     */
+    public Cells getIndexCells() {
+        Cells res = new Cells();
+        for (Cell cell : cells) {
+            if (cell.isPartitionKey() || cell.isClusterKey()) {
+                res.add(cell);
+            }
+
+        }
+
+        return res;
+    }
+
+    /**
+     * Extracts from this Cells object the cells _NOT_ marked as partition key and _NOT_ marked as
+     * cluster key.
+     *
+     * @return the Cells object containing the subset of this Cells object of only the Cell(s) that
+     * are NOT part of the key.
+     */
+    public Cells getValueCells() {
+        Cells res = new Cells();
+        for (Cell cell : cells) {
+            if (!cell.isPartitionKey() && !cell.isClusterKey()) {
+                res.add(cell);
+            }
+
+        }
+
+        return res;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return cells.hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterator<Cell> iterator() {
+        return getCells().iterator();
+    }
+
+    /**
+     * Returns the number of cell(s) this object contains.
+     *
+     * @return the number os Cell objects contained in this Cells object.
+     */
+    public int size() {
+        return cells.size();
+    }
+
+    /**
+     * @return true if this object contains no cells.
+     */
+    public boolean isEmpty() {
+        return cells.isEmpty();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "Cells{" + "cells=" + cells + '}';
+    }
 }

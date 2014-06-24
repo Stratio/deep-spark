@@ -64,8 +64,7 @@ public final class MapReduceJob {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
-                new String[]{p.getJar()});
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
 
         // Creating a configuration for the RDD and initialize it
@@ -78,7 +77,7 @@ public final class MapReduceJob {
         CassandraJavaRDD<TweetEntity> rdd = deepContext.cassandraJavaRDD(config);
 
         // Map stage: Getting key-value pairs from the RDD
-        JavaPairRDD<String, Integer> pairsRDD = rdd.map(new PairFunction<TweetEntity, String, Integer>() {
+        JavaPairRDD<String, Integer> pairsRDD = rdd.mapToPair(new PairFunction<TweetEntity, String, Integer>() {
             @Override
             public Tuple2<String, Integer> call(TweetEntity t) {
                 return new Tuple2<String, Integer>(t.getAuthor(), 1);

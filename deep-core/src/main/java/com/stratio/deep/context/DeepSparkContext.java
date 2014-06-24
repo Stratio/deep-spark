@@ -16,9 +16,7 @@
 
 package com.stratio.deep.context;
 
-import com.stratio.deep.config.CellDeepJobConfig;
-import com.stratio.deep.config.EntityDeepJobConfig;
-import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.config.*;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
@@ -26,6 +24,8 @@ import com.stratio.deep.rdd.CassandraCellRDD;
 import com.stratio.deep.rdd.CassandraEntityRDD;
 import com.stratio.deep.rdd.CassandraJavaRDD;
 import com.stratio.deep.rdd.CassandraRDD;
+import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
+import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaSparkContext;
 
@@ -50,7 +50,7 @@ public class DeepSparkContext extends JavaSparkContext {
     /**
      * Overridden superclass constructor.
      *
-     * @param master the url of the master node.
+     * @param master  the url of the master node.
      * @param appName the name of the application.
      */
     public DeepSparkContext(String master, String appName) {
@@ -60,10 +60,10 @@ public class DeepSparkContext extends JavaSparkContext {
     /**
      * Overridden superclass constructor.
      *
-     * @param master the url of the master node.
-     * @param appName the name of the application.
+     * @param master    the url of the master node.
+     * @param appName   the name of the application.
      * @param sparkHome the spark home folder.
-     * @param jarFile the jar file to serialize and send to all the cluster nodes.
+     * @param jarFile   the jar file to serialize and send to all the cluster nodes.
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String jarFile) {
         super(master, appName, sparkHome, jarFile);
@@ -72,10 +72,10 @@ public class DeepSparkContext extends JavaSparkContext {
     /**
      * Overridden superclass constructor.
      *
-     * @param master the url of the master node.
-     * @param appName the name of the application.
+     * @param master    the url of the master node.
+     * @param appName   the name of the application.
      * @param sparkHome the spark home folder.
-     * @param jars the jar file(s) to serialize and send to all the cluster nodes.
+     * @param jars      the jar file(s) to serialize and send to all the cluster nodes.
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String[] jars) {
         super(master, appName, sparkHome, jars);
@@ -84,10 +84,10 @@ public class DeepSparkContext extends JavaSparkContext {
     /**
      * Overridden superclass constructor.
      *
-     * @param master the url of the master node.
-     * @param appName the name of the application.
-     * @param sparkHome the spark home folder.
-     * @param jars the jar file(s) to serialize and send to all the cluster nodes.
+     * @param master      the url of the master node.
+     * @param appName     the name of the application.
+     * @param sparkHome   the spark home folder.
+     * @param jars        the jar file(s) to serialize and send to all the cluster nodes.
      * @param environment a map of environment variables.
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String[] jars,
@@ -120,7 +120,7 @@ public class DeepSparkContext extends JavaSparkContext {
      * @param config the deep configuration object to use to create the new RDD.
      * @return a new entity-based CassandraRDD
      */
-    public <T extends IDeepType> CassandraRDD<T> cassandraEntityRDD(IDeepJobConfig<T> config) {
+    public <T extends IDeepType> CassandraRDD<T> cassandraEntityRDD(ICassandraDeepJobConfig<T> config) {
         return new CassandraEntityRDD<T>(sc(), config);
     }
 
@@ -130,7 +130,20 @@ public class DeepSparkContext extends JavaSparkContext {
      * @param config the deep configuration object to use to create the new RDD.
      * @return a new generic CassandraRDD.
      */
-    public CassandraRDD<Cells> cassandraGenericRDD(IDeepJobConfig<Cells> config) {
+    public CassandraRDD<Cells> cassandraGenericRDD(ICassandraDeepJobConfig<Cells> config) {
         return new CassandraCellRDD(sc(), config);
     }
+
+    /**
+     * Builds a new entity based MongoEntityRDD
+     *
+     * @param config
+     * @param <T>
+     * @return
+     */
+    public <T> MongoJavaRDD<T> mongoJavaRDD(IMongoDeepJobConfig<T> config) {
+        return new MongoJavaRDD<T>(new MongoEntityRDD(this.sc(), (EntityDeepJobConfigMongoDB) config));
+
+    }
+
 }

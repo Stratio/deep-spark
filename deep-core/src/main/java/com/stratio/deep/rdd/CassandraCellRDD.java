@@ -16,7 +16,7 @@
 
 package com.stratio.deep.rdd;
 
-import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.utils.Pair;
@@ -39,7 +39,7 @@ public class CassandraCellRDD extends CassandraRDD<Cells> {
      * @param sc
      * @param config
      */
-    public CassandraCellRDD(SparkContext sc, IDeepJobConfig<Cells> config) {
+    public CassandraCellRDD(SparkContext sc, ICassandraDeepJobConfig<Cells> config) {
         super(sc, config);
     }
 

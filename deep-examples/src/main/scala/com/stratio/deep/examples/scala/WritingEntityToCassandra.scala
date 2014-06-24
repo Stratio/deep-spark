@@ -42,7 +42,7 @@ object WritingEntityToCassandra {
 
     // Creating the Deep Context where args are Spark Master and Job Name
     val p = new ContextProperties(args)
-    val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, Array(p.getJar))
+    val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
 
     // --- INPUT RDD
     val inputConfig = DeepJobConfigFactory.create(classOf[PageEntity])
@@ -58,7 +58,7 @@ object WritingEntityToCassandra {
 
     val numPerKey: RDD[(String, Int)] = pairRDD.groupByKey
       .map {
-      t: (String, Seq[PageEntity]) => (t._1, t._2.size)
+      t: (String, Iterable[PageEntity]) => (t._1, t._2.size)
     }
 
 

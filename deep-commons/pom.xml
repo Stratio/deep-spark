@@ -27,7 +27,7 @@
     <parent>
         <groupId>com.stratio.deep</groupId>
         <artifactId>deep-parent</artifactId>
-        <version>0.2.9</version>
+        <version>0.3.1</version>
         <relativePath>../deep-parent</relativePath>
     </parent>
 
@@ -62,6 +62,20 @@
             </roles>
         </developer>
     </developers>
+
+    <dependencies>
+        <dependency>
+            <groupId>de.javakaffee</groupId>
+            <artifactId>kryo-serializers</artifactId>
+            <version>0.26</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>2.12.2</version>
+        </dependency>
+    </dependencies>
+
 
     <licenses>
         <license>
@@ -128,6 +142,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 </project>

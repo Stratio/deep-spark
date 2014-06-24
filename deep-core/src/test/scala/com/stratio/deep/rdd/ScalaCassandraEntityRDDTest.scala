@@ -16,15 +16,15 @@
 
 package com.stratio.deep.rdd
 
-import com.stratio.deep.testentity.DeepScalaPageEntity
-import com.stratio.deep.config.{DeepJobConfigFactory, IDeepJobConfig}
-import com.stratio.deep.embedded.CassandraServer
+import com.datastax.driver.core.{Cluster, ResultSet, Row, Session}
+import com.stratio.deep.config.{DeepJobConfigFactory, ICassandraDeepJobConfig}
 import com.stratio.deep.context.AbstractDeepSparkContextTest
-import org.testng.annotations.{BeforeClass, Test}
-import org.testng.Assert._
-import org.apache.spark.Partition
-import com.datastax.driver.core.{Row, ResultSet, Session, Cluster}
+import com.stratio.deep.embedded.CassandraServer
+import com.stratio.deep.testentity.DeepScalaPageEntity
 import com.stratio.deep.utils.Constants
+import org.apache.spark.Partition
+import org.testng.Assert._
+import org.testng.annotations.{BeforeClass, Test}
 
 /**
  * Created by luca on 20/03/14.
@@ -32,8 +32,8 @@ import com.stratio.deep.utils.Constants
 @Test(suiteName = "cassandraRddTests", dependsOnGroups = Array("CassandraJavaRDDTest"), groups = Array("ScalaCassandraEntityRDDTest"))
 class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
   private var rdd: CassandraRDD[DeepScalaPageEntity] = _
-  private var rddConfig: IDeepJobConfig[DeepScalaPageEntity] = _
-  private var writeConfig: IDeepJobConfig[DeepScalaPageEntity] = _
+  private var rddConfig: ICassandraDeepJobConfig[DeepScalaPageEntity] = _
+  private var writeConfig: ICassandraDeepJobConfig[DeepScalaPageEntity] = _
   private val OUTPUT_COLUMN_FAMILY: String = "out_scalatest_page"
 
   @BeforeClass
@@ -88,7 +88,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
     checkSimpleTestData()
   }
 
-  private def initWriteConfig(): IDeepJobConfig[DeepScalaPageEntity] = {
+  private def initWriteConfig(): ICassandraDeepJobConfig[DeepScalaPageEntity] = {
 
     writeConfig =
       DeepJobConfigFactory
@@ -104,7 +104,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
     writeConfig.initialize
   }
 
-  private def initReadConfig(): IDeepJobConfig[DeepScalaPageEntity] = {
+  private def initReadConfig(): ICassandraDeepJobConfig[DeepScalaPageEntity] = {
     rddConfig =
       DeepJobConfigFactory
         .create(classOf[DeepScalaPageEntity])

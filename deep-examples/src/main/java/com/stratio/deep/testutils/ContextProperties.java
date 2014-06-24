@@ -16,7 +16,11 @@
 
 package com.stratio.deep.testutils;
 
-import org.apache.commons.lang.StringUtils;
+import com.stratio.deep.utils.Constants;
+import org.apache.commons.cli.*;
+import org.apache.log4j.Logger;
+
+import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 
 /**
  * Common properties used by the examples.
@@ -25,7 +29,9 @@ import org.apache.commons.lang.StringUtils;
  * Date..: 26-feb-2014
  */
 public class ContextProperties {
+    static final String OPT_INT           = "int";
 
+    private static final Logger LOG = Logger.getLogger(ContextProperties.class);
     /**
      * spark cluster endpoint.
      */
@@ -39,7 +45,7 @@ public class ContextProperties {
     /**
      * The jar to be added to the spark context.
      */
-    private String jar;
+    private String[] jar;
 
     /**
      * Endpoint of the cassandra cluster against which the examples will be run. Defaults to 'localhost'.
@@ -57,43 +63,51 @@ public class ContextProperties {
     private int cassandraThriftPort;
 
     /**
-     * Default constructor
-     */
-    public ContextProperties() {
-
-        String sparkHomeProp = System.getProperty("sparkHome");
-        String sparkMaster = System.getProperty("sparkMaster");
-        String deepVersionProp = StringUtils.isNotEmpty(System.getProperty("deepVersion")) ? System.getProperty
-                ("deepVersion") : "0.1.3-SNAPSHOT";
-        String cassandraHostProp = System.getProperty("cassandraHost");
-        String cassandraCqlPortProp = System.getProperty("cassandraCqlPort");
-        String cassandraThriftPortProp = System.getProperty("cassandraThriftPort");
-
-        cluster = StringUtils.isNotEmpty(sparkMaster) ? sparkMaster : "local";
-        sparkHome = StringUtils.isNotEmpty(sparkHomeProp) ? sparkHomeProp : "/opt/SDS/deep";
-        jar = "/tmp/StratioDeepExamples-" + deepVersionProp + ".jar";
-        cassandraHost = StringUtils.isNotEmpty(cassandraHostProp) ? cassandraHostProp : "localhost";
-        cassandraCqlPort = StringUtils.isNotEmpty(cassandraCqlPortProp) ? Integer.parseInt(cassandraCqlPortProp) : 9042;
-        cassandraThriftPort = StringUtils.isNotEmpty(cassandraThriftPortProp) ? Integer.parseInt
-                (cassandraThriftPortProp) : 9160;
-    }
-
-    /**
      * Public constructor.
      */
     public ContextProperties(String[] args) {
-        this();
+        Options options = new Options();
 
-        if (args != null && args.length > 0) {
-            cluster = args[0];
-            sparkHome = args[1];
-            jar = args[2];
-            cassandraHost = args[3];
-            cassandraCqlPort = Integer.parseInt(args[4]);
-            cassandraThriftPort = Integer.parseInt(args[5]);
+        options.addOption("m","master", true, "The spark's master endpoint");
+        options.addOption("h","sparkHome", true, "The spark's home, eg. /opt/spark");
+        options.addOption("H","cassandraHost", true, "Cassandra endpoint");
+
+        options.addOption(OptionBuilder.hasArg().withType(Integer.class).withLongOpt("cassandraCqlPort").withArgName("cassandra_cql_port").withDescription("cassandra's cql port, defaults to 9042").create());
+        options.addOption(OptionBuilder.hasArg().withType(Integer.class).withLongOpt("cassandraThriftPort")
+                .withArgName("cassandra_thrift_port").withDescription("cassandra's thrift port, " +
+                        "defaults to 9160").create());
+        options.addOption(OptionBuilder.hasArg().withValueSeparator(',').withLongOpt("jars")
+                .withArgName("jars_to_add").withDescription("comma separated list of jars to add").create());
+        Option help = new Option( "help", "print this message" );
+        //options.addOption("j","jars", true, "comma separated list of jars to add");
+        options.addOption(help);
+        CommandLineParser parser = new PosixParser();
+        HelpFormatter formatter = new HelpFormatter();
+
+        try {
+            CommandLine line = parser.parse( options, args );
+
+            if (line.hasOption("help")){
+                formatter.printHelp( "", options );
+
+                System.exit(1);
+            }
+
+            jar = (line.hasOption("jars") ? line.getOptionValues("jars") : new String[]{});
+            cluster = line.getOptionValue ("master", defaultIfEmpty(System.getProperty("spark.master"), "local"));
+            sparkHome = line.getOptionValue ("sparkHome", defaultIfEmpty(System.getProperty("spark.home"), ""));
+            cassandraHost = line.getOptionValue ("cassandraHost", Constants.DEFAULT_CASSANDRA_HOST);
+            cassandraCqlPort = line.hasOption ("cassandraCqlPort") ? Integer.parseInt(line.getOptionValue("cassandraCqlPort")): Constants.DEFAULT_CASSANDRA_CQL_PORT;
+            cassandraThriftPort = line.hasOption ("cassandraThriftPort") ? Integer.parseInt(line.getOptionValue("cassandraThriftPort")): Constants.DEFAULT_CASSANDRA_RPC_PORT;
+
+        } catch (ParseException e) {
+            formatter.printHelp( "", options );
+            LOG.error("Unexpected exception: ", e);
         }
+    }
 
-
+    public static void main(String[] args) {
+        ContextProperties cp = new ContextProperties(args);
     }
 
     public String getCluster() {
@@ -104,7 +118,7 @@ public class ContextProperties {
         return sparkHome;
     }
 
-    public String getJar() {
+    public String[] getJars() {
         return jar;
     }
 

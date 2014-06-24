@@ -16,7 +16,7 @@
 
 package com.stratio.deep.rdd;
 
-import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -41,8 +41,8 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     private Logger logger = Logger.getLogger(getClass());
 
     protected CassandraRDD<W> rdd;
-    private IDeepJobConfig<W> rddConfig;
-    private IDeepJobConfig<W> writeConfig;
+    private ICassandraDeepJobConfig<W> rddConfig;
+    private ICassandraDeepJobConfig<W> writeConfig;
 
     protected int testBisectFactor = 8;
 
@@ -54,17 +54,19 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
         return this.rdd;
     }
 
-    protected IDeepJobConfig<W> getReadConfig() {
+    protected ICassandraDeepJobConfig<W> getReadConfig() {
         return rddConfig;
     }
 
-    protected IDeepJobConfig<W> getWriteConfig() {
+    protected ICassandraDeepJobConfig<W> getWriteConfig() {
         return writeConfig;
     }
 
     protected abstract CassandraRDD<W> initRDD();
 
-    protected abstract IDeepJobConfig<W> initReadConfig();
+    protected abstract ICassandraDeepJobConfig<W> initReadConfig();
+
+    protected abstract ICassandraDeepJobConfig<W> initWriteConfig();
 
     @BeforeClass
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
@@ -75,7 +77,6 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
         rdd = initRDD();
     }
 
-    protected abstract IDeepJobConfig<W> initWriteConfig();
 
     @SuppressWarnings("unchecked")
     @Test(dependsOnMethods = "testGetPreferredLocations")

@@ -17,13 +17,13 @@
 package com.stratio.deep.rdd;
 
 import com.stratio.deep.config.EntityDeepJobConfig;
-import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
+import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
-import com.stratio.deep.utils.Pair;
 import org.apache.spark.SparkContext;
 
 import java.nio.ByteBuffer;
@@ -49,7 +49,7 @@ public final class CassandraEntityRDD<T extends IDeepType> extends CassandraRDD<
      * @param sc
      * @param config
      */
-    public CassandraEntityRDD(SparkContext sc, IDeepJobConfig<T> config) {
+    public CassandraEntityRDD(SparkContext sc, ICassandraDeepJobConfig<T> config) {
         super(sc, config);
     }
 
@@ -62,7 +62,7 @@ public final class CassandraEntityRDD<T extends IDeepType> extends CassandraRDD<
 
         Class<T> entityClass = config.value().getEntityClass();
 
-        EntityDeepJobConfig<T> edjc = (EntityDeepJobConfig) config.value();
+        EntityDeepJobConfig<T> edjc = (EntityDeepJobConfig<T>) config.value();
         T instance = Utils.newTypeInstance(entityClass);
 
         for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {

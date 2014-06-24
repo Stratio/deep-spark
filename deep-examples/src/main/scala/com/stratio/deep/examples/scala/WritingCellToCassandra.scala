@@ -42,7 +42,7 @@ object WritingCellToCassandra {
 
     // Creating the Deep Context where args are Spark Master and Job Name
     val p = new ContextProperties(args)
-    val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, Array(p.getJar))
+    val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
 
     // --- INPUT RDD
     val inputConfig = DeepJobConfigFactory.create()
@@ -58,7 +58,7 @@ object WritingCellToCassandra {
 
     val numPerKey: RDD[(String, Integer)] = pairRDD.groupByKey
       .map {
-      t: (String, Seq[Cells]) => (t._1, t._2.size)
+      t: (String, Iterable[Cells]) => (t._1, t._2.size)
     }
 
 

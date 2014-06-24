@@ -16,7 +16,9 @@
 
 package com.stratio.deep.examples.java;
 
+import com.google.common.collect.Lists;
 import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.CassandraJavaRDD;
@@ -67,8 +69,7 @@ public final class WritingEntityToCassandra {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
-                new String[]{p.getJar()});
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
 
         // --- INPUT RDD
@@ -77,9 +78,10 @@ public final class WritingEntityToCassandra {
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
 
-        CassandraJavaRDD inputRDD = deepContext.cassandraJavaRDD(inputConfig);
+        CassandraJavaRDD<PageEntity> inputRDD = deepContext.cassandraJavaRDD(inputConfig);
 
-        JavaPairRDD<String, PageEntity> pairRDD = inputRDD.map(new PairFunction<PageEntity, String, PageEntity>() {
+        JavaPairRDD<String, PageEntity> pairRDD = inputRDD.mapToPair(new PairFunction<PageEntity, String,
+                PageEntity>() {
             @Override
             public Tuple2<String, PageEntity> call(PageEntity e) {
                 return new Tuple2<String, PageEntity>(e.getDomainName(), e);
@@ -87,10 +89,10 @@ public final class WritingEntityToCassandra {
         });
 
         JavaPairRDD<String, Integer> numPerKey = pairRDD.groupByKey()
-                .map(new PairFunction<Tuple2<String, List<PageEntity>>, String, Integer>() {
+                .mapToPair(new PairFunction<Tuple2<String, Iterable<PageEntity>>, String, Integer>() {
                     @Override
-                    public Tuple2<String, Integer> call(Tuple2<String, List<PageEntity>> t) {
-                        return new Tuple2<String, Integer>(t._1(), t._2().size());
+                    public Tuple2<String, Integer> call(Tuple2<String, Iterable<PageEntity>> t) {
+                        return new Tuple2<String, Integer>(t._1(), Lists.newArrayList(t._2()).size());
                     }
                 });
 
@@ -101,12 +103,12 @@ public final class WritingEntityToCassandra {
         }
 
         // --- OUTPUT RDD
-        IDeepJobConfig outputConfig = DeepJobConfigFactory.createWriteConfig(DomainEntity.class)
+        ICassandraDeepJobConfig<DomainEntity> outputConfig = DeepJobConfigFactory.createWriteConfig(DomainEntity.class)
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(outputTableName)
                 .createTableOnWrite(true).initialize();
 
-        JavaRDD outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, DomainEntity>() {
+        JavaRDD<DomainEntity> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, DomainEntity>() {
             @Override
             public DomainEntity call(Tuple2<String, Integer> t) throws Exception {
                 DomainEntity e = new DomainEntity();
