@@ -16,15 +16,15 @@
 
 package com.stratio.deep.rdd
 
-import com.stratio.deep.testentity.DeepScalaPageEntity
-import com.stratio.deep.config.{ICassandraDeepJobConfig, DeepJobConfigFactory, IDeepJobConfig}
-import com.stratio.deep.embedded.CassandraServer
+import com.datastax.driver.core.{Cluster, ResultSet, Row, Session}
+import com.stratio.deep.config.{DeepJobConfigFactory, ICassandraDeepJobConfig}
 import com.stratio.deep.context.AbstractDeepSparkContextTest
-import org.testng.annotations.{BeforeClass, Test}
-import org.testng.Assert._
-import org.apache.spark.Partition
-import com.datastax.driver.core.{Row, ResultSet, Session, Cluster}
+import com.stratio.deep.embedded.CassandraServer
+import com.stratio.deep.testentity.DeepScalaPageEntity
 import com.stratio.deep.utils.Constants
+import org.apache.spark.Partition
+import org.testng.Assert._
+import org.testng.annotations.{BeforeClass, Test}
 
 /**
  * Created by luca on 20/03/14.

@@ -86,7 +86,6 @@ public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T> {
     public abstract ICassandraDeepJobConfig<T> keyspace(String keyspace);
 
 
-
     /**
      * Sets cassandra host rpcPort.
      *

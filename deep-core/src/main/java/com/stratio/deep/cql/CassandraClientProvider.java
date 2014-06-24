@@ -21,7 +21,6 @@ import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.LoadBalancingPolicy;
 import com.datastax.driver.core.policies.Policies;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.utils.Pair;
 import org.slf4j.Logger;

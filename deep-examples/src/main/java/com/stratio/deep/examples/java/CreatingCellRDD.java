@@ -63,8 +63,8 @@ public final class CreatingCellRDD {
 
         SparkContext sc = new SparkContext(p.getCluster(), job, sparkConf);
 
-        LOG.info("spark.serializer: "+ System.getProperty("spark.serializer"));
-        LOG.info("spark.kryo.registrator: "+ System.getProperty("spark.kryo.registrator"));
+        LOG.info("spark.serializer: " + System.getProperty("spark.serializer"));
+        LOG.info("spark.kryo.registrator: " + System.getProperty("spark.kryo.registrator"));
 
         DeepSparkContext deepContext = new DeepSparkContext(sc);
 

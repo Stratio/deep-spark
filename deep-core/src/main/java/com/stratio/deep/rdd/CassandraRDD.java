@@ -17,7 +17,6 @@
 package com.stratio.deep.rdd;
 
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.cql.DeepRecordReader;
 import com.stratio.deep.cql.DeepTokenRange;
 import com.stratio.deep.cql.RangeUtils;
@@ -107,7 +106,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * does, uses the Datastax Java Driver to perform a batch write to the Cassandra server.<br/>
      * This currently scans the partitions one by one, so it will be slow if a lot of partitions are required.
      *
-     * @param rdd the RDD to persist.
+     * @param rdd         the RDD to persist.
      * @param writeConfig the write configuration object.
      */
     @SuppressWarnings("unchecked")
@@ -131,7 +130,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * Persists the given RDD of Cells to the underlying Cassandra datastore, using configuration
      * options provided by <i>writeConfig</i>.
      *
-     * @param rdd the RDD to persist.
+     * @param rdd         the RDD to persist.
      * @param writeConfig the write configuration object.
      */
     @SuppressWarnings("unchecked")
@@ -154,9 +153,9 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     /**
      * Persists the given JavaRDD to the underlying Cassandra datastore.
      *
-     * @param rdd the RDD to persist.
+     * @param rdd         the RDD to persist.
      * @param writeConfig the write configuration object.
-     * @param <W> the generic type associated to the provided configuration object.
+     * @param <W>         the generic type associated to the provided configuration object.
      */
     public static <W> void saveRDDToCassandra(JavaRDD<W> rdd, ICassandraDeepJobConfig<W> writeConfig) {
         saveRDDToCassandra(rdd.rdd(), writeConfig);
@@ -166,7 +165,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     /**
      * Public constructor that builds a new Cassandra RDD given the context and the configuration file.
      *
-     * @param sc the spark context to which the RDD will be bound to.
+     * @param sc     the spark context to which the RDD will be bound to.
      * @param config the deep configuration object.
      */
     @SuppressWarnings("unchecked")
@@ -217,7 +216,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * Gets an instance of the callback that will be used on the completion of the computation of this RDD.
      *
      * @param recordReader the deep record reader.
-     * @param dp the spark deep partition.
+     * @param dp           the spark deep partition.
      * @return an instance of the callback that will be used on the completion of the computation of this RDD.
      */
     protected AbstractFunction0<BoxedUnit> getComputeCallback(DeepRecordReader recordReader,
@@ -269,7 +268,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * Instantiates a new deep record reader object associated to the provided partition.
      *
      * @param ctx the spark task context.
-     * @param dp a spark deep partition
+     * @param dp  a spark deep partition
      * @return the deep record reader associated to the provided partition.
      */
     private DeepRecordReader initRecordReader(TaskContext ctx, final DeepPartition dp) {

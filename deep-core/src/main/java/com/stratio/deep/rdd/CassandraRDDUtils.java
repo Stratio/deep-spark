@@ -21,7 +21,6 @@ import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.stratio.deep.config.GenericDeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.cql.DeepCqlRecordWriter;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.functions.AbstractSerializableFunction2;

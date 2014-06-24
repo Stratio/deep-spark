@@ -5,7 +5,6 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.stratio.deep.config.DeepJobConfigFactory;
-import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.testentity.MesageTestEntity;
@@ -38,8 +37,6 @@ public class MongoEntityRDDTest {
     static MongoClient mongo = null;
 
     private DBCollection col = null;
-
-//    static  context = null;
 
     private static final String MESSAGE_TEST = "new message test";
 
@@ -84,6 +81,10 @@ public class MongoEntityRDDTest {
     @AfterClass
     public void cleanup() {
         Files.forceDelete(new File(DB_FOLDER_NAME));
+
+        if (mongodExecutable != null) {
+            mongodExecutable.stop();
+        }
     }
 
     @Test
@@ -132,14 +133,6 @@ public class MongoEntityRDDTest {
 
         context.stop();
 
-
-    }
-
-    @AfterClass
-    public void end() {
-        if (mongodExecutable != null) {
-            mongodExecutable.stop();
-        }
 
     }
 

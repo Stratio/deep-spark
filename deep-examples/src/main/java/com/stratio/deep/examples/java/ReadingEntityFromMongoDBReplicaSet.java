@@ -22,19 +22,14 @@ import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
 import com.stratio.deep.testentity.MessageEntity;
 import com.stratio.deep.testutils.ContextProperties;
-import org.apache.log4j.Logger;
-import scala.Tuple2;
 
-import java.util.List;
 
 /**
- * Example class to read an entity from mongoDB
+ * Example class to read an entity from a mongoDB replica set
  */
-public final class ReadingEntityFromMongoDB {
-    private static final Logger LOG = Logger.getLogger(com.stratio.deep.examples.scala.ReadingEntityFromMongoDB.class);
-    public static List<Tuple2<String, Integer>> results;
+public final class ReadingEntityFromMongoDBReplicaSet {
 
-    private ReadingEntityFromMongoDB() {
+    private ReadingEntityFromMongoDBReplicaSet() {
     }
 
 
@@ -44,22 +39,43 @@ public final class ReadingEntityFromMongoDB {
 
 
     public static void doMain(String[] args) {
-        String job = "java:readingEntityFromMongoDB";
 
-        String host = "localhost:27017";
+        // Spark jobName
+        String job = "java:readingEntityFromMongoDBReplicaSet";
 
+
+        // Connect to a replica set and provide three seed nodes
+        String host1 = "localhost:47017";
+        String host2 = "localhost:47018";
+        String host3 = "localhost:47019";
+
+        // database
         String database = "test";
-        String inputCollection = "entrada";
+
+        // collection
+        String inputCollection = "input";
+
+        // replica set name
+        String replicaSet = "s1";
+
+        // Recommended read preference. If the primary node go down, can still read from secundaries
+        String readPreference = "primaryPreferred";
+
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
+
+        // creates Deep Spark Context (spark context wrapper)
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
 
-        IMongoDeepJobConfig<MessageEntity> inputConfigEntity =
-                DeepJobConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(inputCollection).initialize();
+        // can give a list of host.
+        IMongoDeepJobConfig inputConfigEntity = DeepJobConfigFactory.createMongoDB(MessageEntity.class).host(host1).host(host2).host(host3)
+                .database(database).collection(inputCollection).replicaSet(replicaSet).readPreference(readPreference).initialize();
 
+
+        // MongoJavaRDD
         MongoJavaRDD<MessageEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
 
 

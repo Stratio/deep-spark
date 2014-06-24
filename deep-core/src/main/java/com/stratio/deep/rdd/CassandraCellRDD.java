@@ -17,7 +17,6 @@
 package com.stratio.deep.rdd;
 
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.utils.Pair;

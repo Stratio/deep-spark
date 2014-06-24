@@ -17,7 +17,6 @@
 package com.stratio.deep.rdd;
 
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;

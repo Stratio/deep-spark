@@ -22,9 +22,6 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.cql.DeepTokenRange;
-import com.stratio.deep.cql.RangeUtils;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
@@ -32,7 +29,6 @@ import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.testentity.TestEntity;
 import com.stratio.deep.utils.Constants;
-import org.apache.cassandra.dht.IPartitioner;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.serializer.DeserializationStream;
@@ -48,7 +44,6 @@ import scala.reflect.ClassTag$;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
-import java.util.List;
 
 import static org.testng.Assert.*;
 

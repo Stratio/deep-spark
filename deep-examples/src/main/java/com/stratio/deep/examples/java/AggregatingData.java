@@ -31,8 +31,6 @@ import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 import scala.Tuple3;
 
-import java.util.List;
-
 /**
  * Author: Emmanuelle Raffenne
  * Date..: 13-feb-2014
@@ -71,7 +69,7 @@ public class AggregatingData {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),p.getJars());
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // Creating a configuration for the RDD and initialize it
         IDeepJobConfig<TweetEntity> config = DeepJobConfigFactory.create(TweetEntity.class)

@@ -17,8 +17,6 @@
 package com.stratio.deep.rdd.mongodb;
 
 import com.mongodb.hadoop.MongoOutputFormat;
-import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
-import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.utils.UtilMongoDB;
@@ -34,6 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * EntityRDD to interact with mongoDB
+ *
  * @param <T>
  */
 public final class MongoEntityRDD<T extends IDeepType> extends DeepMongoRDD<T> {
@@ -74,6 +73,7 @@ public final class MongoEntityRDD<T extends IDeepType> extends DeepMongoRDD<T> {
 
     /**
      * Save a RDD to MongoDB
+     *
      * @param rdd
      * @param config
      * @param <T>

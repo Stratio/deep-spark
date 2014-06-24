@@ -34,8 +34,9 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     private static final Logger LOG = Logger.getLogger("com.stratio.deep.config.GenericDeepJobConfigMongoDB");
     private static final long serialVersionUID = -7179376653643603038L;
 
+
     /**
-     *
+     * configuration to be broadcasted to every spark node
      */
     public Configuration configHadoop;
 
@@ -73,6 +74,7 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
 
     /**
      * Read Preference
+     * primaryPreferred is the recommended read preference. If the primary node go down, can still read from secundaries
      */
     private String readPreference;
 
@@ -181,7 +183,7 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T>replicaSet(String replicaSet) {
+    public IMongoDeepJobConfig<T> replicaSet(String replicaSet) {
         this.replicaSet = replicaSet;
         return this;
     }
@@ -312,14 +314,14 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     /**
      * validates connection parameters
      */
-    private void validate(){
-        if(hostList.isEmpty()){
+    private void validate() {
+        if (hostList.isEmpty()) {
             throw new IllegalArgumentException("host cannot be null");
         }
-        if(database==null){
+        if (database == null) {
             throw new IllegalArgumentException("database cannot be null");
         }
-        if(collection==null){
+        if (collection == null) {
             throw new IllegalArgumentException("collection cannot be null");
         }
     }

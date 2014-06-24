@@ -24,6 +24,7 @@ import scala.reflect.ClassTag$;
 /**
  * Commodity RDD implementation that should be used as a
  * Java Wrapper for {@link MongoEntityRDD}.
+ *
  * @param <W>
  */
 public class MongoJavaRDD<W> extends JavaRDD<W> {
