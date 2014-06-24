@@ -1,4 +1,4 @@
-Stratio Deep [![Build Status](https://drone.io/github.com/Stratio/stratio-deep/status.png)](https://drone.io/github.com/Stratio/stratio-deep/latest)
+Stratio Deep
 =====================
 
 Stratio Deep is a thin integration layer between Apache Spark and several NoSQL datastores. 
