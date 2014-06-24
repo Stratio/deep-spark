@@ -28,7 +28,7 @@
     <parent>
         <groupId>com.stratio.deep</groupId>
         <artifactId>deep-parent</artifactId>
-        <version>0.2.9</version>
+        <version>0.3.0-SNAPSHOT</version>
         <relativePath>../deep-parent</relativePath>
     </parent>
 
@@ -99,8 +99,6 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-<<<<<<< HEAD
-=======
 
         <!-- MongoDB-->
         <dependency>
@@ -137,7 +135,6 @@
             <artifactId>mongo-hadoop_0.20.205.0</artifactId>
             <version>1.0.0</version>
         </dependency>
->>>>>>> develop
     </dependencies>
 
     <build>
@@ -178,6 +175,9 @@
                             <goal>add-source</goal>
                             <goal>compile</goal>
                         </goals>
+                        <configuration>
+                            <scalaVersion>2.10.3</scalaVersion>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>scala-test-compile</id>
@@ -185,6 +185,9 @@
                         <goals>
                             <goal>testCompile</goal>
                         </goals>
+                        <configuration>
+                            <scalaVersion>2.10.3</scalaVersion>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
