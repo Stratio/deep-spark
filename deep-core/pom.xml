@@ -114,16 +114,6 @@
             <artifactId>de.flapdoodle.embed.mongo</artifactId>
             <version>1.46.0</version>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>org.mongodb.mongo-hadoop</groupId>
-            <artifactId>mongo-hadoop-core</artifactId>
-            <version>1.2.1-SNAPSHOT</version>
-            <classifier>hadoop_1.0</classifier>
-<type>jar</type>
-        </dependency>
-
--->
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-hadoop-core_0.20.205.0</artifactId>
