@@ -37,7 +37,7 @@
 
         <!-- Artifacts include -->
         <distribution.include>
-            org.apache.cassandra,org.apache.thrift,com.github.stephenc.high-scale-lib,com.googlecode.concurrentlinkedhashmap,com.github.stephenc,org.apache.commons,net.jpountz.lz4,com.yammer.metrics,org.yaml,org.antlr,com.datastax.cassandra,de.javakaffee,commons-cli
+            org.apache.cassandra,org.apache.thrift,com.github.stephenc.high-scale-lib,com.googlecode.concurrentlinkedhashmap,com.github.stephenc,org.apache.commons,net.jpountz.lz4,com.yammer.metrics,org.yaml,org.antlr,com.datastax.cassandra,de.javakaffee,commons-cli,org.mongodb
         </distribution.include>
     </properties>
 
@@ -156,14 +156,14 @@
                     <artifactId>metrics-core</artifactId>
                     <groupId>com.codahale.metrics</groupId>
                 </exclusion>
-                <exclusion>
+                <!--exclusion>
                     <artifactId>chill_2.10</artifactId>
                     <groupId>com.twitter</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>chill-java</artifactId>
                     <groupId>com.twitter</groupId>
-                </exclusion>
+                </exclusion-->
             </exclusions>
         </dependency>
 
