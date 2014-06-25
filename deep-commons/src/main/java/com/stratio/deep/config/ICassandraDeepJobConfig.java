@@ -254,6 +254,13 @@ public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T> {
     public abstract ICassandraDeepJobConfig<T> initialize();
 
     /**
+     * Sets the session to use. If a session is not provided, this object will open a new one.
+     *
+     * @param session the session to use.
+     */
+    public abstract IDeepJobConfig<T> session(Session session);
+
+    /**
      * {@inheritDoc}
      */
     @Override
