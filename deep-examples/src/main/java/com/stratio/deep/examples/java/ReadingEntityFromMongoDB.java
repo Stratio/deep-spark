@@ -49,7 +49,7 @@ public final class ReadingEntityFromMongoDB {
         String host = "localhost:27017";
 
         String database = "test";
-        String inputCollection = "entrada";
+        String inputCollection = "input";
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
