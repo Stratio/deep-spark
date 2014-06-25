@@ -102,7 +102,7 @@ public class DeepSparkContext extends JavaSparkContext {
      * @return a new CassandraJavaRDD
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public <T> CassandraJavaRDD<T> cassandraJavaRDD(IDeepJobConfig<T> config) {
+    public <T, S extends IDeepJobConfig> CassandraJavaRDD<T> cassandraJavaRDD(IDeepJobConfig<T, S> config) {
         if (config instanceof EntityDeepJobConfig) {
             return new CassandraJavaRDD<T>(cassandraEntityRDD((EntityDeepJobConfig) config));
         }

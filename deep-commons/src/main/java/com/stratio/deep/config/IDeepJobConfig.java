@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @param <T> the generic type associated to this configuration object.
  */
-public interface IDeepJobConfig<T> extends Serializable {
+public interface IDeepJobConfig<T, S extends IDeepJobConfig> extends Serializable {
 
     /**
      * Returns the password needed to authenticate
@@ -59,7 +59,7 @@ public interface IDeepJobConfig<T> extends Serializable {
      * @throws com.stratio.deep.exception.DeepNoSuchFieldException   if the specified field is not a valid column in
      *                                                               Cassandra.
      */
-    public abstract IDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue);
+    public S filterByField(String filterColumnName, Serializable filterValue);
 
     /**
      * Sets the number of rows to retrieve for each page of data fetched from Cassandra.<br/>
@@ -68,7 +68,7 @@ public interface IDeepJobConfig<T> extends Serializable {
      * @param pageSize the number of rows per page
      * @return this configuration object.
      */
-    public abstract IDeepJobConfig<T> pageSize(int pageSize);
+    public abstract S pageSize(int pageSize);
 
 
     /* Getters */
@@ -105,19 +105,19 @@ public interface IDeepJobConfig<T> extends Serializable {
     public abstract String getUsername();
 
     /**
-     * Sets the cassandra's hostname
+     * Sets the datastore hostname
      *
      * @param hostname the cassandra server endpoint.
      * @return this object.
      */
-    public abstract IDeepJobConfig<T> host(String hostname);
+    public abstract S host(String hostname);
 
     /**
      * Initialized the current configuration object.
      *
      * @return this object.
      */
-    public abstract IDeepJobConfig<T> initialize();
+    public abstract S initialize();
 
     /**
      * Defines a projection over the CF columns. <br/>
@@ -126,14 +126,14 @@ public interface IDeepJobConfig<T> extends Serializable {
      * @param columns list of columns we want to retrieve from the datastore.
      * @return this object.
      */
-    public abstract IDeepJobConfig<T> inputColumns(String... columns);
+    public abstract S inputColumns(String... columns);
 
     /**
      * Sets the password to use to login to Cassandra. Leave empty if you do not need authentication.
      *
      * @return this object.
      */
-    public abstract IDeepJobConfig<T> password(String password);
+    public abstract S password(String password);
 
     /**
      * /**
@@ -141,7 +141,7 @@ public interface IDeepJobConfig<T> extends Serializable {
      *
      * @return this object.
      */
-    public abstract IDeepJobConfig<T> username(String username);
+    public abstract S username(String username);
 
     /**
      * Returns the map of additional filters specified by the user.

@@ -17,8 +17,6 @@
 
 package org.apache.spark.rdd
 
-//package com.stratio.deep.rdd.mongodb
-
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -148,7 +146,7 @@ abstract class DeepMongoRDD[T: ClassTag](sc: SparkContext,
     theSplit.serializableHadoopSplit.value.getLocations.filter(_ != "localhost")
   }
 
-  def getConf: IDeepJobConfig[T] = confBroadcast.value
+  def getConf: IMongoDeepJobConfig[T] = confBroadcast.value
 }
 
 

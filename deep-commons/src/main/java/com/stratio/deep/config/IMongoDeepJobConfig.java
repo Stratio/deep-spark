@@ -22,53 +22,9 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Created by luca on 23/06/14.
+ * Defines the public methods that each Stratio Deep MongoDB configuration object should implement.
  */
-public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T> {
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract IMongoDeepJobConfig<T> password(String password);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract IMongoDeepJobConfig<T> username(String username);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract IMongoDeepJobConfig<T> inputColumns(String... columns);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract IMongoDeepJobConfig<T> host(String hostname);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract IMongoDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract IMongoDeepJobConfig<T> pageSize(int pageSize);
-
-    /**
-     * Creates necessary config to access mongoDB
-     *
-     * @return
-     */
-    @Override
-    public abstract IMongoDeepJobConfig<T> initialize();
-
+public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobConfig<T>> {
     /**
      * {@inheritDoc}
      */
@@ -79,8 +35,11 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T> {
      */
     public abstract IMongoDeepJobConfig<T> database(String database);
 
+
     /**
-     * {@inheritDoc}
+     * Sets the list of available Mongo hosts.
+     * @param host the list of available mongo hosts.
+     * @return this object.
      */
     public abstract IMongoDeepJobConfig<T> host(List<String> host);
 

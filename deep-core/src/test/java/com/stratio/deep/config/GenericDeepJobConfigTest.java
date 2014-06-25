@@ -300,7 +300,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
     @Test
     public void testWronglyMappedField() {
 
-        IDeepJobConfig<WronglyMappedTestEntity> djc = DeepJobConfigFactory.create(WronglyMappedTestEntity.class).host
+        ICassandraDeepJobConfig<WronglyMappedTestEntity> djc = DeepJobConfigFactory.create(WronglyMappedTestEntity.class).host
                 (Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY);
 
@@ -316,7 +316,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
 
     @Test
     public void testValidationNotAnnotadedTestEntity() {
-        IDeepJobConfig<NotAnnotatedTestEntity> djc = DeepJobConfigFactory.create(NotAnnotatedTestEntity.class)
+        ICassandraDeepJobConfig<NotAnnotatedTestEntity> djc = DeepJobConfigFactory.create(NotAnnotatedTestEntity.class)
                 .keyspace("a").columnFamily("cf");
         try {
             djc.initialize();
