@@ -16,13 +16,15 @@
 
 package com.stratio.deep.utils;
 
+import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.entity.IDeepType;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by rcrespo on 12/06/14.
@@ -47,16 +49,60 @@ public class UtilMongoDB {
 
         int count = fields.length;
 
+        Object insert = null;
 
         for (int i = 0; i < count; i++) {
             Method method = Utils.findSetter(fields[i].getName(), classEntity, fields[i].getType());
-            method.invoke(t, bsonObject.get(AnnotationUtils.deepFieldName(fields[i])));
 
+            Class<?> classField = fields[i].getType();
+
+            Object currentBson = bsonObject.get(AnnotationUtils.deepFieldName(fields[i]));
+            if (currentBson!=null){
+
+                if(Iterable.class.isAssignableFrom(classField) ){
+
+                    Method methodGetter = Utils.findGetter(fields[i].getName(), classEntity);
+
+                    Type type = fields[i].getGenericType();
+
+                    insert = subDocumentListCase(type, (List) bsonObject.get(AnnotationUtils.deepFieldName(fields[i])));
+
+
+                }else if (IDeepType.class.isAssignableFrom(classField)){
+                    insert = getObjectFromBson (classField, (BSONObject) bsonObject.get(AnnotationUtils.deepFieldName(fields[i])));
+                }
+                else{
+
+
+                    insert = currentBson;
+    
+                }
+
+                method.invoke(t, insert);
+
+
+            }
         }
-
 
         return t;
     }
+
+
+    private static <T>  Object  subDocumentListCase(Type type, List<T> bsonOject) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        ParameterizedType listType = (ParameterizedType) type;
+
+        Class<?> listClass = (Class<?>) listType.getActualTypeArguments()[0];
+
+        List list = new ArrayList();
+        for(T t : bsonOject){
+            list.add(getObjectFromBson( listClass,(BSONObject)t));
+        }
+
+
+        return list;
+    }
+
+
 
     /**
      * converts from an entity class with deep's anotations to BsonObject
@@ -113,5 +159,7 @@ public class UtilMongoDB {
 
         return null;
     }
+
+
 
 }
