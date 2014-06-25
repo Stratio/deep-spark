@@ -71,11 +71,7 @@ object WritingEntityToCassandra {
       .initialize
 
     val outputRDD: RDD[DomainEntity] = numPerKey map {
-      t: (String, Int) =>
-        val out = new DomainEntity();
-        out.setDomain(t._1);
-        out.setNumPages(t._2);
-        out
+      t: (String, Int) => new DomainEntity(t._1, t._2);
     }
 
     CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig)
