@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.stratio.deep</groupId>
     <artifactId>deep-parent</artifactId>
-    <version>0.3.2</version>
+    <version>0.3.3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>http://www.stratio.com</url>
     <name>deep parent</name>
