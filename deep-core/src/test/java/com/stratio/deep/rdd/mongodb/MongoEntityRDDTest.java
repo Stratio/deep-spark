@@ -24,14 +24,13 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.testentity.MesageTestEntity;
+import de.flapdoodle.embed.mongo.Command;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodProcess;
 import de.flapdoodle.embed.mongo.MongodStarter;
-import de.flapdoodle.embed.mongo.config.IMongodConfig;
-import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
-import de.flapdoodle.embed.mongo.config.Net;
-import de.flapdoodle.embed.mongo.config.Storage;
+import de.flapdoodle.embed.mongo.config.*;
 import de.flapdoodle.embed.mongo.distribution.Version;
+import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.io.file.Files;
 import de.flapdoodle.embed.process.runtime.Network;
 import org.testng.annotations.AfterClass;
@@ -71,22 +70,48 @@ public class MongoEntityRDDTest {
 
     @BeforeClass
     public void init() throws IOException {
+        Command command = Command.MongoD;
+
         MongodStarter starter = MongodStarter.getDefaultInstance();
 
         new File(DB_FOLDER_NAME).mkdirs();
 
         IMongodConfig mongodConfig = new MongodConfigBuilder()
                 .version(Version.Main.PRODUCTION)
+                .configServer(false)
                 .replication(new Storage(DB_FOLDER_NAME, null, 0))
                 .net(new Net(port, Network.localhostIsIPv6()))
+                .cmdOptions(new MongoCmdOptionsBuilder()
+                        .syncDelay(10)
+                        .useNoPrealloc(true)
+                        .useSmallFiles(true)
+                        .useNoJournal(true)
+                        .build())
                 .build();
 
-        mongodExecutable = starter.prepare(mongodConfig);
 
-        Files.forceDelete(new File(System.getProperty("user.home") +
-                File.separator + ".embedmongo"));
+        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder()
+                .defaults(command)
+                .artifactStore(new ArtifactStoreBuilder()
+                        .defaults(command)
+                        .download(new DownloadConfigBuilder()
+                                .defaultsForCommand(command)
+                                .downloadPath("https://s3-eu-west-1.amazonaws.com/stratio-mongodb-distribution/")))
+                .build();
+
+        MongodStarter runtime = MongodStarter.getInstance(runtimeConfig);
+
+        mongodExecutable = null;
+
+
+        mongodExecutable = runtime.prepare(mongodConfig);
 
         MongodProcess mongod = mongodExecutable.start();
+
+//TODO : Uncomment when drone.io is ready
+//        Files.forceDelete(new File(System.getProperty("user.home") +
+//                File.separator + ".embedmongo"));
+
 
         mongo = new MongoClient(host, port);
         DB db = mongo.getDB(database);
