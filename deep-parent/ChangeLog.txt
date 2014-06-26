@@ -1,3 +1,43 @@
+[0.3.3]
+
+commit 8c34b95934e05afb6062ac30bd25db6c25966c3f
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Jun 26 19:24:32 2014 +0200
+
+    [stratio-deep release prepare] preparing for version 0.3.3
+
+commit 51548b156c49b11ada6faba2e1d26fc00d8021a8
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Jun 26 18:24:47 2014 +0200
+
+    fixed NPE in a distributed environment
+
+commit 189c25ea679ed7f3ce10e6c0920e914de6de1c32
+Merge: f5bdb61 fd051d8
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Thu Jun 26 15:31:32 2014 +0200
+
+    Merge branch 'develop' of github.com:Stratio/stratio-deep into develop
+
+commit f5bdb61abe59c0f5e937cc6be26ff0d98c80bbb3
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Thu Jun 26 15:30:12 2014 +0200
+
+    improved: mongodb embedded, added: custom downloadPath
+
+commit fd051d89af8f8a2910a35f9c981092c867ddb087
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Jun 26 11:30:25 2014 +0200
+
+    [stratio-deep release finish] next snapshot version 0.3.3-SNAPSHOT
+
+commit a56878efd46ca7b12f3b2553b14ce88de29992e5
+Merge: 6dff032 fb2337a
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Jun 26 11:30:13 2014 +0200
+
+    Merge branch 'release/version-0.3.2' into develop
+
 [0.3.2]
 
 commit 7591c4bc68e78ac9b7da57fdef6ef0657a41c6ab

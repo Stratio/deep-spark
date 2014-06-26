@@ -38,7 +38,7 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     /**
      * configuration to be broadcasted to every spark node
      */
-    public Configuration configHadoop;
+    public transient Configuration configHadoop;
 
     /**
      * A list of mongodb host to connect
@@ -340,6 +340,10 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
      */
     @Override
     public Configuration getHadoopConfiguration() {
+        if (configHadoop == null){
+            initialize();
+        }
+
         return configHadoop;
     }
 }
