@@ -1,3 +1,95 @@
+[0.3.2]
+
+commit 7591c4bc68e78ac9b7da57fdef6ef0657a41c6ab
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Jun 26 11:07:54 2014 +0200
+
+    [stratio-deep release prepare] preparing for version 0.3.2
+
+commit 6dff03202933fbf81c49f3d09f289026492fcf0d
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Jun 26 09:16:30 2014 +0200
+
+    removed usage of java APIs
+
+commit 3af4363469542e2ce655f34c12d4a239234d2bf0
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Jun 26 09:16:04 2014 +0200
+
+    Added mongoEntityRDD method
+
+commit 0617c2695d8d39e34d2ab3084fbee76a5f2f01a9
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Thu Jun 26 09:15:39 2014 +0200
+
+    fixed dependency conflict
+
+commit 8bc5a6db3d3aecfc978ed8dc91e1db47bdc2c8fb
+Merge: 409001c 76408e4
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Jun 25 18:30:35 2014 +0200
+
+    Merge branch 'develop-spark-1.0' into develop
+    
+    * develop-spark-1.0:
+      added new examples and support for subdocuments
+      fixed collection name
+
+commit 409001ce4be294a6fda3ce185c670bc487ff9a09
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Jun 25 18:28:09 2014 +0200
+
+    Generalized IDeepJobConfig to take into account its sub-interfaces
+
+commit 1b3ba2aa6560f33cc44a21a7b23e47b52c1f5da0
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Jun 25 18:27:11 2014 +0200
+
+    added org.mongodb to the list of artifacts that will be added to the final .tgz package
+
+commit 76408e4912559c0833dbbef47aa32cca16699036
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Wed Jun 25 17:36:31 2014 +0200
+
+    added new examples and support for subdocuments
+
+commit d9bf1aadef6fd17ed82f596dc9be58805e305819
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Jun 25 16:22:20 2014 +0200
+
+    several examples fixes
+
+commit aaf68b20d2eab1e3397d2a3217bb37a7b12cb782
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Wed Jun 25 16:21:58 2014 +0200
+
+    fixed missing session(Session s) method declaration in ICassandraDeepJobConfig
+
+commit c2fff275ab7b77f56b7f11d3e96dbd33f17fd560
+Author: rcrespodelosreyes <ricardo.e.crespo@gmail.com>
+Date:   Wed Jun 25 12:33:03 2014 +0200
+
+    fixed collection name
+
+commit d09856414cc2b165c23708c2df0687255c5cab07
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 24 19:30:21 2014 +0200
+
+    deploy scripts fixes
+
+commit be55b33cb499bf0ce07d9bd6de1a894a58e8080c
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 24 18:59:02 2014 +0200
+
+    [stratio-deep release finish] next snapshot version 0.3.2-SNAPSHOT
+
+commit 101baac51e2eb71e2f9ce630068b27b0a9a4a06f
+Merge: 7155df1 83da695
+Author: Luca Rosellini <luca@stratio.com>
+Date:   Tue Jun 24 18:58:51 2014 +0200
+
+    Merge branch 'release/version-0.3.1' into develop
+
 [0.3.1]
 
 commit ac43a0a435cbc58e130abfcdf88e2b6ae55dfa16
