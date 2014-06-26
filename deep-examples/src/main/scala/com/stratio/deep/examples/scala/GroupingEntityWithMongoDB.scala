@@ -16,15 +16,13 @@
 
 package com.stratio.deep.examples.scala
 
-import java.util.{ArrayList, Arrays, List}
-
 import com.stratio.deep.config.{DeepJobConfigFactory, IMongoDeepJobConfig}
 import com.stratio.deep.context.DeepSparkContext
-import com.stratio.deep.rdd.mongodb.{MongoEntityRDD, MongoJavaRDD}
+import com.stratio.deep.rdd.mongodb.MongoEntityRDD
 import com.stratio.deep.testentity.{BookEntity, WordCount}
 import com.stratio.deep.testutils.ContextProperties
-import org.apache.spark.api.java.{JavaPairRDD, JavaRDD}
-import org.apache.spark.api.java.function.{FlatMapFunction, Function, Function2, PairFunction}
+import org.apache.spark.rdd.RDD
+import org.apache.spark.SparkContext._
 
 import scala.collection.JavaConversions._
 
@@ -49,39 +47,20 @@ final object GroupingEntityWithMongoDB {
 
     val inputConfigEntity: IMongoDeepJobConfig[BookEntity] = DeepJobConfigFactory.createMongoDB(classOf[BookEntity]).host(host).database(database).collection(inputCollection).initialize
 
-    val inputRDDEntity: MongoJavaRDD[BookEntity] = deepContext.mongoJavaRDD(inputConfigEntity)
+    val inputRDDEntity: MongoEntityRDD[BookEntity] = deepContext.mongoEntityRDD(inputConfigEntity)
 
+    val words: RDD[String] = inputRDDEntity flatMap {
+      e: BookEntity => (for (canto <- e.getCantoEntities) yield canto.getText.split(" ")).flatten
+    }
 
-    val words = inputRDDEntity.flatMap(new FlatMapFunction[BookEntity, String]() {
+    val wordCount : RDD[(String, Integer)] = words map { s:String => (s,1) }
 
-      override def call(bookEntity: BookEntity): java.lang.Iterable[String] = {
-        var words : List[String] = new ArrayList[String]()
-        for (canto <- bookEntity.getCantoEntities) {
-          words.addAll(Arrays.asList(canto.getText.split(" "):_*))
-        }
-        return words
-      }
-    })
+    val wordCountReduced  = wordCount reduceByKey { (a,b) =>a + b }
 
-    val wordCount: JavaPairRDD[String, Integer] = words.mapToPair(new PairFunction[String, String, Integer] {
-      def call(s: String): (String, Integer) = {
-        return new (String, Integer)(s, 1)
-      }
-    })
+    val outputRDD = wordCountReduced map { e:(String, Integer) => new WordCount(e._1, e._2)  }
 
-    val wordCountReduced: JavaPairRDD[String, Integer] = wordCount.reduceByKey(new Function2[Integer, Integer, Integer] {
-      def call(integer: Integer, integer2: Integer): Integer = {
-        return integer + integer2
-      }
-    })
-
-    val outputRDD: JavaRDD[WordCount] = wordCountReduced.map(new Function[(String, Integer), WordCount] {
-      def call(stringIntegerTuple2: (String, Integer)): WordCount = {
-        return new WordCount(stringIntegerTuple2._1, stringIntegerTuple2._2)
-      }
-    })
-
-    val outputConfigEntity: IMongoDeepJobConfig[WordCount] = DeepJobConfigFactory.createMongoDB(classOf[WordCount]).host(host).database(database).collection(outputCollection).initialize
+    val outputConfigEntity: IMongoDeepJobConfig[WordCount] =
+      DeepJobConfigFactory.createMongoDB(classOf[WordCount]).host(host).database(database).collection(outputCollection).initialize
 
     MongoEntityRDD.saveEntity(outputRDD, outputConfigEntity)
 
