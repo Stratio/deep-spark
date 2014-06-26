@@ -156,14 +156,14 @@
                     <artifactId>metrics-core</artifactId>
                     <groupId>com.codahale.metrics</groupId>
                 </exclusion>
-                <!--exclusion>
+                <exclusion>
                     <artifactId>chill_2.10</artifactId>
                     <groupId>com.twitter</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>chill-java</artifactId>
                     <groupId>com.twitter</groupId>
-                </exclusion-->
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -192,6 +192,18 @@
             <artifactId>mockito-all</artifactId>
             <version>1.9.5</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.esotericsoftware.kryo</groupId>
+            <artifactId>kryo</artifactId>
+            <version>2.24.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.twitter</groupId>
+            <artifactId>chill_2.10</artifactId>
+            <version>0.3.6</version>
         </dependency>
     </dependencies>
 
