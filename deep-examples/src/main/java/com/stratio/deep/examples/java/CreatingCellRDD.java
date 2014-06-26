@@ -17,8 +17,10 @@
 package com.stratio.deep.examples.java;
 
 import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.rdd.CassandraJavaRDD;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
@@ -59,7 +61,13 @@ public final class CreatingCellRDD {
 
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
-        SparkConf sparkConf = new SparkConf().setMaster(p.getCluster()).setAppName(job).setJars(p.getJars()).setSparkHome(p.getSparkHome());
+        SparkConf sparkConf = new SparkConf()
+                .setMaster(p.getCluster())
+                .setAppName(job)
+                .setJars(p.getJars())
+                .setSparkHome(p.getSparkHome())
+                .set("spark.serializer","org.apache.spark.serializer.KryoSerializer")
+                .set("spark.kryo.registrator","com.stratio.deep.serializer.DeepKryoRegistrator");
 
         SparkContext sc = new SparkContext(p.getCluster(), job, sparkConf);
 
@@ -69,7 +77,7 @@ public final class CreatingCellRDD {
         DeepSparkContext deepContext = new DeepSparkContext(sc);
 
         // Configuration and initialization
-        IDeepJobConfig config = DeepJobConfigFactory.create()
+        ICassandraDeepJobConfig<Cells> config = DeepJobConfigFactory.create()
                 .host(p.getCassandraHost())
                 .cqlPort(p.getCassandraCqlPort())
                 .rpcPort(p.getCassandraThriftPort())

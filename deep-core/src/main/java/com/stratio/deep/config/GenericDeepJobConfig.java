@@ -132,7 +132,8 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
     /**
      * {@inheritDoc}
      */
-    public IDeepJobConfig<T> session(Session session) {
+    @Override
+    public ICassandraDeepJobConfig<T> session(Session session) {
         this.session = session;
         return this;
     }

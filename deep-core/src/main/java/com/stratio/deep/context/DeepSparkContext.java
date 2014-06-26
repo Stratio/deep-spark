@@ -28,6 +28,7 @@ import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.rdd.DeepMongoRDD;
 
 import java.util.Map;
 
@@ -102,7 +103,7 @@ public class DeepSparkContext extends JavaSparkContext {
      * @return a new CassandraJavaRDD
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public <T> CassandraJavaRDD<T> cassandraJavaRDD(IDeepJobConfig<T> config) {
+    public <T, S extends IDeepJobConfig> CassandraJavaRDD<T> cassandraJavaRDD(IDeepJobConfig<T, S> config) {
         if (config instanceof EntityDeepJobConfig) {
             return new CassandraJavaRDD<T>(cassandraEntityRDD((EntityDeepJobConfig) config));
         }
@@ -146,4 +147,15 @@ public class DeepSparkContext extends JavaSparkContext {
 
     }
 
+    /**
+     * Builds a new entity based MongoEntityRDD
+     *
+     * @param config
+     * @param <T>
+     * @return
+     */
+    public <T extends IDeepType> MongoEntityRDD<T> mongoEntityRDD(IMongoDeepJobConfig<T> config) {
+        return new MongoEntityRDD<T>(this.sc(), config);
+
+    }
 }

@@ -21,15 +21,9 @@ import com.datastax.driver.core.Session;
 import java.io.Serializable;
 
 /**
- * Created by luca on 23/06/14.
+ * Defines the public methods that each Stratio Deep Cassandra configuration object should implement.
  */
-public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T> {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract ICassandraDeepJobConfig<T> pageSize(int pageSize);
+public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T, ICassandraDeepJobConfig<T>> {
 
     /**
      * Returns the partitioner class name.
@@ -84,7 +78,6 @@ public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T> {
      * @return this object.
      */
     public abstract ICassandraDeepJobConfig<T> keyspace(String keyspace);
-
 
     /**
      * Sets cassandra host rpcPort.
@@ -224,38 +217,9 @@ public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T> {
     public abstract String getColumnFamily();
 
     /**
-     * {@inheritDoc}
+     * Sets the session to use. If a session is not provided, this object will open a new one.
+     *
+     * @param session the session to use.
      */
-    @Override
-    public abstract ICassandraDeepJobConfig<T> host(String hostname);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract ICassandraDeepJobConfig<T> password(String password);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract ICassandraDeepJobConfig<T> username(String username);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract ICassandraDeepJobConfig<T> inputColumns(String... columns);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract ICassandraDeepJobConfig<T> initialize();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public abstract ICassandraDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue);
+    public abstract ICassandraDeepJobConfig<T> session(Session session);
 }

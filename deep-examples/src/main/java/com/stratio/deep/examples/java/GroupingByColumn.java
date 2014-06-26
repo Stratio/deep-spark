@@ -18,6 +18,7 @@ package com.stratio.deep.examples.java;
 
 import com.google.common.collect.Lists;
 import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.CassandraJavaRDD;
@@ -72,13 +73,13 @@ public final class GroupingByColumn {
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
 // Create a configuration for the RDD and initialize it
-        IDeepJobConfig config = DeepJobConfigFactory.create(TweetEntity.class)
+        ICassandraDeepJobConfig<TweetEntity> config = DeepJobConfigFactory.create(TweetEntity.class)
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(tableName)
                 .initialize();
 
 // Creating the RDD
-        CassandraJavaRDD rdd = deepContext.cassandraJavaRDD(config);
+        CassandraJavaRDD<TweetEntity> rdd = deepContext.cassandraJavaRDD(config);
 
         // grouping
         JavaPairRDD<String, Iterable<TweetEntity>> groups = rdd.groupBy(new Function<TweetEntity, String>() {

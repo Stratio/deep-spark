@@ -60,7 +60,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     private Logger logger = Logger.getLogger(getClass());
 
     private CassandraJavaRDD<TestEntity> rdd;
-    protected IDeepJobConfig<TestEntity> rddConfig;
+    protected IDeepJobConfig<TestEntity, ICassandraDeepJobConfig<TestEntity>> rddConfig;
 
     JavaRDD<TestEntity> slowPages = null;
     JavaRDD<TestEntity> quickPages = null;

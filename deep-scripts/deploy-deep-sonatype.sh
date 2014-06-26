@@ -16,7 +16,7 @@ fi
 
 echo "Version number: ${RELEASE_VER}"
 echo "Compiling branch master"
-mvn -q clean install -DskipTests
+mvn -q clean install
 
 read -p "Insert GPG passphrase: " passphrase
 

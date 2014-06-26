@@ -28,7 +28,7 @@
     <parent>
         <groupId>com.stratio.deep</groupId>
         <artifactId>deep-parent</artifactId>
-        <version>0.3.1</version>
+        <version>0.3.2</version>
         <relativePath>../deep-parent</relativePath>
     </parent>
 
@@ -100,30 +100,13 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- MongoDB-->
-        <dependency>
-
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>2.12.2</version>
-        </dependency>
-
         <!-- mongodb embedded -->
         <dependency>
             <groupId>de.flapdoodle.embed</groupId>
             <artifactId>de.flapdoodle.embed.mongo</artifactId>
             <version>1.46.0</version>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>org.mongodb.mongo-hadoop</groupId>
-            <artifactId>mongo-hadoop-core</artifactId>
-            <version>1.2.1-SNAPSHOT</version>
-            <classifier>hadoop_1.0</classifier>
-<type>jar</type>
-        </dependency>
 
--->
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-hadoop-core_0.20.205.0</artifactId>

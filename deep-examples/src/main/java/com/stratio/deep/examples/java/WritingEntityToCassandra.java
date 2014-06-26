@@ -73,7 +73,7 @@ public final class WritingEntityToCassandra {
 
 
         // --- INPUT RDD
-        IDeepJobConfig inputConfig = DeepJobConfigFactory.create(PageEntity.class)
+        ICassandraDeepJobConfig<PageEntity> inputConfig = DeepJobConfigFactory.create(PageEntity.class)
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();

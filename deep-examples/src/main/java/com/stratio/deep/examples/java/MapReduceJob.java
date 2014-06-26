@@ -17,6 +17,7 @@
 package com.stratio.deep.examples.java;
 
 import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.CassandraJavaRDD;
@@ -68,7 +69,7 @@ public final class MapReduceJob {
 
 
         // Creating a configuration for the RDD and initialize it
-        IDeepJobConfig<TweetEntity> config = DeepJobConfigFactory.create(TweetEntity.class)
+        ICassandraDeepJobConfig<TweetEntity> config = DeepJobConfigFactory.create(TweetEntity.class)
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(tableName)
                 .initialize();
