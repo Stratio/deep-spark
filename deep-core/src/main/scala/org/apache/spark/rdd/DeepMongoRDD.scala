@@ -20,24 +20,23 @@ package org.apache.spark.rdd
 import java.text.SimpleDateFormat
 import java.util.Date
 
-import com.stratio.deep.config.{IDeepJobConfig, IMongoDeepJobConfig}
+import com.stratio.deep.config.IMongoDeepJobConfig
 import org.apache.hadoop.conf.Configurable
 import org.apache.hadoop.io.Writable
 import org.apache.hadoop.mapreduce._
 import org.apache.spark.annotation.DeveloperApi
-import org.apache.spark.{InterruptibleIterator, Logging, Partition, SerializableWritable, SparkContext, TaskContext}
+import org.apache.spark._
 import org.bson.BSONObject
 
 import scala.reflect.ClassTag
 
-private[spark] class NewHadoopPartition(
-                                         rddId: Int,
-                                         val index: Int,
-                                         @transient rawSplit: InputSplit with Writable)
+class NewHadoopPartition(
+                          rddId: Int,
+                          val index: Int,
+                          @transient rawSplit: InputSplit with Writable)
   extends Partition {
 
   val serializableHadoopSplit = new SerializableWritable(rawSplit)
-
   override def hashCode(): Int = 41 * (41 + rddId) + index
 }
 
@@ -148,5 +147,3 @@ abstract class DeepMongoRDD[T: ClassTag](sc: SparkContext,
 
   def getConf: IMongoDeepJobConfig[T] = confBroadcast.value
 }
-
-
