@@ -32,6 +32,7 @@ import java.util.concurrent.*;
 import static com.stratio.deep.entity.CellValidator.Kind;
 import static com.stratio.deep.entity.CellValidator.cellValidator;
 import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Created by luca on 25/03/14.
@@ -117,6 +118,15 @@ public class CellValidatorTest {
 
         assertNotNull(cv.getAbstractType());
         assertEquals(cv.getAbstractType(), ListType.getInstance(TimeUUIDType.instance));
+    }
+
+    public void testBlobDataType(){
+        CellValidator cv = cellValidator(DataType.blob());
+        assertNotNull(cv);
+        assertEquals(cv.getValidatorClassName(), BytesType.class.getName());
+        assertNull(cv.getValidatorTypes());
+        assertNotNull(cv.getAbstractType());
+        assertEquals(cv.getAbstractType(), BytesType.instance);
     }
 
     public void testDataTypeMapInstantiation() {

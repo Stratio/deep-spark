@@ -34,6 +34,7 @@ import java.math.BigInteger;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 /**
@@ -59,6 +60,7 @@ public final class AnnotationUtils {
                     .put(Inet6Address.class, InetAddressType.instance)
                     .put(BigInteger.class, IntegerType.instance)
                     .put(UUID.class, UUIDType.instance)
+                    .put(ByteBuffer.class, BytesType.instance)
                     .build();
 
     /**
@@ -83,6 +85,7 @@ public final class AnnotationUtils {
                     .put(SetType.class.getCanonicalName(), Set.class)
                     .put(ListType.class.getCanonicalName(), List.class)
                     .put(MapType.class.getCanonicalName(), Map.class)
+                    .put(BytesType.class.getCanonicalName(), ByteBuffer.class)
                     .build();
 
     /**
@@ -103,6 +106,7 @@ public final class AnnotationUtils {
                     .put(IntegerType.class, IntegerType.instance)
                     .put(UUIDType.class, UUIDType.instance)
                     .put(TimeUUIDType.class, TimeUUIDType.instance)
+                    .put(BytesType.class, BytesType.instance)
                     .build();
 
     /**
