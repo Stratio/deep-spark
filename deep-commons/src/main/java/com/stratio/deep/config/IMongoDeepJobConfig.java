@@ -26,15 +26,14 @@ import java.util.List;
  */
 public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobConfig<T>> {
     /**
-     * {@inheritDoc}
+     * The MongoDB's collection name
      */
     public abstract IMongoDeepJobConfig<T> collection(String collection);
 
     /**
-     * {@inheritDoc}
+     * The MongoDB's database name
      */
     public abstract IMongoDeepJobConfig<T> database(String database);
-
 
     /**
      * Sets the list of available Mongo hosts.
@@ -44,7 +43,7 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
     public abstract IMongoDeepJobConfig<T> host(List<String> host);
 
     /**
-     * {@inheritDoc}
+     * The replica set identifier.
      */
     public abstract IMongoDeepJobConfig<T> replicaSet(String replicaSet);
 
@@ -59,5 +58,5 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      * @param readPreference the property value to set.
      * @return this object.
      */
-    public IMongoDeepJobConfig<T> readPreference(String readPreference);
+    public abstract IMongoDeepJobConfig<T> readPreference(String readPreference);
 }

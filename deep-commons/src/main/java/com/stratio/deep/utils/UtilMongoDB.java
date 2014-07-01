@@ -16,28 +16,35 @@
 
 package com.stratio.deep.utils;
 
-import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.entity.IDeepType;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
 import java.lang.reflect.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
- * Created by rcrespo on 12/06/14.
+ * Several utilities to work used in the Spark <=> MongoDB integration.
  */
 public class UtilMongoDB {
+
+    private static final String MONGO_DEFAULT_ID = "_id";
+
+    /**
+     * Private default constructor.
+     */
+    private UtilMongoDB(){
+
+    }
 
     /**
      * converts from BsonObject to an entity class with deep's anotations
      *
-     * @param classEntity
-     * @param bsonObject
-     * @param <T>
-     * @return
+     * @param classEntity the entity name.
+     * @param bsonObject the instance of the BSONObjet to convert.
+     * @param <T> return type.
+     * @return the provided bsonObject converted to an instance of T.
      * @throws IllegalAccessException
      * @throws InstantiationException
      * @throws InvocationTargetException
@@ -47,40 +54,30 @@ public class UtilMongoDB {
 
         Field[] fields = AnnotationUtils.filterDeepFields(classEntity);
 
-        int count = fields.length;
+        Object insert;
 
-        Object insert = null;
+        for (Field field : fields) {
+            Method method = Utils.findSetter(field.getName(), classEntity, field.getType());
 
-        for (int i = 0; i < count; i++) {
-            Method method = Utils.findSetter(fields[i].getName(), classEntity, fields[i].getType());
+            Class<?> classField = field.getType();
 
-            Class<?> classField = fields[i].getType();
+            Object currentBson = bsonObject.get(AnnotationUtils.deepFieldName(field));
+            if (currentBson != null) {
 
-            Object currentBson = bsonObject.get(AnnotationUtils.deepFieldName(fields[i]));
-            if (currentBson!=null){
+                if (Iterable.class.isAssignableFrom(classField)) {
+                    Type type = field.getGenericType();
 
-                if(Iterable.class.isAssignableFrom(classField) ){
-
-                    Method methodGetter = Utils.findGetter(fields[i].getName(), classEntity);
-
-                    Type type = fields[i].getGenericType();
-
-                    insert = subDocumentListCase(type, (List) bsonObject.get(AnnotationUtils.deepFieldName(fields[i])));
+                    insert = subDocumentListCase(type, (List) bsonObject.get(AnnotationUtils.deepFieldName(field)));
 
 
-                }else if (IDeepType.class.isAssignableFrom(classField)){
-                    insert = getObjectFromBson (classField, (BSONObject) bsonObject.get(AnnotationUtils.deepFieldName(fields[i])));
-                }
-                else{
-
-
+                } else if (IDeepType.class.isAssignableFrom(classField)) {
+                    insert = getObjectFromBson(classField, (BSONObject) bsonObject.get(AnnotationUtils.deepFieldName
+                            (field)));
+                } else {
                     insert = currentBson;
-    
                 }
 
                 method.invoke(t, insert);
-
-
             }
         }
 
@@ -105,27 +102,23 @@ public class UtilMongoDB {
 
 
     /**
-     * converts from an entity class with deep's anotations to BsonObject
+     * converts from an entity class with deep's anotations to BsonObject.
      *
-     * @param t
-     * @param <T>
-     * @return
+     * @param t an instance of an object of type T to convert to BSONObject.
+     * @param <T> the type of the object to convert.
+     * @return the provided object converted to BSONObject.
      * @throws IllegalAccessException
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
     public static <T extends IDeepType> BSONObject getBsonFromObject(T t) throws IllegalAccessException, InstantiationException, InvocationTargetException {
-
-
         Field[] fields = AnnotationUtils.filterDeepFields(t.getClass());
-
-        int count = fields.length;
 
         BSONObject bson = new BasicBSONObject();
 
-        for (int i = 0; i < count; i++) {
-            Method method = Utils.findGetter(fields[i].getName(), t.getClass());
-            bson.put(AnnotationUtils.deepFieldName(fields[i]), method.invoke(t));
+        for (Field field : fields) {
+            Method method = Utils.findGetter(field.getName(), t.getClass());
+            bson.put(AnnotationUtils.deepFieldName(field), method.invoke(t));
         }
 
         return bson;
@@ -134,32 +127,23 @@ public class UtilMongoDB {
     /**
      * returns the id value annotated with @DeepField(fieldName = "_id")
      *
-     * @param t
-     * @param <T>
-     * @return
+     * @param t an instance of an object of type T to convert to BSONObject.
+     * @param <T> the type of the object to convert.
+     * @return the provided object converted to Object.
      * @throws IllegalAccessException
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
     public static <T extends IDeepType> Object getId(T t) throws IllegalAccessException, InstantiationException, InvocationTargetException {
-
-
         Field[] fields = AnnotationUtils.filterDeepFields(t.getClass());
 
-
-        int count = fields.length;
-
-
-        for (int i = 0; i < count; i++) {
-            if (AnnotationUtils.deepFieldName(fields[i]).equals("_id")) {
-                return Utils.findGetter(fields[i].getName(), t.getClass()).invoke(t);
+        for (Field field : fields) {
+            if (MONGO_DEFAULT_ID.equals(AnnotationUtils.deepFieldName(field))) {
+                return Utils.findGetter(field.getName(), t.getClass()).invoke(t);
             }
 
         }
 
         return null;
     }
-
-
-
 }

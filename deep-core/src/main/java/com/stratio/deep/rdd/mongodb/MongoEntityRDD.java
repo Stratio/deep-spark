@@ -26,6 +26,8 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.DeepMongoRDD;
 import org.bson.BSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 import scala.reflect.ClassTag$;
 
@@ -38,6 +40,7 @@ import java.lang.reflect.InvocationTargetException;
  */
 public final class MongoEntityRDD<T extends IDeepType> extends DeepMongoRDD<T> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MongoEntityRDD.class);
     private static final long serialVersionUID = -3208994171892747470L;
 
 
@@ -61,12 +64,8 @@ public final class MongoEntityRDD<T extends IDeepType> extends DeepMongoRDD<T> {
 
         try {
             return UtilMongoDB.getObjectFromBson(this.getConf().getEntityClass(), tuple._2());
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            LOG.error("Cannot convert BSON: ",e);
         }
         return null;
     }

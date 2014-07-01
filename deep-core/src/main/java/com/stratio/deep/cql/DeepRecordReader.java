@@ -368,8 +368,8 @@ public class DeepRecordReader {
 
                 generatedColumns = withoutKeyColumns(generatedColumns);
                 generatedColumns = (clusterKey == null || "".equals(clusterKey))
-                        ? partitionKey + (generatedColumns != null ? ("," + generatedColumns) : "")
-                        : partitionKey + "," + clusterKey + (generatedColumns != null ? ("," + generatedColumns) : "");
+                        ? partitionKey + (generatedColumns != null ? "," + generatedColumns : "")
+                        : partitionKey + "," + clusterKey + (generatedColumns != null ? "," + generatedColumns : "");
             }
 
             return Pair.create(clause.left,
@@ -478,7 +478,7 @@ public class DeepRecordReader {
          */
         private String partitionKeyMarkers() {
             String result = null;
-            for (BoundColumn column : partitionBoundColumns) {
+            for (int i = 0; i < partitionBoundColumns.size(); i++){
                 result = result == null ? "?" : result + ",?";
             }
 

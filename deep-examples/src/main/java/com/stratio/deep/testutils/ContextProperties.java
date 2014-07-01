@@ -16,6 +16,7 @@
 
 package com.stratio.deep.testutils;
 
+import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.utils.Constants;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
@@ -90,7 +91,7 @@ public class ContextProperties {
             if (line.hasOption("help")){
                 formatter.printHelp( "", options );
 
-                System.exit(1);
+                throw new DeepGenericException("Help command issued");
             }
 
             jar = (line.hasOption("jars") ? line.getOptionValues("jars") : new String[]{});

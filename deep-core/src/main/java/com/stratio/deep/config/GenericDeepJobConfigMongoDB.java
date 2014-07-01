@@ -31,14 +31,13 @@ import java.util.Map;
  * @param <T>
  */
 public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
-    private static final Logger LOG = Logger.getLogger("com.stratio.deep.config.GenericDeepJobConfigMongoDB");
     private static final long serialVersionUID = -7179376653643603038L;
 
 
     /**
      * configuration to be broadcasted to every spark node
      */
-    public transient Configuration configHadoop;
+    private transient Configuration configHadoop;
 
     /**
      * A list of mongodb host to connect
