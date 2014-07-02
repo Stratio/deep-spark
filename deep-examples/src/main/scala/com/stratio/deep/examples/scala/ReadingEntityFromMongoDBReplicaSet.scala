@@ -32,12 +32,12 @@ final object ReadingEntityFromMongoDBReplicaSet {
 
   def doMain(args: Array[String]) {
     val job: String = "scala:readingEntityFromMongoDBReplicaSet"
-    val host1: String = "localhost:47017"
-    val host2: String = "localhost:47018"
-    val host3: String = "localhost:47019"
+    val host1: String = "localhost:57017"
+    val host2: String = "localhost:57018"
+    val host3: String = "localhost:57019"
     val database: String = "test"
     val inputCollection: String = "input"
-    val replicaSet: String = "s1"
+    val replicaSet: String = "s2"
     val readPreference: String = "primaryPreferred"
 
     val p: ContextProperties = new ContextProperties(args)

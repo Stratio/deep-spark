@@ -16,7 +16,7 @@
 
 package com.stratio.deep.examples.scala
 
-import com.stratio.deep.config.{DeepJobConfigFactory, IMongoDeepJobConfig}
+import com.stratio.deep.config._
 import com.stratio.deep.context.DeepSparkContext
 import com.stratio.deep.rdd.mongodb.MongoEntityRDD
 import com.stratio.deep.testentity.{BookEntity, WordCount}

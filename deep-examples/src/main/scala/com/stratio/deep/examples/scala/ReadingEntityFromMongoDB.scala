@@ -34,7 +34,7 @@ import org.apache.log4j.Logger
 
   def doMain(args: Array[String]) {
     val job: String = "scala:readingEntityFromMongoDB"
-    val host: String = "localhost:27017"
+    val host: String = "localhost:27100"
     val database: String = "test"
     val inputCollection: String = "input"
 
