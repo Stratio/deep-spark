@@ -152,11 +152,12 @@ public class MongoEntityRDDTest implements Serializable {
 
     @AfterClass
     public void cleanup() {
-        Files.forceDelete(new File(DB_FOLDER_NAME));
 
         if (mongodExecutable != null) {
             mongodExecutable.stop();
         }
+
+        Files.forceDelete(new File(DB_FOLDER_NAME));
     }
 
     @Test

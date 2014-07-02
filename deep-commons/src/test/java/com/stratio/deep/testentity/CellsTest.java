@@ -16,6 +16,7 @@
 
 package com.stratio.deep.testentity;
 
+import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepGenericException;
@@ -38,12 +39,12 @@ public class CellsTest {
         Cells cells = new Cells();
         assertEquals(cells.size(), 0);
 
-        Cells keys = new Cells(Cell.create("id1", "", true, false), Cell.create("id2", "", false, true));
+        Cells keys = new Cells(CassandraCell.create("id1", "", true, false), CassandraCell.create("id2", "", false, true));
 
         assertEquals(keys.size(), 2);
 
-        Cells values = new Cells(Cell.create("domain_name", ""), Cell.create("url", ""), Cell.create("response_time",
-                ""), Cell.create("response_code", ""), Cell.create("download_time", ""));
+        Cells values = new Cells(CassandraCell.create("domain_name", ""), CassandraCell.create("url", ""), CassandraCell.create("response_time",
+                ""), CassandraCell.create("response_code", ""), CassandraCell.create("download_time", ""));
 
         assertEquals(values.size(), 5);
 
@@ -64,13 +65,13 @@ public class CellsTest {
             fail();
         }
 
-        cells.add(Cell.create("domain_name", ""));
+        cells.add(CassandraCell.create("domain_name", ""));
         assertEquals(cells.size(), 1);
     }
 
     @Test
     public void testGetCellByIdx() {
-        Cells keys = new Cells(Cell.create("id1", "payload1", true, false), Cell.create("id2", "payload2", false,
+        Cells keys = new Cells(CassandraCell.create("id1", "payload1", true, false), CassandraCell.create("id2", "payload2", false,
                 true));
 
         try {
@@ -96,13 +97,13 @@ public class CellsTest {
         assertNotNull(c);
         assertEquals(c.getCellName(), "id2");
         assertEquals(UTF8Type.instance.compose(c.getDecomposedCellValue()), "payload2");
-        assertTrue(c.marshallerClassName().equals(UTF8Type.class.getCanonicalName()));
+        assertTrue(((CassandraCell)c).marshallerClassName().equals(UTF8Type.class.getCanonicalName()));
     }
 
     @Test
     public void testGetCellByName() {
-        Cells values = new Cells(Cell.create("domain_name", "abc.es"), Cell.create("url", ""), Cell.create(
-                "response_time", ""), Cell.create("response_code", ""), Cell.create("download_time", ""));
+        Cells values = new Cells(CassandraCell.create("domain_name", "abc.es"), CassandraCell.create("url", ""), CassandraCell.create(
+                "response_time", ""), CassandraCell.create("response_code", ""), CassandraCell.create("download_time", ""));
 
         assertNull(values.getCellByName("notexistingcell"));
         Cell c = values.getCellByName("domain_name");
@@ -114,8 +115,8 @@ public class CellsTest {
 
     @Test
     public void testGetCells() {
-        Cells values = new Cells(Cell.create("domain_name", "abc.es"), Cell.create("url", ""), Cell.create(
-                "response_time", ""), Cell.create("response_code", ""), Cell.create("download_time", ""));
+        Cells values = new Cells(CassandraCell.create("domain_name", "abc.es"), CassandraCell.create("url", ""), CassandraCell.create(
+                "response_time", ""), CassandraCell.create("response_code", ""), CassandraCell.create("download_time", ""));
 
         Collection<Cell> copy = values.getCells();
 
@@ -126,8 +127,8 @@ public class CellsTest {
     @Test
     public void testGetDecomposedCellValues() {
         long downloadTime = System.currentTimeMillis();
-        Cells values = new Cells(Cell.create("domain_name", "abc.es"), Cell.create("url", "http://www.abc.es"),
-                Cell.create("response_time", 102), Cell.create("response_code", 200), Cell.create("download_time",
+        Cells values = new Cells(CassandraCell.create("domain_name", "abc.es"), CassandraCell.create("url", "http://www.abc.es"),
+                CassandraCell.create("response_time", 102), CassandraCell.create("response_code", 200), CassandraCell.create("download_time",
                 downloadTime)
         );
 
@@ -153,8 +154,8 @@ public class CellsTest {
     public void testIterability() {
         long downloadTime = System.currentTimeMillis();
 
-        Cells values = new Cells(Cell.create("domain_name", "abc.es"), Cell.create("url", "http://www.abc.es"),
-                Cell.create("response_time", 102), Cell.create("response_code", 200), Cell.create("download_time",
+        Cells values = new Cells(CassandraCell.create("domain_name", "abc.es"), CassandraCell.create("url", "http://www.abc.es"),
+                CassandraCell.create("response_time", 102), CassandraCell.create("response_code", 200), CassandraCell.create("download_time",
                 downloadTime)
         );
 
@@ -190,30 +191,30 @@ public class CellsTest {
     @Test
     public void testSplitCells() {
 
-        Cells cells = new Cells(Cell.create("domain_name", ""), Cell.create("id2", "", false, true), Cell.create(
-                "response_time", ""), Cell.create("url", ""), Cell.create("id1", "", true, false), Cell.create(
-                "response_code", ""), Cell.create("download_time", ""));
+        Cells cells = new Cells(CassandraCell.create("domain_name", ""), CassandraCell.create("id2", "", false, true), CassandraCell.create(
+                "response_time", ""), CassandraCell.create("url", ""), CassandraCell.create("id1", "", true, false), CassandraCell.create(
+                "response_code", ""), CassandraCell.create("download_time", ""));
 
         Cells keys = cells.getIndexCells();
         assertNotNull(keys);
-        assertTrue(keys.equals(new Cells(Cell.create("id2", "", false, true), Cell.create("id1", "", true, false))));
+        assertTrue(keys.equals(new Cells(CassandraCell.create("id2", "", false, true), CassandraCell.create("id1", "", true, false))));
 
         Cells values = cells.getValueCells();
         assertNotNull(values);
         assertTrue(values.equals(
-                new Cells(Cell.create("domain_name", ""), Cell.create("response_time", ""), Cell.create("url", ""),
-                        Cell.create("response_code", ""), Cell.create("download_time", ""))
+                new Cells(CassandraCell.create("domain_name", ""), CassandraCell.create("response_time", ""), CassandraCell.create("url", ""),
+                        CassandraCell.create("response_code", ""), CassandraCell.create("download_time", ""))
         ));
     }
 
     public void testNotEquals() {
-        Cells cells = new Cells(Cell.create("domain_name", ""), Cell.create("id2", "", false, true), Cell.create(
-                "response_time", ""), Cell.create("url", ""), Cell.create("id1", "", true, false), Cell.create(
-                "response_code", ""), Cell.create("download_time", ""));
+        Cells cells = new Cells(CassandraCell.create("domain_name", ""), CassandraCell.create("id2", "", false, true), CassandraCell.create(
+                "response_time", ""), CassandraCell.create("url", ""), CassandraCell.create("id1", "", true, false), CassandraCell.create(
+                "response_code", ""), CassandraCell.create("download_time", ""));
 
         assertFalse(cells.equals(new Integer(1)));
 
-        Cells keys = new Cells(Cell.create("id1", "payload1", true, false), Cell.create("id2", "payload2", false, true));
+        Cells keys = new Cells(CassandraCell.create("id1", "payload1", true, false), CassandraCell.create("id2", "payload2", false, true));
 
         assertFalse(cells.equals(keys));
     }

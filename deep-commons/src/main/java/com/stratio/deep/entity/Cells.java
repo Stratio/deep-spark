@@ -198,7 +198,7 @@ public class Cells implements Iterable<Cell>, Serializable {
         List<ByteBuffer> res = new ArrayList<>();
 
         for (Cell c : cells) {
-            res.add(c.getDecomposedCellValue());
+            res.add(((CassandraCell)c).getDecomposedCellValue());
         }
 
         return res;
@@ -230,7 +230,7 @@ public class Cells implements Iterable<Cell>, Serializable {
     public Cells getIndexCells() {
         Cells res = new Cells();
         for (Cell cell : cells) {
-            if (cell.isPartitionKey() || cell.isClusterKey()) {
+            if (((CassandraCell)cell).isPartitionKey() || ((CassandraCell)cell).isClusterKey()) {
                 res.add(cell);
             }
 
@@ -249,7 +249,7 @@ public class Cells implements Iterable<Cell>, Serializable {
     public Cells getValueCells() {
         Cells res = new Cells();
         for (Cell cell : cells) {
-            if (!cell.isPartitionKey() && !cell.isClusterKey()) {
+            if (!((CassandraCell)cell).isPartitionKey() && !((CassandraCell)cell).isClusterKey()) {
                 res.add(cell);
             }
 

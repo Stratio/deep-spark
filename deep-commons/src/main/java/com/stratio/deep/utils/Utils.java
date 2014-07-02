@@ -16,6 +16,7 @@
 
 package com.stratio.deep.utils;
 
+import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
@@ -61,7 +62,7 @@ public final class Utils {
 
         for (Cell c : cells) {
 
-            if (c.isPartitionKey() || c.isClusterKey()) {
+            if (((CassandraCell)c).isPartitionKey() || ((CassandraCell)c).isClusterKey()) {
 
                 keys.add(c);
             } else {
@@ -92,11 +93,11 @@ public final class Utils {
         Cells values = new Cells();
 
         for (Field keyField : keyFields) {
-            keys.add(Cell.create(e, keyField));
+            keys.add(CassandraCell.create(e, keyField));
         }
 
         for (Field valueField : otherFields) {
-            values.add(Cell.create(e, valueField));
+            values.add(CassandraCell.create(e, valueField));
         }
 
         return new Tuple2<>(keys, values);
@@ -237,11 +238,11 @@ public final class Utils {
                 sb.append(", ");
             }
 
-            sb.append(cellName).append(" ").append(key.marshaller().asCQL3Type().toString());
+            sb.append(cellName).append(" ").append(((CassandraCell)key).marshaller().asCQL3Type().toString());
 
-            if (key.isPartitionKey()) {
+            if (((CassandraCell)key).isPartitionKey()) {
                 partitionKey.add(cellName);
-            } else if (key.isClusterKey()) {
+            } else if (((CassandraCell)key).isClusterKey()) {
                 clusterKey.add(cellName);
             }
 
@@ -251,7 +252,7 @@ public final class Utils {
         if (values != null) {
             for (Cell key : values) {
                 sb.append(", ");
-                sb.append(quote(key.getCellName())).append(" ").append(key.marshaller().asCQL3Type().toString());
+                sb.append(quote(key.getCellName())).append(" ").append(((CassandraCell)key).marshaller().asCQL3Type().toString());
             }
         }
 
@@ -320,7 +321,7 @@ public final class Utils {
 
         StringBuilder keyClause = new StringBuilder(" WHERE ");
         for (Cell cell : keys.getCells()) {
-            if (cell.isPartitionKey() || cell.isClusterKey()) {
+            if (((CassandraCell)cell).isPartitionKey() || ((CassandraCell)cell).isClusterKey()) {
                 if (k > 0) {
                     keyClause.append(" AND ");
                 }

@@ -73,8 +73,8 @@ public final class DeepJobConfigFactory implements Serializable {
     }
 
 
-    public static IMongoDeepJobConfig<Object> createMongoDB() {
-        return new GenericDeepJobConfigMongoDB<Object>();
+    public static GenericDeepJobConfigMongoDB<Cells> createMongoDB() {
+        return new CellDeepJobConfigMongoDB();
     }
 
 

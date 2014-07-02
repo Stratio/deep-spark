@@ -17,6 +17,7 @@
 package com.stratio.deep.rdd;
 
 import com.stratio.deep.config.ICassandraDeepJobConfig;
+import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.utils.Pair;
@@ -55,7 +56,7 @@ public class CassandraCellRDD extends CassandraRDD<Cells> {
 
         for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
             Cell cd = columnDefinitions.get(entry.getKey());
-            cells.add(Cell.create(cd, entry.getValue()));
+            cells.add(CassandraCell.create(cd, entry.getValue()));
         }
 
         for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
@@ -64,7 +65,7 @@ public class CassandraCellRDD extends CassandraRDD<Cells> {
                 continue;
             }
 
-            cells.add(Cell.create(cd, entry.getValue()));
+            cells.add(CassandraCell.create(cd, entry.getValue()));
         }
 
         return cells;

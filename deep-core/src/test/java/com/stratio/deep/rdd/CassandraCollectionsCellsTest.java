@@ -23,6 +23,7 @@ import com.datastax.driver.core.Session;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
+import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepIOException;
@@ -291,27 +292,27 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
             Cell ph = e.getCellByName("phones");
             Cell uu = e.getCellByName("uuid2id");
 
-            Cell newid = Cell.create(id, id.getCellValue());
+            Cell newid = CassandraCell.create(id, id.getCellValue());
 
-            Cell newfn = Cell.create(fn, fn.getCellValue() + "_out");
+            Cell newfn = CassandraCell.create(fn, fn.getCellValue() + "_out");
 
-            Cell newln = Cell.create(ln, ln.getCellValue() + "_out");
+            Cell newln = CassandraCell.create(ln, ln.getCellValue() + "_out");
 
             Set<String> emails = (Set<String>) em.getCellValue();
             emails.add("klv@email.com");
 
-            Cell newem = Cell.create(em, emails);
+            Cell newem = CassandraCell.create(em, emails);
 
             List<String> phones = (List<String>) ph.getCellValue();
             phones.add("111-111-1111112");
 
-            Cell newph = Cell.create(ph, phones);
+            Cell newph = CassandraCell.create(ph, phones);
 
             Map<UUID, Integer> uuid2id = (Map<UUID, Integer>) uu.getCellValue();
             for (Map.Entry<UUID, Integer> entry : uuid2id.entrySet()) {
                 entry.setValue(entry.getValue() + 10);
             }
-            Cell newuu = Cell.create(uu, uuid2id);
+            Cell newuu = CassandraCell.create(uu, uuid2id);
 
             return new Cells(newid, newfn, newln, newem, newph, newuu);
         }
