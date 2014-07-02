@@ -301,17 +301,17 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
         List<ColumnMetadata> allColumns = tableMetadata.getColumns();
 
         for (ColumnMetadata key : partitionKeys) {
-            Cell metadata = Cell.create(key.getName(), key.getType(), Boolean.TRUE, Boolean.FALSE);
+            Cell metadata = Cell.create(key.getName(), key.getType(), Boolean.TRUE, Boolean.FALSE, key.getTable().getName());
             columnDefinitionMap.put(key.getName(), metadata);
         }
 
         for (ColumnMetadata key : clusteringKeys) {
-            Cell metadata = Cell.create(key.getName(), key.getType(), Boolean.FALSE, Boolean.TRUE);
+            Cell metadata = Cell.create(key.getName(), key.getType(), Boolean.FALSE, Boolean.TRUE, key.getTable().getName());
             columnDefinitionMap.put(key.getName(), metadata);
         }
 
         for (ColumnMetadata key : allColumns) {
-            Cell metadata = Cell.create(key.getName(), key.getType(), Boolean.FALSE, Boolean.FALSE);
+            Cell metadata = Cell.create(key.getName(), key.getType(), Boolean.FALSE, Boolean.FALSE, key.getTable().getName());
             if (!columnDefinitionMap.containsKey(key.getName())) {
                 columnDefinitionMap.put(key.getName(), metadata);
             }
