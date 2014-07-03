@@ -16,7 +16,9 @@
 
 package com.stratio.deep.config;
 
+import com.mongodb.QueryBuilder;
 import org.apache.hadoop.conf.Configuration;
+import org.bson.BSONObject;
 
 import java.io.Serializable;
 import java.util.List;
@@ -59,4 +61,54 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      * @return this object.
      */
     public abstract IMongoDeepJobConfig<T> readPreference(String readPreference);
+
+    /**
+     *Filter query
+     * @param query
+     * @return
+     */
+    public IMongoDeepJobConfig<T> query(String query);
+
+    /**
+     *Filter query
+     * @param query
+     * @return
+     */
+    public IMongoDeepJobConfig<T> query(BSONObject query);
+
+    /**
+     *Filter query
+     * @param query
+     * @return
+     */
+    public IMongoDeepJobConfig<T> query(QueryBuilder query);
+
+    /**
+     *Fiels to be returned
+     * @param fields
+     * @return
+     */
+    public IMongoDeepJobConfig<T> fields(String fields);
+
+
+    /**
+     * Fiels to be returned
+     * @param fields
+     * @return
+     */
+    public IMongoDeepJobConfig<T> fields(BSONObject fields);
+
+    /**
+     * Sorting
+     * @param sort
+     * @return
+     */
+    public IMongoDeepJobConfig<T> sort(String sort);
+
+    /**
+     * Sorting
+     * @param sort
+     * @return
+     */
+    public IMongoDeepJobConfig<T> sort(BSONObject sort);
 }

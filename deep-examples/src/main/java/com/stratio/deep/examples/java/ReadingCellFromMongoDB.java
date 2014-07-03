@@ -16,6 +16,7 @@
 
 package com.stratio.deep.examples.java;
 
+import com.mongodb.QueryBuilder;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
 import com.stratio.deep.config.IMongoDeepJobConfig;
@@ -28,6 +29,8 @@ import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
 import com.stratio.deep.testentity.MessageEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
+import org.bson.BSONObject;
+import org.bson.BasicBSONObject;
 import scala.Tuple2;
 
 import java.util.List;
@@ -50,7 +53,7 @@ public final class ReadingCellFromMongoDB {
     public static void doMain(String[] args) {
         String job = "java:readingCellFromMongoDB";
 
-        String host = "localhost:27017";
+        String host = "127.0.0.1:27017";
 
         String database = "test";
         String inputCollection = "input";
@@ -60,8 +63,19 @@ public final class ReadingCellFromMongoDB {
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
+        QueryBuilder query = QueryBuilder.start();
+        query.and("number").greaterThan(27).lessThan(30);
 
-        IMongoDeepJobConfig inputConfigEntity = DeepJobConfigFactory.createMongoDB().host(host).database(database).collection(inputCollection).initialize();
+        BSONObject bsonSort = new BasicBSONObject();
+        bsonSort.put("number",-1);
+
+        BSONObject bsonFields = new BasicBSONObject();
+        bsonFields.put("number",1);
+        bsonFields.put("text",1);
+        bsonFields.put("_id",0);
+
+        IMongoDeepJobConfig inputConfigEntity = DeepJobConfigFactory.createMongoDB().host(host).database(database)
+                .collection(inputCollection).query(query).sort(bsonSort).fields(bsonFields).initialize();
 
         MongoCellRDD inputRDDEntity = deepContext.mongoCellRDD(inputConfigEntity);
 
