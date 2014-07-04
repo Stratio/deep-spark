@@ -16,6 +16,11 @@
 
 package com.stratio.deep.testutils;
 
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.math.BigInteger;
+import java.util.*;
+
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
@@ -27,11 +32,6 @@ import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
 import org.testng.annotations.Test;
 import scala.Tuple2;
-
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.math.BigInteger;
-import java.util.*;
 
 import static com.stratio.deep.utils.Utils.*;
 import static org.testng.Assert.*;
@@ -152,9 +152,10 @@ public class UtilsTest {
 
     @Test
     public void testUpdateQueryGenerator() {
-        Cells keys = new Cells(Cell.create("id1", "", true, false), Cell.create("id2", "", true, false));
+        Cells keys = new Cells("defaultTable",
+				        Cell.create("id1", "", true, false), Cell.create("id2", "", true, false));
 
-        Cells values = new Cells(Cell.create("domain_name", ""), Cell.create("url", ""), Cell.create("response_time",
+        Cells values = new Cells("defaultTable",Cell.create("domain_name", ""), Cell.create("url", ""), Cell.create("response_time",
                 ""), Cell.create("response_code", ""), Cell.create("download_time", ""));
 
         String sql = updateQueryGenerator(keys, values, OUTPUT_KEYSPACE_NAME, OUTPUT_COLUMN_FAMILY);
@@ -184,11 +185,11 @@ public class UtilsTest {
 
         UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
 
-        Cells keys = new Cells(Cell.create("id1", "", true, false),
+        Cells keys = new Cells("defaultTable",Cell.create("id1", "", true, false),
                 Cell.create("id2", testTimeUUID, true, false),
                 Cell.create("id3", new Integer(0), false, true));
 
-        Cells values = new Cells(
+        Cells values = new Cells( "defaultTable",
                 Cell.create("domain_name", ""),
                 Cell.create("url", ""),
                 Cell.create("response_time", new Long(0)),
@@ -212,9 +213,9 @@ public class UtilsTest {
 
         UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
 
-        Cells keys = new Cells(Cell.create("id1", testTimeUUID, true, false));
+        Cells keys = new Cells("defaultTable",Cell.create("id1", testTimeUUID, true, false));
 
-        Cells values = new Cells(
+        Cells values = new Cells("defaultTable",
                 Cell.create("domain_name", ""),
                 Cell.create("url", ""),
                 Cell.create("response_time", new Long(0)),
@@ -236,11 +237,11 @@ public class UtilsTest {
         UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
         Date testDate = new Date();
 
-        Cells keys = new Cells(Cell.create("id1", "", true, false),
+        Cells keys = new Cells("defaultTable",Cell.create("id1", "", true, false),
                 Cell.create("id2", testTimeUUID, true, false),
                 Cell.create("id3", new Integer(0), false, true));
 
-        Cells values = new Cells(
+        Cells values = new Cells("defaultTable",
                 Cell.create("domain_name", ""),
                 Cell.create("url", ""),
                 Cell.create("response_time", new Long(0)),
@@ -272,42 +273,7 @@ public class UtilsTest {
         assertEquals(vals[7], testDate);
     }
 
-    @Test
-    public void testCellList2Tuple() {
-        Cell domainName = Cell.create("domain_name", "");
 
-        Cell id2 = Cell.create("id2", "", false, true);
-        Cell responseTime = Cell.create("response_time", "");
-        Cell url = Cell.create("url", "");
-        Cell id1 = Cell.create("id1", "", true, false);
-        Cell id3 = Cell.create("id3", "", true, false);
-        Cell responseCode = Cell.create("response_code", "");
-        Cell downloadTime = Cell.create("download_time", "");
-
-        Cells cells = new Cells(
-                domainName,
-                id2,
-                responseTime,
-                url,
-                id1,
-                id3,
-                responseCode,
-                downloadTime);
-
-        Tuple2<Cells, Cells> tuple = cellList2tuple(cells);
-        assertNotNull(tuple);
-        assertEquals(tuple._1().size(), 3);
-        assertEquals(tuple._2().size(), 5);
-
-        assertEquals(tuple._2().getCellByName("domain_name"), domainName);
-        assertEquals(tuple._2().getCellByName("response_time"), responseTime);
-        assertEquals(tuple._2().getCellByName("download_time"), downloadTime);
-        assertEquals(tuple._2().getCellByName("response_code"), responseCode);
-
-        assertEquals(tuple._1().getCellByName("id2"), id2);
-        assertEquals(tuple._1().getCellByName("id1"), id1);
-        assertEquals(tuple._1().getCellByName("id3"), id3);
-    }
 
     @Test
     public void testSingleQuote() {

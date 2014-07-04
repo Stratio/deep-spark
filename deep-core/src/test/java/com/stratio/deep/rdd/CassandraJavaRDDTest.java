@@ -16,11 +16,18 @@
 
 package com.stratio.deep.rdd;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.CharacterCodingException;
+import java.util.List;
+import java.util.Map;
+
+import com.google.common.collect.Lists;
+
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.google.common.collect.Lists;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
@@ -43,12 +50,6 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import scala.Tuple2;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.CharacterCodingException;
-import java.util.List;
-import java.util.Map;
 
 import static org.testng.Assert.*;
 
@@ -332,7 +333,7 @@ class WrongSensors2CellsFunction implements Function<Tuple2<String, Double>, Cel
         Cell sensorTimeUUID = Cell.create("time_taken", UUIDGen.getTimeUUID());
         Cell sensorDataCell = Cell.create("value", t._2());
 
-        return new Cells(sensorNameCell, sensorTimeUUID, sensorDataCell);
+        return new Cells("defaultTable",sensorNameCell, sensorTimeUUID, sensorDataCell);
     }
 }
 
@@ -343,14 +344,14 @@ class Sensors2CellsFunction implements Function<Tuple2<String, Double>, Cells> {
         Cell sensorTimeUUID = Cell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
         Cell sensorDataCell = Cell.create("value", t._2());
 
-        return new Cells(sensorNameCell, sensorTimeUUID, sensorDataCell);
+        return new Cells("defaultTable",sensorNameCell, sensorTimeUUID, sensorDataCell);
     }
 }
 
 class Tuple2CellsFunction implements Function<Tuple2<String, Integer>, Cells> {
     @Override
     public Cells call(Tuple2<String, Integer> t) throws Exception {
-        return new Cells(Cell.create("domain", t._1(), true, false), Cell.create("count", t._2()));
+        return new Cells("defaultTable",Cell.create("domain", t._1(), true, false), Cell.create("count", t._2()));
     }
 }
 

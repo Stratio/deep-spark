@@ -16,15 +16,15 @@
 
 package com.stratio.deep.entity;
 
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+
 import com.datastax.driver.core.DataType;
 import com.stratio.deep.annotations.DeepField;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepInstantiationException;
 import org.apache.cassandra.db.marshal.AbstractType;
-
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.nio.ByteBuffer;
 
 import static com.stratio.deep.utils.AnnotationUtils.*;
 
@@ -60,8 +60,6 @@ public final class Cell implements Serializable {
     private Boolean isClusterKey = Boolean.FALSE;
 
     private CellValidator cellValidator;
-
-    private String tableName;
 
     /**
      * Factory method, creates a new Cell from its value and metadata information<br/>
@@ -137,19 +135,6 @@ public final class Cell implements Serializable {
     }
 
     /**
-     * Factory method, creates a new metadata Cell, i.e. a Cell without value.
-     *
-     * @param cellName       the cell name
-     * @param cellType       the cell value type.
-     * @param isPartitionKey true if this cell is part of the cassandra's partition key.
-     * @param isClusterKey   true if this cell is part of the cassandra's clustering key.
-     * @return an instance of a Cell object for the provided parameters.
-     */
-    public static Cell create(String cellName, DataType cellType, Boolean isPartitionKey,
-                              Boolean isClusterKey, String tableName) {
-        return new Cell(cellName, cellType, isPartitionKey, isClusterKey, tableName);
-    }
-    /**
      * Constructs a Cell from a {@link com.stratio.deep.annotations.DeepField} property.
      *
      * @param e     instance of the testentity whose field is going to generate a Cell.
@@ -206,18 +191,6 @@ public final class Cell implements Serializable {
         this.isPartitionKey = isPartitionKey;
         this.cellValidator = getValueType(cellType);
     }
-
-    /**
-     * Private constructor.
-     */
-    private Cell(String cellName, DataType cellType, Boolean isPartitionKey, Boolean isClusterKey, String tableName) {
-        this.cellName = cellName;
-        this.isClusterKey = isClusterKey;
-        this.isPartitionKey = isPartitionKey;
-        this.cellValidator = getValueType(cellType);
-        this.tableName = tableName;
-    }
-
 
     /**
      * Private constructor.
@@ -410,14 +383,7 @@ public final class Cell implements Serializable {
         sb.append(", isPartitionKey=").append(isPartitionKey);
         sb.append(", isClusterKey=").append(isClusterKey);
         sb.append(", cellValidator=").append(cellValidator);
-        sb.append(", tableName='").append(tableName).append('\'');
         sb.append('}');
         return sb.toString();
     }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-
 }

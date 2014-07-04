@@ -74,7 +74,7 @@ object WritingCellToCassandra {
       t: (String, Integer) =>
         val c1 = Cell.create("domain", t._1, true, false);
         val c2 = Cell.create("num_pages", t._2);
-        new Cells(c1, c2)
+        new Cells(outputKeyspaceName, c1, c2)
     }
 
     CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig)

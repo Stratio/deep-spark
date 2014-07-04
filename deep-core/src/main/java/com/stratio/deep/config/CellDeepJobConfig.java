@@ -33,7 +33,7 @@ public class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
     }
 
     {
-        dummyCells = new Cells();
+        dummyCells = new Cells("dummyCellsTable");
     }
 
     @SuppressWarnings("unchecked")

@@ -17,7 +17,6 @@
 package com.stratio.deep.functions;
 
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.utils.Utils;
 import scala.Tuple2;
 
 /**
@@ -33,6 +32,9 @@ public class CellList2TupleFunction extends AbstractSerializableFunction<Cells, 
      */
     @Override
     public Tuple2<Cells, Cells> apply(Cells cells) {
-        return Utils.cellList2tuple(cells);
+	    Cells keys = cells.getIndexCells();
+	    Cells values = cells.getValueCells();
+
+        return new Tuple2<>(keys, values);
     }
 }

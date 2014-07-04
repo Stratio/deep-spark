@@ -16,6 +16,16 @@
 
 package com.stratio.deep.utils;
 
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.*;
+
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
+
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
@@ -24,16 +34,7 @@ import com.stratio.deep.exception.DeepIOException;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.TimeUUIDType;
 import org.apache.cassandra.db.marshal.UUIDType;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
 import scala.Tuple2;
-
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.*;
 
 import static com.stratio.deep.utils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
 
@@ -45,32 +46,6 @@ import static com.stratio.deep.utils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_T
  * @author Luca Rosellini <luca@strat.io>
  */
 public final class Utils {
-
-    /**
-     * Utility method that converts an IDeepType to tuple of two Cells.<br/>
-     * The first Cells element contains the list of Cell elements that represent the key (partition + cluster key).
-     * <br/>
-     * The second Cells element contains all the other columns.
-     *
-     * @param cells the Cells object to process.
-     * @return a pair whose first element is a Cells object containing key Cell(s) and whose second element contains all of the other Cell(s).
-     */
-    public static Tuple2<Cells, Cells> cellList2tuple(Cells cells) {
-        Cells keys = new Cells();
-        Cells values = new Cells();
-
-        for (Cell c : cells) {
-
-            if (c.isPartitionKey() || c.isClusterKey()) {
-
-                keys.add(c);
-            } else {
-                values.add(c);
-            }
-        }
-
-        return new Tuple2<>(keys, values);
-    }
 
     /**
      * Convers an instance of type <T> to a tuple of ( Map<String, ByteBuffer>, List<ByteBuffer> ).
@@ -88,8 +63,8 @@ public final class Utils {
         Field[] keyFields = fields.left;
         Field[] otherFields = fields.right;
 
-        Cells keys = new Cells();
-        Cells values = new Cells();
+        Cells keys = new Cells(e.getClass().getName());
+        Cells values = new Cells(e.getClass().getName());
 
         for (Field keyField : keyFields) {
             keys.add(Cell.create(e, keyField));

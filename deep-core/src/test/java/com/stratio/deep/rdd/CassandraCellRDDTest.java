@@ -16,6 +16,8 @@
 
 package com.stratio.deep.rdd;
 
+import java.util.List;
+
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -34,8 +36,6 @@ import org.testng.annotations.Test;
 import scala.Function1;
 import scala.reflect.ClassTag$;
 
-import java.util.List;
-
 import static org.testng.Assert.*;
 
 /**
@@ -50,7 +50,8 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
 
         @Override
         public Cells apply(Cells e) {
-            return new Cells(e.getCellByName("name"), e.getCellByName("gender"), Cell.create("age", 15, false, true),
+            return new Cells(e.getDefaultTableName(),
+				            e.getCellByName("name"), e.getCellByName("gender"), Cell.create("age", 15, false, true),
                     e.getCellByName("animal"), e.getCellByName("password"), e.getCellByName("color"),
                     e.getCellByName("lucene"), e.getCellByName("food"));
         }
@@ -67,7 +68,8 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
             Cells indexCells = cells.getIndexCells();
             Cells valueCells = cells.getValueCells();
 
-            if (indexCells.equals(new Cells(Cell.create("name", "pepito_3", true, false), Cell.create("gender", "male",
+            if (indexCells.equals(
+				            new Cells(cells.getDefaultTableName(),Cell.create("name", "pepito_3", true, false), Cell.create("gender", "male",
                     true, false), Cell.create("age", -2, false, true), Cell.create("animal", "monkey", false, true)))) {
                 assertEquals(valueCells.getCellByName("password").getCellValue(), "abc");
                 assertNull(valueCells.getCellByName("color").getCellValue());

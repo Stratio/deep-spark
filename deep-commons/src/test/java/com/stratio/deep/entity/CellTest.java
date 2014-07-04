@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.testentity;
+package com.stratio.deep.entity;
 
 import com.datastax.driver.core.DataType;
-import com.stratio.deep.entity.Cell;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepInstantiationException;
+import com.stratio.deep.testentity.CommonsTestEntity;
 import org.apache.cassandra.db.marshal.*;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
