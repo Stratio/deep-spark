@@ -23,10 +23,18 @@ import org.apache.commons.lang.StringUtils;
 import com.stratio.deep.exception.DeepGenericException;
 
 /**
+ * <p>
  * Represents a tuple inside the Cassandra's datastore. A Cells object basically is an ordered
  * collection of {@link com.stratio.deep.entity.Cell} objects, plus a few utility methods to access
  * specific cells in the row.
- *
+ * </p>
+ * <p>
+ * A Cells object may contain Cell objects belonging to different tables. Ex: A Cells object may contain the
+ * result of a join of different tables.
+ * For this reason a Cells object carries the information of the table associated to each Cell. You may omit
+ * providing the table name information, the provided Cell(s) object will be internally associated to a fictional default
+ * table.
+ * </p>
  * @author Luca Rosellini <luca@stratio.com>
  */
 public class Cells implements Iterable<Cell>, Serializable {
@@ -37,11 +45,19 @@ public class Cells implements Iterable<Cell>, Serializable {
 	 */
     private String defaultTableName;
 
+	private final static String DEFAULT_TABLE_NAME = "3fa2fbc6d8abbc77cdab9e3216d957dffd64a64b";
+
 	/**
 	 * Maps a list of Cell to their table.
 	 */
     private Map<String,List<Cell>> cells = new HashMap<>();
 
+	/**
+	 * Given the table name, returns the List of Cell object associated to that table.
+	 *
+	 * @param tableName the table name.
+	 * @return the List of Cell object associated to that table.
+	 */
 	private List<Cell> getCellsByTable(String tableName){
 		String tName = StringUtils.isEmpty(tableName) ? defaultTableName : tableName;
 
@@ -55,8 +71,15 @@ public class Cells implements Iterable<Cell>, Serializable {
 		return res;
 	}
 
+	/**
+	 * Constructs a new Cells object without a default table name.
+	 */
+	public Cells() {
+		this.defaultTableName = DEFAULT_TABLE_NAME;
+	}
+
     /**
-     * Default constructor.
+     * Builds a new Cells object using the provided table name as the default table name.
      */
     public Cells(String defaultTableName) {
 	    this.defaultTableName = defaultTableName;
@@ -65,19 +88,21 @@ public class Cells implements Iterable<Cell>, Serializable {
 
 	/**
 	 * Builds a new Cells object containing the provided cells belonging to <i>table</i>.
+	 * Sets the provided table name as the default table.
 	 *
 	 * @param cells the array of Cells we want to use to create the Cells object.
 	 */
-	public Cells(String table, Cell... cells) {
-		this.defaultTableName = table;
-		if (StringUtils.isEmpty(table)){
+	public Cells(String defaultTableName, Cell... cells) {
+		this.defaultTableName = defaultTableName;
+		if (StringUtils.isEmpty(defaultTableName)){
 			throw new IllegalArgumentException("table name cannot be null");
 		}
-		Collections.addAll(getCellsByTable(table), cells);
+		Collections.addAll(getCellsByTable(defaultTableName), cells);
 	}
 
     /**
      * Adds a new Cell object to this Cells instance.
+     * Associates the provided Cell to the default table.
      *
      * @param c the Cell we want to add to this Cells object.
      * @return either true/false if the Cell has been added successfully or not.
@@ -92,6 +117,7 @@ public class Cells implements Iterable<Cell>, Serializable {
 
 	/**
 	 * Adds a new Cell object to this Cells instance.
+	 * Associates the provided Cell to the table whose name is <i>table</i>.
 	 *
 	 * @param c the Cell we want to add to this Cells object.
 	 * @return either true/false if the Cell has been added successfully or not.
@@ -145,7 +171,7 @@ public class Cells implements Iterable<Cell>, Serializable {
     }
 
 	/**
-	 * Replaces the cell having the same name that the given one with the given Cell object.
+	 * Replaces the cell (belonging to the default table) having the same name that the given one with the given Cell object.
 	 *
 	 * @param c the Cell to replace the one in the Cells object.
 	 * @return either true/false if the Cell has been successfully replace or not.
@@ -179,7 +205,7 @@ public class Cells implements Iterable<Cell>, Serializable {
     }
 
 	/**
-	 * Removes the cell with the given cell name.
+	 * Removes the cell (belonging to the default table) with the given cell name.
 	 *
 	 * @param cellName the name of the cell to be removed.
 	 * @return either true/false if the Cell has been successfully removed or not.
@@ -224,7 +250,7 @@ public class Cells implements Iterable<Cell>, Serializable {
     }
 
     /**
-     * Returns the cell at position idx.
+     * Returns the cell at position idx in the list of Cell object associated to the default table.
      *
      * @param idx the index position of the Cell we want to retrieve.
      * @return Returns the cell at position idx.
@@ -234,7 +260,7 @@ public class Cells implements Iterable<Cell>, Serializable {
     }
 
 	/**
-	 * Returns the cell at position idx belonging to the given table.
+	 * Returns the cell at position idx in the list of Cell object associated to <i>table</i>.
 	 *
 	 * @param idx the index position of the Cell we want to retrieve.
 	 * @return Returns the cell at position idx.
@@ -244,7 +270,7 @@ public class Cells implements Iterable<Cell>, Serializable {
 	}
 
     /**
-     * Returns the first found Cell whose name is cellName, or null if this Cells object contains no cell whose
+     * Returns the Cell (associated to the default table) whose name is <i>cellName</i>, or null if this Cells object contains no cell whose
      * name is cellName.
      *
      * @param cellName the name of the Cell we want to retrieve from this Cells object.
@@ -256,7 +282,7 @@ public class Cells implements Iterable<Cell>, Serializable {
     }
 
 	/**
-	 * Returns the Cell (belonging to <i>table</i>) whose name is cellName, or null if this Cells object contains no cell whose
+	 * Returns the Cell (associated to <i>table</i>) whose name is cellName, or null if this Cells object contains no cell whose
 	 * name is cellName.
 	 *
 	 * @param cellName the name of the Cell we want to retrieve from this Cells object.
@@ -291,7 +317,8 @@ public class Cells implements Iterable<Cell>, Serializable {
     }
 
 	/**
-	 * Returns an immutable list of Cell object (belonging to <i>table</i>) contained in this Cells.
+	 * Returns an immutable list of Cell object (associated to <i>table</i>) contained in this Cells.
+	 *
 	 * @param tableName the name of the owning table.
 	 * @return the requested list of Cell objects.
 	 */
@@ -307,7 +334,7 @@ public class Cells implements Iterable<Cell>, Serializable {
 	}
 
     /**
-     * Converts every Cell contained in this object to an ArrayBuffer. In order to perform the
+     * Converts every Cell (associated to the default table) contained in this object to an ArrayBuffer. In order to perform the
      * conversion we use the appropriate Cassandra marshaller for the Cell.
      *
      * @return a collection of Cell(s) values converted to byte buffers using the appropriate
@@ -318,7 +345,7 @@ public class Cells implements Iterable<Cell>, Serializable {
     }
 
 	/**
-	 * Converts every Cell (belonging to <i>table</i>) contained in this object to an ArrayBuffer. In order to perform the
+	 * Converts every Cell (associated to <i>table</i>) contained in this object to an ArrayBuffer. In order to perform the
 	 * conversion we use the appropriate Cassandra marshaller for the Cell.
 	 *
 	 * @return a collection of Cell(s) values converted to byte buffers using the appropriate
@@ -335,7 +362,7 @@ public class Cells implements Iterable<Cell>, Serializable {
 	}
 
     /**
-     * Converts every Cell (belonging to <i>table</i>) contained in this object to an ArrayBuffer. In order to perform the
+     * Converts every Cell (associated to <i>table</i>) contained in this object to an ArrayBuffer. In order to perform the
      * conversion we use the appropriate Cassandra marshaller for the Cell.
      *
      * @return a collection of Cell(s) values.
@@ -351,7 +378,7 @@ public class Cells implements Iterable<Cell>, Serializable {
     }
 
 	/**
-	 * Converts every Cell contained in this object to an ArrayBuffer. In order to perform the
+	 * Converts every Cell (associated to the default table) to an ArrayBuffer. In order to perform the
 	 * conversion we use the appropriate Cassandra marshaller for the Cell.
 	 *
 	 * @return a collection of Cell(s) values.
@@ -361,7 +388,7 @@ public class Cells implements Iterable<Cell>, Serializable {
 	}
 
     /**
-     * Extracts from this Cells object the cells (belonging to <i>table</i>) marked either as partition key or cluster key.
+     * Extracts from this object the Cell(s) associated to <i>table</i> and marked either as partition key or cluster key.
      * Returns an empty Cells object if the current object does not contain any Cell marked as key.
      *
      * @return the Cells object containing the subset of this Cells object of only the Cell(s) part of
@@ -380,14 +407,13 @@ public class Cells implements Iterable<Cell>, Serializable {
     }
 
 	/**
-	 * Extracts from this Cells object the cells marked either as partition key or cluster key.
+	 * Extracts the Cell(s) associated to the default table and marked either as partition key or cluster key.
 	 * Returns an empty Cells object if the current object does not contain any Cell marked as key.
 	 *
 	 * @return the Cells object containing the subset of this Cells object of only the Cell(s) part of
 	 * the key.
 	 */
 	public Cells getIndexCells() {
-
 		Cells res = new Cells(this.defaultTableName);
 
 		for (Map.Entry<String, List<Cell>> entry : cells.entrySet()) {
@@ -402,8 +428,8 @@ public class Cells implements Iterable<Cell>, Serializable {
 	}
 
     /**
-     * Extracts from this Cells object the cells _NOT_ marked as partition key and _NOT_ marked as
-     * cluster key belonging to <i>table</i>.
+     * Extracts the cells associated to <i>table</i> _NOT_ marked as partition key and _NOT_ marked as
+     * cluster key b.
      *
      * @return the Cells object containing the subset of this Cells object of only the Cell(s) that
      * are NOT part of the key.
@@ -420,7 +446,7 @@ public class Cells implements Iterable<Cell>, Serializable {
     }
 
 	/**
-	 * Extracts from this Cells object the cells _NOT_ marked as partition key and _NOT_ marked as
+	 * Extracts the Cell(s) associated to the default table _NOT_ marked as partition key and _NOT_ marked as
 	 * cluster key.
 	 *
 	 * @return the Cells object containing the subset of this Cells object of only the Cell(s) that
@@ -449,7 +475,8 @@ public class Cells implements Iterable<Cell>, Serializable {
     }
 
     /**
-     * {@inheritDoc}
+     * Iterated over the full list of Cell object contained in this object, no matter to which table each Cell is
+     * associated to.
      */
     @Override
     public Iterator<Cell> iterator() {
@@ -505,6 +532,11 @@ public class Cells implements Iterable<Cell>, Serializable {
         return "Cells{" + "cells=" + cells + '}';
     }
 
+	/**
+	 * Default table name getter.
+	 *
+	 * @return the default table name.
+	 */
 	public String getDefaultTableName() {
 		return defaultTableName;
 	}
