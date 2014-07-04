@@ -74,7 +74,7 @@ public final class WritingCellToCassandra {
 
 
         // --- INPUT RDD
-        IDeepJobConfig inputConfig = DeepJobConfigFactory.create()
+        ICassandraDeepJobConfig<Cells> inputConfig = DeepJobConfigFactory.create()
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
