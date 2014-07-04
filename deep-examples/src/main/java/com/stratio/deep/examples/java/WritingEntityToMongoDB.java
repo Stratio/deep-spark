@@ -32,7 +32,7 @@ import java.util.List;
  * Example class to write an entity to mongoDB
  */
 public final class WritingEntityToMongoDB {
-    private static final Logger LOG = Logger.getLogger(com.stratio.deep.examples.scala.WritingEntityToMongoDB.class);
+    private static final Logger LOG = Logger.getLogger(com.stratio.deep.examples.java.WritingEntityToMongoDB.class);
     public static List<Tuple2<String, Integer>> results;
 
     private WritingEntityToMongoDB() {
