@@ -67,7 +67,7 @@ public final class ReadingCellFromMongoDB {
         query.and("number").greaterThan(27).lessThan(30);
 
         BSONObject bsonSort = new BasicBSONObject();
-        bsonSort.put("number",-1);
+        bsonSort.put("number",1);
 
         BSONObject bsonFields = new BasicBSONObject();
         bsonFields.put("number",1);
@@ -75,7 +75,10 @@ public final class ReadingCellFromMongoDB {
         bsonFields.put("_id",0);
 
         IMongoDeepJobConfig inputConfigEntity = DeepJobConfigFactory.createMongoDB().host(host).database(database)
-                .collection(inputCollection).query(query).sort(bsonSort).fields(bsonFields).initialize();
+                .collection(inputCollection)
+                .createInputSplit(false)
+                .filterQuery(query)
+                .sort(bsonSort).fields(bsonFields).initialize();
 
         MongoCellRDD inputRDDEntity = deepContext.mongoCellRDD(inputConfigEntity);
 

@@ -19,11 +19,37 @@ package com.stratio.deep.config;
 import com.datastax.driver.core.Session;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Defines the public methods that each Stratio Deep Cassandra configuration object should implement.
  */
 public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T, ICassandraDeepJobConfig<T>> {
+
+    /**
+     * Adds a new filter for the Cassandra underlying datastore.<br/>
+     * Once a new filter has been added, all subsequent queries generated to the underlying datastore
+     * will include the filter on the specified column called <i>filterColumnName</i>.
+     * Before propagating the filter we check if an index exists in Cassandra.
+     *
+     * @param filterColumnName the name of the columns (as known by the datastore) to filter on.
+     * @param filterValue      the value of the filter to use. May be any expression,
+     *                         depends on the actual index implementation.
+     * @return this configuration object.
+     * @throws com.stratio.deep.exception.DeepIndexNotFoundException if the specified field has not been indexed in
+     *                                                               Cassandra.
+     * @throws com.stratio.deep.exception.DeepNoSuchFieldException   if the specified field is not a valid column in
+     *                                                               Cassandra.
+     */
+    public ICassandraDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue);
+
+    /**
+     * Returns the map of additional filters specified by the user.
+     *
+     * @return the map of configured additional filters.
+     */
+    public abstract Map<String, Serializable> getAdditionalFilters();
+
 
     /**
      * Returns the partitioner class name.

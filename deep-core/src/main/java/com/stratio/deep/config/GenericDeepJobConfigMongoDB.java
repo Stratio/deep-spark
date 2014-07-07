@@ -110,12 +110,29 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
      */
     private String sort;
 
+
+    /**
+     * Shard key
+     */
+    private String inputKey;
+
+
+    private boolean createInputSplit = true;
+
+
+    private boolean useShards = false;
+
+
+    private boolean splitsUseChunks = true;
+
     /**
      * Default constructor
      */
     public GenericDeepJobConfigMongoDB() {
 
     }
+
+
 
     /**
      * {@inheritDoc}
@@ -125,13 +142,6 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public IMongoDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue) {
-        return null;
-    }
 
     /**
      * {@inheritDoc}
@@ -139,7 +149,7 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     // TODO
     @Override
     public IMongoDeepJobConfig<T> pageSize(int pageSize) {
-        return null;
+        return this;
     }
 
     /**
@@ -202,18 +212,29 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     }
 
 
-//    @Override
-    public IMongoDeepJobConfig<T> query(String query) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IMongoDeepJobConfig<T> filterQuery(String query) {
         this.query = query;
         return this;
     }
 
-    public IMongoDeepJobConfig<T> query(BSONObject query) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IMongoDeepJobConfig<T> filterQuery(BSONObject query) {
         this.query = query.toString();
         return this;
     }
 
-    public IMongoDeepJobConfig<T> query(QueryBuilder query) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IMongoDeepJobConfig<T> filterQuery(QueryBuilder query) {
         this.query = query.get().toString();
         return this;
     }
@@ -289,14 +310,44 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         this.sort = sort.toString();
         return this;
     }
+
+
     /**
      * {@inheritDoc}
      */
-    // TODO
     @Override
-    public Map<String, Serializable> getAdditionalFilters() {
-        return null;
+    public IMongoDeepJobConfig<T> createInputSplit(boolean createInputSplit) {
+        this.createInputSplit = createInputSplit;
+        return this;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IMongoDeepJobConfig<T> useShards(boolean useShards) {
+        this.useShards = useShards;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IMongoDeepJobConfig<T> splitsUseChunks(boolean splitsUseChunks) {
+        this.splitsUseChunks = splitsUseChunks;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IMongoDeepJobConfig<T> inputKey(String inputKey) {
+        this.inputKey = inputKey;
+        return this;
+    }
+
 
     /**
      * {@inheritDoc}
@@ -375,18 +426,23 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
 
         configHadoop.set(MongoConfigUtil.OUTPUT_URI, connection.toString());
 
-        // uses mongos instead of connecting to shards directly
-        configHadoop.set(MongoConfigUtil.SPLITS_USE_SHARDS, "false");
 
-        configHadoop.set(MongoConfigUtil.CREATE_INPUT_SPLITS, "false");
+        if(inputKey!=null){
+            configHadoop.set(MongoConfigUtil.INPUT_KEY, inputKey);
+        }
 
-        configHadoop.set(MongoConfigUtil.SPLITS_USE_CHUNKS, "true");
+
+        configHadoop.set(MongoConfigUtil.SPLITS_USE_SHARDS, String.valueOf(useShards));
+
+        configHadoop.set(MongoConfigUtil.CREATE_INPUT_SPLITS, String.valueOf(createInputSplit));
+
+        configHadoop.set(MongoConfigUtil.SPLITS_USE_CHUNKS, String.valueOf(splitsUseChunks));
+
 
 
         if(query !=null){
             configHadoop.set(MongoConfigUtil.INPUT_QUERY, query);
         }
-
 
         if(fields!=null){
             configHadoop.set(MongoConfigUtil.INPUT_FIELDS,fields);
@@ -396,7 +452,6 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         if(sort != null){
             configHadoop.set(MongoConfigUtil.INPUT_SORT, sort);
         }
-
 
         if (username != null && password != null) {
             //TODO: In release 1.2.1 mongo-hadoop will have a new feature with mongos process.

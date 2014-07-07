@@ -67,21 +67,21 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      * @param query
      * @return
      */
-    public IMongoDeepJobConfig<T> query(String query);
+    public IMongoDeepJobConfig<T> filterQuery(String query);
 
     /**
      *Filter query
      * @param query
      * @return
      */
-    public IMongoDeepJobConfig<T> query(BSONObject query);
+    public IMongoDeepJobConfig<T> filterQuery(BSONObject query);
 
     /**
      *Filter query
      * @param query
      * @return
      */
-    public IMongoDeepJobConfig<T> query(QueryBuilder query);
+    public IMongoDeepJobConfig<T> filterQuery(QueryBuilder query);
 
     /**
      *Fiels to be returned
@@ -111,4 +111,43 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      * @return
      */
     public IMongoDeepJobConfig<T> sort(BSONObject sort);
+
+    /**
+     *  This is {@code true} by default now, but if {@code false}, only one InputSplit (your whole collection) will be
+     * assigned to Spark – severely reducing parallel mapping.
+     *
+     * @param createInputSplit
+     * @return
+     */
+    public IMongoDeepJobConfig<T> createInputSplit(boolean createInputSplit);
+
+    /**
+     *
+     * If {@code true} in a sharded setup splits will be made to connect to individual backend {@code mongod}s.  This
+     * can be unsafe. If {@code mongos} is moving chunks around you might see duplicate data, or miss some data
+     * entirely. Defaults to {@code false}
+     *
+     * @param useShards
+     * @return
+     */
+    public IMongoDeepJobConfig<T> useShards(boolean useShards);
+
+
+    /**
+     * If {@code true} have one split = one shard chunk.  If {SPLITS_USE_SHARDS} is not true splits will still
+     * use chunks, but will connect through {@code mongos} instead of the individual backend {@code mongod}s (the safe
+     * thing to do). If {SPLITS_USE_SHARDS} is {@code true} but this is {@code false} one split will be made for
+     * each backend shard. THIS IS UNSAFE and may result in data being run multiple times <p> Defaults to {@code true }
+     *
+     * @param splitsUseChunks
+     * @return
+     */
+    public IMongoDeepJobConfig<T> splitsUseChunks(boolean splitsUseChunks);
+
+    /**
+     *
+     * @param inputKey
+     * @return
+     */
+    public IMongoDeepJobConfig<T> inputKey(String inputKey);
 }
