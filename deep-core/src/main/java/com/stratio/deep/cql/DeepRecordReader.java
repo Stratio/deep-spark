@@ -31,6 +31,7 @@ import com.datastax.driver.core.*;
 import com.datastax.driver.core.exceptions.NoHostAvailableException;
 import com.stratio.deep.config.GenericDeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
+import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
@@ -617,14 +618,14 @@ public class DeepRecordReader {
         for (ColumnMetadata key : partitionKeys) {
             String columnName = key.getName();
             BoundColumn boundColumn = new BoundColumn(columnName);
-            boundColumn.validator = Cell.getValueType(key.getType()).getAbstractType();
+            boundColumn.validator = CassandraCell.getValueType(key.getType()).getAbstractType();
             partitionBoundColumns.add(boundColumn);
             types.add(boundColumn.validator);
         }
         for (ColumnMetadata key : clusteringKeys) {
             String columnName = key.getName();
             BoundColumn boundColumn = new BoundColumn(columnName);
-            boundColumn.validator = Cell.getValueType(key.getType()).getAbstractType();
+            boundColumn.validator = CassandraCell.getValueType(key.getType()).getAbstractType();
             clusterColumns.add(boundColumn);
         }
 

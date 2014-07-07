@@ -25,6 +25,7 @@ import com.datastax.driver.core.Session;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
+import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepIOException;
@@ -51,7 +52,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
         @Override
         public Cells apply(Cells e) {
             return new Cells(e.getDefaultTableName(),
-				            e.getCellByName("name"), e.getCellByName("gender"), Cell.create("age", 15, false, true),
+				            e.getCellByName("name"), e.getCellByName("gender"), CassandraCell.create("age", 15, false, true),
                     e.getCellByName("animal"), e.getCellByName("password"), e.getCellByName("color"),
                     e.getCellByName("lucene"), e.getCellByName("food"));
         }
@@ -69,8 +70,8 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
             Cells valueCells = cells.getValueCells();
 
             if (indexCells.equals(
-				            new Cells(cells.getDefaultTableName(),Cell.create("name", "pepito_3", true, false), Cell.create("gender", "male",
-                    true, false), Cell.create("age", -2, false, true), Cell.create("animal", "monkey", false, true)))) {
+				            new Cells(cells.getDefaultTableName(), CassandraCell.create("name", "pepito_3", true, false), CassandraCell.create("gender", "male",
+                    true, false), CassandraCell.create("age", -2, false, true), CassandraCell.create("animal", "monkey", false, true)))) {
                 assertEquals(valueCells.getCellByName("password").getCellValue(), "abc");
                 assertNull(valueCells.getCellByName("color").getCellValue());
                 assertEquals(valueCells.getCellByName("food").getCellValue(), "donuts");

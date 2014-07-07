@@ -16,13 +16,15 @@
 
 package com.stratio.deep.utils;
 
+import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.entity.MongoCell;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Several utilities to work used in the Spark <=> MongoDB integration.
@@ -146,4 +148,55 @@ public class UtilMongoDB {
 
         return null;
     }
+
+
+    /**
+     * converts from BsonObject to cell class with deep's anotations
+     *
+     * @param bsonObject
+     * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws InvocationTargetException
+     */
+    public static Cells getCellFromBson(BSONObject bsonObject) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+
+        Cells cells = new Cells();
+
+
+        Map<String, Object> map = bsonObject.toMap();
+
+        Set<Map.Entry<String, Object>> entryBson = map.entrySet();
+
+        for(Map.Entry<String, Object> entry : entryBson){
+
+            cells.add(MongoCell.create(entry.getKey(), entry.getValue()));
+        }
+        return cells;
+    }
+
+
+    /**
+     * converts from and entity class with deep's anotations to BsonObject
+     *
+
+     * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws InvocationTargetException
+     */
+    public static BSONObject getBsonFromCell(Cells cells) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+
+        BSONObject bson = new BasicBSONObject();
+
+
+        for(Cell cell : cells){
+            bson.put(cell.getCellName(), cell.getCellValue());
+
+        }
+
+
+        return bson;
+    }
+
 }

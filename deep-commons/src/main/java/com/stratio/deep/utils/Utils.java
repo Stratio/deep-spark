@@ -23,6 +23,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
 
+import com.stratio.deep.entity.CassandraCell;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -67,11 +68,11 @@ public final class Utils {
         Cells values = new Cells(e.getClass().getName());
 
         for (Field keyField : keyFields) {
-            keys.add(Cell.create(e, keyField));
+            keys.add(CassandraCell.create(e, keyField));
         }
 
         for (Field valueField : otherFields) {
-            values.add(Cell.create(e, valueField));
+            values.add(CassandraCell.create(e, valueField));
         }
 
         return new Tuple2<>(keys, values);

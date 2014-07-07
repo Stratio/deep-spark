@@ -33,6 +33,7 @@ import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
+import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
@@ -329,9 +330,9 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 class WrongSensors2CellsFunction implements Function<Tuple2<String, Double>, Cells> {
     @Override
     public Cells call(Tuple2<String, Double> t) throws Exception {
-        Cell sensorNameCell = Cell.create("name", t._1());
-        Cell sensorTimeUUID = Cell.create("time_taken", UUIDGen.getTimeUUID());
-        Cell sensorDataCell = Cell.create("value", t._2());
+        Cell sensorNameCell = CassandraCell.create("name", t._1());
+        Cell sensorTimeUUID = CassandraCell.create("time_taken", UUIDGen.getTimeUUID());
+        Cell sensorDataCell = CassandraCell.create("value", t._2());
 
         return new Cells("defaultTable",sensorNameCell, sensorTimeUUID, sensorDataCell);
     }
@@ -340,9 +341,9 @@ class WrongSensors2CellsFunction implements Function<Tuple2<String, Double>, Cel
 class Sensors2CellsFunction implements Function<Tuple2<String, Double>, Cells> {
     @Override
     public Cells call(Tuple2<String, Double> t) throws Exception {
-        Cell sensorNameCell = Cell.create("name", t._1());
-        Cell sensorTimeUUID = Cell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
-        Cell sensorDataCell = Cell.create("value", t._2());
+        Cell sensorNameCell = CassandraCell.create("name", t._1());
+        Cell sensorTimeUUID = CassandraCell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
+        Cell sensorDataCell = CassandraCell.create("value", t._2());
 
         return new Cells("defaultTable",sensorNameCell, sensorTimeUUID, sensorDataCell);
     }
@@ -351,7 +352,7 @@ class Sensors2CellsFunction implements Function<Tuple2<String, Double>, Cells> {
 class Tuple2CellsFunction implements Function<Tuple2<String, Integer>, Cells> {
     @Override
     public Cells call(Tuple2<String, Integer> t) throws Exception {
-        return new Cells("defaultTable",Cell.create("domain", t._1(), true, false), Cell.create("count", t._2()));
+        return new Cells("defaultTable", CassandraCell.create("domain", t._1(), true, false), CassandraCell.create("count", t._2()));
     }
 }
 

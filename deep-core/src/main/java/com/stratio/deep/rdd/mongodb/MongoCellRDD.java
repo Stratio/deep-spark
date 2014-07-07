@@ -17,7 +17,11 @@
 package com.stratio.deep.rdd.mongodb;
 
 import com.mongodb.hadoop.MongoOutputFormat;
+import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
+import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.IMongoDeepJobConfig;
+import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.utils.UtilMongoDB;
 import org.apache.spark.SparkContext;
@@ -25,6 +29,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.DeepMongoRDD;
+import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,38 +39,37 @@ import scala.reflect.ClassTag$;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * EntityRDD to interact with mongoDB
+ * CellRDD to interact with mongoDB
  *
- * @param <T>
  */
-public final class MongoEntityRDD<T extends IDeepType> extends DeepMongoRDD<T> {
+public final class MongoCellRDD extends DeepMongoRDD<Cells> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MongoEntityRDD.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MongoCellRDD.class);
     private static final long serialVersionUID = -3208994171892747470L;
 
 
     /**
-     * Public constructor that builds a new MongoEntityRDD RDD given the context and the configuration file.
+     * Public constructor that builds a new MongoCellRDD RDD given the context and the configuration file.
      *
      * @param sc     the spark context to which the RDD will be bound to.
      * @param config the deep configuration object.
      */
     @SuppressWarnings("unchecked")
-    public MongoEntityRDD(SparkContext sc, IMongoDeepJobConfig<T> config) {
-        super(sc, config, ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
+    public MongoCellRDD(SparkContext sc, IMongoDeepJobConfig<Cells> config) {
+        super(sc, config, ClassTag$.MODULE$.<Cells>apply(config.getEntityClass()));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public T transformElement(Tuple2<Object, BSONObject> tuple) {
+    public Cells transformElement(Tuple2<Object, BSONObject> tuple) {
 
 
         try {
-            return UtilMongoDB.getObjectFromBson(this.getConf().getEntityClass(), tuple._2());
+            return UtilMongoDB.getCellFromBson(tuple._2());
         } catch (Exception e) {
-            LOG.error("Cannot convert BSON: ",e);
+            LOG.error("Cannot convert BSON: ", e);
         }
         return null;
     }
@@ -73,25 +77,23 @@ public final class MongoEntityRDD<T extends IDeepType> extends DeepMongoRDD<T> {
 
     /**
      * Save a RDD to MongoDB
-     *
      * @param rdd
      * @param config
-     * @param <T>
      */
-    public static <T extends IDeepType> void saveEntity(JavaRDD<T> rdd, IMongoDeepJobConfig<T> config) {
+    public static void saveCell(RDD rdd, IMongoDeepJobConfig<Cells> config) {
 
-        JavaPairRDD<Object, BSONObject> save = rdd.mapToPair(new PairFunction<T, Object, BSONObject>() {
+        JavaPairRDD<Object, BSONObject> save = rdd.toJavaRDD().mapToPair(new PairFunction<Cells, Object, BSONObject>() {
 
 
             @Override
-            public Tuple2<Object, BSONObject> call(T t) throws Exception {
-                return new Tuple2<>(null, UtilMongoDB.getBsonFromObject(t));
+            public Tuple2<Object, BSONObject> call(Cells t) throws Exception {
+                return new Tuple2<>(null, UtilMongoDB.getBsonFromCell(t));
             }
         });
 
 
         // Only MongoOutputFormat and config are relevant
-        save.saveAsNewAPIHadoopFile("file:///entity", Object.class, Object.class, MongoOutputFormat.class, config.getHadoopConfiguration());
+        save.saveAsNewAPIHadoopFile("file:///cell", Object.class, Object.class, MongoOutputFormat.class, config.getHadoopConfiguration());
     }
 
 }

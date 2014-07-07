@@ -16,10 +16,14 @@
 
 package com.stratio.deep.config;
 
+import com.mongodb.QueryBuilder;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import com.stratio.deep.entity.Cell;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
+import org.bson.BSON;
+import org.bson.BSONObject;
+import org.bson.BasicBSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -87,12 +91,48 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
      */
     private transient Map<String, Cell> columnDefinitionMap;
 
+
+    /**
+     *OPTIONAL
+     * filter query
+     */
+    private String query;
+
+    /**
+     * OPTIONAL
+     * fields to be returned
+     */
+    private String fields;
+
+    /**
+     * OPTIONAL
+     * sorting
+     */
+    private String sort;
+
+
+    /**
+     * Shard key
+     */
+    private String inputKey;
+
+
+    private boolean createInputSplit = true;
+
+
+    private boolean useShards = false;
+
+
+    private boolean splitsUseChunks = true;
+
     /**
      * Default constructor
      */
     public GenericDeepJobConfigMongoDB() {
 
     }
+
+
 
     /**
      * {@inheritDoc}
@@ -102,13 +142,6 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public IMongoDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue) {
-        return null;
-    }
 
     /**
      * {@inheritDoc}
@@ -116,7 +149,7 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     // TODO
     @Override
     public IMongoDeepJobConfig<T> pageSize(int pageSize) {
-        return null;
+        return this;
     }
 
     /**
@@ -178,6 +211,34 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         return this;
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IMongoDeepJobConfig<T> filterQuery(String query) {
+        this.query = query;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IMongoDeepJobConfig<T> filterQuery(BSONObject query) {
+        this.query = query.toString();
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IMongoDeepJobConfig<T> filterQuery(QueryBuilder query) {
+        this.query = query.get().toString();
+        return this;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -217,11 +278,76 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     /**
      * {@inheritDoc}
      */
-    // TODO
     @Override
-    public Map<String, Serializable> getAdditionalFilters() {
-        return null;
+    public IMongoDeepJobConfig<T> fields(String fields) {
+        this.fields = fields;
+        return this;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IMongoDeepJobConfig<T> fields(BSONObject fields) {
+        this.fields = fields.toString();
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IMongoDeepJobConfig<T> sort(String sort) {
+        this.sort = sort;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IMongoDeepJobConfig<T> sort(BSONObject sort) {
+        this.sort = sort.toString();
+        return this;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IMongoDeepJobConfig<T> createInputSplit(boolean createInputSplit) {
+        this.createInputSplit = createInputSplit;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IMongoDeepJobConfig<T> useShards(boolean useShards) {
+        this.useShards = useShards;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IMongoDeepJobConfig<T> splitsUseChunks(boolean splitsUseChunks) {
+        this.splitsUseChunks = splitsUseChunks;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IMongoDeepJobConfig<T> inputKey(String inputKey) {
+        this.inputKey = inputKey;
+        return this;
+    }
+
 
     /**
      * {@inheritDoc}
@@ -297,10 +423,35 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         connection.append(options);
 
         configHadoop.set(MongoConfigUtil.INPUT_URI, connection.toString());
+
         configHadoop.set(MongoConfigUtil.OUTPUT_URI, connection.toString());
 
-        // it allows hadoop to make data split
-        configHadoop.set(MongoConfigUtil.CREATE_INPUT_SPLITS, "false");
+
+        if(inputKey!=null){
+            configHadoop.set(MongoConfigUtil.INPUT_KEY, inputKey);
+        }
+
+
+        configHadoop.set(MongoConfigUtil.SPLITS_USE_SHARDS, String.valueOf(useShards));
+
+        configHadoop.set(MongoConfigUtil.CREATE_INPUT_SPLITS, String.valueOf(createInputSplit));
+
+        configHadoop.set(MongoConfigUtil.SPLITS_USE_CHUNKS, String.valueOf(splitsUseChunks));
+
+
+
+        if(query !=null){
+            configHadoop.set(MongoConfigUtil.INPUT_QUERY, query);
+        }
+
+        if(fields!=null){
+            configHadoop.set(MongoConfigUtil.INPUT_FIELDS,fields);
+        }
+
+
+        if(sort != null){
+            configHadoop.set(MongoConfigUtil.INPUT_SORT, sort);
+        }
 
         if (username != null && password != null) {
             //TODO: In release 1.2.1 mongo-hadoop will have a new feature with mongos process.

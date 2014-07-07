@@ -63,7 +63,6 @@
             <artifactId>deep-commons</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.sf.opencsv</groupId>
