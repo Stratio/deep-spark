@@ -54,7 +54,7 @@ public class MessageEntity implements IDeepType {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("MessageEntity{");
+        final StringBuilder sb = new StringBuilder("MessageEntity{");
         sb.append("id=").append(id);
         sb.append(", text='").append(text).append('\'');
         sb.append('}');

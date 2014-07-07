@@ -16,10 +16,10 @@
 
 package com.stratio.deep.config;
 
+import java.io.Serializable;
+
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
-
-import java.io.Serializable;
 
 /**
  * Factory class for deep configuration objects.
@@ -57,6 +57,8 @@ public final class DeepJobConfigFactory implements Serializable {
     /**
      * Creates an entity-based configuration object.
      *
+     * @param entityClass the class instance of the entity class that will be used to map db objects to Java objects.
+     * @param <T> the generic type of the entity object implementing IDeepType.
      * @return a new an entity-based configuration object.
      */
     public static <T extends IDeepType> ICassandraDeepJobConfig<T> create(Class<T> entityClass) {
@@ -73,11 +75,22 @@ public final class DeepJobConfigFactory implements Serializable {
     }
 
 
+	/**
+	 * Creates a new cell-based MongoDB job configuration object.
+	 *
+	 * @return a new cell-based MongoDB job configuration object.
+	 */
     public static IMongoDeepJobConfig<Object> createMongoDB() {
         return new GenericDeepJobConfigMongoDB<Object>();
     }
 
-
+	/**
+	 * Creates a new entity-based MongoDB job configuration object.
+	 *
+	 * @param entityClass the class instance of the entity class that will be used to map db objects to Java objects.
+	 * @param <T> the generic type of the entity object implementing IDeepType.
+	 * @return a new entity-based MongoDB job configuration object.
+	 */
     public static <T extends IDeepType> IMongoDeepJobConfig<T> createMongoDB(Class<T> entityClass) {
         return new EntityDeepJobConfigMongoDB<T>(entityClass);
     }

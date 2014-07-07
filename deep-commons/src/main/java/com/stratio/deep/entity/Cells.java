@@ -148,9 +148,9 @@ public class Cells implements Iterable<Cell>, Serializable {
         boolean cellFound = false;
         int position = 0;
 
-	    List<Cell> cells = getCellsByTable(table);
+	    List<Cell> localCells = getCellsByTable(table);
 
-        Iterator<Cell> cellsIt = cells.iterator();
+        Iterator<Cell> cellsIt = localCells.iterator();
         while (!cellFound && cellsIt.hasNext()) {
             Cell currentCell = cellsIt.next();
 
@@ -162,9 +162,9 @@ public class Cells implements Iterable<Cell>, Serializable {
         }
 
         if (cellFound) {
-            cells.remove(position);
+            localCells.remove(position);
 
-            return cells.add(c);
+            return localCells.add(c);
         }
 
         return false;
@@ -193,11 +193,11 @@ public class Cells implements Iterable<Cell>, Serializable {
                     "cell name parameter cannot be null"));
         }
 
-	    List<Cell> cells = getCellsByTable(table);
+	    List<Cell> localCells = getCellsByTable(table);
 
-	    for (Cell currentCell : cells) {
+	    for (Cell currentCell : localCells) {
 		    if (currentCell.getCellName().equals(cellName)) {
-			    return cells.remove(currentCell);
+			    return localCells.remove(currentCell);
 		    }
 	    }
 
@@ -231,9 +231,9 @@ public class Cells implements Iterable<Cell>, Serializable {
         }
 
 	    for (Map.Entry<String, List<Cell>> entry : cells.entrySet()) {
-		    List<Cell> cells = entry.getValue();
+		    List<Cell> localCells = entry.getValue();
 
-		    for (Cell cell : cells) {
+		    for (Cell cell : localCells) {
 			    Cell otherCell = o.getCellByName(entry.getKey(), cell.getCellName());
 
 			    if (otherCell == null) {

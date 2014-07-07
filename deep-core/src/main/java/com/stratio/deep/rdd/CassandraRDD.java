@@ -16,6 +16,10 @@
 
 package com.stratio.deep.rdd;
 
+import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.Map;
+
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cql.DeepRecordReader;
 import com.stratio.deep.cql.DeepTokenRange;
@@ -40,10 +44,6 @@ import scala.reflect.ClassTag$;
 import scala.runtime.AbstractFunction0;
 import scala.runtime.BoxedUnit;
 
-import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.Map;
-
 import static scala.collection.JavaConversions.asScalaBuffer;
 import static scala.collection.JavaConversions.asScalaIterator;
 
@@ -56,7 +56,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
     private static final long serialVersionUID = -7338324965474684418L;
 
-    /*
+    /**
      * RDD configuration. This config is broadcasted to all the Sparks machines.
      */
     protected final Broadcast<ICassandraDeepJobConfig<T>> config;

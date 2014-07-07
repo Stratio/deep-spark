@@ -50,7 +50,7 @@ public class CantoEntity  implements IDeepType {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("Canto{");
+        final StringBuilder sb = new StringBuilder("Canto{");
         sb.append("number='").append(number).append('\'');
         sb.append(", text='").append(text).append('\'');
         sb.append('}');

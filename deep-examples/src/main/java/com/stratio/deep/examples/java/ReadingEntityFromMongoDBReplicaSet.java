@@ -22,12 +22,14 @@ import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
 import com.stratio.deep.testentity.MessageEntity;
 import com.stratio.deep.testutils.ContextProperties;
+import org.apache.log4j.Logger;
 
 
 /**
  * Example class to read an entity from a mongoDB replica set
  */
 public final class ReadingEntityFromMongoDBReplicaSet {
+	private static final Logger LOG = Logger.getLogger(com.stratio.deep.examples.java.ReadingEntityFromMongoDBReplicaSet.class);
 
     private ReadingEntityFromMongoDBReplicaSet() {
     }
@@ -79,7 +81,7 @@ public final class ReadingEntityFromMongoDBReplicaSet {
         MongoJavaRDD<MessageEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
 
 
-        System.out.println("count : " + inputRDDEntity.cache().count());
+        LOG.info("count : " + inputRDDEntity.cache().count());
 
 
         deepContext.stop();

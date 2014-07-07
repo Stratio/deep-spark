@@ -82,7 +82,7 @@ public class DeepPartition implements Partition {
      */
     @Override
     public int hashCode() {
-        return (MAGIC_NUMBER * (MAGIC_NUMBER + this.rddId) + this.idx);
+        return MAGIC_NUMBER * (MAGIC_NUMBER + this.rddId) + this.idx;
     }
 
     /**

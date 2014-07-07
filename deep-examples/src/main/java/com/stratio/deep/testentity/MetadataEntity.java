@@ -60,7 +60,7 @@ public class MetadataEntity implements IDeepType {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("MetadataEntity{");
+        final StringBuilder sb = new StringBuilder("MetadataEntity{");
         sb.append("author='").append(author).append('\'');
         sb.append(", title='").append(title).append('\'');
         sb.append(", source='").append(source).append('\'');

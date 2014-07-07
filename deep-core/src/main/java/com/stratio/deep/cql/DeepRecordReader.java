@@ -16,11 +16,19 @@
 
 package com.stratio.deep.cql;
 
-import com.datastax.driver.core.*;
-import com.datastax.driver.core.exceptions.NoHostAvailableException;
+import java.nio.ByteBuffer;
+import java.util.*;
+
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.datastax.driver.core.*;
+import com.datastax.driver.core.exceptions.NoHostAvailableException;
 import com.stratio.deep.config.GenericDeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.entity.Cell;
@@ -34,13 +42,6 @@ import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.utils.ByteBufferUtil;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.nio.ByteBuffer;
-import java.util.*;
 
 import static com.stratio.deep.cql.CassandraClientProvider.trySessionForLocation;
 
@@ -53,11 +54,15 @@ import static com.stratio.deep.cql.CassandraClientProvider.trySessionForLocation
 public class DeepRecordReader {
     private static final Logger LOG = LoggerFactory.getLogger(DeepRecordReader.class);
 
+	/*
+	 * Default page size
+	 */
     private static final int DEFAULT_CQL_PAGE_LIMIT = 1000;
 
     private DeepTokenRange split;
     private RowIterator rowIterator;
 
+	/* Column family name */
     private String cfName;
 
     // partition keys -- key aliases
@@ -72,12 +77,14 @@ public class DeepRecordReader {
     // the number of cql rows per page
     private int pageSize;
 
+	/* the Cassandra partitioner object */
     private IPartitioner partitioner;
 
     private AbstractType<?> keyValidator;
 
     private final ICassandraDeepJobConfig config;
 
+	/* A cached session opened against the Cassandra's cluster */
     private Session session;
 
     /**
@@ -208,7 +215,6 @@ public class DeepRecordReader {
 
             Map<String, ByteBuffer> valueColumns = createValue();
             Map<String, ByteBuffer> keyColumns = createKey();
-
 
             initColumns(valueColumns, keyColumns);
 
@@ -367,9 +373,12 @@ public class DeepRecordReader {
                 String clusterKey = keyString(clusterColumns);
 
                 generatedColumns = withoutKeyColumns(generatedColumns);
-                generatedColumns = (clusterKey == null || "".equals(clusterKey))
-                        ? partitionKey + (generatedColumns != null ? "," + generatedColumns : "")
-                        : partitionKey + "," + clusterKey + (generatedColumns != null ? "," + generatedColumns : "");
+	            boolean isClusterKeyEmpty = clusterKey == null || "".equals(clusterKey);
+	            String prependGeneratedColumns = StringUtils.isNotEmpty(generatedColumns)? "," + generatedColumns: "";
+
+                generatedColumns = isClusterKeyEmpty
+                        ? partitionKey +  prependGeneratedColumns
+                        : partitionKey + "," + clusterKey + prependGeneratedColumns;
             }
 
             return Pair.create(clause.left,

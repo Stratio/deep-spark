@@ -377,7 +377,7 @@ public final class Cell implements Serializable {
      */
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("Cell{");
+        final StringBuilder sb = new StringBuilder("Cell{");
         sb.append("cellName='").append(cellName).append('\'');
         sb.append(", cellValue=").append(cellValue);
         sb.append(", isPartitionKey=").append(isPartitionKey);

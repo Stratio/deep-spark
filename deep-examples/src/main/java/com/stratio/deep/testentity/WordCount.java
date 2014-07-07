@@ -58,7 +58,7 @@ public class WordCount implements IDeepType {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("WordCount{");
+        final StringBuilder sb = new StringBuilder("WordCount{");
         sb.append("word='").append(word).append('\'');
         sb.append(", count=").append(count);
         sb.append('}');

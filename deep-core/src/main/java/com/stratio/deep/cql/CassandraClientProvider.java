@@ -16,6 +16,14 @@
 
 package com.stratio.deep.cql;
 
+import java.net.InetAddress;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.LoadBalancingPolicy;
@@ -23,30 +31,24 @@ import com.datastax.driver.core.policies.Policies;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.utils.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.net.InetAddress;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by luca on 09/04/14.
  */
 class CassandraClientProvider {
-    private static final transient Map<String, Session> clientsCache = Collections.synchronizedMap(new
+    private static final transient Map<String, Session> CLIENTS_CACHE = Collections.synchronizedMap(new
             HashMap<String, Session>());
+
     private static final Logger LOG = LoggerFactory.getLogger(CassandraClientProvider.class);
 
     static {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                synchronized (clientsCache) {
-                    if (clientsCache != null && !clientsCache.isEmpty()) {
+                synchronized (CLIENTS_CACHE) {
+                    if (CLIENTS_CACHE != null && !CLIENTS_CACHE.isEmpty()) {
                         LOG.info("Closing clients ");
-                        for (Session entry : clientsCache.values()) {
+                        for (Session entry : CLIENTS_CACHE.values()) {
                             if (entry != null) {
                                 entry.close();
                             }
@@ -75,19 +77,19 @@ class CassandraClientProvider {
     static Pair<Session, String> getSession(String location, ICassandraDeepJobConfig conf, Boolean balanced) {
         assert balanced != null;
 
-        synchronized (clientsCache) {
+        synchronized (CLIENTS_CACHE) {
             final int port = conf.getCqlPort();
             final String key = location + ":" + port + ":" + conf.getKeyspace() + ":" + balanced;
 
-            if (clientsCache.containsKey(key)) {
+            if (CLIENTS_CACHE.containsKey(key)) {
                 LOG.trace("Found cached session at level 1 for key {{}}", key);
-                return Pair.create(clientsCache.get(key), location);
+                return Pair.create(CLIENTS_CACHE.get(key), location);
             }
 
             if (balanced && location.equals(conf.getHost())) {
-                clientsCache.put(key, conf.getSession());
+                CLIENTS_CACHE.put(key, conf.getSession());
                 LOG.trace("Found cached session at level 2 for key {{}}", key);
-                return Pair.create(clientsCache.get(key), location);
+                return Pair.create(CLIENTS_CACHE.get(key), location);
             }
 
             try {
@@ -105,9 +107,9 @@ class CassandraClientProvider {
                         .build();
 
                 Session session = cluster.connect(conf.getKeyspace());
-                clientsCache.put(key, session);
+                CLIENTS_CACHE.put(key, session);
 
-                return Pair.create(clientsCache.get(key), location);
+                return Pair.create(CLIENTS_CACHE.get(key), location);
             } catch (Exception e) {
                 throw new DeepIOException("Failed to create authenticated client to {" + location + "}:{" + port +
                         "}", e);

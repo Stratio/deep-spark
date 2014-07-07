@@ -16,12 +16,12 @@
 
 package com.stratio.deep.testentity;
 
+import java.util.List;
+
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.annotations.DeepField;
 import com.stratio.deep.entity.IDeepType;
 import org.bson.types.ObjectId;
-
-import java.util.List;
 
 /**
  * Created by rcrespo on 25/06/14.
@@ -66,7 +66,7 @@ public class BookEntity implements IDeepType {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("BookEntity{");
+        final StringBuilder sb = new StringBuilder("BookEntity{");
         sb.append("id=").append(id);
         sb.append(", cantoEntities=").append(cantoEntities);
         sb.append(", metadataEntity=").append(metadataEntity);

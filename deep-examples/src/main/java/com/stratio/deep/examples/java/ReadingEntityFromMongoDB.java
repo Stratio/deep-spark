@@ -16,6 +16,8 @@
 
 package com.stratio.deep.examples.java;
 
+import java.util.List;
+
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
@@ -24,8 +26,6 @@ import com.stratio.deep.testentity.MessageEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import scala.Tuple2;
-
-import java.util.List;
 
 /**
  * Example class to read an entity from mongoDB
@@ -63,7 +63,7 @@ public final class ReadingEntityFromMongoDB {
         MongoJavaRDD<MessageEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
 
 
-        System.out.println("count : " + inputRDDEntity.cache().count());
+	    LOG.info("count : " + inputRDDEntity.cache().count());
 
 
         deepContext.stop();
