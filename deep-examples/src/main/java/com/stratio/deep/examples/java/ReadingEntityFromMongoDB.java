@@ -31,7 +31,7 @@ import java.util.List;
  * Example class to read an entity from mongoDB
  */
 public final class ReadingEntityFromMongoDB {
-    private static final Logger LOG = Logger.getLogger(com.stratio.deep.examples.scala.ReadingEntityFromMongoDB.class);
+    private static final Logger LOG = Logger.getLogger(com.stratio.deep.examples.java.ReadingEntityFromMongoDB.class);
     public static List<Tuple2<String, Integer>> results;
 
     private ReadingEntityFromMongoDB() {

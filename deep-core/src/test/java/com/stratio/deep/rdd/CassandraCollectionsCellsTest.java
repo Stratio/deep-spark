@@ -16,6 +16,10 @@
 
 package com.stratio.deep.rdd;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.*;
+
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -36,10 +40,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import scala.Function1;
 import scala.reflect.ClassTag$;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.*;
 
 import static org.testng.Assert.*;
 
@@ -63,6 +63,8 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
         boolean found = false;
 
         assertEquals(entities.length, 500);
+
+	    String keyspace = getReadConfig().getKeyspace();
 
         for (Cells e : entities) {
             Integer id = (Integer) e.getCellByName("id").getCellValue();
@@ -314,7 +316,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
             }
             Cell newuu = CassandraCell.create(uu, uuid2id);
 
-            return new Cells(newid, newfn, newln, newem, newph, newuu);
+            return new Cells(e.getDefaultTableName(), newid, newfn, newln, newem, newph, newuu);
         }
     }
 

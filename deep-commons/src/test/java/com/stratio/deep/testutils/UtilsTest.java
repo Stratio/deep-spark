@@ -16,6 +16,11 @@
 
 package com.stratio.deep.testutils;
 
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.math.BigInteger;
+import java.util.*;
+
 import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
@@ -28,11 +33,6 @@ import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
 import org.testng.annotations.Test;
 import scala.Tuple2;
-
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.math.BigInteger;
-import java.util.*;
 
 import static com.stratio.deep.utils.Utils.*;
 import static org.testng.Assert.*;
@@ -153,9 +153,10 @@ public class UtilsTest {
 
     @Test
     public void testUpdateQueryGenerator() {
-        Cells keys = new Cells(CassandraCell.create("id1", "", true, false), CassandraCell.create("id2", "", true, false));
+        Cells keys = new Cells("defaultTable",
+				        CassandraCell.create("id1", "", true, false), CassandraCell.create("id2", "", true, false));
 
-        Cells values = new Cells(CassandraCell.create("domain_name", ""), CassandraCell.create("url", ""), CassandraCell.create("response_time",
+        Cells values = new Cells("defaultTable",CassandraCell.create("domain_name", ""), CassandraCell.create("url", ""), CassandraCell.create("response_time",
                 ""), CassandraCell.create("response_code", ""), CassandraCell.create("download_time", ""));
 
         String sql = updateQueryGenerator(keys, values, OUTPUT_KEYSPACE_NAME, OUTPUT_COLUMN_FAMILY);
@@ -185,11 +186,11 @@ public class UtilsTest {
 
         UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
 
-        Cells keys = new Cells(CassandraCell.create("id1", "", true, false),
+        Cells keys = new Cells("defaultTable",CassandraCell.create("id1", "", true, false),
                 CassandraCell.create("id2", testTimeUUID, true, false),
                 CassandraCell.create("id3", new Integer(0), false, true));
 
-        Cells values = new Cells(
+        Cells values = new Cells( "defaultTable",
                 CassandraCell.create("domain_name", ""),
                 CassandraCell.create("url", ""),
                 CassandraCell.create("response_time", new Long(0)),
@@ -213,9 +214,9 @@ public class UtilsTest {
 
         UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
 
-        Cells keys = new Cells(CassandraCell.create("id1", testTimeUUID, true, false));
+        Cells keys = new Cells("defaultTable",CassandraCell.create("id1", testTimeUUID, true, false));
 
-        Cells values = new Cells(
+        Cells values = new Cells("defaultTable",
                 CassandraCell.create("domain_name", ""),
                 CassandraCell.create("url", ""),
                 CassandraCell.create("response_time", new Long(0)),
@@ -237,11 +238,11 @@ public class UtilsTest {
         UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
         Date testDate = new Date();
 
-        Cells keys = new Cells(CassandraCell.create("id1", "", true, false),
+        Cells keys = new Cells("defaultTable",CassandraCell.create("id1", "", true, false),
                 CassandraCell.create("id2", testTimeUUID, true, false),
                 CassandraCell.create("id3", new Integer(0), false, true));
 
-        Cells values = new Cells(
+        Cells values = new Cells("defaultTable",
                 CassandraCell.create("domain_name", ""),
                 CassandraCell.create("url", ""),
                 CassandraCell.create("response_time", new Long(0)),
@@ -273,42 +274,7 @@ public class UtilsTest {
         assertEquals(vals[7], testDate);
     }
 
-    @Test
-    public void testCellList2Tuple() {
-        Cell domainName = CassandraCell.create("domain_name", "");
 
-        Cell id2 = CassandraCell.create("id2", "", false, true);
-        Cell responseTime = CassandraCell.create("response_time", "");
-        Cell url = CassandraCell.create("url", "");
-        Cell id1 = CassandraCell.create("id1", "", true, false);
-        Cell id3 = CassandraCell.create("id3", "", true, false);
-        Cell responseCode = CassandraCell.create("response_code", "");
-        Cell downloadTime = CassandraCell.create("download_time", "");
-
-        Cells cells = new Cells(
-                domainName,
-                id2,
-                responseTime,
-                url,
-                id1,
-                id3,
-                responseCode,
-                downloadTime);
-
-        Tuple2<Cells, Cells> tuple = cellList2tuple(cells);
-        assertNotNull(tuple);
-        assertEquals(tuple._1().size(), 3);
-        assertEquals(tuple._2().size(), 5);
-
-        assertEquals(tuple._2().getCellByName("domain_name"), domainName);
-        assertEquals(tuple._2().getCellByName("response_time"), responseTime);
-        assertEquals(tuple._2().getCellByName("download_time"), downloadTime);
-        assertEquals(tuple._2().getCellByName("response_code"), responseCode);
-
-        assertEquals(tuple._1().getCellByName("id2"), id2);
-        assertEquals(tuple._1().getCellByName("id1"), id1);
-        assertEquals(tuple._1().getCellByName("id3"), id3);
-    }
 
     @Test
     public void testSingleQuote() {

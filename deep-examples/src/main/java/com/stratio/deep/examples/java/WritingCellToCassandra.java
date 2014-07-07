@@ -16,7 +16,10 @@
 
 package com.stratio.deep.examples.java;
 
+import java.util.List;
+
 import com.google.common.collect.Lists;
+
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
@@ -27,15 +30,12 @@ import com.stratio.deep.entity.Cells;
 import com.stratio.deep.rdd.CassandraJavaRDD;
 import com.stratio.deep.rdd.CassandraRDD;
 import com.stratio.deep.testutils.ContextProperties;
-import org.apache.cassandra.thrift.Cassandra;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
-
-import java.util.List;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -67,7 +67,7 @@ public final class WritingCellToCassandra {
 
         String keyspaceName = "crawler";
         String inputTableName = "Page";
-        String outputTableName = "newlistdomains";
+        final String outputTableName = "newlistdomains";
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -75,7 +75,7 @@ public final class WritingCellToCassandra {
 
 
         // --- INPUT RDD
-        IDeepJobConfig inputConfig = DeepJobConfigFactory.create()
+        ICassandraDeepJobConfig<Cells> inputConfig = DeepJobConfigFactory.create()
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
@@ -118,7 +118,7 @@ public final class WritingCellToCassandra {
             public Cells call(Tuple2<String, Integer> t) {
                 Cell c1 = CassandraCell.create("domain", t._1(), true, false);
                 Cell c2 = CassandraCell.create("num_pages", t._2());
-                return new Cells(c1, c2);
+                return new Cells(outputTableName,c1, c2);
             }
         });
 
