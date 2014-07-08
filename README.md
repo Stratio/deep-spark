@@ -10,12 +10,12 @@ Apache Cassandra integration
 The integration is _not_ based on the Cassandra's Hadoop interface.
 Stratio Deep is one of the core modules on which [Stratio's BigData platform (SDS)](http://www.stratio.com/) is based.
 
-StratioDeep comes with an user friendly API that lets developers create Spark RDDs mapped to Cassandra column families.
+Stratio Deep comes with an user friendly API that lets developers create Spark RDDs mapped to Cassandra column families.
 We provide two different interfaces:
 
   * The first one will let developers map Cassandra tables to object entities (POJOs), just like if you were using any other ORM.
     This abstraction is quite handy, it will let you work on RDD<YourEntityHere> (under the hood StratioDeep will map columns to entity properties).
-    Your domain entities must be correctly annotated using StratioDeep annotations (see StratioDeepExample example entities in package com.stratio.deep.testentity).
+    Your domain entities must be correctly annotated using Deep annotations (take a look at deep-examples example entities in package com.stratio.deep.testentity).
 
   * The second one is a more generic 'cell' API, that will let devs work on RDD<com.stratio.deep.entity.Cells> where a Cells object is a collection of com.stratio.deep.entity.Cell object.
     Column metadata is automatically fetched from the data store. This interface is a little bit more cumbersome to work with (see the example below),
@@ -56,7 +56,7 @@ Configure the development and test environment
     * Install a new Stratio cluster using the Stratio installer. Please refer to Stratio's website to download the installer and its documentation.
     * You already have a working Cassandra server on your development machine: you need a spark+deep bundle, we suggest to create one by running:
     
-	    ``cd deep-parent``
+	    ``cd deep-scripts``
 	    
 	    ``./make-distribution-deep.sh``
 	    
