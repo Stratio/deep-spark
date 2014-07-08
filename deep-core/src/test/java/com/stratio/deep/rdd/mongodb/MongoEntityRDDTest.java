@@ -34,8 +34,12 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
@@ -62,6 +66,8 @@ public class MongoEntityRDDTest implements Serializable {
     private static final String collection = "input";
 
     private static final String collectionOutput = "output";
+
+    private static final String dataSetName = "divineComedy.json";
 
     private final static String DB_FOLDER_NAME = System.getProperty("user.home") +
             File.separator + "mongoEntityRDDTest";
@@ -115,10 +121,10 @@ public class MongoEntityRDDTest implements Serializable {
 
         mongo = new MongoClient(host, port);
         DB db = mongo.getDB(database);
-        col = db.createCollection(collection, new BasicDBObject());
+        col = db.getCollection(collection);
         col.save(new BasicDBObject("message", MESSAGE_TEST));
 
-//
+
         dataSetImport();
 
 
@@ -131,7 +137,11 @@ public class MongoEntityRDDTest implements Serializable {
     private static void dataSetImport() throws IOException {
         String dbName = "book";
         String collection = "input";
-        String JSONFile = "/home/rcrespo/Descargas/divineComedy.json";
+        URL website = new URL("http://docs.openstratio.org/resources/datasets/divineComedy.json");
+        ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+        FileOutputStream fos = new FileOutputStream(dataSetName);
+        fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+        fos.close();
         IMongoImportConfig mongoImportConfig = new MongoImportConfigBuilder()
                 .version(Version.Main.PRODUCTION)
                 .net(new Net(port, Network.localhostIsIPv6()))
@@ -140,13 +150,13 @@ public class MongoEntityRDDTest implements Serializable {
                 .upsert(false)
                 .dropCollection(true)
                 .jsonArray(true)
-                .importFile(JSONFile)
+                .importFile(dataSetName)
                 .build();
         MongoImportExecutable mongoImportExecutable = MongoImportStarter.getDefaultInstance().prepare(mongoImportConfig);
         mongoImportExecutable.start();
 
 
-//        return mongoImport;
+
 
     }
 
@@ -158,6 +168,7 @@ public class MongoEntityRDDTest implements Serializable {
         }
 
         Files.forceDelete(new File(DB_FOLDER_NAME));
+        Files.forceDelete(new File(dataSetName));
     }
 
     @Test
