@@ -53,7 +53,7 @@ echo "################################################"
 echo "Compiling Stratio Deep"
 echo "################################################"
 echo "$(pwd)"
-mvn clean package -DskipTests || { echo "Cannot build StratioDeep project, aborting"; exit 1; }
+mvn clean package -DskipTests || { echo "Cannot build Deep project, aborting"; exit 1; }
 
 mkdir -p ${TMPDIR}/lib || { echo "Cannot create output lib directory"; exit 1; }
 
@@ -65,11 +65,9 @@ latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
 
 echo -e "[${RELEASE_VER}]\n\n$(git log ${latest_tag}..HEAD)\n\n$(cat ChangeLog.txt)" > ${TMPDIR}/ChangeLog.txt
 
-if [ -n "$LOCAL_EDITOR" ]; then
-    $LOCAL_EDITOR ${TMPDIR}/ChangeLog.txt
-fi
-
-#mvn dependency:get -DgroupId=org.apache.cassandra -DartifactId=cassandra-clientutil -Dversion=${CASS_VER} -Ddest=. -Dtransitive=false -DremoteRepositories=stratio-snapshots::default::http://nexus.strat.io:8081/nexus/content/repositories/snapshots/
+#if [ -n "$LOCAL_EDITOR" ]; then
+#    $LOCAL_EDITOR ${TMPDIR}/ChangeLog.txt
+#fi
 
 echo "################################################"
 echo "Creating Spark distribuition"
@@ -86,7 +84,7 @@ git checkout "$SPARK_BRANCH" || { echo "Cannot checkout branch: ${SPARK_BRANCH}"
 chmod +x bin/stratio-deep-shell
 
 #--hadoop 2.0.0-mr1-cdh4.4.0
-./make-distribution.sh --skip-java-test || { echo "Cannot make Spark distribution"; exit 1; }
+./make-distribution.sh --skip-java-test --hadoop 2.4.0 --with-yarn || { echo "Cannot make Spark distribution"; exit 1; }
 
 cd ..
 
