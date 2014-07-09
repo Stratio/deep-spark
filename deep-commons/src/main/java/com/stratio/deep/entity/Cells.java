@@ -236,11 +236,7 @@ public class Cells implements Iterable<Cell>, Serializable {
 		    for (Cell cell : localCells) {
 			    Cell otherCell = o.getCellByName(entry.getKey(), cell.getCellName());
 
-			    if (otherCell == null) {
-				    return false;
-			    }
-
-			    if (!otherCell.equals(cell)) {
+			    if (otherCell == null || !otherCell.equals(cell)) {
 				    return false;
 			    }
 		    }

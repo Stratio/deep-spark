@@ -16,9 +16,9 @@
 
 package com.stratio.deep.entity;
 
-import org.apache.cassandra.db.marshal.AbstractType;
-
 import java.nio.ByteBuffer;
+
+import org.apache.cassandra.db.marshal.AbstractType;
 
 /**
  * Created by rcrespo on 2/07/14.
@@ -44,7 +44,7 @@ public class MongoCell extends GenericCell{
     }
 
     @Override
-    public Class<?> getValueType() {
+    public Class getValueType() {
         return null;
     }
 

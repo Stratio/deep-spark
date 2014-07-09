@@ -16,6 +16,10 @@
 
 package com.stratio.deep.examples.java;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
@@ -32,9 +36,6 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by rcrespo on 25/06/14.
@@ -71,9 +72,6 @@ public final class GroupingEntityWithMongoDB {
                 DeepJobConfigFactory.createMongoDB(BookEntity.class).host(host).database(database).collection(inputCollection).initialize();
 
         MongoJavaRDD<BookEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
-
-
-
         JavaRDD<String> words =inputRDDEntity.flatMap(new FlatMapFunction<BookEntity, String>() {
             @Override
             public Iterable<String> call(BookEntity bookEntity) throws Exception {
@@ -114,7 +112,6 @@ public final class GroupingEntityWithMongoDB {
                 DeepJobConfigFactory.createMongoDB(WordCount.class).host(host).database(database).collection(outputCollection).initialize();
 
         MongoEntityRDD.saveEntity(outputRDD,outputConfigEntity);
-
 
         deepContext.stop();
     }

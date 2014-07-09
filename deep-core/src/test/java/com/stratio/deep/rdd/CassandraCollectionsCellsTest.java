@@ -152,7 +152,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
     protected ICassandraDeepJobConfig<Cells> initReadConfig() {
         ICassandraDeepJobConfig<Cells> config = DeepJobConfigFactory.create()
                 .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).bisectFactor(testBisectFactor)
-                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily
+				        .pageSize(DEFAULT_PAGE_SIZE).cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily
                         (CQL3_COLLECTION_COLUMN_FAMILY);
 
         return config.initialize();

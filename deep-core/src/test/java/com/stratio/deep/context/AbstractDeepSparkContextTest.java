@@ -16,22 +16,23 @@
 
 package com.stratio.deep.context;
 
+import java.io.*;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.common.io.Resources;
+
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.google.common.io.Resources;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
-
-import java.io.*;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.stratio.deep.utils.Utils.quote;
 import static org.testng.Assert.assertEquals;
@@ -46,8 +47,8 @@ public abstract class AbstractDeepSparkContextTest {
     protected static DeepSparkContext context;
 
     private static CassandraServer cassandraServer;
-    public static final String KEYSPACE_NAME = "test_keyspace";
-    public static final String COLUMN_FAMILY = "test_Page";
+    public static final String KEYSPACE_NAME = "test_Keyspace";
+    public static final String COLUMN_FAMILY = "Test_Page";
     public static final String OUTPUT_KEYSPACE_NAME = "out_test_keyspace";
     public static final String OUTPUT_COLUMN_FAMILY = "out_test_page";
     public static final String CQL3_COLUMN_FAMILY = "cql3_cf";

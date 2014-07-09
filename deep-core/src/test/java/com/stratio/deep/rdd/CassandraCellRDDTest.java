@@ -26,7 +26,6 @@ import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.entity.CassandraCell;
-import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
@@ -145,7 +144,8 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
     protected ICassandraDeepJobConfig<Cells> initReadConfig() {
         ICassandraDeepJobConfig<Cells> rddConfig = DeepJobConfigFactory.create().host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(KEYSPACE_NAME).columnFamily(CQL3_COLUMN_FAMILY)
-                .bisectFactor(testBisectFactor).cqlPort(CassandraServer.CASSANDRA_CQL_PORT).initialize();
+				        .pageSize(DEFAULT_PAGE_SIZE)
+				        .bisectFactor(testBisectFactor).cqlPort(CassandraServer.CASSANDRA_CQL_PORT).initialize();
 
         return rddConfig;
     }
