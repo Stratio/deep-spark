@@ -16,6 +16,10 @@
 
 package com.stratio.deep.rdd;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.CharacterCodingException;
+
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import org.apache.cassandra.exceptions.ConfigurationException;
@@ -24,10 +28,6 @@ import org.apache.spark.Partition;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import scala.collection.Seq;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.CharacterCodingException;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -45,6 +45,8 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     private ICassandraDeepJobConfig<W> writeConfig;
 
     protected int testBisectFactor = 8;
+
+	protected static final int DEFAULT_PAGE_SIZE = 100;
 
     protected abstract void checkComputedData(W[] entities);
 
@@ -127,7 +129,6 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
 
     protected static void truncateCf(String keyspace, String cf) {
         executeCustomCQL("TRUNCATE  " + keyspace + "." + cf);
-
     }
 
     @Test(dependsOnMethods = "testSaveToCassandra")

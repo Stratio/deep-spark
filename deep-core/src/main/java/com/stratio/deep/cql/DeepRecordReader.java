@@ -32,7 +32,6 @@ import com.datastax.driver.core.exceptions.NoHostAvailableException;
 import com.stratio.deep.config.GenericDeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
-import com.stratio.deep.entity.Cell;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;

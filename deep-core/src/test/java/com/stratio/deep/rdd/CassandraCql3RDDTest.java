@@ -16,6 +16,8 @@
 
 package com.stratio.deep.rdd;
 
+import java.util.List;
+
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -33,8 +35,6 @@ import org.apache.spark.rdd.RDD;
 import org.testng.annotations.Test;
 import scala.Function1;
 import scala.reflect.ClassTag$;
-
-import java.util.List;
 
 import static org.testng.Assert.*;
 
@@ -218,8 +218,9 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
     @Override
     protected ICassandraDeepJobConfig<Cql3TestEntity> initReadConfig() {
         return DeepJobConfigFactory.create(Cql3TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST).bisectFactor(testBisectFactor)
-                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace
-                        (KEYSPACE_NAME).columnFamily(CQL3_COLUMN_FAMILY)
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+				        .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+				        .pageSize(DEFAULT_PAGE_SIZE).keyspace(KEYSPACE_NAME).columnFamily(CQL3_COLUMN_FAMILY)
                 .initialize();
     }
 

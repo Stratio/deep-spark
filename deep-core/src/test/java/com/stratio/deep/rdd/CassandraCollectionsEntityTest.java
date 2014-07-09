@@ -16,6 +16,13 @@
 
 package com.stratio.deep.rdd;
 
+import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
+
+import com.google.common.io.Resources;
+
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -23,7 +30,6 @@ import com.datastax.driver.core.Session;
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.google.common.io.Resources;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
@@ -38,11 +44,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import scala.Function1;
 import scala.reflect.ClassTag$;
-
-import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.*;
 
 import static org.testng.Assert.*;
 
@@ -203,8 +204,8 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
     protected ICassandraDeepJobConfig<Cql3CollectionsTestEntity> initReadConfig() {
         ICassandraDeepJobConfig<Cql3CollectionsTestEntity> config = DeepJobConfigFactory.create(Cql3CollectionsTestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).bisectFactor(testBisectFactor)
-                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily
-                        (CQL3_COLLECTION_COLUMN_FAMILY);
+                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME)
+				        .pageSize(DEFAULT_PAGE_SIZE).columnFamily(CQL3_COLLECTION_COLUMN_FAMILY);
 
         return config.initialize();
     }
