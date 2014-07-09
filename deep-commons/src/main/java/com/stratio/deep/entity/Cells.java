@@ -351,7 +351,10 @@ public class Cells implements Iterable<Cell>, Serializable {
 		List<ByteBuffer> res = new ArrayList<>();
 
 		for (Cell c : getCellsByTable(table)) {
-			res.add(c.getDecomposedCellValue());
+            if ( c instanceof CassandraCell){
+                res.add(((CassandraCell)c).getDecomposedCellValue());
+            }
+
 		}
 
 		return res;
@@ -393,7 +396,7 @@ public class Cells implements Iterable<Cell>, Serializable {
     public Cells getIndexCells(String table) {
         Cells res = new Cells(table);
         for (Cell cell : getCellsByTable(table)) {
-            if (cell.isPartitionKey() || cell.isClusterKey()) {
+            if ( cell instanceof CassandraCell && ((CassandraCell)cell).isPartitionKey() || ((CassandraCell)cell).isClusterKey()) {
                 res.add(table, cell);
             }
 
@@ -433,7 +436,7 @@ public class Cells implements Iterable<Cell>, Serializable {
     public Cells getValueCells(String table) {
         Cells res = new Cells(table);
         for (Cell cell : getCellsByTable(table)) {
-            if (!cell.isPartitionKey() && !cell.isClusterKey()) {
+            if ( cell instanceof CassandraCell && !((CassandraCell)cell).isPartitionKey() && !((CassandraCell)cell).isClusterKey()) {
                 res.add(table, cell);
             }
         }

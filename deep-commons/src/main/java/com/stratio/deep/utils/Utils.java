@@ -213,11 +213,11 @@ public final class Utils {
                 sb.append(", ");
             }
 
-            sb.append(cellName).append(" ").append(key.marshaller().asCQL3Type().toString());
+            sb.append(cellName).append(" ").append(((CassandraCell)key).marshaller().asCQL3Type().toString());
 
-            if (key.isPartitionKey()) {
+            if (((CassandraCell)key).isPartitionKey()) {
                 partitionKey.add(cellName);
-            } else if (key.isClusterKey()) {
+            } else if (((CassandraCell)key).isClusterKey()) {
                 clusterKey.add(cellName);
             }
 
@@ -227,7 +227,7 @@ public final class Utils {
         if (values != null) {
             for (Cell key : values) {
                 sb.append(", ");
-                sb.append(quote(key.getCellName())).append(" ").append(key.marshaller().asCQL3Type().toString());
+                sb.append(quote(key.getCellName())).append(" ").append(((CassandraCell)key).marshaller().asCQL3Type().toString());
             }
         }
 
@@ -296,7 +296,7 @@ public final class Utils {
 
         StringBuilder keyClause = new StringBuilder(" WHERE ");
         for (Cell cell : keys.getCells()) {
-            if (cell.isPartitionKey() || cell.isClusterKey()) {
+            if (((CassandraCell)cell).isPartitionKey() || ((CassandraCell)cell).isClusterKey()) {
                 if (k > 0) {
                     keyClause.append(" AND ");
                 }
