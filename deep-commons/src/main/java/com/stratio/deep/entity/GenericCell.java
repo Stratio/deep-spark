@@ -53,20 +53,11 @@ public abstract class GenericCell implements Cell{
         return cellName;
     }
 
-    public void setCellName(String cellName) {
-        this.cellName = cellName;
-    }
-
     public Object getCellValue() {
         return cellValue;
     }
 
 
-
-
-    public void setCellValue(Object cellValue) {
-        this.cellValue = cellValue;
-    }
 
     @Override
     public String toString() {

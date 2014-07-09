@@ -57,22 +57,24 @@ public class MongoEntityRDDTest implements Serializable {
 
     private static final String MESSAGE_TEST = "new message test";
 
-    private static final Integer port = 27890;
+    private static final Integer PORT = 27890;
 
-    private static final String host = "localhost";
+    private static final String HOST = "localhost";
 
-    private static final String database = "test";
+    private static final String DATABASE = "test";
 
-    private static final String collection = "input";
+    private static final String COLLECTION_INPUT = "input";
 
-    private static final String collectionOutput = "output";
+    private static final String COLLECTION_OUTPUT = "output";
 
-    private static final String dataSetName = "divineComedy.json";
+    private static final String DATA_SET_NAME = "divineComedy.json";
 
     private final static String DB_FOLDER_NAME = System.getProperty("user.home") +
             File.separator + "mongoEntityRDDTest";
 
     private static final Long WORD_COUNT_SPECTED = 3833L;
+
+    private static final String DATA_SET_URL = "http://docs.openstratio.org/resources/datasets/divineComedy.json";
 
     @BeforeClass
     public void init() throws IOException {
@@ -86,7 +88,7 @@ public class MongoEntityRDDTest implements Serializable {
                 .version(Version.Main.PRODUCTION)
                 .configServer(false)
                 .replication(new Storage(DB_FOLDER_NAME, null, 0))
-                .net(new Net(port, Network.localhostIsIPv6()))
+                .net(new Net(PORT, Network.localhostIsIPv6()))
                 .cmdOptions(new MongoCmdOptionsBuilder()
                         .syncDelay(10)
                         .useNoPrealloc(true)
@@ -119,9 +121,9 @@ public class MongoEntityRDDTest implements Serializable {
 //                File.separator + ".embedmongo"));
 
 
-        mongo = new MongoClient(host, port);
-        DB db = mongo.getDB(database);
-        col = db.getCollection(collection);
+        mongo = new MongoClient(HOST, PORT);
+        DB db = mongo.getDB(DATABASE);
+        col = db.getCollection(COLLECTION_INPUT);
         col.save(new BasicDBObject("message", MESSAGE_TEST));
 
 
@@ -137,20 +139,20 @@ public class MongoEntityRDDTest implements Serializable {
     private static void dataSetImport() throws IOException {
         String dbName = "book";
         String collection = "input";
-        URL website = new URL("http://docs.openstratio.org/resources/datasets/divineComedy.json");
+        URL website = new URL(DATA_SET_URL);
         ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-        FileOutputStream fos = new FileOutputStream(dataSetName);
+        FileOutputStream fos = new FileOutputStream(DATA_SET_NAME);
         fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
         fos.close();
         IMongoImportConfig mongoImportConfig = new MongoImportConfigBuilder()
                 .version(Version.Main.PRODUCTION)
-                .net(new Net(port, Network.localhostIsIPv6()))
+                .net(new Net(PORT, Network.localhostIsIPv6()))
                 .db(dbName)
                 .collection(collection)
                 .upsert(false)
                 .dropCollection(true)
                 .jsonArray(true)
-                .importFile(dataSetName)
+                .importFile(DATA_SET_NAME)
                 .build();
         MongoImportExecutable mongoImportExecutable = MongoImportStarter.getDefaultInstance().prepare(mongoImportConfig);
         mongoImportExecutable.start();
@@ -168,16 +170,16 @@ public class MongoEntityRDDTest implements Serializable {
         }
 
         Files.forceDelete(new File(DB_FOLDER_NAME));
-        Files.forceDelete(new File(dataSetName));
+        Files.forceDelete(new File(DATA_SET_NAME));
     }
 
     @Test
     public void testReadingRDD() {
-        String hostConcat = host.concat(":").concat(port.toString());
+        String hostConcat = HOST.concat(":").concat(PORT.toString());
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
         IMongoDeepJobConfig<MesageTestEntity> inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
-                .host(hostConcat).database(database).collection(collection).initialize();
+                .host(hostConcat).database(DATABASE).collection(COLLECTION_INPUT).initialize();
 
         MongoJavaRDD<MesageTestEntity> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
 
@@ -192,17 +194,17 @@ public class MongoEntityRDDTest implements Serializable {
     public void testWritingRDD() {
 
 
-        String hostConcat = host.concat(":").concat(port.toString());
+        String hostConcat = HOST.concat(":").concat(PORT.toString());
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
         IMongoDeepJobConfig<MesageTestEntity> inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
-                .host(hostConcat).database(database).collection(collection).initialize();
+                .host(hostConcat).database(DATABASE).collection(COLLECTION_INPUT).initialize();
 
         MongoJavaRDD<MesageTestEntity> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
 
         IMongoDeepJobConfig<MesageTestEntity> outputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
-                .host(hostConcat).database(database).collection(collectionOutput).initialize();
+                .host(hostConcat).database(DATABASE).collection(COLLECTION_OUTPUT).initialize();
 
 
         //Save RDD in MongoDB
@@ -211,7 +213,7 @@ public class MongoEntityRDDTest implements Serializable {
         MongoJavaRDD<MesageTestEntity> outputRDDEntity = context.mongoJavaRDD(outputConfigEntity);
 
 
-        assertEquals(mongo.getDB(database).getCollection(collectionOutput).findOne().get("message"),
+        assertEquals(mongo.getDB(DATABASE).getCollection(COLLECTION_OUTPUT).findOne().get("message"),
                 outputRDDEntity.first().getMessage());
 
 
@@ -225,7 +227,7 @@ public class MongoEntityRDDTest implements Serializable {
     public void testDataSet() {
 
 
-        String hostConcat = host.concat(":").concat(port.toString());
+        String hostConcat = HOST.concat(":").concat(PORT.toString());
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
