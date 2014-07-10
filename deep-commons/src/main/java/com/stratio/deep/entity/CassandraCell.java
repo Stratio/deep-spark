@@ -16,7 +16,7 @@ import static com.stratio.deep.utils.AnnotationUtils.*;
 /**
  * Created by rcrespo on 23/06/14.
  */
-public class CassandraCell extends GenericCell {
+public class CassandraCell extends Cell {
 
     /**
      * flag that tells if this cell is part of the partition key.

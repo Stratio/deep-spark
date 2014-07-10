@@ -23,6 +23,7 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.*;
 
+import com.stratio.deep.entity.CassandraCell;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,7 +120,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
             ByteBuffer[] keys = new ByteBuffer[partitionKeyColumns.length];
 
             for (int i = 0; i < cells.size(); i++) {
-                Cell c = cells.getCellByIdx(i);
+                CassandraCell c = (CassandraCell) cells.getCellByIdx(i);
 
                 if (c.isPartitionKey()) {
                     keys[i] = c.getDecomposedCellValue();
@@ -128,7 +129,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
 
             partitionKey = CompositeType.build(keys);
         } else {
-            partitionKey = cells.getCellByIdx(0).getDecomposedCellValue();
+            partitionKey = ((CassandraCell)cells.getCellByIdx(0)).getDecomposedCellValue();
         }
         return partitionKey;
     }

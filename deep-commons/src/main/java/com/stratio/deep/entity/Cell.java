@@ -16,79 +16,57 @@
 
 package com.stratio.deep.entity;
 
-import com.datastax.driver.core.DataType;
-import com.stratio.deep.annotations.DeepField;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepInstantiationException;
 import org.apache.cassandra.db.marshal.AbstractType;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 
-import static com.stratio.deep.utils.AnnotationUtils.*;
-
 /**
- * Generic abstraction for cassandra's columns.
- *
- * @author Luca Rosellini <luca@stratio.com>
+ * Created by rcrespo on 2/07/14.
  */
-public interface Cell extends Serializable {
+public abstract class Cell implements Serializable {
+
+    private static final long serialVersionUID = 2298549804049316156L;
 
     /**
-     * @return the name of the current cell as defined in the database.
+     * Name of the cell. Mapped to a DataBase column name.
      */
-    public String getCellName();
+    protected String cellName;
 
     /**
-     * Returns the composed cell value. The type of the returned object can be obtained by calling
-     * {@link com.stratio.deep.entity.Cell}
-     *
-     * @return the composed cell value.
+     * Cell value.
      */
-    public Object getCellValue();
+    protected Object cellValue;
 
-    /**
-     * @return Returns the validator object associated to this Cell.
-     */
-    public CellValidator getCellValidator();
 
-    /**
-     * Returns the Java type corresponding to the current Cell.
-     *
-     * @return the Java type corresponding to the current Cell.
-     */
-    public Class<?> getValueType();
+    protected Cell(){
+        super();
+    }
 
-    /**
-     * Returns the cell value as a ByteBuffer, performs the conversion using the
-     * configured validator.
-     * <p/>
-     * If cell value is null we propagate an empty array, see CASSANDRA-5885 and CASSANDRA-6180.
-     *
-     * @return Returns the cell value as a ByteBuffer.
-     */
-    public ByteBuffer getDecomposedCellValue();
+    protected Cell(String cellName, Object cellValue){
+        super();
+        this.cellName = cellName;
+        this.cellValue = cellValue;
+    }
 
-    /**
-     * @return true if the current cell is part of the clustering key.
-     */
-    public Boolean isClusterKey();
 
-    /**
-     * @return true if the current cell is part of the partition key.
-     */
+    public String getCellName() {
+        return cellName;
+    }
 
-    public Boolean isPartitionKey();
+    public Object getCellValue() {
+        return cellValue;
+    }
 
-    /**
-     * @return Returns the validator instance associated to this cell.
-     */
-    public AbstractType marshaller();
 
-    /**
-     * @return the fully qualified class name of the validator associated to this cell.
-     */
-    public String marshallerClassName();
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Cell{");
+        sb.append("cellName='").append(cellName).append('\'');
+        sb.append(", cellValue=").append(cellValue);
+        sb.append('}');
+        return sb.toString();
+    }
 
 }
