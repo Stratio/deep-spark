@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.stratio.deep</groupId>
     <artifactId>deep-parent</artifactId>
-    <version>0.3.4-SNAPSHOT</version>
+    <version>0.4.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>http://www.stratio.com</url>
     <name>deep parent</name>
@@ -262,7 +262,7 @@
 
     <modules>
         <module>../deep-commons</module>
-        <module>../deep-core</module>
+        <module>../deep-core-cassandra</module>
         <module>../deep-core-mongodb</module>
         <module>../deep-examples</module>
     </modules>

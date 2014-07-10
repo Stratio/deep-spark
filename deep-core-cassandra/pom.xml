@@ -18,11 +18,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>deep-core-mongodb</artifactId>
+    <artifactId>deep-core-cassandra</artifactId>
     <packaging>jar</packaging>
-    <name>deep core mongodb</name>
+    <name>deep core cassandra</name>
     <url>http://www.stratio.com</url>
-    <description>Project containing the actual implementation of the RDD integrating Apache Spark and MongoDB
+    <description>Project containing the actual implementation of the RDD integrating Apache Spark and Apache Cassandra
     </description>
 
     <parent>
@@ -62,16 +62,6 @@
                 <role>contributor</role>
             </roles>
         </developer>
-        <developer>
-            <id>rcrespo</id>
-            <name>Ricardo Crespo</name>
-            <email>rcrespo@stratio.com</email>
-            <roles>
-                <role>architect</role>
-                <role>developer</role>
-                <role>contributor</role>
-            </roles>
-        </developer>
     </developers>
 
     <licenses>
@@ -108,62 +98,6 @@
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
-        </dependency>
-
-        <!-- mongodb embedded -->
-        <dependency>
-            <groupId>de.flapdoodle.embed</groupId>
-            <artifactId>de.flapdoodle.embed.mongo</artifactId>
-            <version>1.46.0</version>
-        </dependency>
-
-        <!-- mongodb hadoop connector -->
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-hadoop-core</artifactId>
-            <version>1.3.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-common</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-hdfs</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-mapreduce-client-app</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-mapreduce-client-common</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-mapreduce-client-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-mapreduce-client-shuffle</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-yarn-server-tests</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.mongodb</groupId>
-                    <artifactId>mongo-java-driver</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 

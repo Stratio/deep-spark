@@ -21,12 +21,12 @@
     <parent>
         <groupId>com.stratio.deep</groupId>
         <artifactId>deep-parent</artifactId>
-        <version>0.3.4-SNAPSHOT</version>
+        <version>0.4.0-SNAPSHOT</version>
         <relativePath>../deep-parent</relativePath>
     </parent>
 
     <artifactId>deep-examples</artifactId>
-
+    <name>deep examples</name>
     <licenses>
         <license>
             <name>Apache 2</name>
@@ -37,7 +37,7 @@
     <dependencies>
         <dependency>
             <groupId>com.stratio.deep</groupId>
-            <artifactId>deep-core</artifactId>
+            <artifactId>deep-core-cassandra</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

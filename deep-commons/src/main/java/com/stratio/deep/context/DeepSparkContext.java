@@ -17,6 +17,9 @@
 package com.stratio.deep.context;
 
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
+
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.IMongoDeepJobConfig;
@@ -30,9 +33,6 @@ import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 
 /**
  * Entry point to the Cassandra-aware Spark context.
