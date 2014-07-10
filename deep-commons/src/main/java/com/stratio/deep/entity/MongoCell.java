@@ -16,14 +16,14 @@
 
 package com.stratio.deep.entity;
 
-import org.apache.cassandra.db.marshal.AbstractType;
-
 import java.nio.ByteBuffer;
+
+import org.apache.cassandra.db.marshal.AbstractType;
 
 /**
  * Created by rcrespo on 2/07/14.
  */
-public class MongoCell extends GenericCell{
+public class MongoCell extends Cell {
 
 
     private MongoCell (String cellName, Object cellValue){
@@ -38,38 +38,4 @@ public class MongoCell extends GenericCell{
     }
 
 
-    @Override
-    public CellValidator getCellValidator() {
-        return null;
-    }
-
-    @Override
-    public Class<?> getValueType() {
-        return null;
-    }
-
-    @Override
-    public ByteBuffer getDecomposedCellValue() {
-        return null;
-    }
-
-    @Override
-    public Boolean isClusterKey() {
-        return null;
-    }
-
-    @Override
-    public Boolean isPartitionKey() {
-        return null;
-    }
-
-    @Override
-    public AbstractType marshaller() {
-        return null;
-    }
-
-    @Override
-    public String marshallerClassName() {
-        return null;
-    }
 }

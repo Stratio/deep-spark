@@ -1,27 +1,14 @@
 package com.stratio.deep.entity;
 
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+
 import com.datastax.driver.core.DataType;
 import com.stratio.deep.annotations.DeepField;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepInstantiationException;
 import org.apache.cassandra.db.marshal.AbstractType;
-
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.nio.ByteBuffer;
-
-import static com.stratio.deep.utils.AnnotationUtils.MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE;
-import static com.stratio.deep.utils.AnnotationUtils.deepFieldName;
-import static com.stratio.deep.utils.AnnotationUtils.getBeanFieldValue;
-import com.datastax.driver.core.DataType;
-import com.stratio.deep.annotations.DeepField;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepInstantiationException;
-import org.apache.cassandra.db.marshal.AbstractType;
-
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.nio.ByteBuffer;
 
 import static com.stratio.deep.utils.AnnotationUtils.*;
 
@@ -29,7 +16,7 @@ import static com.stratio.deep.utils.AnnotationUtils.*;
 /**
  * Created by rcrespo on 23/06/14.
  */
-public class CassandraCell extends GenericCell {
+public class CassandraCell extends Cell {
 
     /**
      * flag that tells if this cell is part of the partition key.
@@ -247,15 +234,27 @@ public class CassandraCell extends GenericCell {
 
         CassandraCell cell = (CassandraCell) o;
 
-        return cellName.equals(cell.cellName) &&
-                (cellValue != null ? cellValue.equals(cell.cellValue) : cell.cellValue == null) &&
-                isClusterKey.equals(cell.isClusterKey) &&
-                isPartitionKey.equals(cell.isPartitionKey) &&
-                (cellValidator != null ? cellValidator.equals(cell.cellValidator) : cell.cellValidator == null);
+	    boolean isCellEqual = cellEquals(cell);
+	    boolean isKey = keyEquals(cell);
+	    boolean isCellValidatorEqual = cellValidatorEquals(cell);
+
+        return isCellEqual && isKey && isCellValidatorEqual;
     }
 
+	private boolean cellEquals(CassandraCell cell) {
+		return cellName.equals(cell.cellName) && cellValue != null ? cellValue.equals(cell.cellValue) : cell.cellValue == null;
+	}
 
-    public Class<?> getValueType() {
+	private boolean keyEquals(CassandraCell cell) {
+		return isClusterKey.equals(cell.isClusterKey) && isPartitionKey.equals(cell.isPartitionKey);
+	}
+
+	private boolean cellValidatorEquals(CassandraCell cell) {
+		return cellValidator != null ? cellValidator.equals(cell.cellValidator) : cell.cellValidator == null;
+	}
+
+
+	public Class getValueType() {
         Class valueType = MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE.get(cellValidator.getValidatorClassName());
         if (valueType == null) {
             throw new DeepGenericException("Cannot find value type for marshaller " + cellValidator

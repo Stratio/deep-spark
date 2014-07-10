@@ -5,6 +5,11 @@ TMPDIR=/tmp/stratio-deep-distribution
 
 rm -rf ${TMPDIR}
 mkdir -p ${TMPDIR}
+export JAVA_HOME=$JAVA_HOME
+export PATH=$JAVA_HOME/bin:$PATH
+
+export SCALA_HOME=$SCALA_HOME
+export PATH=$SCALA_HOME/bin:$PATH
 
 SPARK_REPO="$1"
 
@@ -57,8 +62,8 @@ mvn clean package -DskipTests || { echo "Cannot build Deep project, aborting"; e
 
 mkdir -p ${TMPDIR}/lib || { echo "Cannot create output lib directory"; exit 1; }
 
-cp ../*/target/*.jar ${TMPDIR}/lib || { echo "Cannot copy target jars to output lib directory, aborting"; exit 1; }
-cp ../*/target/alternateLocation/*.jar ${TMPDIR}/lib || { echo "Cannot copy alternate jars to output lib directory, aborting"; exit 1; }
+cp -u ../*/target/*.jar ${TMPDIR}/lib || { echo "Cannot copy target jars to output lib directory, aborting"; exit 1; }
+cp -u ../*/target/alternateLocation/*.jar ${TMPDIR}/lib || { echo "Cannot copy alternate jars to output lib directory, aborting"; exit 1; }
 
 git fetch --tags
 latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)

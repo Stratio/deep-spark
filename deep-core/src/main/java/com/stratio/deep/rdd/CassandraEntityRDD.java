@@ -18,6 +18,7 @@ package com.stratio.deep.rdd;
 
 import com.stratio.deep.config.EntityDeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
+import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
@@ -66,7 +67,7 @@ public final class CassandraEntityRDD<T extends IDeepType> extends CassandraRDD<
         T instance = Utils.newTypeInstance(entityClass);
 
         for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
-            Cell metadata = columnDefinitions.get(entry.getKey());
+            CassandraCell metadata = (CassandraCell) columnDefinitions.get(entry.getKey());
             AbstractType<?> marshaller = metadata.marshaller();
             edjc.setInstancePropertyFromDbName(instance, entry.getKey(), marshaller.compose(entry.getValue()));
         }
@@ -76,7 +77,7 @@ public final class CassandraEntityRDD<T extends IDeepType> extends CassandraRDD<
                 continue;
             }
 
-            Cell metadata = columnDefinitions.get(entry.getKey());
+            CassandraCell metadata = (CassandraCell) columnDefinitions.get(entry.getKey());
             AbstractType<?> marshaller = metadata.marshaller();
             try {
                 edjc.setInstancePropertyFromDbName(instance, entry.getKey(), marshaller.compose(entry.getValue()));

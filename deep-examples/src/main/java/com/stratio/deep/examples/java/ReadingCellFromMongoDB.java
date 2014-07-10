@@ -18,22 +18,13 @@ package com.stratio.deep.examples.java;
 
 import com.mongodb.QueryBuilder;
 import com.stratio.deep.config.DeepJobConfigFactory;
-import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
 import com.stratio.deep.rdd.mongodb.MongoCellRDD;
-import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
-import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
-import com.stratio.deep.testentity.MessageEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
-import scala.Tuple2;
-
-import java.util.List;
 
 /**
  * Example class to read a collection from mongoDB
@@ -83,10 +74,8 @@ public final class ReadingCellFromMongoDB {
         MongoCellRDD inputRDDEntity = deepContext.mongoCellRDD(inputConfigEntity);
 
 
-        System.out.println("count : " + inputRDDEntity.count());
-
-
-        System.out.println("prints first cell  : " + inputRDDEntity.first());
+	    LOG.info("count : " + inputRDDEntity.count());
+	    LOG.info("prints first cell  : " + inputRDDEntity.first());
 
 
         deepContext.stop();

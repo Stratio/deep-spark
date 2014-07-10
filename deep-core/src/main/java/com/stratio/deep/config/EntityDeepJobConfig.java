@@ -17,6 +17,7 @@
 package com.stratio.deep.config;
 
 import com.stratio.deep.annotations.DeepEntity;
+import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
@@ -144,7 +145,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
      */
     public void setInstancePropertyFromDbName(T instance, String dbName, Object value) {
         Map<String, Cell> cfs = columnDefinitions();
-        Cell metadataCell = cfs.get(dbName);
+        CassandraCell metadataCell = (CassandraCell) cfs.get(dbName);
 
         String f = mapDBNameToEntityName.get(dbName);
 
@@ -163,7 +164,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
     }
 
     @SuppressWarnings("unchecked")
-    private Object packageCollectionValue(Cell metadataCell, Object value) {
+    private Object packageCollectionValue(CassandraCell metadataCell, Object value) {
         switch (metadataCell.getCellValidator().validatorKind()) {
             case SET:
                 return new LinkedHashSet((Collection) value);

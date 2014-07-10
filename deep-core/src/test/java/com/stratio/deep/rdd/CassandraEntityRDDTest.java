@@ -16,6 +16,10 @@
 
 package com.stratio.deep.rdd;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -40,10 +44,6 @@ import scala.Function1;
 import scala.collection.Iterator;
 import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
 
 import static org.testng.Assert.*;
 
@@ -221,7 +221,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         ICassandraDeepJobConfig<TestEntity> config = DeepJobConfigFactory.create(TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY)
-                .bisectFactor(testBisectFactor).initialize();
+                .bisectFactor(testBisectFactor).pageSize(DEFAULT_PAGE_SIZE).initialize();
 
         return config;
     }
@@ -250,6 +250,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
                 .keyspace(KEYSPACE_NAME)
                 .columnFamily(COLUMN_FAMILY)
                 .batchSize(2)
+				.pageSize(DEFAULT_PAGE_SIZE)
                 .inputColumns("domain_name", "response_time")
                 .initialize();
 

@@ -264,11 +264,7 @@ public class Cells implements Iterable<Cell>, Serializable {
       for (Cell cell : localCells) {
         Cell otherCell = o.getCellByName(entry.getKey(), cell.getCellName());
 
-        if (otherCell == null) {
-          return false;
-        }
-
-        if (!otherCell.equals(cell)) {
+        if (otherCell == null || !otherCell.equals(cell)) {
           return false;
         }
       }
@@ -376,101 +372,101 @@ public class Cells implements Iterable<Cell>, Serializable {
   }
 
   /**
-   * Converts every Cell (associated to <i>table</i>) contained in this object to an ArrayBuffer. In
-   * order to perform the conversion we use the appropriate Cassandra marshaller for the Cell.
-   * 
-   * @return a collection of Cell(s) values converted to byte buffers using the appropriate
-   *         marshaller.
-   */
-  public Collection<ByteBuffer> getDecomposedCellValues(String table) {
-    List<ByteBuffer> res = new ArrayList<>();
+	 * Converts every Cell (associated to <i>table</i>) contained in this object to an ArrayBuffer. In order to perform the
+	 * conversion we use the appropriate Cassandra marshaller for the Cell.
+	 *
+	 * @return a collection of Cell(s) values converted to byte buffers using the appropriate
+	 * marshaller.
+	 */
+	public Collection<ByteBuffer> getDecomposedCellValues(String table) {
+		List<ByteBuffer> res = new ArrayList<>();
 
-    for (Cell c : getCellsByTable(table)) {
-      res.add(c.getDecomposedCellValue());
+		for (Cell c : getCellsByTable(table)) {
+            if ( c instanceof CassandraCell){
+                res.add(((CassandraCell)c).getDecomposedCellValue());
+            }
+
+		}
+
+		return res;
+	}
+
+    /**
+     * Converts every Cell (associated to <i>table</i>) contained in this object to an ArrayBuffer. In order to perform the
+     * conversion we use the appropriate Cassandra marshaller for the Cell.
+     *
+     * @return a collection of Cell(s) values.
+     */
+    public Collection<Object> getCellValues(String table) {
+        List<Object> res = new ArrayList<>();
+
+        for (Cell c : getCellsByTable(table)) {
+            res.add(c.getCellValue());
+        }
+    return res;
+  }
+
+  /**
+	 * Converts every Cell (associated to the default table) to an ArrayBuffer. In order to perform the
+	 * conversion we use the appropriate Cassandra marshaller for the Cell.
+	 *
+	 * @return a collection of Cell(s) values.
+	 */
+	public Collection<Object> getCellValues() {
+		return getCellValues(defaultTableName);
+	}
+
+    /**
+     * Extracts from this object the Cell(s) associated to <i>table</i> and marked either as partition key or cluster key.
+     * Returns an empty Cells object if the current object does not contain any Cell marked as key.
+     *
+     * @return the Cells object containing the subset of this Cells object of only the Cell(s) part of
+     * the key.
+     */
+    public Cells getIndexCells(String table) {
+        Cells res = new Cells(table);
+        for (Cell cell : getCellsByTable(table)) {
+            if ( cell instanceof CassandraCell && ((CassandraCell)cell).isPartitionKey() || ((CassandraCell)cell).isClusterKey()) {
+                res.add(table, cell);
+            }
+
     }
 
     return res;
   }
 
   /**
-   * Converts every Cell (associated to <i>table</i>) contained in this object to an ArrayBuffer. In
-   * order to perform the conversion we use the appropriate Cassandra marshaller for the Cell.
-   * 
-   * @return a collection of Cell(s) values.
-   */
-  public Collection<Object> getCellValues(String table) {
-    List<Object> res = new ArrayList<>();
+	 * Extracts the Cell(s) associated to the default table and marked either as partition key or cluster key.
+	 * Returns an empty Cells object if the current object does not contain any Cell marked as key.
+	 *
+	 * @return the Cells object containing the subset of this Cells object of only the Cell(s) part of
+	 * the key.
+	 */
+	public Cells getIndexCells() {
+		Cells res = new Cells(this.defaultTableName);
 
-    for (Cell c : getCellsByTable(table)) {
-      res.add(c.getCellValue());
-    }
+		for (Map.Entry<String, List<Cell>> entry : cells.entrySet()) {
+			Cells keys = getIndexCells(entry.getKey());
 
-    return res;
-  }
+			for (Cell c : keys) {
+				res.add(entry.getKey(), c);
+			}
+		}
 
-  /**
-   * Converts every Cell (associated to the default table) to an ArrayBuffer. In order to perform
-   * the conversion we use the appropriate Cassandra marshaller for the Cell.
-   * 
-   * @return a collection of Cell(s) values.
-   */
-  public Collection<Object> getCellValues() {
-    return getCellValues(defaultTableName);
-  }
+	    return res;
+	}
 
-  /**
-   * Extracts from this object the Cell(s) associated to <i>table</i> and marked either as partition
-   * key or cluster key. Returns an empty Cells object if the current object does not contain any
-   * Cell marked as key.
-   * 
-   * @return the Cells object containing the subset of this Cells object of only the Cell(s) part of
-   *         the key.
-   */
-  public Cells getIndexCells(String table) {
-    Cells res = new Cells(table);
-    for (Cell cell : getCellsByTable(table)) {
-      if (cell.isPartitionKey() || cell.isClusterKey()) {
-        res.add(table, cell);
-      }
-
-    }
-
-    return res;
-  }
-
-  /**
-   * Extracts the Cell(s) associated to the default table and marked either as partition key or
-   * cluster key. Returns an empty Cells object if the current object does not contain any Cell
-   * marked as key.
-   * 
-   * @return the Cells object containing the subset of this Cells object of only the Cell(s) part of
-   *         the key.
-   */
-  public Cells getIndexCells() {
-    Cells res = new Cells(this.defaultTableName);
-
-    for (Map.Entry<String, List<Cell>> entry : cells.entrySet()) {
-      Cells keys = getIndexCells(entry.getKey());
-
-      for (Cell c : keys) {
-        res.add(entry.getKey(), c);
-      }
-    }
-
-    return res;
-  }
-
-  /**
-   * Extracts the cells associated to <i>table</i> _NOT_ marked as partition key and _NOT_ marked as
-   * cluster key b.
-   * 
-   * @return the Cells object containing the subset of this Cells object of only the Cell(s) that
-   *         are NOT part of the key.
-   */
-  public Cells getValueCells(String table) {
-    Cells res = new Cells(table);
-    for (Cell cell : getCellsByTable(table)) {
-      if (!cell.isPartitionKey() && !cell.isClusterKey()) {
+    /**
+     * Extracts the cells associated to <i>table</i> _NOT_ marked as partition key and _NOT_ marked as
+     * cluster key b.
+     *
+     * @return the Cells object containing the subset of this Cells object of only the Cell(s) that
+     * are NOT part of the key.
+     */
+    public Cells getValueCells(String table) {
+        Cells res = new Cells(table);
+        for (Cell cell : getCellsByTable(table)) {
+            if ( cell instanceof CassandraCell && !((CassandraCell)cell).isPartitionKey() && !((CassandraCell)cell).isClusterKey()) {
         res.add(table, cell);
       }
     }

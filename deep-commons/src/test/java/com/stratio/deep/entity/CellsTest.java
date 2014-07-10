@@ -161,7 +161,7 @@ public class CellsTest {
             fail();
         }
 
-        Cell c = keys.getCellByIdx(1);
+        CassandraCell c = (CassandraCell) keys.getCellByIdx(1);
 
         assertNotNull(c);
         assertEquals(c.getCellName(), "id2");
@@ -213,14 +213,14 @@ public class CellsTest {
 			fail();
 		}
 
-		Cell c = keys.getCellByIdx("myFirstTable",1);
+        CassandraCell c = (CassandraCell) keys.getCellByIdx("myFirstTable",1);
 
 		assertNotNull(c);
 		assertEquals(c.getCellName(), "id2");
 		assertEquals(UTF8Type.instance.compose(c.getDecomposedCellValue()), "payload2");
-		assertTrue(c.marshallerClassName().equals(UTF8Type.class.getCanonicalName()));
+		assertTrue((c.marshallerClassName().equals(UTF8Type.class.getCanonicalName())));
 
-		c = keys.getCellByIdx("mySecondTable",0);
+		c = (CassandraCell) keys.getCellByIdx("mySecondTable",0);
 
 		assertNotNull(c);
 		assertEquals(c.getCellName(), "id2");
@@ -234,7 +234,7 @@ public class CellsTest {
                 "response_time", ""), CassandraCell.create("response_code", ""), CassandraCell.create("download_time", ""));
 
         assertNull(values.getCellByName("notexistingcell"));
-        Cell c = values.getCellByName("domain_name");
+        CassandraCell c = (CassandraCell) values.getCellByName("domain_name");
         assertNotNull(c);
         assertEquals(c.getCellName(), "domain_name");
         assertEquals(UTF8Type.instance.compose(c.getDecomposedCellValue()), "abc.es");
@@ -402,7 +402,7 @@ public class CellsTest {
 
         int idx = 0;
         for (Cell cell : values) {
-            ByteBuffer bb = cell.getDecomposedCellValue();
+            ByteBuffer bb = ((CassandraCell)cell).getDecomposedCellValue();
 
             switch (idx) {
                 case 0:

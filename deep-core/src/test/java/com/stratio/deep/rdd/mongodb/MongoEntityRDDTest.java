@@ -166,6 +166,7 @@ public class MongoEntityRDDTest implements Serializable {
     public void cleanup() {
 
         if (mongodExecutable != null) {
+            mongo.close();
             mongodExecutable.stop();
         }
 

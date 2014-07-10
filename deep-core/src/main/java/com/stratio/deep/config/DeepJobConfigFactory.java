@@ -80,8 +80,8 @@ public final class DeepJobConfigFactory implements Serializable {
 	 *
 	 * @return a new cell-based MongoDB job configuration object.
 	 */
-    public static IMongoDeepJobConfig<Object> createMongoDB() {
-        return new GenericDeepJobConfigMongoDB<Object>();
+    public static IMongoDeepJobConfig<Cells> createMongoDB() {
+        return new CellDeepJobConfigMongoDB();
     }
 
 	/**
