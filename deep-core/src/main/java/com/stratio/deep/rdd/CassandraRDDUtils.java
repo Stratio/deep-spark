@@ -16,6 +16,11 @@
 
 package com.stratio.deep.rdd;
 
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
@@ -33,10 +38,7 @@ import scala.collection.Iterator;
 import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
 
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import static com.stratio.deep.utils.Utils.quote;
 
 /**
  * Created by luca on 16/04/14.
@@ -74,7 +76,7 @@ class CassandraRDDUtils {
             for (Tuple2<Cells, Cells> t : split) {
                 Tuple2<String[], Object[]> bindVars = Utils.prepareTuple4CqlDriver(t);
 
-                Insert insert = QueryBuilder.insertInto(writeConfig.getKeyspace(), writeConfig.getTable())
+                Insert insert = QueryBuilder.insertInto(quote(writeConfig.getKeyspace()), quote(writeConfig.getTable()))
                         .values(bindVars._1(), bindVars._2());
 
                 batch.add(insert);

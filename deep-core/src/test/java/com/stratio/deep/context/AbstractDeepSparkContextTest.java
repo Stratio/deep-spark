@@ -47,10 +47,10 @@ public abstract class AbstractDeepSparkContextTest {
     protected static DeepSparkContext context;
 
     private static CassandraServer cassandraServer;
-    public static final String KEYSPACE_NAME = "test_Keyspace";
-    public static final String COLUMN_FAMILY = "Test_Page";
+    public static final String KEYSPACE_NAME = "Test_Keyspace";
+    public static final String COLUMN_FAMILY = "test_Page";
     public static final String OUTPUT_KEYSPACE_NAME = "out_test_keyspace";
-    public static final String OUTPUT_COLUMN_FAMILY = "out_test_page";
+    public static final String OUTPUT_COLUMN_FAMILY = "Out_Test_Page";
     public static final String CQL3_COLUMN_FAMILY = "cql3_cf";
     public static final String CQL3_OUTPUT_COLUMN_FAMILY = "cql3_output_cf";
     public static final String CQL3_COLLECTION_COLUMN_FAMILY = "cql3_collection_cf";
@@ -61,7 +61,7 @@ public abstract class AbstractDeepSparkContextTest {
     protected static final int entityTestDataSize = 19;
     protected static final int cql3TestDataSize = 20;
 
-    protected String createCF = "CREATE TABLE " + KEYSPACE_NAME + "." + quote(COLUMN_FAMILY) + " (id text PRIMARY " +
+    protected String createCF = "CREATE TABLE " + quote(KEYSPACE_NAME) + "." + quote(COLUMN_FAMILY) + " (id text PRIMARY " +
             "KEY, " + "url text, "
             + "domain_name text, " + "response_code int, " + "charset text," + "response_time int,"
             + "download_time bigint," + "first_download_time bigint," + "title text, lucene text ) ;";
@@ -76,18 +76,18 @@ public abstract class AbstractDeepSparkContextTest {
                     "response_code:{type:\"integer\"}, id:{type:\"string\"}, response_time:{type:\"integer\"} } }'};";
     */
 
-    protected String createCFIndex = "create index idx_" + COLUMN_FAMILY + "_resp_time on " + KEYSPACE_NAME + "." +
+    protected String createCFIndex = "create index idx_" + COLUMN_FAMILY + "_resp_time on " + quote(KEYSPACE_NAME) + "." +
             quote(COLUMN_FAMILY) + " (response_time);";
 
-    protected String createCql3CF = "create table " + KEYSPACE_NAME + "." + CQL3_COLUMN_FAMILY
+    protected String createCql3CF = "create table " + quote(KEYSPACE_NAME) + "." + CQL3_COLUMN_FAMILY
             + "(name varchar, password varchar, color varchar, gender varchar, food varchar, "
             + " animal varchar, lucene varchar,age int,PRIMARY KEY ((name, gender), age, animal)); ";
 
-    protected String createCql3CFIndex = "create index idx_" + CQL3_COLUMN_FAMILY + "_food on " + KEYSPACE_NAME + "."
+    protected String createCql3CFIndex = "create index idx_" + CQL3_COLUMN_FAMILY + "_food on " + quote(KEYSPACE_NAME) + "."
             + CQL3_COLUMN_FAMILY + "(food);";
 
     protected String createCql3CollectionsCF =
-            "CREATE TABLE " + KEYSPACE_NAME + "." + CQL3_COLLECTION_COLUMN_FAMILY +
+            "CREATE TABLE " + quote(KEYSPACE_NAME) + "." + CQL3_COLLECTION_COLUMN_FAMILY +
                     " ( id int PRIMARY KEY, first_name text, last_name text, emails set<text>, phones list<text>, " +
                     "uuid2id map<uuid,int>);";
 
@@ -152,12 +152,12 @@ public abstract class AbstractDeepSparkContextTest {
 
         Session session = cluster.connect();
 
-        String command = "select count(*) from " + KEYSPACE_NAME + "." + quote(COLUMN_FAMILY) + ";";
+        String command = "select count(*) from " + quote(KEYSPACE_NAME) + "." + quote(COLUMN_FAMILY) + ";";
 
         ResultSet rs = session.execute(command);
         assertEquals(rs.one().getLong(0), entityTestDataSize);
 
-        command = "select * from " + KEYSPACE_NAME + "." + quote(COLUMN_FAMILY)
+        command = "select * from " + quote(KEYSPACE_NAME) + "." + quote(COLUMN_FAMILY)
                 + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
 
         rs = session.execute(command);
@@ -170,11 +170,11 @@ public abstract class AbstractDeepSparkContextTest {
         assertEquals(row.getLong("first_download_time"), 1380802049276L);
         assertEquals(row.getString("url"), "http://11870.com/k/es/de");
 
-        command = "select count(*) from " + KEYSPACE_NAME + "." + CQL3_COLUMN_FAMILY + ";";
+        command = "select count(*) from " + quote(KEYSPACE_NAME) + "." + CQL3_COLUMN_FAMILY + ";";
         rs = session.execute(command);
         assertEquals(rs.one().getLong(0), cql3TestDataSize);
 
-        command = "select * from " + KEYSPACE_NAME + "." + CQL3_COLUMN_FAMILY
+        command = "select * from " + quote(KEYSPACE_NAME) + "." + CQL3_COLUMN_FAMILY
                 + " WHERE name = 'pepito_3' and gender = 'male' and age = -2 and animal = 'monkey';";
 
         rs = session.execute(command);
@@ -219,13 +219,13 @@ public abstract class AbstractDeepSparkContextTest {
         logger.info("instantiating context");
         context = new DeepSparkContext("local", "deepSparkContextTest");
 
-        String createKeyspace = "CREATE KEYSPACE " + KEYSPACE_NAME
+        String createKeyspace = "CREATE KEYSPACE " + quote(KEYSPACE_NAME)
                 + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 };";
 
         String createOutputKeyspace = "CREATE KEYSPACE " + OUTPUT_KEYSPACE_NAME
                 + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 };";
 
-        String useKeyspace = "USE " + KEYSPACE_NAME + ";";
+        String useKeyspace = "USE " + quote(KEYSPACE_NAME) + ";";
 
         String useOutputKeyspace = "USE " + OUTPUT_KEYSPACE_NAME + ";";
 

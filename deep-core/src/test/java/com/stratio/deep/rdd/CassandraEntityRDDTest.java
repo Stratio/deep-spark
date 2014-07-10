@@ -45,6 +45,7 @@ import scala.collection.Iterator;
 import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
 
+import static com.stratio.deep.utils.Utils.quote;
 import static org.testng.Assert.*;
 
 /**
@@ -92,12 +93,12 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
                 .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
         Session session = cluster.connect();
 
-        String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY + ";";
+        String command = "select count(*) from " + quote(OUTPUT_KEYSPACE_NAME) + "." + quote(OUTPUT_COLUMN_FAMILY) + ";";
 
         ResultSet rs = session.execute(command);
         assertEquals(rs.one().getLong(0), entityTestDataSize);
 
-        command = "SELECT * from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY
+        command = "SELECT * from " + quote(OUTPUT_KEYSPACE_NAME) + "." + quote(OUTPUT_COLUMN_FAMILY)
                 + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
 
         rs = session.execute(command);
@@ -118,12 +119,12 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
                 .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
         Session session = cluster.connect();
 
-        String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY + ";";
+        String command = "select count(*) from " + quote(OUTPUT_KEYSPACE_NAME) + "." + quote(OUTPUT_COLUMN_FAMILY) + ";";
 
         ResultSet rs = session.execute(command);
         assertEquals(rs.one().getLong(0), entityTestDataSize);
 
-        command = "select * from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY
+        command = "select * from " + quote(OUTPUT_KEYSPACE_NAME) + "." + quote(OUTPUT_COLUMN_FAMILY)
                 + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
 
         rs = session.execute(command);
@@ -279,7 +280,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         RDD<TestEntity> mappedRDD = getRDD().map(mappingFunc, ClassTag$.MODULE$.<TestEntity>apply(TestEntity.class));
 
         try {
-            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY);
+            executeCustomCQL("DROP TABLE " + quote(OUTPUT_KEYSPACE_NAME) + "." + quote(OUTPUT_COLUMN_FAMILY));
         } catch (Exception e) {
         }
 
@@ -309,7 +310,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
-            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY);
+	        executeCustomCQL("DROP TABLE " + quote(OUTPUT_KEYSPACE_NAME) + "." + quote(OUTPUT_COLUMN_FAMILY));
         } catch (Exception e) {
         }
 
@@ -332,7 +333,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     public void testCql3SaveToCassandra() {
 
         try {
-            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY);
+	        executeCustomCQL("DROP TABLE " + quote(OUTPUT_KEYSPACE_NAME) + "." + quote(OUTPUT_COLUMN_FAMILY));
         } catch (Exception e) {
         }
 

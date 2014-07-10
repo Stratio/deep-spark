@@ -49,6 +49,7 @@ import org.apache.cassandra.exceptions.SyntaxException;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.spark.TaskContext;
 
+import static com.stratio.deep.utils.Utils.quote;
 import static com.stratio.deep.utils.Utils.updateQueryGenerator;
 
 /**
@@ -216,7 +217,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     public void write(Cells keys, Cells values) {
         /* generate SQL */
         String localCql = updateQueryGenerator(keys, values, writeConfig.getKeyspace(),
-                writeConfig.getColumnFamily());
+                quote(writeConfig.getColumnFamily()));
 
         Token range = partitioner.getToken(getPartitionKey(keys));
 

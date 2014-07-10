@@ -45,6 +45,7 @@ import org.testng.annotations.Test;
 import scala.Function1;
 import scala.reflect.ClassTag$;
 
+import static com.stratio.deep.utils.Utils.quote;
 import static org.testng.Assert.*;
 
 /**
@@ -114,7 +115,7 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
 
         Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
                 .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
-        Session session = cluster.connect(KEYSPACE_NAME);
+        Session session = cluster.connect(quote(KEYSPACE_NAME));
         session.execute(batch);
     }
 

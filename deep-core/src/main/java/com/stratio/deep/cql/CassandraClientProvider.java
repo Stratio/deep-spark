@@ -32,6 +32,8 @@ import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.utils.Pair;
 
+import static com.stratio.deep.utils.Utils.quote;
+
 /**
  * Created by luca on 09/04/14.
  */
@@ -106,7 +108,7 @@ class CassandraClientProvider {
                         .withCredentials(conf.getUsername(), conf.getPassword())
                         .build();
 
-                Session session = cluster.connect(conf.getKeyspace());
+                Session session = cluster.connect(quote(conf.getKeyspace()));
                 CLIENTS_CACHE.put(key, session);
 
                 return Pair.create(CLIENTS_CACHE.get(key), location);

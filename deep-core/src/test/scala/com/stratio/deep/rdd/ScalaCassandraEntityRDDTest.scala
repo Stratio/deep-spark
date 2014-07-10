@@ -22,6 +22,7 @@ import com.stratio.deep.context.AbstractDeepSparkContextTest
 import com.stratio.deep.embedded.CassandraServer
 import com.stratio.deep.testentity.DeepScalaPageEntity
 import com.stratio.deep.utils.Constants
+import com.stratio.deep.utils.Utils
 import org.apache.spark.Partition
 import org.testng.Assert._
 import org.testng.annotations.{BeforeClass, Test}
@@ -77,7 +78,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
 
     try {
       AbstractDeepSparkContextTest.executeCustomCQL("DROP TABLE " +
-        AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME + "." + OUTPUT_COLUMN_FAMILY)
+        Utils.quote(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME) + "." + Utils.quote(OUTPUT_COLUMN_FAMILY))
     }
     catch {
       case e: Exception =>
@@ -125,13 +126,13 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
     val cluster: Cluster = Cluster.builder.withPort(CassandraServer.CASSANDRA_CQL_PORT).addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build
     val session: Session = cluster.connect
     var command: String = "select count(*) from " +
-      AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME + "." +
-      AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY + ";"
+      Utils.quote(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME) + "." +
+      Utils.quote(AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY) + ";"
     var rs: ResultSet = session.execute(command)
     assertEquals(rs.one.getLong(0), AbstractDeepSparkContextTest.entityTestDataSize)
     command = "select * from " +
-      AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME + "." +
-      AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';"
+      Utils.quote(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME) + "." +
+        Utils.quote(AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY) + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';"
     rs = session.execute(command)
     val row: Row = rs.one
     assertEquals(row.getString("domain_name"), "11870.com")

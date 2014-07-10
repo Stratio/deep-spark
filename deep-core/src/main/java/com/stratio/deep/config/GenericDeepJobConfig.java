@@ -152,7 +152,7 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
                     .withCredentials(this.username, this.password)
                     .build();
 
-            session = cluster.connect(this.keyspace);
+            session = cluster.connect(quote(this.keyspace));
         }
 
         return session;
@@ -196,7 +196,7 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
     public TableMetadata fetchTableMetadata() {
 
         Metadata metadata = getSession().getCluster().getMetadata();
-        KeyspaceMetadata ksMetadata = metadata.getKeyspace(this.keyspace);
+        KeyspaceMetadata ksMetadata = metadata.getKeyspace(quote(this.keyspace));
 
         if (ksMetadata != null) {
             return ksMetadata.getTable(quote(this.columnFamily));
@@ -218,8 +218,11 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
      */
     public void createOutputTableIfNeeded(RDD<Tuple2<Cells, Cells>> tupleRDD) {
 
-        TableMetadata metadata = getSession().getCluster().getMetadata().getKeyspace(this.keyspace).getTable(this
-                .columnFamily);
+        TableMetadata metadata = getSession()
+				        .getCluster()
+				        .getMetadata()
+				        .getKeyspace(this.keyspace)
+				        .getTable(quote(this.columnFamily));
 
         if (metadata == null && !createTableOnWrite) {
             throw new DeepIOException("Cannot write RDD, output table does not exists and configuration object has " +
@@ -235,7 +238,7 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
         if (first._1() == null || first._1().isEmpty()) {
             throw new DeepNoSuchFieldException("no key structure found on row metadata");
         }
-        String createTableQuery = createTableQueryGenerator(first._1(), first._2(), getKeyspace(), getColumnFamily());
+        String createTableQuery = createTableQueryGenerator(first._1(), first._2(), this.keyspace, quote(this.columnFamily));
         getSession().execute(createTableQuery);
         waitForNewTableMetadata();
     }
@@ -248,8 +251,11 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
         int retries = 0;
         final int waitTime = 100;
         do {
-            metadata = getSession().getCluster().getMetadata().getKeyspace(this.keyspace).getTable(this
-                    .columnFamily);
+            metadata = getSession()
+				            .getCluster()
+				            .getMetadata()
+				            .getKeyspace(this.keyspace)
+				            .getTable(quote(this.columnFamily));
 
             if (metadata != null) {
                 continue;
@@ -639,7 +645,7 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
 
             } catch (Exception e) {
                 throw new IllegalArgumentException("writeConsistencyLevel not valid, " +
-                        "should be one of thos defined in org.apache.cassandra.db.ConsistencyLevel", e);
+                        "should be one of those defined in org.apache.cassandra.db.ConsistencyLevel", e);
             }
         }
     }

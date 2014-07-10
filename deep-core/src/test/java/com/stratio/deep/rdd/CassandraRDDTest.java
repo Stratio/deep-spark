@@ -29,6 +29,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import scala.collection.Seq;
 
+import static com.stratio.deep.utils.Utils.quote;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
@@ -128,7 +129,7 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     public abstract void testSimpleSaveToCassandra();
 
     protected static void truncateCf(String keyspace, String cf) {
-        executeCustomCQL("TRUNCATE  " + keyspace + "." + cf);
+        executeCustomCQL("TRUNCATE  " + quote(keyspace) + "." + cf);
     }
 
     @Test(dependsOnMethods = "testSaveToCassandra")

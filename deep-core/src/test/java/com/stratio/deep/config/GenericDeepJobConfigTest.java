@@ -16,6 +16,8 @@
 
 package com.stratio.deep.config;
 
+import java.lang.annotation.AnnotationTypeMismatchException;
+
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.entity.Cells;
@@ -28,8 +30,6 @@ import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
-
-import java.lang.annotation.AnnotationTypeMismatchException;
 
 import static org.testng.Assert.fail;
 
@@ -47,7 +47,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
         ICassandraDeepJobConfig<TestEntity> djc = DeepJobConfigFactory.createWriteConfig(TestEntity.class);
 
         djc.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-                .columnFamily("test_page").keyspace("test_keyspace");
+                .columnFamily("inexistent_test_page").keyspace(KEYSPACE_NAME);
 
         try {
             djc.initialize();
@@ -207,7 +207,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
             fail(e.getMessage());
         }
 
-        djc.keyspace("test_keyspace");
+        djc.keyspace(KEYSPACE_NAME);
 
         try {
             djc.initialize();
@@ -278,7 +278,7 @@ public class GenericDeepJobConfigTest extends AbstractDeepSparkContextTest {
         } catch (IllegalArgumentException iae) {
             // OK
             log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
-            djc.columnFamily("test_Page");
+            djc.columnFamily(COLUMN_FAMILY);
         } catch (Exception e) {
             fail(e.getMessage());
         }

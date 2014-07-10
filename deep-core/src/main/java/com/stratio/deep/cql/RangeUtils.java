@@ -35,6 +35,7 @@ import org.apache.cassandra.dht.Token;
 import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
 
 import static com.google.common.collect.Iterables.*;
+import static com.stratio.deep.utils.Utils.quote;
 
 /**
  * {@link CqlPagingRecordReader} implementation that returns an instance of a
@@ -120,7 +121,7 @@ public class RangeUtils {
         final Metadata metadata = session.getCluster().getMetadata();
 
         @SuppressWarnings("unchecked")
-        Set<Host> replicas = metadata.getReplicas(config.getKeyspace(), tkValidator.decompose(token));
+        Set<Host> replicas = metadata.getReplicas(quote(config.getKeyspace()), tkValidator.decompose(token));
 
         return Lists.newArrayList(Iterables.transform(replicas, new Function<Host, String>() {
             @Nullable
