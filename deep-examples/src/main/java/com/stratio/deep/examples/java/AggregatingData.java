@@ -26,6 +26,7 @@ import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
@@ -79,7 +80,7 @@ public class AggregatingData {
                 .initialize();
 
         // Creating the RDD
-        CassandraJavaRDD<TweetEntity> rdd = deepContext.cassandraJavaRDD(config);
+        JavaRDD<TweetEntity> rdd = deepContext.cassandraJavaRDD(config);
 
         // grouping to get key-value pairs
         JavaPairRDD<String, Integer> groups = rdd.groupBy(new Function<TweetEntity, String>() {

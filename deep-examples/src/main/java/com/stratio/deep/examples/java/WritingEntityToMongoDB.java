@@ -24,6 +24,7 @@ import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
 import com.stratio.deep.testentity.MessageEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
+import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
 import java.util.List;
@@ -67,7 +68,7 @@ public final class WritingEntityToMongoDB {
         IMongoDeepJobConfig<MessageEntity> inputConfigEntity =
                 DeepJobConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(inputCollection).readPreference(readPreference).initialize();
 
-        MongoJavaRDD<MessageEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
+        RDD<MessageEntity> inputRDDEntity = deepContext.mongoEntityRDD(inputConfigEntity);
 
 
         IMongoDeepJobConfig<MessageEntity> outputConfigEntityPruebaGuardado =

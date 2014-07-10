@@ -23,6 +23,7 @@ import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.mongodb.MongoCellRDD;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
+import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
@@ -71,7 +72,7 @@ public final class ReadingCellFromMongoDB {
                 .filterQuery(query)
                 .sort(bsonSort).fields(bsonFields).initialize();
 
-        MongoCellRDD inputRDDEntity = deepContext.mongoCellRDD(inputConfigEntity);
+        RDD inputRDDEntity = deepContext.mongoCellRDD(inputConfigEntity);
 
 
 	    LOG.info("count : " + inputRDDEntity.count());

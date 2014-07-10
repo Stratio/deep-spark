@@ -25,6 +25,7 @@ import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
@@ -75,7 +76,7 @@ public final class MapReduceJob {
                 .initialize();
 
         // Creating the RDD
-        CassandraJavaRDD<TweetEntity> rdd = deepContext.cassandraJavaRDD(config);
+        JavaRDD<TweetEntity> rdd = deepContext.cassandraJavaRDD(config);
 
         // Map stage: Getting key-value pairs from the RDD
         JavaPairRDD<String, Integer> pairsRDD = rdd.mapToPair(new PairFunction<TweetEntity, String, Integer>() {

@@ -26,7 +26,7 @@ public class CellDeepJobConfigMongoDB extends GenericDeepJobConfigMongoDB<Cells>
     private static final long serialVersionUID = -598862509865396541L;
     private Cells dummyCells;
 
-    CellDeepJobConfigMongoDB() {
+    public CellDeepJobConfigMongoDB() {
     }
 
     {

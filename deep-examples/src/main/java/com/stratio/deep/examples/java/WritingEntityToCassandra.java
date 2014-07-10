@@ -78,7 +78,7 @@ public final class WritingEntityToCassandra {
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
 
-        CassandraJavaRDD<PageEntity> inputRDD = deepContext.cassandraJavaRDD(inputConfig);
+        JavaRDD<PageEntity> inputRDD = deepContext.cassandraJavaRDD(inputConfig);
 
         JavaPairRDD<String, PageEntity> pairRDD = inputRDD.mapToPair(new PairFunction<PageEntity, String,
                 PageEntity>() {

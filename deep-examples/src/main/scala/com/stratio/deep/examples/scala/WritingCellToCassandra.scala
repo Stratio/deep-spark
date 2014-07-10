@@ -50,7 +50,7 @@ object WritingCellToCassandra {
       .keyspace(inputKeyspaceName).table(inputTableName)
       .initialize
 
-    val inputRDD: CassandraRDD[Cells] = deepContext.cassandraGenericRDD(inputConfig)
+    val inputRDD: RDD[Cells] = deepContext.cassandraGenericRDD(inputConfig)
 
     val pairRDD: RDD[(String, Cells)] = inputRDD map {
       c: Cells => (c.getCellByName("domainName").getCellValue.asInstanceOf[String], c)

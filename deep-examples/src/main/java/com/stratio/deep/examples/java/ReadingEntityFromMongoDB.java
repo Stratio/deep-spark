@@ -25,6 +25,7 @@ import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
 import com.stratio.deep.testentity.MessageEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
+import org.apache.spark.api.java.JavaRDD;
 import scala.Tuple2;
 
 /**
@@ -60,7 +61,7 @@ public final class ReadingEntityFromMongoDB {
         IMongoDeepJobConfig<MessageEntity> inputConfigEntity =
                 DeepJobConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(inputCollection).initialize();
 
-        MongoJavaRDD<MessageEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
+        JavaRDD<MessageEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
 
 
 	    LOG.info("count : " + inputRDDEntity.cache().count());

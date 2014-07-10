@@ -17,9 +17,13 @@
 package com.stratio.deep.config;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.utils.DeepConfig;
+import org.apache.log4j.Logger;
+import org.apache.spark.rdd.RDD;
 
 /**
  * Factory class for deep configuration objects.
@@ -30,11 +34,15 @@ public final class DeepJobConfigFactory implements Serializable {
 
     private static final long serialVersionUID = -4559130919203819088L;
 
+    private static final Logger LOG = Logger.getLogger(DeepJobConfigFactory.class);
+
     /**
      * private constructor
      */
     private DeepJobConfigFactory() {
     }
+
+
 
     /**
      * Creates a new cell-based job configuration object.
@@ -42,7 +50,13 @@ public final class DeepJobConfigFactory implements Serializable {
      * @return a new cell-based job configuration object.
      */
     public static ICassandraDeepJobConfig<Cells> create() {
-        return new CellDeepJobConfig(false);
+        try{
+            Class c = Class.forName(DeepConfig.CASSANDRA_CELL.getConfig());
+            return  (ICassandraDeepJobConfig) c.getConstructors()[0].newInstance(false);
+        }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
+            LOG.error(e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -51,7 +65,13 @@ public final class DeepJobConfigFactory implements Serializable {
      * @return a new cell-based write suitable job configuration object.
      */
     public static ICassandraDeepJobConfig<Cells> createWriteConfig() {
-        return new CellDeepJobConfig(true);
+        try{
+            Class c = Class.forName(DeepConfig.CASSANDRA_CELL.getConfig());
+            return  (ICassandraDeepJobConfig) c.getConstructors()[0].newInstance(true);
+        }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
+            LOG.error(e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -62,7 +82,13 @@ public final class DeepJobConfigFactory implements Serializable {
      * @return a new an entity-based configuration object.
      */
     public static <T extends IDeepType> ICassandraDeepJobConfig<T> create(Class<T> entityClass) {
-        return new EntityDeepJobConfig<>(entityClass, false);
+        try{
+            Class c = Class.forName(DeepConfig.CASSANDRA_ENTITY.getConfig());
+            return  (ICassandraDeepJobConfig) c.getConstructors()[0].newInstance(entityClass, false);
+        }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
+            LOG.error(e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -71,17 +97,29 @@ public final class DeepJobConfigFactory implements Serializable {
      * @return an entity-based write configuration object.
      */
     public static <T extends IDeepType> ICassandraDeepJobConfig<T> createWriteConfig(Class<T> entityClass) {
-        return new EntityDeepJobConfig<>(entityClass, true);
+        try{
+            Class c = Class.forName(DeepConfig.CASSANDRA_ENTITY.getConfig());
+            return  (ICassandraDeepJobConfig) c.getConstructors()[0].newInstance(entityClass, true);
+        }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
+            LOG.error(e.getMessage());
+            return null;
+        }
     }
 
 
-	/**
+    /**
 	 * Creates a new cell-based MongoDB job configuration object.
 	 *
 	 * @return a new cell-based MongoDB job configuration object.
 	 */
     public static IMongoDeepJobConfig<Cells> createMongoDB() {
-        return new CellDeepJobConfigMongoDB();
+        try{
+            Class c = Class.forName(DeepConfig.MONGODB_CELL.getConfig());
+            return  (IMongoDeepJobConfig) c.getConstructors()[0].newInstance();
+        }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
+            LOG.error(e.getMessage());
+            return null;
+        }
     }
 
 	/**
@@ -92,6 +130,12 @@ public final class DeepJobConfigFactory implements Serializable {
 	 * @return a new entity-based MongoDB job configuration object.
 	 */
     public static <T extends IDeepType> IMongoDeepJobConfig<T> createMongoDB(Class<T> entityClass) {
-        return new EntityDeepJobConfigMongoDB<T>(entityClass);
+        try{
+            Class c = Class.forName(DeepConfig.MONGODB_ENTITY.getConfig());
+            return  (IMongoDeepJobConfig) c.getConstructors()[0].newInstance(entityClass);
+        }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
+            LOG.error(e.getMessage());
+            return null;
+        }
     }
 }

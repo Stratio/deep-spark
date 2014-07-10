@@ -85,7 +85,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
         logger.info("Constructed configuration object: " + rddConfig);
         logger.info("Constructiong cassandraRDD");
 
-        rdd = context.cassandraJavaRDD(rddConfig);
+        rdd = (CassandraJavaRDD<TestEntity>) context.cassandraJavaRDD(rddConfig);
     }
 
     @Test

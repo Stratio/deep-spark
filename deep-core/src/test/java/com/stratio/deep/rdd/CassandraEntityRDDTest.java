@@ -186,7 +186,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
                 .filterByField("response_time", 371)
                 .initialize();
 
-        CassandraRDD<TestEntity> otherRDD = context.cassandraEntityRDD(config);
+        RDD<TestEntity> otherRDD = context.cassandraEntityRDD(config);
 
         entities = (TestEntity[]) otherRDD.collect();
         assertEquals(entities.length, 2);
@@ -213,7 +213,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     @Override
     protected CassandraRDD<TestEntity> initRDD() {
         assertNotNull(context);
-        return context.cassandraEntityRDD(getReadConfig());
+        return (CassandraRDD)context.cassandraEntityRDD(getReadConfig());
     }
 
     @Override
@@ -254,7 +254,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
                 .inputColumns("domain_name", "response_time")
                 .initialize();
 
-        CassandraRDD<TestEntity> tmpRdd = context.cassandraEntityRDD(tmpConfig);
+        RDD<TestEntity> tmpRdd = context.cassandraEntityRDD(tmpConfig);
 
         TestEntity[] cells = (TestEntity[]) tmpRdd.collect();
 

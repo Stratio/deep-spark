@@ -22,6 +22,7 @@ import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.mongodb.MongoCellRDD;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
+import org.apache.spark.rdd.RDD;
 
 /**
  * Example class to write a RDD to mongoDB
@@ -56,7 +57,7 @@ public final class WritingCellToMongoDB {
 
         IMongoDeepJobConfig inputConfigEntity = DeepJobConfigFactory.createMongoDB().host(host).database(database).collection(inputCollection).initialize();
 
-        MongoCellRDD inputRDDCell = deepContext.mongoCellRDD(inputConfigEntity);
+        RDD inputRDDCell = deepContext.mongoCellRDD(inputConfigEntity);
 
 
 	    LOG.info("count : " + inputRDDCell.count());
@@ -68,7 +69,7 @@ public final class WritingCellToMongoDB {
         MongoCellRDD.saveCell(inputRDDCell, outputConfigEntity);
 
 
-        MongoCellRDD outputRDDCell = deepContext.mongoCellRDD(outputConfigEntity);
+        RDD outputRDDCell = deepContext.mongoCellRDD(outputConfigEntity);
 
         LOG.info("count output : " + outputRDDCell.count());
 	    LOG.info("prints first output cell: " + outputRDDCell.first());

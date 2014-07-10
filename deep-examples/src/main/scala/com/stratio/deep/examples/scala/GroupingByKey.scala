@@ -50,7 +50,7 @@ object GroupingByKey {
       .initialize
 
     // Creating the RDD
-    val rdd: CassandraRDD[TweetEntity] = deepContext.cassandraEntityRDD(config)
+    val rdd: RDD[TweetEntity] = deepContext.cassandraEntityRDD(config)
 
     // creating a key-value pairs RDD
     val pairsRDD: RDD[(String, TweetEntity)] = rdd map {

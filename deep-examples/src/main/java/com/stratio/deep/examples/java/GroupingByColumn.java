@@ -79,7 +79,7 @@ public final class GroupingByColumn {
                 .initialize();
 
 // Creating the RDD
-        CassandraJavaRDD<TweetEntity> rdd = deepContext.cassandraJavaRDD(config);
+        CassandraJavaRDD<TweetEntity> rdd = (CassandraJavaRDD) deepContext.cassandraJavaRDD(config);
 
         // grouping
         JavaPairRDD<String, Iterable<TweetEntity>> groups = rdd.groupBy(new Function<TweetEntity, String>() {

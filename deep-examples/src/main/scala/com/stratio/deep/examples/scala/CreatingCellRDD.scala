@@ -21,6 +21,7 @@ import com.stratio.deep.config._
 import com.stratio.deep.rdd._
 import com.stratio.deep.testutils.ContextProperties
 import com.stratio.deep.entity.Cells
+import org.apache.spark.rdd.RDD
 
 /**
  * Author: Emmanuelle Raffenne
@@ -46,7 +47,7 @@ object CreatingCellRDD {
       .initialize
 
     // Creating the RDD
-    val rdd: CassandraRDD[Cells] = deepContext.cassandraGenericRDD(config)
+    val rdd: RDD[Cells] = deepContext.cassandraGenericRDD(config)
 
     val counts = rdd.count()
 

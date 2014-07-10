@@ -137,7 +137,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
     @Override
     protected CassandraRDD<Cells> initRDD() {
         assertNotNull(context);
-        return context.cassandraGenericRDD(getReadConfig());
+        return (CassandraRDD)context.cassandraGenericRDD(getReadConfig());
     }
 
     @Override
@@ -162,7 +162,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
                 .inputColumns("password")
                 .initialize();
 
-        CassandraRDD<Cells> tmpRdd = context.cassandraGenericRDD(tmpConfig);
+        CassandraRDD<Cells> tmpRdd = (CassandraRDD)context.cassandraGenericRDD(tmpConfig);
 
         Cells[] cells = (Cells[]) tmpRdd.collect();
 

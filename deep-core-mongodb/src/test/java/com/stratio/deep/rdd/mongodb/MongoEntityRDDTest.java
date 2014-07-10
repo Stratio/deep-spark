@@ -28,6 +28,8 @@ import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.io.file.Files;
 import de.flapdoodle.embed.process.runtime.Network;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -134,7 +136,7 @@ public class MongoEntityRDDTest implements Serializable {
 
     /**
      * Imports dataset
-     * @throws IOException
+     * @throws java.io.IOException
      */
     private static void dataSetImport() throws IOException {
         String dbName = "book";
@@ -182,7 +184,7 @@ public class MongoEntityRDDTest implements Serializable {
         IMongoDeepJobConfig<MesageTestEntity> inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_INPUT).initialize();
 
-        MongoJavaRDD<MesageTestEntity> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
+        JavaRDD<MesageTestEntity> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
 
         assertEquals(col.count(), inputRDDEntity.cache().count());
         assertEquals(col.findOne().get("message"), inputRDDEntity.first().getMessage());
@@ -202,7 +204,7 @@ public class MongoEntityRDDTest implements Serializable {
         IMongoDeepJobConfig<MesageTestEntity> inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_INPUT).initialize();
 
-        MongoJavaRDD<MesageTestEntity> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
+        RDD<MesageTestEntity> inputRDDEntity = context.mongoEntityRDD(inputConfigEntity);
 
         IMongoDeepJobConfig<MesageTestEntity> outputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_OUTPUT).initialize();
@@ -211,7 +213,7 @@ public class MongoEntityRDDTest implements Serializable {
         //Save RDD in MongoDB
         MongoEntityRDD.saveEntity(inputRDDEntity, outputConfigEntity);
 
-        MongoJavaRDD<MesageTestEntity> outputRDDEntity = context.mongoJavaRDD(outputConfigEntity);
+        RDD<MesageTestEntity> outputRDDEntity = context.mongoEntityRDD(outputConfigEntity);
 
 
         assertEquals(mongo.getDB(DATABASE).getCollection(COLLECTION_OUTPUT).findOne().get("message"),
@@ -235,14 +237,14 @@ public class MongoEntityRDDTest implements Serializable {
         IMongoDeepJobConfig<BookEntity> inputConfigEntity = DeepJobConfigFactory.createMongoDB(BookEntity.class)
                 .host(hostConcat).database("book").collection("input").initialize();
 
-        MongoJavaRDD<BookEntity> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
+        RDD<BookEntity> inputRDDEntity = context.mongoEntityRDD(inputConfigEntity);
 
 
 //Import dataSet was OK and we could read it
         assertEquals(1, inputRDDEntity.count());
 
 
-        List<BookEntity> books = inputRDDEntity.collect();
+        List<BookEntity> books = inputRDDEntity.toJavaRDD().collect();
 
 
         BookEntity book = books.get(0);

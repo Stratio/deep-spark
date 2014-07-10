@@ -50,7 +50,7 @@ object MapReduceJob {
       .initialize
 
     // Creating the RDD
-    val rdd: CassandraRDD[TweetEntity] = deepContext.cassandraEntityRDD(config)
+    val rdd: RDD[TweetEntity] = deepContext.cassandraEntityRDD(config)
 
     // ------------------ MapReduce block
     // Map stage: Getting key-value pairs from the RDD

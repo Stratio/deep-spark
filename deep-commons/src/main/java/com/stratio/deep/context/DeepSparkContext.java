@@ -16,21 +16,22 @@
 
 package com.stratio.deep.context;
 
-import com.stratio.deep.config.*;
+
+import com.stratio.deep.config.ICassandraDeepJobConfig;
+import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.rdd.CassandraCellRDD;
-import com.stratio.deep.rdd.CassandraEntityRDD;
-import com.stratio.deep.rdd.CassandraJavaRDD;
-import com.stratio.deep.rdd.CassandraRDD;
-import com.stratio.deep.rdd.mongodb.MongoCellRDD;
-import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
-import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
+import com.stratio.deep.utils.DeepConfig;
+import com.stratio.deep.utils.DeepRDD;
+import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.rdd.DeepMongoRDD;
+import org.apache.spark.rdd.RDD;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 /**
@@ -39,6 +40,9 @@ import java.util.Map;
  * @author Luca Rosellini <luca@strat.io>
  */
 public class DeepSparkContext extends JavaSparkContext {
+
+    private static final Logger LOG = Logger.getLogger(DeepSparkContext.class);
+
 
     /**
      * Overridden superclass constructor.
@@ -97,23 +101,36 @@ public class DeepSparkContext extends JavaSparkContext {
         super(master, appName, sparkHome, jars, environment);
     }
 
+
+
+
+    //Cassandra
     /**
      * Builds a new CassandraJavaRDD.
      *
      * @param config the deep configuration object to use to create the new RDD.
      * @return a new CassandraJavaRDD
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public <T, S extends IDeepJobConfig> CassandraJavaRDD<T> cassandraJavaRDD(IDeepJobConfig<T, S> config) {
-        if (config instanceof EntityDeepJobConfig) {
-            return new CassandraJavaRDD<T>(cassandraEntityRDD((EntityDeepJobConfig) config));
-        }
+//    @SuppressWarnings({"unchecked", "rawtypes"})
+    public <T, S extends IDeepJobConfig> JavaRDD<T> cassandraJavaRDD(IDeepJobConfig<T, S> config) {
+        try {
 
-        if (config instanceof CellDeepJobConfig) {
-            return new CassandraJavaRDD<T>((CassandraRDD<T>) cassandraGenericRDD((CellDeepJobConfig) config));
-        }
+            Class c = Class.forName(DeepRDD.CASSANDRA_JAVA.getClassName());;
 
-        throw new DeepGenericException("not recognized config type");
+            if (config.getClass().isAssignableFrom(Class.forName(DeepConfig.CASSANDRA_ENTITY.getConfig()))) {
+                return (JavaRDD<T>) c.getConstructors()[0].newInstance(cassandraEntityRDD((ICassandraDeepJobConfig) config));
+            }
+
+            if (config.getClass().isAssignableFrom(Class.forName(DeepConfig.CASSANDRA_CELL.getConfig()))) {
+                return (JavaRDD<T>) c.getConstructors()[0].newInstance(cassandraGenericRDD((ICassandraDeepJobConfig) config));
+
+            }
+
+            throw new DeepGenericException("not recognized config type");
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            LOG.error(e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -122,8 +139,14 @@ public class DeepSparkContext extends JavaSparkContext {
      * @param config the deep configuration object to use to create the new RDD.
      * @return a new entity-based CassandraRDD
      */
-    public <T extends IDeepType> CassandraRDD<T> cassandraEntityRDD(ICassandraDeepJobConfig<T> config) {
-        return new CassandraEntityRDD<T>(sc(), config);
+    public <T extends IDeepType> RDD<T> cassandraEntityRDD(ICassandraDeepJobConfig<T> config) {
+        try{
+            Class c = Class.forName(DeepRDD.CASSANDRA_ENTITY.getClassName());
+            return  (RDD<T>) c.getConstructors()[0].newInstance(sc(), config);
+        }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
+            LOG.error(e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -132,8 +155,36 @@ public class DeepSparkContext extends JavaSparkContext {
      * @param config the deep configuration object to use to create the new RDD.
      * @return a new generic CassandraRDD.
      */
-    public CassandraRDD<Cells> cassandraGenericRDD(ICassandraDeepJobConfig<Cells> config) {
-        return new CassandraCellRDD(sc(), config);
+    public RDD<Cells> cassandraGenericRDD(ICassandraDeepJobConfig<Cells> config) {
+        try{
+            Class c = Class.forName(DeepRDD.CASSANDRA_CELL.getClassName());
+            return  (RDD<Cells>) c.getConstructors()[0].newInstance(sc(), config);
+        }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
+            LOG.error(e.getMessage());
+            return null;
+        }
+    }
+
+
+    //MongoDB
+
+
+    /**
+     * Builds a new entity based MongoEntityRDD
+     *
+     * @param config
+     * @param <T>
+     * @return
+     */
+    public <T extends IDeepType> JavaRDD<T> mongoJavaRDD(IMongoDeepJobConfig<T> config) {
+        try{
+            Class c = Class.forName(DeepRDD.MONGO_JAVA.getClassName());
+            return  (JavaRDD<T>) c.getConstructors()[0].newInstance(mongoEntityRDD(config));
+        }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
+            LOG.error(e.getMessage());
+            return null;
+        }
+
     }
 
     /**
@@ -143,20 +194,15 @@ public class DeepSparkContext extends JavaSparkContext {
      * @param <T>
      * @return
      */
-    public <T> MongoJavaRDD<T> mongoJavaRDD(IMongoDeepJobConfig<T> config) {
-        return new MongoJavaRDD<T>(new MongoEntityRDD(this.sc(), (EntityDeepJobConfigMongoDB) config));
 
-    }
-
-    /**
-     * Builds a new entity based MongoEntityRDD
-     *
-     * @param config
-     * @param <T>
-     * @return
-     */
-    public <T extends IDeepType> MongoEntityRDD<T> mongoEntityRDD(IMongoDeepJobConfig<T> config) {
-        return new MongoEntityRDD<T>(this.sc(), config);
+    public <T extends IDeepType> RDD<T> mongoEntityRDD(IMongoDeepJobConfig<T> config) {
+        try{
+            Class c = Class.forName(DeepRDD.MONGO_ENTITY.getClassName());
+            return  (RDD<T>) c.getConstructors()[0].newInstance(sc(), config);
+        }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
+            LOG.error(e.getMessage());
+            return null;
+        }
 
     }
 
@@ -167,8 +213,15 @@ public class DeepSparkContext extends JavaSparkContext {
      * @param <T>
      * @return
      */
-    public <T extends IDeepType> MongoCellRDD mongoCellRDD(IMongoDeepJobConfig<Cells> config) {
-        return new MongoCellRDD(this.sc(), config);
-
+//    com.stratio.deep.rdd.mongodb.MongoCellRDD
+    public <T extends IDeepType> RDD mongoCellRDD(IMongoDeepJobConfig<Cells> config) {
+        try{
+            Class c = Class.forName(DeepRDD.MONGO_CELL.getClassName());
+            return  (RDD<T>) c.getConstructors()[0].newInstance(sc(), config);
+        }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
+            LOG.error(e.getMessage());
+            return null;
+        }
     }
+
 }

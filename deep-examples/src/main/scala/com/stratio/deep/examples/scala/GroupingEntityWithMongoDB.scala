@@ -47,7 +47,7 @@ final object GroupingEntityWithMongoDB {
 
     val inputConfigEntity: IMongoDeepJobConfig[BookEntity] = DeepJobConfigFactory.createMongoDB(classOf[BookEntity]).host(host).database(database).collection(inputCollection).initialize
 
-    val inputRDDEntity: MongoEntityRDD[BookEntity] = deepContext.mongoEntityRDD(inputConfigEntity)
+    val inputRDDEntity: RDD[BookEntity] = deepContext.mongoEntityRDD(inputConfigEntity)
 
     val words: RDD[String] = inputRDDEntity flatMap {
       e: BookEntity => (for (canto <- e.getCantoEntities) yield canto.getText.split(" ")).flatten

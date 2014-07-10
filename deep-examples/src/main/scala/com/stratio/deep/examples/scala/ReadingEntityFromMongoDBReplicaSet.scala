@@ -21,6 +21,7 @@ import com.stratio.deep.rdd.mongodb.MongoJavaRDD
 import com.stratio.deep.testentity.MessageEntity
 import com.stratio.deep.testutils.ContextProperties
 import org.apache.log4j.Logger
+import org.apache.spark.rdd.RDD
 
 /**
  * Example class to read an entity from a mongoDB replica set
@@ -46,7 +47,7 @@ final object ReadingEntityFromMongoDBReplicaSet {
 
     val inputConfigEntity: IMongoDeepJobConfig[MessageEntity] = DeepJobConfigFactory.createMongoDB(classOf[MessageEntity]).host(host1).host(host2).host(host3).database(database).collection(inputCollection).replicaSet(replicaSet).readPreference(readPreference).initialize
 
-    val inputRDDEntity: MongoJavaRDD[MessageEntity] = deepContext.mongoJavaRDD(inputConfigEntity)
+    val inputRDDEntity: RDD[MessageEntity] = deepContext.mongoJavaRDD(inputConfigEntity)
 
     System.out.println("count : " + inputRDDEntity.cache.count)
     deepContext.stop

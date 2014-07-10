@@ -76,7 +76,7 @@ public final class GroupingByKey {
                 .initialize();
 
         // Creating the RDD
-        CassandraJavaRDD<TweetEntity> rdd = deepContext.cassandraJavaRDD(config);
+        CassandraJavaRDD<TweetEntity> rdd = (CassandraJavaRDD) deepContext.cassandraJavaRDD(config);
 
         // creating a key-value pairs RDD
         JavaPairRDD<String, TweetEntity> pairsRDD = rdd.mapToPair(new PairFunction<TweetEntity, String, TweetEntity>() {

@@ -48,7 +48,7 @@ object GroupingByColumn {
       .initialize
 
     // Create the RDD
-    val rdd: CassandraRDD[TweetEntity] = deepContext.cassandraEntityRDD(config)
+    val rdd: RDD[TweetEntity] = deepContext.cassandraEntityRDD(config)
 
     // grouping
     val groups: RDD[(String, Iterable[TweetEntity])] = rdd groupBy {

@@ -58,7 +58,7 @@ object AggregatingData {
       .initialize
 
     // Creating the RDD
-    val rdd: CassandraRDD[TweetEntity] = deepContext.cassandraEntityRDD(config)
+    val rdd: RDD[TweetEntity] = deepContext.cassandraEntityRDD(config)
 
     // grouping to get key-value pairs
     val groups: RDD[(String, Int)] = rdd.groupBy {

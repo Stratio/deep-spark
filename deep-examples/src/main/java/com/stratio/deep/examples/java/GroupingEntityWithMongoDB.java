@@ -71,7 +71,7 @@ public final class GroupingEntityWithMongoDB {
         IMongoDeepJobConfig<BookEntity> inputConfigEntity =
                 DeepJobConfigFactory.createMongoDB(BookEntity.class).host(host).database(database).collection(inputCollection).initialize();
 
-        MongoJavaRDD<BookEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
+        MongoJavaRDD<BookEntity> inputRDDEntity = (MongoJavaRDD) deepContext.mongoJavaRDD(inputConfigEntity);
         JavaRDD<String> words =inputRDDEntity.flatMap(new FlatMapFunction<BookEntity, String>() {
             @Override
             public Iterable<String> call(BookEntity bookEntity) throws Exception {
@@ -111,7 +111,7 @@ public final class GroupingEntityWithMongoDB {
         IMongoDeepJobConfig<WordCount> outputConfigEntity =
                 DeepJobConfigFactory.createMongoDB(WordCount.class).host(host).database(database).collection(outputCollection).initialize();
 
-        MongoEntityRDD.saveEntity(outputRDD,outputConfigEntity);
+        MongoEntityRDD.saveEntity(outputRDD.rdd(),outputConfigEntity);
 
         deepContext.stop();
     }

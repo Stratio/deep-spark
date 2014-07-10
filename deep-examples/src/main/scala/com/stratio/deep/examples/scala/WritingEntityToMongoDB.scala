@@ -23,6 +23,7 @@ import com.stratio.deep.rdd.mongodb.{MongoEntityRDD, MongoJavaRDD}
 import com.stratio.deep.testentity.MessageEntity
 import com.stratio.deep.testutils.ContextProperties
 import org.apache.log4j.Logger
+import org.apache.spark.rdd.RDD
 
 /**
  * Example class to write an entity to mongoDB
@@ -51,7 +52,7 @@ object WritingEntityToMongoDB {
 
     val inputConfigEntity: IMongoDeepJobConfig[MessageEntity] = DeepJobConfigFactory.createMongoDB(classOf[MessageEntity]).host(host).database(database).collection(inputCollection).readPreference(readPreference).initialize
 
-    val inputRDDEntity: MongoJavaRDD[MessageEntity] = deepContext.mongoJavaRDD(inputConfigEntity)
+    val inputRDDEntity: RDD[MessageEntity] = deepContext.mongoJavaRDD(inputConfigEntity)
 
     val outputConfigEntity: IMongoDeepJobConfig[MessageEntity] = DeepJobConfigFactory.createMongoDB(classOf[MessageEntity]).host(host).database(database).collection(outputCollection).readPreference(readPreference).initialize
 

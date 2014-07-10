@@ -50,7 +50,7 @@ object WritingEntityToCassandra {
       .keyspace(inputKeyspaceName).table(inputTableName)
       .initialize
 
-    val inputRDD: CassandraRDD[PageEntity] = deepContext.cassandraEntityRDD(inputConfig)
+    val inputRDD: RDD[PageEntity] = deepContext.cassandraEntityRDD(inputConfig)
 
     val pairRDD: RDD[(String, PageEntity)] = inputRDD map {
       e: PageEntity => (e.getDomainName, e)

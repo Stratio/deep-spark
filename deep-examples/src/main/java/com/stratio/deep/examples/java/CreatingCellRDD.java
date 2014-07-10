@@ -86,7 +86,7 @@ public final class CreatingCellRDD {
                 .initialize();
 
         // Creating the RDD
-        CassandraJavaRDD rdd = deepContext.cassandraJavaRDD(config);
+        CassandraJavaRDD rdd = (CassandraJavaRDD) deepContext.cassandraJavaRDD(config);
 
         counts = rdd.count();
 

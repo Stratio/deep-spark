@@ -25,6 +25,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.DeepMongoRDD;
+import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,9 +79,9 @@ public final class MongoEntityRDD<T extends IDeepType> extends DeepMongoRDD<T> {
      * @param config
      * @param <T>
      */
-    public static <T extends IDeepType> void saveEntity(JavaRDD<T> rdd, IMongoDeepJobConfig<T> config) {
+    public static <T extends IDeepType> void saveEntity(RDD<T> rdd, IMongoDeepJobConfig<T> config) {
 
-        JavaPairRDD<Object, BSONObject> save = rdd.mapToPair(new PairFunction<T, Object, BSONObject>() {
+        JavaPairRDD<Object, BSONObject> save = rdd.toJavaRDD().mapToPair(new PairFunction<T, Object, BSONObject>() {
 
 
             @Override

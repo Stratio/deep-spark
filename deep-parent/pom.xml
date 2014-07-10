@@ -88,6 +88,16 @@
                 <role>contributor</role>
             </roles>
         </developer>
+        <developer>
+            <id>rcrespo</id>
+            <name>Ricardo Crespo</name>
+            <email>rcrespo@stratio.com</email>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+                <role>contributor</role>
+            </roles>
+        </developer>
     </developers>
 
     <licenses>
@@ -253,6 +263,7 @@
     <modules>
         <module>../deep-commons</module>
         <module>../deep-core</module>
+        <module>../deep-core-mongodb</module>
         <module>../deep-examples</module>
     </modules>
 
