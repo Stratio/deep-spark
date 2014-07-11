@@ -17,7 +17,7 @@
 package com.stratio.deep.rdd
 
 import com.datastax.driver.core.{Cluster, ResultSet, Row, Session}
-import com.stratio.deep.config.{DeepJobConfigFactory, ICassandraDeepJobConfig}
+import com.stratio.deep.config.{ConfigFactory, ICassandraDeepJobConfig}
 import com.stratio.deep.context.AbstractDeepSparkContextTest
 import com.stratio.deep.embedded.CassandraServer
 import com.stratio.deep.testentity.DeepScalaPageEntity
@@ -92,7 +92,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
   private def initWriteConfig(): ICassandraDeepJobConfig[DeepScalaPageEntity] = {
 
     writeConfig =
-      DeepJobConfigFactory
+      ConfigFactory
         .createWriteConfig(classOf[DeepScalaPageEntity])
         .host(Constants.DEFAULT_CASSANDRA_HOST)
         .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -107,7 +107,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
 
   private def initReadConfig(): ICassandraDeepJobConfig[DeepScalaPageEntity] = {
     rddConfig =
-      DeepJobConfigFactory
+      ConfigFactory
         .create(classOf[DeepScalaPageEntity])
         .host(Constants.DEFAULT_CASSANDRA_HOST)
         .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -119,7 +119,8 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
   }
 
   private def initRDD(): CassandraRDD[DeepScalaPageEntity] = {
-    super.getContext.cassandraEntityRDD(rddConfig).asInstanceOf[CassandraRDD[DeepScalaPageEntity]]
+
+    super.getContext.cassandraRDD(rddConfig).asInstanceOf[CassandraRDD[DeepScalaPageEntity]]
   }
 
   private def checkSimpleTestData(): Unit = {

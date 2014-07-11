@@ -24,7 +24,7 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.exception.DeepIOException;
@@ -142,7 +142,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
 
         try {
-            DeepJobConfigFactory
+            ConfigFactory
                     .create(TestEntity.class)
                     .host(Constants.DEFAULT_CASSANDRA_HOST)
                     .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -158,7 +158,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         }
 
         try {
-            DeepJobConfigFactory
+            ConfigFactory
                     .create(TestEntity.class)
                     .host(Constants.DEFAULT_CASSANDRA_HOST)
                     .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -177,7 +177,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         int allElements = entities.length;
         assertTrue(allElements > 2);
 
-        ICassandraDeepJobConfig<TestEntity> config = DeepJobConfigFactory
+        ICassandraDeepJobConfig<TestEntity> config = ConfigFactory
                 .create(TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -187,7 +187,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
                 .filterByField("response_time", 371)
                 .initialize();
 
-        RDD<TestEntity> otherRDD = context.cassandraEntityRDD(config);
+        RDD<TestEntity> otherRDD = context.cassandraRDD(config);
 
         entities = (TestEntity[]) otherRDD.collect();
         assertEquals(entities.length, 2);
@@ -214,12 +214,12 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     @Override
     protected CassandraRDD<TestEntity> initRDD() {
         assertNotNull(context);
-        return (CassandraRDD)context.cassandraEntityRDD(getReadConfig());
+        return (CassandraRDD)context.cassandraRDD(getReadConfig());
     }
 
     @Override
     protected ICassandraDeepJobConfig<TestEntity> initReadConfig() {
-        ICassandraDeepJobConfig<TestEntity> config = DeepJobConfigFactory.create(TestEntity.class)
+        ICassandraDeepJobConfig<TestEntity> config = ConfigFactory.create(TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY)
                 .bisectFactor(testBisectFactor).pageSize(DEFAULT_PAGE_SIZE).initialize();
@@ -229,7 +229,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
     @Override
     protected ICassandraDeepJobConfig<TestEntity> initWriteConfig() {
-        ICassandraDeepJobConfig<TestEntity> writeConfig = DeepJobConfigFactory.createWriteConfig(TestEntity.class)
+        ICassandraDeepJobConfig<TestEntity> writeConfig = ConfigFactory.createWriteConfig(TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
@@ -244,7 +244,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     public void testCountWithInputColumns() {
         logger.info("testCountWithInputColumns()");
 
-        ICassandraDeepJobConfig<TestEntity> tmpConfig = DeepJobConfigFactory.create(TestEntity.class)
+        ICassandraDeepJobConfig<TestEntity> tmpConfig = ConfigFactory.create(TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
@@ -255,7 +255,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
                 .inputColumns("domain_name", "response_time")
                 .initialize();
 
-        RDD<TestEntity> tmpRdd = context.cassandraEntityRDD(tmpConfig);
+        RDD<TestEntity> tmpRdd = context.cassandraRDD(tmpConfig);
 
         TestEntity[] cells = (TestEntity[]) tmpRdd.collect();
 

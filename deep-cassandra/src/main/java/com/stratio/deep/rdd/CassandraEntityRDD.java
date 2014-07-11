@@ -16,6 +16,9 @@
 
 package com.stratio.deep.rdd;
 
+import java.nio.ByteBuffer;
+import java.util.Map;
+
 import com.stratio.deep.config.EntityDeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
@@ -26,9 +29,6 @@ import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.spark.SparkContext;
-
-import java.nio.ByteBuffer;
-import java.util.Map;
 
 /**
  * Stratio's implementation of an RDD reading and writing data from and to
@@ -47,8 +47,8 @@ public final class CassandraEntityRDD<T extends IDeepType> extends CassandraRDD<
      * This constructor should not be called explicitly.<br/>
      * Use {@link com.stratio.deep.context.DeepSparkContext} instead to create an RDD.
      *
-     * @param sc
-     * @param config
+     * @param sc parent spark context
+     * @param config the configuration object
      */
     public CassandraEntityRDD(SparkContext sc, ICassandraDeepJobConfig<T> config) {
         super(sc, config);

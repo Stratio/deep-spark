@@ -17,10 +17,9 @@
 package com.stratio.deep.examples.java;
 
 import com.mongodb.QueryBuilder;
-import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ConfigFactory;
 import com.stratio.deep.config.IMongoDeepJobConfig;
-import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.rdd.mongodb.MongoCellRDD;
+import com.stratio.deep.context.MongoDeepSparkContext;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
@@ -52,7 +51,7 @@ public final class ReadingCellFromMongoDB {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+	    MongoDeepSparkContext deepContext = new MongoDeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
         QueryBuilder query = QueryBuilder.start();
@@ -66,13 +65,13 @@ public final class ReadingCellFromMongoDB {
         bsonFields.put("text",1);
         bsonFields.put("_id",0);
 
-        IMongoDeepJobConfig inputConfigEntity = DeepJobConfigFactory.createMongoDB().host(host).database(database)
+        IMongoDeepJobConfig inputConfigEntity = ConfigFactory.createMongoDB().host(host).database(database)
                 .collection(inputCollection)
                 .createInputSplit(false)
                 .filterQuery(query)
                 .sort(bsonSort).fields(bsonFields).initialize();
 
-        RDD inputRDDEntity = deepContext.mongoCellRDD(inputConfigEntity);
+        RDD inputRDDEntity = deepContext.mongoRDD(inputConfigEntity);
 
 
 	    LOG.info("count : " + inputRDDEntity.count());

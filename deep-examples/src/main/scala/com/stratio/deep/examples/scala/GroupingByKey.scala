@@ -16,8 +16,8 @@
 
 package com.stratio.deep.examples.scala
 
-import com.stratio.deep.context.DeepSparkContext
-import com.stratio.deep.config.DeepJobConfigFactory
+import com.stratio.deep.context.{CassandraDeepSparkContext, DeepSparkContext}
+import com.stratio.deep.config.ConfigFactory
 import com.stratio.deep.rdd._
 
 import org.apache.spark.SparkContext._
@@ -41,16 +41,16 @@ object GroupingByKey {
 
     // Creating the Deep Context where args are Spark Master and Job Name
     val p = new ContextProperties(args)
-    val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
+    val deepContext = new CassandraDeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
 
     // Creating a configuration for the RDD and initialize it
-    val config = DeepJobConfigFactory.create(classOf[TweetEntity])
+    val config = ConfigFactory.create(classOf[TweetEntity])
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(keyspaceName).table(tableName)
       .initialize
 
     // Creating the RDD
-    val rdd: RDD[TweetEntity] = deepContext.cassandraEntityRDD(config)
+    val rdd: RDD[TweetEntity] = deepContext.cassandraRDD(config)
 
     // creating a key-value pairs RDD
     val pairsRDD: RDD[(String, TweetEntity)] = rdd map {

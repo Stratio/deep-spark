@@ -16,10 +16,10 @@
 
 package com.stratio.deep.config;
 
-import com.stratio.deep.entity.Cell;
-
 import java.io.Serializable;
 import java.util.Map;
+
+import com.stratio.deep.entity.Cell;
 
 /**
  * Defines the public methods that each Stratio Deep configuration object should implement.
@@ -43,8 +43,6 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig> extends Serializabl
      * @return the map of column names and the corresponding Cell object containing its metadata.
      */
     Map<String, Cell> columnDefinitions();
-
-
 
     /**
      * Sets the number of rows to retrieve for each page of data fetched from Cassandra.<br/>

@@ -17,8 +17,8 @@ package com.stratio.deep.examples.scala
 
 import java.util.List
 
-import com.stratio.deep.config.{IMongoDeepJobConfig, DeepJobConfigFactory, GenericDeepJobConfigMongoDB}
-import com.stratio.deep.context.DeepSparkContext
+import com.stratio.deep.config.{IMongoDeepJobConfig, ConfigFactory, GenericDeepJobConfigMongoDB}
+import com.stratio.deep.context.{MongoDeepSparkContext, DeepSparkContext}
 import com.stratio.deep.rdd.mongodb.{MongoEntityRDD, MongoJavaRDD}
 import com.stratio.deep.testentity.MessageEntity
 import com.stratio.deep.testutils.ContextProperties
@@ -48,13 +48,13 @@ object WritingEntityToMongoDB {
 
     val p: ContextProperties = new ContextProperties(args)
 
-    val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
+    val deepContext: MongoDeepSparkContext = new MongoDeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
 
-    val inputConfigEntity: IMongoDeepJobConfig[MessageEntity] = DeepJobConfigFactory.createMongoDB(classOf[MessageEntity]).host(host).database(database).collection(inputCollection).readPreference(readPreference).initialize
+    val inputConfigEntity: IMongoDeepJobConfig[MessageEntity] = ConfigFactory.createMongoDB(classOf[MessageEntity]).host(host).database(database).collection(inputCollection).readPreference(readPreference).initialize
 
     val inputRDDEntity: RDD[MessageEntity] = deepContext.mongoJavaRDD(inputConfigEntity)
 
-    val outputConfigEntity: IMongoDeepJobConfig[MessageEntity] = DeepJobConfigFactory.createMongoDB(classOf[MessageEntity]).host(host).database(database).collection(outputCollection).readPreference(readPreference).initialize
+    val outputConfigEntity: IMongoDeepJobConfig[MessageEntity] = ConfigFactory.createMongoDB(classOf[MessageEntity]).host(host).database(database).collection(outputCollection).readPreference(readPreference).initialize
 
     MongoEntityRDD.saveEntity(inputRDDEntity, outputConfigEntity)
 

@@ -141,5 +141,5 @@ RDD creation
 ----------------
 Methods used to create Cell and Entity RDD has been merged into one single method:
 
-* __CassandraDeepSparkContext__: cassandraEntityRDD and cassandraGenericRDD has been merged to cassandraRDD
-* __MongoDeepSparkContext__: mongoEntityRDD and mongoCellRDD has been merged to mongoRDD
+* __CassandraDeepSparkContext__: cassandraEntityRDD(...) and cassandraGenericRDD(...) has been merged to cassandraRDD(...)
+* __MongoDeepSparkContext__: mongoEntityRDD(...) and mongoCellRDD(...) has been merged to mongoRDD(...)

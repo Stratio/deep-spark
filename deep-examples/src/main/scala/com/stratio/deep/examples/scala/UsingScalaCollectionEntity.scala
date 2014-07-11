@@ -16,8 +16,8 @@
 
 package com.stratio.deep.examples.scala
 
-import com.stratio.deep.context.DeepSparkContext
-import com.stratio.deep.config.{ICassandraDeepJobConfig, IDeepJobConfig, DeepJobConfigFactory}
+import com.stratio.deep.context.{CassandraDeepSparkContext, DeepSparkContext}
+import com.stratio.deep.config.{ICassandraDeepJobConfig, IDeepJobConfig, ConfigFactory}
 import org.apache.spark.{SparkContext, SparkConf}
 
 import com.stratio.deep.testutils.ContextProperties
@@ -52,7 +52,7 @@ object UsingScalaCollectionEntity {
     sparkConf.setMaster(p.getCluster)
     sparkConf.setSparkHome(p.getSparkHome)
     val sc = new SparkContext(sparkConf)
-    val deepContext: DeepSparkContext = new DeepSparkContext(sc);
+    val deepContext = new CassandraDeepSparkContext(sc);
 
     try {
       doMain(args, deepContext, p)
@@ -61,16 +61,16 @@ object UsingScalaCollectionEntity {
     }
   }
 
-  private def doMain(args: Array[String], deepContext: DeepSparkContext, p: ContextProperties) = {
+  private def doMain(args: Array[String], deepContext: CassandraDeepSparkContext, p: ContextProperties) = {
 
     // Configuration and initialization
-    val config: ICassandraDeepJobConfig[ScalaCollectionEntity] = DeepJobConfigFactory.create(classOf[ScalaCollectionEntity])
+    val config: ICassandraDeepJobConfig[ScalaCollectionEntity] = ConfigFactory.create(classOf[ScalaCollectionEntity])
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(keyspaceName).table(tableName)
       .initialize
 
     // Creating the RDD
-    val rdd = deepContext.cassandraEntityRDD(config)
+    val rdd = deepContext.cassandraRDD(config)
 
     val rddCount: Long = rdd.count
 
@@ -92,7 +92,7 @@ object UsingScalaCollectionEntity {
     }
 
     // let's write the result to Cassandra
-    val writeConfig: ICassandraDeepJobConfig[ScalaOutputEntity] = DeepJobConfigFactory.create(classOf[ScalaOutputEntity])
+    val writeConfig: ICassandraDeepJobConfig[ScalaOutputEntity] = ConfigFactory.create(classOf[ScalaOutputEntity])
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort)
       .keyspace(keyspaceName).table(outputTableName).createTableOnWrite(true)
       .initialize

@@ -9,7 +9,7 @@ import static org.testng.Assert.fail;
 /**
  * Created by rcrespo on 18/06/14.
  */
-public class GenericDeepJobConfigMongoDBTest {
+public class GenericConfigFactoryMongoDBTest {
 
     private static final String DATATABASE_TEST = "test";
 
@@ -21,7 +21,7 @@ public class GenericDeepJobConfigMongoDBTest {
 
     @Test
     public void testDatabaseValidation() {
-        IMongoDeepJobConfig<TestEntity> djc = DeepJobConfigFactory.createMongoDB(TestEntity.class);
+        IMongoDeepJobConfig<TestEntity> djc = ConfigFactory.createMongoDB(TestEntity.class);
 
         djc.host(HOST_TEST).collection(COLLECTION_TEST);
 
@@ -39,7 +39,7 @@ public class GenericDeepJobConfigMongoDBTest {
 
     @Test
     public void testCollectionValidation() {
-        IMongoDeepJobConfig<TestEntity> djc = DeepJobConfigFactory.createMongoDB(TestEntity.class);
+        IMongoDeepJobConfig<TestEntity> djc = ConfigFactory.createMongoDB(TestEntity.class);
 
 
         djc.host(HOST_TEST).database(DATATABASE_TEST);
@@ -58,7 +58,7 @@ public class GenericDeepJobConfigMongoDBTest {
 
     @Test
     public void testHostValidation() {
-        IMongoDeepJobConfig<TestEntity> djc = DeepJobConfigFactory.createMongoDB(TestEntity.class);
+        IMongoDeepJobConfig<TestEntity> djc = ConfigFactory.createMongoDB(TestEntity.class);
 
 
         djc.database(DATATABASE_TEST).collection(COLLECTION_TEST);

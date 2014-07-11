@@ -44,7 +44,7 @@ import static org.testng.Assert.assertNotNull;
 public abstract class AbstractDeepSparkContextTest {
 
     private Logger logger = Logger.getLogger(getClass());
-    protected static DeepSparkContext context;
+    protected static CassandraDeepSparkContext context;
 
     private static CassandraServer cassandraServer;
     public static final String KEYSPACE_NAME = "Test_Keyspace";
@@ -217,7 +217,7 @@ public abstract class AbstractDeepSparkContextTest {
     @BeforeSuite
     protected void initContextAndServer() throws ConfigurationException, IOException, InterruptedException {
         logger.info("instantiating context");
-        context = new DeepSparkContext("local", "deepSparkContextTest");
+        context = new CassandraDeepSparkContext("local", "deepSparkContextTest");
 
         String createKeyspace = "CREATE KEYSPACE " + quote(KEYSPACE_NAME)
                 + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 };";
@@ -242,7 +242,7 @@ public abstract class AbstractDeepSparkContextTest {
         checkTestData();
     }
 
-    protected DeepSparkContext getContext() {
+    protected CassandraDeepSparkContext getContext() {
         return context;
     }
 

@@ -16,10 +16,19 @@
 
 package com.stratio.deep.rdd.mongodb;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.util.List;
+
 import com.mongodb.*;
-import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ConfigFactory;
 import com.stratio.deep.config.IMongoDeepJobConfig;
-import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.context.MongoDeepSparkContext;
 import com.stratio.deep.testentity.BookEntity;
 import com.stratio.deep.testentity.MesageTestEntity;
 import de.flapdoodle.embed.mongo.*;
@@ -34,15 +43,6 @@ import org.bson.BSONObject;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 
@@ -179,9 +179,9 @@ public class MongoEntityRDDTest implements Serializable {
     @Test
     public void testReadingRDD() {
         String hostConcat = HOST.concat(":").concat(PORT.toString());
-        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
+	    MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
 
-        IMongoDeepJobConfig<MesageTestEntity> inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
+        IMongoDeepJobConfig<MesageTestEntity> inputConfigEntity = ConfigFactory.createMongoDB(MesageTestEntity.class)
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_INPUT).initialize();
 
         JavaRDD<MesageTestEntity> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
@@ -199,21 +199,21 @@ public class MongoEntityRDDTest implements Serializable {
 
         String hostConcat = HOST.concat(":").concat(PORT.toString());
 
-        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
+	    MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
 
-        IMongoDeepJobConfig<MesageTestEntity> inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
+        IMongoDeepJobConfig<MesageTestEntity> inputConfigEntity = ConfigFactory.createMongoDB(MesageTestEntity.class)
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_INPUT).initialize();
 
-        RDD<MesageTestEntity> inputRDDEntity = context.mongoEntityRDD(inputConfigEntity);
+        RDD<MesageTestEntity> inputRDDEntity = context.mongoRDD(inputConfigEntity);
 
-        IMongoDeepJobConfig<MesageTestEntity> outputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
+        IMongoDeepJobConfig<MesageTestEntity> outputConfigEntity = ConfigFactory.createMongoDB(MesageTestEntity.class)
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_OUTPUT).initialize();
 
 
         //Save RDD in MongoDB
         MongoEntityRDD.saveEntity(inputRDDEntity, outputConfigEntity);
 
-        RDD<MesageTestEntity> outputRDDEntity = context.mongoEntityRDD(outputConfigEntity);
+        RDD<MesageTestEntity> outputRDDEntity = context.mongoRDD(outputConfigEntity);
 
 
         assertEquals(mongo.getDB(DATABASE).getCollection(COLLECTION_OUTPUT).findOne().get("message"),
@@ -232,12 +232,12 @@ public class MongoEntityRDDTest implements Serializable {
 
         String hostConcat = HOST.concat(":").concat(PORT.toString());
 
-        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
+	    MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
 
-        IMongoDeepJobConfig<BookEntity> inputConfigEntity = DeepJobConfigFactory.createMongoDB(BookEntity.class)
+        IMongoDeepJobConfig<BookEntity> inputConfigEntity = ConfigFactory.createMongoDB(BookEntity.class)
                 .host(hostConcat).database("book").collection("input").initialize();
 
-        RDD<BookEntity> inputRDDEntity = context.mongoEntityRDD(inputConfigEntity);
+        RDD<BookEntity> inputRDDEntity = context.mongoRDD(inputConfigEntity);
 
 
 //Import dataSet was OK and we could read it

@@ -23,26 +23,23 @@ import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.utils.DeepConfig;
 import org.apache.log4j.Logger;
-import org.apache.spark.rdd.RDD;
 
 /**
  * Factory class for deep configuration objects.
  *
  * @author Luca Rosellini <luca@stratio.com>
  */
-public final class DeepJobConfigFactory implements Serializable {
+public final class ConfigFactory implements Serializable {
 
     private static final long serialVersionUID = -4559130919203819088L;
 
-    private static final Logger LOG = Logger.getLogger(DeepJobConfigFactory.class);
+    private static final Logger LOG = Logger.getLogger(ConfigFactory.class);
 
     /**
      * private constructor
      */
-    private DeepJobConfigFactory() {
+    private ConfigFactory() {
     }
-
-
 
     /**
      * Creates a new cell-based job configuration object.
