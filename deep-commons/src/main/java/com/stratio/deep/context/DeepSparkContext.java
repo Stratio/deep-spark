@@ -129,7 +129,7 @@ public class DeepSparkContext extends JavaSparkContext {
             throw new DeepGenericException("not recognized config type");
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             LOG.error(e.getMessage());
-            return null;
+            throw new DeepGenericException("impossible to make a new instance, please check dependencies " +e.getMessage());
         }
     }
 
@@ -145,7 +145,7 @@ public class DeepSparkContext extends JavaSparkContext {
             return  (RDD<T>) c.getConstructors()[0].newInstance(sc(), config);
         }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
             LOG.error(e.getMessage());
-            return null;
+            throw new DeepGenericException("impossible to make a new instance, please check dependencies " +e.getMessage());
         }
     }
 
@@ -161,7 +161,7 @@ public class DeepSparkContext extends JavaSparkContext {
             return  (RDD<Cells>) c.getConstructors()[0].newInstance(sc(), config);
         }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
             LOG.error(e.getMessage());
-            return null;
+            throw new DeepGenericException("impossible to make a new instance, please check dependencies " +e.getMessage());
         }
     }
 
@@ -177,12 +177,23 @@ public class DeepSparkContext extends JavaSparkContext {
      * @return
      */
     public <T extends IDeepType> JavaRDD<T> mongoJavaRDD(IMongoDeepJobConfig<T> config) {
-        try{
-            Class c = Class.forName(DeepRDD.MONGO_JAVA.getClassName());
-            return  (JavaRDD<T>) c.getConstructors()[0].newInstance(mongoEntityRDD(config));
-        }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
+        try {
+
+            Class c = Class.forName(DeepRDD.MONGODB_JAVA.getClassName());;
+
+            if (config.getClass().isAssignableFrom(Class.forName(DeepConfig.MONGODB_ENTITY.getConfig()))) {
+                return (JavaRDD<T>) c.getConstructors()[0].newInstance(mongoEntityRDD((IMongoDeepJobConfig) config));
+            }
+
+            if (config.getClass().isAssignableFrom(Class.forName(DeepConfig.MONGODB_CELL.getConfig()))) {
+                return (JavaRDD<T>) c.getConstructors()[0].newInstance(mongoCellRDD((IMongoDeepJobConfig) config));
+
+            }
+
+            throw new DeepGenericException("not recognized config type");
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             LOG.error(e.getMessage());
-            return null;
+            throw new DeepGenericException("impossible to make a new instance, please check dependencies " +e.getMessage());
         }
 
     }
@@ -197,11 +208,11 @@ public class DeepSparkContext extends JavaSparkContext {
 
     public <T extends IDeepType> RDD<T> mongoEntityRDD(IMongoDeepJobConfig<T> config) {
         try{
-            Class c = Class.forName(DeepRDD.MONGO_ENTITY.getClassName());
+            Class c = Class.forName(DeepRDD.MONGODB_ENTITY.getClassName());
             return  (RDD<T>) c.getConstructors()[0].newInstance(sc(), config);
         }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
             LOG.error(e.getMessage());
-            return null;
+            throw new DeepGenericException("impossible to make a new instance, please check dependencies " +e.getMessage());
         }
 
     }
@@ -216,11 +227,11 @@ public class DeepSparkContext extends JavaSparkContext {
 //    com.stratio.deep.rdd.mongodb.MongoCellRDD
     public <T extends IDeepType> RDD mongoCellRDD(IMongoDeepJobConfig<Cells> config) {
         try{
-            Class c = Class.forName(DeepRDD.MONGO_CELL.getClassName());
+            Class c = Class.forName(DeepRDD.MONGODB_CELL.getClassName());
             return  (RDD<T>) c.getConstructors()[0].newInstance(sc(), config);
         }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
             LOG.error(e.getMessage());
-            return null;
+            throw new DeepGenericException("impossible to make a new instance, please check dependencies " +e.getMessage());
         }
     }
 

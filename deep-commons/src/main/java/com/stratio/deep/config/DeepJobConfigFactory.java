@@ -21,9 +21,9 @@ import java.lang.reflect.InvocationTargetException;
 
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.utils.DeepConfig;
 import org.apache.log4j.Logger;
-import org.apache.spark.rdd.RDD;
 
 /**
  * Factory class for deep configuration objects.
@@ -55,7 +55,7 @@ public final class DeepJobConfigFactory implements Serializable {
             return  (ICassandraDeepJobConfig) c.getConstructors()[0].newInstance(false);
         }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
             LOG.error(e.getMessage());
-            return null;
+            throw new DeepGenericException("impossible to make a new instance, please check dependencies " +e.getMessage());
         }
     }
 
@@ -70,7 +70,7 @@ public final class DeepJobConfigFactory implements Serializable {
             return  (ICassandraDeepJobConfig) c.getConstructors()[0].newInstance(true);
         }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
             LOG.error(e.getMessage());
-            return null;
+            throw new DeepGenericException("impossible to make a new instance, please check dependencies " +e.getMessage());
         }
     }
 
@@ -87,7 +87,7 @@ public final class DeepJobConfigFactory implements Serializable {
             return  (ICassandraDeepJobConfig) c.getConstructors()[0].newInstance(entityClass, false);
         }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
             LOG.error(e.getMessage());
-            return null;
+            throw new DeepGenericException("impossible to make a new instance, please check dependencies " +e.getMessage());
         }
     }
 
@@ -102,7 +102,7 @@ public final class DeepJobConfigFactory implements Serializable {
             return  (ICassandraDeepJobConfig) c.getConstructors()[0].newInstance(entityClass, true);
         }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
             LOG.error(e.getMessage());
-            return null;
+            throw new DeepGenericException("impossible to make a new instance, please check dependencies " +e.getMessage());
         }
     }
 
@@ -118,7 +118,7 @@ public final class DeepJobConfigFactory implements Serializable {
             return  (IMongoDeepJobConfig) c.getConstructors()[0].newInstance();
         }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
             LOG.error(e.getMessage());
-            return null;
+            throw new DeepGenericException("impossible to make a new instance, please check dependencies " +e.getMessage());
         }
     }
 
@@ -135,7 +135,7 @@ public final class DeepJobConfigFactory implements Serializable {
             return  (IMongoDeepJobConfig) c.getConstructors()[0].newInstance(entityClass);
         }catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e){
             LOG.error(e.getMessage());
-            return null;
+            throw new DeepGenericException("impossible to make a new instance, please check dependencies " +e.getMessage());
         }
     }
 }
