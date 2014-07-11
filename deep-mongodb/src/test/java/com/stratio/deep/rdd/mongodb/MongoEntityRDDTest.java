@@ -16,12 +16,13 @@
 
 package com.stratio.deep.rdd.mongodb;
 
+import com.google.common.io.Resources;
 import com.mongodb.*;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.testentity.BookEntity;
-import com.stratio.deep.testentity.MesageTestEntity;
+import com.stratio.deep.testentity.MessageTestEntity;
 import de.flapdoodle.embed.mongo.*;
 import de.flapdoodle.embed.mongo.config.*;
 import de.flapdoodle.embed.mongo.distribution.Version;
@@ -141,11 +142,8 @@ public class MongoEntityRDDTest implements Serializable {
     private static void dataSetImport() throws IOException {
         String dbName = "book";
         String collection = "input";
-        URL website = new URL(DATA_SET_URL);
-        ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-        FileOutputStream fos = new FileOutputStream(DATA_SET_NAME);
-        fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-        fos.close();
+        URL url = Resources.getResource(DATA_SET_NAME);
+
         IMongoImportConfig mongoImportConfig = new MongoImportConfigBuilder()
                 .version(Version.Main.PRODUCTION)
                 .net(new Net(PORT, Network.localhostIsIPv6()))
@@ -154,7 +152,7 @@ public class MongoEntityRDDTest implements Serializable {
                 .upsert(false)
                 .dropCollection(true)
                 .jsonArray(true)
-                .importFile(DATA_SET_NAME)
+                .importFile(url.getFile())
                 .build();
         MongoImportExecutable mongoImportExecutable = MongoImportStarter.getDefaultInstance().prepare(mongoImportConfig);
         mongoImportExecutable.start();
@@ -173,7 +171,6 @@ public class MongoEntityRDDTest implements Serializable {
         }
 
         Files.forceDelete(new File(DB_FOLDER_NAME));
-        Files.forceDelete(new File(DATA_SET_NAME));
     }
 
     @Test
@@ -181,10 +178,10 @@ public class MongoEntityRDDTest implements Serializable {
         String hostConcat = HOST.concat(":").concat(PORT.toString());
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
-        IMongoDeepJobConfig<MesageTestEntity> inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
+        IMongoDeepJobConfig<MessageTestEntity> inputConfigEntity = DeepJobConfigFactory.createMongoDB(MessageTestEntity.class)
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_INPUT).initialize();
 
-        JavaRDD<MesageTestEntity> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
+        JavaRDD<MessageTestEntity> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
 
         assertEquals(col.count(), inputRDDEntity.cache().count());
         assertEquals(col.findOne().get("message"), inputRDDEntity.first().getMessage());
@@ -201,19 +198,19 @@ public class MongoEntityRDDTest implements Serializable {
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
-        IMongoDeepJobConfig<MesageTestEntity> inputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
+        IMongoDeepJobConfig<MessageTestEntity> inputConfigEntity = DeepJobConfigFactory.createMongoDB(MessageTestEntity.class)
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_INPUT).initialize();
 
-        RDD<MesageTestEntity> inputRDDEntity = context.mongoEntityRDD(inputConfigEntity);
+        RDD<MessageTestEntity> inputRDDEntity = context.mongoEntityRDD(inputConfigEntity);
 
-        IMongoDeepJobConfig<MesageTestEntity> outputConfigEntity = DeepJobConfigFactory.createMongoDB(MesageTestEntity.class)
+        IMongoDeepJobConfig<MessageTestEntity> outputConfigEntity = DeepJobConfigFactory.createMongoDB(MessageTestEntity.class)
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_OUTPUT).initialize();
 
 
         //Save RDD in MongoDB
         MongoEntityRDD.saveEntity(inputRDDEntity, outputConfigEntity);
 
-        RDD<MesageTestEntity> outputRDDEntity = context.mongoEntityRDD(outputConfigEntity);
+        RDD<MessageTestEntity> outputRDDEntity = context.mongoEntityRDD(outputConfigEntity);
 
 
         assertEquals(mongo.getDB(DATABASE).getCollection(COLLECTION_OUTPUT).findOne().get("message"),
