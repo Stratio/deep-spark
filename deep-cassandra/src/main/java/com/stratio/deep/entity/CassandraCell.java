@@ -265,7 +265,7 @@ public class CassandraCell extends Cell {
     }
 
 
-
+	@Override
     @SuppressWarnings("unchecked")
     public ByteBuffer getDecomposedCellValue() {
 
@@ -299,6 +299,11 @@ public class CassandraCell extends Cell {
     public Boolean isPartitionKey() {
         return isPartitionKey;
     }
+
+	@Override
+	public Boolean isKey(){
+		return isClusterKey || isPartitionKey;
+	}
 
 
     public AbstractType marshaller() {

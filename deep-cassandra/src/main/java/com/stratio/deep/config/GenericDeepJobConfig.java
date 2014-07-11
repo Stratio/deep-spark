@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
-import static com.stratio.deep.utils.Utils.createTableQueryGenerator;
+import static com.stratio.deep.rdd.CassandraRDDUtils.createTableQueryGenerator;
 import static com.stratio.deep.utils.Utils.quote;
 
 /**

@@ -16,8 +16,6 @@
 
 package com.stratio.deep.entity;
 
-import org.apache.cassandra.db.marshal.AbstractType;
-
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 
@@ -38,7 +36,6 @@ public abstract class Cell implements Serializable {
      */
     protected Object cellValue;
 
-
     protected Cell(){
         super();
     }
@@ -49,7 +46,6 @@ public abstract class Cell implements Serializable {
         this.cellValue = cellValue;
     }
 
-
     public String getCellName() {
         return cellName;
     }
@@ -58,9 +54,12 @@ public abstract class Cell implements Serializable {
         return cellValue;
     }
 
+	/**
+	 * @return true is the current cell is a key inside the datastore, false otherwise.
+	 */
+	public abstract Boolean isKey();
 
-
-    @Override
+	@Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("Cell{");
         sb.append("cellName='").append(cellName).append('\'');
@@ -68,5 +67,10 @@ public abstract class Cell implements Serializable {
         sb.append('}');
         return sb.toString();
     }
+
+	@SuppressWarnings("unchecked")
+	public ByteBuffer getDecomposedCellValue() {
+		return null;
+	}
 
 }

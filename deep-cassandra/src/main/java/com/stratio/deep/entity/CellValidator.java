@@ -16,16 +16,6 @@
 
 package com.stratio.deep.entity;
 
-import com.datastax.driver.core.DataType;
-import com.google.common.collect.ImmutableMap;
-import com.stratio.deep.annotations.DeepField;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepInstantiationException;
-import com.stratio.deep.utils.AnnotationUtils;
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.db.marshal.*;
-import org.apache.commons.collections.CollectionUtils;
-
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -35,7 +25,18 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.util.*;
 
-import static com.stratio.deep.utils.Utils.marshallerInstance;
+import com.google.common.collect.ImmutableMap;
+import org.apache.commons.collections.CollectionUtils;
+
+import com.datastax.driver.core.DataType;
+import com.stratio.deep.annotations.DeepField;
+import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.exception.DeepInstantiationException;
+import com.stratio.deep.rdd.CassandraRDDUtils;
+import com.stratio.deep.utils.AnnotationUtils;
+import org.apache.cassandra.cql3.CQL3Type;
+import org.apache.cassandra.db.marshal.*;
+
 import static java.lang.Class.forName;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableCollection;
@@ -225,7 +226,7 @@ public class CellValidator implements Serializable {
         }
 
         Kind kind = Kind.objectToKind(obj);
-        AbstractType<?> tAbstractType = marshallerInstance(obj);
+        AbstractType<?> tAbstractType = CassandraRDDUtils.marshallerInstance(obj);
         String validatorClassName = tAbstractType.getClass().getCanonicalName();
         Collection<String> validatorTypes = null;
         DataType.Name cqlTypeName = MAP_JAVA_TYPE_TO_DATA_TYPE_NAME.get(validatorClassName);// tAbstractType.get

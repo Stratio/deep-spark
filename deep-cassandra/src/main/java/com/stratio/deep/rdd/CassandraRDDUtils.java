@@ -16,10 +16,11 @@
 
 package com.stratio.deep.rdd;
 
+import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
@@ -27,9 +28,18 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.stratio.deep.config.GenericDeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cql.DeepCqlRecordWriter;
+import com.stratio.deep.entity.CassandraCell;
+import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
+import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.functions.AbstractSerializableFunction2;
+import com.stratio.deep.utils.AnnotationUtils;
+import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
+import org.apache.cassandra.db.marshal.AbstractType;
+import org.apache.cassandra.db.marshal.TimeUUIDType;
+import org.apache.cassandra.db.marshal.UUIDType;
 import org.apache.spark.TaskContext;
 import org.apache.spark.rdd.RDD;
 import scala.Function1;
@@ -38,12 +48,13 @@ import scala.collection.Iterator;
 import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
 
+import static com.stratio.deep.utils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
 import static com.stratio.deep.utils.Utils.quote;
 
 /**
  * Created by luca on 16/04/14.
  */
-class CassandraRDDUtils {
+public class CassandraRDDUtils {
 
     /**
      * private constructor
@@ -51,7 +62,7 @@ class CassandraRDDUtils {
     CassandraRDDUtils() {
     }
 
-    static <W> void doCql3SaveToCassandra(RDD<W> rdd, ICassandraDeepJobConfig<W> writeConfig,
+    public static <W> void doCql3SaveToCassandra(RDD<W> rdd, ICassandraDeepJobConfig<W> writeConfig,
                                           Function1<W, Tuple2<Cells, Cells>> transformer) {
         if (!writeConfig.getIsWriteConfig()) {
             throw new IllegalArgumentException("Provided configuration object is not suitable for writing");
@@ -94,7 +105,7 @@ class CassandraRDDUtils {
      * @param writeConfig
      * @param transformer
      */
-    static <W> void doSaveToCassandra(RDD<W> rdd, final ICassandraDeepJobConfig<W> writeConfig,
+    public static <W> void doSaveToCassandra(RDD<W> rdd, final ICassandraDeepJobConfig<W> writeConfig,
                                       Function1<W, Tuple2<Cells, Cells>> transformer) {
 
         if (!writeConfig.getIsWriteConfig()) {
@@ -129,4 +140,206 @@ class CassandraRDDUtils {
         );
 
     }
+
+	/**
+	 * Returns an instance of the Cassandra validator that matches the provided object.
+	 *
+	 * @param obj the object to use to resolve the cassandra marshaller.
+	 * @param <T> the generic object type.
+	 * @return an instance of the Cassandra validator that matches the provided object.
+	 * @throws com.stratio.deep.exception.DeepGenericException if no validator can be found for the specified object.
+	 */
+	public static <T> AbstractType<?> marshallerInstance(T obj) {
+		AbstractType<?> abstractType = MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(obj.getClass());
+
+		if (obj instanceof UUID) {
+			UUID uuid = (UUID) obj;
+
+			if (uuid.version() == 1) {
+				abstractType = TimeUUIDType.instance;
+
+			} else {
+				abstractType = UUIDType.instance;
+			}
+		}
+
+		if (abstractType == null) {
+			throw new DeepGenericException("parameter class " + obj.getClass().getCanonicalName() + " does not have a" +
+							" Cassandra marshaller");
+		}
+
+		return abstractType;
+	}
+
+	/**
+	 * Generates the update query for the provided IDeepType.
+	 * The UPDATE query takes into account all the columns of the testentity, even those containing the null value.
+	 * We do not generate the key part of the update query. The provided query will be concatenated with the key part
+	 * by CqlRecordWriter.
+	 *
+	 * @param keys               the row  keys wrapped inside a Cells object.
+	 * @param values             all the other row columns wrapped inside a Cells object.
+	 * @param outputKeyspace     the output keyspace.
+	 * @param outputColumnFamily the output column family.
+	 * @return the update query statement.
+	 */
+	public static String updateQueryGenerator(Cells keys, Cells values, String outputKeyspace,
+					String outputColumnFamily) {
+
+		StringBuilder sb = new StringBuilder("UPDATE ").append(outputKeyspace).append(".").append(outputColumnFamily)
+						.append(" SET ");
+
+		int k = 0;
+
+		StringBuilder keyClause = new StringBuilder(" WHERE ");
+		for (Cell cell : keys.getCells()) {
+			if (((CassandraCell)cell).isPartitionKey() || ((CassandraCell)cell).isClusterKey()) {
+				if (k > 0) {
+					keyClause.append(" AND ");
+				}
+
+				keyClause.append(String.format("%s = ?", quote(cell.getCellName())));
+
+				++k;
+			}
+
+		}
+
+		k = 0;
+		for (Cell cell : values.getCells()) {
+			if (k > 0) {
+				sb.append(", ");
+			}
+
+			sb.append(String.format("%s = ?", quote(cell.getCellName())));
+			++k;
+		}
+
+		sb.append(keyClause).append(";");
+
+		return sb.toString();
+	}
+
+	/**
+	 * Generates a create table cql statement from the given Cells description.
+	 *
+	 * @param keys               the row  keys wrapped inside a Cells object.
+	 * @param values             all the other row columns wrapped inside a Cells object.
+	 * @param outputKeyspace     the output keyspace.
+	 * @param outputColumnFamily the output column family.
+	 * @return the create table statement.
+	 */
+	public static String createTableQueryGenerator(Cells keys, Cells values, String outputKeyspace,
+					String outputColumnFamily) {
+
+		if (keys == null || StringUtils.isEmpty(outputKeyspace)
+						|| StringUtils.isEmpty(outputColumnFamily)) {
+			throw new DeepGenericException("keys, outputKeyspace and outputColumnFamily cannot be null");
+		}
+
+		StringBuilder sb = new StringBuilder("CREATE TABLE ").append(outputKeyspace)
+						.append(".").append(outputColumnFamily).append(" (");
+
+		List<String> partitionKey = new ArrayList<>();
+		List<String> clusterKey = new ArrayList<>();
+
+		boolean isFirstField = true;
+
+		for (Cell key : keys) {
+			String cellName = quote(key.getCellName());
+
+			if (!isFirstField) {
+				sb.append(", ");
+			}
+
+			sb.append(cellName).append(" ").append(((CassandraCell)key).marshaller().asCQL3Type().toString());
+
+			if (((CassandraCell)key).isPartitionKey()) {
+				partitionKey.add(cellName);
+			} else if (((CassandraCell)key).isClusterKey()) {
+				clusterKey.add(cellName);
+			}
+
+			isFirstField = false;
+		}
+
+		if (values != null) {
+			for (Cell key : values) {
+				sb.append(", ");
+				sb.append(quote(key.getCellName())).append(" ").append(((CassandraCell)key).marshaller().asCQL3Type().toString());
+			}
+		}
+
+		StringBuilder partitionKeyToken = new StringBuilder("(");
+
+		isFirstField = true;
+		for (String s : partitionKey) {
+			if (!isFirstField) {
+				partitionKeyToken.append(", ");
+			}
+			partitionKeyToken.append(s);
+			isFirstField = false;
+		}
+
+		partitionKeyToken.append(")");
+
+		StringBuilder clusterKeyToken = new StringBuilder("");
+
+		isFirstField = true;
+		for (String s : clusterKey) {
+			if (!isFirstField) {
+				clusterKeyToken.append(", ");
+			}
+			clusterKeyToken.append(s);
+			isFirstField = false;
+		}
+
+		StringBuilder keyPart = new StringBuilder(", PRIMARY KEY ");
+
+		if (!clusterKey.isEmpty()) {
+			keyPart.append("(");
+		}
+
+		keyPart.append(partitionKeyToken);
+
+		if (!clusterKey.isEmpty()) {
+			keyPart.append(", ");
+			keyPart.append(clusterKeyToken);
+			keyPart.append(")");
+		}
+
+		sb.append(keyPart).append(");");
+
+		return sb.toString();
+	}
+
+	/**
+	 * Convers an instance of type <T> to a tuple of ( Map<String, ByteBuffer>, List<ByteBuffer> ).
+	 * The first map contains the key column names and the corresponding values.
+	 * The ByteBuffer list contains the value of the columns that will be bounded to CQL query parameters.
+	 *
+	 * @param e   the entity object to process.
+	 * @param <T> the entity object generic type.
+	 * @return a pair whose first element is a Cells object containing key Cell(s) and whose second element contains all of the other Cell(s).
+	 */
+	public static <T extends IDeepType> Tuple2<Cells, Cells> deepType2tuple(T e) {
+
+		Pair<Field[], Field[]> fields = AnnotationUtils.filterKeyFields(e.getClass());
+
+		Field[] keyFields = fields.left;
+		Field[] otherFields = fields.right;
+
+		Cells keys = new Cells(e.getClass().getName());
+		Cells values = new Cells(e.getClass().getName());
+
+		for (Field keyField : keyFields) {
+			keys.add(CassandraCell.create(e, keyField));
+		}
+
+		for (Field valueField : otherFields) {
+			values.add(CassandraCell.create(e, valueField));
+		}
+
+		return new Tuple2<>(keys, values);
+	}
 }

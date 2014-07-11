@@ -18,8 +18,9 @@ package com.stratio.deep.functions;
 
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.utils.Utils;
 import scala.Tuple2;
+
+import static com.stratio.deep.rdd.CassandraRDDUtils.deepType2tuple;
 
 /**
  * Function that converts an IDeepType to tuple of two Cells.<br/>
@@ -35,6 +36,6 @@ public class DeepType2TupleFunction<T extends IDeepType> extends AbstractSeriali
      */
     @Override
     public Tuple2<Cells, Cells> apply(T e) {
-        return Utils.deepType2tuple(e);
+        return deepType2tuple(e);
     }
 }
