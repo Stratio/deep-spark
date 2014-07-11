@@ -37,12 +37,12 @@
     <dependencies>
         <dependency>
             <groupId>com.stratio.deep</groupId>
-            <artifactId>deep-core-cassandra</artifactId>
+            <artifactId>deep-cassandra</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.stratio.deep</groupId>
-            <artifactId>deep-core-mongodb</artifactId>
+            <artifactId>deep-mongodb</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

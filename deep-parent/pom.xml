@@ -262,8 +262,8 @@
 
     <modules>
         <module>../deep-commons</module>
-        <module>../deep-core-cassandra</module>
-        <module>../deep-core-mongodb</module>
+        <module>../deep-cassandra</module>
+        <module>../deep-mongodb</module>
         <module>../deep-examples</module>
     </modules>
 
