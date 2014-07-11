@@ -102,13 +102,44 @@ First steps with Spark and MongoDB
 
 Migrating from version 0.2.9
 ============================
-Deep has undergone an huge refactor between versions 0.2.9 and 0.4.x, to port your code to the new version you should take into account the following:
+From version 0.4.x, Deep supports multiple datastores, in order to correctly implement this new feature Deep has undergone an huge refactor between versions 0.2.9 and 0.4.x. To port your code to the new version you should take into account a few changes we made.
 
-* From version 0.4.x, Deep supports multiple datastores, in your project you should import only the maven dependency you will use: deep-cassandra or deep-mongodb.
+New Project Structure
+---------------------
+From version 0.4.x, Deep supports multiple datastores, in your project you should import only the maven dependency you will use: deep-cassandra or deep-mongodb.
+
+Changes to 'com.stratio.deep.entity.Cells'
+------------------------------------------
+
 * Until version 0.4.x the 'Cells' was implicitly associated to a record coming from a specific table. When performing a join in Spark, 'Cell' objects coming from different tables are mixed into an single 'Cells' object.
   Deep now keeps track of the original table a Cell object comes from, changing the internal structure of 'Cells', where each 'Cell' is associated to its 'table'.
     1. If you are a user of 'Cells' objects returned from Deep, nothing changes for you. The 'Cells' API keeps working as usual.
     2. If you manually create 'Cells' objects you can keep using the original API, in this case each Cell you add to your Cells object is automatically associated to a default table name.
     3. You can specify the default table name, or let Deep chose an internal default table name for you.
-    4. For each method manipulating the content of a 'Cells' object, we added a new methos that also accepts the table name (ex: getCellByName(String table, String cellName) will return the Cell whose name is 'cellName' and is associated to 'table' ).
-*
+    4. We added a new constructor to 'Cells' accepting the default table name. This way the 'old' API will always manipulate 'Cell' objects associated to the specified default table.
+    5. For each method manipulating the content of a 'Cells' object, we added a new method that also accepts the table name: if you call the method	 whose signature does _not_ have the table name, the table action is performed over the Cell associated to the default table, otherwise the action is performed over the 'Cell'(s) associated to the specified table. 
+    6. size() y isEmpty() will compute their results taking into account all the 'Cell' objects contained. 
+    7. size(String tableName) and isEmpty(tableName) compute their result taking into account only the 'Cell' objects associated to the specified table.  
+    8. Obviously, when dealing with Cells objects, Deep always associates a Cell to the correct table name.
+    
+Examples:
+<pre>
+Cells cells1 = new Cells(); // instantiate a Cells object whose default table name is generated internally.
+Cells cells2 = new Cells("my_default_table"); // creates a new Cells object whose default table name is specified by the user
+cells2.add(new Cell(...)); // adds to the 'cells2' object a new Cell object associated to the default table
+cells2.add("my_other_table", new Cell(...)); // adds to the 'cells2' object a new Cell associated to "my_other_table"  
+</pre>
+
+Changes to objects hierarchy
+-----------------------------------------------------------
+* IDeepJobConfig interface has been splitted into ICassandraDeepJobConfig and IMongoDeepJobConfig sub-interfaces. Each sub-interface exposes only the configuration properties that make sense for each data base.
+com.stratio.deep.config.DeepJobConfigFactory's factory methods now return the proper subinterface.
+* __DeepSparkContext__ has been splitted into __CassandraDeepSparkContext__ and __MongoDeepSparkContext__.
+* __DeepJobConfigFactory__ has been renamed to __ConfigFactory__ (to reduce verbosity).
+
+RDD creation
+----------------
+Methods used to create Cell and Entity RDD has been merged into one single method:
+
+* __CassandraDeepSparkContext__: cassandraEntityRDD and cassandraGenericRDD has been merged to cassandraRDD
+* __MongoDeepSparkContext__: mongoEntityRDD and mongoCellRDD has been merged to mongoRDD
