@@ -52,10 +52,10 @@ if [ "$RELEASE_VER" = "" ]; then
    echo "Release version empty, aborting"; exit 1;
 fi
 
-#### Create Stratio Deep jars from bitbucket (master tag) through maven release plugin
+#### Create Deep jars from github (master tag) through maven release plugin
 
 echo "################################################"
-echo "Compiling Stratio Deep"
+echo "Compiling Deep"
 echo "################################################"
 echo "$(pwd)"
 mvn clean package -DskipTests || { echo "Cannot build Deep project, aborting"; exit 1; }
