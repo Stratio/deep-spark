@@ -16,9 +16,9 @@
 
 package com.stratio.deep.examples.java;
 
-import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ConfigFactory;
 import com.stratio.deep.config.IMongoDeepJobConfig;
-import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.context.MongoDeepSparkContext;
 import com.stratio.deep.rdd.mongodb.MongoCellRDD;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
@@ -51,25 +51,25 @@ public final class WritingCellToMongoDB {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+	    MongoDeepSparkContext deepContext = new MongoDeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
 
-        IMongoDeepJobConfig inputConfigEntity = DeepJobConfigFactory.createMongoDB().host(host).database(database).collection(inputCollection).initialize();
+        IMongoDeepJobConfig inputConfigEntity = ConfigFactory.createMongoDB().host(host).database(database).collection(inputCollection).initialize();
 
-        RDD inputRDDCell = deepContext.mongoCellRDD(inputConfigEntity);
+        RDD inputRDDCell = deepContext.mongoRDD(inputConfigEntity);
 
 
 	    LOG.info("count : " + inputRDDCell.count());
 	    LOG.info("prints first cell : " + inputRDDCell.first());
 
-        IMongoDeepJobConfig outputConfigEntity = DeepJobConfigFactory.createMongoDB().host(host).database(database).collection(outputCollection).initialize();
+        IMongoDeepJobConfig outputConfigEntity = ConfigFactory.createMongoDB().host(host).database(database).collection(outputCollection).initialize();
 
 
         MongoCellRDD.saveCell(inputRDDCell, outputConfigEntity);
 
 
-        RDD outputRDDCell = deepContext.mongoCellRDD(outputConfigEntity);
+        RDD outputRDDCell = deepContext.mongoRDD(outputConfigEntity);
 
         LOG.info("count output : " + outputRDDCell.count());
 	    LOG.info("prints first output cell: " + outputRDDCell.first());

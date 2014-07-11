@@ -49,16 +49,16 @@ object AggregatingData {
 
     // Creating the Deep Context where args are Spark Master and Job Name
     val p = new ContextProperties(args)
-    val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome,p.getJars)
+    val deepContext = new CassandraDeepSparkContext(p.getCluster, job, p.getSparkHome,p.getJars)
 
     // Creating a configuration for the RDD and initialize it
-    val config = DeepJobConfigFactory.create(classOf[TweetEntity])
+    val config = ConfigFactory.create(classOf[TweetEntity])
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(keyspaceName).table(tableName)
       .initialize
 
     // Creating the RDD
-    val rdd: RDD[TweetEntity] = deepContext.cassandraEntityRDD(config)
+    val rdd: RDD[TweetEntity] = deepContext.cassandraRDD(config)
 
     // grouping to get key-value pairs
     val groups: RDD[(String, Int)] = rdd.groupBy {

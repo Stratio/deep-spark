@@ -16,26 +16,20 @@
 
 package com.stratio.deep.entity;
 
-import java.nio.ByteBuffer;
-
-import org.apache.cassandra.db.marshal.AbstractType;
-
 /**
  * Created by rcrespo on 2/07/14.
  */
 public class MongoCell extends Cell {
-
-
     private MongoCell (String cellName, Object cellValue){
         super(cellName, cellValue);
-
     }
 
+	@Override
+	public Boolean isKey() {
+		return cellName.equals("_id");
+	}
 
-    public static Cell create(String cellName, Object cellValue){
-
+	public static Cell create(String cellName, Object cellValue){
         return new MongoCell (cellName, cellValue);
     }
-
-
 }

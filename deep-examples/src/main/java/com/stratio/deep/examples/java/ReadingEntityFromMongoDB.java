@@ -18,10 +18,9 @@ package com.stratio.deep.examples.java;
 
 import java.util.List;
 
-import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ConfigFactory;
 import com.stratio.deep.config.IMongoDeepJobConfig;
-import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
+import com.stratio.deep.context.MongoDeepSparkContext;
 import com.stratio.deep.testentity.MessageEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
@@ -54,12 +53,12 @@ public final class ReadingEntityFromMongoDB {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+	    MongoDeepSparkContext deepContext = new MongoDeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
 
         IMongoDeepJobConfig<MessageEntity> inputConfigEntity =
-                DeepJobConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(inputCollection).initialize();
+                ConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(inputCollection).initialize();
 
         JavaRDD<MessageEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
 

@@ -22,7 +22,7 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.ConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.exception.DeepIOException;
@@ -83,7 +83,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
     @Test
     public void testAdditionalFilters() {
         try {
-            DeepJobConfigFactory
+            ConfigFactory
                     .create(Cql3TestEntity.class)
                     .host(Constants.DEFAULT_CASSANDRA_HOST)
                     .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -99,7 +99,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
         }
 
         try {
-            DeepJobConfigFactory
+            ConfigFactory
                     .create(Cql3TestEntity.class)
                     .host(Constants.DEFAULT_CASSANDRA_HOST)
                     .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -119,7 +119,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
         int allElements = entities.length;
         assertTrue(allElements > 1);
 
-        ICassandraDeepJobConfig<Cql3TestEntity> config = DeepJobConfigFactory
+        ICassandraDeepJobConfig<Cql3TestEntity> config = ConfigFactory
                 .create(Cql3TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -129,7 +129,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
                 .filterByField("food", "donuts")
                 .initialize();
 
-        RDD<Cql3TestEntity> otherRDD = context.cassandraEntityRDD(config);
+        RDD<Cql3TestEntity> otherRDD = context.cassandraRDD(config);
 
         entities = (Cql3TestEntity[]) otherRDD.collect();
 
@@ -140,7 +140,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
         assertEquals(entities[0].getAge(), Integer.valueOf(-2));
         assertEquals(entities[0].getAnimal(), "monkey");
 
-        config = DeepJobConfigFactory
+        config = ConfigFactory
                 .create(Cql3TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -150,7 +150,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
                 .filterByField("food", "chips")
                 .initialize();
 
-        otherRDD = context.cassandraEntityRDD(config);
+        otherRDD = context.cassandraRDD(config);
 
         entities = (Cql3TestEntity[]) otherRDD.collect();
         assertEquals(entities.length, allElements - 1);
@@ -212,12 +212,12 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
     @Override
     protected CassandraRDD<Cql3TestEntity> initRDD() {
         assertNotNull(context);
-        return (CassandraRDD) context.cassandraEntityRDD(getReadConfig());
+        return (CassandraRDD) context.cassandraRDD(getReadConfig());
     }
 
     @Override
     protected ICassandraDeepJobConfig<Cql3TestEntity> initReadConfig() {
-        return DeepJobConfigFactory.create(Cql3TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST).bisectFactor(testBisectFactor)
+        return ConfigFactory.create(Cql3TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST).bisectFactor(testBisectFactor)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
 				        .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
 				        .pageSize(DEFAULT_PAGE_SIZE).keyspace(KEYSPACE_NAME).columnFamily(CQL3_COLUMN_FAMILY)
@@ -227,7 +227,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
     @Override
     protected ICassandraDeepJobConfig<Cql3TestEntity> initWriteConfig() {
 
-        return DeepJobConfigFactory.createWriteConfig(Cql3TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST)
+        return ConfigFactory.createWriteConfig(Cql3TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(OUTPUT_KEYSPACE_NAME)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).columnFamily(CQL3_ENTITY_OUTPUT_COLUMN_FAMILY)
                 .createTableOnWrite(Boolean.TRUE).initialize();

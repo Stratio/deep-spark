@@ -23,7 +23,6 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-import com.stratio.deep.entity.CassandraCell;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,7 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
@@ -50,8 +49,8 @@ import org.apache.cassandra.exceptions.SyntaxException;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.spark.TaskContext;
 
+import static com.stratio.deep.rdd.CassandraRDDUtils.updateQueryGenerator;
 import static com.stratio.deep.utils.Utils.quote;
-import static com.stratio.deep.utils.Utils.updateQueryGenerator;
 
 /**
  * Handles the distributed write to cassandra in batch.

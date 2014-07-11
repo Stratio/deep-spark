@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.testentity;
+package com.stratio.deep.entity;
 
-import com.datastax.driver.core.DataType;
-import com.stratio.deep.entity.CellValidator;
-import org.apache.cassandra.db.marshal.*;
-import org.testng.annotations.Test;
-
-import javax.management.relation.RoleList;
-import javax.management.relation.RoleUnresolvedList;
-import javax.print.attribute.standard.PrinterStateReasons;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
 
+import com.datastax.driver.core.DataType;
+import com.stratio.deep.testentity.CommonsTestEntity;
+import javax.management.relation.RoleList;
+import javax.management.relation.RoleUnresolvedList;
+import javax.print.attribute.standard.PrinterStateReasons;
+import org.apache.cassandra.db.marshal.*;
+import org.testng.annotations.Test;
+
 import static com.stratio.deep.entity.CellValidator.Kind;
 import static com.stratio.deep.entity.CellValidator.cellValidator;
 import static org.testng.Assert.*;
-import static org.testng.Assert.assertEquals;
 
 /**
  * Created by luca on 25/03/14.
@@ -194,7 +193,7 @@ public class CellValidatorTest {
 
         Field emails = CommonsTestEntity.class.getDeclaredField("emails");
 
-        cv = CellValidator.cellValidator(emails);
+        cv = cellValidator(emails);
         assertNotNull(cv);
         assertEquals(cv.getValidatorClassName(), SetType.class.getCanonicalName());
         assertEquals(cv.validatorKind(), CellValidator.Kind.SET);
@@ -206,7 +205,7 @@ public class CellValidatorTest {
 
         Field phones = CommonsTestEntity.class.getDeclaredField("phones");
 
-        cv = CellValidator.cellValidator(phones);
+        cv = cellValidator(phones);
         assertNotNull(cv);
         assertEquals(cv.getValidatorClassName(), ListType.class.getCanonicalName());
         assertEquals(cv.validatorKind(), Kind.LIST);
@@ -218,7 +217,7 @@ public class CellValidatorTest {
 
         Field uuid2id = CommonsTestEntity.class.getDeclaredField("uuid2id");
 
-        cv = CellValidator.cellValidator(uuid2id);
+        cv = cellValidator(uuid2id);
         assertNotNull(cv);
         assertEquals(cv.getValidatorClassName(), MapType.class.getCanonicalName());
         assertEquals(cv.validatorKind(), Kind.MAP);

@@ -30,19 +30,17 @@ import org.apache.log4j.Logger;
  *
  * @author Luca Rosellini <luca@stratio.com>
  */
-public final class DeepJobConfigFactory implements Serializable {
+public final class ConfigFactory implements Serializable {
 
     private static final long serialVersionUID = -4559130919203819088L;
 
-    private static final Logger LOG = Logger.getLogger(DeepJobConfigFactory.class);
+    private static final Logger LOG = Logger.getLogger(ConfigFactory.class);
 
     /**
      * private constructor
      */
-    private DeepJobConfigFactory() {
+    private ConfigFactory() {
     }
-
-
 
     /**
      * Creates a new cell-based job configuration object.
