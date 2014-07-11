@@ -1,6 +1,6 @@
 package com.stratio.deep.config;
 
-import com.stratio.deep.testentity.TestEntity;
+import com.stratio.deep.testentity.MessageTestEntity;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
 
@@ -9,7 +9,7 @@ import static org.testng.Assert.fail;
 /**
  * Created by rcrespo on 18/06/14.
  */
-public class GenericConfigFactoryMongoDBTest {
+public class GenericDeepJobConfigMongoDBTest {
 
     private static final String DATATABASE_TEST = "test";
 
@@ -21,7 +21,7 @@ public class GenericConfigFactoryMongoDBTest {
 
     @Test
     public void testDatabaseValidation() {
-        IMongoDeepJobConfig<TestEntity> djc = ConfigFactory.createMongoDB(TestEntity.class);
+        IMongoDeepJobConfig<MessageTestEntity> djc = DeepJobConfigFactory.createMongoDB(MessageTestEntity.class);
 
         djc.host(HOST_TEST).collection(COLLECTION_TEST);
 
@@ -39,7 +39,7 @@ public class GenericConfigFactoryMongoDBTest {
 
     @Test
     public void testCollectionValidation() {
-        IMongoDeepJobConfig<TestEntity> djc = ConfigFactory.createMongoDB(TestEntity.class);
+        IMongoDeepJobConfig<MessageTestEntity> djc = DeepJobConfigFactory.createMongoDB(MessageTestEntity.class);
 
 
         djc.host(HOST_TEST).database(DATATABASE_TEST);
@@ -58,7 +58,7 @@ public class GenericConfigFactoryMongoDBTest {
 
     @Test
     public void testHostValidation() {
-        IMongoDeepJobConfig<TestEntity> djc = ConfigFactory.createMongoDB(TestEntity.class);
+        IMongoDeepJobConfig<MessageTestEntity> djc = DeepJobConfigFactory.createMongoDB(MessageTestEntity.class);
 
 
         djc.database(DATATABASE_TEST).collection(COLLECTION_TEST);

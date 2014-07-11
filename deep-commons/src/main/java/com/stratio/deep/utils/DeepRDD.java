@@ -6,9 +6,9 @@ package com.stratio.deep.utils;
 public enum DeepRDD {
 
 
-    MONGO_JAVA("com.stratio.deep.rdd.mongodb.MongoJavaRDD"),
-    MONGO_ENTITY("com.stratio.deep.rdd.mongodb.MongoEntityRDD"),
-    MONGO_CELL("com.stratio.deep.rdd.mongodb.MongoCellRDD"),
+    MONGODB_JAVA("com.stratio.deep.rdd.mongodb.MongoJavaRDD"),
+    MONGODB_ENTITY("com.stratio.deep.rdd.mongodb.MongoEntityRDD"),
+    MONGODB_CELL("com.stratio.deep.rdd.mongodb.MongoCellRDD"),
     CASSANDRA_JAVA("com.stratio.deep.rdd.CassandraJavaRDD"),
     CASSANDRA_ENTITY("com.stratio.deep.rdd.CassandraEntityRDD"),
     CASSANDRA_CELL("com.stratio.deep.rdd.CassandraCellRDD");

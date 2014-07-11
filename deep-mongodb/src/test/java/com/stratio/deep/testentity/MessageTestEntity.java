@@ -9,7 +9,7 @@ import org.bson.types.ObjectId;
  * Created by rcrespo on 18/06/14.
  */
 @DeepEntity
-public class MesageTestEntity implements IDeepType {
+public class MessageTestEntity implements IDeepType {
 
     @DeepField(fieldName = "_id")
     private ObjectId id;
