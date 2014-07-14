@@ -45,7 +45,7 @@ final object GroupingEntityWithMongoDB {
 
     val deepContext = new MongoDeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
 
-    val inputConfigEntity: IMongoDeepJobConfig[BookEntity] = ConfigFactory.createMongoDB(classOf[BookEntity]).host(host).database(database).collection(inputCollection).initialize
+    val inputConfigEntity: IMongoDeepJobConfig[BookEntity] = MongoConfigFactory.createMongoDB(classOf[BookEntity]).host(host).database(database).collection(inputCollection).initialize
 
     val inputRDDEntity: RDD[BookEntity] = deepContext.mongoRDD(inputConfigEntity)
 
@@ -60,7 +60,7 @@ final object GroupingEntityWithMongoDB {
     val outputRDD = wordCountReduced map { e:(String, Integer) => new WordCount(e._1, e._2)  }
 
     val outputConfigEntity: IMongoDeepJobConfig[WordCount] =
-      ConfigFactory.createMongoDB(classOf[WordCount]).host(host).database(database).collection(outputCollection).initialize
+      MongoConfigFactory.createMongoDB(classOf[WordCount]).host(host).database(database).collection(outputCollection).initialize
 
     MongoEntityRDD.saveEntity(outputRDD, outputConfigEntity)
 

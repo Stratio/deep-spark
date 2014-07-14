@@ -17,7 +17,7 @@
 package com.stratio.deep.examples.scala
 
 import com.stratio.deep.context.{CassandraDeepSparkContext, DeepSparkContext}
-import com.stratio.deep.config.{ICassandraDeepJobConfig, IDeepJobConfig, ConfigFactory}
+import com.stratio.deep.config.{ICassandraDeepJobConfig, IDeepJobConfig, CassandraConfigFactory}
 import org.apache.spark.{SparkContext, SparkConf}
 
 import com.stratio.deep.testutils.ContextProperties
@@ -64,7 +64,7 @@ object UsingScalaCollectionEntity {
   private def doMain(args: Array[String], deepContext: CassandraDeepSparkContext, p: ContextProperties) = {
 
     // Configuration and initialization
-    val config: ICassandraDeepJobConfig[ScalaCollectionEntity] = ConfigFactory.create(classOf[ScalaCollectionEntity])
+    val config: ICassandraDeepJobConfig[ScalaCollectionEntity] = CassandraConfigFactory.create(classOf[ScalaCollectionEntity])
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(keyspaceName).table(tableName)
       .initialize
@@ -92,7 +92,7 @@ object UsingScalaCollectionEntity {
     }
 
     // let's write the result to Cassandra
-    val writeConfig: ICassandraDeepJobConfig[ScalaOutputEntity] = ConfigFactory.create(classOf[ScalaOutputEntity])
+    val writeConfig: ICassandraDeepJobConfig[ScalaOutputEntity] = CassandraConfigFactory.create(classOf[ScalaOutputEntity])
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort)
       .keyspace(keyspaceName).table(outputTableName).createTableOnWrite(true)
       .initialize

@@ -45,7 +45,7 @@ object WritingEntityToCassandra {
     val deepContext: CassandraDeepSparkContext = new CassandraDeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
 
     // --- INPUT RDD
-    val inputConfig = ConfigFactory.create(classOf[PageEntity])
+    val inputConfig = CassandraConfigFactory.create(classOf[PageEntity])
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(inputKeyspaceName).table(inputTableName)
       .initialize
@@ -65,7 +65,7 @@ object WritingEntityToCassandra {
     // -------------------------------- OUTPUT to Cassandra
     // Creating a configuration for the output RDD and initialize it
     // --- OUTPUT RDD
-    val outputConfig = ConfigFactory.createWriteConfig(classOf[DomainEntity])
+    val outputConfig = CassandraConfigFactory.createWriteConfig(classOf[DomainEntity])
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(outputKeyspaceName).table(outputTableName).createTableOnWrite(true)
       .initialize

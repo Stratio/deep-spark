@@ -16,14 +16,14 @@ package com.stratio.deep.context;/*
 
 import java.util.Map;
 
+import com.stratio.deep.config.CellDeepJobConfig;
+import com.stratio.deep.config.EntityDeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepInstantiationException;
 import com.stratio.deep.rdd.CassandraCellRDD;
 import com.stratio.deep.rdd.CassandraEntityRDD;
 import com.stratio.deep.rdd.CassandraJavaRDD;
 import com.stratio.deep.rdd.CassandraRDD;
-import com.stratio.deep.utils.DeepConfig;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
 
@@ -81,21 +81,17 @@ public class CassandraDeepSparkContext extends DeepSparkContext {
 	 * @param config the deep configuration object to use to create the new RDD.
 	 * @return a new generic CassandraRDD.
 	 */
+	@SuppressWarnings("unchecked")
 	public <T> CassandraRDD<T> cassandraRDD(ICassandraDeepJobConfig<T> config) {
-		try {
-
-			if (config.getClass().isAssignableFrom(Class.forName(DeepConfig.CASSANDRA_ENTITY.getConfig()))) {
-				return new CassandraEntityRDD(sc(), config);
-			}
-
-			if (config.getClass().isAssignableFrom(Class.forName(DeepConfig.CASSANDRA_CELL.getConfig()))) {
-				return (CassandraRDD<T>) new CassandraCellRDD(sc(), (ICassandraDeepJobConfig<com.stratio.deep.entity.Cells>) config);
-			}
-
-			throw new DeepGenericException("not recognized config type");
-		} catch (ClassNotFoundException e) {
-			LOG.error(e.getMessage());
-			throw new DeepInstantiationException(e);
+		if (config.getClass().isAssignableFrom(EntityDeepJobConfig.class)) {
+			return new CassandraEntityRDD(sc(), config);
 		}
+
+		if (config.getClass().isAssignableFrom(CellDeepJobConfig.class)) {
+			return (CassandraRDD<T>) new CassandraCellRDD(sc(), (ICassandraDeepJobConfig<com.stratio.deep.entity.Cells>) config);
+		}
+
+		throw new DeepGenericException("not recognized config type");
+
 	}
 }

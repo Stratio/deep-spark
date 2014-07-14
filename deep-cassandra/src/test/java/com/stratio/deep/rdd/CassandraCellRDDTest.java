@@ -22,7 +22,7 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.stratio.deep.config.ConfigFactory;
+import com.stratio.deep.config.CassandraConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.entity.CassandraCell;
@@ -142,7 +142,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
 
     @Override
     protected ICassandraDeepJobConfig<Cells> initReadConfig() {
-        ICassandraDeepJobConfig<Cells> rddConfig = ConfigFactory.create().host(Constants.DEFAULT_CASSANDRA_HOST)
+        ICassandraDeepJobConfig<Cells> rddConfig = CassandraConfigFactory.create().host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(KEYSPACE_NAME).columnFamily(CQL3_COLUMN_FAMILY)
 				        .pageSize(DEFAULT_PAGE_SIZE)
 				        .bisectFactor(testBisectFactor).cqlPort(CassandraServer.CASSANDRA_CQL_PORT).initialize();
@@ -154,7 +154,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
     public void testCountWithInputColumns() {
         logger.info("testCountWithInputColumns()");
 
-        ICassandraDeepJobConfig<Cells> tmpConfig = ConfigFactory.create().host(Constants.DEFAULT_CASSANDRA_HOST)
+        ICassandraDeepJobConfig<Cells> tmpConfig = CassandraConfigFactory.create().host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .keyspace(KEYSPACE_NAME)
                 .columnFamily(CQL3_COLUMN_FAMILY)
@@ -175,7 +175,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
 
     @Override
     protected ICassandraDeepJobConfig<Cells> initWriteConfig() {
-        ICassandraDeepJobConfig<Cells> writeConfig = ConfigFactory.createWriteConfig().host(Constants
+        ICassandraDeepJobConfig<Cells> writeConfig = CassandraConfigFactory.createWriteConfig().host(Constants
                 .DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(OUTPUT_KEYSPACE_NAME)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).columnFamily(CQL3_OUTPUT_COLUMN_FAMILY)

@@ -41,7 +41,7 @@ object CreatingCellRDD {
     val deepContext = new CassandraDeepSparkContext(p.getCluster, job)
 
     // Configuration and initialization
-    val config: ICassandraDeepJobConfig[Cells] = ConfigFactory.create()
+    val config: ICassandraDeepJobConfig[Cells] = CassandraConfigFactory.create()
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(keyspaceName).table(tableName)
       .initialize

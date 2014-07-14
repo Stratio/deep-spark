@@ -17,7 +17,7 @@
 package com.stratio.deep.examples.scala
 
 import com.stratio.deep.context.{CassandraDeepSparkContext, DeepSparkContext}
-import com.stratio.deep.config.{ICassandraDeepJobConfig, IDeepJobConfig, ConfigFactory}
+import com.stratio.deep.config.{ICassandraDeepJobConfig, IDeepJobConfig, CassandraConfigFactory}
 import com.stratio.deep.rdd.CassandraRDD
 import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.rdd.RDD
@@ -62,7 +62,7 @@ object UsingScalaEntity {
   private def doMain(args: Array[String], deepContext: CassandraDeepSparkContext, p: ContextProperties) = {
 
     // Configuration and initialization
-    val config: ICassandraDeepJobConfig[ScalaPageEntity] = ConfigFactory.create(classOf[ScalaPageEntity])
+    val config: ICassandraDeepJobConfig[ScalaPageEntity] = CassandraConfigFactory.create(classOf[ScalaPageEntity])
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(keyspaceName).table(tableName)
       .initialize
@@ -129,7 +129,7 @@ object UsingScalaEntity {
     }
 
     // --- OUTPUT RDD
-    val outputConfig = ConfigFactory.create(classOf[ScalaOutputEntity])
+    val outputConfig = CassandraConfigFactory.create(classOf[ScalaOutputEntity])
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort)
       .keyspace(keyspaceName).table(outputTableName)
       .createTableOnWrite(true)

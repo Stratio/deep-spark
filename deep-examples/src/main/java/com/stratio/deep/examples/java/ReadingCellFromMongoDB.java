@@ -17,8 +17,8 @@
 package com.stratio.deep.examples.java;
 
 import com.mongodb.QueryBuilder;
-import com.stratio.deep.config.ConfigFactory;
 import com.stratio.deep.config.IMongoDeepJobConfig;
+import com.stratio.deep.config.MongoConfigFactory;
 import com.stratio.deep.context.MongoDeepSparkContext;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
@@ -65,7 +65,7 @@ public final class ReadingCellFromMongoDB {
         bsonFields.put("text",1);
         bsonFields.put("_id",0);
 
-        IMongoDeepJobConfig inputConfigEntity = ConfigFactory.createMongoDB().host(host).database(database)
+        IMongoDeepJobConfig inputConfigEntity = MongoConfigFactory.createMongoDB().host(host).database(database)
                 .collection(inputCollection)
                 .createInputSplit(false)
                 .filterQuery(query)

@@ -30,7 +30,7 @@ import com.datastax.driver.core.Session;
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.stratio.deep.config.ConfigFactory;
+import com.stratio.deep.config.CassandraConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.exception.DeepIOException;
@@ -203,7 +203,7 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
 
     @Override
     protected ICassandraDeepJobConfig<Cql3CollectionsTestEntity> initReadConfig() {
-        ICassandraDeepJobConfig<Cql3CollectionsTestEntity> config = ConfigFactory.create(Cql3CollectionsTestEntity.class)
+        ICassandraDeepJobConfig<Cql3CollectionsTestEntity> config = CassandraConfigFactory.create(Cql3CollectionsTestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).bisectFactor(testBisectFactor)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME)
 				        .pageSize(DEFAULT_PAGE_SIZE).columnFamily(CQL3_COLLECTION_COLUMN_FAMILY);
@@ -213,7 +213,7 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
 
     @Override
     protected ICassandraDeepJobConfig<Cql3CollectionsTestEntity> initWriteConfig() {
-        ICassandraDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = ConfigFactory.createWriteConfig
+        ICassandraDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = CassandraConfigFactory.createWriteConfig
 				        (Cql3CollectionsTestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)

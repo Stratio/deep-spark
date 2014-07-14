@@ -23,7 +23,7 @@ import com.stratio.deep.entity.Cells;
  *
  * @author Luca Rosellini <luca@stratio.com>
  */
-public class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
+public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
 
     private static final long serialVersionUID = -598862509865396541L;
     private Cells dummyCells;
