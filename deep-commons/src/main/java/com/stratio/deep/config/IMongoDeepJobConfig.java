@@ -30,29 +30,29 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
     /**
      * The MongoDB's collection name
      */
-    public abstract IMongoDeepJobConfig<T> collection(String collection);
+    IMongoDeepJobConfig<T> collection(String collection);
 
     /**
      * The MongoDB's database name
      */
-    public abstract IMongoDeepJobConfig<T> database(String database);
+    IMongoDeepJobConfig<T> database(String database);
 
     /**
      * Sets the list of available Mongo hosts.
      * @param host the list of available mongo hosts.
      * @return this object.
      */
-    public abstract IMongoDeepJobConfig<T> host(List<String> host);
+    IMongoDeepJobConfig<T> host(List<String> host);
 
     /**
      * The replica set identifier.
      */
-    public abstract IMongoDeepJobConfig<T> replicaSet(String replicaSet);
+    IMongoDeepJobConfig<T> replicaSet(String replicaSet);
 
     /**
      * @return the hadoop configuration object if the concrete implementation has one, null otherwise.
      */
-    public abstract Configuration getHadoopConfiguration();
+    Configuration getHadoopConfiguration();
 
     /**
      * Configures the 'readPreference' MongoDB's config property.
@@ -60,35 +60,28 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      * @param readPreference the property value to set.
      * @return this object.
      */
-    public abstract IMongoDeepJobConfig<T> readPreference(String readPreference);
+    IMongoDeepJobConfig<T> readPreference(String readPreference);
 
     /**
      *Filter query
      * @param query
      * @return
      */
-    public IMongoDeepJobConfig<T> filterQuery(String query);
+    IMongoDeepJobConfig<T> filterQuery(String query);
 
     /**
      *Filter query
      * @param query
      * @return
      */
-    public IMongoDeepJobConfig<T> filterQuery(BSONObject query);
+    IMongoDeepJobConfig<T> filterQuery(BSONObject query);
 
     /**
      *Filter query
      * @param query
      * @return
      */
-    public IMongoDeepJobConfig<T> filterQuery(QueryBuilder query);
-
-    /**
-     *Fiels to be returned
-     * @param fields
-     * @return
-     */
-    public IMongoDeepJobConfig<T> fields(String fields);
+    IMongoDeepJobConfig<T> filterQuery(QueryBuilder query);
 
 
     /**
@@ -96,21 +89,21 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      * @param fields
      * @return
      */
-    public IMongoDeepJobConfig<T> fields(BSONObject fields);
+    IMongoDeepJobConfig<T> fields(BSONObject fields);
 
     /**
      * Sorting
      * @param sort
      * @return
      */
-    public IMongoDeepJobConfig<T> sort(String sort);
+    IMongoDeepJobConfig<T> sort(String sort);
 
     /**
      * Sorting
      * @param sort
      * @return
      */
-    public IMongoDeepJobConfig<T> sort(BSONObject sort);
+    IMongoDeepJobConfig<T> sort(BSONObject sort);
 
     /**
      *  This is {@code true} by default now, but if {@code false}, only one InputSplit (your whole collection) will be
@@ -119,7 +112,7 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      * @param createInputSplit
      * @return
      */
-    public IMongoDeepJobConfig<T> createInputSplit(boolean createInputSplit);
+    IMongoDeepJobConfig<T> createInputSplit(boolean createInputSplit);
 
     /**
      *
@@ -130,7 +123,7 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      * @param useShards
      * @return
      */
-    public IMongoDeepJobConfig<T> useShards(boolean useShards);
+    IMongoDeepJobConfig<T> useShards(boolean useShards);
 
 
     /**
@@ -142,12 +135,18 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      * @param splitsUseChunks
      * @return
      */
-    public IMongoDeepJobConfig<T> splitsUseChunks(boolean splitsUseChunks);
+    IMongoDeepJobConfig<T> splitsUseChunks(boolean splitsUseChunks);
 
     /**
      *
      * @param inputKey
      * @return
      */
-    public IMongoDeepJobConfig<T> inputKey(String inputKey);
+    IMongoDeepJobConfig<T> inputKey(String inputKey);
+
+    /**
+     *
+     * @return
+     */
+    List<String> getHostList();
 }
