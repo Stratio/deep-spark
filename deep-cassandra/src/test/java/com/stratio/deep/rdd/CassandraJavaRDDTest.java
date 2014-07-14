@@ -28,7 +28,7 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.stratio.deep.config.ConfigFactory;
+import com.stratio.deep.config.CassandraConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
@@ -70,7 +70,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
             InterruptedException {
 
-        rddConfig = ConfigFactory.create(TestEntity.class)
+        rddConfig = CassandraConfigFactory.create(TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -222,7 +222,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
         //executeCustomCQL("create table  " + OUTPUT_KEYSPACE_NAME + "." + table + " (domain text, count int,
         // PRIMARY KEY(domain));");
 
-        ICassandraDeepJobConfig<Cells> writeConfig = ConfigFactory.createWriteConfig()
+        ICassandraDeepJobConfig<Cells> writeConfig = CassandraConfigFactory.createWriteConfig()
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -250,7 +250,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
     @Test(dependsOnMethods = "testSaveToCassandra")
     public void testSaveToCassandra2() {
-        ICassandraDeepJobConfig<Cells> writeConfig = ConfigFactory.createWriteConfig()
+        ICassandraDeepJobConfig<Cells> writeConfig = CassandraConfigFactory.createWriteConfig()
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)

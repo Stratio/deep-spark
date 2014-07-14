@@ -16,8 +16,8 @@
 
 package com.stratio.deep.examples.java;
 
-import com.stratio.deep.config.ConfigFactory;
 import com.stratio.deep.config.IMongoDeepJobConfig;
+import com.stratio.deep.config.MongoConfigFactory;
 import com.stratio.deep.context.MongoDeepSparkContext;
 import com.stratio.deep.rdd.mongodb.MongoCellRDD;
 import com.stratio.deep.testutils.ContextProperties;
@@ -55,7 +55,7 @@ public final class WritingCellToMongoDB {
                 p.getJars());
 
 
-        IMongoDeepJobConfig inputConfigEntity = ConfigFactory.createMongoDB().host(host).database(database).collection(inputCollection).initialize();
+        IMongoDeepJobConfig inputConfigEntity = MongoConfigFactory.createMongoDB().host(host).database(database).collection(inputCollection).initialize();
 
         RDD inputRDDCell = deepContext.mongoRDD(inputConfigEntity);
 
@@ -63,7 +63,7 @@ public final class WritingCellToMongoDB {
 	    LOG.info("count : " + inputRDDCell.count());
 	    LOG.info("prints first cell : " + inputRDDCell.first());
 
-        IMongoDeepJobConfig outputConfigEntity = ConfigFactory.createMongoDB().host(host).database(database).collection(outputCollection).initialize();
+        IMongoDeepJobConfig outputConfigEntity = MongoConfigFactory.createMongoDB().host(host).database(database).collection(outputCollection).initialize();
 
 
         MongoCellRDD.saveCell(inputRDDCell, outputConfigEntity);

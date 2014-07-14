@@ -31,7 +31,7 @@ import java.util.*;
  */
 public class UtilMongoDB {
 
-    private static final String MONGO_DEFAULT_ID = "_id";
+    public static final String MONGO_DEFAULT_ID = "_id";
 
     /**
      * Private default constructor.

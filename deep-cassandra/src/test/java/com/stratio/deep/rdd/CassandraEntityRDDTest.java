@@ -24,7 +24,7 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.stratio.deep.config.ConfigFactory;
+import com.stratio.deep.config.CassandraConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.exception.DeepIOException;
@@ -142,7 +142,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
 
         try {
-            ConfigFactory
+            CassandraConfigFactory
                     .create(TestEntity.class)
                     .host(Constants.DEFAULT_CASSANDRA_HOST)
                     .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -158,7 +158,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         }
 
         try {
-            ConfigFactory
+            CassandraConfigFactory
                     .create(TestEntity.class)
                     .host(Constants.DEFAULT_CASSANDRA_HOST)
                     .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -177,7 +177,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         int allElements = entities.length;
         assertTrue(allElements > 2);
 
-        ICassandraDeepJobConfig<TestEntity> config = ConfigFactory
+        ICassandraDeepJobConfig<TestEntity> config = CassandraConfigFactory
                 .create(TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -219,7 +219,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
     @Override
     protected ICassandraDeepJobConfig<TestEntity> initReadConfig() {
-        ICassandraDeepJobConfig<TestEntity> config = ConfigFactory.create(TestEntity.class)
+        ICassandraDeepJobConfig<TestEntity> config = CassandraConfigFactory.create(TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY)
                 .bisectFactor(testBisectFactor).pageSize(DEFAULT_PAGE_SIZE).initialize();
@@ -229,7 +229,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
     @Override
     protected ICassandraDeepJobConfig<TestEntity> initWriteConfig() {
-        ICassandraDeepJobConfig<TestEntity> writeConfig = ConfigFactory.createWriteConfig(TestEntity.class)
+        ICassandraDeepJobConfig<TestEntity> writeConfig = CassandraConfigFactory.createWriteConfig(TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
@@ -244,7 +244,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     public void testCountWithInputColumns() {
         logger.info("testCountWithInputColumns()");
 
-        ICassandraDeepJobConfig<TestEntity> tmpConfig = ConfigFactory.create(TestEntity.class)
+        ICassandraDeepJobConfig<TestEntity> tmpConfig = CassandraConfigFactory.create(TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)

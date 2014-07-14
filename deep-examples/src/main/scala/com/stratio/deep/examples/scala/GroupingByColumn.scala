@@ -42,7 +42,7 @@ object GroupingByColumn {
     val deepContext = new CassandraDeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
 
     // Configure and initialize the RDD
-    val config = ConfigFactory.create(classOf[TweetEntity])
+    val config = CassandraConfigFactory.create(classOf[TweetEntity])
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(keyspaceName).table(tableName)
       .initialize

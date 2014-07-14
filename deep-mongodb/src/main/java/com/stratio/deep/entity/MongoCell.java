@@ -16,6 +16,8 @@
 
 package com.stratio.deep.entity;
 
+import com.stratio.deep.utils.UtilMongoDB;
+
 /**
  * Created by rcrespo on 2/07/14.
  */
@@ -26,7 +28,7 @@ public class MongoCell extends Cell {
 
 	@Override
 	public Boolean isKey() {
-		return cellName.equals("_id");
+		return cellName.equals(UtilMongoDB.MONGO_DEFAULT_ID);
 	}
 
 	public static Cell create(String cellName, Object cellValue){

@@ -17,7 +17,7 @@
 package com.stratio.deep.examples.scala
 
 import com.stratio.deep.context.{CassandraDeepSparkContext, DeepSparkContext}
-import com.stratio.deep.config.ConfigFactory
+import com.stratio.deep.config.CassandraConfigFactory
 import com.stratio.deep.rdd.CassandraRDD
 import org.apache.spark.rdd.RDD
 
@@ -45,7 +45,7 @@ object WritingCellToCassandra {
     val deepContext: CassandraDeepSparkContext = new CassandraDeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
 
     // --- INPUT RDD
-    val inputConfig = ConfigFactory.create()
+    val inputConfig = CassandraConfigFactory.create()
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(inputKeyspaceName).table(inputTableName)
       .initialize
@@ -65,7 +65,7 @@ object WritingCellToCassandra {
     // -------------------------------- OUTPUT to Cassandra
     // Creating a configuration for the output RDD and initialize it
     // --- OUTPUT RDD
-    val outputConfig = ConfigFactory.createWriteConfig()
+    val outputConfig = CassandraConfigFactory.createWriteConfig()
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(outputKeyspaceName).table(outputTableName).createTableOnWrite(true)
       .initialize

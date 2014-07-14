@@ -52,7 +52,7 @@ object AggregatingData {
     val deepContext = new CassandraDeepSparkContext(p.getCluster, job, p.getSparkHome,p.getJars)
 
     // Creating a configuration for the RDD and initialize it
-    val config = ConfigFactory.create(classOf[TweetEntity])
+    val config = CassandraConfigFactory.create(classOf[TweetEntity])
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(keyspaceName).table(tableName)
       .initialize

@@ -18,7 +18,7 @@ package com.stratio.deep.examples.java;
 
 import com.google.common.collect.Lists;
 
-import com.stratio.deep.config.ConfigFactory;
+import com.stratio.deep.config.CassandraConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.context.CassandraDeepSparkContext;
 import com.stratio.deep.testentity.TweetEntity;
@@ -73,7 +73,7 @@ public class AggregatingData {
 	    CassandraDeepSparkContext deepContext = new CassandraDeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // Creating a configuration for the RDD and initialize it
-        ICassandraDeepJobConfig<TweetEntity> config = ConfigFactory.create(TweetEntity.class)
+        ICassandraDeepJobConfig<TweetEntity> config = CassandraConfigFactory.create(TweetEntity.class)
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(tableName)
                 .initialize();

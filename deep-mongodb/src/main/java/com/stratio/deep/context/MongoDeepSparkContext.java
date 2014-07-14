@@ -18,15 +18,15 @@ package com.stratio.deep.context;
 
 import java.util.Map;
 
+import com.stratio.deep.config.CellDeepJobConfigMongoDB;
+import com.stratio.deep.config.EntityDeepJobConfigMongoDB;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepInstantiationException;
 import com.stratio.deep.rdd.mongodb.MongoCellRDD;
 import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
-import com.stratio.deep.utils.DeepConfig;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
@@ -91,22 +91,17 @@ public class MongoDeepSparkContext extends DeepSparkContext {
 	 * @param <T>
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public <T> DeepMongoRDD<T> mongoRDD(IMongoDeepJobConfig<T> config) {
-		try {
-
-			if (config.getClass().isAssignableFrom(Class.forName(DeepConfig.MONGODB_ENTITY.getConfig()))) {
-				return new MongoEntityRDD(sc(), config);
-			}
-
-			if (config.getClass().isAssignableFrom(Class.forName(DeepConfig.MONGODB_CELL.getConfig()))) {
-				return (DeepMongoRDD<T>) new MongoCellRDD(sc(), (IMongoDeepJobConfig<Cells>) config);
-			}
-
-			throw new DeepGenericException("not recognized config type");
-		} catch (ClassNotFoundException e) {
-			LOG.error(e.getMessage());
-			throw new DeepInstantiationException(e);
+		if (config.getClass().isAssignableFrom(EntityDeepJobConfigMongoDB.class)) {
+			return new MongoEntityRDD(sc(), config);
 		}
+
+		if (config.getClass().isAssignableFrom(CellDeepJobConfigMongoDB.class)) {
+			return (DeepMongoRDD<T>) new MongoCellRDD(sc(), (IMongoDeepJobConfig<Cells>) config);
+		}
+
+		throw new DeepGenericException("not recognized config type");
 
 	}
 }

@@ -16,7 +16,7 @@
 
 package com.stratio.deep.examples.java;
 
-import com.stratio.deep.config.ConfigFactory;
+import com.stratio.deep.config.CassandraConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.context.CassandraDeepSparkContext;
 import com.stratio.deep.entity.Cells;
@@ -76,7 +76,7 @@ public final class CreatingCellRDD {
 	    CassandraDeepSparkContext deepContext = new CassandraDeepSparkContext(sc);
 
         // Configuration and initialization
-        ICassandraDeepJobConfig<Cells> config = ConfigFactory.create()
+        ICassandraDeepJobConfig<Cells> config = CassandraConfigFactory.create()
                 .host(p.getCassandraHost())
                 .cqlPort(p.getCassandraCqlPort())
                 .rpcPort(p.getCassandraThriftPort())

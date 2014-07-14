@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.stratio.deep.config.ConfigFactory;
 import com.stratio.deep.config.IMongoDeepJobConfig;
+import com.stratio.deep.config.MongoConfigFactory;
 import com.stratio.deep.context.MongoDeepSparkContext;
 import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
@@ -69,7 +69,7 @@ public final class GroupingEntityWithMongoDB {
 
 
         IMongoDeepJobConfig<BookEntity> inputConfigEntity =
-                ConfigFactory.createMongoDB(BookEntity.class).host(host).database(database).collection(inputCollection).initialize();
+				        MongoConfigFactory.createMongoDB(BookEntity.class).host(host).database(database).collection(inputCollection).initialize();
 
         MongoJavaRDD<BookEntity> inputRDDEntity = (MongoJavaRDD) deepContext.mongoJavaRDD(inputConfigEntity);
         JavaRDD<String> words =inputRDDEntity.flatMap(new FlatMapFunction<BookEntity, String>() {
@@ -109,7 +109,7 @@ public final class GroupingEntityWithMongoDB {
 
 
         IMongoDeepJobConfig<WordCount> outputConfigEntity =
-                ConfigFactory.createMongoDB(WordCount.class).host(host).database(database).collection(outputCollection).initialize();
+				        MongoConfigFactory.createMongoDB(WordCount.class).host(host).database(database).collection(outputCollection).initialize();
 
         MongoEntityRDD.saveEntity(outputRDD.rdd(),outputConfigEntity);
 
