@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -91,6 +92,7 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
      */
     private transient Map<String, Cell> columnDefinitionMap;
 
+    private String[] inputColumns;
 
     /**
      *OPTIONAL
@@ -102,7 +104,7 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
      * OPTIONAL
      * fields to be returned
      */
-    private String fields;
+    private BSONObject fields;
 
     /**
      * OPTIONAL
@@ -165,7 +167,11 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
      */
     @Override
     public String getHost() {
-        return null;
+        return !hostList.isEmpty()?hostList.get(0):null;
+    }
+
+    public List<String> getHostList() {
+        return hostList;
     }
 
     /**
@@ -174,7 +180,7 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     // TODO
     @Override
     public String[] getInputColumns() {
-        return new String[0];
+        return fields.keySet().toArray(new String[fields.keySet().size()]);
     }
 
     /**
@@ -275,21 +281,13 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public IMongoDeepJobConfig<T> fields(String fields) {
-        this.fields = fields;
-        return this;
-    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public IMongoDeepJobConfig<T> fields(BSONObject fields) {
-        this.fields = fields.toString();
+        this.fields = fields;
         return this;
     }
 
@@ -445,7 +443,7 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         }
 
         if(fields!=null){
-            configHadoop.set(MongoConfigUtil.INPUT_FIELDS,fields);
+            configHadoop.set(MongoConfigUtil.INPUT_FIELDS,fields.toString());
         }
 
 
@@ -454,8 +452,7 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         }
 
         if (username != null && password != null) {
-            //TODO: In release 1.2.1 mongo-hadoop will have a new feature with mongos process.
-//            configHadoop.set(MongoConfigUtil.AUTH_URI , connection.toString());
+            configHadoop.set(MongoConfigUtil.AUTH_URI , connection.toString());
         }
 
         return this;
@@ -479,11 +476,17 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     /**
      * {@inheritDoc}
      */
-    // TODO
     @Override
     public IMongoDeepJobConfig<T> inputColumns(String... columns) {
-        return null;
+        BSONObject bsonFields = new BasicBSONObject();
+        for (String column: columns){
+            bsonFields.put(column,1);
+        }
+        fields = bsonFields;
+        return this;
     }
+
+
 
     /**
      * {@inheritDoc}
@@ -493,7 +496,6 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         if (configHadoop == null){
             initialize();
         }
-
         return configHadoop;
     }
 }
