@@ -80,8 +80,8 @@ public class MongoDeepSparkContext extends DeepSparkContext {
 	 * @param <T>
 	 * @return
 	 */
-	public <T extends IDeepType> JavaRDD<T> mongoJavaRDD(IMongoDeepJobConfig<T> config) {
-		return new MongoJavaRDD<>(mongoRDD(config));
+	public <T> JavaRDD<T> mongoJavaRDD(IMongoDeepJobConfig<T> config) {
+		return new MongoJavaRDD<T>(mongoRDD(config));
 	}
 
 	/**

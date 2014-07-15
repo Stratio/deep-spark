@@ -170,7 +170,21 @@ public class UtilMongoDB {
 
         for(Map.Entry<String, Object> entry : entryBson){
 
-            cells.add(MongoCell.create(entry.getKey(), entry.getValue()));
+            if (List.class.isAssignableFrom(entry.getValue().getClass())){
+                List<Cells> innerCell = new ArrayList<>();
+                for(BSONObject innerBson : (List<BSONObject>)entry.getValue() ){
+                    innerCell.add(getCellFromBson(innerBson));
+                }
+                cells.add(MongoCell.create(entry.getKey(), innerCell));
+            }
+            else if (BSONObject.class.isAssignableFrom(entry.getValue().getClass())){
+                Cells innerCells = getCellFromBson((BSONObject) entry.getValue());
+                cells.add(MongoCell.create(entry.getKey(), innerCells));
+            }
+            else{
+                cells.add(MongoCell.create(entry.getKey(), entry.getValue()));
+            }
+
         }
         return cells;
     }
