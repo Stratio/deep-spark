@@ -24,8 +24,8 @@ import com.stratio.deep.config.IMongoDeepJobConfig
 import org.apache.hadoop.conf.Configurable
 import org.apache.hadoop.io.Writable
 import org.apache.hadoop.mapreduce._
-import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark._
+import org.apache.spark.annotation.DeveloperApi
 import org.bson.BSONObject
 
 import scala.reflect.ClassTag
@@ -37,6 +37,7 @@ class NewHadoopPartition(
   extends Partition {
 
   val serializableHadoopSplit = new SerializableWritable(rawSplit)
+
   override def hashCode(): Int = 41 * (41 + rddId) + index
 }
 

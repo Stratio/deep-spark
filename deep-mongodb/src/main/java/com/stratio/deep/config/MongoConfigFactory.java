@@ -24,25 +24,25 @@ import org.apache.log4j.Logger;
  * Created by luca on 14/07/14.
  */
 public class MongoConfigFactory {
-	private static final Logger LOG = Logger.getLogger(MongoConfigFactory.class);
+    private static final Logger LOG = Logger.getLogger(MongoConfigFactory.class);
 
-	/**
-	 * Creates a new cell-based MongoDB job configuration object.
-	 *
-	 * @return a new cell-based MongoDB job configuration object.
-	 */
-	public static IMongoDeepJobConfig<Cells> createMongoDB() {
-		return new CellDeepJobConfigMongoDB();
-	}
+    /**
+     * Creates a new cell-based MongoDB job configuration object.
+     *
+     * @return a new cell-based MongoDB job configuration object.
+     */
+    public static IMongoDeepJobConfig<Cells> createMongoDB() {
+        return new CellDeepJobConfigMongoDB();
+    }
 
-	/**
-	 * Creates a new entity-based MongoDB job configuration object.
-	 *
-	 * @param entityClass the class instance of the entity class that will be used to map db objects to Java objects.
-	 * @param <T> the generic type of the entity object implementing IDeepType.
-	 * @return a new entity-based MongoDB job configuration object.
-	 */
-	public static <T extends IDeepType> IMongoDeepJobConfig<T> createMongoDB(Class<T> entityClass) {
-		return new EntityDeepJobConfigMongoDB<>(entityClass);
-	}
+    /**
+     * Creates a new entity-based MongoDB job configuration object.
+     *
+     * @param entityClass the class instance of the entity class that will be used to map db objects to Java objects.
+     * @param <T>         the generic type of the entity object implementing IDeepType.
+     * @return a new entity-based MongoDB job configuration object.
+     */
+    public static <T extends IDeepType> IMongoDeepJobConfig<T> createMongoDB(Class<T> entityClass) {
+        return new EntityDeepJobConfigMongoDB<>(entityClass);
+    }
 }

@@ -24,7 +24,10 @@ import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
 import java.lang.reflect.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Several utilities to work used in the Spark <=> MongoDB integration.
@@ -36,7 +39,7 @@ public class UtilMongoDB {
     /**
      * Private default constructor.
      */
-    private UtilMongoDB(){
+    private UtilMongoDB() {
 
     }
 
@@ -44,8 +47,8 @@ public class UtilMongoDB {
      * converts from BsonObject to an entity class with deep's anotations
      *
      * @param classEntity the entity name.
-     * @param bsonObject the instance of the BSONObjet to convert.
-     * @param <T> return type.
+     * @param bsonObject  the instance of the BSONObjet to convert.
+     * @param <T>         return type.
      * @return the provided bsonObject converted to an instance of T.
      * @throws IllegalAccessException
      * @throws InstantiationException
@@ -87,14 +90,14 @@ public class UtilMongoDB {
     }
 
 
-    private static <T>  Object  subDocumentListCase(Type type, List<T> bsonOject) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    private static <T> Object subDocumentListCase(Type type, List<T> bsonOject) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         ParameterizedType listType = (ParameterizedType) type;
 
         Class<?> listClass = (Class<?>) listType.getActualTypeArguments()[0];
 
         List list = new ArrayList();
-        for(T t : bsonOject){
-            list.add(getObjectFromBson( listClass,(BSONObject)t));
+        for (T t : bsonOject) {
+            list.add(getObjectFromBson(listClass, (BSONObject) t));
         }
 
 
@@ -102,11 +105,10 @@ public class UtilMongoDB {
     }
 
 
-
     /**
      * converts from an entity class with deep's anotations to BsonObject.
      *
-     * @param t an instance of an object of type T to convert to BSONObject.
+     * @param t   an instance of an object of type T to convert to BSONObject.
      * @param <T> the type of the object to convert.
      * @return the provided object converted to BSONObject.
      * @throws IllegalAccessException
@@ -129,7 +131,7 @@ public class UtilMongoDB {
     /**
      * returns the id value annotated with @DeepField(fieldName = "_id")
      *
-     * @param t an instance of an object of type T to convert to BSONObject.
+     * @param t   an instance of an object of type T to convert to BSONObject.
      * @param <T> the type of the object to convert.
      * @return the provided object converted to Object.
      * @throws IllegalAccessException
@@ -168,20 +170,18 @@ public class UtilMongoDB {
 
         Set<Map.Entry<String, Object>> entryBson = map.entrySet();
 
-        for(Map.Entry<String, Object> entry : entryBson){
+        for (Map.Entry<String, Object> entry : entryBson) {
 
-            if (List.class.isAssignableFrom(entry.getValue().getClass())){
+            if (List.class.isAssignableFrom(entry.getValue().getClass())) {
                 List<Cells> innerCell = new ArrayList<>();
-                for(BSONObject innerBson : (List<BSONObject>)entry.getValue() ){
+                for (BSONObject innerBson : (List<BSONObject>) entry.getValue()) {
                     innerCell.add(getCellFromBson(innerBson));
                 }
                 cells.add(MongoCell.create(entry.getKey(), innerCell));
-            }
-            else if (BSONObject.class.isAssignableFrom(entry.getValue().getClass())){
+            } else if (BSONObject.class.isAssignableFrom(entry.getValue().getClass())) {
                 Cells innerCells = getCellFromBson((BSONObject) entry.getValue());
                 cells.add(MongoCell.create(entry.getKey(), innerCells));
-            }
-            else{
+            } else {
                 cells.add(MongoCell.create(entry.getKey(), entry.getValue()));
             }
 
@@ -193,7 +193,6 @@ public class UtilMongoDB {
     /**
      * converts from and entity class with deep's anotations to BsonObject
      *
-
      * @return
      * @throws IllegalAccessException
      * @throws InstantiationException
@@ -204,7 +203,7 @@ public class UtilMongoDB {
         BSONObject bson = new BasicBSONObject();
 
 
-        for(Cell cell : cells){
+        for (Cell cell : cells) {
             bson.put(cell.getCellName(), cell.getCellValue());
 
         }

@@ -20,16 +20,12 @@ import com.mongodb.QueryBuilder;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import com.stratio.deep.entity.Cell;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.log4j.Logger;
-import org.bson.BSON;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -95,7 +91,7 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     private String[] inputColumns;
 
     /**
-     *OPTIONAL
+     * OPTIONAL
      * filter query
      */
     private String query;
@@ -135,7 +131,6 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     }
 
 
-
     /**
      * {@inheritDoc}
      */
@@ -167,7 +162,7 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
      */
     @Override
     public String getHost() {
-        return !hostList.isEmpty()?hostList.get(0):null;
+        return !hostList.isEmpty() ? hostList.get(0) : null;
     }
 
     public List<String> getHostList() {
@@ -378,6 +373,17 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
      * {@inheritDoc}
      */
     @Override
+    public IMongoDeepJobConfig<T> ignoreIdField() {
+        BSONObject bsonFields = fields != null ? fields : new BasicBSONObject();
+        fields.put("_id", 0);
+        fields = bsonFields;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public GenericDeepJobConfigMongoDB<T> initialize() {
         validate();
         configHadoop = new Configuration();
@@ -425,7 +431,7 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         configHadoop.set(MongoConfigUtil.OUTPUT_URI, connection.toString());
 
 
-        if(inputKey!=null){
+        if (inputKey != null) {
             configHadoop.set(MongoConfigUtil.INPUT_KEY, inputKey);
         }
 
@@ -437,22 +443,21 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         configHadoop.set(MongoConfigUtil.SPLITS_USE_CHUNKS, String.valueOf(splitsUseChunks));
 
 
-
-        if(query !=null){
+        if (query != null) {
             configHadoop.set(MongoConfigUtil.INPUT_QUERY, query);
         }
 
-        if(fields!=null){
-            configHadoop.set(MongoConfigUtil.INPUT_FIELDS,fields.toString());
+        if (fields != null) {
+            configHadoop.set(MongoConfigUtil.INPUT_FIELDS, fields.toString());
         }
 
 
-        if(sort != null){
+        if (sort != null) {
             configHadoop.set(MongoConfigUtil.INPUT_SORT, sort);
         }
 
         if (username != null && password != null) {
-            configHadoop.set(MongoConfigUtil.AUTH_URI , connection.toString());
+            configHadoop.set(MongoConfigUtil.AUTH_URI, connection.toString());
         }
 
         return this;
@@ -478,14 +483,13 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
      */
     @Override
     public IMongoDeepJobConfig<T> inputColumns(String... columns) {
-        BSONObject bsonFields = new BasicBSONObject();
-        for (String column: columns){
-            bsonFields.put(column,1);
+        BSONObject bsonFields = fields != null ? fields : new BasicBSONObject();
+        for (String column : columns) {
+            bsonFields.put(column, 1);
         }
         fields = bsonFields;
         return this;
     }
-
 
 
     /**
@@ -493,7 +497,7 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
      */
     @Override
     public Configuration getHadoopConfiguration() {
-        if (configHadoop == null){
+        if (configHadoop == null) {
             initialize();
         }
         return configHadoop;

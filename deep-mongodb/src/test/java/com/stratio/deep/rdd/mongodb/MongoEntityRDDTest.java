@@ -16,14 +16,7 @@
 
 package com.stratio.deep.rdd.mongodb;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URL;
-import java.util.List;
-
 import com.google.common.io.Resources;
-
 import com.mongodb.*;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.config.MongoConfigFactory;
@@ -42,6 +35,12 @@ import org.bson.BSONObject;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URL;
+import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 
@@ -135,6 +134,7 @@ public class MongoEntityRDDTest implements Serializable {
 
     /**
      * Imports dataset
+     *
      * @throws java.io.IOException
      */
     private static void dataSetImport() throws IOException {
@@ -156,8 +156,6 @@ public class MongoEntityRDDTest implements Serializable {
         mongoImportExecutable.start();
 
 
-
-
     }
 
     @AfterClass
@@ -174,7 +172,7 @@ public class MongoEntityRDDTest implements Serializable {
     @Test
     public void testReadingRDD() {
         String hostConcat = HOST.concat(":").concat(PORT.toString());
-	    MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
+        MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
 
         IMongoDeepJobConfig<MessageTestEntity> inputConfigEntity = MongoConfigFactory.createMongoDB(MessageTestEntity.class)
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_INPUT).initialize();
@@ -194,7 +192,7 @@ public class MongoEntityRDDTest implements Serializable {
 
         String hostConcat = HOST.concat(":").concat(PORT.toString());
 
-	    MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
+        MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
 
         IMongoDeepJobConfig<MessageTestEntity> inputConfigEntity = MongoConfigFactory.createMongoDB(MessageTestEntity.class)
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_INPUT).initialize();
@@ -227,7 +225,7 @@ public class MongoEntityRDDTest implements Serializable {
 
         String hostConcat = HOST.concat(":").concat(PORT.toString());
 
-	    MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
+        MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
 
         IMongoDeepJobConfig<BookEntity> inputConfigEntity = MongoConfigFactory.createMongoDB(BookEntity.class)
                 .host(hostConcat).database("book").collection("input").initialize();
@@ -245,7 +243,7 @@ public class MongoEntityRDDTest implements Serializable {
         BookEntity book = books.get(0);
 
         DBObject proObject = new BasicDBObject();
-        proObject.put("_id",0);
+        proObject.put("_id", 0);
 
 
 //      tests subDocuments
@@ -254,15 +252,14 @@ public class MongoEntityRDDTest implements Serializable {
 
 
 //      tests List<subDocuments>
-        List<BSONObject> listCantos = (List<BSONObject>)result.get("cantos");
+        List<BSONObject> listCantos = (List<BSONObject>) result.get("cantos");
         BSONObject bsonObject = null;
 
-        for(int i = 0; i< listCantos.size() ; i++){
+        for (int i = 0; i < listCantos.size(); i++) {
             bsonObject = listCantos.get(i);
             assertEquals(bsonObject.get("canto"), book.getCantoEntities().get(i).getNumber());
             assertEquals(bsonObject.get("text"), book.getCantoEntities().get(i).getText());
         }
-
 
 
         context.stop();

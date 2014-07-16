@@ -17,16 +17,11 @@
 package com.stratio.deep.rdd.mongodb;
 
 import com.mongodb.hadoop.MongoOutputFormat;
-import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
-import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.IMongoDeepJobConfig;
-import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.utils.UtilMongoDB;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.DeepMongoRDD;
 import org.apache.spark.rdd.RDD;
@@ -36,11 +31,8 @@ import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 import scala.reflect.ClassTag$;
 
-import java.lang.reflect.InvocationTargetException;
-
 /**
  * CellRDD to interact with mongoDB
- *
  */
 public final class MongoCellRDD extends DeepMongoRDD<Cells> {
 
@@ -77,6 +69,7 @@ public final class MongoCellRDD extends DeepMongoRDD<Cells> {
 
     /**
      * Save a RDD to MongoDB
+     *
      * @param rdd
      * @param config
      */

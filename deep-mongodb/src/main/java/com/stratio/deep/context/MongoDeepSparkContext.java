@@ -16,13 +16,10 @@
 
 package com.stratio.deep.context;
 
-import java.util.Map;
-
 import com.stratio.deep.config.CellDeepJobConfigMongoDB;
 import com.stratio.deep.config.EntityDeepJobConfigMongoDB;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.rdd.mongodb.MongoCellRDD;
 import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
@@ -32,76 +29,78 @@ import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.rdd.DeepMongoRDD;
 
+import java.util.Map;
+
 /**
  * Created by luca on 11/07/14.
  */
 public class MongoDeepSparkContext extends DeepSparkContext {
-	private static final Logger LOG = Logger.getLogger(MongoDeepSparkContext.class);
+    private static final Logger LOG = Logger.getLogger(MongoDeepSparkContext.class);
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public MongoDeepSparkContext(SparkContext sc) {
-		super(sc);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public MongoDeepSparkContext(SparkContext sc) {
+        super(sc);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public MongoDeepSparkContext(String master, String appName) {
-		super(master, appName);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public MongoDeepSparkContext(String master, String appName) {
+        super(master, appName);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public MongoDeepSparkContext(String master, String appName, String sparkHome, String jarFile) {
-		super(master, appName, sparkHome, jarFile);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public MongoDeepSparkContext(String master, String appName, String sparkHome, String jarFile) {
+        super(master, appName, sparkHome, jarFile);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public MongoDeepSparkContext(String master, String appName, String sparkHome, String[] jars) {
-		super(master, appName, sparkHome, jars);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public MongoDeepSparkContext(String master, String appName, String sparkHome, String[] jars) {
+        super(master, appName, sparkHome, jars);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public MongoDeepSparkContext(String master, String appName, String sparkHome, String[] jars, Map<String, String> environment) {
-		super(master, appName, sparkHome, jars, environment);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public MongoDeepSparkContext(String master, String appName, String sparkHome, String[] jars, Map<String, String> environment) {
+        super(master, appName, sparkHome, jars, environment);
+    }
 
-	/**
-	 * Builds a new entity based MongoEntityRDD
-	 *
-	 * @param config
-	 * @param <T>
-	 * @return
-	 */
-	public <T> JavaRDD<T> mongoJavaRDD(IMongoDeepJobConfig<T> config) {
-		return new MongoJavaRDD<T>(mongoRDD(config));
-	}
+    /**
+     * Builds a new entity based MongoEntityRDD
+     *
+     * @param config
+     * @param <T>
+     * @return
+     */
+    public <T> JavaRDD<T> mongoJavaRDD(IMongoDeepJobConfig<T> config) {
+        return new MongoJavaRDD<T>(mongoRDD(config));
+    }
 
-	/**
-	 * Builds a new Mongo RDD.
-	 *
-	 * @param config
-	 * @param <T>
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public <T> DeepMongoRDD<T> mongoRDD(IMongoDeepJobConfig<T> config) {
-		if (config.getClass().isAssignableFrom(EntityDeepJobConfigMongoDB.class)) {
-			return new MongoEntityRDD(sc(), config);
-		}
+    /**
+     * Builds a new Mongo RDD.
+     *
+     * @param config
+     * @param <T>
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public <T> DeepMongoRDD<T> mongoRDD(IMongoDeepJobConfig<T> config) {
+        if (config.getClass().isAssignableFrom(EntityDeepJobConfigMongoDB.class)) {
+            return new MongoEntityRDD(sc(), config);
+        }
 
-		if (config.getClass().isAssignableFrom(CellDeepJobConfigMongoDB.class)) {
-			return (DeepMongoRDD<T>) new MongoCellRDD(sc(), (IMongoDeepJobConfig<Cells>) config);
-		}
+        if (config.getClass().isAssignableFrom(CellDeepJobConfigMongoDB.class)) {
+            return (DeepMongoRDD<T>) new MongoCellRDD(sc(), (IMongoDeepJobConfig<Cells>) config);
+        }
 
-		throw new DeepGenericException("not recognized config type");
+        throw new DeepGenericException("not recognized config type");
 
-	}
+    }
 }

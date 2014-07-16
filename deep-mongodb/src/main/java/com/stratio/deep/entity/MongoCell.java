@@ -22,16 +22,16 @@ import com.stratio.deep.utils.UtilMongoDB;
  * Created by rcrespo on 2/07/14.
  */
 public class MongoCell extends Cell {
-    private MongoCell (String cellName, Object cellValue){
+    private MongoCell(String cellName, Object cellValue) {
         super(cellName, cellValue);
     }
 
-	@Override
-	public Boolean isKey() {
-		return cellName.equals(UtilMongoDB.MONGO_DEFAULT_ID);
-	}
+    @Override
+    public Boolean isKey() {
+        return cellName.equals(UtilMongoDB.MONGO_DEFAULT_ID);
+    }
 
-	public static Cell create(String cellName, Object cellValue){
-        return new MongoCell (cellName, cellValue);
+    public static Cell create(String cellName, Object cellValue) {
+        return new MongoCell(cellName, cellValue);
     }
 }

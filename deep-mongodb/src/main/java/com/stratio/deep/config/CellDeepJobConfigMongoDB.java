@@ -19,8 +19,6 @@ package com.stratio.deep.config;
 import com.stratio.deep.entity.Cells;
 
 
-
-
 public class CellDeepJobConfigMongoDB extends GenericDeepJobConfigMongoDB<Cells> {
 
     private static final long serialVersionUID = -598862509865396541L;

@@ -16,7 +16,6 @@
 
 package com.stratio.deep.testutils;
 
-import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.testentity.CommonsTestEntity;
 import com.stratio.deep.testentity.MongoDBTestEntity;
@@ -90,33 +89,29 @@ public class UtilMongoDBTest {
         BSONObject bson = new BasicBSONObject();
 
         BSONObject metadata = new BasicBSONObject();
-        metadata.put("author","ANTE ALIGHIERI");
-        metadata.put("title","THE DIVINE COMEDY");
-        metadata.put("source","http://www.gutenberg.org/ebooks/8800");
+        metadata.put("author", "ANTE ALIGHIERI");
+        metadata.put("title", "THE DIVINE COMEDY");
+        metadata.put("source", "http://www.gutenberg.org/ebooks/8800");
 
 
         BSONObject cantoI = new BasicBSONObject();
 
-        cantoI.put("canto","Canto I");
-        cantoI.put("text","text I");
+        cantoI.put("canto", "Canto I");
+        cantoI.put("text", "text I");
 
         BSONObject cantoII = new BasicBSONObject();
-        cantoII.put("canto","Canto II");
-        cantoII.put("text","text II");
+        cantoII.put("canto", "Canto II");
+        cantoII.put("text", "text II");
 
 
         List<BSONObject> cantosList = new ArrayList<>();
         cantosList.add(cantoI);
         cantosList.add(cantoII);
 
-        bson.put("metadata" , metadata);
-        bson.put("cantos" , cantosList);
+        bson.put("metadata", metadata);
+        bson.put("cantos", cantosList);
 
         Cells cells = UtilMongoDB.getCellFromBson(bson);
-
-
-
-
 
 
         // Check metadata Object
@@ -124,9 +119,9 @@ public class UtilMongoDBTest {
 
         Map<String, Object> mapMetadata = (Map<String, Object>) bson.get("metadata");
 
-        assertEquals(mapMetadata.get("author"), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("author").getCellValue()) ;
-        assertEquals(mapMetadata.get("title"), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("title").getCellValue()) ;
-        assertEquals(mapMetadata.get("source"), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("source").getCellValue()) ;
+        assertEquals(mapMetadata.get("author"), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("author").getCellValue());
+        assertEquals(mapMetadata.get("title"), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("title").getCellValue());
+        assertEquals(mapMetadata.get("source"), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("source").getCellValue());
 
 
         // Check list Oject
@@ -136,17 +131,14 @@ public class UtilMongoDBTest {
         List<Map<String, Object>> mapCantos = (List<Map<String, Object>>) bson.get("cantos");
 
 
-        assertEquals(mapCantos.get(0).get("canto"),  list.get(0).getCellByName("canto").getCellValue());
-        assertEquals(mapCantos.get(0).get("text"),  list.get(0).getCellByName("text").getCellValue());
+        assertEquals(mapCantos.get(0).get("canto"), list.get(0).getCellByName("canto").getCellValue());
+        assertEquals(mapCantos.get(0).get("text"), list.get(0).getCellByName("text").getCellValue());
 
-        assertEquals(mapCantos.get(1).get("canto"),  list.get(1).getCellByName("canto").getCellValue());
-        assertEquals(mapCantos.get(1).get("text"),  list.get(1).getCellByName("text").getCellValue());
+        assertEquals(mapCantos.get(1).get("canto"), list.get(1).getCellByName("canto").getCellValue());
+        assertEquals(mapCantos.get(1).get("text"), list.get(1).getCellByName("text").getCellValue());
 
 
     }
-
-
-
 
 
 }

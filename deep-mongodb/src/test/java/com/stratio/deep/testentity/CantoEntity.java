@@ -24,7 +24,7 @@ import com.stratio.deep.entity.IDeepType;
  * Created by rcrespo on 25/06/14.
  */
 @DeepEntity
-public class CantoEntity  implements IDeepType {
+public class CantoEntity implements IDeepType {
 
     @DeepField(fieldName = "canto")
     private String number;

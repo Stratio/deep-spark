@@ -20,7 +20,6 @@ import com.mongodb.QueryBuilder;
 import org.apache.hadoop.conf.Configuration;
 import org.bson.BSONObject;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -39,6 +38,7 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
 
     /**
      * Sets the list of available Mongo hosts.
+     *
      * @param host the list of available mongo hosts.
      * @return this object.
      */
@@ -63,65 +63,70 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
     IMongoDeepJobConfig<T> readPreference(String readPreference);
 
     /**
-     *Filter query
+     * Filter query
+     *
      * @param query
-     * @return
+     * @return this object.
      */
     IMongoDeepJobConfig<T> filterQuery(String query);
 
     /**
-     *Filter query
+     * Filter query
+     *
      * @param query
-     * @return
+     * @return this object.
      */
     IMongoDeepJobConfig<T> filterQuery(BSONObject query);
 
     /**
-     *Filter query
+     * Filter query
+     *
      * @param query
-     * @return
+     * @return this object.
      */
     IMongoDeepJobConfig<T> filterQuery(QueryBuilder query);
 
 
     /**
-     * Fiels to be returned
+     * Fiels to be returned, you can also use inputFields() and ignoreIdField()
+     *
      * @param fields
-     * @return
+     * @return this object.
      */
     IMongoDeepJobConfig<T> fields(BSONObject fields);
 
     /**
      * Sorting
+     *
      * @param sort
-     * @return
+     * @return this object.
      */
     IMongoDeepJobConfig<T> sort(String sort);
 
     /**
      * Sorting
+     *
      * @param sort
-     * @return
+     * @return this object.
      */
     IMongoDeepJobConfig<T> sort(BSONObject sort);
 
     /**
-     *  This is {@code true} by default now, but if {@code false}, only one InputSplit (your whole collection) will be
+     * This is {@code true} by default now, but if {@code false}, only one InputSplit (your whole collection) will be
      * assigned to Spark – severely reducing parallel mapping.
      *
      * @param createInputSplit
-     * @return
+     * @return this object.
      */
     IMongoDeepJobConfig<T> createInputSplit(boolean createInputSplit);
 
     /**
-     *
      * If {@code true} in a sharded setup splits will be made to connect to individual backend {@code mongod}s.  This
      * can be unsafe. If {@code mongos} is moving chunks around you might see duplicate data, or miss some data
      * entirely. Defaults to {@code false}
      *
      * @param useShards
-     * @return
+     * @return this object.
      */
     IMongoDeepJobConfig<T> useShards(boolean useShards);
 
@@ -133,20 +138,25 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      * each backend shard. THIS IS UNSAFE and may result in data being run multiple times <p> Defaults to {@code true }
      *
      * @param splitsUseChunks
-     * @return
+     * @return this object.
      */
     IMongoDeepJobConfig<T> splitsUseChunks(boolean splitsUseChunks);
 
     /**
-     *
      * @param inputKey
-     * @return
+     * @return this object.
      */
     IMongoDeepJobConfig<T> inputKey(String inputKey);
 
     /**
-     *
-     * @return
+     * @return Hosts list
      */
     List<String> getHostList();
+
+    /**
+     * If use it, MongoDB will not return _id field.
+     *
+     * @return this object.
+     */
+    IMongoDeepJobConfig<T> ignoreIdField();
 }
