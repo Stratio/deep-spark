@@ -62,10 +62,15 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>com.stratio.deep</groupId>
             <artifactId>deep-commons</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.stratio.deep</groupId>
+            <artifactId>deep-mongodb</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
         </dependency>
