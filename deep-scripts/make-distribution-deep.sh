@@ -31,7 +31,7 @@ fi
 
 
 if [ -z "$2" ]; then
-    SPARK_BRANCH="stratio-branch-1.0.0"
+    SPARK_BRANCH="stratio-branch-1.0.1"
 fi
 
 echo "SPARK_REPO: ${SPARK_REPO}"
