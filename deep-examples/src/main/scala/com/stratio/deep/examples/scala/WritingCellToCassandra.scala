@@ -16,14 +16,14 @@
 
 package com.stratio.deep.examples.scala
 
-import com.stratio.deep.context.DeepSparkContext
-import com.stratio.deep.config.DeepJobConfigFactory
+import com.stratio.deep.context.{CassandraDeepSparkContext, DeepSparkContext}
+import com.stratio.deep.config.CassandraConfigFactory
 import com.stratio.deep.rdd.CassandraRDD
 import org.apache.spark.rdd.RDD
 
 import org.apache.spark.SparkContext._
 import com.stratio.deep.testutils.ContextProperties
-import com.stratio.deep.entity.{Cell, Cells}
+import com.stratio.deep.entity.{CassandraCell, Cell, Cells}
 
 /**
  * Author: Emmanuelle Raffenne
@@ -42,15 +42,15 @@ object WritingCellToCassandra {
 
     // Creating the Deep Context where args are Spark Master and Job Name
     val p = new ContextProperties(args)
-    val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
+    val deepContext: CassandraDeepSparkContext = new CassandraDeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
 
     // --- INPUT RDD
-    val inputConfig = DeepJobConfigFactory.create()
+    val inputConfig = CassandraConfigFactory.create()
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(inputKeyspaceName).table(inputTableName)
       .initialize
 
-    val inputRDD: CassandraRDD[Cells] = deepContext.cassandraGenericRDD(inputConfig)
+    val inputRDD: RDD[Cells] = deepContext.cassandraRDD(inputConfig)
 
     val pairRDD: RDD[(String, Cells)] = inputRDD map {
       c: Cells => (c.getCellByName("domainName").getCellValue.asInstanceOf[String], c)
@@ -65,16 +65,16 @@ object WritingCellToCassandra {
     // -------------------------------- OUTPUT to Cassandra
     // Creating a configuration for the output RDD and initialize it
     // --- OUTPUT RDD
-    val outputConfig = DeepJobConfigFactory.createWriteConfig()
+    val outputConfig = CassandraConfigFactory.createWriteConfig()
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(outputKeyspaceName).table(outputTableName).createTableOnWrite(true)
       .initialize
 
     val outputRDD: RDD[Cells] = numPerKey map {
       t: (String, Integer) =>
-        val c1 = Cell.create("domain", t._1, true, false);
-        val c2 = Cell.create("num_pages", t._2);
-        new Cells(c1, c2)
+        val c1 = CassandraCell.create("domain", t._1, true, false);
+        val c2 = CassandraCell.create("num_pages", t._2);
+        new Cells(outputKeyspaceName, c1, c2)
     }
 
     CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig)

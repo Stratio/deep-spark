@@ -16,14 +16,6 @@
 
 package com.stratio.deep.utils;
 
-import com.google.common.collect.ImmutableMap;
-import com.stratio.deep.annotations.DeepField;
-import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.exception.DeepIOException;
-import org.apache.cassandra.db.marshal.*;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
-
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -34,7 +26,17 @@ import java.math.BigInteger;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 import java.util.*;
+
+import com.google.common.collect.ImmutableMap;
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
+
+import com.stratio.deep.annotations.DeepField;
+import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.exception.DeepIOException;
+import org.apache.cassandra.db.marshal.*;
 
 /**
  * Common utility methods to manipulate beans and fields annotated with @DeepEntity and @DeepField.
@@ -59,6 +61,7 @@ public final class AnnotationUtils {
                     .put(Inet6Address.class, InetAddressType.instance)
                     .put(BigInteger.class, IntegerType.instance)
                     .put(UUID.class, UUIDType.instance)
+                    .put(ByteBuffer.class, BytesType.instance)
                     .build();
 
     /**
@@ -83,6 +86,7 @@ public final class AnnotationUtils {
                     .put(SetType.class.getCanonicalName(), Set.class)
                     .put(ListType.class.getCanonicalName(), List.class)
                     .put(MapType.class.getCanonicalName(), Map.class)
+                    .put(BytesType.class.getCanonicalName(), ByteBuffer.class)
                     .build();
 
     /**
@@ -103,6 +107,7 @@ public final class AnnotationUtils {
                     .put(IntegerType.class, IntegerType.instance)
                     .put(UUIDType.class, UUIDType.instance)
                     .put(TimeUUIDType.class, TimeUUIDType.instance)
+                    .put(BytesType.class, BytesType.instance)
                     .build();
 
     /**
@@ -198,7 +203,7 @@ public final class AnnotationUtils {
      * @param field the field instance to process.
      * @return the list of generic types associated to the provided field (if any).
      */
-    public static Class<?>[] getGenericTypes(Field field) {
+    public static Class[] getGenericTypes(Field field) {
         try {
             ParameterizedType type = (ParameterizedType) field.getGenericType();
             Type[] types = type.getActualTypeArguments();

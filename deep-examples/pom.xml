@@ -21,12 +21,12 @@
     <parent>
         <groupId>com.stratio.deep</groupId>
         <artifactId>deep-parent</artifactId>
-        <version>0.3.3</version>
+        <version>0.4.0</version>
         <relativePath>../deep-parent</relativePath>
     </parent>
 
     <artifactId>deep-examples</artifactId>
-
+    <name>deep examples</name>
     <licenses>
         <license>
             <name>Apache 2</name>
@@ -37,7 +37,12 @@
     <dependencies>
         <dependency>
             <groupId>com.stratio.deep</groupId>
-            <artifactId>deep-core</artifactId>
+            <artifactId>deep-cassandra</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.stratio.deep</groupId>
+            <artifactId>deep-mongodb</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -57,13 +62,17 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>com.stratio.deep</groupId>
             <artifactId>deep-commons</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
-            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.stratio.deep</groupId>
+            <artifactId>deep-mongodb</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>net.sf.opencsv</groupId>

@@ -16,10 +16,9 @@
 
 package com.stratio.deep.examples.java;
 
-import com.stratio.deep.config.DeepJobConfigFactory;
+import com.stratio.deep.config.CassandraConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.context.CassandraDeepSparkContext;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.rdd.CassandraJavaRDD;
 import com.stratio.deep.testutils.ContextProperties;
@@ -74,10 +73,10 @@ public final class CreatingCellRDD {
         LOG.info("spark.serializer: " + System.getProperty("spark.serializer"));
         LOG.info("spark.kryo.registrator: " + System.getProperty("spark.kryo.registrator"));
 
-        DeepSparkContext deepContext = new DeepSparkContext(sc);
+	    CassandraDeepSparkContext deepContext = new CassandraDeepSparkContext(sc);
 
         // Configuration and initialization
-        ICassandraDeepJobConfig<Cells> config = DeepJobConfigFactory.create()
+        ICassandraDeepJobConfig<Cells> config = CassandraConfigFactory.create()
                 .host(p.getCassandraHost())
                 .cqlPort(p.getCassandraCqlPort())
                 .rpcPort(p.getCassandraThriftPort())
@@ -86,7 +85,7 @@ public final class CreatingCellRDD {
                 .initialize();
 
         // Creating the RDD
-        CassandraJavaRDD rdd = deepContext.cassandraJavaRDD(config);
+        CassandraJavaRDD rdd = (CassandraJavaRDD) deepContext.cassandraJavaRDD(config);
 
         counts = rdd.count();
 

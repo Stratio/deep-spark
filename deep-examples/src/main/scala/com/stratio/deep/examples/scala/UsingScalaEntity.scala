@@ -16,8 +16,8 @@
 
 package com.stratio.deep.examples.scala
 
-import com.stratio.deep.context.DeepSparkContext
-import com.stratio.deep.config.{ICassandraDeepJobConfig, IDeepJobConfig, DeepJobConfigFactory}
+import com.stratio.deep.context.{CassandraDeepSparkContext, DeepSparkContext}
+import com.stratio.deep.config.{ICassandraDeepJobConfig, IDeepJobConfig, CassandraConfigFactory}
 import com.stratio.deep.rdd.CassandraRDD
 import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.rdd.RDD
@@ -55,20 +55,20 @@ object UsingScalaEntity {
     sparkConf.setMaster(p.getCluster)
     sparkConf.setSparkHome(p.getSparkHome)
     val sc = new SparkContext(sparkConf)
-    val deepContext: DeepSparkContext = new DeepSparkContext(sc);
+    val deepContext: CassandraDeepSparkContext = new CassandraDeepSparkContext(sc);
     doMain(args, deepContext, p)
   }
 
-  private def doMain(args: Array[String], deepContext: DeepSparkContext, p: ContextProperties) = {
+  private def doMain(args: Array[String], deepContext: CassandraDeepSparkContext, p: ContextProperties) = {
 
     // Configuration and initialization
-    val config: ICassandraDeepJobConfig[ScalaPageEntity] = DeepJobConfigFactory.create(classOf[ScalaPageEntity])
+    val config: ICassandraDeepJobConfig[ScalaPageEntity] = CassandraConfigFactory.create(classOf[ScalaPageEntity])
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(keyspaceName).table(tableName)
       .initialize
 
     // Creating the RDD
-    val rdd = deepContext.cassandraEntityRDD(config)
+    val rdd = deepContext.cassandraRDD(config)
 
     val rddCount: Long = rdd.count
 
@@ -129,7 +129,7 @@ object UsingScalaEntity {
     }
 
     // --- OUTPUT RDD
-    val outputConfig = DeepJobConfigFactory.create(classOf[ScalaOutputEntity])
+    val outputConfig = CassandraConfigFactory.create(classOf[ScalaOutputEntity])
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort)
       .keyspace(keyspaceName).table(outputTableName)
       .createTableOnWrite(true)

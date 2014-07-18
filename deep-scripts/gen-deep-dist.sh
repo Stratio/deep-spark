@@ -14,7 +14,7 @@ fi
 SPARK_BRANCH="$2"
 
 if [ -z "$2" ]; then
-    SPARK_BRANCH="stratio-branch-1.0.0"
+    SPARK_BRANCH="stratio-branch-1.0.1"
 fi
 
 LOCAL_EDITOR=$(which vim)
@@ -42,10 +42,10 @@ mkdir -p ${TMPDIR_SPARK}
 
 mvn -version >/dev/null || { echo "Cannot find Maven in path, aborting"; exit 1; }
 
-#### Create Stratio Deep jars from bitbucket (master tag) through maven release plugin
+#### Create Deep jars from github (master tag) through maven release plugin
 
-# Clone Stratio Deep (master tag) from bitbucket
-git clone ${STRATIO_DEEP_REPO} ${TMPDIR} || { echo "Cannot clone stratio deep project from github"; exit 1; }
+# Clone Deep (master tag) from github
+git clone ${STRATIO_DEEP_REPO} ${TMPDIR} || { echo "Cannot clone deep project"; exit 1; }
 cd ${TMPDIR}
 
 git checkout develop
@@ -138,7 +138,6 @@ echo "RELEASE_VER=$RELEASE_VER"
 #echo "CASS_VER=$CASS_VER"
 
 # Clone develop branch from bitbucket stratiospark project
-# (TODO) Find out last stable branch instead of using develop branch
 git clone ${STRATIO_SPARK_REPO} ${TMPDIR_SPARK} || { echo "Cannot clone stratiospark project from bitbucket"; exit 1; }
 
 cd ${TMPDIR_SPARK}
@@ -148,7 +147,7 @@ chmod +x bin/stratio-deep-shell
 
 echo " >>> Executing make distribution script"
 ##  --skip-java-test has been added to Spark 1.0.0, avoids prompting the user about not having JDK 6 installed
-./make-distribution.sh --skip-java-test || { echo "Cannot make Spark distribution"; exit 1; }
+./make-distribution.sh --skip-java-test --hadoop 2.4.0 --with-yarn || { echo "Cannot make Spark distribution"; exit 1; }
 
 DISTDIR=spark-deep-distribution-${RELEASE_VER}
 DISTFILENAME=${DISTDIR}.tgz

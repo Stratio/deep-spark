@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.stratio.deep</groupId>
     <artifactId>deep-parent</artifactId>
-    <version>0.3.3</version>
+    <version>0.4.0</version>
     <packaging>pom</packaging>
     <url>http://www.stratio.com</url>
     <name>deep parent</name>
@@ -28,10 +28,10 @@
     <properties>
         <!-- Cassandra -->
         <cassandra.version>2.0.8</cassandra.version>
-        <datastax.driver.version>2.0.2</datastax.driver.version>
+        <datastax.driver.version>2.0.3</datastax.driver.version>
 
         <!-- Spark version -->
-        <spark.version>1.0.0</spark.version>
+        <spark.version>1.0.1</spark.version>
 
         <java.version>1.7</java.version>
 
@@ -88,6 +88,16 @@
                 <role>contributor</role>
             </roles>
         </developer>
+        <developer>
+            <id>rcrespo</id>
+            <name>Ricardo Crespo</name>
+            <email>rcrespo@stratio.com</email>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+                <role>contributor</role>
+            </roles>
+        </developer>
     </developers>
 
     <licenses>
@@ -127,7 +137,7 @@
 
         </dependency>
         <dependency>
-            <groupId>com.datastax.cassandra</groupId>
+            <groupId>com.stratio.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
             <version>${datastax.driver.version}</version>
             <exclusions>
@@ -148,6 +158,10 @@
             <artifactId>spark-core_2.10</artifactId>
             <version>${spark.version}</version>
             <exclusions>
+                <exclusion>
+                    <artifactId>hadoop-client</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
                 <exclusion>
                     <artifactId>avro</artifactId>
                     <groupId>org.apache.avro</groupId>
@@ -172,6 +186,17 @@
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-mapreduce-client-app</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+
 
         <!-- test -->
         <dependency>
@@ -220,18 +245,6 @@
                 </plugin>
 
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>2.4.2</version>
-
-                    <configuration>
-                        <autoVersionSubmodules>true</autoVersionSubmodules>
-                        <preparationGoals>clean verify install</preparationGoals>
-                        <pushChanges>false</pushChanges>
-                        <localCheckout>true</localCheckout>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>cobertura-maven-plugin</artifactId>
                     <version>2.6</version>
@@ -242,13 +255,15 @@
                         </formats>
                     </configuration>
                 </plugin>
+
             </plugins>
         </pluginManagement>
     </build>
 
     <modules>
         <module>../deep-commons</module>
-        <module>../deep-core</module>
+        <module>../deep-cassandra</module>
+        <module>../deep-mongodb</module>
         <module>../deep-examples</module>
     </modules>
 
@@ -269,6 +284,67 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>aggjavadoc</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>net.alchim31.maven</groupId>
+                        <artifactId>scala-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>doc</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <args>
+                                <arg>-P:genjavadoc:out=${project.build.directory}/genjavadoc</arg>
+                            </args>
+                            <compilerPlugins>
+                                <compilerPlugin>
+                                    <groupId>com.typesafe.genjavadoc</groupId>
+                                    <artifactId>genjavadoc-plugin_2.10.3</artifactId>
+                                    <version>0.8</version>
+                                </compilerPlugin>
+                            </compilerPlugins>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${project.build.directory}/genjavadoc</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.9</version>
+                        <configuration>
+                            <minmemory>64m</minmemory>
+                            <maxmemory>2g</maxmemory>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <detectLinks>true</detectLinks>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

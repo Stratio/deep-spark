@@ -27,7 +27,7 @@
     <parent>
         <groupId>com.stratio.deep</groupId>
         <artifactId>deep-parent</artifactId>
-        <version>0.3.3</version>
+        <version>0.4.0</version>
         <relativePath>../deep-parent</relativePath>
     </parent>
 
@@ -75,11 +75,6 @@
                 </exclusion>
 
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>2.12.2</version>
         </dependency>
     </dependencies>
 

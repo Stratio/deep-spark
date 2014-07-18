@@ -21,9 +21,17 @@ import com.google.common.base.Objects;
 
 /**
  * Common utility class wrapping a pair of objects.
+ * Instances of Pair are immutable.
  */
 public class Pair<L, R> {
+	/**
+	 * Left element of the pair.
+	 */
     public final L left;
+
+	/**
+	 * Right element of the pair.
+	 */
     public final R right;
 
     /**
@@ -64,8 +72,9 @@ public class Pair<L, R> {
      */
     @Override
     public final boolean equals(Object o) {
-        if (!(o instanceof Pair))
-            return false;
+        if (!(o instanceof Pair)) {
+	        return false;
+        }
         Pair that = (Pair) o;
         // handles nulls properly
         return Objects.equal(left, that.left) && Objects.equal(right, that.right);

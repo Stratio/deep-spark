@@ -21,6 +21,7 @@ import com.stratio.deep.config._
 import com.stratio.deep.rdd._
 import com.stratio.deep.testutils.ContextProperties
 import com.stratio.deep.entity.Cells
+import org.apache.spark.rdd.RDD
 
 /**
  * Author: Emmanuelle Raffenne
@@ -37,16 +38,16 @@ object CreatingCellRDD {
 
     // Creating the Deep Context where args are Spark Master and Job Name
     val p = new ContextProperties(args)
-    val deepContext: DeepSparkContext = new DeepSparkContext(p.getCluster, job)
+    val deepContext = new CassandraDeepSparkContext(p.getCluster, job)
 
     // Configuration and initialization
-    val config: ICassandraDeepJobConfig[Cells] = DeepJobConfigFactory.create()
+    val config: ICassandraDeepJobConfig[Cells] = CassandraConfigFactory.create()
       .host(p.getCassandraHost).cqlPort(p.getCassandraCqlPort).rpcPort(p.getCassandraThriftPort)
       .keyspace(keyspaceName).table(tableName)
       .initialize
 
     // Creating the RDD
-    val rdd: CassandraRDD[Cells] = deepContext.cassandraGenericRDD(config)
+    val rdd: RDD[Cells] = deepContext.cassandraRDD(config)
 
     val counts = rdd.count()
 

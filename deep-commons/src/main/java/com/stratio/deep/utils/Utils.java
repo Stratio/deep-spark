@@ -16,26 +16,25 @@
 
 package com.stratio.deep.utils;
 
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepIOException;
-import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.db.marshal.TimeUUIDType;
-import org.apache.cassandra.db.marshal.UUIDType;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
-import scala.Tuple2;
-
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
-import static com.stratio.deep.utils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
+
+import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.exception.DeepIOException;
+import scala.Tuple2;
 
 /**
  * Utility class providing useful methods to manipulate the conversion
@@ -45,62 +44,6 @@ import static com.stratio.deep.utils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_T
  * @author Luca Rosellini <luca@strat.io>
  */
 public final class Utils {
-
-    /**
-     * Utility method that converts an IDeepType to tuple of two Cells.<br/>
-     * The first Cells element contains the list of Cell elements that represent the key (partition + cluster key).
-     * <br/>
-     * The second Cells element contains all the other columns.
-     *
-     * @param cells the Cells object to process.
-     * @return a pair whose first element is a Cells object containing key Cell(s) and whose second element contains all of the other Cell(s).
-     */
-    public static Tuple2<Cells, Cells> cellList2tuple(Cells cells) {
-        Cells keys = new Cells();
-        Cells values = new Cells();
-
-        for (Cell c : cells) {
-
-            if (c.isPartitionKey() || c.isClusterKey()) {
-
-                keys.add(c);
-            } else {
-                values.add(c);
-            }
-        }
-
-        return new Tuple2<>(keys, values);
-    }
-
-    /**
-     * Convers an instance of type <T> to a tuple of ( Map<String, ByteBuffer>, List<ByteBuffer> ).
-     * The first map contains the key column names and the corresponding values.
-     * The ByteBuffer list contains the value of the columns that will be bounded to CQL query parameters.
-     *
-     * @param e   the entity object to process.
-     * @param <T> the entity object generic type.
-     * @return a pair whose first element is a Cells object containing key Cell(s) and whose second element contains all of the other Cell(s).
-     */
-    public static <T extends IDeepType> Tuple2<Cells, Cells> deepType2tuple(T e) {
-
-        Pair<Field[], Field[]> fields = AnnotationUtils.filterKeyFields(e.getClass());
-
-        Field[] keyFields = fields.left;
-        Field[] otherFields = fields.right;
-
-        Cells keys = new Cells();
-        Cells values = new Cells();
-
-        for (Field keyField : keyFields) {
-            keys.add(Cell.create(e, keyField));
-        }
-
-        for (Field valueField : otherFields) {
-            values.add(Cell.create(e, valueField));
-        }
-
-        return new Tuple2<>(keys, values);
-    }
 
     /**
      * Creates a new instance of the given class.
@@ -205,147 +148,9 @@ public final class Utils {
         return sb.toString();
     }
 
-    /**
-     * Generates a create table cql statement from the given Cells description.
-     *
-     * @param keys               the row  keys wrapped inside a Cells object.
-     * @param values             all the other row columns wrapped inside a Cells object.
-     * @param outputKeyspace     the output keyspace.
-     * @param outputColumnFamily the output column family.
-     * @return the create table statement.
-     */
-    public static String createTableQueryGenerator(Cells keys, Cells values, String outputKeyspace,
-                                                   String outputColumnFamily) {
 
-        if (keys == null || StringUtils.isEmpty(outputKeyspace)
-                || StringUtils.isEmpty(outputColumnFamily)) {
-            throw new DeepGenericException("keys, outputKeyspace and outputColumnFamily cannot be null");
-        }
 
-        StringBuilder sb = new StringBuilder("CREATE TABLE ").append(outputKeyspace)
-                .append(".").append(outputColumnFamily).append(" (");
 
-        List<String> partitionKey = new ArrayList<>();
-        List<String> clusterKey = new ArrayList<>();
-
-        boolean isFirstField = true;
-
-        for (Cell key : keys) {
-            String cellName = quote(key.getCellName());
-
-            if (!isFirstField) {
-                sb.append(", ");
-            }
-
-            sb.append(cellName).append(" ").append(key.marshaller().asCQL3Type().toString());
-
-            if (key.isPartitionKey()) {
-                partitionKey.add(cellName);
-            } else if (key.isClusterKey()) {
-                clusterKey.add(cellName);
-            }
-
-            isFirstField = false;
-        }
-
-        if (values != null) {
-            for (Cell key : values) {
-                sb.append(", ");
-                sb.append(quote(key.getCellName())).append(" ").append(key.marshaller().asCQL3Type().toString());
-            }
-        }
-
-        StringBuilder partitionKeyToken = new StringBuilder("(");
-
-        isFirstField = true;
-        for (String s : partitionKey) {
-            if (!isFirstField) {
-                partitionKeyToken.append(", ");
-            }
-            partitionKeyToken.append(s);
-            isFirstField = false;
-        }
-
-        partitionKeyToken.append(")");
-
-        StringBuilder clusterKeyToken = new StringBuilder("");
-
-        isFirstField = true;
-        for (String s : clusterKey) {
-            if (!isFirstField) {
-                clusterKeyToken.append(", ");
-            }
-            clusterKeyToken.append(s);
-            isFirstField = false;
-        }
-
-        StringBuilder keyPart = new StringBuilder(", PRIMARY KEY ");
-
-        if (!clusterKey.isEmpty()) {
-            keyPart.append("(");
-        }
-
-        keyPart.append(partitionKeyToken);
-
-        if (!clusterKey.isEmpty()) {
-            keyPart.append(", ");
-            keyPart.append(clusterKeyToken);
-            keyPart.append(")");
-        }
-
-        sb.append(keyPart).append(");");
-
-        return sb.toString();
-    }
-
-    /**
-     * Generates the update query for the provided IDeepType.
-     * The UPDATE query takes into account all the columns of the testentity, even those containing the null value.
-     * We do not generate the key part of the update query. The provided query will be concatenated with the key part
-     * by CqlRecordWriter.
-     *
-     * @param keys               the row  keys wrapped inside a Cells object.
-     * @param values             all the other row columns wrapped inside a Cells object.
-     * @param outputKeyspace     the output keyspace.
-     * @param outputColumnFamily the output column family.
-     * @return the update query statement.
-     */
-    public static String updateQueryGenerator(Cells keys, Cells values, String outputKeyspace,
-                                              String outputColumnFamily) {
-
-        StringBuilder sb = new StringBuilder("UPDATE ").append(outputKeyspace).append(".").append(outputColumnFamily)
-                .append(" SET ");
-
-        int k = 0;
-
-        StringBuilder keyClause = new StringBuilder(" WHERE ");
-        for (Cell cell : keys.getCells()) {
-            if (cell.isPartitionKey() || cell.isClusterKey()) {
-                if (k > 0) {
-                    keyClause.append(" AND ");
-                }
-
-                keyClause.append(String.format("%s = ?", quote(cell.getCellName())));
-
-                ++k;
-            }
-
-        }
-
-        k = 0;
-        for (Cell cell : values.getCells()) {
-            if (k > 0) {
-                sb.append(", ");
-            }
-
-            sb.append(String.format("%s = ?", quote(cell.getCellName())));
-            ++k;
-        }
-
-        sb.append(keyClause).append(";");
-
-        return sb.toString();
-    }
 
     /**
      * Returns a CQL batch query wrapping the given statements.
@@ -458,35 +263,7 @@ public final class Utils {
         return getter;
     }
 
-    /**
-     * Returns an instance of the Cassandra validator that matches the provided object.
-     *
-     * @param obj the object to use to resolve the cassandra marshaller.
-     * @param <T> the generic object type.
-     * @return an instance of the Cassandra validator that matches the provided object.
-     * @throws com.stratio.deep.exception.DeepGenericException if no validator can be found for the specified object.
-     */
-    public static <T> AbstractType<?> marshallerInstance(T obj) {
-        AbstractType<?> abstractType = MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(obj.getClass());
 
-        if (obj instanceof UUID) {
-            UUID uuid = (UUID) obj;
-
-            if (uuid.version() == 1) {
-                abstractType = TimeUUIDType.instance;
-
-            } else {
-                abstractType = UUIDType.instance;
-            }
-        }
-
-        if (abstractType == null) {
-            throw new DeepGenericException("parameter class " + obj.getClass().getCanonicalName() + " does not have a" +
-                    " Cassandra marshaller");
-        }
-
-        return abstractType;
-    }
 
     /**
      * Returns the inet address for the specified location.

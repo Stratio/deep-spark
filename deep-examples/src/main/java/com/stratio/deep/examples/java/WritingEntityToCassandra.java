@@ -16,12 +16,13 @@
 
 package com.stratio.deep.examples.java;
 
+import java.util.List;
+
 import com.google.common.collect.Lists;
-import com.stratio.deep.config.DeepJobConfigFactory;
+
+import com.stratio.deep.config.CassandraConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.rdd.CassandraJavaRDD;
+import com.stratio.deep.context.CassandraDeepSparkContext;
 import com.stratio.deep.rdd.CassandraRDD;
 import com.stratio.deep.testentity.DomainEntity;
 import com.stratio.deep.testentity.PageEntity;
@@ -32,8 +33,6 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
-
-import java.util.List;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -69,16 +68,16 @@ public final class WritingEntityToCassandra {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
+	    CassandraDeepSparkContext deepContext = new CassandraDeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
 
         // --- INPUT RDD
-        ICassandraDeepJobConfig<PageEntity> inputConfig = DeepJobConfigFactory.create(PageEntity.class)
+        ICassandraDeepJobConfig<PageEntity> inputConfig = CassandraConfigFactory.create(PageEntity.class)
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
 
-        CassandraJavaRDD<PageEntity> inputRDD = deepContext.cassandraJavaRDD(inputConfig);
+        JavaRDD<PageEntity> inputRDD = deepContext.cassandraJavaRDD(inputConfig);
 
         JavaPairRDD<String, PageEntity> pairRDD = inputRDD.mapToPair(new PairFunction<PageEntity, String,
                 PageEntity>() {
@@ -103,7 +102,7 @@ public final class WritingEntityToCassandra {
         }
 
         // --- OUTPUT RDD
-        ICassandraDeepJobConfig<DomainEntity> outputConfig = DeepJobConfigFactory.createWriteConfig(DomainEntity.class)
+        ICassandraDeepJobConfig<DomainEntity> outputConfig = CassandraConfigFactory.createWriteConfig(DomainEntity.class)
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(outputTableName)
                 .createTableOnWrite(true).initialize();

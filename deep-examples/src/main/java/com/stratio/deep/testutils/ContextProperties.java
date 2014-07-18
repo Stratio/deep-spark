@@ -16,8 +16,10 @@
 
 package com.stratio.deep.testutils;
 
-import com.stratio.deep.utils.Constants;
 import org.apache.commons.cli.*;
+
+import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.utils.Constants;
 import org.apache.log4j.Logger;
 
 import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
@@ -90,7 +92,7 @@ public class ContextProperties {
             if (line.hasOption("help")){
                 formatter.printHelp( "", options );
 
-                System.exit(1);
+                throw new DeepGenericException("Help command issued");
             }
 
             jar = (line.hasOption("jars") ? line.getOptionValues("jars") : new String[]{});
@@ -104,10 +106,6 @@ public class ContextProperties {
             formatter.printHelp( "", options );
             LOG.error("Unexpected exception: ", e);
         }
-    }
-
-    public static void main(String[] args) {
-        ContextProperties cp = new ContextProperties(args);
     }
 
     public String getCluster() {

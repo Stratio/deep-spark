@@ -5,6 +5,11 @@ TMPDIR=/tmp/stratio-deep-distribution
 
 rm -rf ${TMPDIR}
 mkdir -p ${TMPDIR}
+export JAVA_HOME=$JAVA_HOME
+export PATH=$JAVA_HOME/bin:$PATH
+
+export SCALA_HOME=$SCALA_HOME
+export PATH=$SCALA_HOME/bin:$PATH
 
 SPARK_REPO="$1"
 
@@ -26,7 +31,7 @@ fi
 
 
 if [ -z "$2" ]; then
-    SPARK_BRANCH="stratio-branch-1.0.0"
+    SPARK_BRANCH="stratio-branch-1.0.1"
 fi
 
 echo "SPARK_REPO: ${SPARK_REPO}"
@@ -47,29 +52,27 @@ if [ "$RELEASE_VER" = "" ]; then
    echo "Release version empty, aborting"; exit 1;
 fi
 
-#### Create Stratio Deep jars from bitbucket (master tag) through maven release plugin
+#### Create Deep jars from github (master tag) through maven release plugin
 
 echo "################################################"
-echo "Compiling Stratio Deep"
+echo "Compiling Deep"
 echo "################################################"
 echo "$(pwd)"
-mvn clean package -DskipTests || { echo "Cannot build StratioDeep project, aborting"; exit 1; }
+mvn clean package -DskipTests || { echo "Cannot build Deep project, aborting"; exit 1; }
 
 mkdir -p ${TMPDIR}/lib || { echo "Cannot create output lib directory"; exit 1; }
 
-cp ../*/target/*.jar ${TMPDIR}/lib || { echo "Cannot copy target jars to output lib directory, aborting"; exit 1; }
-cp ../*/target/alternateLocation/*.jar ${TMPDIR}/lib || { echo "Cannot copy alternate jars to output lib directory, aborting"; exit 1; }
+cp -u ../*/target/*.jar ${TMPDIR}/lib || { echo "Cannot copy target jars to output lib directory, aborting"; exit 1; }
+cp -u ../*/target/alternateLocation/*.jar ${TMPDIR}/lib || { echo "Cannot copy alternate jars to output lib directory, aborting"; exit 1; }
 
 git fetch --tags
 latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
 
 echo -e "[${RELEASE_VER}]\n\n$(git log ${latest_tag}..HEAD)\n\n$(cat ChangeLog.txt)" > ${TMPDIR}/ChangeLog.txt
 
-if [ -n "$LOCAL_EDITOR" ]; then
-    $LOCAL_EDITOR ${TMPDIR}/ChangeLog.txt
-fi
-
-#mvn dependency:get -DgroupId=org.apache.cassandra -DartifactId=cassandra-clientutil -Dversion=${CASS_VER} -Ddest=. -Dtransitive=false -DremoteRepositories=stratio-snapshots::default::http://nexus.strat.io:8081/nexus/content/repositories/snapshots/
+#if [ -n "$LOCAL_EDITOR" ]; then
+#    $LOCAL_EDITOR ${TMPDIR}/ChangeLog.txt
+#fi
 
 echo "################################################"
 echo "Creating Spark distribuition"
@@ -86,7 +89,7 @@ git checkout "$SPARK_BRANCH" || { echo "Cannot checkout branch: ${SPARK_BRANCH}"
 chmod +x bin/stratio-deep-shell
 
 #--hadoop 2.0.0-mr1-cdh4.4.0
-./make-distribution.sh --skip-java-test || { echo "Cannot make Spark distribution"; exit 1; }
+./make-distribution.sh --skip-java-test --hadoop 2.4.0 --with-yarn || { echo "Cannot make Spark distribution"; exit 1; }
 
 cd ..
 

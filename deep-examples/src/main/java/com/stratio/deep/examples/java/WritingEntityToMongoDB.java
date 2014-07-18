@@ -16,23 +16,23 @@
 
 package com.stratio.deep.examples.java;
 
-import com.stratio.deep.config.DeepJobConfigFactory;
+import java.util.List;
+
 import com.stratio.deep.config.IMongoDeepJobConfig;
-import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.config.MongoConfigFactory;
+import com.stratio.deep.context.MongoDeepSparkContext;
 import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
-import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
 import com.stratio.deep.testentity.MessageEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
+import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
-
-import java.util.List;
 
 /**
  * Example class to write an entity to mongoDB
  */
 public final class WritingEntityToMongoDB {
-    private static final Logger LOG = Logger.getLogger(com.stratio.deep.examples.scala.WritingEntityToMongoDB.class);
+    private static final Logger LOG = Logger.getLogger(com.stratio.deep.examples.java.WritingEntityToMongoDB.class);
     public static List<Tuple2<String, Integer>> results;
 
     private WritingEntityToMongoDB() {
@@ -60,18 +60,18 @@ public final class WritingEntityToMongoDB {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+	    MongoDeepSparkContext deepContext = new MongoDeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
 
         IMongoDeepJobConfig<MessageEntity> inputConfigEntity =
-                DeepJobConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(inputCollection).readPreference(readPreference).initialize();
+				        MongoConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(inputCollection).readPreference(readPreference).initialize();
 
-        MongoJavaRDD<MessageEntity> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
+        RDD<MessageEntity> inputRDDEntity = deepContext.mongoRDD(inputConfigEntity);
 
 
         IMongoDeepJobConfig<MessageEntity> outputConfigEntityPruebaGuardado =
-                DeepJobConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(outputCollection).readPreference(readPreference).initialize();
+				        MongoConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(outputCollection).readPreference(readPreference).initialize();
 
 
         MongoEntityRDD.saveEntity(inputRDDEntity, outputConfigEntityPruebaGuardado);

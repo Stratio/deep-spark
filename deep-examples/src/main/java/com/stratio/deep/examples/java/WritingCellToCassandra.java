@@ -16,14 +16,16 @@
 
 package com.stratio.deep.examples.java;
 
+import java.util.List;
+
 import com.google.common.collect.Lists;
-import com.stratio.deep.config.DeepJobConfigFactory;
+
+import com.stratio.deep.config.CassandraConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.context.CassandraDeepSparkContext;
+import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.rdd.CassandraJavaRDD;
 import com.stratio.deep.rdd.CassandraRDD;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
@@ -32,8 +34,6 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
-
-import java.util.List;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -65,20 +65,20 @@ public final class WritingCellToCassandra {
 
         String keyspaceName = "crawler";
         String inputTableName = "Page";
-        String outputTableName = "newlistdomains";
+        final String outputTableName = "newlistdomains";
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
+	    CassandraDeepSparkContext deepContext = new CassandraDeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
 
         // --- INPUT RDD
-        IDeepJobConfig inputConfig = DeepJobConfigFactory.create()
+        ICassandraDeepJobConfig<Cells> inputConfig = CassandraConfigFactory.create()
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
 
-        CassandraJavaRDD<Cells> inputRDD = deepContext.cassandraJavaRDD(inputConfig);
+        JavaRDD<Cells> inputRDD = deepContext.cassandraJavaRDD(inputConfig);
 
         JavaPairRDD<String, Cells> pairRDD = inputRDD.mapToPair(new PairFunction<Cells, String, Cells>() {
             @Override
@@ -104,7 +104,7 @@ public final class WritingCellToCassandra {
 
 
         // --- OUTPUT RDD
-        ICassandraDeepJobConfig<Cells> outputConfig = DeepJobConfigFactory.createWriteConfig()
+        ICassandraDeepJobConfig<Cells> outputConfig = CassandraConfigFactory.createWriteConfig()
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(outputTableName)
                 .createTableOnWrite(true);
@@ -114,9 +114,9 @@ public final class WritingCellToCassandra {
         JavaRDD<Cells> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
             public Cells call(Tuple2<String, Integer> t) {
-                Cell c1 = Cell.create("domain", t._1(), true, false);
-                Cell c2 = Cell.create("num_pages", t._2());
-                return new Cells(c1, c2);
+                Cell c1 = CassandraCell.create("domain", t._1(), true, false);
+                Cell c2 = CassandraCell.create("num_pages", t._2());
+                return new Cells(outputTableName,c1, c2);
             }
         });
 

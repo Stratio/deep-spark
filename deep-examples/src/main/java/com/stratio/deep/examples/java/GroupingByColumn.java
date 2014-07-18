@@ -16,11 +16,13 @@
 
 package com.stratio.deep.examples.java;
 
+import java.util.List;
+
 import com.google.common.collect.Lists;
-import com.stratio.deep.config.DeepJobConfigFactory;
+
+import com.stratio.deep.config.CassandraConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.context.CassandraDeepSparkContext;
 import com.stratio.deep.rdd.CassandraJavaRDD;
 import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.testutils.ContextProperties;
@@ -29,8 +31,6 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
-
-import java.util.List;
 
 // !!Important!!
 
@@ -70,16 +70,16 @@ public final class GroupingByColumn {
 
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
-        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
+	    CassandraDeepSparkContext deepContext = new CassandraDeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
 // Create a configuration for the RDD and initialize it
-        ICassandraDeepJobConfig<TweetEntity> config = DeepJobConfigFactory.create(TweetEntity.class)
+        ICassandraDeepJobConfig<TweetEntity> config = CassandraConfigFactory.create(TweetEntity.class)
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(tableName)
                 .initialize();
 
 // Creating the RDD
-        CassandraJavaRDD<TweetEntity> rdd = deepContext.cassandraJavaRDD(config);
+        CassandraJavaRDD<TweetEntity> rdd = (CassandraJavaRDD) deepContext.cassandraJavaRDD(config);
 
         // grouping
         JavaPairRDD<String, Iterable<TweetEntity>> groups = rdd.groupBy(new Function<TweetEntity, String>() {
