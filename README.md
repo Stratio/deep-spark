@@ -31,7 +31,7 @@ Please, refer to the deep-example project README for further information on how 
 MongoDB integration
 ===================
 
-Spark-MongoDB connector is based in Hadoop-mongoDB.
+Spark-MongoDB connector is based on Hadoop-mongoDB.
 
 Support for MongoDB has been added in version 0.3.0 and is not yet considered feature complete.
 
