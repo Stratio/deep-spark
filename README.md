@@ -37,7 +37,7 @@ Support for MongoDB has been added in version 0.3.0 and is not yet considered a 
 
 We provide two different interfaces:
 
-  * ORM API, you just have to annotate your POJOs with Deep annotations and the magic will begin, you will be able to connect MongoDB with Spark using your own model entities.
+  * ORM API, you just have to annotate your POJOs with Deep annotations and magic will begin, you will be able to connect MongoDB with Spark using your own model entities.
 
   * Generic cell API, you do not need to specify the collection's schema or add anything to your POJOs, each document will be transform to an object "Cells".
 
@@ -56,7 +56,7 @@ Cells:
   * com.stratio.deep.examples.java.GroupingCellWithMongoDB
 
 
-You can check out our first steeps guide here:
+You can check out our first steps guide here:
 
 http://www.openstratio.org/tutorials/first-steps-with-stratio-deep-and-mongodb/
 
