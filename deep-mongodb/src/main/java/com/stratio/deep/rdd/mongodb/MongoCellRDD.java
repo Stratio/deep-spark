@@ -63,7 +63,7 @@ public final class MongoCellRDD extends DeepMongoRDD<Cells> {
             return UtilMongoDB.getCellFromBson(tuple._2());
         } catch (Exception e) {
             LOG.error("Cannot convert BSON: ", e);
-            throw new DeepTransformException("Could not transform from Bson to Cell " +e.getMessage());
+            throw new DeepTransformException("Could not transform from Bson to Cell " + e.getMessage());
         }
     }
 

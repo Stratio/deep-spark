@@ -65,7 +65,7 @@ public final class MongoEntityRDD<T extends IDeepType> extends DeepMongoRDD<T> {
             return UtilMongoDB.getObjectFromBson(this.getConf().getEntityClass(), tuple._2());
         } catch (Exception e) {
             LOG.error("Cannot convert BSON: ", e);
-            throw new DeepTransformException("Could not transform from Bson to Entity " +e.getMessage());
+            throw new DeepTransformException("Could not transform from Bson to Entity " + e.getMessage());
         }
 
     }

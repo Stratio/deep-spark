@@ -25,7 +25,6 @@ import com.stratio.deep.testentity.BookEntity;
 import com.stratio.deep.testentity.CantoEntity;
 import com.stratio.deep.testentity.MessageTestEntity;
 import com.stratio.deep.testentity.WordCount;
-import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -38,7 +37,6 @@ import org.bson.BasicBSONObject;
 import org.testng.annotations.Test;
 import scala.Tuple2;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,7 +49,7 @@ import static org.testng.Assert.*;
  * Created by rcrespo on 18/06/14.
  */
 
-@Test(suiteName = "mongoRddTests", groups = {"MongoEntityRDDTest"} )
+@Test(suiteName = "mongoRddTests", groups = {"MongoEntityRDDTest"})
 public class MongoEntityRDDTest implements Serializable {
 
 
@@ -147,7 +145,7 @@ public class MongoEntityRDDTest implements Serializable {
             assertEquals(bsonObject.get("text"), book.getCantoEntities().get(i).getText());
         }
 
-        RDD<BookEntity> inputRDDEntity2  = context.mongoRDD(inputConfigEntity);
+        RDD<BookEntity> inputRDDEntity2 = context.mongoRDD(inputConfigEntity);
 
         JavaRDD<String> words = inputRDDEntity2.toJavaRDD().flatMap(new FlatMapFunction<BookEntity, String>() {
             @Override
@@ -189,11 +187,11 @@ public class MongoEntityRDDTest implements Serializable {
                 MongoConfigFactory.createMongoDB(WordCount.class).host(hostConcat).database("book").collection("output")
                         .initialize();
 
-        MongoEntityRDD.saveEntity((RDD<WordCount>)outputRDD.rdd(), outputConfigEntity);
+        MongoEntityRDD.saveEntity((RDD<WordCount>) outputRDD.rdd(), outputConfigEntity);
 
         RDD<WordCount> outputRDDEntity = context.mongoRDD(outputConfigEntity);
 
-        assertEquals( ((Long) outputRDDEntity.cache().count()).longValue(), WORD_COUNT_SPECTED.longValue());
+        assertEquals(((Long) outputRDDEntity.cache().count()).longValue(), WORD_COUNT_SPECTED.longValue());
 
         context.stop();
 
