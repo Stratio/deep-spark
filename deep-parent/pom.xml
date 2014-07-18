@@ -31,7 +31,7 @@
         <datastax.driver.version>2.0.2</datastax.driver.version>
 
         <!-- Spark version -->
-        <spark.version>1.0.0</spark.version>
+        <spark.version>1.0.1</spark.version>
 
         <java.version>1.7</java.version>
 
