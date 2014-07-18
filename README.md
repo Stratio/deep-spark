@@ -33,15 +33,15 @@ MongoDB integration
 
 Spark-MongoDB connector is based on Hadoop-mongoDB.
 
-Support for MongoDB has been added in version 0.3.0 and is not yet considered feature complete.
+Support for MongoDB has been added in version 0.3.0 and is not yet considered a complete feature.
 
 We provide two different interfaces:
 
-  * ORM API, You just have to annotate your POJOs with Deep annotations and the magic will begin, you will be able to connect MongoDB with Spark using your own model entities.
+  * ORM API, you just have to annotate your POJOs with Deep annotations and the magic will begin, you will be able to connect MongoDB with Spark using your own model entities.
 
-  * Generic cell API, with this you do not need to specify the collection's schema or add anything to your POJOs, each document will be transform to an object "Cells".
+  * Generic cell API, you do not need to specify the collection's schema or add anything to your POJOs, each document will be transform to an object "Cells".
 
-We added a few working example for MongoDB in deep-examples subproject, take a look at:
+We added a few working examples for MongoDB in deep-examples subproject, take a look at:
 
 Entities:
 
@@ -56,13 +56,12 @@ Cells:
   * com.stratio.deep.examples.java.GroupingCellWithMongoDB
 
 
-You can check first steeps guide:
+You can check out our first steeps guide here:
 
 http://www.openstratio.org/tutorials/first-steps-with-stratio-deep-and-mongodb/
 
 
-We are still working on new improvements.
-
+We are working on further improvements!
 
 Requirements
 ============
