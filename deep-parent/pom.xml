@@ -28,7 +28,7 @@
     <properties>
         <!-- Cassandra -->
         <cassandra.version>2.0.8</cassandra.version>
-        <datastax.driver.version>2.0.2</datastax.driver.version>
+        <datastax.driver.version>2.0.3</datastax.driver.version>
 
         <!-- Spark version -->
         <spark.version>1.0.1</spark.version>
@@ -137,7 +137,7 @@
 
         </dependency>
         <dependency>
-            <groupId>com.datastax.cassandra</groupId>
+            <groupId>com.stratio.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
             <version>${datastax.driver.version}</version>
             <exclusions>
