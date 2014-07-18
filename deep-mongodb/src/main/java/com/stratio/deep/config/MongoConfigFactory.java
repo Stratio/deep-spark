@@ -26,6 +26,10 @@ import org.apache.log4j.Logger;
 public class MongoConfigFactory {
     private static final Logger LOG = Logger.getLogger(MongoConfigFactory.class);
 
+    private MongoConfigFactory() {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Creates a new cell-based MongoDB job configuration object.
      *

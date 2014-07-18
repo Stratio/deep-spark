@@ -24,15 +24,12 @@ import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Several utilities to work used in the Spark <=> MongoDB integration.
  */
-public class UtilMongoDB {
+public final class UtilMongoDB {
 
     public static final String MONGO_DEFAULT_ID = "_id";
 
@@ -40,7 +37,7 @@ public class UtilMongoDB {
      * Private default constructor.
      */
     private UtilMongoDB() {
-
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -122,7 +119,23 @@ public class UtilMongoDB {
 
         for (Field field : fields) {
             Method method = Utils.findGetter(field.getName(), t.getClass());
-            bson.put(AnnotationUtils.deepFieldName(field), method.invoke(t));
+            Object object = method.invoke(t);
+            if (object != null) {
+                if (Collection.class.isAssignableFrom(field.getType())) {
+                    Collection c = (Collection) object;
+                    Iterator iterator = c.iterator();
+                    List<BSONObject> innerBsonList = new ArrayList<>();
+
+                    while (iterator.hasNext()) {
+                        innerBsonList.add(getBsonFromObject((IDeepType) iterator.next()));
+                    }
+                    bson.put(AnnotationUtils.deepFieldName(field), innerBsonList);
+                } else if (IDeepType.class.isAssignableFrom(field.getType())) {
+                    bson.put(AnnotationUtils.deepFieldName(field), getBsonFromObject((IDeepType) object));
+                } else {
+                    bson.put(AnnotationUtils.deepFieldName(field), object);
+                }
+            }
         }
 
         return bson;
@@ -201,10 +214,22 @@ public class UtilMongoDB {
     public static BSONObject getBsonFromCell(Cells cells) throws IllegalAccessException, InstantiationException, InvocationTargetException {
 
         BSONObject bson = new BasicBSONObject();
-
-
         for (Cell cell : cells) {
-            bson.put(cell.getCellName(), cell.getCellValue());
+            if (List.class.isAssignableFrom(cell.getCellValue().getClass())) {
+                Collection c = (Collection) cell.getCellValue();
+                Iterator iterator = c.iterator();
+                List<BSONObject> innerBsonList = new ArrayList<>();
+
+                while (iterator.hasNext()) {
+                    innerBsonList.add(getBsonFromCell((Cells) iterator.next()));
+                }
+                bson.put(cell.getCellName(), innerBsonList);
+            } else if (Cells.class.isAssignableFrom(cell.getCellValue().getClass())) {
+                bson.put(cell.getCellName(), getBsonFromCell((Cells) cell.getCellValue()));
+            } else {
+                bson.put(cell.getCellName(), cell.getCellValue());
+            }
+
 
         }
 

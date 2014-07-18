@@ -19,6 +19,7 @@ package com.stratio.deep.rdd.mongodb;
 import com.mongodb.hadoop.MongoOutputFormat;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.entity.Cells;
+import com.stratio.deep.exception.DeepTransformException;
 import com.stratio.deep.utils.UtilMongoDB;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -62,8 +63,8 @@ public final class MongoCellRDD extends DeepMongoRDD<Cells> {
             return UtilMongoDB.getCellFromBson(tuple._2());
         } catch (Exception e) {
             LOG.error("Cannot convert BSON: ", e);
+            throw new DeepTransformException("Could not transform from Bson to Cell " +e.getMessage());
         }
-        return null;
     }
 
 

@@ -375,7 +375,7 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     @Override
     public IMongoDeepJobConfig<T> ignoreIdField() {
         BSONObject bsonFields = fields != null ? fields : new BasicBSONObject();
-        fields.put("_id", 0);
+        bsonFields.put("_id", 0);
         fields = bsonFields;
         return this;
     }
