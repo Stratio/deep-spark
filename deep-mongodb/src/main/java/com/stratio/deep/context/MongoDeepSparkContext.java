@@ -92,11 +92,11 @@ public class MongoDeepSparkContext extends DeepSparkContext {
      */
     @SuppressWarnings("unchecked")
     public <T> DeepMongoRDD<T> mongoRDD(IMongoDeepJobConfig<T> config) {
-        if (config.getClass().isAssignableFrom(EntityDeepJobConfigMongoDB.class)) {
+        if (EntityDeepJobConfigMongoDB.class.isAssignableFrom(config.getClass())) {
             return new MongoEntityRDD(sc(), config);
         }
 
-        if (config.getClass().isAssignableFrom(CellDeepJobConfigMongoDB.class)) {
+        if (CellDeepJobConfigMongoDB.class.isAssignableFrom(config.getClass())) {
             return (DeepMongoRDD<T>) new MongoCellRDD(sc(), (IMongoDeepJobConfig<Cells>) config);
         }
 

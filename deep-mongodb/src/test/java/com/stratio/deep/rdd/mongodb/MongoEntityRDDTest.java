@@ -16,162 +16,48 @@
 
 package com.stratio.deep.rdd.mongodb;
 
-import com.google.common.io.Resources;
-import com.mongodb.*;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.config.MongoConfigFactory;
 import com.stratio.deep.context.MongoDeepSparkContext;
 import com.stratio.deep.testentity.BookEntity;
+import com.stratio.deep.testentity.CantoEntity;
 import com.stratio.deep.testentity.MessageTestEntity;
-import de.flapdoodle.embed.mongo.*;
-import de.flapdoodle.embed.mongo.config.*;
-import de.flapdoodle.embed.mongo.distribution.Version;
-import de.flapdoodle.embed.process.config.IRuntimeConfig;
-import de.flapdoodle.embed.process.io.file.Files;
-import de.flapdoodle.embed.process.runtime.Network;
+import com.stratio.deep.testentity.WordCount;
+import org.apache.log4j.Logger;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
+import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import org.bson.BasicBSONObject;
 import org.testng.annotations.Test;
+import scala.Tuple2;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
+import static com.stratio.deep.rdd.mongodb.MongoJavaRDDTest.*;
+import static org.testng.Assert.*;
 
 /**
  * Created by rcrespo on 18/06/14.
  */
-@Test
+
+@Test(suiteName = "mongoRddTests", groups = {"MongoEntityRDDTest"} )
 public class MongoEntityRDDTest implements Serializable {
 
-    static MongodExecutable mongodExecutable = null;
-    static MongoClient mongo = null;
-
-    private DBCollection col = null;
-
-    private static final String MESSAGE_TEST = "new message test";
-
-    private static final Integer PORT = 27890;
-
-    private static final String HOST = "localhost";
-
-    private static final String DATABASE = "test";
-
-    private static final String COLLECTION_INPUT = "input";
-
-    private static final String COLLECTION_OUTPUT = "output";
-
-    private static final String DATA_SET_NAME = "divineComedy.json";
-
-    private final static String DB_FOLDER_NAME = System.getProperty("user.home") +
-            File.separator + "mongoEntityRDDTest";
-
-    private static final Long WORD_COUNT_SPECTED = 3833L;
-
-    private static final String DATA_SET_URL = "http://docs.openstratio.org/resources/datasets/divineComedy.json";
-
-    @BeforeClass
-    public void init() throws IOException {
-        Command command = Command.MongoD;
-
-        MongodStarter starter = MongodStarter.getDefaultInstance();
-
-        new File(DB_FOLDER_NAME).mkdirs();
-
-        IMongodConfig mongodConfig = new MongodConfigBuilder()
-                .version(Version.Main.PRODUCTION)
-                .configServer(false)
-                .replication(new Storage(DB_FOLDER_NAME, null, 0))
-                .net(new Net(PORT, Network.localhostIsIPv6()))
-                .cmdOptions(new MongoCmdOptionsBuilder()
-                        .syncDelay(10)
-                        .useNoPrealloc(true)
-                        .useSmallFiles(true)
-                        .useNoJournal(true)
-                        .build())
-                .build();
-
-
-        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder()
-                .defaults(command)
-                .artifactStore(new ArtifactStoreBuilder()
-                        .defaults(command)
-                        .download(new DownloadConfigBuilder()
-                                .defaultsForCommand(command)
-                                .downloadPath("https://s3-eu-west-1.amazonaws.com/stratio-mongodb-distribution/")))
-                .build();
-
-        MongodStarter runtime = MongodStarter.getInstance(runtimeConfig);
-
-        mongodExecutable = null;
-
-
-        mongodExecutable = runtime.prepare(mongodConfig);
-
-        MongodProcess mongod = mongodExecutable.start();
-
-//TODO : Uncomment when drone.io is ready
-//        Files.forceDelete(new File(System.getProperty("user.home") +
-//                File.separator + ".embedmongo"));
-
-
-        mongo = new MongoClient(HOST, PORT);
-        DB db = mongo.getDB(DATABASE);
-        col = db.getCollection(COLLECTION_INPUT);
-        col.save(new BasicDBObject("message", MESSAGE_TEST));
-
-
-        dataSetImport();
-
-
-    }
-
-    /**
-     * Imports dataset
-     *
-     * @throws java.io.IOException
-     */
-    private static void dataSetImport() throws IOException {
-        String dbName = "book";
-        String collection = "input";
-        URL url = Resources.getResource(DATA_SET_NAME);
-
-        IMongoImportConfig mongoImportConfig = new MongoImportConfigBuilder()
-                .version(Version.Main.PRODUCTION)
-                .net(new Net(PORT, Network.localhostIsIPv6()))
-                .db(dbName)
-                .collection(collection)
-                .upsert(false)
-                .dropCollection(true)
-                .jsonArray(true)
-                .importFile(url.getFile())
-                .build();
-        MongoImportExecutable mongoImportExecutable = MongoImportStarter.getDefaultInstance().prepare(mongoImportConfig);
-        mongoImportExecutable.start();
-
-
-    }
-
-    @AfterClass
-    public void cleanup() {
-
-        if (mongodExecutable != null) {
-            mongo.close();
-            mongodExecutable.stop();
-        }
-
-        Files.forceDelete(new File(DB_FOLDER_NAME));
-    }
 
     @Test
     public void testReadingRDD() {
-        String hostConcat = HOST.concat(":").concat(PORT.toString());
+        String hostConcat = MongoJavaRDDTest.HOST.concat(":").concat(MongoJavaRDDTest.PORT.toString());
         MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
 
         IMongoDeepJobConfig<MessageTestEntity> inputConfigEntity = MongoConfigFactory.createMongoDB(MessageTestEntity.class)
@@ -179,8 +65,8 @@ public class MongoEntityRDDTest implements Serializable {
 
         JavaRDD<MessageTestEntity> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
 
-        assertEquals(col.count(), inputRDDEntity.cache().count());
-        assertEquals(col.findOne().get("message"), inputRDDEntity.first().getMessage());
+        assertEquals(MongoJavaRDDTest.col.count(), inputRDDEntity.cache().count());
+        assertEquals(MongoJavaRDDTest.col.findOne().get("message"), inputRDDEntity.first().getMessage());
 
         context.stop();
 
@@ -209,7 +95,7 @@ public class MongoEntityRDDTest implements Serializable {
         RDD<MessageTestEntity> outputRDDEntity = context.mongoRDD(outputConfigEntity);
 
 
-        assertEquals(mongo.getDB(DATABASE).getCollection(COLLECTION_OUTPUT).findOne().get("message"),
+        assertEquals(MongoJavaRDDTest.mongo.getDB(DATABASE).getCollection(COLLECTION_OUTPUT).findOne().get("message"),
                 outputRDDEntity.first().getMessage());
 
 
@@ -222,13 +108,13 @@ public class MongoEntityRDDTest implements Serializable {
     @Test
     public void testDataSet() {
 
-
         String hostConcat = HOST.concat(":").concat(PORT.toString());
 
         MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
 
         IMongoDeepJobConfig<BookEntity> inputConfigEntity = MongoConfigFactory.createMongoDB(BookEntity.class)
-                .host(hostConcat).database("book").collection("input").initialize();
+                .host(hostConcat).database("book").collection("input")
+                .initialize();
 
         RDD<BookEntity> inputRDDEntity = context.mongoRDD(inputConfigEntity);
 
@@ -247,7 +133,7 @@ public class MongoEntityRDDTest implements Serializable {
 
 
 //      tests subDocuments
-        BSONObject result = mongo.getDB("book").getCollection("input").findOne(null, proObject);
+        BSONObject result = MongoJavaRDDTest.mongo.getDB("book").getCollection("input").findOne(null, proObject);
         assertEquals(((DBObject) result.get("metadata")).get("author"), book.getMetadataEntity().getAuthor());
 
 
@@ -261,10 +147,112 @@ public class MongoEntityRDDTest implements Serializable {
             assertEquals(bsonObject.get("text"), book.getCantoEntities().get(i).getText());
         }
 
+        RDD<BookEntity> inputRDDEntity2  = context.mongoRDD(inputConfigEntity);
+
+        JavaRDD<String> words = inputRDDEntity2.toJavaRDD().flatMap(new FlatMapFunction<BookEntity, String>() {
+            @Override
+            public Iterable<String> call(BookEntity bookEntity) throws Exception {
+
+                List<String> words = new ArrayList<>();
+                for (CantoEntity canto : bookEntity.getCantoEntities()) {
+                    words.addAll(Arrays.asList(canto.getText().split(" ")));
+                }
+                return words;
+            }
+        });
+
+
+        JavaPairRDD<String, Integer> wordCount = words.mapToPair(new PairFunction<String, String, Integer>() {
+            @Override
+            public Tuple2<String, Integer> call(String s) throws Exception {
+                return new Tuple2<String, Integer>(s, 1);
+            }
+        });
+
+
+        JavaPairRDD<String, Integer> wordCountReduced = wordCount.reduceByKey(new Function2<Integer, Integer, Integer>() {
+            @Override
+            public Integer call(Integer integer, Integer integer2) throws Exception {
+                return integer + integer2;
+            }
+        });
+
+        JavaRDD<WordCount> outputRDD = wordCountReduced.map(new Function<Tuple2<String, Integer>, WordCount>() {
+            @Override
+            public WordCount call(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
+                return new WordCount(stringIntegerTuple2._1(), stringIntegerTuple2._2());
+            }
+        });
+
+
+        IMongoDeepJobConfig<WordCount> outputConfigEntity =
+                MongoConfigFactory.createMongoDB(WordCount.class).host(hostConcat).database("book").collection("output")
+                        .initialize();
+
+        MongoEntityRDD.saveEntity((RDD<WordCount>)outputRDD.rdd(), outputConfigEntity);
+
+        RDD<WordCount> outputRDDEntity = context.mongoRDD(outputConfigEntity);
+
+        assertEquals( ((Long) outputRDDEntity.cache().count()).longValue(), WORD_COUNT_SPECTED.longValue());
 
         context.stop();
 
+    }
+
+
+    @Test
+    public void testInputColums() {
+
+        String hostConcat = HOST.concat(":").concat(PORT.toString());
+
+        MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
+
+        IMongoDeepJobConfig<BookEntity> inputConfigEntity = MongoConfigFactory.createMongoDB(BookEntity.class)
+                .host(hostConcat).database("book").collection("input").inputColumns("metadata").initialize();
+
+        RDD<BookEntity> inputRDDEntity = context.mongoRDD(inputConfigEntity);
+
+
+        BookEntity bookEntity = inputRDDEntity.toJavaRDD().first();
+
+
+        assertNotNull(bookEntity.getId());
+        assertNotNull(bookEntity.getMetadataEntity());
+        assertNull(bookEntity.getCantoEntities());
+
+
+        IMongoDeepJobConfig<BookEntity> inputConfigEntity2 = MongoConfigFactory.createMongoDB(BookEntity.class)
+                .host(hostConcat).database("book").collection("input").inputColumns("cantos").ignoreIdField().initialize();
+
+
+        RDD<BookEntity> inputRDDEntity2 = context.mongoRDD(inputConfigEntity2);
+
+
+        BookEntity bookEntity2 = inputRDDEntity2.toJavaRDD().first();
+
+        assertNull(bookEntity2.getId());
+        assertNull(bookEntity2.getMetadataEntity());
+        assertNotNull(bookEntity2.getCantoEntities());
+
+
+        BSONObject bson = new BasicBSONObject();
+
+        bson.put("_id", 0);
+        bson.put("cantos", 1);
+
+        IMongoDeepJobConfig<BookEntity> inputConfigEntity3 = MongoConfigFactory.createMongoDB(BookEntity.class)
+                .host(hostConcat).database("book").collection("input").fields(bson).initialize();
+
+        RDD<BookEntity> inputRDDEntity3 = context.mongoRDD(inputConfigEntity3);
+
+
+        BookEntity bookEntity3 = inputRDDEntity3.toJavaRDD().first();
+
+        assertNull(bookEntity3.getId());
+        assertNull(bookEntity3.getMetadataEntity());
+        assertNotNull(bookEntity3.getCantoEntities());
 
     }
+
 
 }
