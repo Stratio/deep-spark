@@ -17,27 +17,28 @@
 package com.stratio.deep.cql;
 
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
-import com.stratio.deep.utils.Pair;
-import org.apache.cassandra.dht.Murmur3Partitioner;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import javax.annotation.Nullable;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
+
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
+import com.stratio.deep.utils.Pair;
+import javax.annotation.Nullable;
+import org.apache.cassandra.dht.Murmur3Partitioner;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
@@ -191,6 +192,11 @@ public class RangeUtilsTest {
             "9151314442816847871", "9187343239835811839", "936748722493063167", "972777519512027135"
     );
 
+	private final Set<String> localTokens3 = Sets.newHashSet("-6148914691236517206");
+
+	private final Set<String> remoteTokens3 = Sets.newHashSet("-9223372036854775808",
+					"-3074457345618258604", "-2", "3074457345618258600", "6148914691236517202");
+
     @Mock
     private Session mockSession1;
 
@@ -202,6 +208,13 @@ public class RangeUtilsTest {
 
     @Mock
     private ResultSet mockLocalTokensResultSet2;
+
+	@Mock
+	private Session mockSession3;
+
+	@Mock
+	private ResultSet mockLocalTokensResultSet3;
+
 
     @BeforeMethod
     protected void setUp() throws Exception {
@@ -245,6 +258,25 @@ public class RangeUtilsTest {
 
         when(mockLocalTokensResultSet2.all()).thenReturn(rows2);
         when(mockSession2.execute(any(String.class))).thenReturn(mockLocalTokensResultSet2);
+
+	    /* mock example 3 */
+	    List<Row> rows3 = new ArrayList<>();
+	    Row localTokensRow3 = mock(Row.class);
+	    when(localTokensRow3.getInet(any(String.class))).thenThrow(IllegalArgumentException.class);
+	    Set<String> shuffledLocalTokens3 = Sets.newHashSet(Ordering.arbitrary().sortedCopy(localTokens3));
+	    when(localTokensRow3.getSet("tokens", String.class)).thenReturn(shuffledLocalTokens3);
+	    rows3.add(localTokensRow3);
+
+	    Row remoteTokensRow3 = mock(Row.class);
+	    when(remoteTokensRow3.getInet("peer")).thenReturn(mockInet);
+
+	    Set<String> shuffledRemoteTokens3 = Sets.newHashSet(Ordering.arbitrary().sortedCopy(remoteTokens3));
+	    when(remoteTokensRow3.getSet("tokens", String.class)).thenReturn(shuffledRemoteTokens3);
+	    rows3.add(remoteTokensRow3);
+
+	    when(mockLocalTokensResultSet3.all()).thenReturn(rows3);
+	    when(mockSession3.getLoggedKeyspace()).thenReturn("fake-keyspace");
+	    when(mockSession3.execute(any(String.class))).thenReturn(mockLocalTokensResultSet3);
     }
 
     @Test
@@ -338,4 +370,5 @@ public class RangeUtilsTest {
 
         assertTrue(elementsEquals);
     }
+
 }
