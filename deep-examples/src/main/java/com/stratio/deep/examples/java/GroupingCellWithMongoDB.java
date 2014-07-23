@@ -21,6 +21,8 @@ import com.stratio.deep.config.MongoConfigFactory;
 import com.stratio.deep.context.MongoDeepSparkContext;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
+import com.stratio.deep.entity.MongoCell;
+import com.stratio.deep.rdd.mongodb.MongoCellRDD;
 import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
 import com.stratio.deep.testentity.BookEntity;
@@ -104,18 +106,18 @@ public final class GroupingCellWithMongoDB {
             }
         });
 
-        JavaRDD<WordCount>  outputRDD =  wordCountReduced.map(new Function<Tuple2<String, Integer>, WordCount>() {
+        JavaRDD<Cells>  outputRDD =  wordCountReduced.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
-            public WordCount call(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
-                return new WordCount(stringIntegerTuple2._1(), stringIntegerTuple2._2());
+            public Cells call(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
+                return new Cells(MongoCell.create("word", stringIntegerTuple2._1()) , MongoCell.create("count", stringIntegerTuple2._2()));
             }
         });
 
 
-        IMongoDeepJobConfig<WordCount> outputConfigEntity =
-				        MongoConfigFactory.createMongoDB(WordCount.class).host(host).database(database).collection(outputCollection).initialize();
+        IMongoDeepJobConfig<Cells> outputConfigEntity =
+				        MongoConfigFactory.createMongoDB().host(host).database(database).collection(outputCollection).initialize();
 
-        MongoEntityRDD.saveEntity(outputRDD.rdd(),outputConfigEntity);
+        MongoCellRDD.saveCell(outputRDD.rdd(), outputConfigEntity);
 
         deepContext.stop();
     }

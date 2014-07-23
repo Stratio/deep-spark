@@ -19,8 +19,8 @@ import java.util.{List}
 
 import com.stratio.deep.config._
 import com.stratio.deep.context.{MongoDeepSparkContext}
-import com.stratio.deep.entity.{Cell, Cells}
-import com.stratio.deep.rdd.mongodb.MongoEntityRDD
+import com.stratio.deep.entity.{MongoCell, Cell, Cells}
+import com.stratio.deep.rdd.mongodb.{MongoCellRDD, MongoEntityRDD}
 import com.stratio.deep.testentity.{BookEntity, WordCount}
 import com.stratio.deep.testutils.ContextProperties
 import org.apache.spark.rdd.RDD
@@ -57,12 +57,12 @@ final object GroupingCellWithMongoDB {
 
     val wordCountReduced  = wordCount reduceByKey { (a,b) =>a + b }
 
-    val outputRDD = wordCountReduced map { e:(String, Integer) => new WordCount(e._1, e._2)  }
+    val outputRDD = wordCountReduced map { e:(String, Integer) => new Cells(MongoCell.create("word", e._1), MongoCell.create("count",e._2))  }
 
-    val outputConfigEntity: IMongoDeepJobConfig[WordCount] =
-      MongoConfigFactory.createMongoDB(classOf[WordCount]).host(host).database(database).collection(outputCollection).initialize
+    val outputConfigEntity: IMongoDeepJobConfig[Cells] =
+      MongoConfigFactory.createMongoDB().host(host).database(database).collection(outputCollection).initialize
 
-    MongoEntityRDD.saveEntity(outputRDD, outputConfigEntity)
+    MongoCellRDD.saveCell(outputRDD, outputConfigEntity)
 
     deepContext.stop
   }
