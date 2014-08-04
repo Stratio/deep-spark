@@ -464,7 +464,6 @@ Validation types are located in the org.apache.cassandra.db.marshal package.
 |text|UTF-8 encoded string|java.lang.String|UTF8Type|
 |timestamp|Date plus time, encoded as 8 bytes since epoch|java.util.Date|TimestampType|
 |uuid|Type 1 or type 4 UUID|java.util.UUID|UUIDType|
-|timeuuid|Type 1 UUID only (CQL3)|java.util.UUID
- see [Working with timeuuid in Java](http://wiki.apache.org/cassandra/FAQ#working_with_timeuuid_in_java)|TimeUUIDType|
+|timeuuid|Type 1 UUID only (CQL3)|java.util.UUID see [Working with timeuuid in Java](http://wiki.apache.org/cassandra/FAQ#working_with_timeuuid_in_java)|TimeUUIDType|
 |varchar|UTF-8 encoded string|java.lang.String|UTF8Type|
 |varint|Arbitrary-precision integer|java.math.BigInteger|IntegerType|
