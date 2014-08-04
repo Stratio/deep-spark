@@ -66,25 +66,13 @@ Stratio Deep comes with a user friendly API that allows developers to create RDD
 
 ![Cassandra Column Families to RDD by Entities](http://www.openstratio.org/wp-content/uploads/2014/04/Captura-de-pantalla-2014-04-07-a-las-17.04.11.png "Cassandra Column Families to RDD by Entities")
 
-Cassandra Column Families to RDD by Entities
 
 -   **Cells**: a generic API that will let you work on Cassandra RDD without Scala/Java entity objects, by fetching automatically the columns metadata along with the data itself from the database. This interface is a little bit more cumbersome to work with (see the example below), but has the advantage that it does not require the definition of additional classes.
 
 ![Cassandra Column Families to RDD by Cells](http://www.openstratio.org/wp-content/uploads/2014/04/Captura-de-pantalla-2014-04-07-a-las-17.04.18.png "Cassandra Column Families to RDD by Cells")
 
-Cassandra Column Families to RDD by Cells
 
 Stratio Deep consists of a set of libraries in Apache Spark that will provide the functionalities described above. A common Spark-Cassandra integration cluster will look like the figure below:
 
 ![Stratio Deep Architecture](http://www.openstratio.org/wp-content/uploads/2014/04/Captura-de-pantalla-2014-04-08-a-las-15.42.59.png)
 
-Stratio Deep Architecture
-
-Where to go from here
-=====================
-
-To explore and play with Stratio Deep, we recommend visiting the following:
-
--   [Tutorials](/tutorials/): for step by step instructions on how to perform different tasks with Deep
--   [Examples](/examples/): snippets in Java and Scala
--   [Manuals](/manuals/): user guides and references

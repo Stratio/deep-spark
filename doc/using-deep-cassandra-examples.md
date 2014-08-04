@@ -9,11 +9,11 @@ In the examples below, generic names have been used for the following objects:
 
 Replace them with your own object names before using these snippets.
 
--   [Creating a Deep Context](#creatingDeepContext)
--   [Creating a Cassandra RDD](#creatingCassandraRDD)
--   [Grouping Tuples](#groupingTuples)
--   [Map and Reduce](#mapReduce)
--   [Writing to Cassandra](#writingToCassandra)
+-   [Creating a Deep Context](#creating-a-deep-context)
+-   [Creating a Cassandra RDD](#creating-a-cassandra-rdd)
+-   [Grouping Tuples](#grouping-tuples)
+-   [Map and Reduce](#map-and-reduce)
+-   [Writing to Cassandra](#writing-to-cassandra)
 -   [Aggregation](#aggregation)
 
 Creating a Deep Context
@@ -22,9 +22,9 @@ Creating a Deep Context
 Local context
 -------------
 
-Scala
-
-~~~~ {.prettyprint .lang-java}
+{% tabgroup %}
+{% tab Scala %}
+~~~~ {.prettyprint .lang-java }
 val cluster = "local"
 val job = "myjobname"
 val sparkHome = "/path/to/StratioDeep"
@@ -32,9 +32,8 @@ val jarList = Array("/path/to/myfirstjar.jar", "/path/to/mysecondjar.jar")
 
 val deepContext: DeepSparkContext = new DeepSparkContext(cluster, job, sparkHome, jarList)
 ~~~~
-
-Java
-
+{% endtab %}
+{% tab Java %}
 ~~~~ {.prettyprint .lang-java}
 String cluster = "local";
 String job = "myJobName";
@@ -44,12 +43,14 @@ String[] jarList = {"/path/to/myfirstjar.jar","/path/to/mysecondjar.jar"};
 // Creating the Deep Context where args are Spark Master and Job Name
 DeepSparkContext deepContext = new DeepSparkContext(cluster, job, sparkHome, jarList);
 ~~~~
+{% endtab %}
+{% endtabgroup %}
 
 Cluster context
 ---------------
 
-Scala
-
+{% tabgroup %}
+{% tab Scala %}
 ~~~~ {.prettyprint .lang-java}
 val cluster = "spark://hostname:port"
 val job = "myjobname"
@@ -59,9 +60,8 @@ val deepContext: DeepSparkContext = new DeepSparkContext(cluster, job)
 // Add jars to the context
 deepContext.addJar("/path/to/jarfile.jar")
 ~~~~
-
-Java
-
+{% endtab %}
+{% tab Java %}
 ~~~~ {.prettyprint .lang-java}
 String cluster = "spark://hostname:port";
 String job = "myJobName";
@@ -72,6 +72,8 @@ DeepSparkContext deepContext = new DeepSparkContext(cluster, job);
 // Add jars to the context
 deepContext.addJar("/path/to/jarfile.jar")
 ~~~~
+{% endtab %}
+{% endtabgroup %}
 
 Creating a Cassandra RDD
 ========================
@@ -81,8 +83,8 @@ Cell RDD
 
 A cell (or generic) RDD does not need an entity object to operate with Cassandra data. In this case, columns are bound to generic cells that include metadata along with the values.
 
-Scala
-
+{% tabgroup %}
+{% tab Scala %}
 ~~~~ {.prettyprint .lang-java}
 // Creating the Deep Context
 val deepContext: DeepSparkContext = new DeepSparkContext(cluster, job)
@@ -96,15 +98,14 @@ val config: ICassandraDeepJobConfig[Cells] = DeepJobConfigFactory.create()
 // Creating the RDD
 val rdd: CassandraRDD[Cells] = deepContext.cassandraGenericRDD(config)
 ~~~~
-
-Java
-
+{% endtab %}
+{% tab Java %}
 ~~~~ {.prettyprint .lang-java}
 // Creating the Deep Context
 DeepSparkContext deepContext = new DeepSparkContext(cluster, job, sparkHome, jarList);
 
 // Configuration and initialization
-ICassandraDeepJobConfig<Cells> config = DeepJobConfigFactory.create()
+ICassandraDeepJobConfig&lt;Cells> config = DeepJobConfigFactory.create()
         .host(cassandraHost).rpcPort(cassandraPort)
         .keyspace(keyspaceName).table(tableName)
         .initialize();
@@ -112,14 +113,16 @@ ICassandraDeepJobConfig<Cells> config = DeepJobConfigFactory.create()
 // Creating the RDD
 CassandraJavaRDD rdd = deepContext.cassandraJavaRDD(config);
 ~~~~
+{% endtab %}
+{% endtabgroup %}
 
 Entity RDD
 ----------
 
 When working with entity objects, an entity RDD must be used.
 
-Scala
-
+{% tabgroup %}
+{% tab Scala %}
 ~~~~ {.prettyprint .lang-java}
 // Create the Deep Context
 val deepContext: DeepSparkContext = new DeepSparkContext(cluster, job)
@@ -133,15 +136,14 @@ val config = DeepJobConfigFactory.create(classOf[TableEntity])
 // Create the RDD
 val rdd: CassandraRDD[TableEntity] = deepContext.cassandraEntityRDD(config)
 ~~~~
-
-Java
-
+{% endtab %}
+{% tab Java %}
 ~~~~ {.prettyprint .lang-java}
 // Creating the Deep Context
 DeepSparkContext deepContext = new DeepSparkContext(cluster, job);
 
 // Create a configuration for the RDD and initialize it
-ICassandraDeepJobConfig<TableEntity> config = DeepJobConfigFactory.create(TableEntity.class)
+ICassandraDeepJobConfig&lt;TableEntity> config = DeepJobConfigFactory.create(TableEntity.class)
         .host(cassandraHost).rpcPort(cassandraPort)
         .keyspace(keyspaceName).table(tableName)
         .initialize();
@@ -149,6 +151,8 @@ ICassandraDeepJobConfig<TableEntity> config = DeepJobConfigFactory.create(TableE
 // Creating the RDD
 CassandraJavaRDD rdd = deepContext.cassandraJavaRDD(config);
 ~~~~
+{% endtab %}
+{% endtabgroup %}
 
 Grouping Tuples
 ===============
@@ -156,8 +160,8 @@ Grouping Tuples
 Using GroupBy
 -------------
 
-Scala
-
+{% tabgroup %}
+{% tab Scala %}
 ~~~~ {.prettyprint .lang-java}
 // grouping
 val groups: RDD[(String, Iterable[TableEntity])] = rdd groupBy  {t:TableEntity => t.getKey}
@@ -168,12 +172,11 @@ val counts: RDD[(String, Int)] = groups map {t:(String, Iterable[TableEntity]) =
 // fetching results
 val result: Array[(String, Int)] = counts.collect()
 ~~~~
-
-Java
-
+{% endtab %}
+{% tab Java %}
 ~~~~ {.prettyprint .lang-java}
 // grouping
-JavaPairRDD<String, Iterable<TableEntity>> groups = rdd.groupBy(new Function<TableEntity, String>() {
+JavaPairRDD&lt;String, Iterable&lt;TableEntity>> groups = rdd.groupBy(new Function&lt;TableEntity, String>() {
     @Override
     public String call(TableEntity tableEntity) throws Exception {
         return tableEntity.getKey();
@@ -181,23 +184,25 @@ JavaPairRDD<String, Iterable<TableEntity>> groups = rdd.groupBy(new Function<Tab
 });
 
 // counting elements in groups
-JavaPairRDD<String,Integer> counts = groups.mapToPair(new PairFunction<Tuple2<String, Iterable<TableEntity>>, String, Integer>() {
+JavaPairRDD&lt;String,Integer> counts = groups.mapToPair(new PairFunction&lt;Tuple2&lt;String, Iterable&lt;TableEntity>>, String, Integer>() {
     @Override
-    public Tuple2<String, Integer> call(Tuple2<String, Iterable<TableEntity>> t) throws Exception {
+    public Tuple2&lt;String, Integer> call(Tuple2&lt;String, Iterable&lt;TableEntity>> t) throws Exception {
         // I need to wrap the Iterable into a List to get its size
-        return new Tuple2<String,Integer>(t._1(), Lists.newArrayList(t._2()).size());
+        return new Tuple2&lt;String,Integer>(t._1(), Lists.newArrayList(t._2()).size());
     }
 });
 
 // fetching the results
-List<Tuple2<String,Integer>> results = counts.collect();
+List&lt;Tuple2&lt;String,Integer>> results = counts.collect();
 ~~~~
+{% endtab %}
+{% endtabgroup %}
 
 Using GroupByKey
 ----------------
 
-Scala
-
+{% tabgroup %}
+{% tab Scala %}
 ~~~~ {.prettyprint .lang-java}
 // !!! IMPORTANT !!!
 import org.apache.spark.SparkContext._ 
@@ -216,39 +221,40 @@ val counts: RDD[(String, Int)] = groups map {t:(String, Iterable[TableEntity]) =
 // fetching results
 val result: Array[(String, Int)] = counts.collect()
 ~~~~
-
-Java
-
+{% endtab %}
+{% tab Java %}
 ~~~~ {.prettyprint .lang-java}
 // creating a key-value pairs RDD
-JavaPairRDD<String,TableEntity> pairsRDD = rdd.mapToPair(new PairFunction<TableEntity, String, TableEntity>() {
+JavaPairRDD&lt;String,TableEntity> pairsRDD = rdd.mapToPair(new PairFunction&lt;TableEntity, String, TableEntity>() {
     @Override
-    public Tuple2<String, TableEntity> call(TableEntity t) throws Exception {
-        return new Tuple2<String,TableEntity>(t.getKey(),t);
+    public Tuple2&lt;String, TableEntity> call(TableEntity t) throws Exception {
+        return new Tuple2&lt;String,TableEntity>(t.getKey(),t);
     }
 });
 
 // grouping
-JavaPairRDD<String, Iterable<TableEntity>> groups = pairsRDD.groupByKey();
+JavaPairRDD&lt;String, Iterable&lt;TableEntity>> groups = pairsRDD.groupByKey();
 
 // counting elements in groups
-JavaPairRDD<String,Integer> counts = groups.mapToPair(new PairFunction<Tuple2<String, Iterable<TableEntity>>, String, Integer>() {
+JavaPairRDD&lt;String,Integer> counts = groups.mapToPair(new PairFunction&lt;Tuple2&lt;String, Iterable&lt;TableEntity>>, String, Integer>() {
     @Override
-    public Tuple2<String, Integer> call(Tuple2<String, Iterable<TableEntity>> t) throws Exception {
+    public Tuple2&lt;String, Integer> call(Tuple2&lt;String, Iterable&lt;TableEntity>> t) throws Exception {
         // I need to wrap the Iterable into a List to get its size
-        return new Tuple2<String, Integer>(t._1(), Lists.newArrayList(t._2()).size());
+        return new Tuple2&lt;String, Integer>(t._1(), Lists.newArrayList(t._2()).size());
     }
 });
 
 // fetching results
-List<Tuple2<String, Integer>> result = counts.collect();
+List&lt;Tuple2&lt;String, Integer>> result = counts.collect();
 ~~~~
+{% endtab %}
+{% endtabgroup %}
 
 Map and Reduce
 ==============
 
-Scala
-
+{% tabgroup %}
+{% tab Scala %}
 ~~~~ {.prettyprint .lang-java}
 // Important imports
 import org.apache.spark.SparkContext._
@@ -265,20 +271,19 @@ val counts: RDD[(String, Int)] = pairsRDD reduceByKey {_ + _}
 // Fetching the results
 val results: Array[(String, Int)] = counts.collect()
 ~~~~
-
-Java
-
+{% endtab %}
+{% tab Java %}
 ~~~~ {.prettyprint .lang-java}
 // Map stage: Getting key-value pairs from the RDD
-JavaPairRDD<String, Integer> pairsRDD = rdd.mapToPair(new PairFunction<TableEntity, String, Integer>() {
+JavaPairRDD&lt;String, Integer> pairsRDD = rdd.mapToPair(new PairFunction&lt;TableEntity, String, Integer>() {
     @Override
-    public Tuple2<String, Integer> call(TableEntity t) throws Exception {
-        return new Tuple2<String,Integer>(t.getKey(), 1);
+    public Tuple2&lt;String, Integer> call(TableEntity t) throws Exception {
+        return new Tuple2&lt;String,Integer>(t.getKey(), 1);
     }
 });
 
 // Reduce stage: counting rows
-JavaPairRDD<String, Integer> counts = pairsRDD.reduceByKey(new Function2<Integer, Integer, Integer>() {
+JavaPairRDD&lt;String, Integer> counts = pairsRDD.reduceByKey(new Function2&lt;Integer, Integer, Integer>() {
     @Override
     public Integer call(Integer a, Integer b) {
         return a + b;
@@ -286,8 +291,10 @@ JavaPairRDD<String, Integer> counts = pairsRDD.reduceByKey(new Function2<Integer
 });
 
 // Fetching the results
-List<Tuple2<String,Integer>> results = counts.collect();
+List&lt;Tuple2&lt;String,Integer>> results = counts.collect();
 ~~~~
+{% endtab %}
+{% endtabgroup %}
 
 Writing to Cassandra
 ====================
@@ -295,8 +302,8 @@ Writing to Cassandra
 Writing a Cell RDD
 ------------------
 
-Scala
-
+{% tabgroup %}
+{% tab Scala %}
 ~~~~ {.prettyprint .lang-java}
 // --- INPUT RDD
 val inputConfig = DeepJobConfigFactory.create()
@@ -329,45 +336,44 @@ val outputRDD: RDD[Cells] = numPerKey map { t: (String, Int) =>
 // Write to Cassandra
 CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig)
 ~~~~
-
-Java
-
+{% endtab %}
+{% tab Java %}
 ~~~~ {.prettyprint .lang-java}
 // --- INPUT RDD
-ICassandraDeepJobConfig<Cells> inputConfig = DeepJobConfigFactory.create()
+ICassandraDeepJobConfig&lt;Cells> inputConfig = DeepJobConfigFactory.create()
         .host(cassandraHost).rpcPort(cassandraPort)
         .keyspace(keyspaceName).table(inputTableName)
         .initialize();
 
-CassandraJavaRDD<Cells> inputRDD = deepContext.cassandraJavaRDD(inputConfig);
+CassandraJavaRDD&lt;Cells> inputRDD = deepContext.cassandraJavaRDD(inputConfig);
 
-JavaPairRDD<String,Cells> pairRDD = inputRDD.mapToPair(new PairFunction<Cells,String,Cells>() {
+JavaPairRDD&lt;String,Cells> pairRDD = inputRDD.mapToPair(new PairFunction&lt;Cells,String,Cells>() {
     @Override
-    public Tuple2<String,Cells> call(Cells c) throws Exception {
-        return new Tuple2<String, Cells>((String) c.getCellByName("columnName")
+    public Tuple2&lt;String,Cells> call(Cells c) throws Exception {
+        return new Tuple2&lt;String, Cells>((String) c.getCellByName("columnName")
             .getCellValue(),c);
     }
 });
 
-JavaPairRDD<String,Integer> numPerKey = pairRDD.groupByKey()
-        .mapToPair(new PairFunction<Tuple2<String, Iterable<Cells>>, String, Integer>() {
+JavaPairRDD&lt;String,Integer> numPerKey = pairRDD.groupByKey()
+        .mapToPair(new PairFunction&lt;Tuple2&lt;String, Iterable&lt;Cells>>, String, Integer>() {
             @Override
-            public Tuple2<String, Integer> call(Tuple2<String, Iterable<Cells>> t) throws Exception {
+            public Tuple2&lt;String, Integer> call(Tuple2&lt;String, Iterable&lt;Cells>> t) throws Exception {
                 // I need to wrap the Iterable into a List to get its size
-                return new Tuple2<String, Integer>(t._1(), Lists.newArrayList(t._2()).size());
+                return new Tuple2&lt;String, Integer>(t._1(), Lists.newArrayList(t._2()).size());
             }
         });
 
 // --- OUTPUT RDD
-ICassandraDeepJobConfig<Cells> outputConfig = DeepJobConfigFactory.createWriteConfig()
+ICassandraDeepJobConfig&lt;Cells> outputConfig = DeepJobConfigFactory.createWriteConfig()
         .host(cassandraHost).rpcPort(cassandraPort)
         .keyspace(keyspaceName).table(outputTableName)
         .createTableOnWrite(true)
         .initialize();
 
-JavaRDD<Cells> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, Cells>() {
+JavaRDD&lt;Cells> outputRDD = numPerKey.map(new Function&lt;Tuple2&lt;String, Integer>, Cells>() {
     @Override
-    public Cells call(Tuple2<String, Integer> t) throws Exception {
+    public Cells call(Tuple2&lt;String, Integer> t) throws Exception {
         Cell c1 = Cell.create("primaryKeyColumnName",t._1(),true,false);
         Cell c2 = Cell.create("otherColumn",t._2());
         return new Cells(c1, c2);
@@ -377,12 +383,14 @@ JavaRDD<Cells> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, C
 // Write to Cassandra
 CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig);
 ~~~~
+{% endtab %}
+{% endtabgroup %}
 
 Writing an Entity RDD
 ---------------------
 
-Scala
-
+{% tabgroup %}
+{% tab Scala %}
 ~~~~ {.prettyprint .lang-java}
 // --- INPUT RDD
 val inputConfig = DeepJobConfigFactory.create(classOf[InputTableEntity])
@@ -410,43 +418,42 @@ val outputRDD: RDD[OutputTableEntity] = numPerKey map { t: (String, Int) =>
 // Write to Cassandra
 CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig)
 ~~~~
-
-Java
-
+{% endtab %}
+{% tab Java %}
 ~~~~ {.prettyprint .lang-java}
 // --- INPUT RDD
-ICassandraDeepJobConfig<InputEntity> inputConfig = DeepJobConfigFactory.create(InputEntity.class)
+ICassandraDeepJobConfig&lt;InputEntity> inputConfig = DeepJobConfigFactory.create(InputEntity.class)
         .host(cassandraHost).rpcPort(cassandraPort)
         .keyspace(keyspaceName).table(inputTableName)
         .initialize();
 
-CassandraJavaRDD<InputEntity> inputRDD = deepContext.cassandraJavaRDD(inputConfig);
+CassandraJavaRDD&lt;InputEntity> inputRDD = deepContext.cassandraJavaRDD(inputConfig);
 
-JavaPairRDD<String,InputEntity> pairRDD = inputRDD.mapToPair(new PairFunction<InputEntity,String,InputEntity>() {
+JavaPairRDD&lt;String,InputEntity> pairRDD = inputRDD.mapToPair(new PairFunction&lt;InputEntity,String,InputEntity>() {
     @Override
-    public Tuple2<String,InputEntity> call(InputEntity e) throws Exception {
-        return new Tuple2<String, InputEntity>(e.getKey(),e);
+    public Tuple2&lt;String,InputEntity> call(InputEntity e) throws Exception {
+        return new Tuple2&lt;String, InputEntity>(e.getKey(),e);
     }
 });
 
-JavaPairRDD<String,Integer> numPerKey = pairRDD.groupByKey()
-        .mapToPair(new PairFunction<Tuple2<String, Iterable<InputEntity>>, String, Integer>() {
+JavaPairRDD&lt;String,Integer> numPerKey = pairRDD.groupByKey()
+        .mapToPair(new PairFunction&lt;Tuple2&lt;String, Iterable&lt;InputEntity>>, String, Integer>() {
             @Override
-            public Tuple2<String, Integer> call(Tuple2<String, Iterable<InputEntity>> t) throws Exception {
+            public Tuple2&lt;String, Integer> call(Tuple2&lt;String, Iterable&lt;InputEntity>> t) throws Exception {
                 // I need to wrap the Iterable into a List to get its size
-                return new Tuple2<String, Integer>(t._1(), Lists.newArrayList(t._2()).size());
+                return new Tuple2&lt;String, Integer>(t._1(), Lists.newArrayList(t._2()).size());
             }
         });
 
 // --- OUTPUT RDD
-ICassandraDeepJobConfig<OutputEntity> outputConfig = DeepJobConfigFactory.createWriteConfig(OutputEntity.class)
+ICassandraDeepJobConfig&lt;OutputEntity> outputConfig = DeepJobConfigFactory.createWriteConfig(OutputEntity.class)
         .host(cassandraHost).rpcPort(cassandraPort)
         .keyspace(keyspaceName).table(outputTableName)
         .initialize();
 
-JavaRDD<OutputEntity> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, OutputEntity>() {
+JavaRDD&lt;OutputEntity> outputRDD = numPerKey.map(new Function&lt;Tuple2&lt;String, Integer>, OutputEntity>() {
     @Override
-    public OutputEntity call(Tuple2<String, Integer> t) throws Exception {
+    public OutputEntity call(Tuple2&lt;String, Integer> t) throws Exception {
         OutputEntity e = new OutputEntity();
         e.setKey(t._1());
         e.setValue(t._2());
@@ -457,12 +464,14 @@ JavaRDD<OutputEntity> outputRDD = numPerKey.map(new Function<Tuple2<String, Inte
 // Write to Cassandra
 CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig);
 ~~~~
+{% endtab %}
+{% endtabgroup %}
 
 Aggregation
 ===========
 
-Scala
-
+{% tabgroup %}
+{% tab Scala %}
 ~~~~ {.prettyprint .lang-java}
 // grouping to get key-value pairs
 val groups: RDD[(String,Int)] = rdd groupBy  {t:TableEntity => t.getKey}
@@ -481,42 +490,41 @@ val avg: Double = sumOfX.toDouble / n.toDouble
 val variance: Double = (sumOfSquares.toDouble / n.toDouble) - pow(avg,2)
 val stddev: Double = sqrt(variance)
 ~~~~
-
-Java
-
+{% endtab %}
+{% tab Java %}
 ~~~~ {.prettyprint .lang-java}
 // grouping to get key-value pairs
-JavaPairRDD<String,Integer> groups = rdd.groupBy(new Function<TableEntity, String>() {
+JavaPairRDD&lt;String,Integer> groups = rdd.groupBy(new Function&lt;TableEntity, String>() {
     @Override
     public String call(TableEntity tableEntity) throws Exception {
         return tableEntity.getKey();
     }
-}).mapToPair(new PairFunction<Tuple2<String, Iterable<TableEntity>>, String, Integer>() {
+}).mapToPair(new PairFunction&lt;Tuple2&lt;String, Iterable&lt;TableEntity>>, String, Integer>() {
     @Override
-    public Tuple2<String, Integer> call(Tuple2<String, Iterable<TableEntity>> t) throws Exception {
-        return new Tuple2<String, Integer>(t._1(), Lists.newArrayList(t._2()).size());
+    public Tuple2&lt;String, Integer> call(Tuple2&lt;String, Iterable&lt;TableEntity>> t) throws Exception {
+        return new Tuple2&lt;String, Integer>(t._1(), Lists.newArrayList(t._2()).size());
     }
 });
 
 // aggregating
 Double zero = new Double(0);
-Tuple3<Double, Double, Double> initValues = new Tuple3<Double, Double, Double>(zero,zero,zero);
-Tuple3<Double, Double, Double> results = groups.aggregate(initValues,
-        new Function2<Tuple3<Double, Double, Double>, Tuple2<String, Integer>, Tuple3<Double, Double, Double>>() {
+Tuple3&lt;Double, Double, Double> initValues = new Tuple3&lt;Double, Double, Double>(zero,zero,zero);
+Tuple3&lt;Double, Double, Double> results = groups.aggregate(initValues,
+        new Function2&lt;Tuple3&lt;Double, Double, Double>, Tuple2&lt;String, Integer>, Tuple3&lt;Double, Double, Double>>() {
             @Override
-            public Tuple3<Double, Double, Double> call(Tuple3<Double, Double, Double> n, Tuple2<String, Integer> t) throws Exception {
+            public Tuple3&lt;Double, Double, Double> call(Tuple3&lt;Double, Double, Double> n, Tuple2&lt;String, Integer> t) throws Exception {
                 Double sumOfX = n._1() + t._2();
                 Double numOfX = n._2() + 1;
                 Double sumOfSquares = n._3() + Math.pow(t._2(),2);
-                return new Tuple3<Double, Double, Double>(sumOfX, numOfX, sumOfSquares);
+                return new Tuple3&lt;Double, Double, Double>(sumOfX, numOfX, sumOfSquares);
             }
-        }, new Function2<Tuple3<Double, Double, Double>, Tuple3<Double, Double, Double>, Tuple3<Double, Double, Double>>() {
+        }, new Function2&lt;Tuple3&lt;Double, Double, Double>, Tuple3&lt;Double, Double, Double>, Tuple3&lt;Double, Double, Double>>() {
             @Override
-            public Tuple3<Double, Double, Double> call(Tuple3<Double, Double, Double> a, Tuple3<Double, Double, Double> b) throws Exception {
+            public Tuple3&lt;Double, Double, Double> call(Tuple3&lt;Double, Double, Double> a, Tuple3&lt;Double, Double, Double> b) throws Exception {
                 Double sumOfX = a._1() + b._1();
                 Double numOfX = a._2() + b._2();
                 Double sumOfSquares = a._3() + b._3();
-                return new Tuple3<Double, Double, Double>(sumOfX,numOfX, sumOfSquares);
+                return new Tuple3&lt;Double, Double, Double>(sumOfX,numOfX, sumOfSquares);
             }
         }
 );
@@ -530,3 +538,5 @@ Double avg = sumOfX / numOfX;
 Double variance = (sumOfSquares / numOfX) - Math.pow(avg,2);
 Double stddev = Math.sqrt(variance);
 ~~~~
+{% endtab %}
+{% endtabgroup %}

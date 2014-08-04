@@ -16,30 +16,30 @@ This tutorial shows how Stratio Deep can be used to perform simple to complex qu
 Table of Contents
 =================
 
--   [Summary](#__RefHeading__7938_2128049027)
--   [Before you start](#__RefHeading__7940_2128049027)
-    -   [Prerequisites](#__RefHeading__2440_21369393)
-    -   [Configuration](#__RefHeading__2444_21369393)
-    -   [Notes](#__RefHeading__2446_21369393)
-        -   [Changes in Cassandra version 2](#__RefHeading__9155_2128049027)
-        -   [Method invocation syntax in Scala](#__RefHeading__9157_2128049027)
--   [Creating the keyspace and table in Cassandra](#__RefHeading__2448_21369393)
-    -   [Step 1: Creating the keyspace](#__RefHeading__2450_21369393)
-    -   [Step 2: Creating the table schemas](#__RefHeading__2452_21369393)
--   [Loading the dataset](#__RefHeading__2454_21369393)
-    -   [Alt 1: Using SSTables](#__RefHeading__380_1891270820)
-    -   [Alt 2: Using the CSV file](#__RefHeading__384_1891270820)
-    -   [Alt 3: Using the JSON dump](#__RefHeading__382_1891270820)
--   [Using the Stratio Deep Shell](#__RefHeading__2302_1365652423)
-    -   [Step 1: Creating a RDD](#__RefHeading__2456_21369393)
-    -   [Step 2: Filtering data](#__RefHeading__2458_21369393)
-    -   [Step 3: Caching data](#__RefHeading__2460_21369393)
-    -   [Step 4: Grouping data](#__RefHeading__2462_21369393)
-    -   [Step 5: Writing the results to Cassandra](#step5-writing)
--   [Where to go from here](#where2go)
--   [Troubleshooting](#__RefHeading__7942_2128049027)
-    -   [“TSocket read 0 bytes” when bulk loading data into Cassandra](#__RefHeading__2464_21369393)
-    -   [NullPointer exception when writing to Cassandra](#troubleshooting_nullpointer)
+-   [Summary](#summary)
+-   [Before you start](#before-you-start)
+    -   [Prerequisites](#prerequisites)
+    -   [Configuration](#configuration)
+    -   [Notes](#notes)
+        -   [Changes in Cassandra version 2](#changes-in-cassandra-version-2)
+        -   [Method invocation syntax in Scala](#method-invocation-syntax-in-scala)
+-   [Creating the keyspace and table in Cassandra](#creating-the-keyspace-and-table-in-cassandra)
+    -   [Step 1: Creating the keyspace](#step-1-creating-the-keyspace)
+    -   [Step 2: Creating the table schemas](#step-2-creating-the-table-schemas)
+-   [Loading the dataset](#loading-the-dataset)
+    -   [Alt 1: Using SSTables](#alt-1-using-sstables)
+    -   [Alt 2: Using the CSV file](#alt-2-using-the-csv-file)
+    -   [Alt 3: Using the JSON dump](#alt-3-using-the-json-dump)
+-   [Using the Stratio Deep Shell](#using-the-stratio-deep-shell)
+    -   [Step 1: Creating a RDD](#step-1-creating-a-rdd)
+    -   [Step 2: Filtering data](#step-2-filtering-data)
+    -   [Step 3: Caching data](#step-3-caching-data)
+    -   [Step 4: Grouping data](#step-4-grouping-data)
+    -   [Step 5: Writing the results to Cassandra](#step-5-writing-the-results-to-cassandra)
+-   [Where to go from here](#where-to-go-from-here)
+-   [Troubleshooting](#troubleshooting)
+    -   [“TSocket read 0 bytes” when bulk loading data into Cassandra](#tsocket-read-0-bytes-when-bulk-loading-data-into-cassandra)
+    -   [NullPointer exception when writing to Cassandra](#nullpointer-exception-when-writing-to-cassandra)
 
 Before you start
 ================
@@ -47,7 +47,8 @@ Before you start
 Prerequisites
 -------------
 
-This tutorial assumes the reader has installed Cassandra and Stratio Deep on a single machine. Follow the instructions of the [Getting Started](http://www.openstratio.org/getting-started/ "Getting Started") page if you need to install the software.
+This tutorial assumes the reader has installed Cassandra and Stratio Deep on a single machine. Follow the instructions of the 
+[Getting Started](/getting-started.html "Getting Started") page if you need to install the software.
 
 Regarding programming skills, basic knowledge of CQL (or a SQL like language), Java and/or Scala are required.
 
@@ -82,7 +83,13 @@ For more information about improvements and changes in Cassandra version 2, plea
 
 ### Method invocation syntax in Scala
 
-The pieces of code included in this document have been written following the[Scala Style Guide](http://docs.scala-lang.org/style/ "The Style Guide at Scala website"). Special attention has been put on the method invocation syntax which follows Java convention in most cases. However it may differ depending on the order and arity of the invoked method. For more details, refer to the “[Method Invocation](http://docs.scala-lang.org/style/method-invocation.html "Method Invocation section of the Scala Style Guide")” section of the Scala Style Guide.
+The pieces of code included in this document have been written following the 
+[Scala Style Guide](http://docs.scala-lang.org/style/ "The Style Guide at Scala website"). 
+Special attention has been put on the method invocation syntax which follows Java convention in 
+most cases. However it may differ depending on the order and arity of the invoked method. For more 
+details, refer to the 
+“[Method Invocation](http://docs.scala-lang.org/style/method-invocation.html "Method Invocation section of the Scala Style Guide")” 
+section of the Scala Style Guide.
 
 Creating the keyspace and table in Cassandra
 ============================================
@@ -424,12 +431,14 @@ cqlsh:crawler> select * from listdomains;
 Where to go from here
 =====================
 
-Congratulations! You have completed the “First steps with Stratio Deep” tutorial. If you want to learn more, we recommend the “[Creating an Entity Object for Stratio Deep](http://www.openstratio.org/tutorials/creating-an-entity-for-stratio-deep/ "Creating an Entity Object for Stratio Deep")” tutorial.
+Congratulations! You have completed the “First steps with Stratio Deep” tutorial. If you want to 
+learn more, we recommend the "[Creating an Entity Object for Stratio Deep and Cassandra](t30-entity-object-cassandra.html "Creating an Entity Object for Stratio Deep and Cassandra")" tutorial.
 
 Troubleshooting
 ===============
 
-In this section we describe the most common problems that can be encountered when following this tutorial. For errors not reported here, please refer to the documentation of the issuing component.
+In this section we describe the most common problems that can be encountered when following this tutorial. For 
+errors not reported here, please refer to the documentation of the issuing component.
 
 “TSocket read 0 bytes” when bulk loading data into Cassandra
 ------------------------------------------------------------
