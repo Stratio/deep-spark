@@ -46,6 +46,22 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.stratio.deep</groupId>
+            <artifactId>deep-elasticsearch</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.elasticsearch</groupId>
+                    <artifactId>elasticsearch-hadoop</artifactId>
+
+                </exclusion>
+                <exclusion>
+                    <groupId>org.elasticsearch</groupId>
+                    <artifactId>elasticsearch</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>2.10.3</version>
@@ -73,6 +89,23 @@
             <artifactId>deep-mongodb</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.stratio.deep</groupId>
+            <artifactId>deep-elasticsearch</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.elasticsearch</groupId>
+                    <artifactId>elasticsearch-hadoop</artifactId>
+
+                </exclusion>
+                <exclusion>
+                    <groupId>org.elasticsearch</groupId>
+                    <artifactId>elasticsearch</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>net.sf.opencsv</groupId>

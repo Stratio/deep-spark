@@ -765,4 +765,10 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
     public int getBisectFactor() {
         return bisectFactor;
     }
+
+
+    @Override
+    public ICassandraDeepJobConfig<T> customConfiguration(Map<String, Object> customConfiguration){
+        return this;
+    }
 }

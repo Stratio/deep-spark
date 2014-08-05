@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import com.stratio.deep.entity.Cell;
+import org.apache.spark.rdd.RDD;
 
 /**
  * Defines the public methods that each Stratio Deep configuration object should implement.
@@ -34,7 +35,7 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig> extends Serializabl
      *
      * @return the password used to login to the remote cluster.
      */
-    public abstract String getPassword();
+    String getPassword();
 
     /**
      * Fetches table metadata from the underlying datastore and generates a Map<K, V> where the key is the column name, and the value
@@ -51,7 +52,7 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig> extends Serializabl
      * @param pageSize the number of rows per page
      * @return this configuration object.
      */
-    public abstract S pageSize(int pageSize);
+    S pageSize(int pageSize);
 
 
     /* Getters */
@@ -62,14 +63,14 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig> extends Serializabl
      *
      * @return the entity class object associated to this configuration object.
      */
-    public abstract Class<T> getEntityClass();
+    Class<T> getEntityClass();
 
     /**
      * Returns the hostname of the cassandra server.
      *
      * @return the endpoint of the cassandra server.
      */
-    public abstract String getHost();
+    String getHost();
 
     /**
      * Returns the list of column names that will
@@ -77,7 +78,7 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig> extends Serializabl
      *
      * @return the array of column names that will be retrieved from the data store.
      */
-    public abstract String[] getInputColumns();
+    String[] getInputColumns();
 
     /**
      * Returns the username used to authenticate to the cassandra server.
@@ -85,7 +86,7 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig> extends Serializabl
      *
      * @return the username to use to login to the remote server.
      */
-    public abstract String getUsername();
+    String getUsername();
 
     /**
      * Sets the datastore hostname
@@ -93,14 +94,14 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig> extends Serializabl
      * @param hostname the cassandra server endpoint.
      * @return this object.
      */
-    public abstract S host(String hostname);
+    S host(String hostname);
 
     /**
      * Initialized the current configuration object.
      *
      * @return this object.
      */
-    public abstract S initialize();
+    S initialize();
 
     /**
      * Defines a projection over the CF columns. <br/>
@@ -109,14 +110,14 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig> extends Serializabl
      * @param columns list of columns we want to retrieve from the datastore.
      * @return this object.
      */
-    public abstract S inputColumns(String... columns);
+    S inputColumns(String... columns);
 
     /**
      * Sets the password to use to login to Cassandra. Leave empty if you do not need authentication.
      *
      * @return this object.
      */
-    public abstract S password(String password);
+    S password(String password);
 
     /**
      * /**
@@ -124,7 +125,7 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig> extends Serializabl
      *
      * @return this object.
      */
-    public abstract S username(String username);
+    S username(String username);
 
 
 
@@ -133,5 +134,20 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig> extends Serializabl
      *
      * @return the page size
      */
-    public abstract int getPageSize();
+    int getPageSize();
+
+
+
+    /**
+     * In case you want to add custom configuration to hadoop-connector, this override any other configuration,
+     * these configurations are not validated, so be careful
+     *
+     *
+     * @param customConfiguration
+     * @return
+     */
+    S customConfiguration(Map<String, Object> customConfiguration);
+
+
+
 }

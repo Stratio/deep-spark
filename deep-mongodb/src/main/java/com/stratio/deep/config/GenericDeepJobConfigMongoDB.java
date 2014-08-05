@@ -23,9 +23,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -122,6 +120,9 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
 
 
     private boolean splitsUseChunks = true;
+
+
+    private Map<String, Object> customConfiguration;
 
     /**
      * Default constructor
@@ -351,6 +352,12 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         return 0;
     }
 
+    @Override
+    public IMongoDeepJobConfig<T> customConfiguration (Map<String, Object> customConfiguration){
+        this.customConfiguration=customConfiguration;
+        return this;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -458,6 +465,15 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
 
         if (username != null && password != null) {
             configHadoop.set(MongoConfigUtil.AUTH_URI, connection.toString());
+        }
+
+        if (customConfiguration !=null ) {
+            Set<Map.Entry<String, Object>> set = customConfiguration.entrySet();
+            Iterator<Map.Entry<String, Object>> iterator = set.iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, Object> entry = iterator.next();
+                configHadoop.set(entry.getKey(), entry.getValue().toString());
+            }
         }
 
         return this;
