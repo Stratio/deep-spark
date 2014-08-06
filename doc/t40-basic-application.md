@@ -32,7 +32,7 @@ Prerequisites
 -   [Eclipse](https://www.eclipse.org/ "Eclipse website") or an equivalent IDE.
 -   [Oracle JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/index.html "Oracle Java7 download page").
 -   [Apache Maven](http://maven.apache.org/ "The Maven project website"): Stratio Deep is available in a Maven repository that will be used in this tutorial.
--   [Scala](http://www.scala-lang.org/ "Scala website") \>=2.10.3.
+-   [Scala](http://www.scala-lang.org/ "Scala website") >=2.10.3.
 -   Scala-IDE: follow [instructions at Eclipse marketplace](http://marketplace.eclipse.org/marketplace-client-intro "Instructions to use Eclipse Marketplace") to install it from the marketplace (recommended over downloading the plugin from scala-ide.org).
 -   m2eclipse-scala plugin: follow [instructions at scala-ide.org](http://scala-ide.org/docs/tutorials/m2eclipse/index.html "Tutorial for m2eclipse-scala plugin installation") for installation.
 
@@ -52,7 +52,7 @@ Creating the project
 Step 1: Create an empty project
 -------------------------------
 
--   Launch Eclipse and in the menu choose File -\> New -\> Project
+-   Launch Eclipse and in the menu choose File -> New -> Project
 -   In the “New project” window select “Project” under “General” and click “Next”:
 
 ![Screenshot of the New Project window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/03/01-newProject.png)
@@ -72,7 +72,7 @@ Download the project skeleton of your choice and save it in a convenient locatio
 -   [Scala project](http://docs.openstratio.org/resources/eclipse/deep/ScalaProject.zip)
 -   [Mixed java + scala project](http://docs.openstratio.org/resources/eclipse/deep/MixedProject.zip)
 
-In the menu, choose File -\> Import. In the “Import” window, select “Archive file” in the section “General”, and click “Next”:
+In the menu, choose File -> Import. In the “Import” window, select “Archive file” in the section “General”, and click “Next”:
 
 ![Screenshot of the Import window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/03/03-importWindow.png)
 
@@ -114,7 +114,7 @@ any yet, create a keyspace and table for that purpose:
 
 -   Launch the Cassandra shell in the Sandbox:
 
-~~~~ {.code}
+~~~~ {code}
 $ cqlsh
 Connected to Test Cluster at localhost:9160.
 [cqlsh 4.1.1 | Cassandra 2.0.53 | CQL spec 3.1.1 | Thrift protocol 19.39.0]
@@ -124,7 +124,7 @@ cqlsh>
 
 -   Then create a keyspace, a table and fill it with at least one row:
 
-~~~~ {.code}
+~~~~ {code}
 cqlsh> CREATE KEYSPACE test WITH replication = {
       'class': 'SimpleStrategy',
       'replication_factor': '1'
@@ -149,7 +149,7 @@ already set to work with the Stratio VM ([skip to Step 2](#runningStep2)).
 
 ### Alt 1: Local instance
 
-~~~~ {.prettyprint .lang-java}
+~~~~ {prettyprint lang-java}
 // context properties
 String cluster = "local";
 String jobName = "stratioDeepExample";
@@ -165,7 +165,7 @@ String tableName = "mytable";
 
 Point your browser to the web UI of your cluster and copy the address of your master. It should look like spark://YOURHOSTNAME:7077.
 
-~~~~ {.prettyprint .lang-java}
+~~~~ {prettyprint lang-java}
 // context properties
 String cluster = "spark://YOURHOSTNAME:7077";
 String jobName = "stratioDeepExample";
@@ -195,7 +195,7 @@ Once compiled, the jar can be packaged:
 
 For a Java or Scala project, the result should be similar to the following:
 
-~~~~ {.code}
+~~~~ {code}
 Results :
 
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
@@ -208,7 +208,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 
 And as follow for a mixed one:
 
-~~~~ {.code}
+~~~~ {code}
 Results :
 
 Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
@@ -222,7 +222,7 @@ Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
 Finally, copy the jar to the same location that has been set in "[Step 1: Configure the Context](#step-1-configure-the-context)" 
 (variable "jar"):
 
-~~~~ {.code}
+~~~~ {code}
 $ cp /PATH/TO/ECLIPSE_WORKSPACE/MyProject/target/MyProject-0.0.1.jar /PATH/TO/JAR
 ~~~~
 
@@ -231,7 +231,7 @@ Step 3: Run it
 
 In a terminal, enter at the prompt:
 
-~~~~ {.code}
+~~~~ {code}
 # For a Java or mixed project:
 $ bin/spark-submit --master CLUSTER_ADDRESS --class com.stratio.examples.JavaExample --jars /PATH/TO/JAR/MyProject-0.0.1.jar /PATH/TO/JAR/MyProject-0.0.1.jar
 
@@ -239,11 +239,11 @@ $ bin/spark-submit --master CLUSTER_ADDRESS --class com.stratio.examples.JavaExa
 $ bin/spark-submit --master CLUSTER_ADDRESS --class com.stratio.examples.ScalaExample --jars /PATH/TO/JAR/MyProject-0.0.1.jar /PATH/TO/JAR/MyProject-0.0.1.jar
 ~~~~
 
-where CLUSTER\_ADDRESS should be replaced with “local” or “spark://YOURHOSTNAME:7077″ and /PATH/TO/JAR with the path of your jar file.
+where CLUSTER_ADDRESS should be replaced with “local” or “spark://YOURHOSTNAME:7077″ and /PATH/TO/JAR with the path of your jar file.
 
 In both case the last lines of the output should be similar to:
 
-~~~~ {.code}
+~~~~ {code}
 14/03/2014 17:32:49 INFO SparkContext: Successfully stopped SparkContext
 Rows in the RDD (JavaClass): 1
 ~~~~

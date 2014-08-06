@@ -2,7 +2,9 @@
 title: About Stratio Deep
 ---
 
-Stratio Deep is one of the core modules on which the Stratio platform is based. It’s a thin integration layer between [Apache Spark](http://spark.apache.org "Apache Spark project website") and [Apache Cassandra](http://cassandra.apache.org "Apache Cassandra project website").
+Stratio Deep is one of the core modules on which the Stratio platform is based. It’s a thin integration layer between 
+[Apache Spark](http://spark.apache.org "Apache Spark project website") and 
+[Apache Cassandra](http://cassandra.apache.org "Apache Cassandra project website").
 
 Table of Contents
 =================
@@ -14,7 +16,14 @@ Table of Contents
 Introduction
 ============
 
-[Apache Cassandra](http://cassandra.apache.org "Cassandra project website") is an open source NoSQL database that can store large amounts of structured, semi-structured, and unstructured data. However it can not resolve all searches and the database schema needs to be designed according to the most usual queries that will be run. Most of the time, more than these queries will be needed and the schema can not be changed to meet a particular requirement. In those cases, a new approach allowing searching your database without restriction will be welcome. [Apache Spark](http://spark.apache.org "Apache Spark project website") resolves this problem providing mechanisms for large-scale data processing but does not provide out-of-the-box support for Cassandra. Stratio Deep is the Cassandra-Spark integration that will allow a limitless exploration of your data.
+[Apache Cassandra](http://cassandra.apache.org "Cassandra project website") is an open source NoSQL database that 
+can store large amounts of structured, semi-structured, and unstructured data. However it can not resolve all 
+searches and the database schema needs to be designed according to the most usual queries that will be run. Most 
+of the time, more than these queries will be needed and the schema can not be changed to meet a particular 
+requirement. In those cases, a new approach allowing searching your database without restriction will be welcome. 
+[Apache Spark](http://spark.apache.org "Apache Spark project website") resolves this problem providing mechanisms 
+for large-scale data processing but does not provide out-of-the-box support for Cassandra. Stratio Deep is the 
+Cassandra-Spark integration that will allow a limitless exploration of your data.
 
 Features
 ========
@@ -37,12 +46,16 @@ Features
 Architecture
 ============
 
-Stratio Deep, the integration of Apache Spark and Apache Cassandra, provides a Scala and Java API to manage and operate with Cassandra RDDs. In the next sections, after a quick introduction on Cassandra and Spark, Deep architecture is described.
+Stratio Deep, the integration of Apache Spark and Apache Cassandra, provides a Scala and Java API to manage and 
+operate with Cassandra RDDs. In the next sections, after a quick introduction on Cassandra and Spark, Deep architecture 
+is described.
 
 Apache Cassandra
 ----------------
 
-Apache Cassandra, a massively scalable open source NoSQL database, is the right choice when high availability without compromising performance is needed. It’s perfect for managing large amounts of structured, semi-structured, and unstructured data across multiple data centers and the cloud. A Cassandra cluster is shown in the figure below:
+Apache Cassandra, a massively scalable open source NoSQL database, is the right choice when high availability without 
+compromising performance is needed. It’s perfect for managing large amounts of structured, semi-structured, and unstructured 
+data across multiple data centers and the cloud. A Cassandra cluster is shown in the figure below:
 
 ![Captura de pantalla 2014-04-07 a la(s) 17.03.56](http://www.openstratio.org/wp-content/uploads/2014/04/Captura-de-pantalla-2014-04-07-a-las-17.03.56.png)
 
@@ -51,16 +64,19 @@ For more information, please visit the [Apache Cassandra](http://cassandra.apach
 Apache Spark
 ------------
 
-Spark started as a research project at the UC Berkeley AMPLab in 2009, and was open sourced in early 2010. Spark is a fast and general-purpose cluster computing system that leverages the MapReduce paradigm. It provides high-level APIs in Scala, Java and Python.
+Spark started as a research project at the UC Berkeley AMPLab in 2009, and was open sourced in early 2010. Spark is 
+a fast and general-purpose cluster computing system that leverages the MapReduce paradigm. It provides high-level 
+APIs in Scala, Java and Python.
 
-![Captura de pantalla 2014-04-07 a la(s) 17.03.43](http://www.openstratio.org/wp-content/uploads/2014/04/Captura-de-pantalla-2014-04-07-a-las-17.03.43.png)
+![Spark Architecture Overview](http://www.openstratio.org/wp-content/uploads/2014/04/Captura-de-pantalla-2014-04-07-a-las-17.03.43.png)
 
 For more information, please visit the [Apache Spark](http://spark.apache.org/) web.
 
 Stratio Deep
 ------------
 
-Stratio Deep comes with a user friendly API that allows developers to create RDDs out of Cassandra tables. It provides two different interfaces for mapping Cassandra data to Java/Scala objects:
+Stratio Deep comes with a user friendly API that allows developers to create RDDs out of Cassandra tables. 
+It provides two different interfaces for mapping Cassandra data to Java/Scala objects:
 
 -   **Entities**: will let you map your Cassandra’s tables to entity objects, just like if you were using any other ORM. This abstraction is quite handy, it will let you work on RDD by mapping columns to entity properties and using their getter and setter to access the data. The figure below shows this paradigm:
 

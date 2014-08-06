@@ -55,20 +55,20 @@ Loading the dataset
 
 The data can be loaded using mongoimport command.
 
-~~~~ {.code}
+~~~~ {code}
 $ mongoimport -d book -c input divineComedy.json --jsonArray
 ~~~~
 
 That will produce the following output:
 
-~~~~ {.code}
+~~~~ {code}
 connected to: 127.0.0.1
 imported 1 objects
 ~~~~
 
 Start the Mongo shell and check that there is 1 row in the “input” table:
 
-~~~~ {.code}
+~~~~ {code}
 > use book;
 > db.input.count();
 > db.input.findOne();
@@ -81,7 +81,7 @@ The Stratio Deep shell provides a Scala interpreter that allows interactive calc
 this section, you are going to learn how to create RDDs of the MongoDB dataset we imported in the previous 
 section and how to make basic operations on them. Start the shell:
 
-~~~~ {.code}
+~~~~ {code}
 $ stratio-deep-shell
 ~~~~
 
@@ -100,7 +100,7 @@ the RDD will try to connect to “localhost” on port “27017”, this can be 
 port properties of the configuration object: Define a configuration object for the RDD that contains the
 connection string for MongoDB, namely the database and the collection name:
 
-~~~~ {.code}
+~~~~ {code}
 scala> import org.apache.spark.rdd._
 scala> import scala.collection.JavaConversions._
 scala> val inputConfigEntity: IMongoDeepJobConfig[BookEntity] = Cfg.createMongoDB(classOf[BookEntity]).host("localhost:27017").database("book").collection("input").initialize
@@ -108,7 +108,7 @@ scala> val inputConfigEntity: IMongoDeepJobConfig[BookEntity] = Cfg.createMongoD
 
 Create a RDD in the Deep context using the configuration object:
 
-~~~~ {.code}
+~~~~ {code}
 scala> val inputRDDEntity: MongoEntityRDD[BookEntity] = deepContext.mongoEntityRDD(inputConfigEntity)
 ~~~~
 
@@ -117,27 +117,27 @@ Step 2: Word Count
 
 We create a JavaRDD&lt;String> from the BookEntity
 
-~~~~ {.code}
+~~~~ {code}
 scala> val words: RDD[String] = inputRDDEntity flatMap {
-      e: BookEntity => (for (canto &lt;- e.getCantoEntities) yield canto.getText.split(" ")).flatten
+      e: BookEntity => (for (canto <- e.getCantoEntities) yield canto.getText.split(" ")).flatten
     }
 ~~~~
 
 Now we make a JavaPairRDD&lt;String, Integer>, counting one unit for each word
 
-~~~~ {.code}
+~~~~ {code}
 scala> val wordCount : RDD[(String, Integer)] = words map { s:String => (s,1) }
 ~~~~
 
 We group by word
 
-~~~~ {.code}
+~~~~ {code}
 scala> val wordCountReduced  = wordCount reduceByKey { (a,b) => a + b }
 ~~~~
 
 Create a new WordCount Object from
 
-~~~~ {.code}
+~~~~ {code}
 scala> val outputRDD = wordCountReduced map { e:(String, Integer) => new WordCount(e._1, e._2) }
 ~~~~
 
@@ -149,20 +149,20 @@ and the number of occurrence (Integer). To write this result to the output colle
 a configuration that binds the RDD to the given collection and then writes its contents to MongoDB 
 using that configuration:
 
-~~~~ {.code}
+~~~~ {code}
 scala> val outputConfigEntity: IMongoDeepJobConfig[WordCount] = Cfg.createMongoDB(classOf[WordCount]).host("localhost:27017").database("book").collection("output").initialize
 ~~~~
 
 Then write the outRDD to MongoDB:
 
-~~~~ {.code}
+~~~~ {code}
 scala> MongoEntityRDD.saveEntity(outputRDD, outputConfigEntity)
 ~~~~
 
 To check that the data has been correctly written to MongoDB, open a Mongo shell and look at the contents 
 of the “output” collection:
 
-~~~~ {.code}
+~~~~ {code}
 $ mongo --host 127.0.0.1 --port 27017 book
 > db.output.find().sort({"count":-1}).pretty()
 ~~~~

@@ -63,13 +63,13 @@ Step 2: Creating the table
 
 Start the CQL shell:
 
-~~~~ {.code}
+~~~~ {code}
 $ cqlsh
 ~~~~
 
 Create a keyspace:
 
-~~~~ {.code}
+~~~~ {code}
 cqlsh> CREATE KEYSPACE IF NOT EXISTS test 
 WITH replication = {
   'class': 'SimpleStrategy',
@@ -79,13 +79,13 @@ WITH replication = {
 
 Create the table where tweets will be stored:
 
-~~~~ {.code}
+~~~~ {code}
 cqlsh> use test;
 cqlsh:test> CREATE TABLE IF NOT EXISTS tweets (
   tweet_id uuid PRIMARY KEY,
   tweet_date timestamp,
   author text,
-  hashtags set&lt;text>,
+  hashtags set<text>,
   favorite_count int,
   content text,
   truncated boolean
@@ -98,7 +98,7 @@ Step 3: Populating the table
 Import the tweets dataset ([test-tweets.csv](http://docs.openstratio.org/resources/datasets/test-tweets.csv "Tweets in CSV format")) 
 to populate the table you just created:
 
-~~~~ {.code}
+~~~~ {code}
 cqlsh> use test;
 cqlsh:test> copy tweets (tweet_id, tweet_date, author, hashtags, favorite_count, content, truncated) from '/PATH/TO/FILE/test-tweets.csv';
 ~~~~
@@ -108,7 +108,8 @@ There should be 4892 imported rows.
 Creating the Tweet Entity
 =========================
 
-In this section, we will show how to create the corresponding Java entity for tweets. The steps below are based on the ones for the Eclipse environment.
+In this section, we will show how to create the corresponding Java entity for tweets. The steps below are 
+based on the ones for the Eclipse environment.
 
 Step 1: Create a Maven project
 ------------------------------
@@ -130,7 +131,8 @@ The elements of the project have been created and appear in the Package Explorer
 Step 2: Set the dependencies
 ----------------------------
 
-In the package explorer, look for the pom.xml file and open it. The file is shown in a graphical view with the “Overview” tab selected:
+In the package explorer, look for the pom.xml file and open it. The file is shown in a graphical view with 
+the “Overview” tab selected:
 
 ![Screenshot of the graphical view of the pom.xml file in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/02/04-pom-edition.png)
 
@@ -138,21 +140,22 @@ Click on the “Dependencies” tab at the bottom of the window to add a depende
 
 ![Screenshot of the dependencies tab in the graphical view of the pom.xml file](http://www.openstratio.org/wp-content/uploads/2014/02/05-pom-dependencies.png)
 
-Click the “Add” button, the one highlighted in the image above, fill in the fields: Groud id, Artifact Id and Version (replace it with the current version) as shown in the screenshot below and click OK:
+Click the “Add” button, the one highlighted in the image above, fill in the fields: Groud id, Artifact Id 
+and Version (replace it with the current version) as shown in the screenshot below and click OK:
 
 ![Screenshot of the Add Dependency window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/02/06-pom-dependency-add2.png)
 
 Finally, click on the “pom.xml” tab to check that the following has been added to the XML (where DEEP-VERSION should 
 be your version of Deep, e.g.: 0.3.1):
 
-~~~~ {.prettyprint .lang-xml}
-&lt;dependencies>
-  &lt;dependency>
-    &lt;groupId>com.stratio.deep&lt;/groupId>
-    &lt;artifactId>deep-core&lt;/artifactId>
-    &lt;version>DEEP-VERSION&lt;/version>
-  &lt;/dependency>
-&lt;/dependencies>
+~~~~ {prettyprint lang-xml}
+<dependencies>
+  <dependency>
+    <groupId>com.stratio.deep</groupId>
+    <artifactId>deep-core</artifactId>
+    <version>DEEP-VERSION</version>
+  </dependency>
+</dependencies>
 ~~~~
 
 Save the pom.xml file. A new folder “Maven Dependencies” should have appeared in the Project Explorer window, containing 
@@ -163,7 +166,8 @@ Take a look at [maven central](http://search.maven.org/#search|gav|1|g%3A%22com.
 Step 3: Code the TweetEntity class
 ----------------------------------
 
-In the project explorer window, right click on src/main/java and choose “New…” then “Class” from the contextual menu. A “New Java Class” window will be displayed, fill the form as follow to create the TweetPojo.java skeleton:
+In the project explorer window, right click on src/main/java and choose “New…” then “Class” from the contextual 
+menu. A “New Java Class” window will be displayed, fill the form as follow to create the TweetPojo.java skeleton:
 
 ![Screenshot of the New Java Class window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/02/07-new-java-class.png)
 
@@ -172,7 +176,7 @@ The import statement for the IDeepType interface has been added automatically.
 To inform Stratio Deep that the entity object corresponds to a Cassandra table and its properties to Cassandra columns, 
 annotations are used: DeepEntity for the class and DeepField for properties. Add the import statements below the existing one:
 
-~~~~ {.prettyprint .lang-java}
+~~~~ {prettyprint lang-java}
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.annotations.DeepField;
 ~~~~
@@ -219,9 +223,9 @@ included in the annexe:
 </tr>
 <tr>
 <td>hashtags</td>
-<td>set&lt;text&gt;</td>
+<td>set&lt;text></td>
 <td>hashtags</td>
-<td>Set&lt;String&gt;</td>
+<td>Set&lt;String></td>
 <td>SetType</td>
 </tr>
 <tr>
@@ -251,7 +255,7 @@ included in the annexe:
 Validation types are implemented in the org.apache.cassandra.db.marshal package, part of the cassandra-all jar that has 
 been added automatically by Maven. Add imports for these classes:
 
-~~~~ {.prettyprint .lang-java}
+~~~~ {prettyprint lang-java}
 import org.apache.cassandra.db.marshal.BooleanType;
 import org.apache.cassandra.db.marshal.Int32Type;
 import org.apache.cassandra.db.marshal.SetType;
@@ -280,7 +284,7 @@ to have an attribute ignored by Stratio Deep:
 
 Now we can declare each property along with their annotation:
 
-~~~~ {.prettyprint .lang-java}
+~~~~ {prettyprint lang-java}
 @DeepEntity
 public class TweetEntity implements IDeepType {
 
@@ -296,7 +300,7 @@ public class TweetEntity implements IDeepType {
     private String author;
 
     @DeepField(validationClass = SetType.class )
-    private java.util.Set&lt;String> hashtags;
+    private java.util.Set<String> hashtags;
 
     @DeepField(fieldName = "favorite_count", validationClass = Int32Type.class)
     private Integer favoriteCount;
@@ -325,20 +329,20 @@ Step 4: Package the Entity
 Navigate to the directory that contains your TweetPojo project. It contains two subdirectories (src and target) 
 and the pom.xml file:
 
-~~~~ {.code}
+~~~~ {code}
 $ ls
 pom.xml   src/   target/
 ~~~~
 
 Use Maven to package the TweetPojo project:
 
-~~~~ {.code}
+~~~~ {code}
 $ mvn package
 ~~~~
 
 You should get an output similar to the following:
 
-~~~~ {.code}
+~~~~ {code}
 [INFO] Scanning for projects...
 [INFO] 
 [INFO] ----------------------------------------------------------------------
@@ -378,7 +382,7 @@ Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
 
 The jar has been placed in the target subdirectory:
 
-~~~~ {.code}
+~~~~ {code}
 $ ls target/
 classes  maven-archiver  surefire  test-classes  TweetPojo-0.0.1-SNAPSHOT.jar
 ~~~~
@@ -391,13 +395,13 @@ Using the Entity with Stratio Deep
 If you are using the Stratio Sandbox, copy the TweetPojo jar to the virtual machine. Also, to use the TweetEntity 
 in the Stratio Deep shell, we have to add it to the Spark classpath:
 
-~~~~ {.code}
+~~~~ {code}
 $ export SPARK_CLASSPATH=/path/to/jars/TweetPojo-0.0.1-SNAPSHOT.jar
 ~~~~
 
 Then start the Stratio Deep shell:
 
-~~~~ {.code}
+~~~~ {code}
 $ stratio-deep-shell
 ~~~~
 
@@ -405,29 +409,29 @@ In the Stratio Deep shell, a special interpreter-aware DeepSparkContext is alrea
 variable called deepContext. The TweetPojo JAR has to be added to this context so the workers can use 
 TweetEntity objects.
 
-~~~~ {.code}
+~~~~ {code}
 scala> deepContext.addJar("/path/to/jars/TweetPojo-0.0.1-SNAPSHOT.jar")
 ~~~~
 
 Import the entity object:
 
-~~~~ {.code}
+~~~~ {code}
 scala> import com.example.TweetEntity
 ~~~~
 
 TweetEntity can now be used to create a RDD out of the Cassandra table “tweets”:
 
-~~~~ {.code}
+~~~~ {code}
 scala> val config = Cfg.create(classOf[TweetEntity]).host("localhost").rpcPort(9160).keyspace("test").table("tweets").initialize
 ~~~~
 
-~~~~ {.code}
+~~~~ {code}
 scala> val rdd = deepContext.cassandraEntityRDD(config)
 ~~~~
 
 Check the number of tweet objects in the RDD:
 
-~~~~ {.code}
+~~~~ {code}
 scala> rdd.count
 ~~~~
 
@@ -436,7 +440,9 @@ If you get “4892″ then congratulations, you successfully completed this tuto
 Where to go from here
 =====================
 
-We recommend you follow the next tutorial “[Writing and Running a Basic Application for Stratio Deep](t40-basic-application.html "Writing and Running a Basic Application for Stratio Deep")” and try to integrate this entity with it. Have fun coding!
+We recommend you follow the next tutorial 
+“[Writing and Running a Basic Application for Stratio Deep](t40-basic-application.html "Writing and Running a Basic Application for Stratio Deep")” 
+and try to integrate this entity with it. Have fun coding!
 
 Annexes
 =======
@@ -458,9 +464,9 @@ Validation types are located in the org.apache.cassandra.db.marshal package.
 |float|32-bit IEEE-754 floating point|java.lang.Float|FloatType|
 |inet|IP address string in IPv4 or IPv6 format|java.net.InetAddress|InetAddressType|
 |int|32-bit signed integer|java.lang.Integer|Int32Type|
-|list\<T\>|A collection of one or more ordered elements|java.util.List\<T\>|ListType|
-|map\<K,V\>|A JSON-style array of literals: { literal : literal, literal : literal … }|java.util.Map\<K,V\>|MapType|
-|set\<T\>|A collection of one or more elements|java.util.Set\<T\>|SetType|
+|list&lt;T>|A collection of one or more ordered elements|java.util.List&lt;T>|ListType|
+|map&lt;K,V>|A JSON-style array of literals: { literal : literal, literal : literal … }|java.util.Map&lt;K,V>|MapType|
+|set&lt;T>|A collection of one or more elements|java.util.Set&lt;T>|SetType|
 |text|UTF-8 encoded string|java.lang.String|UTF8Type|
 |timestamp|Date plus time, encoded as 8 bytes since epoch|java.util.Date|TimestampType|
 |uuid|Type 1 or type 4 UUID|java.util.UUID|UUIDType|
