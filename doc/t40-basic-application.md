@@ -42,9 +42,9 @@ Resources
 Here is a list of the resources that will be used in this tutorial. You can download them now or as 
 you go through the instructions. Links will be provided later as they will be needed.
 
--   [Java project example](http://docs.openstratio.org/resources/eclipse/deep/JavaProject.zip)
--   [Scala project example](http://docs.openstratio.org/resources/eclipse/deep/ScalaProject.zip)
--   [Mixed java + scala project example](http://docs.openstratio.org/resources/eclipse/deep/MixedProject.zip)
+-   [Java project example](resources/JavaProject.zip)
+-   [Scala project example](resources/ScalaProject.zip)
+-   [Mixed java + scala project example](resources/MixedProject.zip)
 
 Creating the project
 ====================
@@ -55,11 +55,11 @@ Step 1: Create an empty project
 -   Launch Eclipse and in the menu choose File -> New -> Project
 -   In the “New project” window select “Project” under “General” and click “Next”:
 
-![Screenshot of the New Project window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/03/01-newProject.png)
+![Screenshot of the New Project window in Eclipse](images/t40-01-newProject.png)
 
 In the next window, enter a name for your project and click “Finish”:
 
-![Screenshot of the Project Name window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/03/02-projectName.png)
+![Screenshot of the Project Name window in Eclipse](images/t40-02-projectName.png)
 
 The newly created project now appears in the package explorer.
 
@@ -68,13 +68,13 @@ Step 2: Import the project skeleton
 
 Download the project skeleton of your choice and save it in a convenient location:
 
--   [Java project](http://docs.openstratio.org/resources/eclipse/deep/JavaProject.zip)
--   [Scala project](http://docs.openstratio.org/resources/eclipse/deep/ScalaProject.zip)
--   [Mixed java + scala project](http://docs.openstratio.org/resources/eclipse/deep/MixedProject.zip)
+-   [Java project](resources/JavaProject.zip)
+-   [Scala project](resources/ScalaProject.zip)
+-   [Mixed java + scala project](resources/MixedProject.zip)
 
 In the menu, choose File -> Import. In the “Import” window, select “Archive file” in the section “General”, and click “Next”:
 
-![Screenshot of the Import window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/03/03-importWindow.png)
+![Screenshot of the Import window in Eclipse](images/t40-03-importWindow.png)
 
 In the next screen:
 
@@ -83,7 +83,7 @@ In the next screen:
 -   Check “Overwrite existing resources without warning”,
 -   and click “Finish”
 
-![Screenshot of the Importing from Archive file window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/03/04-importFromFile1.png)
+![Screenshot of the Importing from Archive file window in Eclipse](images/t40-04-importFromFile1.png)
 
 The structure of the project will be displayed in the package explorer. Give it a time for Maven to check and 
 download dependencies. Finally the project should appear free of errors.
@@ -94,7 +94,7 @@ Step 3: Update dependency versions
 The last step is to check that the project is using the same Stratio Deep version than your installation. In 
 order to do so, open the pom.xml file and check the deep.version property in the overview:
 
-![Screenshot of the Overview of the pom file in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/03/05-deepVersion1.png)
+![Screenshot of the Overview of the pom file in Eclipse](images/t40-05-deepVersion1.png)
 
 To modify the version, double-click on it.
 
@@ -191,7 +191,7 @@ Once compiled, the jar can be packaged:
 -   In the menu, choose Run -> Run as -> Maven build
 -   In the “Edit configuration” dialog, enter “package” under Goals and click “Run”:
 
-![Screenshot of the Edit Configuration dialog in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/03/06-runAsMaven11.png)
+![Screenshot of the Edit Configuration dialog in Eclipse](images/t40-06-runAsMaven11.png)
 
 For a Java or Scala project, the result should be similar to the following:
 

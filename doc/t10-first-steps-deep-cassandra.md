@@ -164,7 +164,7 @@ Step 2: Creating the table schemas
 ----------------------------------
 
 To create the schema for the table “Page”, we will use the CQL script provided with this tutorial: 
-[table-Page-create.cql](http://docs.openstratio.org/resources/cql-scripts/table-Page-create.cql "CQL script to create the table "Page""). 
+[table-Page-create.cql](resources/table-Page-create.cql "CQL script to create the table "Page""). 
 If you prefer so, you can create the schema manually by entering the statements in the CQL shell. Source 
 the script from the CQL shell:
 
@@ -219,7 +219,7 @@ CREATE TABLE "Page" (
 ~~~~
 
 Then same steps will be repeated to create the schema for the table “listdomains”, using the 
-[table-listdomains-create.cql](http://docs.openstratio.org/resources/cql-scripts/table-listdomains-create.cql "CQL script to create the table "listdomains"") 
+[table-listdomains-create.cql](resources/table-listdomains-create.cql "CQL script to create the table "listdomains"") 
 script: Source the script from the CQL shell:
 
 ~~~~ {code}
@@ -360,7 +360,7 @@ $ stratio-deep-shell
 
 A welcome screen will be displayed (figure 2).
 
-![Stratio Deep shell Welcome Screen](http://www.openstratio.org/wp-content/uploads/2014/01/stratio-deep-shell-WelcomeScreen.png)
+![Stratio Deep shell Welcome Screen](images/t10-deepshell.png)
 
 Figure 2: The Stratio Deep shell welcome screen
 

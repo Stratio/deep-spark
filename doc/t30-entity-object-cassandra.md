@@ -116,15 +116,15 @@ Step 1: Create a Maven project
 
 Create a new project using the “Maven project” wizard:
 
-![Screenshot of the "New project" window in Eclipse ](http://www.openstratio.org/wp-content/uploads/2014/02/01-create-maven-project.png)
+![Screenshot of the "New project" window in Eclipse ](images/t30-01-create-maven-project.png)
 
 In the first window, check the box “Create a simple project (skip archetype selection)” and click “next”:
 
-![Screenshot of the "New Maven Project" window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/02/02-check-simple-project.png)
+![Screenshot of the "New Maven Project" window in Eclipse](images/t30-02-check-simple-project.png)
 
 In the last window, enter the information related to the Maven artifact as shown in the screenshot below:
 
-![Screenshot of the "Configure project" window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/02/03-artifact-data.png)
+![Screenshot of the "Configure project" window in Eclipse](images/t30-03-artifact-data.png)
 
 The elements of the project have been created and appear in the Package Explorer window.
 
@@ -134,16 +134,16 @@ Step 2: Set the dependencies
 In the package explorer, look for the pom.xml file and open it. The file is shown in a graphical view with 
 the “Overview” tab selected:
 
-![Screenshot of the graphical view of the pom.xml file in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/02/04-pom-edition.png)
+![Screenshot of the graphical view of the pom.xml file in Eclipse](images/t30-04-pom-edition.png)
 
 Click on the “Dependencies” tab at the bottom of the window to add a dependency:
 
-![Screenshot of the dependencies tab in the graphical view of the pom.xml file](http://www.openstratio.org/wp-content/uploads/2014/02/05-pom-dependencies.png)
+![Screenshot of the dependencies tab in the graphical view of the pom.xml file](images/t30-05-pom-dependencies.png)
 
 Click the “Add” button, the one highlighted in the image above, fill in the fields: Groud id, Artifact Id 
 and Version (replace it with the current version) as shown in the screenshot below and click OK:
 
-![Screenshot of the Add Dependency window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/02/06-pom-dependency-add2.png)
+![Screenshot of the Add Dependency window in Eclipse](images/t30-06-pom-dependency-add2.png)
 
 Finally, click on the “pom.xml” tab to check that the following has been added to the XML (where DEEP-VERSION should 
 be your version of Deep, e.g.: 0.3.1):
@@ -161,7 +161,7 @@ be your version of Deep, e.g.: 0.3.1):
 Save the pom.xml file. A new folder “Maven Dependencies” should have appeared in the Project Explorer window, containing 
 libraries such as Stratio Deep core, cassandra-all and many more.
 
-Take a look at [maven central](http://search.maven.org/#search|gav|1|g%3A%22com.stratio.deep%22%20AND%20a%3A%22deep-parent%22) to know the latest stratio-deep version.
+Search [maven central](http://search.maven.org/) for the latest stratio-deep version.
 
 Step 3: Code the TweetEntity class
 ----------------------------------
@@ -169,7 +169,7 @@ Step 3: Code the TweetEntity class
 In the project explorer window, right click on src/main/java and choose “New…” then “Class” from the contextual 
 menu. A “New Java Class” window will be displayed, fill the form as follow to create the TweetPojo.java skeleton:
 
-![Screenshot of the New Java Class window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/02/07-new-java-class.png)
+![Screenshot of the New Java Class window in Eclipse](images/t30-07-new-java-class.png)
 
 The import statement for the IDeepType interface has been added automatically.
 
@@ -319,7 +319,7 @@ somewhere in the body of the class and in the main menu click on “Source”, t
 In the “Generate getters and setters” window, select all the properties except serialVersionUID, “last member” 
 as insertion point, “public” as access modifier and click OK:
 
-![Screenshot of the Generate Getters and Setters window in Eclipse](http://www.openstratio.org/wp-content/uploads/2014/02/09-generate-getters-setters.png)
+![Screenshot of the Generate Getters and Setters window in Eclipse](images/t30-09-generate-getters-setters.png)
 
 Methods have been added to the class. Save and close TweetEntity.java. We are ready to package the project.
 
