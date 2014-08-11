@@ -96,11 +96,11 @@
             <version>${project.version}</version>
             <type>test-jar</type>
             <exclusions>
-                <exclusion>
+              <!--  <exclusion>
                     <groupId>org.elasticsearch</groupId>
                     <artifactId>elasticsearch-hadoop</artifactId>
 
-                </exclusion>
+                </exclusion>-->
                 <exclusion>
                     <groupId>org.elasticsearch</groupId>
                     <artifactId>elasticsearch</artifactId>

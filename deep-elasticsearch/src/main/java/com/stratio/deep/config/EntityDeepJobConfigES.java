@@ -17,9 +17,12 @@
 package com.stratio.deep.config;
 
 import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.rdd.ESEntityRDD;
 import com.stratio.deep.utils.AnnotationUtils;
+import org.apache.spark.rdd.RDD;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,6 +73,17 @@ public final class EntityDeepJobConfigES<T extends IDeepType> extends GenericDee
         mapDBNameToEntityName = Collections.unmodifiableMap(tmpMap);
 
         return this;
+    }
+
+    @Override
+    public Class getRDDClass() {
+        return ESEntityRDD.class;
+    }
+
+    @Override
+    public Method getSaveMethod() throws NoSuchMethodException {
+        return ESEntityRDD.class.getDeclaredMethod("saveRDD", RDD.class, IDeepJobConfig.class);
+//        return ESEntityRDD.class.getMethod("pruebaAbsoluta", Integer.class);
     }
 
 

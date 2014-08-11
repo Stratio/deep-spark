@@ -25,6 +25,8 @@ import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.utils.AnnotationUtils;
 import com.stratio.deep.utils.Utils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.spark.rdd.RDD;
 
 import java.lang.annotation.AnnotationTypeMismatchException;
 import java.lang.reflect.Field;
@@ -68,6 +70,21 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         mapDBNameToEntityName = Collections.unmodifiableMap(tmpMap);
 
         return this;
+    }
+
+    @Override
+    public Class<? extends RDD<T>> getRDDClass() {
+        return null;
+    }
+
+    @Override
+    public Method getSaveMethod() throws NoSuchMethodException {
+        return null;
+    }
+
+    @Override
+    public Configuration getHadoopConfiguration() {
+        return null;
     }
 
     /**

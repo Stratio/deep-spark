@@ -29,7 +29,7 @@ import java.util.*;
 /**
  * @param <T>
  */
-public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
+public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     private static final long serialVersionUID = -7179376653643603038L;
 
 
@@ -357,6 +357,7 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         this.customConfiguration=customConfiguration;
         return this;
     }
+
 
     /**
      * {@inheritDoc}

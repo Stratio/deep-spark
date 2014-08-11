@@ -17,6 +17,10 @@
 package com.stratio.deep.config;
 
 import com.stratio.deep.entity.Cells;
+import com.stratio.deep.rdd.mongodb.MongoCellRDD;
+import org.apache.spark.rdd.RDD;
+
+import java.lang.reflect.Method;
 
 
 public class CellDeepJobConfigMongoDB extends GenericDeepJobConfigMongoDB<Cells> {
@@ -35,6 +39,16 @@ public class CellDeepJobConfigMongoDB extends GenericDeepJobConfigMongoDB<Cells>
     @Override
     public Class<Cells> getEntityClass() {
         return (Class<Cells>) dummyCells.getClass();
+    }
+
+    @Override
+    public Class<? extends RDD<Cells>> getRDDClass() {
+        return MongoCellRDD.class;
+    }
+
+    @Override
+    public Method getSaveMethod() throws NoSuchMethodException {
+        return null;
     }
 
 }

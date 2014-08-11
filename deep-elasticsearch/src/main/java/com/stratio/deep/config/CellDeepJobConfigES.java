@@ -17,6 +17,9 @@
 package com.stratio.deep.config;
 
 import com.stratio.deep.entity.Cells;
+import com.stratio.deep.rdd.ESCellRDD;
+
+import java.lang.reflect.Method;
 
 /**
  * Created by rcrespo on 29/07/14.
@@ -37,6 +40,15 @@ public class CellDeepJobConfigES extends GenericDeepJobConfigES<Cells> {
     @Override
     public Class<Cells> getEntityClass() {
         return (Class<Cells>) dummyCells.getClass();
+    }
+
+    @Override
+    public Class<ESCellRDD> getRDDClass() {
+        return (Class<ESCellRDD>) ESCellRDD.class;
+    }
+
+    public Method getSaveMethod() throws NoSuchMethodException {
+        return ESCellRDD.class.getMethod("saveCell");
     }
 
 }

@@ -17,6 +17,7 @@
 package com.stratio.deep.rdd.mongodb;
 
 import com.mongodb.hadoop.MongoOutputFormat;
+import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepTransformException;
@@ -48,8 +49,8 @@ public final class MongoCellRDD extends DeepMongoRDD<Cells> {
      * @param config the deep configuration object.
      */
     @SuppressWarnings("unchecked")
-    public MongoCellRDD(SparkContext sc, IMongoDeepJobConfig<Cells> config) {
-        super(sc, config, ClassTag$.MODULE$.<Cells>apply(config.getEntityClass()));
+    public MongoCellRDD(SparkContext sc, IDeepJobConfig<Cells, IMongoDeepJobConfig<Cells>> config) {
+        super(sc, (IMongoDeepJobConfig<Cells>) config, ClassTag$.MODULE$.<Cells>apply(config.getEntityClass()));
     }
 
     /**

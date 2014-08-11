@@ -16,6 +16,7 @@
 
 package com.stratio.deep.rdd;
 
+import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.IESDeepJobConfig;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepTransformException;
@@ -49,8 +50,8 @@ public final class ESEntityRDD<T extends IDeepType> extends DeepElasticSearchRDD
      * @param config the deep configuration object.
      */
     @SuppressWarnings("unchecked")
-    public ESEntityRDD(SparkContext sc, IESDeepJobConfig<T> config) {
-        super(sc, config, ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
+    public ESEntityRDD(SparkContext sc, IDeepJobConfig<T, IESDeepJobConfig<T>> config) {
+        super(sc, (IESDeepJobConfig<T>) config, ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
     }
 
     /**
@@ -76,7 +77,7 @@ public final class ESEntityRDD<T extends IDeepType> extends DeepElasticSearchRDD
      * @param config
      * @param <T>
      */
-    public static <T extends IDeepType> void saveEntity(RDD<T> rdd, IESDeepJobConfig<T> config) {
+    public static <T extends IDeepType> void saveRDD(RDD<T> rdd, IDeepJobConfig<T, IESDeepJobConfig<T>> config) {
 
         JavaPairRDD<Object, JSONObject> save = rdd.toJavaRDD().mapToPair(new PairFunction<T, Object, JSONObject>() {
 
@@ -88,8 +89,12 @@ public final class ESEntityRDD<T extends IDeepType> extends DeepElasticSearchRDD
         });
 
 
-        save.saveAsNewAPIHadoopFile("file:///entity", Object.class, Object.class, EsOutputFormat.class, config.getHadoopConfiguration());
+        save.saveAsNewAPIHadoopFile("file:///entity", Object.class, Object.class, EsOutputFormat.class, ((IESDeepJobConfig)config).getHadoopConfiguration());
     }
 
+    public static void pruebaAbsoluta(Integer numero)
+    {
+        System.out.println("paso por el prueb absoluta");
+    }
 
 }

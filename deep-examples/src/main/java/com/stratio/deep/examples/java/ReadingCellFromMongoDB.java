@@ -19,7 +19,7 @@ package com.stratio.deep.examples.java;
 import com.mongodb.QueryBuilder;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.config.MongoConfigFactory;
-import com.stratio.deep.context.MongoDeepSparkContext;
+import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
@@ -51,7 +51,7 @@ public final class ReadingCellFromMongoDB {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    MongoDeepSparkContext deepContext = new MongoDeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
         QueryBuilder query = QueryBuilder.start();
@@ -71,11 +71,15 @@ public final class ReadingCellFromMongoDB {
                 .filterQuery(query)
                 .sort(bsonSort).fields(bsonFields).initialize();
 
-        RDD inputRDDEntity = deepContext.mongoRDD(inputConfigEntity);
+        RDD inputRDDEntity = deepContext.createRDD(inputConfigEntity);
 
-
-	    LOG.info("count : " + inputRDDEntity.count());
-	    LOG.info("prints first cell  : " + inputRDDEntity.first());
+        LOG.info("****************************************************************************");
+        LOG.info("****************************************************************************");
+        LOG.info("****************************************************************************");
+        LOG.info("****************************************************************************");
+        LOG.info("****************************************************************************");
+	    LOG.error("count : " + inputRDDEntity.count());
+	    LOG.error("prints first cell  : " + inputRDDEntity.first());
 
 
         deepContext.stop();

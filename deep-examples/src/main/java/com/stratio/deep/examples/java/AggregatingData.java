@@ -20,7 +20,7 @@ import com.google.common.collect.Lists;
 
 import com.stratio.deep.config.CassandraConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.context.CassandraDeepSparkContext;
+import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
@@ -29,8 +29,11 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 import scala.Tuple3;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -70,7 +73,7 @@ public class AggregatingData {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    CassandraDeepSparkContext deepContext = new CassandraDeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
+	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // Creating a configuration for the RDD and initialize it
         ICassandraDeepJobConfig<TweetEntity> config = CassandraConfigFactory.create(TweetEntity.class)
@@ -79,10 +82,10 @@ public class AggregatingData {
                 .initialize();
 
         // Creating the RDD
-        JavaRDD<TweetEntity> rdd = deepContext.cassandraJavaRDD(config);
+        RDD<TweetEntity> rdd = deepContext.createRDD(config);
 
         // grouping to get key-value pairs
-        JavaPairRDD<String, Integer> groups = rdd.groupBy(new Function<TweetEntity, String>() {
+        JavaPairRDD<String, Integer> groups = rdd.toJavaRDD().groupBy(new Function<TweetEntity, String>() {
             @Override
             public String call(TweetEntity tableEntity) {
                 return tableEntity.getAuthor();

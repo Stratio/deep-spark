@@ -17,6 +17,10 @@
 package com.stratio.deep.config;
 
 import com.stratio.deep.entity.Cells;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.spark.rdd.RDD;
+
+import java.lang.reflect.Method;
 
 /**
  * Cell-based configuration object.
@@ -40,6 +44,21 @@ public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
     @Override
     public Class<Cells> getEntityClass() {
         return (Class<Cells>) dummyCells.getClass();
+    }
+
+    @Override
+    public Class<? extends RDD<Cells>> getRDDClass() {
+        return null;
+    }
+
+    @Override
+    public Method getSaveMethod() throws NoSuchMethodException {
+        return null;
+    }
+
+    @Override
+    public Configuration getHadoopConfiguration() {
+        return null;
     }
 
 }

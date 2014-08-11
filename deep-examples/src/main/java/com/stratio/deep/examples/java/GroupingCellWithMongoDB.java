@@ -18,7 +18,7 @@ package com.stratio.deep.examples.java;
 
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.config.MongoConfigFactory;
-import com.stratio.deep.context.MongoDeepSparkContext;
+import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.MongoCell;
@@ -35,6 +35,7 @@ import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
 import java.util.ArrayList;
@@ -68,23 +69,23 @@ public final class GroupingCellWithMongoDB {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    MongoDeepSparkContext deepContext = new MongoDeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
 
         IMongoDeepJobConfig<Cells> inputConfigEntity =
 				        MongoConfigFactory.createMongoDB().host(host).database(database).collection(inputCollection).initialize();
 
-        JavaRDD<Cells> inputRDDEntity = deepContext.mongoJavaRDD(inputConfigEntity);
+        RDD<Cells> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
 
 
-        JavaRDD<String> words =inputRDDEntity.flatMap(new FlatMapFunction<Cells, String>() {
+        JavaRDD<String> words =inputRDDEntity.toJavaRDD().flatMap(new FlatMapFunction<Cells, String>() {
             @Override
             public Iterable<String> call(Cells cells) throws Exception {
 
                 List<String> words = new ArrayList<>();
-                for (Cells canto : (List<Cells>)cells.getCellByName("cantos").getCellValue() ){
-                    words.addAll(Arrays.asList( ((String)canto.getCellByName("text").getCellValue()).split(" ")));
+                for (Cells canto : (List<Cells>) cells.getCellByName("cantos").getCellValue()) {
+                    words.addAll(Arrays.asList(((String) canto.getCellByName("text").getCellValue()).split(" ")));
                 }
                 return words;
             }

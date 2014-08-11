@@ -17,9 +17,11 @@
 package com.stratio.deep.config;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import com.stratio.deep.entity.Cell;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.rdd.RDD;
 
 /**
@@ -148,6 +150,17 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig> extends Serializabl
      */
     S customConfiguration(Map<String, Object> customConfiguration);
 
+    Class<? extends RDD> getRDDClass();
+
+
+    Method getSaveMethod() throws NoSuchMethodException;
+
+
+//    /**
+//     * Just in case you have a hadoopInputFormat
+//     * @return
+//     */
+    Configuration getHadoopConfiguration();
 
 
 }
