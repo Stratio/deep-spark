@@ -150,7 +150,7 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig> extends Serializabl
      */
     S customConfiguration(Map<String, Object> customConfiguration);
 
-    Class<? extends RDD> getRDDClass();
+    Class<?> getRDDClass();
 
 
     Method getSaveMethod() throws NoSuchMethodException;

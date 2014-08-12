@@ -25,6 +25,7 @@ import com.google.common.collect.*;
 
 import com.datastax.driver.core.*;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
+import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
@@ -139,14 +140,14 @@ public class RangeUtils {
      * @param config the Deep configuration object.
      * @return the list of computed token ranges.
      */
-    public static List<DeepTokenRange> getSplits(ICassandraDeepJobConfig config) {
+    public static List<DeepTokenRange> getSplits(IDeepJobConfig config) {
         Map<String, Iterable<Comparable>> tokens = new HashMap<>();
-        IPartitioner p = getPartitioner(config);
+        IPartitioner p = getPartitioner((ICassandraDeepJobConfig)config);
 
         Pair<Session, String> sessionWithHost =
                 CassandraClientProvider.getSession(
 				                config.getHost(),
-				                config, false);
+                        (ICassandraDeepJobConfig)config, false);
 
         String queryLocal = "select tokens from system.local";
         tokens.putAll(fetchTokens(queryLocal, sessionWithHost, p));
@@ -155,7 +156,7 @@ public class RangeUtils {
         tokens.putAll(fetchTokens(queryPeers, sessionWithHost, p));
 
 	    List<DeepTokenRange> merged = mergeTokenRanges(tokens, sessionWithHost.left, p);
-	    return splitRanges(merged, p, config.getBisectFactor());
+	    return splitRanges(merged, p, ((ICassandraDeepJobConfig)config).getBisectFactor());
     }
 
     private static List<DeepTokenRange> splitRanges(

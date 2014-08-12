@@ -21,14 +21,17 @@ import java.util.Map;
 
 import com.stratio.deep.config.EntityDeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
+import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.spark.SparkContext;
+import org.apache.spark.broadcast.Broadcast;
 
 /**
  * Stratio's implementation of an RDD reading and writing data from and to
@@ -50,20 +53,20 @@ public final class CassandraEntityRDD<T extends IDeepType> extends CassandraRDD<
      * @param sc parent spark context
      * @param config the configuration object
      */
-    public CassandraEntityRDD(SparkContext sc, ICassandraDeepJobConfig<T> config) {
-        super(sc, config);
-    }
+//    public CassandraEntityRDD(SparkContext sc, ICassandraDeepJobConfig<T> config) {
+//        super(sc, config);
+//    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem) {
+    protected T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem, Broadcast<IDeepJobConfig<T, IDeepJobConfig<T, ?>>> config) {
         Map<String, Cell> columnDefinitions = config.value().columnDefinitions();
 
         Class<T> entityClass = config.value().getEntityClass();
 
-        EntityDeepJobConfig<T> edjc = (EntityDeepJobConfig<T>) config.value();
+        EntityDeepJobConfig<T> edjc = (EntityDeepJobConfig) config.value();
         T instance = Utils.newTypeInstance(entityClass);
 
         for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
@@ -82,10 +85,11 @@ public final class CassandraEntityRDD<T extends IDeepType> extends CassandraRDD<
             try {
                 edjc.setInstancePropertyFromDbName(instance, entry.getKey(), marshaller.compose(entry.getValue()));
             } catch (DeepNoSuchFieldException e) {
-                log().debug(e.getMessage());
+//                log().debug(e.getMessage());
             }
         }
 
         return instance;
     }
+
 }

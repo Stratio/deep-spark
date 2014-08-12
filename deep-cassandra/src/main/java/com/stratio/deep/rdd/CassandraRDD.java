@@ -16,11 +16,13 @@
 
 package com.stratio.deep.rdd;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
 import com.stratio.deep.config.ICassandraDeepJobConfig;
+import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.cql.DeepRecordReader;
 import com.stratio.deep.cql.DeepTokenRange;
 import com.stratio.deep.cql.RangeUtils;
@@ -52,14 +54,14 @@ import static scala.collection.JavaConversions.asScalaIterator;
  * Implementors should only provide a way to convert an object of type T to a {@link com.stratio.deep.entity.Cells}
  * element.
  */
-public abstract class CassandraRDD<T> extends RDD<T> {
+public abstract class CassandraRDD<T> implements IDeepRDD<T>, Serializable {
 
     private static final long serialVersionUID = -7338324965474684418L;
 
     /**
      * RDD configuration. This config is broadcasted to all the Sparks machines.
      */
-    protected final Broadcast<ICassandraDeepJobConfig<T>> config;
+//    protected final Broadcast<ICassandraDeepJobConfig<T>> config;
 
     /**
      * Transform a row coming from the Cassandra's API to an element of
@@ -68,7 +70,8 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * @param elem the element to transform.
      * @return the transformed element.
      */
-    protected abstract T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem);
+    @SuppressWarnings("unchecked")
+    protected abstract T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem, Broadcast<IDeepJobConfig<T, IDeepJobConfig<T, ?>>> config);
 
     /**
      * Helper callback class called by Spark when the current RDD is computed
@@ -162,30 +165,30 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     }
 
 
-    /**
-     * Public constructor that builds a new Cassandra RDD given the context and the configuration file.
-     *
-     * @param sc     the spark context to which the RDD will be bound to.
-     * @param config the deep configuration object.
-     */
-    @SuppressWarnings("unchecked")
-    public CassandraRDD(SparkContext sc, ICassandraDeepJobConfig<T> config) {
-        super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
-        this.config = sc.broadcast(config, ClassTag$.MODULE$.<ICassandraDeepJobConfig<T>>apply(config.getClass()));
-    }
+//    /**
+//     * Public constructor that builds a new Cassandra RDD given the context and the configuration file.
+//     *
+//     * @param sc     the spark context to which the RDD will be bound to.
+//     * @param config the deep configuration object.
+//     */
+//    @SuppressWarnings("unchecked")
+//    public CassandraRDD(SparkContext sc, ICassandraDeepJobConfig<T> config) {
+//        super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
+//        this.config = sc.broadcast(config, ClassTag$.MODULE$.<ICassandraDeepJobConfig<T>>apply(config.getClass()));
+//    }
 
     /**
      * Computes the current RDD over the given data partition. Returns an
      * iterator of Scala tuples.
      */
     @Override
-    public Iterator<T> compute(Partition split, TaskContext ctx) {
+    public Iterator<T> compute(Partition split, TaskContext ctx, final Broadcast<IDeepJobConfig<T, IDeepJobConfig<T, ?>>> config) {
 
         DeepPartition deepPartition = (DeepPartition) split;
 
-        log().debug("Executing compute for split: " + deepPartition);
+//        log().debug("Executing compute for split: " + deepPartition);
 
-        final DeepRecordReader recordReader = initRecordReader(ctx, deepPartition);
+        final DeepRecordReader recordReader = initRecordReader(ctx, deepPartition, config);
 
         /**
          * Creates a new anonymous iterator inner class and returns it as a
@@ -200,7 +203,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
 
             @Override
             public T next() {
-                return transformElement(recordReader.next());
+                return transformElement(recordReader.next(),config);
             }
 
             @Override
@@ -233,7 +236,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * number of tokens configured in cassandra.yaml + 1.
      */
     @Override
-    public Partition[] getPartitions() {
+    public Partition[] getPartitions(Broadcast<IDeepJobConfig<T, IDeepJobConfig<T, ?>>> config, int id) {
 
         List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits(config.value());
 
@@ -242,9 +245,9 @@ public abstract class CassandraRDD<T> extends RDD<T> {
         int i = 0;
 
         for (DeepTokenRange split : underlyingInputSplits) {
-            partitions[i] = new DeepPartition(id(), i, split);
+            partitions[i] = new DeepPartition(id, i, split);
 
-            log().debug("Detected partition: " + partitions[i]);
+//            log().debug("Detected partition: " + partitions[i]);
             ++i;
         }
 
@@ -254,12 +257,11 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     /**
      * Returns a list of hosts on which the given split resides.
      */
-    @Override
     public Seq<String> getPreferredLocations(Partition split) {
         DeepPartition p = (DeepPartition) split;
 
         List<String> locations = p.splitWrapper().getReplicas();
-        log().debug("getPreferredLocations: " + p);
+//        log().debug("getPreferredLocations: " + p);
 
         return asScalaBuffer(locations);
     }
@@ -271,8 +273,8 @@ public abstract class CassandraRDD<T> extends RDD<T> {
      * @param dp  a spark deep partition
      * @return the deep record reader associated to the provided partition.
      */
-    private DeepRecordReader initRecordReader(TaskContext ctx, final DeepPartition dp) {
-        DeepRecordReader recordReader = new DeepRecordReader(config.value(), dp.splitWrapper());
+    private DeepRecordReader initRecordReader(TaskContext ctx, final DeepPartition dp, Broadcast<IDeepJobConfig<T, IDeepJobConfig<T, ?>>> config) {
+        DeepRecordReader recordReader = new DeepRecordReader((ICassandraDeepJobConfig )config.value(), dp.splitWrapper());
         ctx.addOnCompleteCallback(getComputeCallback(recordReader, dp));
         return recordReader;
 

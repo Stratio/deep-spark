@@ -24,6 +24,8 @@ import java.util.Map;
 
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepInstantiationException;
+import com.stratio.deep.rdd.DeepRDD;
+import com.stratio.deep.rdd.IDeepRDD;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -99,11 +101,11 @@ public class DeepSparkContext extends JavaSparkContext {
         super(master, appName, sparkHome, jars, environment);
     }
 
-    public <T, S extends IDeepJobConfig>RDD<T> createRDD(IDeepJobConfig<T, S> deepJobConfig) {
+    public <T >RDD<T> createRDD(IDeepJobConfig deepJobConfig) {
         try{
             Class rdd = deepJobConfig.getRDDClass();
-            Constructor c = rdd.getConstructor(SparkContext.class, IDeepJobConfig.class);
-            return (RDD<T>) c.newInstance(sc(), deepJobConfig);
+            Constructor c = rdd.getConstructor();
+            return new DeepRDD<T>(this.sc(), deepJobConfig, (IDeepRDD)c.newInstance());
         }
         catch(InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
@@ -111,6 +113,11 @@ public class DeepSparkContext extends JavaSparkContext {
         }
 
     }
+
+//    public static void haceAlgo(){
+//        DeepRDD deep =   new DeepRDD()
+//    }
+
 
     public <T, S extends IDeepJobConfig>void saveRDD(RDD<T> rdd, IDeepJobConfig<T, S> deepJobConfig)  {
         try{

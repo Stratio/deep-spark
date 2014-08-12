@@ -20,11 +20,13 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 
 import com.stratio.deep.config.ICassandraDeepJobConfig;
+import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.utils.Pair;
 import org.apache.spark.SparkContext;
+import org.apache.spark.broadcast.Broadcast;
 
 /**
  * Concrete implementation of a CassandraRDD representing an RDD of {@link com.stratio.deep.entity.Cells} element.<br/>
@@ -40,18 +42,18 @@ public class CassandraCellRDD extends CassandraRDD<Cells> {
      * @param sc
      * @param config
      */
-    public CassandraCellRDD(SparkContext sc, ICassandraDeepJobConfig<Cells> config) {
-        super(sc, config);
-    }
+//    public CassandraCellRDD(SparkContext sc, ICassandraDeepJobConfig<Cells> config) {
+//        super(sc, config);
+//    }
 
     /**
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
     @Override
-    protected Cells transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem) {
+    protected Cells transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem, Broadcast<IDeepJobConfig<Cells, IDeepJobConfig<Cells, ?>>> config) {
 
-        Cells cells = new Cells(config.getValue().getTable());
+        Cells cells = new Cells(((ICassandraDeepJobConfig)config.getValue()).getTable());
         Map<String, Cell> columnDefinitions = config.value().columnDefinitions();
 
 

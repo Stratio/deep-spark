@@ -17,6 +17,7 @@
 package com.stratio.deep.config;
 
 import com.stratio.deep.entity.Cells;
+import com.stratio.deep.rdd.CassandraCellRDD;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.rdd.RDD;
 
@@ -47,8 +48,8 @@ public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
     }
 
     @Override
-    public Class<? extends RDD<Cells>> getRDDClass() {
-        return null;
+    public Class<?> getRDDClass() {
+        return CassandraCellRDD.class;
     }
 
     @Override
