@@ -27,7 +27,7 @@ import org.apache.hadoop.io.Writable
 import org.apache.hadoop.mapreduce._
 import org.apache.spark._
 import org.apache.spark.annotation.DeveloperApi
-
+import org.apache.spark.broadcast.Broadcast
 import scala.reflect.ClassTag
 
 
@@ -62,8 +62,8 @@ abstract class DeepHadoopRDD[T: ClassTag, S <:IDeepJobConfig[_,_<:AnyRef] : Clas
 //  IDeepJobConfig[T, _ <:IDeepJobConfig[_,_<:AnyRef]]
   // A Hadoop Configuration can be about 10 KB, which is pretty big, so broadcast it
 
-  this.config = sc.broadcast(conf)
-  private val confBroadcast = sc.broadcast(conf)
+  this.config = sc.broadcast(conf).asInstanceOf[Broadcast[IDeepJobConfig[T, _ <: IDeepJobConfig[_,_]]]]
+//  private val confBroadcast = sc.broadcast(conf)
   // private val serializableConf = new SerializableWritable(conf)
 
   private val jobTrackerId: String = {
@@ -77,10 +77,10 @@ abstract class DeepHadoopRDD[T: ClassTag, S <:IDeepJobConfig[_,_<:AnyRef] : Clas
     val inputFormat = inputFormatClass.newInstance
     inputFormat match {
       case configurable: Configurable =>
-        configurable.setConf(config.getHadoopConfiguration)
+        configurable.setConf(config.getValue.getHadoopConfiguration)
       case _ =>
     }
-    val jobContext = newJobContext(config.getHadoopConfiguration, jobId)
+    val jobContext = newJobContext(config.getValue.getHadoopConfiguration, jobId)
     val rawSplits = inputFormat.getSplits(jobContext).toArray
     val result = new Array[Partition](rawSplits.size)
     for (i <- 0 until rawSplits.size) {
@@ -95,7 +95,7 @@ abstract class DeepHadoopRDD[T: ClassTag, S <:IDeepJobConfig[_,_<:AnyRef] : Clas
     val iter = new Iterator[T] {
       val split = theSplit.asInstanceOf[NewHadoopPartition]
       logInfo("Input split: " + split.serializableHadoopSplit)
-      val conf = confBroadcast.value.getHadoopConfiguration
+      val conf = config.value.getHadoopConfiguration
       val attemptId = newTaskAttemptID(jobTrackerId, id, isMap = true, split.index, 0)
       val hadoopAttemptContext = newTaskAttemptContext(conf, attemptId)
       val format = inputFormatClass.newInstance
@@ -147,5 +147,5 @@ abstract class DeepHadoopRDD[T: ClassTag, S <:IDeepJobConfig[_,_<:AnyRef] : Clas
     theSplit.serializableHadoopSplit.value.getLocations.filter(_ != "localhost")
   }
 
-  def getConf: IDeepJobConfig[T, _ <:IDeepJobConfig[_,_]]  = confBroadcast.value
+  def getConf: IDeepJobConfig[T, _ <:IDeepJobConfig[_,_]]  = config.value
 }
