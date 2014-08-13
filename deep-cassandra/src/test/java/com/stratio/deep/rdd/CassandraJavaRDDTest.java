@@ -60,7 +60,7 @@ import static org.testng.Assert.*;
 public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     private Logger logger = Logger.getLogger(getClass());
 
-    private CassandraJavaRDD<TestEntity> rdd;
+    private JavaRDD<TestEntity> rdd;
     protected ICassandraDeepJobConfig<TestEntity> rddConfig;
 
     JavaRDD<TestEntity> slowPages = null;
@@ -84,7 +84,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
         logger.info("Constructed configuration object: " + rddConfig);
         logger.info("Constructiong cassandraRDD");
 
-        rdd = (CassandraJavaRDD<TestEntity>) context.cassandraJavaRDD(rddConfig);
+        rdd = context.createJavaRDD(rddConfig);
     }
 
     @Test

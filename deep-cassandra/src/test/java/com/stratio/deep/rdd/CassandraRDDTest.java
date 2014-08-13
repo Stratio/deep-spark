@@ -25,6 +25,7 @@ import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.spark.Partition;
+import org.apache.spark.rdd.RDD;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import scala.collection.Seq;
@@ -41,7 +42,7 @@ import static org.testng.Assert.assertNotNull;
 public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     private Logger logger = Logger.getLogger(getClass());
 
-    protected CassandraRDD<W> rdd;
+    protected RDD<W> rdd;
     private ICassandraDeepJobConfig<W> rddConfig;
     private ICassandraDeepJobConfig<W> writeConfig;
 
@@ -53,7 +54,7 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
 
     protected abstract void checkSimpleTestData();
 
-    protected CassandraRDD<W> getRDD() {
+    protected RDD<W> getRDD() {
         return this.rdd;
     }
 
@@ -65,7 +66,7 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
         return writeConfig;
     }
 
-    protected abstract CassandraRDD<W> initRDD();
+    protected abstract RDD<W> initRDD();
 
     protected abstract ICassandraDeepJobConfig<W> initReadConfig();
 

@@ -120,7 +120,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
 
   private def initRDD(): CassandraRDD[DeepScalaPageEntity] = {
 
-    super.getContext.cassandraRDD(rddConfig).asInstanceOf[CassandraRDD[DeepScalaPageEntity]]
+    super.getcontext.createRDD(rddConfig).asInstanceOf[CassandraRDD[DeepScalaPageEntity]]
   }
 
   private def checkSimpleTestData(): Unit = {

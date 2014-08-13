@@ -197,8 +197,8 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
     }
 
     @Override
-    protected CassandraRDD<Cql3CollectionsTestEntity> initRDD() {
-        return context.cassandraRDD(getReadConfig());
+    protected RDD<Cql3CollectionsTestEntity> initRDD() {
+        return context.createRDD(getReadConfig());
     }
 
     @Override

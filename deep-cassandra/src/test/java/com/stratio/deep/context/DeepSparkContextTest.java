@@ -30,25 +30,25 @@ import org.testng.annotations.Test;
 public class DeepSparkContextTest {
 
     public void testInstantiationBySparkContext() {
-        DeepSparkContext sc = new CassandraDeepSparkContext(new SparkContext("local", "myapp1", new SparkConf()));
+        DeepSparkContext sc = new DeepSparkContext(new SparkContext("local", "myapp1", new SparkConf()));
 
         sc.stop();
     }
 
     public void testInstantiationWithJar() {
-        DeepSparkContext sc = new CassandraDeepSparkContext("local", "myapp1", "/tmp", "");
+        DeepSparkContext sc = new DeepSparkContext("local", "myapp1", "/tmp", "");
         sc.stop();
     }
 
 
     public void testInstantiationWithJars() {
-        DeepSparkContext sc = new CassandraDeepSparkContext("local", "myapp1", "/tmp", new String[]{"", ""});
+        DeepSparkContext sc = new DeepSparkContext("local", "myapp1", "/tmp", new String[]{"", ""});
         sc.stop();
     }
 
     public void testInstantiationWithJarsAndEnv() {
         Map<String, String> env = new HashMap<>();
-        DeepSparkContext sc = new CassandraDeepSparkContext("local", "myapp1", "/tmp", new String[]{"", ""}, env);
+        DeepSparkContext sc = new DeepSparkContext("local", "myapp1", "/tmp", new String[]{"", ""}, env);
         sc.stop();
     }
 }
