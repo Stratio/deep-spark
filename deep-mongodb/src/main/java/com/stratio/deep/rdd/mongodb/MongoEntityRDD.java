@@ -17,13 +17,17 @@
 package com.stratio.deep.rdd.mongodb;
 
 import com.mongodb.hadoop.MongoOutputFormat;
+import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.IMongoDeepJobConfig;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepTransformException;
+import com.stratio.deep.rdd.IDeepHadoopRDD;
 import com.stratio.deep.utils.UtilMongoDB;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.rdd.DeepMongoRDD;
 import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
@@ -37,39 +41,38 @@ import scala.reflect.ClassTag$;
  *
  * @param <T>
  */
-public final class MongoEntityRDD<T extends IDeepType> extends DeepMongoRDD<T> {
+public final class MongoEntityRDD<T> implements IDeepHadoopRDD<T, Object, BSONObject> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoEntityRDD.class);
     private static final long serialVersionUID = -3208994171892747470L;
 
 
-    /**
-     * Public constructor that builds a new MongoEntityRDD RDD given the context and the configuration file.
-     *
-     * @param sc     the spark context to which the RDD will be bound to.
-     * @param config the deep configuration object.
-     */
-    @SuppressWarnings("unchecked")
-    public MongoEntityRDD(SparkContext sc, IMongoDeepJobConfig<T> config) {
-        super(sc, config, ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
-    }
+//    /**
+//     * Public constructor that builds a new MongoEntityRDD RDD given the context and the configuration file.
+//     *
+//     * @param sc     the spark context to which the RDD will be bound to.
+//     * @param config the deep configuration object.
+//     */
+//    @SuppressWarnings("unchecked")
+//    public MongoEntityRDD(SparkContext sc, IMongoDeepJobConfig<T> config) {
+//        super(sc, config, ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
+//    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public T transformElement(Tuple2<Object, BSONObject> tuple) {
+    public T transformElement(Tuple2<Object, BSONObject> tuple, Broadcast<IDeepJobConfig<T, ? extends IDeepJobConfig<?,?>>> config ) {
 
 
         try {
-            return UtilMongoDB.getObjectFromBson(this.getConf().getEntityClass(), tuple._2());
+            return UtilMongoDB.getObjectFromBson(config.value().getEntityClass(), tuple._2());
         } catch (Exception e) {
             LOG.error("Cannot convert BSON: ", e);
             throw new DeepTransformException("Could not transform from Bson to Entity " + e.getMessage());
         }
 
     }
-
 
     /**
      * Save a RDD to MongoDB
@@ -93,5 +96,6 @@ public final class MongoEntityRDD<T extends IDeepType> extends DeepMongoRDD<T> {
         // Only MongoOutputFormat and config are relevant
         save.saveAsNewAPIHadoopFile("file:///entity", Object.class, Object.class, MongoOutputFormat.class, config.getHadoopConfiguration());
     }
+
 
 }

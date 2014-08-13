@@ -21,6 +21,7 @@ import com.stratio.deep.entity.Cell;
 import com.stratio.deep.utils.Utils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapreduce.InputFormat;
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
 
@@ -287,6 +288,13 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
         return hostList;
     }
 
+
+
+
+    @Override
+    public Class<? extends InputFormat<?,?>> getInputFormat() {
+        return null;
+    }
 
 
 }

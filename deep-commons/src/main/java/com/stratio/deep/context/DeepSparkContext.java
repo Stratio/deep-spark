@@ -17,26 +17,28 @@
 package com.stratio.deep.context;
 
 
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Map;
 
 import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepInstantiationException;
-import com.stratio.deep.rdd.DeepRDD;
-import com.stratio.deep.rdd.IDeepRDD;
+import com.stratio.deep.rdd.*;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
+import scala.reflect.ClassTag$;
 
 /**
  * Entry point to the Cassandra-aware Spark context.
  *
  * @author Luca Rosellini <luca@stratio.com>
  */
-public class DeepSparkContext extends JavaSparkContext {
+public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
     private static final Logger LOG = Logger.getLogger(DeepSparkContext.class);
 
@@ -101,32 +103,49 @@ public class DeepSparkContext extends JavaSparkContext {
         super(master, appName, sparkHome, jars, environment);
     }
 
-    public <T >RDD<T> createRDD(IDeepJobConfig deepJobConfig) {
+
+    /**
+     *
+     * @param deepJobConfig
+     * @param <T>
+     * @return
+     */
+    public <T> RDD<T> createRDD(final IDeepJobConfig deepJobConfig) {
         try{
+
             Class rdd = deepJobConfig.getRDDClass();
-            Constructor c = rdd.getConstructor();
-            return new DeepRDD<T>(this.sc(), deepJobConfig, (IDeepRDD)c.newInstance());
+            final Constructor c = rdd.getConstructor();
+            if(deepJobConfig.getInputFormat()!=null){
+                 return new DeepGenericHadoopRDD(this.sc(), deepJobConfig, deepJobConfig.getInputFormat(),(IDeepHadoopRDD)c.newInstance(),
+                ClassTag$.MODULE$.<Cells>apply(deepJobConfig.getEntityClass()), ClassTag$.MODULE$.Any(), ClassTag$.MODULE$.Any());
+            }else{
+
+                return new DeepRDD<T>(this.sc(), deepJobConfig, (IDeepRDD)c.newInstance());
+            }
+
         }
         catch(InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
+            LOG.error("impossible to instance IDeepJobConfig, check configuration");
             throw new DeepInstantiationException( e.getMessage());
         }
 
     }
 
-//    public static void haceAlgo(){
-//        DeepRDD deep =   new DeepRDD()
-//    }
-
-
-    public <T, S extends IDeepJobConfig>void saveRDD(RDD<T> rdd, IDeepJobConfig<T, S> deepJobConfig)  {
-        try{
-        deepJobConfig.getSaveMethod().invoke(null, rdd, deepJobConfig);
-    }
-    catch(NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-        throw new DeepInstantiationException( e.getMessage());
-    }
+    /**
+     *
+     * @param deepJobConfig
+     * @param <T>
+     * @param <S>
+     * @return
+     */
+    public <T, S extends IDeepJobConfig<?,?>> JavaRDD<T> createJavaRDD(IDeepJobConfig<T, S> deepJobConfig){
+        return new DeepJavaRDD((DeepRDD<T>)createRDD(deepJobConfig));
     }
 
 
-}
+    public <T, S extends IDeepJobConfig<?,?>>void saveRDD(RDD<T> rdd, IDeepJobConfig<T, S> deepJobConfig) {
+        try {
+            deepJobConfig.getSaveMethod().invoke(null, rdd, deepJobConfig);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new DeepInstantiationException(e.getMessage());
+        }}}

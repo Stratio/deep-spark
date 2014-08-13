@@ -21,10 +21,12 @@ import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepTransformException;
+import com.stratio.deep.rdd.IDeepHadoopRDD;
 import com.stratio.deep.utils.UtilMongoDB;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.rdd.DeepMongoRDD;
 import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
@@ -36,28 +38,28 @@ import scala.reflect.ClassTag$;
 /**
  * CellRDD to interact with mongoDB
  */
-public final class MongoCellRDD extends DeepMongoRDD<Cells> {
+public final class MongoCellRDD implements IDeepHadoopRDD<Cells, Object, BSONObject> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoCellRDD.class);
     private static final long serialVersionUID = -3208994171892747470L;
 
 
-    /**
-     * Public constructor that builds a new MongoCellRDD RDD given the context and the configuration file.
-     *
-     * @param sc     the spark context to which the RDD will be bound to.
-     * @param config the deep configuration object.
-     */
-    @SuppressWarnings("unchecked")
-    public MongoCellRDD(SparkContext sc, IDeepJobConfig<Cells, IMongoDeepJobConfig<Cells>> config) {
-        super(sc, (IMongoDeepJobConfig<Cells>) config, ClassTag$.MODULE$.<Cells>apply(config.getEntityClass()));
-    }
+//    /**
+//     * Public constructor that builds a new MongoCellRDD RDD given the context and the configuration file.
+//     *
+//     * @param sc     the spark context to which the RDD will be bound to.
+//     * @param config the deep configuration object.
+//     */
+//    @SuppressWarnings("unchecked")
+//    public MongoCellRDD(SparkContext sc, IDeepJobConfig<Cells, IMongoDeepJobConfig<Cells>> config) {
+//        super(sc, (IMongoDeepJobConfig<Cells>) config, ClassTag$.MODULE$.<Cells>apply(config.getEntityClass()));
+//    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Cells transformElement(Tuple2<Object, BSONObject> tuple) {
+    public Cells transformElement(Tuple2<Object, BSONObject> tuple, Broadcast<IDeepJobConfig<Cells, ? extends IDeepJobConfig<?,?>>> config) {
 
 
         try {

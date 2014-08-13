@@ -26,6 +26,7 @@ import com.stratio.deep.utils.AnnotationUtils;
 import com.stratio.deep.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.spark.rdd.RDD;
 
 import java.lang.annotation.AnnotationTypeMismatchException;
@@ -86,6 +87,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
     public Configuration getHadoopConfiguration() {
         return null;
     }
+
 
     /**
      * Public constructor. Constructs a job object with the specified entity class.

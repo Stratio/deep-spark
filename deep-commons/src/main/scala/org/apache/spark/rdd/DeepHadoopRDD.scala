@@ -54,7 +54,7 @@ class NewHadoopPartition(
  * @param conf The Deep ElasticSearch configuration.
  */
 @DeveloperApi
-abstract class DeepHadoopRDD[T: ClassTag, S <:IDeepJobConfig[_,_<:AnyRef] : ClassTag , K: ClassTag, V: ClassTag](sc: SparkContext,
+abstract class DeepHadoopRDD[T: ClassTag,  K: ClassTag, V: ClassTag](sc: SparkContext,
                                                  @transient conf: IDeepJobConfig[T, _ <:IDeepJobConfig[_,_]] , inputFormatClass: Class[_ <: InputFormat[K, V]])
   extends DeepRDD[T](sc, conf.getEntityClass)
   with SparkHadoopMapReduceUtil
@@ -89,7 +89,7 @@ abstract class DeepHadoopRDD[T: ClassTag, S <:IDeepJobConfig[_,_<:AnyRef] : Clas
     result
   }
 
-  def transformElement(tuple: (K, V)): T
+  def transformElement(tuple: (K, V), config: Broadcast[IDeepJobConfig[T, _ <: IDeepJobConfig[_, _]]]): T
 
   override def compute(theSplit: Partition, context: TaskContext): InterruptibleIterator[T] = {
     val iter = new Iterator[T] {
@@ -128,7 +128,7 @@ abstract class DeepHadoopRDD[T: ClassTag, S <:IDeepJobConfig[_,_<:AnyRef] : Clas
         havePair = false
 
         val tuple = (reader.getCurrentKey, reader.getCurrentValue)
-        transformElement(tuple)
+        transformElement(tuple, config)
       }
 
       private def close() {
@@ -148,4 +148,6 @@ abstract class DeepHadoopRDD[T: ClassTag, S <:IDeepJobConfig[_,_<:AnyRef] : Clas
   }
 
   def getConf: IDeepJobConfig[T, _ <:IDeepJobConfig[_,_]]  = config.value
+
+
 }

@@ -55,7 +55,7 @@ public final class ReadingCellFromMongoDB {
                 p.getJars());
 
         QueryBuilder query = QueryBuilder.start();
-        query.and("number").greaterThan(27).lessThan(30);
+//        query.and("number").greaterThan(27).lessThan(30);
 
         BSONObject bsonSort = new BasicBSONObject();
         bsonSort.put("number",1);

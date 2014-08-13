@@ -89,7 +89,7 @@ public final class EntityDeepJobConfigMongoDB<T extends IDeepType> extends Gener
     }
 
     @Override
-    public Class<? extends RDD> getRDDClass() {
+    public Class<?> getRDDClass() {
         return MongoEntityRDD.class;
     }
 

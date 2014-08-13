@@ -19,6 +19,7 @@ package com.stratio.deep.config;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.rdd.ESEntityRDD;
 import com.stratio.deep.utils.AnnotationUtils;
+import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.spark.rdd.RDD;
 
 import java.lang.reflect.Field;
@@ -85,6 +86,7 @@ public final class EntityDeepJobConfigES<T extends IDeepType> extends GenericDee
         return ESEntityRDD.class.getDeclaredMethod("saveRDD", RDD.class, IDeepJobConfig.class);
 //        return ESEntityRDD.class.getMethod("pruebaAbsoluta", Integer.class);
     }
+
 
 
     public Map<String, String> getMapDBNameToEntityName() {

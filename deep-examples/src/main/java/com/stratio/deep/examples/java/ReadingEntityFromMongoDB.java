@@ -65,7 +65,7 @@ public final class ReadingEntityFromMongoDB {
 
 
 	    LOG.info("count : " + inputRDDEntity.cache().count());
-
+        LOG.info("count : " + inputRDDEntity.first());
 
         deepContext.stop();
     }

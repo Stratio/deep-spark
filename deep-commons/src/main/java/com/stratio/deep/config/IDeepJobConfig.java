@@ -22,6 +22,7 @@ import java.util.Map;
 
 import com.stratio.deep.entity.Cell;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.spark.rdd.RDD;
 
 /**
@@ -29,7 +30,7 @@ import org.apache.spark.rdd.RDD;
  *
  * @param <T> the generic type associated to this configuration object.
  */
-public interface IDeepJobConfig<T, S extends IDeepJobConfig> extends Serializable {
+public interface IDeepJobConfig<T, S extends IDeepJobConfig<?,?>> extends Serializable {
 
     /**
      * Returns the password needed to authenticate
@@ -162,5 +163,9 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig> extends Serializabl
 //     */
     Configuration getHadoopConfiguration();
 
+
+//    S InputFormat(InputFormat inputFormat);
+
+    Class<? extends InputFormat<?,?>> getInputFormat();
 
 }

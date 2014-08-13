@@ -25,8 +25,11 @@ import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.utils.Pair;
+import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
+import org.apache.spark.TaskContext;
 import org.apache.spark.broadcast.Broadcast;
+import scala.collection.Iterator;
 
 /**
  * Concrete implementation of a CassandraRDD representing an RDD of {@link com.stratio.deep.entity.Cells} element.<br/>
@@ -35,23 +38,14 @@ public class CassandraCellRDD extends CassandraRDD<Cells> {
 
     private static final long serialVersionUID = -738528971629963221L;
 
-    /**
-     * This constructor should not be called explicitly.<br/>
-     * Use {@link com.stratio.deep.context.DeepSparkContext} instead to create an RDD.
-     *
-     * @param sc
-     * @param config
-     */
-//    public CassandraCellRDD(SparkContext sc, ICassandraDeepJobConfig<Cells> config) {
-//        super(sc, config);
-//    }
+
 
     /**
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
     @Override
-    protected Cells transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem, Broadcast<IDeepJobConfig<Cells, IDeepJobConfig<Cells, ?>>> config) {
+    public Cells transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem, Broadcast<IDeepJobConfig<Cells, ? extends IDeepJobConfig<?,?>>> config) {
 
         Cells cells = new Cells(((ICassandraDeepJobConfig)config.getValue()).getTable());
         Map<String, Cell> columnDefinitions = config.value().columnDefinitions();
@@ -73,4 +67,6 @@ public class CassandraCellRDD extends CassandraRDD<Cells> {
 
         return cells;
     }
+
+
 }

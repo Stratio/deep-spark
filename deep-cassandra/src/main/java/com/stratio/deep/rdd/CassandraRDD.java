@@ -54,7 +54,7 @@ import static scala.collection.JavaConversions.asScalaIterator;
  * Implementors should only provide a way to convert an object of type T to a {@link com.stratio.deep.entity.Cells}
  * element.
  */
-public abstract class CassandraRDD<T> implements IDeepRDD<T>, Serializable {
+public abstract class CassandraRDD<T> implements IDeepRDD<T> {
 
     private static final long serialVersionUID = -7338324965474684418L;
 
@@ -63,15 +63,7 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T>, Serializable {
      */
 //    protected final Broadcast<ICassandraDeepJobConfig<T>> config;
 
-    /**
-     * Transform a row coming from the Cassandra's API to an element of
-     * type <T>.
-     *
-     * @param elem the element to transform.
-     * @return the transformed element.
-     */
-    @SuppressWarnings("unchecked")
-    protected abstract T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem, Broadcast<IDeepJobConfig<T, IDeepJobConfig<T, ?>>> config);
+
 
     /**
      * Helper callback class called by Spark when the current RDD is computed
@@ -182,7 +174,7 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T>, Serializable {
      * iterator of Scala tuples.
      */
     @Override
-    public Iterator<T> compute(Partition split, TaskContext ctx, final Broadcast<IDeepJobConfig<T, IDeepJobConfig<T, ?>>> config) {
+    public Iterator<T> compute(Partition split, TaskContext ctx, final Broadcast<IDeepJobConfig<T, ? extends IDeepJobConfig<?,?>>> config) {
 
         DeepPartition deepPartition = (DeepPartition) split;
 
@@ -236,7 +228,7 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T>, Serializable {
      * number of tokens configured in cassandra.yaml + 1.
      */
     @Override
-    public Partition[] getPartitions(Broadcast<IDeepJobConfig<T, IDeepJobConfig<T, ?>>> config, int id) {
+    public Partition[] getPartitions(Broadcast<IDeepJobConfig<T,? extends IDeepJobConfig<?,?>>> config, int id) {
 
         List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits(config.value());
 
@@ -273,7 +265,7 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T>, Serializable {
      * @param dp  a spark deep partition
      * @return the deep record reader associated to the provided partition.
      */
-    private DeepRecordReader initRecordReader(TaskContext ctx, final DeepPartition dp, Broadcast<IDeepJobConfig<T, IDeepJobConfig<T, ?>>> config) {
+    private DeepRecordReader initRecordReader(TaskContext ctx, final DeepPartition dp, Broadcast<IDeepJobConfig<T, ? extends IDeepJobConfig<?,?>>> config) {
         DeepRecordReader recordReader = new DeepRecordReader((ICassandraDeepJobConfig )config.value(), dp.splitWrapper());
         ctx.addOnCompleteCallback(getComputeCallback(recordReader, dp));
         return recordReader;

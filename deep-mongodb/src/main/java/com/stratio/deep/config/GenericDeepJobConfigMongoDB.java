@@ -17,12 +17,16 @@
 package com.stratio.deep.config;
 
 import com.mongodb.QueryBuilder;
+import com.mongodb.hadoop.MongoInputFormat;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.InputFormat;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 
@@ -106,6 +110,8 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
      */
     private String sort;
 
+
+    private Class<? extends InputFormat<?,?>> inputFormat = MongoInputFormat.class;
 
     /**
      * Shard key
@@ -518,5 +524,16 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
             initialize();
         }
         return configHadoop;
+    }
+
+
+//    @Override
+//    public IMongoDeepJobConfig<T> InputFormat(InputFormat inputFormat) {
+//        this.inputFormat = inputFormat;
+//        return this;
+//    }
+    @Override
+    public Class<? extends InputFormat<?,?>> getInputFormat() {
+        return inputFormat;
     }
 }

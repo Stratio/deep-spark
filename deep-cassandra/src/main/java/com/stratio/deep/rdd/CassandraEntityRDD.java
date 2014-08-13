@@ -61,7 +61,7 @@ public final class CassandraEntityRDD<T extends IDeepType> extends CassandraRDD<
      * {@inheritDoc}
      */
     @Override
-    protected T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem, Broadcast<IDeepJobConfig<T, IDeepJobConfig<T, ?>>> config) {
+    public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem, Broadcast<IDeepJobConfig<T,? extends IDeepJobConfig<?,?>>> config) {
         Map<String, Cell> columnDefinitions = config.value().columnDefinitions();
 
         Class<T> entityClass = config.value().getEntityClass();
