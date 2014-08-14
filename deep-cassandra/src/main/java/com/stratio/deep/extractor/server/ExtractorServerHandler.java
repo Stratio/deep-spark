@@ -35,7 +35,7 @@ import com.stratio.deep.rdd.CassandraRDD;
 
 public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Action> {
 
-  private CassandraRDD<T> extractor;
+  private transient CassandraRDD<T> extractor;
   
   @Override
   public void channelRead0(ChannelHandlerContext ctx, Action action) throws Exception {

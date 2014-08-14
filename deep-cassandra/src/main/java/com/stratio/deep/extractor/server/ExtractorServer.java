@@ -25,7 +25,7 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 
 /**
- * Receives a list of continent/city pairs from a {@link ExtractorClient} to
+ * Receives a list of continent/city pairs from a {@link } to
  * get the local times of the specified cities.
  */
 public final class ExtractorServer {

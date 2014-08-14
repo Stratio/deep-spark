@@ -1,5 +1,6 @@
 package com.stratio.deep.rdd;
 
+import com.stratio.deep.exception.DeepInstantiationException;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
@@ -11,6 +12,8 @@ import scala.reflect.ClassTag$;
 
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.extractor.client.ExtractorClient;
+
+import javax.net.ssl.SSLException;
 
 /**
  * Created by rcrespo on 11/08/14.
@@ -30,6 +33,11 @@ public class DeepRDD<T> extends RDD<T> {
     this.config =
         sc.broadcast(config, ClassTag$.MODULE$
             .<IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>>>apply(config.getClass()));
+      try {
+          extractorClient.initialize();
+      } catch (SSLException | InterruptedException e) {
+          throw new DeepInstantiationException("error creating IDeepRDD " +e.getMessage());
+      }
   }
 
   public DeepRDD(SparkContext sc, Class entityClass) {

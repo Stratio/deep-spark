@@ -33,13 +33,14 @@ import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.rdd.IDeepRDD;
 
 /**
- * Sends a list of continent/city pairs to a {@link ExtractorServer} to get the local times of the
+ * Sends a list of continent/city pairs to a {@link } to get the local times of the
  * specified cities.
  */
 public class ExtractorClient<T> implements IDeepRDD<T> {
 
   static final boolean SSL = System.getProperty("ssl") != null;
-  static final String HOST = System.getProperty("host", "127.0.0.1");
+//  static final String HOST = System.getProperty("host", "172.19.0.133");
+static final String HOST = System.getProperty("host", "127.0.0.1");
   static final int PORT = Integer.parseInt(System.getProperty("port", "8463"));
 
   private EventLoopGroup group = new NioEventLoopGroup();
@@ -82,7 +83,6 @@ public class ExtractorClient<T> implements IDeepRDD<T> {
   @Override
   public Iterator<T> compute(Partition split, TaskContext ctx,
       IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
-
     return this.handler.compute(split, ctx, config);
   }
 
@@ -93,7 +93,6 @@ public class ExtractorClient<T> implements IDeepRDD<T> {
    */
   @Override
   public Partition[] getPartitions(IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config, int id) {
-
     return this.handler.getPartitions(config, id);
   }
 }
