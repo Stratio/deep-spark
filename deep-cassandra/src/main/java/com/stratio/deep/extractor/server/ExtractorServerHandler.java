@@ -17,27 +17,44 @@ package com.stratio.deep.extractor.server;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+import org.apache.spark.Partition;
+
+import scala.collection.Iterator;
+
+import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.extractor.action.Action;
 import com.stratio.deep.extractor.action.ComputeAction;
 import com.stratio.deep.extractor.action.GetPartitionsAction;
+import com.stratio.deep.extractor.response.ComputeResponse;
+import com.stratio.deep.extractor.response.GetPartitionsResponse;
+import com.stratio.deep.extractor.response.Response;
+import com.stratio.deep.rdd.CassandraRDD;
 
-public class ExtractorServerHandler extends SimpleChannelInboundHandler<Action> {
+public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Action> {
 
+  private CassandraRDD<T> extractor;
+  
   @Override
   public void channelRead0(ChannelHandlerContext ctx, Action action) throws Exception {
 
+    Response response = null;
     switch (action.getType()) {
       case COMPUTE:
-        ComputeAction computeAction = (ComputeAction) action;
+        ComputeAction<T> computeAction = (ComputeAction<T>) action;
+        response = new ComputeResponse(this.compute(computeAction));
         break;
       case GET_PARTITIONS:
-        GetPartitionsAction partitionsAction = (GetPartitionsAction) action;
+        GetPartitionsAction<T> partitionsAction = (GetPartitionsAction<T>) action;
+        response = new GetPartitionsResponse(this.getPartitions(partitionsAction));
         break;
       default:
         break;
     }
 
-    ctx.write("Type: " + action.getType().name());
+    ctx.write(response);
   }
 
   @Override
@@ -49,5 +66,41 @@ public class ExtractorServerHandler extends SimpleChannelInboundHandler<Action> 
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
     cause.printStackTrace();
     ctx.close();
+  }
+  
+  protected Iterator<T> compute(ComputeAction<T> computeAction) {
+    
+    if (extractor == null) {
+      this.initExtractor(computeAction.getConfig());
+    }
+    
+    return extractor.compute(computeAction.getSplit(), computeAction.getContext(), computeAction.getConfig());
+    
+  }
+  
+  protected Partition[] getPartitions(GetPartitionsAction<T> getPartitionsAction){
+    
+    if (extractor == null) {
+      this.initExtractor(getPartitionsAction.getConfig());
+    }
+
+    return extractor.getPartitions(getPartitionsAction.getConfig(), getPartitionsAction.getId());
+  }
+
+  /**
+   * @param config
+   */
+  @SuppressWarnings("unchecked")
+  private void initExtractor(IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
+
+    Class<T> rdd = (Class<T>) config.getRDDClass();
+    try {
+    final Constructor<T> c = rdd.getConstructor();
+      this.extractor = (CassandraRDD<T>) c.newInstance();
+    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+        | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 }

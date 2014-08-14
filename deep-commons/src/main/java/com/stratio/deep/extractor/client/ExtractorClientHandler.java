@@ -42,7 +42,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
   private final BlockingQueue<Response> answer = new LinkedBlockingQueue<Response>();
 
   public ExtractorClientHandler() {
-    super(false);
+    super(true);
   }
 
   @Override

@@ -3,14 +3,13 @@
  */
 package com.stratio.deep.extractor.action;
 
+import com.stratio.deep.config.IDeepJobConfig;
 
-/**
- * @author Óscar Puertas
- * 
- */
-public class GetPartitionsAction extends Action {
+public class GetPartitionsAction<T> extends Action {
 
   private static final long serialVersionUID = 9163365799147805458L;
+
+  private IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config;
 
   private int id;
 
@@ -18,9 +17,14 @@ public class GetPartitionsAction extends Action {
     super();
   }
 
-  public GetPartitionsAction(int id) {
+  public GetPartitionsAction(IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config, int id) {
     super(ActionType.GET_PARTITIONS);
+    this.config = config;
     this.id = id;
+  }
+
+  public IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> getConfig() {
+    return config;
   }
 
   public int getId() {

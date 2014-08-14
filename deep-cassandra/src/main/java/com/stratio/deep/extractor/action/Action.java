@@ -5,7 +5,6 @@ package com.stratio.deep.extractor.action;
 
 import java.io.Serializable;
 
-
 /**
  * @author Óscar Puertas
  * 

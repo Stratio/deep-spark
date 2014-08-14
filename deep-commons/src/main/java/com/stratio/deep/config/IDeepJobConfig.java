@@ -23,7 +23,6 @@ import java.util.Map;
 import com.stratio.deep.entity.Cell;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
-import org.apache.spark.rdd.RDD;
 
 /**
  * Defines the public methods that each Stratio Deep configuration object should implement.

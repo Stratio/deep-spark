@@ -3,8 +3,7 @@
  */
 package com.stratio.deep.extractor.response;
 
-import org.apache.spark.Partition;
-import org.apache.spark.TaskContext;
+import scala.collection.Iterator;
 
 import com.stratio.deep.extractor.action.ActionType;
 
@@ -12,30 +11,22 @@ import com.stratio.deep.extractor.action.ActionType;
  * @author Óscar Puertas
  * 
  */
-public class ComputeResponse extends Response {
+public class ComputeResponse<T> extends Response {
 
   private static final long serialVersionUID = -1270097974102584045L;
 
-  private Partition split;
-
-  private TaskContext context;
+  private Iterator<T> data;
 
   public ComputeResponse() {
     super();
   }
 
-  public ComputeResponse(Partition split, TaskContext context) {
+  public ComputeResponse(Iterator<T> data) {
     super(ActionType.COMPUTE);
-    this.split = split;
-    this.context = context;
+    this.data = data;
   }
 
-  public Partition getSplit() {
-    return split;
+  public Iterator<T> getData() {
+    return data;
   }
-
-  public TaskContext getContext() {
-    return context;
-  }
-
 }

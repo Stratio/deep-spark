@@ -3,6 +3,8 @@
  */
 package com.stratio.deep.extractor.response;
 
+import org.apache.spark.Partition;
+
 import com.stratio.deep.extractor.action.ActionType;
 
 /**
@@ -11,20 +13,20 @@ import com.stratio.deep.extractor.action.ActionType;
  */
 public class GetPartitionsResponse extends Response {
 
-  private static final long serialVersionUID = 9163365799147805458L;
+  private static final long serialVersionUID = -7728817078374511478L;
 
-  private int id;
+  private Partition[] partitions;
 
   public GetPartitionsResponse() {
     super();
   }
 
-  public GetPartitionsResponse(int id) {
+  public GetPartitionsResponse(Partition[] partitions) {
     super(ActionType.GET_PARTITIONS);
-    this.id = id;
+    this.partitions = partitions;
   }
 
-  public int getId() {
-    return id;
+  public Partition[] getPartitions() {
+    return partitions;
   }
 }

@@ -12,7 +12,6 @@ import com.stratio.deep.config.IDeepJobConfig;
  */
 public interface IDeepRDD<T> {
 
-
   Iterator<T> compute(Partition split, TaskContext ctx,
       IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config);
 
