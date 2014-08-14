@@ -47,7 +47,7 @@ static final String HOST = System.getProperty("host", "127.0.0.1");
 
   private Channel ch;
 
-  private ExtractorClientHandler<T> handler;
+  private  ExtractorClientHandler<T> handler;
 
   public void initialize() throws SSLException, InterruptedException {
 
