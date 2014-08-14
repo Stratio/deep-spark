@@ -13,7 +13,7 @@ import com.stratio.deep.extractor.actions.ActionType;
  */
 public class ComputeResponse<T> extends Response {
 
-  private static final long serialVersionUID = -1270097974102584045L;
+  private static final long serialVersionUID = -2647516898871636731L;
 
   private Iterator<T> data;
 

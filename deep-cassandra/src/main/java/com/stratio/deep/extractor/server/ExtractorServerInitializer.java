@@ -14,15 +14,15 @@
  */
 package com.stratio.deep.extractor.server;
 
-import com.stratio.deep.extractor.server.codec.ActionDecoder;
-import com.stratio.deep.extractor.server.codec.ResponseEncoder;
-
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.ssl.SslContext;
 
-public class ExtractorServerInitializer extends ChannelInitializer<SocketChannel> {
+import com.stratio.deep.extractor.client.codecs.ActionDecoder;
+import com.stratio.deep.extractor.client.codecs.ResponseEncoder;
+
+public class ExtractorServerInitializer<T> extends ChannelInitializer<SocketChannel> {
 
   private final SslContext sslCtx;
 
@@ -40,6 +40,6 @@ public class ExtractorServerInitializer extends ChannelInitializer<SocketChannel
     p.addLast(new ActionDecoder());
     p.addLast(new ResponseEncoder());
 
-    p.addLast(new ExtractorServerHandler());
+    p.addLast(new ExtractorServerHandler<T>());
   }
 }

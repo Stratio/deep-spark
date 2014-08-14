@@ -25,9 +25,9 @@ import org.apache.spark.Partition;
 import scala.collection.Iterator;
 
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.extractor.action.Action;
-import com.stratio.deep.extractor.action.ComputeAction;
-import com.stratio.deep.extractor.action.GetPartitionsAction;
+import com.stratio.deep.extractor.actions.Action;
+import com.stratio.deep.extractor.actions.ComputeAction;
+import com.stratio.deep.extractor.actions.GetPartitionsAction;
 import com.stratio.deep.extractor.response.ComputeResponse;
 import com.stratio.deep.extractor.response.GetPartitionsResponse;
 import com.stratio.deep.extractor.response.Response;
