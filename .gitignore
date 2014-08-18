@@ -4,6 +4,7 @@
 */.project
 */.settings
 */.cache
+data/*
 spark-deep-distribution*
 */*.versionsBackup
 target/

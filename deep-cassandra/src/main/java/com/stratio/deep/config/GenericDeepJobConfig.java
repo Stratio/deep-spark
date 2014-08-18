@@ -34,6 +34,7 @@ import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
+import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
@@ -764,5 +765,16 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
     @Override
     public int getBisectFactor() {
         return bisectFactor;
+    }
+
+
+    @Override
+    public ICassandraDeepJobConfig<T> customConfiguration(Map<String, Object> customConfiguration){
+        return this;
+    }
+
+    @Override
+    public Class<? extends InputFormat<?,?>> getInputFormat() {
+        return null;
     }
 }

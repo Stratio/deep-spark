@@ -17,21 +17,23 @@
 package com.stratio.deep.config;
 
 import com.mongodb.QueryBuilder;
+import com.mongodb.hadoop.MongoInputFormat;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.InputFormat;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Method;
+import java.util.*;
 
 
 /**
  * @param <T>
  */
-public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
+public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     private static final long serialVersionUID = -7179376653643603038L;
 
 
@@ -109,6 +111,8 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     private String sort;
 
 
+    private Class<? extends InputFormat<?,?>> inputFormat = MongoInputFormat.class;
+
     /**
      * Shard key
      */
@@ -122,6 +126,9 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
 
 
     private boolean splitsUseChunks = true;
+
+
+    private Map<String, Object> customConfiguration;
 
     /**
      * Default constructor
@@ -351,6 +358,13 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         return 0;
     }
 
+    @Override
+    public IMongoDeepJobConfig<T> customConfiguration (Map<String, Object> customConfiguration){
+        this.customConfiguration=customConfiguration;
+        return this;
+    }
+
+
     /**
      * {@inheritDoc}
      */
@@ -460,6 +474,15 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
             configHadoop.set(MongoConfigUtil.AUTH_URI, connection.toString());
         }
 
+        if (customConfiguration !=null ) {
+            Set<Map.Entry<String, Object>> set = customConfiguration.entrySet();
+            Iterator<Map.Entry<String, Object>> iterator = set.iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, Object> entry = iterator.next();
+                configHadoop.set(entry.getKey(), entry.getValue().toString());
+            }
+        }
+
         return this;
     }
 
@@ -501,5 +524,16 @@ public class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
             initialize();
         }
         return configHadoop;
+    }
+
+
+//    @Override
+//    public IMongoDeepJobConfig<T> InputFormat(InputFormat inputFormat) {
+//        this.inputFormat = inputFormat;
+//        return this;
+//    }
+    @Override
+    public Class<? extends InputFormat<?,?>> getInputFormat() {
+        return inputFormat;
     }
 }

@@ -187,7 +187,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
                 .filterByField("response_time", 371)
                 .initialize();
 
-        RDD<TestEntity> otherRDD = context.cassandraRDD(config);
+        RDD<TestEntity> otherRDD = context.createRDD(config);
 
         entities = (TestEntity[]) otherRDD.collect();
         assertEquals(entities.length, 2);
@@ -212,9 +212,9 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     }
 
     @Override
-    protected CassandraRDD<TestEntity> initRDD() {
+    protected RDD<TestEntity> initRDD() {
         assertNotNull(context);
-        return (CassandraRDD)context.cassandraRDD(getReadConfig());
+        return context.createRDD(getReadConfig());
     }
 
     @Override
@@ -255,7 +255,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
                 .inputColumns("domain_name", "response_time")
                 .initialize();
 
-        RDD<TestEntity> tmpRdd = context.cassandraRDD(tmpConfig);
+        RDD<TestEntity> tmpRdd = context.createRDD(tmpConfig);
 
         TestEntity[] cells = (TestEntity[]) tmpRdd.collect();
 
@@ -349,11 +349,11 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         JavaSerializer ser = new JavaSerializer(context.getConf());
 
         SerializerInstance instance = ser.newInstance();
-        ClassTag<CassandraRDD<TestEntity>> classTag = ClassTag$.MODULE$.<CassandraRDD<TestEntity>>apply(rdd.getClass());
+        ClassTag<RDD<TestEntity>> classTag = ClassTag$.MODULE$.<RDD<TestEntity>>apply(rdd.getClass());
 
         ByteBuffer serializedRDD = instance.serialize(rdd, classTag);
 
-        CassandraRDD deserializedRDD = instance.deserialize(serializedRDD, classTag);
+        RDD deserializedRDD = instance.deserialize(serializedRDD, classTag);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -369,7 +369,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         Iterator<Object> iter = deserializationStream.asIterator();
         assertTrue(iter.hasNext());
 
-        deserializedRDD = (CassandraRDD) iter.next();
+        deserializedRDD = (RDD) iter.next();
         assertNotNull(deserializedRDD);
     }
 

@@ -22,7 +22,7 @@ import java.util.List;
 
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.config.MongoConfigFactory;
-import com.stratio.deep.context.MongoDeepSparkContext;
+import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
 import com.stratio.deep.testentity.BookEntity;
@@ -35,6 +35,7 @@ import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
 /**
@@ -64,15 +65,15 @@ public final class GroupingEntityWithMongoDB {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    MongoDeepSparkContext deepContext = new MongoDeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
 
         IMongoDeepJobConfig<BookEntity> inputConfigEntity =
 				        MongoConfigFactory.createMongoDB(BookEntity.class).host(host).database(database).collection(inputCollection).initialize();
 
-        MongoJavaRDD<BookEntity> inputRDDEntity = (MongoJavaRDD) deepContext.mongoJavaRDD(inputConfigEntity);
-        JavaRDD<String> words =inputRDDEntity.flatMap(new FlatMapFunction<BookEntity, String>() {
+        RDD<BookEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
+        JavaRDD<String> words =inputRDDEntity.toJavaRDD().flatMap(new FlatMapFunction<BookEntity, String>() {
             @Override
             public Iterable<String> call(BookEntity bookEntity) throws Exception {
 

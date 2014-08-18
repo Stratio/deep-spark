@@ -1,5 +1,20 @@
 package com.stratio.deep.context;
 
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.apache.spark.SparkConf;
+import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.rdd.DeepMongoRDD;
+import org.testng.annotations.Test;
+
 import com.stratio.deep.config.CellDeepJobConfigMongoDB;
 import com.stratio.deep.config.EntityDeepJobConfigMongoDB;
 import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
@@ -9,17 +24,6 @@ import com.stratio.deep.rdd.mongodb.MongoCellRDD;
 import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
 import com.stratio.deep.testentity.BookEntity;
-import org.apache.log4j.Logger;
-import org.apache.spark.SparkConf;
-import org.apache.spark.SparkContext;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.rdd.DeepMongoRDD;
-import org.testng.annotations.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.testng.Assert.*;
 
 
 /**

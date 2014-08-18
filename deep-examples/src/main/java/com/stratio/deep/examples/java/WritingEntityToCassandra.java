@@ -22,7 +22,8 @@ import com.google.common.collect.Lists;
 
 import com.stratio.deep.config.CassandraConfigFactory;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.context.CassandraDeepSparkContext;
+import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.CassandraRDD;
 import com.stratio.deep.testentity.DomainEntity;
 import com.stratio.deep.testentity.PageEntity;
@@ -32,6 +33,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
 /**
@@ -68,7 +70,7 @@ public final class WritingEntityToCassandra {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    CassandraDeepSparkContext deepContext = new CassandraDeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
+	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
 
         // --- INPUT RDD
@@ -77,9 +79,9 @@ public final class WritingEntityToCassandra {
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
 
-        JavaRDD<PageEntity> inputRDD = deepContext.cassandraJavaRDD(inputConfig);
+        RDD<PageEntity> inputRDD = deepContext.createRDD(inputConfig);
 
-        JavaPairRDD<String, PageEntity> pairRDD = inputRDD.mapToPair(new PairFunction<PageEntity, String,
+        JavaPairRDD<String, PageEntity> pairRDD = inputRDD.toJavaRDD().mapToPair(new PairFunction<PageEntity, String,
                 PageEntity>() {
             @Override
             public Tuple2<String, PageEntity> call(PageEntity e) {

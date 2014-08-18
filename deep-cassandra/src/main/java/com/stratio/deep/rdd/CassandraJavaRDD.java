@@ -27,7 +27,7 @@ import scala.reflect.ClassTag$;
  * @param <W>
  * @author Luca Rosellini <luca@strat.io>
  */
-public final class CassandraJavaRDD<W> extends JavaRDD<W> {
+public final class CassandraJavaRDD<W> {
     private static final long serialVersionUID = -3208994171892747470L;
 
     /**
@@ -35,15 +35,15 @@ public final class CassandraJavaRDD<W> extends JavaRDD<W> {
      *
      * @param rdd
      */
-    public CassandraJavaRDD(CassandraRDD<W> rdd) {
-        super(rdd, ClassTag$.MODULE$.<W>apply(rdd.config.value().getEntityClass()));
-    }
+//    public CassandraJavaRDD(CassandraRDD<W> rdd) {
+//        super(rdd, ClassTag$.MODULE$.<W>apply(rdd.config.value().getEntityClass()));
+//    }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public ClassTag<W> classTag() {
-        return ClassTag$.MODULE$.<W>apply(((CassandraRDD<W>) this.rdd()).config.value().getEntityClass());
-    }
+//    @Override
+//    public ClassTag<W> classTag() {
+//        return ClassTag$.MODULE$.<W>apply(((CassandraRDD<W>) this.rdd()).config.value().getEntityClass());
+//    }
 }

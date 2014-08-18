@@ -144,8 +144,8 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
     }
 
     @Override
-    protected CassandraRDD<Cells> initRDD() {
-        return context.cassandraRDD(getReadConfig());
+    protected RDD<Cells> initRDD() {
+        return context.createRDD(getReadConfig());
     }
 
     @Override

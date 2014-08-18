@@ -129,7 +129,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
                 .filterByField("food", "donuts")
                 .initialize();
 
-        RDD<Cql3TestEntity> otherRDD = context.cassandraRDD(config);
+        RDD<Cql3TestEntity> otherRDD = context.createRDD(config);
 
         entities = (Cql3TestEntity[]) otherRDD.collect();
 
@@ -150,7 +150,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
                 .filterByField("food", "chips")
                 .initialize();
 
-        otherRDD = context.cassandraRDD(config);
+        otherRDD = context.createRDD(config);
 
         entities = (Cql3TestEntity[]) otherRDD.collect();
         assertEquals(entities.length, allElements - 1);
@@ -210,9 +210,9 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
     }
 
     @Override
-    protected CassandraRDD<Cql3TestEntity> initRDD() {
+    protected RDD<Cql3TestEntity> initRDD() {
         assertNotNull(context);
-        return (CassandraRDD) context.cassandraRDD(getReadConfig());
+        return context.createRDD(getReadConfig());
     }
 
     @Override
