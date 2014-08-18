@@ -40,7 +40,7 @@ import java.lang.reflect.InvocationTargetException;
  * Author: Emmanuelle Raffenne
  * Date..: 13-feb-2014
  */
-public class AggregatingData {
+public final class AggregatingData {
     private static final Logger LOG = Logger.getLogger(AggregatingData.class);
 
     /* used to perform external tests */

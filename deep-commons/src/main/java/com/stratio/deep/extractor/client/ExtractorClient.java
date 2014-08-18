@@ -22,6 +22,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 
+import java.io.Serializable;
+
 import javax.net.ssl.SSLException;
 
 import org.apache.spark.Partition;
@@ -39,15 +41,15 @@ import com.stratio.deep.rdd.IDeepRDD;
 public class ExtractorClient<T> implements IDeepRDD<T> {
 
   static final boolean SSL = System.getProperty("ssl") != null;
-//  static final String HOST = System.getProperty("host", "172.19.0.133");
-static final String HOST = System.getProperty("host", "127.0.0.1");
+  //  static final String HOST = System.getProperty("host", "172.19.0.133");
+  static final String HOST = System.getProperty("host", "127.0.0.1");
   static final int PORT = Integer.parseInt(System.getProperty("port", "8463"));
 
   private EventLoopGroup group = new NioEventLoopGroup();
 
   private Channel ch;
 
-  private  ExtractorClientHandler<T> handler;
+  private ExtractorClientHandler<T> handler;
 
   public void initialize() throws SSLException, InterruptedException {
 

@@ -18,6 +18,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+import java.io.Serializable;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -39,6 +40,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
   // Stateful properties
   private volatile Channel channel;
+  
   private final BlockingQueue<Response> answer = new LinkedBlockingQueue<Response>();
 
   public ExtractorClientHandler() {

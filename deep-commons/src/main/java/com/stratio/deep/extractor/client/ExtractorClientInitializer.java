@@ -19,6 +19,8 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.ssl.SslContext;
 
+import java.io.Serializable;
+
 import com.stratio.deep.extractor.client.codecs.ActionEncoder;
 import com.stratio.deep.extractor.client.codecs.ResponseDecoder;
 
