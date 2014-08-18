@@ -20,7 +20,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.config.MongoConfigFactory;
-import com.stratio.deep.context.MongoDeepSparkContext;
+import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.testentity.BookEntity;
 import com.stratio.deep.testentity.CantoEntity;
 import com.stratio.deep.testentity.MessageTestEntity;
@@ -56,12 +56,12 @@ public class MongoEntityRDDTest implements Serializable {
     @Test
     public void testReadingRDD() {
         String hostConcat = MongoJavaRDDTest.HOST.concat(":").concat(MongoJavaRDDTest.PORT.toString());
-        MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
+        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
         IMongoDeepJobConfig<MessageTestEntity> inputConfigEntity = MongoConfigFactory.createMongoDB(MessageTestEntity.class)
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_INPUT).initialize();
 
-        JavaRDD<MessageTestEntity> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
+        JavaRDD<MessageTestEntity> inputRDDEntity = context.createJavaRDD(inputConfigEntity);
 
         assertEquals(MongoJavaRDDTest.col.count(), inputRDDEntity.cache().count());
         assertEquals(MongoJavaRDDTest.col.findOne().get("message"), inputRDDEntity.first().getMessage());
@@ -76,12 +76,12 @@ public class MongoEntityRDDTest implements Serializable {
 
         String hostConcat = HOST.concat(":").concat(PORT.toString());
 
-        MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
+        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
         IMongoDeepJobConfig<MessageTestEntity> inputConfigEntity = MongoConfigFactory.createMongoDB(MessageTestEntity.class)
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_INPUT).initialize();
 
-        RDD<MessageTestEntity> inputRDDEntity = context.mongoRDD(inputConfigEntity);
+        RDD<MessageTestEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
 
         IMongoDeepJobConfig<MessageTestEntity> outputConfigEntity = MongoConfigFactory.createMongoDB(MessageTestEntity.class)
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_OUTPUT).initialize();
@@ -90,7 +90,7 @@ public class MongoEntityRDDTest implements Serializable {
         //Save RDD in MongoDB
         MongoEntityRDD.saveEntity(inputRDDEntity, outputConfigEntity);
 
-        RDD<MessageTestEntity> outputRDDEntity = context.mongoRDD(outputConfigEntity);
+        RDD<MessageTestEntity> outputRDDEntity = context.createRDD(outputConfigEntity);
 
 
         assertEquals(MongoJavaRDDTest.mongo.getDB(DATABASE).getCollection(COLLECTION_OUTPUT).findOne().get("message"),
@@ -108,13 +108,13 @@ public class MongoEntityRDDTest implements Serializable {
 
         String hostConcat = HOST.concat(":").concat(PORT.toString());
 
-        MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
+        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
         IMongoDeepJobConfig<BookEntity> inputConfigEntity = MongoConfigFactory.createMongoDB(BookEntity.class)
                 .host(hostConcat).database("book").collection("input")
                 .initialize();
 
-        RDD<BookEntity> inputRDDEntity = context.mongoRDD(inputConfigEntity);
+        RDD<BookEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
 
 
 //Import dataSet was OK and we could read it
@@ -145,7 +145,7 @@ public class MongoEntityRDDTest implements Serializable {
             assertEquals(bsonObject.get("text"), book.getCantoEntities().get(i).getText());
         }
 
-        RDD<BookEntity> inputRDDEntity2 = context.mongoRDD(inputConfigEntity);
+        RDD<BookEntity> inputRDDEntity2 = context.createRDD(inputConfigEntity);
 
         JavaRDD<String> words = inputRDDEntity2.toJavaRDD().flatMap(new FlatMapFunction<BookEntity, String>() {
             @Override
@@ -189,7 +189,7 @@ public class MongoEntityRDDTest implements Serializable {
 
         MongoEntityRDD.saveEntity((RDD<WordCount>) outputRDD.rdd(), outputConfigEntity);
 
-        RDD<WordCount> outputRDDEntity = context.mongoRDD(outputConfigEntity);
+        RDD<WordCount> outputRDDEntity = context.createRDD(outputConfigEntity);
 
         assertEquals(((Long) outputRDDEntity.cache().count()).longValue(), WORD_COUNT_SPECTED.longValue());
 
@@ -203,12 +203,12 @@ public class MongoEntityRDDTest implements Serializable {
 
         String hostConcat = HOST.concat(":").concat(PORT.toString());
 
-        MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
+        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
         IMongoDeepJobConfig<BookEntity> inputConfigEntity = MongoConfigFactory.createMongoDB(BookEntity.class)
                 .host(hostConcat).database("book").collection("input").inputColumns("metadata").initialize();
 
-        RDD<BookEntity> inputRDDEntity = context.mongoRDD(inputConfigEntity);
+        RDD<BookEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
 
 
         BookEntity bookEntity = inputRDDEntity.toJavaRDD().first();
@@ -223,7 +223,7 @@ public class MongoEntityRDDTest implements Serializable {
                 .host(hostConcat).database("book").collection("input").inputColumns("cantos").ignoreIdField().initialize();
 
 
-        RDD<BookEntity> inputRDDEntity2 = context.mongoRDD(inputConfigEntity2);
+        RDD<BookEntity> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
 
 
         BookEntity bookEntity2 = inputRDDEntity2.toJavaRDD().first();
@@ -241,7 +241,7 @@ public class MongoEntityRDDTest implements Serializable {
         IMongoDeepJobConfig<BookEntity> inputConfigEntity3 = MongoConfigFactory.createMongoDB(BookEntity.class)
                 .host(hostConcat).database("book").collection("input").fields(bson).initialize();
 
-        RDD<BookEntity> inputRDDEntity3 = context.mongoRDD(inputConfigEntity3);
+        RDD<BookEntity> inputRDDEntity3 = context.createRDD(inputConfigEntity3);
 
 
         BookEntity bookEntity3 = inputRDDEntity3.toJavaRDD().first();
