@@ -75,6 +75,7 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
       super();
       this.recordReader = recordReader;
       this.deepPartition = dp;
+        System.out.print("termina el cbuilder " +this);
     }
 
     @Override
@@ -176,6 +177,9 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
   public Iterator<T> compute(Partition split, TaskContext ctx,
       final IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
 
+
+      ctx = new TaskContext (ctx.stageId(), ctx.partitionId(), ctx.attemptId(), ctx.runningLocally(), ctx.taskMetrics());
+
     DeepPartition deepPartition = (DeepPartition) split;
 
     // log().debug("Executing compute for split: " + deepPartition);
@@ -275,7 +279,7 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
       IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
     DeepRecordReader recordReader =
         new DeepRecordReader((ICassandraDeepJobConfig) config, dp.splitWrapper());
-    ctx.addOnCompleteCallback(getComputeCallback(recordReader, dp));
+      ctx.addOnCompleteCallback(getComputeCallback(recordReader, dp));
     return recordReader;
 
   }
