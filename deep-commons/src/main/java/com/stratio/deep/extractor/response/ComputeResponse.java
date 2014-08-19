@@ -3,7 +3,7 @@
  */
 package com.stratio.deep.extractor.response;
 
-import scala.collection.Iterator;
+import java.util.Iterator;
 
 import com.stratio.deep.extractor.actions.ActionType;
 

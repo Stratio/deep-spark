@@ -92,9 +92,5 @@ public final class ESEntityRDD<T extends IDeepType> extends DeepElasticSearchRDD
         save.saveAsNewAPIHadoopFile("file:///entity", Object.class, Object.class, EsOutputFormat.class, ((IESDeepJobConfig)config).getHadoopConfiguration());
     }
 
-    public static void pruebaAbsoluta(Integer numero)
-    {
-        System.out.println("paso por el prueb absoluta");
-    }
 
 }

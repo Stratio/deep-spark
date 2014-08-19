@@ -51,8 +51,10 @@ import static java.util.Collections.unmodifiableCollection;
  * is not enough to fully generate an AbstractType, we also need the type(s) the
  * collection holds.
  */
-public class CellValidator implements Serializable {
-    private static final String DEFAULT_VALIDATOR_CLASSNAME = "org.apache.cassandra.db.marshal.UTF8Type";
+public class CellValidator {
+//    private static final String DEFAULT_VALIDATOR_CLASSNAME = "org.apache.cassandra.db.marshal.UTF8Type";
+
+    private static final String DEFAULT_VALIDATOR_CLASSNAME = "";
 
     private static final Map<Class, CQL3Type.Native> MAP_JAVA_TYPE_TO_CQL_TYPE =
             ImmutableMap.<Class, CQL3Type.Native>builder()

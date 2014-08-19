@@ -78,7 +78,8 @@ public final class AggregatingData {
 
         // Creating a configuration for the RDD and initialize it
         ICassandraDeepJobConfig<Cells> config = CassandraConfigFactory.create()
-                .host("172.19.0.133").cqlPort(9042).rpcPort(9160)
+//                .host("172.19.0.133").cqlPort(9042).rpcPort(9160)
+                .host("172.19.0.166").cqlPort(9042).rpcPort(9160)
                 .keyspace("twitter").table("tweets")
                 .initialize();
 

@@ -14,6 +14,8 @@
  */
 package com.stratio.deep.extractor.client;
 
+import com.stratio.deep.rdd.IDeepRecordReader;
+import com.stratio.deep.utils.Pair;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -22,17 +24,16 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 
-import java.io.Serializable;
-
 import javax.net.ssl.SSLException;
 
 import org.apache.spark.Partition;
 import org.apache.spark.TaskContext;
 
-import scala.collection.Iterator;
-
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.rdd.IDeepRDD;
+
+import java.nio.ByteBuffer;
+import java.util.Map;
 
 /**
  * Sends a list of continent/city pairs to a {@link } to get the local times of the
@@ -83,9 +84,9 @@ public class ExtractorClient<T> implements IDeepRDD<T> {
    * org.apache.spark.TaskContext, com.stratio.deep.config.IDeepJobConfig)
    */
   @Override
-  public Iterator<T> compute(Partition split, TaskContext ctx,
-      IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
-    return this.handler.compute(split, ctx, config);
+  public java.util.Iterator<T> compute(IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader,
+                                       IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
+    return this.handler.compute(recordReader, config);
   }
 
   /*
@@ -97,4 +98,9 @@ public class ExtractorClient<T> implements IDeepRDD<T> {
   public Partition[] getPartitions(IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config, int id) {
     return this.handler.getPartitions(config, id);
   }
+
+//    @Override
+//    public IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> createRecordReader() {
+//        return null;
+//    }
 }

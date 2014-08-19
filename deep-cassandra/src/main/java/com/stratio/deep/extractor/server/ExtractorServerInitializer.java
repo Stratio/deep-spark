@@ -24,7 +24,7 @@ import com.stratio.deep.extractor.client.codecs.ResponseEncoder;
 
 public class ExtractorServerInitializer<T> extends ChannelInitializer<SocketChannel> {
 
-  private final transient SslContext sslCtx;
+  private final SslContext sslCtx;
 
   public ExtractorServerInitializer(SslContext sslCtx) {
     this.sslCtx = sslCtx;

@@ -30,7 +30,7 @@ public class CassandraCell extends Cell {
      */
     private Boolean isClusterKey = Boolean.FALSE;
 
-    private CellValidator cellValidator;
+    private transient CellValidator cellValidator;
 
     /**
      * Factory method, creates a new CassandraCell from its value and metadata information<br/>

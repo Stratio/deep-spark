@@ -22,7 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.spark.Partition;
 
-import scala.collection.Iterator;
+import java.util.Iterator;
 
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.extractor.actions.Action;
@@ -35,7 +35,7 @@ import com.stratio.deep.rdd.CassandraRDD;
 
 public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Action> {
 
-  private transient CassandraRDD<T> extractor;
+  private CassandraRDD<T> extractor;
   
   @Override
   public void channelRead0(ChannelHandlerContext ctx, Action action) throws Exception {
@@ -74,7 +74,7 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
       this.initExtractor(computeAction.getConfig());
     }
     
-    return extractor.compute(computeAction.getSplit(), computeAction.getContext(), computeAction.getConfig());
+    return extractor.compute(computeAction.getRecordReader(), computeAction.getConfig());
     
   }
   

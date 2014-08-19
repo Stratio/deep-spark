@@ -21,6 +21,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
 
+import com.stratio.deep.cql.DeepRecordReader;
+import com.stratio.deep.rdd.IDeepPartition;
+import com.stratio.deep.rdd.IDeepRecordReader;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -774,7 +777,19 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
     }
 
     @Override
-    public Class<? extends InputFormat<?,?>> getInputFormat() {
+    public Class<? extends InputFormat<?,?>> getInputFormatClass() {
         return null;
     }
+
+    @Override
+    public Class<? extends IDeepRecordReader> getRecordReaderClass(){
+        return DeepRecordReader.class;
+    }
+
+
+    @Override
+    public Class<? extends IDeepPartition> getPatitionClass() {
+        return null;
+    }
+
 }

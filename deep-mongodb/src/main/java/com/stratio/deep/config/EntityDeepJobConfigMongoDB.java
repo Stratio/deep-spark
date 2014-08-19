@@ -18,6 +18,7 @@ package com.stratio.deep.config;
 
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.rdd.IDeepRecordReader;
 import com.stratio.deep.rdd.mongodb.MongoCellRDD;
 import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
 import com.stratio.deep.utils.AnnotationUtils;
@@ -97,4 +98,6 @@ public final class EntityDeepJobConfigMongoDB<T extends IDeepType> extends Gener
     public Method getSaveMethod() throws NoSuchMethodException {
         return null;
     }
+
+
 }
