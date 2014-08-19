@@ -14,18 +14,19 @@
  */
 package com.stratio.deep.extractor.client;
 
+import com.stratio.deep.rdd.IDeepRecordReader;
+import com.stratio.deep.utils.Pair;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
-import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.spark.Partition;
 import org.apache.spark.TaskContext;
-
-import scala.collection.Iterator;
 
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.extractor.actions.ComputeAction;
@@ -107,10 +108,10 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
    * org.apache.spark.TaskContext, com.stratio.deep.config.IDeepJobConfig)
    */
   @Override
-  public Iterator<T> compute(Partition split, TaskContext ctx,
-      IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
+  public java.util.Iterator<T> compute(IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader,
+                                       IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
 
-    ComputeAction<T> computeAction = new ComputeAction<>(split, ctx, config);
+    ComputeAction<T> computeAction = new ComputeAction<>(recordReader, config);
 
     channel.writeAndFlush(computeAction);
 

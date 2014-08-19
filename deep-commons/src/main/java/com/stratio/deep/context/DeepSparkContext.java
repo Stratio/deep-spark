@@ -116,8 +116,8 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
       Class rdd = deepJobConfig.getRDDClass();
       final Constructor c = rdd.getConstructor();
-      if (deepJobConfig.getInputFormat() != null) {
-        return new DeepGenericHadoopRDD(this.sc(), deepJobConfig, deepJobConfig.getInputFormat(),
+      if (deepJobConfig.getInputFormatClass() != null) {
+        return new DeepGenericHadoopRDD(this.sc(), deepJobConfig, deepJobConfig.getInputFormatClass(),
             (IDeepHadoopRDD) c.newInstance(), ClassTag$.MODULE$.<Cells>apply(deepJobConfig
                 .getEntityClass()), ClassTag$.MODULE$.Any(), ClassTag$.MODULE$.Any());
       } else {

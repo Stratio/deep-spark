@@ -16,13 +16,14 @@
 
 package com.stratio.deep.partition.impl;
 
-import com.stratio.deep.cql.DeepTokenRange;
+import com.stratio.deep.rdd.DeepTokenRange;
+import com.stratio.deep.rdd.IDeepPartition;
 import org.apache.spark.Partition;
 
 /**
  * Object that carries spark's partition information.
  */
-public class DeepPartition implements Partition {
+public class DeepPartition implements IDeepPartition {
 
     private static final int MAGIC_NUMBER = 41;
 

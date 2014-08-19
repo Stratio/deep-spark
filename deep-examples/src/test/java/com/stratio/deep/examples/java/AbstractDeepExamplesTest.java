@@ -95,7 +95,8 @@ public class AbstractDeepExamplesTest {
     @BeforeSuite
     protected void initContextAndServer() throws ConfigurationException, IOException, InterruptedException {
         logger.info("instantiating context");
-        //context = new DeepSparkContext("local", "deepSparkContextTest");
+
+        context = new DeepSparkContext("local", "deepSparkContextTest");
 
         String createKeyspace = "CREATE KEYSPACE " + KEYSPACE_NAME
                 + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 2 };";
@@ -111,25 +112,25 @@ public class AbstractDeepExamplesTest {
         cassandraServer = new CassandraServer();
         cassandraServer.setStartupCommands(startupCommands);
         cassandraServer.start();
-
-        Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-                .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
-
-        session = cluster.connect();
-
-        /*
-        try {
-
-            session.execute(createKeyspace);
-            session.execute(createCrawlerKeyspace);
-            session.execute(useKeyspace);
-            session.execute(createTweetCF);
-            session.execute(createCrawlerCF);
-        } catch (Exception ex){}*/
-
-        dataInsertCql();
-
-        checkTestData();
+//
+//        Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
+//                .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+//
+//        session = cluster.connect();
+//
+//
+//        try {
+//
+//            session.execute(createKeyspace);
+//            session.execute(createCrawlerKeyspace);
+//            session.execute(useKeyspace);
+//            session.execute(createTweetCF);
+//            session.execute(createCrawlerCF);
+//        } catch (Exception ex){}
+//
+//        dataInsertCql();
+//
+//        checkTestData();
     }
 
     @AfterSuite

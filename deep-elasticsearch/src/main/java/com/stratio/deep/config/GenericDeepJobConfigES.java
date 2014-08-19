@@ -18,6 +18,8 @@ package com.stratio.deep.config;
 
 
 import com.stratio.deep.entity.Cell;
+import com.stratio.deep.rdd.IDeepPartition;
+import com.stratio.deep.rdd.IDeepRecordReader;
 import com.stratio.deep.utils.Utils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
@@ -292,9 +294,16 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
 
     @Override
-    public Class<? extends InputFormat<?,?>> getInputFormat() {
+    public Class<? extends InputFormat<?,?>> getInputFormatClass() {
         return null;
     }
 
+    public Class<? extends IDeepPartition> getPatitionClass(){
+        return null;
+    }
 
+    @Override
+    public Class<? extends IDeepRecordReader> getRecordReaderClass() {
+        return null;
+    }
 }

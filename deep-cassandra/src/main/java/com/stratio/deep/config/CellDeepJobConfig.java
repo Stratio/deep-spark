@@ -18,6 +18,8 @@ package com.stratio.deep.config;
 
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.rdd.CassandraCellRDD;
+import com.stratio.deep.rdd.IDeepPartition;
+import com.stratio.deep.rdd.IDeepRecordReader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.rdd.RDD;
 
@@ -61,5 +63,7 @@ public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
     public Configuration getHadoopConfiguration() {
         return null;
     }
+
+
 
 }

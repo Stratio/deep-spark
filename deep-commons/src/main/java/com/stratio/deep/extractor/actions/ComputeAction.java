@@ -3,10 +3,15 @@
  */
 package com.stratio.deep.extractor.actions;
 
+import com.stratio.deep.rdd.IDeepRecordReader;
+import com.stratio.deep.utils.Pair;
 import org.apache.spark.Partition;
 import org.apache.spark.TaskContext;
 
 import com.stratio.deep.config.IDeepJobConfig;
+
+import java.nio.ByteBuffer;
+import java.util.Map;
 
 /**
  * @author Óscar Puertas
@@ -18,7 +23,7 @@ public class ComputeAction<T> extends Action {
 
   private IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config;
 
-  private Partition split;
+  private IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
 
   private TaskContext context;
 
@@ -26,19 +31,18 @@ public class ComputeAction<T> extends Action {
     super();
   }
 
-  public ComputeAction(Partition split, TaskContext context,
-      IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
+  public ComputeAction(IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader,
+                       IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
     super(ActionType.COMPUTE);
-    this.split = split;
-    this.context = context;
+    this.recordReader = recordReader;
     this.config = config;
   }
 
-  public Partition getSplit() {
-    return split;
-  }
+    public IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> getRecordReader() {
+        return recordReader;
+    }
 
-  public TaskContext getContext() {
+    public TaskContext getContext() {
     return context;
   }
 

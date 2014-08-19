@@ -21,6 +21,8 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import com.stratio.deep.entity.Cell;
+import com.stratio.deep.rdd.IDeepPartition;
+import com.stratio.deep.rdd.IDeepRecordReader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
 
@@ -165,6 +167,12 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?,?>> extends Serial
 
 //    S InputFormat(InputFormat inputFormat);
 
-    Class<? extends InputFormat<?,?>> getInputFormat();
+    Class<? extends InputFormat<?,?>> getInputFormatClass();
+
+
+    Class<? extends IDeepPartition> getPatitionClass();
+
+    Class<? extends IDeepRecordReader> getRecordReaderClass();
+
 
 }

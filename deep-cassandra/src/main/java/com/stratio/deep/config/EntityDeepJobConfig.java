@@ -17,11 +17,14 @@
 package com.stratio.deep.config;
 
 import com.stratio.deep.annotations.DeepEntity;
+import com.stratio.deep.cql.DeepRecordReader;
 import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
+import com.stratio.deep.rdd.IDeepPartition;
+import com.stratio.deep.rdd.IDeepRecordReader;
 import com.stratio.deep.utils.AnnotationUtils;
 import com.stratio.deep.utils.Utils;
 import org.apache.commons.lang.StringUtils;
@@ -87,6 +90,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
     public Configuration getHadoopConfiguration() {
         return null;
     }
+
 
 
     /**
@@ -195,4 +199,6 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
                 return value;
         }
     }
+
+
 }

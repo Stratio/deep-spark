@@ -15,27 +15,21 @@
 package com.stratio.deep.rdd;
 
 import static scala.collection.JavaConversions.asScalaBuffer;
-import static scala.collection.JavaConversions.asScalaIterator;
 
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.spark.InterruptibleIterator;
 import org.apache.spark.Partition;
-import org.apache.spark.TaskContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.rdd.RDD;
 
-import scala.collection.Iterator;
 import scala.collection.Seq;
 import scala.runtime.AbstractFunction0;
 import scala.runtime.BoxedUnit;
 
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.cql.DeepRecordReader;
-import com.stratio.deep.cql.DeepTokenRange;
 import com.stratio.deep.cql.RangeUtils;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
@@ -44,6 +38,8 @@ import com.stratio.deep.functions.CellList2TupleFunction;
 import com.stratio.deep.functions.DeepType2TupleFunction;
 import com.stratio.deep.partition.impl.DeepPartition;
 import com.stratio.deep.utils.Pair;
+import java.util.Iterator;
+
 
 /**
  * Base class that abstracts the complexity of interacting with the Cassandra Datastore.<br/>
@@ -57,35 +53,6 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
    */
   // protected final Broadcast<ICassandraDeepJobConfig<T>> config;
 
-
-
-  /**
-   * Helper callback class called by Spark when the current RDD is computed successfully. This class
-   * simply closes the {@link org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader} passed as an
-   * argument.
-   * 
-   * @param <R>
-   * @author Luca Rosellini <luca@strat.io>
-   */
-  class OnComputedRDDCallback<R> extends AbstractFunction0<R> {
-    private final DeepRecordReader recordReader;
-    private final DeepPartition deepPartition;
-
-    public OnComputedRDDCallback(DeepRecordReader recordReader, DeepPartition dp) {
-      super();
-      this.recordReader = recordReader;
-      this.deepPartition = dp;
-        System.out.print("termina el cbuilder " +this);
-    }
-
-    @Override
-    public R apply() {
-      recordReader.close();
-
-      return null;
-    }
-
-  }
 
   /**
    * Persists the given RDD to the underlying Cassandra datastore using the java cql3 driver.<br/>
@@ -155,36 +122,13 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
   }
 
 
-  // /**
-  // * Public constructor that builds a new Cassandra RDD given the context and the configuration
-  // file.
-  // *
-  // * @param sc the spark context to which the RDD will be bound to.
-  // * @param config the deep configuration object.
-  // */
-  // @SuppressWarnings("unchecked")
-  // public CassandraRDD(SparkContext sc, ICassandraDeepJobConfig<T> config) {
-  // super(sc, scala.collection.Seq$.MODULE$.empty(),
-  // ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
-  // this.config = sc.broadcast(config,
-  // ClassTag$.MODULE$.<ICassandraDeepJobConfig<T>>apply(config.getClass()));
-  // }
-
   /**
    * Computes the current RDD over the given data partition. Returns an iterator of Scala tuples.
    */
   @Override
-  public Iterator<T> compute(Partition split, TaskContext ctx,
-      final IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
+  public Iterator<T> compute(final IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader,
+                             final IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
 
-
-      ctx = new TaskContext (ctx.stageId(), ctx.partitionId(), ctx.attemptId(), ctx.runningLocally(), ctx.taskMetrics());
-
-    DeepPartition deepPartition = (DeepPartition) split;
-
-    // log().debug("Executing compute for split: " + deepPartition);
-
-    final DeepRecordReader recordReader = initRecordReader(ctx, deepPartition, config);
 
     /**
      * Creates a new anonymous iterator inner class and returns it as a scala iterator.
@@ -208,7 +152,7 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
       }
     };
 
-    return new InterruptibleIterator<T>(ctx, asScalaIterator(recordReaderIterator));
+    return recordReaderIterator;
   }
 
   protected abstract T transformElement(
@@ -220,13 +164,11 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
    * RDD.
    * 
    * @param recordReader the deep record reader.
-   * @param dp the spark deep partition.
    * @return an instance of the callback that will be used on the completion of the computation of
    *         this RDD.
    */
-  protected AbstractFunction0<BoxedUnit> getComputeCallback(DeepRecordReader recordReader,
-      DeepPartition dp) {
-    return new OnComputedRDDCallback<>(recordReader, dp);
+  protected AbstractFunction0<BoxedUnit> getComputeCallback(IDeepRecordReader recordReader) {
+    return new OnComputedRDDCallback<>(recordReader);
   }
 
   /**
@@ -268,19 +210,5 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
     return asScalaBuffer(locations);
   }
 
-  /**
-   * Instantiates a new deep record reader object associated to the provided partition.
-   * 
-   * @param ctx the spark task context.
-   * @param dp a spark deep partition
-   * @return the deep record reader associated to the provided partition.
-   */
-  private DeepRecordReader initRecordReader(TaskContext ctx, final DeepPartition dp,
-      IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
-    DeepRecordReader recordReader =
-        new DeepRecordReader((ICassandraDeepJobConfig) config, dp.splitWrapper());
-      ctx.addOnCompleteCallback(getComputeCallback(recordReader, dp));
-    return recordReader;
 
-  }
 }

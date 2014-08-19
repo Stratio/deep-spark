@@ -27,6 +27,7 @@ import com.datastax.driver.core.*;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.rdd.DeepTokenRange;
 import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
 import javax.annotation.Nullable;

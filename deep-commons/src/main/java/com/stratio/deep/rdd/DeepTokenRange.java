@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.cql;
+package com.stratio.deep.rdd;
 
 import java.io.Serializable;
 import java.util.List;

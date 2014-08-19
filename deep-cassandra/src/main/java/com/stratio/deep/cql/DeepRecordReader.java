@@ -16,14 +16,21 @@
 
 package com.stratio.deep.cql;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
 
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.rdd.DeepTokenRange;
+import com.stratio.deep.rdd.IDeepRecordReader;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +60,7 @@ import static com.stratio.deep.utils.Utils.additionalFilterGenerator;
  *
  * @author Luca Rosellini <luca@strat.io>
  */
-public class DeepRecordReader {
+public class DeepRecordReader implements IDeepRecordReader {
     private static final Logger LOG = LoggerFactory.getLogger(DeepRecordReader.class);
 
     private DeepTokenRange split;
@@ -87,8 +94,8 @@ public class DeepRecordReader {
      * @param config the deep configuration object.
      * @param split  the token range on which the new reader will be based.
      */
-    public DeepRecordReader(ICassandraDeepJobConfig config, DeepTokenRange split) {
-        this.config = config;
+    public DeepRecordReader(IDeepJobConfig config, DeepTokenRange split) {
+        this.config = (ICassandraDeepJobConfig) config;
         this.split = split;
 	    this.pageSize = config.getPageSize();
         initialize();
@@ -144,6 +151,8 @@ public class DeepRecordReader {
 
         throw new DeepIOException(lastException);
     }
+
+
 
     /**
      * Closes this input reader object.
@@ -481,4 +490,35 @@ public class DeepRecordReader {
         }
         return rowIterator.next();
     }
+
+
+
+//
+//
+//    @Override
+//    public void initialize(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
+//
+//    }
+//
+//    @Override
+//    public boolean nextKeyValue() throws IOException, InterruptedException {
+//        return false;
+//    }
+//
+//    @Override
+//    public Object getCurrentKey() throws IOException, InterruptedException {
+//        return null;
+//    }
+//
+//    @Override
+//    public Object getCurrentValue() throws IOException, InterruptedException {
+//        return null;
+//    }
+//
+//    @Override
+//    public float getProgress() throws IOException, InterruptedException {
+//        return 0;
+//    }
+//
+
 }
