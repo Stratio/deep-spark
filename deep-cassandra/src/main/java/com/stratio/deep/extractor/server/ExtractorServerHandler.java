@@ -14,6 +14,8 @@
  */
 package com.stratio.deep.extractor.server;
 
+import com.stratio.deep.extractor.actions.TransformElementAction;
+import com.stratio.deep.extractor.response.TransformElementResponse;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -50,6 +52,10 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
         GetPartitionsAction<T> partitionsAction = (GetPartitionsAction<T>) action;
         response = new GetPartitionsResponse(this.getPartitions(partitionsAction));
         break;
+      case TRANSFORM_ELEMENT:
+          TransformElementAction<T> transformElementAction = (TransformElementAction<T>) action;
+          response = new TransformElementResponse(this.transformElement(transformElementAction));
+          break;
       default:
         break;
     }
@@ -86,6 +92,15 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
 
     return extractor.getPartitions(getPartitionsAction.getConfig(), getPartitionsAction.getId());
   }
+
+    protected T transformElement(TransformElementAction<T> transformElementAction){
+
+        if (extractor == null) {
+            this.initExtractor(transformElementAction.getConfig());
+        }
+
+        return extractor.transformElement(transformElementAction.getElement(), transformElementAction.getConfig());
+    }
 
   /**
    * @param config

@@ -14,6 +14,8 @@
  */
 package com.stratio.deep.extractor.client;
 
+import com.stratio.deep.extractor.actions.TransformElementAction;
+import com.stratio.deep.extractor.response.TransformElementResponse;
 import com.stratio.deep.rdd.IDeepRecordReader;
 import com.stratio.deep.utils.Pair;
 import io.netty.channel.Channel;
@@ -132,5 +134,30 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
     return ((ComputeResponse<T>) response).getData();
   }
+
+    public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader,
+                                         IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
+
+        TransformElementAction<T> transformElementAction = new TransformElementAction<>(recordReader, config);
+
+        channel.writeAndFlush(transformElementAction);
+
+        Response response;
+        boolean interrupted = false;
+        for (;;) {
+            try {
+                response = answer.take();
+                break;
+            } catch (InterruptedException ignore) {
+                interrupted = true;
+            }
+        }
+
+        if (interrupted) {
+            Thread.currentThread().interrupt();
+        }
+
+        return ((TransformElementResponse<T>) response).getData();
+    }
 
 }

@@ -5,7 +5,12 @@ import static scala.collection.JavaConversions.asScalaIterator;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.ByteBuffer;
+import java.util.Map;
 import javax.net.ssl.SSLException;
+
+import com.stratio.deep.exception.DeepIOException;
+import com.stratio.deep.utils.Pair;
 import org.apache.spark.InterruptibleIterator;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
@@ -31,7 +36,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
 
 //  private Broadcast<ExtractorClient<T>> extractorClient;
 
-    private ExtractorClient<T> extractorClient;
+    private transient ExtractorClient<T> extractorClient;
 
 
     protected Broadcast<IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>>> config;
@@ -61,7 +66,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
 
   @Override
   public Iterator<T> compute(Partition split, TaskContext context) {
-      IDeepRecordReader IDeepRecordReader = initRecordReader(context, (IDeepPartition)split, config.value());
+      final IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader = initRecordReader(context, (IDeepPartition)split, config.value());
     if (extractorClient == null) {
       extractorClient = new ExtractorClient<>();
       try {
@@ -71,9 +76,34 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         e.printStackTrace();
       }
     }
-//      new InterruptibleIterator<T>(ctx, asScalaIterator(recordReaderIterator));
-      return new InterruptibleIterator<>(context , asScalaIterator(extractorClient.compute(IDeepRecordReader, config.getValue()))) ;
 
+
+      /**
+       * Creates a new anonymous iterator inner class and returns it as a scala iterator.
+       */
+      java.util.Iterator<T> recordReaderIterator = new java.util.Iterator<T>() {
+
+          @Override
+          public boolean hasNext() {
+              return recordReader.hasNext();
+          }
+
+          @Override
+          public T next() {
+              return extractorClient.transformElement(recordReader.next(), config.value());
+          }
+
+          @Override
+          public void remove() {
+              throw new DeepIOException(
+                      "Method not implemented (and won't be implemented anytime soon!!!)");
+          }
+      };
+
+
+//      new InterruptibleIterator<T>(ctx, asScalaIterator(recordReaderIterator));
+//      return new InterruptibleIterator<>(context , asScalaIterator(extractorClient.compute(IDeepRecordReader, config.getValue()))) ;
+      return new InterruptibleIterator<>(context , asScalaIterator(recordReaderIterator)) ;
 
 //    return new InterruptibleIterator<>(context , asScalaIterator(extractorClient.value().compute(IDeepRecordReader, config.getValue()))) ;
   }

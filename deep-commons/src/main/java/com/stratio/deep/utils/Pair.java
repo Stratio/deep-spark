@@ -18,12 +18,14 @@ package com.stratio.deep.utils;
 
 import com.google.common.base.Objects;
 
+import java.io.Serializable;
+
 
 /**
  * Common utility class wrapping a pair of objects.
  * Instances of Pair are immutable.
  */
-public class Pair<L, R> {
+public class Pair<L, R> implements Serializable {
 	/**
 	 * Left element of the pair.
 	 */

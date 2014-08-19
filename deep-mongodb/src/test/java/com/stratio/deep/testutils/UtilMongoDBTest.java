@@ -88,7 +88,7 @@ public class UtilMongoDBTest {
 
         BSONObject bson = UtilMongoDB.getBsonFromObject(bookEntity);
 
-        
+
         BSONObject metadataFromBson = (BSONObject) bson.get("metadata");
 
         assertEquals(metadataFromBson.get("author"), AUTHOR);
