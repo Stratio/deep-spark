@@ -46,9 +46,9 @@ public class ExtractorClient<T> implements IDeepRDD<T> {
   static final String HOST = System.getProperty("host", "127.0.0.1");
   static final int PORT = Integer.parseInt(System.getProperty("port", "8463"));
 
-  private EventLoopGroup group = new NioEventLoopGroup();
+  private transient EventLoopGroup group = new NioEventLoopGroup();
 
-  private Channel ch;
+  private transient Channel ch;
 
   private ExtractorClientHandler<T> handler;
 
@@ -89,6 +89,11 @@ public class ExtractorClient<T> implements IDeepRDD<T> {
     return this.handler.compute(recordReader, config);
   }
 
+//    @Override
+    public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader,
+                                         IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
+        return this.handler.transformElement(recordReader, config);
+    }
   /*
    * (non-Javadoc)
    * 

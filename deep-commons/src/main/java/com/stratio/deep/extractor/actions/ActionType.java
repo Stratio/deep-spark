@@ -10,7 +10,7 @@ package com.stratio.deep.extractor.actions;
  */
 public enum ActionType {
 
-  COMPUTE(1), GET_PARTITIONS(2), GET_PREFERRED(3), WRITE(4);
+  COMPUTE(1), GET_PARTITIONS(2), GET_PREFERRED(3), WRITE(4), TRANSFORM_ELEMENT(5);
 
   private final int actionId;
 

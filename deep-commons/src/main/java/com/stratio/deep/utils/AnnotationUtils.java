@@ -70,7 +70,7 @@ public final class AnnotationUtils {
      */
     public static final Map<String, Class> MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE =
             ImmutableMap.<String, Class>builder()
-                    .put(UTF8Type.class.getCanonicalName(), String.class)
+//                    .put(UTF8Type.class.getCanonicalName(), String.class)
                     .put(Int32Type.class.getCanonicalName(), Integer.class)
                     .put(BooleanType.class.getCanonicalName(), Boolean.class)
                     .put(TimestampType.class.getCanonicalName(), Date.class)
@@ -94,7 +94,7 @@ public final class AnnotationUtils {
      */
     public static final Map<Class<?>, AbstractType<?>> MAP_ABSTRACT_TYPE_CLASS_TO_ABSTRACT_TYPE =
             ImmutableMap.<Class<?>, AbstractType<?>>builder()
-                    .put(UTF8Type.class, UTF8Type.instance)
+//                    .put(UTF8Type.class, UTF8Type.instance)
                     .put(Int32Type.class, Int32Type.instance)
                     .put(BooleanType.class, BooleanType.instance)
                     .put(TimestampType.class, TimestampType.instance)

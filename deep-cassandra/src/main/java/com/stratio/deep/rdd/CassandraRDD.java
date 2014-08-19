@@ -130,32 +130,12 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
                              final IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
 
 
-    /**
-     * Creates a new anonymous iterator inner class and returns it as a scala iterator.
-     */
-    java.util.Iterator<T> recordReaderIterator = new java.util.Iterator<T>() {
 
-      @Override
-      public boolean hasNext() {
-        return recordReader.hasNext();
-      }
 
-      @Override
-      public T next() {
-        return transformElement(recordReader.next(), config);
-      }
-
-      @Override
-      public void remove() {
-        throw new DeepIOException(
-            "Method not implemented (and won't be implemented anytime soon!!!)");
-      }
-    };
-
-    return recordReaderIterator;
+    return null;
   }
 
-  protected abstract T transformElement(
+  public abstract T transformElement(
       Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
       IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config);
 

@@ -17,7 +17,7 @@
 package com.stratio.deep.annotations;
 
 import org.apache.cassandra.db.marshal.AbstractType;
-//import org.apache.cassandra.db.marshal.UTF8Type;
+import org.apache.cassandra.db.marshal.UTF8Type;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -51,6 +51,6 @@ public @interface DeepField {
      * Specifies the cassandra validator class to be used to marshall/unmarshall the field value to the database.
      * Defaults to org.apache.cassandra.db.marshal.UTF8Type.class
      */
-    Class<? extends AbstractType> validationClass();
+    Class<? extends AbstractType> validationClass() default UTF8Type.class;
 
 }

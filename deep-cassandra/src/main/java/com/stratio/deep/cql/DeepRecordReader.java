@@ -17,6 +17,7 @@
 package com.stratio.deep.cql;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -459,7 +460,7 @@ public class DeepRecordReader implements IDeepRecordReader {
         return endToken.equals(currentToken);
     }
 
-    private static class BoundColumn {
+    private static class BoundColumn implements Serializable {
         private final String name;
         private ByteBuffer value;
         private AbstractType<?> validator;
