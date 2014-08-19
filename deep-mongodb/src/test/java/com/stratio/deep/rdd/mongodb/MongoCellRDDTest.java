@@ -2,7 +2,7 @@ package com.stratio.deep.rdd.mongodb;
 
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.config.MongoConfigFactory;
-import com.stratio.deep.context.MongoDeepSparkContext;
+import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.entity.Cells;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
@@ -24,12 +24,12 @@ public class MongoCellRDDTest {
     public void testReadingRDD() {
 
         String hostConcat = MongoJavaRDDTest.HOST.concat(":").concat(MongoJavaRDDTest.PORT.toString());
-        MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
+        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
         IMongoDeepJobConfig<Cells> inputConfigEntity = MongoConfigFactory.createMongoDB()
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_INPUT).initialize();
 
-        JavaRDD<Cells> inputRDDEntity = context.mongoJavaRDD(inputConfigEntity);
+        JavaRDD<Cells> inputRDDEntity = context.createJavaRDD(inputConfigEntity);
 
         assertEquals(MongoJavaRDDTest.col.count(), inputRDDEntity.cache().count());
         assertEquals(MongoJavaRDDTest.col.findOne().get("message"), inputRDDEntity.first().getCellByName("message").getCellValue());
@@ -44,12 +44,12 @@ public class MongoCellRDDTest {
 
         String hostConcat = HOST.concat(":").concat(PORT.toString());
 
-        MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
+        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
         IMongoDeepJobConfig<Cells> inputConfigEntity = MongoConfigFactory.createMongoDB()
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_INPUT).initialize();
 
-        RDD<Cells> inputRDDEntity = context.mongoRDD(inputConfigEntity);
+        RDD<Cells> inputRDDEntity = context.createRDD(inputConfigEntity);
 
         IMongoDeepJobConfig<Cells> outputConfigEntity = MongoConfigFactory.createMongoDB()
                 .host(hostConcat).database(DATABASE).collection(COLLECTION_OUTPUT_CELL).initialize();
@@ -58,7 +58,7 @@ public class MongoCellRDDTest {
         //Save RDD in MongoDB
         MongoCellRDD.saveCell(inputRDDEntity, outputConfigEntity);
 
-        RDD<Cells> outputRDDEntity = context.mongoRDD(outputConfigEntity);
+        RDD<Cells> outputRDDEntity = context.createRDD(outputConfigEntity);
 
 
         assertEquals(MongoJavaRDDTest.mongo.getDB(DATABASE).getCollection(COLLECTION_OUTPUT_CELL).findOne().get("message"),
@@ -76,7 +76,7 @@ public class MongoCellRDDTest {
 //
 //        String hostConcat = HOST.concat(":").concat(PORT.toString());
 //
-//        MongoDeepSparkContext context = new MongoDeepSparkContext("local", "deepSparkContextTest");
+//        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 //
 //        IMongoDeepJobConfig<Cells> inputConfigEntity = MongoConfigFactory.createMongoDB()
 //                .host(hostConcat).database(DATABASE).collection(COLLECTION_INPUT).initialize();
