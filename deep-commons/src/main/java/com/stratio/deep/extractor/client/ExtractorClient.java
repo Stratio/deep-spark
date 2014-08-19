@@ -14,7 +14,9 @@
  */
 package com.stratio.deep.extractor.client;
 
-import com.stratio.deep.rdd.IDeepRecordReader;
+import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.extractor.core.IDeepExtractor;
+import com.stratio.deep.extractor.core.IDeepRecordReader;
 import com.stratio.deep.utils.Pair;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -23,15 +25,9 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import org.apache.spark.Partition;
 
 import javax.net.ssl.SSLException;
-
-import org.apache.spark.Partition;
-import org.apache.spark.TaskContext;
-
-import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.rdd.IDeepRDD;
-
 import java.nio.ByteBuffer;
 import java.util.Map;
 
@@ -39,70 +35,71 @@ import java.util.Map;
  * Sends a list of continent/city pairs to a {@link } to get the local times of the
  * specified cities.
  */
-public class ExtractorClient<T> implements IDeepRDD<T> {
+public class ExtractorClient<T> implements IDeepExtractor<T> {
 
-  static final boolean SSL = System.getProperty("ssl") != null;
-  //  static final String HOST = System.getProperty("host", "172.19.0.133");
-  static final String HOST = System.getProperty("host", "127.0.0.1");
-  static final int PORT = Integer.parseInt(System.getProperty("port", "8463"));
+    static final boolean SSL = System.getProperty("ssl") != null;
+    //  static final String HOST = System.getProperty("host", "172.19.0.133");
+    static final String HOST = System.getProperty("host", "127.0.0.1");
+    static final int PORT = Integer.parseInt(System.getProperty("port", "8463"));
 
-  private transient EventLoopGroup group = new NioEventLoopGroup();
+    private transient EventLoopGroup group = new NioEventLoopGroup();
 
-  private transient Channel ch;
+    private transient Channel ch;
 
-  private ExtractorClientHandler<T> handler;
+    private ExtractorClientHandler<T> handler;
 
-  public void initialize() throws SSLException, InterruptedException {
+    public void initialize() throws SSLException, InterruptedException {
 
-    // Configure SSL.
-    final SslContext sslCtx;
-    if (SSL) {
-      sslCtx = SslContext.newClientContext(InsecureTrustManagerFactory.INSTANCE);
-    } else {
-      sslCtx = null;
+        // Configure SSL.
+        final SslContext sslCtx;
+        if (SSL) {
+            sslCtx = SslContext.newClientContext(InsecureTrustManagerFactory.INSTANCE);
+        } else {
+            sslCtx = null;
+        }
+
+        Bootstrap b = new Bootstrap();
+        b.group(group).channel(NioSocketChannel.class).handler(new ExtractorClientInitializer<T>(sslCtx));
+
+        // Make a new connection.
+        this.ch = b.connect(HOST, PORT).sync().channel();
+
+        // Get the handler instance to initiate the request.
+        this.handler = ch.pipeline().get(ExtractorClientHandler.class);
     }
 
-    Bootstrap b = new Bootstrap();
-    b.group(group).channel(NioSocketChannel.class).handler(new ExtractorClientInitializer<T>(sslCtx));
+    public void finish() {
+        ch.close();
+        group.shutdownGracefully();
+    }
 
-    // Make a new connection.
-    this.ch = b.connect(HOST, PORT).sync().channel();
-
-    // Get the handler instance to initiate the request.
-    this.handler = ch.pipeline().get(ExtractorClientHandler.class);
-  }
-
-  public void finish() {
-    ch.close();
-    group.shutdownGracefully();
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.stratio.deep.rdd.IDeepRDD#compute(org.apache.spark.Partition,
-   * org.apache.spark.TaskContext, com.stratio.deep.config.IDeepJobConfig)
-   */
-  @Override
-  public java.util.Iterator<T> compute(IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader,
-                                       IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
-    return this.handler.compute(recordReader, config);
-  }
-
-//    @Override
-    public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader,
+    /*
+     * (non-Javadoc)
+     *
+     * @see com.stratio.deep.rdd.IDeepRDD#compute(org.apache.spark.Partition,
+     * org.apache.spark.TaskContext, com.stratio.deep.config.IDeepJobConfig)
+     */
+    @Override
+    public java.util.Iterator<T> compute(IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader,
                                          IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
+        return this.handler.compute(recordReader, config);
+    }
+
+    //    @Override
+    public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader,
+                              IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
         return this.handler.transformElement(recordReader, config);
     }
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(com.stratio.deep.config.IDeepJobConfig, int)
-   */
-  @Override
-  public Partition[] getPartitions(IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config, int id) {
-    return this.handler.getPartitions(config, id);
-  }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(com.stratio.deep.config.IDeepJobConfig, int)
+     */
+    @Override
+    public Partition[] getPartitions(IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config, int id) {
+        return this.handler.getPartitions(config, id);
+    }
 
 //    @Override
 //    public IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> createRecordReader() {

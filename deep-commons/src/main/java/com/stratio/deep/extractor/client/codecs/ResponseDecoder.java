@@ -14,6 +14,7 @@
  */
 package com.stratio.deep.extractor.client.codecs;
 
+import com.stratio.deep.extractor.response.Response;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -24,51 +25,49 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.util.List;
 
-import com.stratio.deep.extractor.response.Response;
-
 public class ResponseDecoder extends ByteToMessageDecoder {
 
-  protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
 
-    // Wait until the length prefix is available.
-    if (in.readableBytes() < 5) {
-      return;
-    }
-
-    // Wait until the whole data is available.
-    int dataLength = in.readInt();
-    if (in.readableBytes() < dataLength) {
-      in.resetReaderIndex();
-      return;
-    }
-
-    // Convert the received data into a new BigInteger.
-    byte[] decoded = new byte[dataLength];
-    in.readBytes(decoded);
-
-    ByteArrayInputStream bis = new ByteArrayInputStream(decoded);
-    ObjectInput inObj = null;
-    Response response = null;
-    try {
-      inObj = new ObjectInputStream(bis);
-      response = (Response) inObj.readObject();
-    } catch (IOException | ClassNotFoundException e) {
-      e.printStackTrace();
-    } finally {
-      try {
-        bis.close();
-      } catch (IOException ex) {
-        // ignore close exception
-      }
-      try {
-        if (inObj != null) {
-          inObj.close();
+        // Wait until the length prefix is available.
+        if (in.readableBytes() < 5) {
+            return;
         }
-      } catch (IOException ex) {
-        // ignore close exception
-      }
-    }
 
-    out.add(response);
-  }
+        // Wait until the whole data is available.
+        int dataLength = in.readInt();
+        if (in.readableBytes() < dataLength) {
+            in.resetReaderIndex();
+            return;
+        }
+
+        // Convert the received data into a new BigInteger.
+        byte[] decoded = new byte[dataLength];
+        in.readBytes(decoded);
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(decoded);
+        ObjectInput inObj = null;
+        Response response = null;
+        try {
+            inObj = new ObjectInputStream(bis);
+            response = (Response) inObj.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                bis.close();
+            } catch (IOException ex) {
+                // ignore close exception
+            }
+            try {
+                if (inObj != null) {
+                    inObj.close();
+                }
+            } catch (IOException ex) {
+                // ignore close exception
+            }
+        }
+
+        out.add(response);
+    }
 }
