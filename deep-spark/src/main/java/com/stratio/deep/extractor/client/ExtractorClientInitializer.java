@@ -14,34 +14,31 @@
  */
 package com.stratio.deep.extractor.client;
 
+import com.stratio.deep.extractor.client.codecs.ActionEncoder;
+import com.stratio.deep.extractor.client.codecs.ResponseDecoder;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.ssl.SslContext;
 
-import java.io.Serializable;
-
-import com.stratio.deep.extractor.client.codecs.ActionEncoder;
-import com.stratio.deep.extractor.client.codecs.ResponseDecoder;
-
 public class ExtractorClientInitializer<T> extends ChannelInitializer<SocketChannel> {
 
-  private final SslContext sslCtx;
+    private final SslContext sslCtx;
 
-  public ExtractorClientInitializer(SslContext sslCtx) {
-    this.sslCtx = sslCtx;
-  }
-
-  @Override
-  public void initChannel(SocketChannel ch) {
-    ChannelPipeline p = ch.pipeline();
-    if (sslCtx != null) {
-      p.addLast(sslCtx.newHandler(ch.alloc(), ExtractorClient.HOST, ExtractorClient.PORT));
+    public ExtractorClientInitializer(SslContext sslCtx) {
+        this.sslCtx = sslCtx;
     }
 
-    p.addLast(new ResponseDecoder());
-    p.addLast(new ActionEncoder());
+    @Override
+    public void initChannel(SocketChannel ch) {
+        ChannelPipeline p = ch.pipeline();
+        if (sslCtx != null) {
+            p.addLast(sslCtx.newHandler(ch.alloc(), ExtractorClient.HOST, ExtractorClient.PORT));
+        }
 
-    p.addLast(new ExtractorClientHandler<T>());
-  }
+        p.addLast(new ResponseDecoder());
+        p.addLast(new ActionEncoder());
+
+        p.addLast(new ExtractorClientHandler<T>());
+    }
 }
