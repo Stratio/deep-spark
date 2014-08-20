@@ -16,39 +16,34 @@
 
 package com.stratio.deep.cql;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.nio.ByteBuffer;
-import java.util.*;
-
+import com.datastax.driver.core.*;
+import com.datastax.driver.core.exceptions.NoHostAvailableException;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.rdd.DeepTokenRange;
-import com.stratio.deep.rdd.IDeepRecordReader;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.mapreduce.InputSplit;
-import org.apache.hadoop.mapreduce.RecordReader;
-import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.datastax.driver.core.*;
-import com.datastax.driver.core.exceptions.NoHostAvailableException;
 import com.stratio.deep.config.GenericDeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
+import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.partition.impl.DeepPartitionLocationComparator;
+import com.stratio.deep.rdd.DeepTokenRange;
+import com.stratio.deep.rdd.IDeepRecordReader;
 import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.dht.IPartitioner;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.util.*;
 
 import static com.stratio.deep.cql.CassandraClientProvider.trySessionForLocation;
 import static com.stratio.deep.utils.Utils.additionalFilterGenerator;
@@ -56,7 +51,7 @@ import static com.stratio.deep.utils.Utils.additionalFilterGenerator;
 /**
  * Implements a cassandra record reader with pagination capabilities.
  * Does not rely on Cassandra's Hadoop CqlPagingRecordReader.
- *
+ * <p/>
  * Pagination is outsourced to Datastax Java Driver.
  *
  * @author Luca Rosellini <luca@strat.io>
@@ -98,7 +93,7 @@ public class DeepRecordReader implements IDeepRecordReader {
     public DeepRecordReader(IDeepJobConfig config, DeepTokenRange split) {
         this.config = (ICassandraDeepJobConfig) config;
         this.split = split;
-	    this.pageSize = config.getPageSize();
+        this.pageSize = config.getPageSize();
         initialize();
     }
 
@@ -154,7 +149,6 @@ public class DeepRecordReader implements IDeepRecordReader {
     }
 
 
-
     /**
      * Closes this input reader object.
      */
@@ -200,12 +194,12 @@ public class DeepRecordReader implements IDeepRecordReader {
                 return endOfData();
             }
 
-	        Map<String, ByteBuffer> valueColumns = createEmptyMap();
-	        Map<String, ByteBuffer> keyColumns = createEmptyMap();
+            Map<String, ByteBuffer> valueColumns = createEmptyMap();
+            Map<String, ByteBuffer> keyColumns = createEmptyMap();
 
-	        initColumns(valueColumns, keyColumns);
+            initColumns(valueColumns, keyColumns);
 
-	        return Pair.create(keyColumns, valueColumns);
+            return Pair.create(keyColumns, valueColumns);
         }
 
         private void initColumns(Map<String, ByteBuffer> valueColumns, Map<String, ByteBuffer> keyColumns) {
@@ -251,7 +245,7 @@ public class DeepRecordReader implements IDeepRecordReader {
                 String clusterKey = keyString(clusterColumns);
 
                 generatedColumns = withoutKeyColumns(generatedColumns);
-	            generatedColumns = (generatedColumns != null ? "," + generatedColumns : "");
+                generatedColumns = (generatedColumns != null ? "," + generatedColumns : "");
 
                 generatedColumns = StringUtils.isEmpty(clusterKey)
                         ? partitionKey + generatedColumns
@@ -259,8 +253,8 @@ public class DeepRecordReader implements IDeepRecordReader {
             }
 
             return String.format("SELECT %s FROM %s%s%s ALLOW FILTERING",
-				            generatedColumns, quote(cfName), clause,
-				            additionalFilterGenerator(config.getAdditionalFilters()));
+                    generatedColumns, quote(cfName), clause,
+                    additionalFilterGenerator(config.getAdditionalFilters()));
         }
 
         /**
@@ -299,8 +293,8 @@ public class DeepRecordReader implements IDeepRecordReader {
             }
             // initial
             // query token(k) >= start_token and token(k) <= end_token
-	        return String.format(" WHERE token(%s) > ? AND token(%s) <= ?", partitionKeyString,
-					        partitionKeyString);
+            return String.format(" WHERE token(%s) > ? AND token(%s) <= ?", partitionKeyString,
+                    partitionKeyString);
         }
 
         /**
@@ -320,9 +314,9 @@ public class DeepRecordReader implements IDeepRecordReader {
          */
         private String partitionKeyMarkers() {
             String result = null;
-	        for (BoundColumn partitionBoundColumn : partitionBoundColumns) {
-		        result = result == null ? "?" : result + ",?";
-	        }
+            for (BoundColumn partitionBoundColumn : partitionBoundColumns) {
+                result = result == null ? "?" : result + ",?";
+            }
 
             return result;
         }
@@ -336,9 +330,9 @@ public class DeepRecordReader implements IDeepRecordReader {
             Object startToken = split.getStartToken();
             Object endToken = split.getEndToken();
 
-	        values.add(startToken);
-	        values.add(endToken);
-	        return values;
+            values.add(startToken);
+            values.add(endToken);
+            return values;
         }
 
         /**
@@ -357,7 +351,7 @@ public class DeepRecordReader implements IDeepRecordReader {
             List<Object> bindValues = preparedQueryBindValues();
             assert bindValues != null;
 
-	        rows = null;
+            rows = null;
 
             int retries = 0;
 
@@ -367,10 +361,10 @@ public class DeepRecordReader implements IDeepRecordReader {
                 try {
                     Object[] values = bindValues.toArray(new Object[bindValues.size()]);
 
-	                LOG.debug("query: " + query + "; values: " + Arrays.toString(values));
+                    LOG.debug("query: " + query + "; values: " + Arrays.toString(values));
 
-	                Statement stmt = new SimpleStatement(query, values);
-	                stmt.setFetchSize(pageSize);
+                    Statement stmt = new SimpleStatement(query, values);
+                    stmt.setFetchSize(pageSize);
 
                     ResultSet resultSet = session.execute(stmt);
 
@@ -415,14 +409,14 @@ public class DeepRecordReader implements IDeepRecordReader {
         for (ColumnMetadata key : partitionKeys) {
             String columnName = key.getName();
             BoundColumn boundColumn = new BoundColumn(columnName);
-	        boundColumn.validator = CassandraCell.getValueType(key.getType()).getAbstractType();
+            boundColumn.validator = CassandraCell.getValueType(key.getType()).getAbstractType();
             partitionBoundColumns.add(boundColumn);
             types.add(boundColumn.validator);
         }
         for (ColumnMetadata key : clusteringKeys) {
             String columnName = key.getName();
             BoundColumn boundColumn = new BoundColumn(columnName);
-	        boundColumn.validator = CassandraCell.getValueType(key.getType()).getAbstractType();
+            boundColumn.validator = CassandraCell.getValueType(key.getType()).getAbstractType();
             clusterColumns.add(boundColumn);
         }
 
@@ -491,7 +485,6 @@ public class DeepRecordReader implements IDeepRecordReader {
         }
         return rowIterator.next();
     }
-
 
 
 //

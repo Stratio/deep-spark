@@ -16,11 +16,6 @@
 
 package com.stratio.deep.testutils;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.math.BigInteger;
-import java.util.*;
-
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
@@ -29,6 +24,11 @@ import com.stratio.deep.utils.AnnotationUtils;
 import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
 import org.testng.annotations.Test;
+
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.math.BigInteger;
+import java.util.*;
 
 import static com.stratio.deep.utils.Utils.*;
 import static org.testng.Assert.*;
@@ -42,7 +42,6 @@ public class UtilsTest {
 
         private static final long serialVersionUID = -3311345712290429412L;
     }
-
 
 
     @Test
@@ -125,13 +124,6 @@ public class UtilsTest {
 
         Utils.newTypeInstance(CommonsTestEntity.class);
     }
-
-
-
-
-
-
-
 
 
     @Test

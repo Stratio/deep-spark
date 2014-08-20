@@ -16,18 +16,8 @@
 
 package com.stratio.deep.config;
 
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.*;
-
-import com.stratio.deep.cql.DeepRecordReader;
-import com.stratio.deep.rdd.IDeepPartition;
-import com.stratio.deep.rdd.IDeepRecordReader;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-
 import com.datastax.driver.core.*;
+import com.stratio.deep.cql.DeepRecordReader;
 import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
@@ -35,12 +25,21 @@ import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
+import com.stratio.deep.rdd.IDeepPartition;
+import com.stratio.deep.rdd.IDeepRecordReader;
 import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
+
+import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.*;
 
 import static com.stratio.deep.rdd.CassandraRDDUtils.createTableQueryGenerator;
 import static com.stratio.deep.utils.Utils.quote;
@@ -223,10 +222,10 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
     public void createOutputTableIfNeeded(RDD<Tuple2<Cells, Cells>> tupleRDD) {
 
         TableMetadata metadata = getSession()
-				        .getCluster()
-				        .getMetadata()
-				        .getKeyspace(this.keyspace)
-				        .getTable(quote(this.columnFamily));
+                .getCluster()
+                .getMetadata()
+                .getKeyspace(this.keyspace)
+                .getTable(quote(this.columnFamily));
 
         if (metadata == null && !createTableOnWrite) {
             throw new DeepIOException("Cannot write RDD, output table does not exists and configuration object has " +
@@ -256,10 +255,10 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
         final int waitTime = 100;
         do {
             metadata = getSession()
-				            .getCluster()
-				            .getMetadata()
-				            .getKeyspace(this.keyspace)
-				            .getTable(quote(this.columnFamily));
+                    .getCluster()
+                    .getMetadata()
+                    .getKeyspace(this.keyspace)
+                    .getTable(quote(this.columnFamily));
 
             if (metadata != null) {
                 continue;
@@ -772,17 +771,17 @@ public abstract class GenericDeepJobConfig<T> implements ICassandraDeepJobConfig
 
 
     @Override
-    public ICassandraDeepJobConfig<T> customConfiguration(Map<String, Object> customConfiguration){
+    public ICassandraDeepJobConfig<T> customConfiguration(Map<String, Object> customConfiguration) {
         return this;
     }
 
     @Override
-    public Class<? extends InputFormat<?,?>> getInputFormatClass() {
+    public Class<? extends InputFormat<?, ?>> getInputFormatClass() {
         return null;
     }
 
     @Override
-    public Class<? extends IDeepRecordReader> getRecordReaderClass(){
+    public Class<? extends IDeepRecordReader> getRecordReaderClass() {
         return DeepRecordReader.class;
     }
 

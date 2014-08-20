@@ -42,6 +42,11 @@
         </dependency>
         <dependency>
             <groupId>com.stratio.deep</groupId>
+            <artifactId>deep-spark</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.stratio.deep</groupId>
             <artifactId>deep-mongodb</artifactId>
             <version>${project.version}</version>
         </dependency>

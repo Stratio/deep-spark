@@ -16,6 +16,13 @@
 
 package com.stratio.deep.cql;
 
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Host;
+import com.datastax.driver.core.HostDistance;
+import com.datastax.driver.core.Statement;
+import com.datastax.driver.core.policies.RoundRobinPolicy;
+import com.google.common.collect.AbstractIterator;
+
 import java.net.InetAddress;
 import java.util.Collection;
 import java.util.Iterator;
@@ -23,23 +30,15 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.google.common.collect.AbstractIterator;
-
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.Host;
-import com.datastax.driver.core.HostDistance;
-import com.datastax.driver.core.Statement;
-import com.datastax.driver.core.policies.RoundRobinPolicy;
-
 /**
  * Load balancing policy that, unlike round robin, sticks to one host.
  */
 public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
     private InetAddress host;
 
-	/**
-	 * Public constructor.
-	 */
+    /**
+     * Public constructor.
+     */
     public LocalMachineLoadBalancingPolicy(InetAddress host) {
         this.host = host;
     }
@@ -47,9 +46,9 @@ public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
     private final CopyOnWriteArrayList<Host> liveHosts = new CopyOnWriteArrayList<Host>();
     private final AtomicInteger index = new AtomicInteger();
 
-	/**
-	 * {@inheritDoc}
-	 */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void init(Cluster cluster, Collection<Host> hosts) {
 
@@ -127,27 +126,27 @@ public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
         };
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onUp(Host host) {
         liveHosts.addIfAbsent(host);
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onDown(Host host) {
         liveHosts.remove(host);
     }
 
-	/**
-	 * Adds the given new host only if the list of known hosts is empty.
-	 *
-	 * @param host the host to add.
-	 */
+    /**
+     * Adds the given new host only if the list of known hosts is empty.
+     *
+     * @param host the host to add.
+     */
     @Override
     public void onAdd(Host host) {
         if (liveHosts.isEmpty()) {
@@ -155,9 +154,9 @@ public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
         }
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onRemove(Host host) {
         onDown(host);

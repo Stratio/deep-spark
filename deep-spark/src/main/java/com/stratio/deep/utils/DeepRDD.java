@@ -19,10 +19,9 @@ public enum DeepRDD {
         this.className = className;
     }
 
-    public String getClassName(){
+    public String getClassName() {
         return className;
     }
-
 
 
 }

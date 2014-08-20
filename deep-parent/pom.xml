@@ -263,6 +263,7 @@
     <modules>
         <module>../deep-commons</module>
         <module>../deep-cassandra</module>
+        <module>../deep-spark</module>
         <module>../deep-examples</module>
     </modules>
 

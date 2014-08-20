@@ -14,6 +14,7 @@
  */
 package com.stratio.deep.extractor.client.codecs;
 
+import com.stratio.deep.extractor.actions.Action;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -23,38 +24,36 @@ import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 
-import com.stratio.deep.extractor.actions.Action;
-
 public class ActionEncoder extends MessageToByteEncoder<Action> {
 
-  protected void encode(ChannelHandlerContext ctx, Action action, ByteBuf out) {
+    protected void encode(ChannelHandlerContext ctx, Action action, ByteBuf out) {
 
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    ObjectOutput outObj = null;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutput outObj = null;
 
-    try {
-      outObj = new ObjectOutputStream(bos);
-      outObj.writeObject(action);
-    } catch (IOException e) {
-      e.printStackTrace();
-    } finally {
-      try {
-        if (outObj != null) {
-          outObj.close();
+        try {
+            outObj = new ObjectOutputStream(bos);
+            outObj.writeObject(action);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (outObj != null) {
+                    outObj.close();
+                }
+            } catch (IOException ex) {
+                // ignore close exception
+            }
+            try {
+                bos.close();
+            } catch (IOException ex) {
+                // ignore close exception
+            }
         }
-      } catch (IOException ex) {
-        // ignore close exception
-      }
-      try {
-        bos.close();
-      } catch (IOException ex) {
-        // ignore close exception
-      }
-    }
 
-    byte[] encodedObj = bos.toByteArray();
-    int dataLength = encodedObj.length;
-    out.writeInt(dataLength);
-    out.writeBytes(encodedObj);
-  }
+        byte[] encodedObj = bos.toByteArray();
+        int dataLength = encodedObj.length;
+        out.writeInt(dataLength);
+        out.writeBytes(encodedObj);
+    }
 }

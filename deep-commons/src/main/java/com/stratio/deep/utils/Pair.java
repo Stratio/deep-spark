@@ -26,14 +26,14 @@ import java.io.Serializable;
  * Instances of Pair are immutable.
  */
 public class Pair<L, R> implements Serializable {
-	/**
-	 * Left element of the pair.
-	 */
+    /**
+     * Left element of the pair.
+     */
     public final L left;
 
-	/**
-	 * Right element of the pair.
-	 */
+    /**
+     * Right element of the pair.
+     */
     public final R right;
 
     /**
@@ -75,7 +75,7 @@ public class Pair<L, R> implements Serializable {
     @Override
     public final boolean equals(Object o) {
         if (!(o instanceof Pair)) {
-	        return false;
+            return false;
         }
         Pair that = (Pair) o;
         // handles nulls properly

@@ -16,10 +16,6 @@
 
 package com.stratio.deep.rdd;
 
-import org.apache.spark.api.java.JavaRDD;
-import scala.reflect.ClassTag;
-import scala.reflect.ClassTag$;
-
 /**
  * Commodity RDD implementation that should be used as a
  * Java Wrapper for {@link CassandraEntityRDD}.

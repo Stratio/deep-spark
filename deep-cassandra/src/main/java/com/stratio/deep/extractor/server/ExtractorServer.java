@@ -48,9 +48,9 @@ public final class ExtractorServer {
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
-             .channel(NioServerSocketChannel.class)
-             .handler(new LoggingHandler(LogLevel.INFO))
-             .childHandler(new ExtractorServerInitializer(sslCtx));
+                    .channel(NioServerSocketChannel.class)
+                    .handler(new LoggingHandler(LogLevel.INFO))
+                    .childHandler(new ExtractorServerInitializer(sslCtx));
 
             b.bind(PORT).sync().channel().closeFuture().sync();
         } finally {

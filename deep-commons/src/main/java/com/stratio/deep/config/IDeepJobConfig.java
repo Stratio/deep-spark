@@ -16,22 +16,22 @@
 
 package com.stratio.deep.config;
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
-import java.util.Map;
-
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.rdd.IDeepPartition;
 import com.stratio.deep.rdd.IDeepRecordReader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
 
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.util.Map;
+
 /**
  * Defines the public methods that each Stratio Deep configuration object should implement.
  *
  * @param <T> the generic type associated to this configuration object.
  */
-public interface IDeepJobConfig<T, S extends IDeepJobConfig<?,?>> extends Serializable {
+public interface IDeepJobConfig<T, S extends IDeepJobConfig<?, ?>> extends Serializable {
 
     /**
      * Returns the password needed to authenticate
@@ -132,7 +132,6 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?,?>> extends Serial
     S username(String username);
 
 
-
     /**
      * Returns the maximum number of rows that will be retrieved when fetching data pages from Cassandra.
      *
@@ -141,11 +140,9 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?,?>> extends Serial
     int getPageSize();
 
 
-
     /**
      * In case you want to add custom configuration to hadoop-connector, this override any other configuration,
      * these configurations are not validated, so be careful
-     *
      *
      * @param customConfiguration
      * @return
@@ -158,7 +155,7 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?,?>> extends Serial
     Method getSaveMethod() throws NoSuchMethodException;
 
 
-//    /**
+    //    /**
 //     * Just in case you have a hadoopInputFormat
 //     * @return
 //     */
@@ -167,7 +164,7 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?,?>> extends Serial
 
 //    S InputFormat(InputFormat inputFormat);
 
-    Class<? extends InputFormat<?,?>> getInputFormatClass();
+    Class<? extends InputFormat<?, ?>> getInputFormatClass();
 
 
     Class<? extends IDeepPartition> getPatitionClass();

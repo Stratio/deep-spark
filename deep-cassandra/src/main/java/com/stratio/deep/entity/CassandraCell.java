@@ -1,14 +1,14 @@
 package com.stratio.deep.entity;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.nio.ByteBuffer;
-
 import com.datastax.driver.core.DataType;
 import com.stratio.deep.annotations.DeepField;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepInstantiationException;
 import org.apache.cassandra.db.marshal.AbstractType;
+
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
 
 import static com.stratio.deep.utils.AnnotationUtils.*;
 
@@ -70,11 +70,11 @@ public class CassandraCell extends Cell {
      * Factory method, builds a new CassandraCell (isPartitionKey = false and isClusterKey = false) with value = null.
      * The validator will be automatically calculated using the value object type.
      *
-     * @param cellName  the cell name
+     * @param cellName the cell name
      * @return an instance of a Cell object for the provided parameters.
      */
     public static Cell create(String cellName) {
-        return create(cellName, (Object)null, Boolean.FALSE, Boolean.FALSE);
+        return create(cellName, (Object) null, Boolean.FALSE, Boolean.FALSE);
     }
 
     /**
@@ -168,11 +168,11 @@ public class CassandraCell extends Cell {
      */
     private CassandraCell(Cell metadata, ByteBuffer cellValue) {
         this.cellName = metadata.getCellName();
-        this.isClusterKey = ((CassandraCell)metadata).isClusterKey;
-        this.isPartitionKey = ((CassandraCell)metadata).isPartitionKey;
-        this.cellValidator = ((CassandraCell)metadata).cellValidator;
+        this.isClusterKey = ((CassandraCell) metadata).isClusterKey;
+        this.isPartitionKey = ((CassandraCell) metadata).isPartitionKey;
+        this.cellValidator = ((CassandraCell) metadata).cellValidator;
         if (cellValue != null) {
-            this.cellValue = ((CassandraCell)metadata).marshaller().compose(cellValue);
+            this.cellValue = ((CassandraCell) metadata).marshaller().compose(cellValue);
         }
     }
 
@@ -185,9 +185,9 @@ public class CassandraCell extends Cell {
         }
 
         this.cellName = metadata.getCellName();
-        this.isClusterKey = ((CassandraCell)metadata).isClusterKey;
-        this.isPartitionKey = ((CassandraCell)metadata).isPartitionKey;
-        this.cellValidator = ((CassandraCell)metadata).cellValidator;
+        this.isClusterKey = ((CassandraCell) metadata).isClusterKey;
+        this.isPartitionKey = ((CassandraCell) metadata).isPartitionKey;
+        this.cellValidator = ((CassandraCell) metadata).cellValidator;
         this.cellValue = cellValue;
     }
 
@@ -234,27 +234,27 @@ public class CassandraCell extends Cell {
 
         CassandraCell cell = (CassandraCell) o;
 
-	    boolean isCellEqual = cellEquals(cell);
-	    boolean isKey = keyEquals(cell);
-	    boolean isCellValidatorEqual = cellValidatorEquals(cell);
+        boolean isCellEqual = cellEquals(cell);
+        boolean isKey = keyEquals(cell);
+        boolean isCellValidatorEqual = cellValidatorEquals(cell);
 
         return isCellEqual && isKey && isCellValidatorEqual;
     }
 
-	private boolean cellEquals(CassandraCell cell) {
-		return cellName.equals(cell.cellName) && cellValue != null ? cellValue.equals(cell.cellValue) : cell.cellValue == null;
-	}
+    private boolean cellEquals(CassandraCell cell) {
+        return cellName.equals(cell.cellName) && cellValue != null ? cellValue.equals(cell.cellValue) : cell.cellValue == null;
+    }
 
-	private boolean keyEquals(CassandraCell cell) {
-		return isClusterKey.equals(cell.isClusterKey) && isPartitionKey.equals(cell.isPartitionKey);
-	}
+    private boolean keyEquals(CassandraCell cell) {
+        return isClusterKey.equals(cell.isClusterKey) && isPartitionKey.equals(cell.isPartitionKey);
+    }
 
-	private boolean cellValidatorEquals(CassandraCell cell) {
-		return cellValidator != null ? cellValidator.equals(cell.cellValidator) : cell.cellValidator == null;
-	}
+    private boolean cellValidatorEquals(CassandraCell cell) {
+        return cellValidator != null ? cellValidator.equals(cell.cellValidator) : cell.cellValidator == null;
+    }
 
 
-	public Class getValueType() {
+    public Class getValueType() {
         Class valueType = MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE.get(cellValidator.getValidatorClassName());
         if (valueType == null) {
             throw new DeepGenericException("Cannot find value type for marshaller " + cellValidator
@@ -265,7 +265,7 @@ public class CassandraCell extends Cell {
     }
 
 
-	@Override
+    @Override
     @SuppressWarnings("unchecked")
     public ByteBuffer getDecomposedCellValue() {
 
@@ -300,10 +300,10 @@ public class CassandraCell extends Cell {
         return isPartitionKey;
     }
 
-	@Override
-	public Boolean isKey(){
-		return isClusterKey || isPartitionKey;
-	}
+    @Override
+    public Boolean isKey() {
+        return isClusterKey || isPartitionKey;
+    }
 
 
     public AbstractType marshaller() {

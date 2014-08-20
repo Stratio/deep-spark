@@ -16,11 +16,11 @@
 
 package com.stratio.deep.config;
 
-import java.io.Serializable;
-
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import org.apache.log4j.Logger;
+
+import java.io.Serializable;
 
 /**
  * Factory class for deep configuration objects.
@@ -54,14 +54,14 @@ public final class CassandraConfigFactory implements Serializable {
      * @return a new cell-based write suitable job configuration object.
      */
     public static ICassandraDeepJobConfig<Cells> createWriteConfig() {
-	    return new CellDeepJobConfig(true);
+        return new CellDeepJobConfig(true);
     }
 
     /**
      * Creates an entity-based configuration object.
      *
      * @param entityClass the class instance of the entity class that will be used to map db objects to Java objects.
-     * @param <T> the generic type of the entity object implementing IDeepType.
+     * @param <T>         the generic type of the entity object implementing IDeepType.
      * @return a new an entity-based configuration object.
      */
     public static <T extends IDeepType> ICassandraDeepJobConfig<T> create(Class<T> entityClass) {
@@ -74,9 +74,8 @@ public final class CassandraConfigFactory implements Serializable {
      * @return an entity-based write configuration object.
      */
     public static <T extends IDeepType> ICassandraDeepJobConfig<T> createWriteConfig(Class<T> entityClass) {
-	    return new EntityDeepJobConfig<>(entityClass, true);
+        return new EntityDeepJobConfig<>(entityClass, true);
     }
-
 
 
 }

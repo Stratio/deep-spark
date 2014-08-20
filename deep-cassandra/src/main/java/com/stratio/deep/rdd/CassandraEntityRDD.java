@@ -14,11 +14,6 @@
 
 package com.stratio.deep.rdd;
 
-import java.nio.ByteBuffer;
-import java.util.Map;
-
-import org.apache.cassandra.db.marshal.AbstractType;
-
 import com.stratio.deep.config.EntityDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
@@ -27,6 +22,10 @@ import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
+import org.apache.cassandra.db.marshal.AbstractType;
+
+import java.nio.ByteBuffer;
+import java.util.Map;
 
 /**
  * Stratio's implementation of an RDD reading and writing data from and to Apache Cassandra. This
@@ -34,60 +33,60 @@ import com.stratio.deep.utils.Utils;
  * <p/>
  * We do not use Map<String,ByteBuffer> as key and value objects, since ByteBuffer is not
  * serializable.
- * 
+ *
  * @author Luca Rosellini <luca@strat.io>
  */
 public final class CassandraEntityRDD<T extends IDeepType> extends CassandraRDD<T> {
 
-  private static final long serialVersionUID = -3208994171892747470L;
+    private static final long serialVersionUID = -3208994171892747470L;
 
-  /**
-   * This constructor should not be called explicitly.<br/>
-   * Use {@link com.stratio.deep.context.DeepSparkContext} instead to create an RDD.
-   * 
-   * @param sc parent spark context
-   * @param config the configuration object
-   */
-  // public CassandraEntityRDD(SparkContext sc, ICassandraDeepJobConfig<T> config) {
-  // super(sc, config);
-  // }
+    /**
+     * This constructor should not be called explicitly.<br/>
+     * Use {@link com.stratio.deep.context.DeepSparkContext} instead to create an RDD.
+     *
+     * @param sc parent spark context
+     * @param config the configuration object
+     */
+    // public CassandraEntityRDD(SparkContext sc, ICassandraDeepJobConfig<T> config) {
+    // super(sc, config);
+    // }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
-      IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
-    Map<String, Cell> columnDefinitions = config.columnDefinitions();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
+                              IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
+        Map<String, Cell> columnDefinitions = config.columnDefinitions();
 
-    Class<T> entityClass = config.getEntityClass();
+        Class<T> entityClass = config.getEntityClass();
 
-    EntityDeepJobConfig<T> edjc = (EntityDeepJobConfig) config;
-    T instance = Utils.newTypeInstance(entityClass);
+        EntityDeepJobConfig<T> edjc = (EntityDeepJobConfig) config;
+        T instance = Utils.newTypeInstance(entityClass);
 
-    for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
-      CassandraCell metadata = (CassandraCell) columnDefinitions.get(entry.getKey());
-      AbstractType<?> marshaller = metadata.marshaller();
-      edjc.setInstancePropertyFromDbName(instance, entry.getKey(),
-          marshaller.compose(entry.getValue()));
+        for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
+            CassandraCell metadata = (CassandraCell) columnDefinitions.get(entry.getKey());
+            AbstractType<?> marshaller = metadata.marshaller();
+            edjc.setInstancePropertyFromDbName(instance, entry.getKey(),
+                    marshaller.compose(entry.getValue()));
+        }
+
+        for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
+            if (entry.getValue() == null) {
+                continue;
+            }
+
+            CassandraCell metadata = (CassandraCell) columnDefinitions.get(entry.getKey());
+            AbstractType<?> marshaller = metadata.marshaller();
+            try {
+                edjc.setInstancePropertyFromDbName(instance, entry.getKey(),
+                        marshaller.compose(entry.getValue()));
+            } catch (DeepNoSuchFieldException e) {
+                // log().debug(e.getMessage());
+            }
+        }
+
+        return instance;
     }
-
-    for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
-      if (entry.getValue() == null) {
-        continue;
-      }
-
-      CassandraCell metadata = (CassandraCell) columnDefinitions.get(entry.getKey());
-      AbstractType<?> marshaller = metadata.marshaller();
-      try {
-        edjc.setInstancePropertyFromDbName(instance, entry.getKey(),
-            marshaller.compose(entry.getValue()));
-      } catch (DeepNoSuchFieldException e) {
-        // log().debug(e.getMessage());
-      }
-    }
-
-    return instance;
-  }
 
 }

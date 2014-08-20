@@ -17,80 +17,62 @@ package com.stratio.deep.extractor.server;
 import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.extractor.actions.*;
 import com.stratio.deep.extractor.response.*;
+import com.stratio.deep.rdd.CassandraRDD;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.apache.spark.Partition;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import org.apache.spark.Partition;
-
-import java.util.Iterator;
-
-import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.rdd.CassandraRDD;
-
 public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Action> {
 
-  private CassandraRDD<T> extractor;
-  
-  @Override
-  public void channelRead0(ChannelHandlerContext ctx, Action action) throws Exception {
+    private CassandraRDD<T> extractor;
 
-    Response response = null;
-    switch (action.getType()) {
-      case COMPUTE:
-        ComputeAction<T> computeAction = (ComputeAction<T>) action;
-        response = new ComputeResponse(this.compute(computeAction));
-        break;
-      case GET_PARTITIONS:
-        GetPartitionsAction<T> partitionsAction = (GetPartitionsAction<T>) action;
-        response = new GetPartitionsResponse(this.getPartitions(partitionsAction));
-        break;
+    @Override
+    public void channelRead0(ChannelHandlerContext ctx, Action action) throws Exception {
+
+        Response response = null;
+        switch (action.getType()) {
+            case GET_PARTITIONS:
+                GetPartitionsAction<T> partitionsAction = (GetPartitionsAction<T>) action;
+                response = new GetPartitionsResponse(this.getPartitions(partitionsAction));
+                break;
 //      case TRANSFORM_ELEMENT:
 //          TransformElementAction<T> transformElementAction = (TransformElementAction<T>) action;
 //          response = new TransformElementResponse(this.transformElement(transformElementAction));
 //          break;
-      case HAS_NEXT:
-          HasNextAction<T> hasNextAction = (HasNextAction<T>) action;
-          response = new HasNextResponse(this.hastNext(hasNextAction));
-          break;
-      case NEXT:
-          NextAction<T> nextAction = (NextAction<T>) action;
-          response = new NextResponse<T>(this.next(nextAction));
-          break;
-        case INIT_ITERATOR:
-            InitIteratorAction<T> initIteratorAction = (InitIteratorAction<T>) action;
-            this.initIterator(initIteratorAction);
-            response = new InitIteratorResponse();
-            break;
-      default:
-        break;
+            case HAS_NEXT:
+                HasNextAction<T> hasNextAction = (HasNextAction<T>) action;
+                response = new HasNextResponse(this.hastNext(hasNextAction));
+                break;
+            case NEXT:
+                NextAction<T> nextAction = (NextAction<T>) action;
+                response = new NextResponse<T>(this.next(nextAction));
+                break;
+            case INIT_ITERATOR:
+                InitIteratorAction<T> initIteratorAction = (InitIteratorAction<T>) action;
+                this.initIterator(initIteratorAction);
+                response = new InitIteratorResponse();
+                break;
+            default:
+                break;
+        }
+
+        ctx.write(response);
     }
 
-    ctx.write(response);
-  }
-
-  @Override
-  public void channelReadComplete(ChannelHandlerContext ctx) {
-    ctx.flush();
-  }
-
-  @Override
-  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-    cause.printStackTrace();
-    ctx.close();
-  }
-  
-  protected Iterator<T> compute(ComputeAction<T> computeAction) {
-
-    if (extractor == null) {
-      this.initExtractor(computeAction.getConfig());
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) {
+        ctx.flush();
     }
 
-    return extractor.compute(computeAction.getContext(), computeAction.getPartition(), computeAction.getConfig());
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        cause.printStackTrace();
+        ctx.close();
+    }
 
-  }
 
     protected boolean hastNext(HasNextAction hasNextAction) {
 
@@ -104,41 +86,40 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
 
     }
 
-    protected void initIterator (InitIteratorAction<T> initIteratorAction) {
+    protected void initIterator(InitIteratorAction<T> initIteratorAction) {
         if (extractor == null) {
             this.initExtractor(initIteratorAction.getConfig());
         }
 
         extractor.initIterator(initIteratorAction.getPartition(), initIteratorAction.getConfig());
-        return ;
+        return;
 
     }
-  
-  protected Partition[] getPartitions(GetPartitionsAction<T> getPartitionsAction){
-    
-    if (extractor == null) {
-      this.initExtractor(getPartitionsAction.getConfig());
+
+    protected Partition[] getPartitions(GetPartitionsAction<T> getPartitionsAction) {
+
+        if (extractor == null) {
+            this.initExtractor(getPartitionsAction.getConfig());
+        }
+
+        return extractor.getPartitions(getPartitionsAction.getConfig(), getPartitionsAction.getId());
     }
 
-    return extractor.getPartitions(getPartitionsAction.getConfig(), getPartitionsAction.getId());
-  }
 
+    /**
+     * @param config
+     */
+    @SuppressWarnings("unchecked")
+    private void initExtractor(DeepJobConfig<T> config) {
 
-
-  /**
-   * @param config
-   */
-  @SuppressWarnings("unchecked")
-  private void initExtractor(DeepJobConfig<T> config) {
-
-    Class<T> rdd = (Class<T>) config.getRDDClass();
-    try {
-    final Constructor<T> c = rdd.getConstructor();
-      this.extractor = (CassandraRDD<T>) c.newInstance();
-    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-        | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+        Class<T> rdd = (Class<T>) config.getRDDClass();
+        try {
+            final Constructor<T> c = rdd.getConstructor();
+            this.extractor = (CassandraRDD<T>) c.newInstance();
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
-  }
 }

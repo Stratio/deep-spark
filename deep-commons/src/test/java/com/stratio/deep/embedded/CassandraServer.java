@@ -18,9 +18,6 @@ package com.stratio.deep.embedded;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-import com.google.common.io.Resources;
 import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.commitlog.CommitLog;
@@ -32,11 +29,8 @@ import org.apache.log4j.Logger;
 import org.apache.thrift.transport.TTransportException;
 
 import java.io.*;
-import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Embedded Cassandra Server helper class.

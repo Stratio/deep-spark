@@ -32,8 +32,8 @@ public class CellList2TupleFunction extends AbstractSerializableFunction<Cells, 
      */
     @Override
     public Tuple2<Cells, Cells> apply(Cells cells) {
-	    Cells keys = cells.getIndexCells();
-	    Cells values = cells.getValueCells();
+        Cells keys = cells.getIndexCells();
+        Cells values = cells.getValueCells();
 
         return new Tuple2<>(keys, values);
     }

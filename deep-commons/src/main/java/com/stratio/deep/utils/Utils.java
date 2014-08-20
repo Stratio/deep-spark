@@ -16,6 +16,15 @@
 
 package com.stratio.deep.utils;
 
+import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.exception.DeepIOException;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
+import scala.Tuple2;
+
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -25,16 +34,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
-
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepIOException;
-import scala.Tuple2;
 
 /**
  * Utility class providing useful methods to manipulate the conversion
@@ -149,9 +148,6 @@ public final class Utils {
     }
 
 
-
-
-
     /**
      * Returns a CQL batch query wrapping the given statements.
      *
@@ -264,7 +260,6 @@ public final class Utils {
     }
 
 
-
     /**
      * Returns the inet address for the specified location.
      *
@@ -304,11 +299,10 @@ public final class Utils {
     }
 
     /**
-     *
      * @param hosts
      * @return
      */
-    public static String splitHosts(List<String> hosts){
+    public static String splitHosts(List<String> hosts) {
         boolean firstHost = true;
         StringBuilder hostConnection = new StringBuilder();
         for (String host : hosts) {

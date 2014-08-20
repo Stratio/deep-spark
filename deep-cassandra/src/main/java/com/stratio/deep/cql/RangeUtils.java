@@ -16,25 +16,24 @@
 
 package com.stratio.deep.cql;
 
-import java.net.InetAddress;
-import java.util.*;
-
+import com.datastax.driver.core.*;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
-
-import com.datastax.driver.core.*;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.rdd.DeepTokenRange;
 import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
-import javax.annotation.Nullable;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.dht.Token;
 import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
+
+import javax.annotation.Nullable;
+import java.net.InetAddress;
+import java.util.*;
 
 import static com.google.common.collect.Iterables.*;
 import static com.stratio.deep.utils.Utils.quote;
@@ -84,23 +83,22 @@ public class RangeUtils {
     /**
      * Merges the list of tokens for each cluster machine to a single list of token ranges.
      *
-     * @param tokens      the map of tokens for each cluster machine.
-     * @param session     the connection to the cluster.
-     * @param p the partitioner used in the cluster.
+     * @param tokens  the map of tokens for each cluster machine.
+     * @param session the connection to the cluster.
+     * @param p       the partitioner used in the cluster.
      * @return the merged lists of tokens transformed to DeepTokenRange(s). The returned collection is shuffled.
      */
     static List<DeepTokenRange> mergeTokenRanges(Map<String, Iterable<Comparable>> tokens,
-                                                         final Session session,
-                                                         final IPartitioner p) {
+                                                 final Session session,
+                                                 final IPartitioner p) {
         final Iterable<Comparable> allRanges = Ordering.natural().sortedCopy(concat(tokens.values()));
-
 
 
         final Comparable maxValue = Ordering.natural().max(allRanges);
         final Comparable minValue = (Comparable) p.minValue(maxValue.getClass()).getToken().token;
 
         Function<Comparable, Set<DeepTokenRange>> map =
-				        new MergeTokenRangesFunction(maxValue, minValue, session, p, allRanges);
+                new MergeTokenRangesFunction(maxValue, minValue, session, p, allRanges);
 
         Iterable<DeepTokenRange> concatenated = concat(transform(allRanges, map));
 
@@ -143,12 +141,12 @@ public class RangeUtils {
      */
     public static List<DeepTokenRange> getSplits(IDeepJobConfig config) {
         Map<String, Iterable<Comparable>> tokens = new HashMap<>();
-        IPartitioner p = getPartitioner((ICassandraDeepJobConfig)config);
+        IPartitioner p = getPartitioner((ICassandraDeepJobConfig) config);
 
         Pair<Session, String> sessionWithHost =
                 CassandraClientProvider.getSession(
-				                config.getHost(),
-                        (ICassandraDeepJobConfig)config, false);
+                        config.getHost(),
+                        (ICassandraDeepJobConfig) config, false);
 
         String queryLocal = "select tokens from system.local";
         tokens.putAll(fetchTokens(queryLocal, sessionWithHost, p));
@@ -156,14 +154,14 @@ public class RangeUtils {
         String queryPeers = "select peer, tokens from system.peers";
         tokens.putAll(fetchTokens(queryPeers, sessionWithHost, p));
 
-	    List<DeepTokenRange> merged = mergeTokenRanges(tokens, sessionWithHost.left, p);
-	    return splitRanges(merged, p, ((ICassandraDeepJobConfig)config).getBisectFactor());
+        List<DeepTokenRange> merged = mergeTokenRanges(tokens, sessionWithHost.left, p);
+        return splitRanges(merged, p, ((ICassandraDeepJobConfig) config).getBisectFactor());
     }
 
     private static List<DeepTokenRange> splitRanges(
-				    final List<DeepTokenRange> ranges,
-				    final IPartitioner p,
-				    final int bisectFactor) {
+            final List<DeepTokenRange> ranges,
+            final IPartitioner p,
+            final int bisectFactor) {
         if (bisectFactor == 1) {
             return ranges;
         }
@@ -182,14 +180,14 @@ public class RangeUtils {
         return Lists.newArrayList(bisectedRanges);
     }
 
-	/**
-	 * Recursive function that splits a given token range to a given number of tolen ranges.
-	 *
-	 * @param range the token range to be splitted.
-	 * @param partitioner the cassandra partitioner.
-	 * @param bisectFactor the actual number of pieces the original token range will be splitted to.
-	 * @param accumulator a token range accumulator (ne
-	 */
+    /**
+     * Recursive function that splits a given token range to a given number of tolen ranges.
+     *
+     * @param range        the token range to be splitted.
+     * @param partitioner  the cassandra partitioner.
+     * @param bisectFactor the actual number of pieces the original token range will be splitted to.
+     * @param accumulator  a token range accumulator (ne
+     */
     private static void bisectTokeRange(
             DeepTokenRange range, final IPartitioner partitioner, final int bisectFactor, final List<DeepTokenRange> accumulator) {
 
@@ -227,99 +225,99 @@ public class RangeUtils {
         }
     }
 
-	private static class FetchTokensRowPairFunction implements Function<Row, Pair<String, Iterable<Comparable>>> {
-		private final Pair<Session, String> sessionWithHost;
-		private final AbstractType tkValidator;
+    private static class FetchTokensRowPairFunction implements Function<Row, Pair<String, Iterable<Comparable>>> {
+        private final Pair<Session, String> sessionWithHost;
+        private final AbstractType tkValidator;
 
-		public FetchTokensRowPairFunction(Pair<Session, String> sessionWithHost, AbstractType tkValidator) {
-			this.sessionWithHost = sessionWithHost;
-			this.tkValidator = tkValidator;
-		}
+        public FetchTokensRowPairFunction(Pair<Session, String> sessionWithHost, AbstractType tkValidator) {
+            this.sessionWithHost = sessionWithHost;
+            this.tkValidator = tkValidator;
+        }
 
-		@Nullable
-		@Override
-		public Pair<String, Iterable<Comparable>> apply(final @Nullable Row row) {
-		    assert row != null;
-		    InetAddress host;
-		    try {
-		        host = row.getInet("peer");
-		    } catch (IllegalArgumentException e) {
-		        host = Utils.inetAddressFromLocation(sessionWithHost.right);
-		    }
+        @Nullable
+        @Override
+        public Pair<String, Iterable<Comparable>> apply(final @Nullable Row row) {
+            assert row != null;
+            InetAddress host;
+            try {
+                host = row.getInet("peer");
+            } catch (IllegalArgumentException e) {
+                host = Utils.inetAddressFromLocation(sessionWithHost.right);
+            }
 
-		    Iterable<Comparable> sortedTokens =
-		            transform(row.getSet("tokens", String.class), new Function<String, Comparable>() {
-		                        @Nullable
-		                        @Override
-		                        public Comparable apply(final @Nullable String token) {
-		                            return (Comparable) tkValidator.compose(tkValidator.fromString(token));
-		                        }
-		                    }
-		            );
+            Iterable<Comparable> sortedTokens =
+                    transform(row.getSet("tokens", String.class), new Function<String, Comparable>() {
+                                @Nullable
+                                @Override
+                                public Comparable apply(final @Nullable String token) {
+                                    return (Comparable) tkValidator.compose(tkValidator.fromString(token));
+                                }
+                            }
+                    );
 
-		    return Pair.create(host.getHostName(), sortedTokens);
-		}
-	}
+            return Pair.create(host.getHostName(), sortedTokens);
+        }
+    }
 
-	/**
-	 * Function that converts a partitioner hash to a token range. Takes into account
-	 * the ring wrap-around range.
-	 */
-	private static class MergeTokenRangesFunction implements Function<Comparable, Set<DeepTokenRange>> {
-		private final Comparable maxValue;
-		private final Comparable minValue;
-		private final Session session;
-		private final IPartitioner partitioner;
-		private final Iterable<Comparable> allRanges;
+    /**
+     * Function that converts a partitioner hash to a token range. Takes into account
+     * the ring wrap-around range.
+     */
+    private static class MergeTokenRangesFunction implements Function<Comparable, Set<DeepTokenRange>> {
+        private final Comparable maxValue;
+        private final Comparable minValue;
+        private final Session session;
+        private final IPartitioner partitioner;
+        private final Iterable<Comparable> allRanges;
 
-		public MergeTokenRangesFunction(Comparable maxValue,
-										Comparable minValue,
-										Session session,
-										IPartitioner partitioner,
-										Iterable<Comparable> allRanges) {
-			this.maxValue = maxValue;
-			this.minValue = minValue;
-			this.session = session;
-			this.partitioner = partitioner;
-			this.allRanges = allRanges;
-		}
+        public MergeTokenRangesFunction(Comparable maxValue,
+                                        Comparable minValue,
+                                        Session session,
+                                        IPartitioner partitioner,
+                                        Iterable<Comparable> allRanges) {
+            this.maxValue = maxValue;
+            this.minValue = minValue;
+            this.session = session;
+            this.partitioner = partitioner;
+            this.allRanges = allRanges;
+        }
 
-		public Set<DeepTokenRange> apply(final Comparable elem) {
-		    Comparable nextValue;
-		    Comparable currValue = elem;
+        public Set<DeepTokenRange> apply(final Comparable elem) {
+            Comparable nextValue;
+            Comparable currValue = elem;
 
-		    Set<DeepTokenRange> result = new HashSet<>();
+            Set<DeepTokenRange> result = new HashSet<>();
 
-		    if (currValue.equals(maxValue)) {
+            if (currValue.equals(maxValue)) {
 
-		        result.add(new DeepTokenRange(currValue, minValue,
-		                initReplicas(currValue, session, partitioner)));
-		        currValue = minValue;
+                result.add(new DeepTokenRange(currValue, minValue,
+                        initReplicas(currValue, session, partitioner)));
+                currValue = minValue;
 
-		        nextValue = Iterables.find(allRanges, new Predicate<Comparable>() {
-			        @Override
-			        @SuppressWarnings("unchecked")
-			        public boolean apply(@Nullable Comparable input) {
-				        assert input != null;
-				        return input.compareTo(minValue) > 0;
-			        }
-		        });
+                nextValue = Iterables.find(allRanges, new Predicate<Comparable>() {
+                    @Override
+                    @SuppressWarnings("unchecked")
+                    public boolean apply(@Nullable Comparable input) {
+                        assert input != null;
+                        return input.compareTo(minValue) > 0;
+                    }
+                });
 
-		    } else {
+            } else {
 
-		        int nextIdx = 1 + indexOf(allRanges, new Predicate<Comparable>() {
-		            @Override
-		            public boolean apply(@Nullable Comparable input) {
-		                assert input != null;
-		                return input.equals(elem);
-		            }
-		        });
-		        nextValue = Iterables.get(allRanges, nextIdx);
-		    }
+                int nextIdx = 1 + indexOf(allRanges, new Predicate<Comparable>() {
+                    @Override
+                    public boolean apply(@Nullable Comparable input) {
+                        assert input != null;
+                        return input.equals(elem);
+                    }
+                });
+                nextValue = Iterables.get(allRanges, nextIdx);
+            }
 
-		    result.add(new DeepTokenRange(currValue, nextValue, initReplicas(currValue, session, partitioner)));
+            result.add(new DeepTokenRange(currValue, nextValue, initReplicas(currValue, session, partitioner)));
 
-		    return result;
-		}
-	}
+            return result;
+        }
+    }
 }

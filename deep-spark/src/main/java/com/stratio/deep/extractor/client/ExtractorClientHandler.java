@@ -1,12 +1,12 @@
 /*
  * Copyright 2012 The Netty Project
- * 
+ *
  * The Netty Project licenses this file to you under the Apache License, version 2.0 (the
  * "License"); you may not use this file except in compliance with the License. You may obtain a
  * copy of the License at:
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -18,101 +18,69 @@ import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.extractor.actions.*;
 import com.stratio.deep.extractor.response.*;
 import com.stratio.deep.rdd.IDeepPartition;
-import com.stratio.deep.rdd.IDeepRecordReader;
+import com.stratio.deep.rdd.IDeepRDD;
 import com.stratio.deep.utils.Pair;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.apache.spark.Partition;
+import org.apache.spark.TaskContext;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.apache.spark.Partition;
-import org.apache.spark.TaskContext;
-
-import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.rdd.IDeepRDD;
-
 public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Response> implements
-    IDeepRDD<T> {
+        IDeepRDD<T> {
 
-  // Stateful properties
-  private volatile Channel channel;
-  
-  private final BlockingQueue<Response> answer = new LinkedBlockingQueue<Response>();
+    // Stateful properties
+    private volatile Channel channel;
 
-  public ExtractorClientHandler() {
-    super(true);
-  }
+    private final BlockingQueue<Response> answer = new LinkedBlockingQueue<Response>();
 
-  @Override
-  public void channelRegistered(ChannelHandlerContext ctx) {
-    channel = ctx.channel();
-  }
-
-  @Override
-  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-    cause.printStackTrace();
-    ctx.close();
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext
-   * , java.lang.Object)
-   */
-  @Override
-  protected void channelRead0(ChannelHandlerContext ctx, Response msg) throws Exception {
-    answer.add(msg);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(org.apache.spark.broadcast.Broadcast, int)
-   */
-  @Override
-  public Partition[] getPartitions(DeepJobConfig<T> config, int id) {
-
-    GetPartitionsAction<T> getPartitionsAction = new GetPartitionsAction<>(config, id);
-
-    channel.writeAndFlush(getPartitionsAction);
-
-    Response response;
-    boolean interrupted = false;
-    for (;;) {
-      try {
-        response = answer.take();
-        break;
-      } catch (InterruptedException ignore) {
-        interrupted = true;
-      }
+    public ExtractorClientHandler() {
+        super(true);
     }
 
-    if (interrupted) {
-      Thread.currentThread().interrupt();
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) {
+        channel = ctx.channel();
     }
 
-    return ((GetPartitionsResponse) response).getPartitions();
-  }
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        cause.printStackTrace();
+        ctx.close();
+    }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext
+     * , java.lang.Object)
+     */
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, Response msg) throws Exception {
+        answer.add(msg);
+    }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(org.apache.spark.broadcast.Broadcast, int)
+     */
+    @Override
+    public Partition[] getPartitions(DeepJobConfig<T> config, int id) {
 
+        GetPartitionsAction<T> getPartitionsAction = new GetPartitionsAction<>(config, id);
 
-//    @Override
-    public java.util.Iterator<T> compute(TaskContext context, IDeepPartition partition, DeepJobConfig<T> config) {
-
-        ComputeAction<T> computeAction = new ComputeAction<>(context, partition, config);
-
-        channel.writeAndFlush(computeAction);
+        channel.writeAndFlush(getPartitionsAction);
 
         Response response;
         boolean interrupted = false;
-        for (;;) {
+        for (; ; ) {
             try {
                 response = answer.take();
                 break;
@@ -125,7 +93,34 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
             Thread.currentThread().interrupt();
         }
 
-        return ((ComputeResponse<T>) response).getData();
+        return ((GetPartitionsResponse) response).getPartitions();
+    }
+
+
+    //    @Override
+    public java.util.Iterator<T> compute(TaskContext context, IDeepPartition partition, DeepJobConfig<T> config) {
+//
+////        ComputeAction<T> computeAction = new ComputeAction<T>(context, partition, config);
+//
+//        channel.writeAndFlush(computeAction);
+//
+//        Response response;
+//        boolean interrupted = false;
+//        for (;;) {
+//            try {
+//                response = answer.take();
+//                break;
+//            } catch (InterruptedException ignore) {
+//                interrupted = true;
+//            }
+//        }
+//
+//        if (interrupted) {
+//            Thread.currentThread().interrupt();
+//        }
+//
+//        return ((ComputeResponse<T>) response).getData();
+        return null;
     }
 
     @Override
@@ -136,7 +131,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (;;) {
+        for (; ; ) {
             try {
                 response = answer.take();
                 break;
@@ -160,7 +155,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (;;) {
+        for (; ; ) {
             try {
                 response = answer.take();
                 break;
@@ -189,7 +184,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (;;) {
+        for (; ; ) {
             try {
                 response = answer.take();
                 break;
@@ -201,11 +196,11 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         if (interrupted) {
             Thread.currentThread().interrupt();
         }
-        return ;
+        return;
     }
 
     public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader,
-                                         DeepJobConfig<T> config) {
+                              DeepJobConfig<T> config) {
 
         TransformElementAction<T> transformElementAction = new TransformElementAction<>(recordReader, config);
 
@@ -213,7 +208,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (;;) {
+        for (; ; ) {
             try {
                 response = answer.take();
                 break;

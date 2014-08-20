@@ -14,10 +14,6 @@
 
 package com.stratio.deep.rdd;
 
-import java.nio.ByteBuffer;
-import java.util.Map;
-
-
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
@@ -25,44 +21,46 @@ import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.utils.Pair;
 
+import java.nio.ByteBuffer;
+import java.util.Map;
+
 /**
  * Concrete implementation of a CassandraRDD representing an RDD of
  * {@link com.stratio.deep.entity.Cells} element.<br/>
  */
 public class CassandraCellRDD extends CassandraRDD<Cells> {
 
-  private static final long serialVersionUID = -738528971629963221L;
+    private static final long serialVersionUID = -738528971629963221L;
 
 
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public Cells transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
+                                  IDeepJobConfig<Cells, ? extends IDeepJobConfig<?, ?>> config) {
 
-  /**
-   * {@inheritDoc}
-   */
-  @SuppressWarnings("unchecked")
-  @Override
-  public Cells transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
-      IDeepJobConfig<Cells, ? extends IDeepJobConfig<?, ?>> config) {
-
-    Cells cells = new Cells(((ICassandraDeepJobConfig) config).getTable());
-    Map<String, Cell> columnDefinitions = config.columnDefinitions();
+        Cells cells = new Cells(((ICassandraDeepJobConfig) config).getTable());
+        Map<String, Cell> columnDefinitions = config.columnDefinitions();
 
 
-    for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
-      Cell cd = columnDefinitions.get(entry.getKey());
-      cells.add(CassandraCell.create(cd, entry.getValue()));
+        for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
+            Cell cd = columnDefinitions.get(entry.getKey());
+            cells.add(CassandraCell.create(cd, entry.getValue()));
+        }
+
+        for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
+            Cell cd = columnDefinitions.get(entry.getKey());
+            if (cd == null) {
+                continue;
+            }
+
+            cells.add(CassandraCell.create(cd, entry.getValue()));
+        }
+
+        return cells;
     }
-
-    for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
-      Cell cd = columnDefinitions.get(entry.getKey());
-      if (cd == null) {
-        continue;
-      }
-
-      cells.add(CassandraCell.create(cd, entry.getValue()));
-    }
-
-    return cells;
-  }
 
 
 }

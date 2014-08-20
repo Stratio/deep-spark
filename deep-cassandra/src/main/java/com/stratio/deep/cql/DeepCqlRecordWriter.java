@@ -16,17 +16,6 @@
 
 package com.stratio.deep.cql;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.util.*;
-
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
@@ -47,7 +36,17 @@ import org.apache.cassandra.dht.Token;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.exceptions.SyntaxException;
 import org.apache.cassandra.utils.FBUtilities;
+import org.apache.commons.io.IOUtils;
 import org.apache.spark.TaskContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.util.*;
 
 import static com.stratio.deep.rdd.CassandraRDDUtils.updateQueryGenerator;
 import static com.stratio.deep.utils.Utils.quote;
@@ -128,7 +127,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
 
             partitionKey = CompositeType.build(keys);
         } else {
-            partitionKey = ((CassandraCell)cells.getCellByIdx(0)).getDecomposedCellValue();
+            partitionKey = ((CassandraCell) cells.getCellByIdx(0)).getDecomposedCellValue();
         }
         return partitionKey;
     }

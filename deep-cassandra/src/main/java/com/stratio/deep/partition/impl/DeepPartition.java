@@ -18,7 +18,6 @@ package com.stratio.deep.partition.impl;
 
 import com.stratio.deep.rdd.DeepTokenRange;
 import com.stratio.deep.rdd.IDeepPartition;
-import org.apache.spark.Partition;
 
 /**
  * Object that carries spark's partition information.

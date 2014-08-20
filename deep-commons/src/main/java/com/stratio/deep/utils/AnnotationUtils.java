@@ -16,6 +16,14 @@
 
 package com.stratio.deep.utils;
 
+import com.google.common.collect.ImmutableMap;
+import com.stratio.deep.annotations.DeepField;
+import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.exception.DeepIOException;
+import org.apache.cassandra.db.marshal.*;
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
+
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -28,15 +36,6 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.*;
-
-import com.google.common.collect.ImmutableMap;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
-
-import com.stratio.deep.annotations.DeepField;
-import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.exception.DeepIOException;
-import org.apache.cassandra.db.marshal.*;
 
 /**
  * Common utility methods to manipulate beans and fields annotated with @DeepEntity and @DeepField.

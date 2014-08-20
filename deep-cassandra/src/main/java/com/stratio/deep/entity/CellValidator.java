@@ -16,19 +16,8 @@
 
 package com.stratio.deep.entity;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.util.*;
-
-import com.google.common.collect.ImmutableMap;
-import org.apache.commons.collections.CollectionUtils;
-
 import com.datastax.driver.core.DataType;
+import com.google.common.collect.ImmutableMap;
 import com.stratio.deep.annotations.DeepField;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepInstantiationException;
@@ -36,6 +25,15 @@ import com.stratio.deep.rdd.CassandraRDDUtils;
 import com.stratio.deep.utils.AnnotationUtils;
 import org.apache.cassandra.cql3.CQL3Type;
 import org.apache.cassandra.db.marshal.*;
+import org.apache.commons.collections.CollectionUtils;
+
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.util.*;
 
 import static java.lang.Class.forName;
 import static java.util.Arrays.asList;
