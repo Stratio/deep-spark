@@ -17,8 +17,9 @@
 package com.stratio.deep.config;
 
 import com.stratio.deep.entity.Cell;
-import com.stratio.deep.extractor.core.IDeepRecordReader;
+
 import com.stratio.deep.rdd.IDeepPartition;
+import com.stratio.deep.rdd.IDeepRecordReader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
 

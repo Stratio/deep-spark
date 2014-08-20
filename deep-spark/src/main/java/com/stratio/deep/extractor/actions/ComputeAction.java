@@ -4,7 +4,7 @@
 package com.stratio.deep.extractor.actions;
 
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.extractor.core.IDeepRecordReader;
+import com.stratio.deep.rdd.IDeepRecordReader;
 import com.stratio.deep.utils.Pair;
 import org.apache.spark.TaskContext;
 

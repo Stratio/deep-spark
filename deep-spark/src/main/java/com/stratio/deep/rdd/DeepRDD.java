@@ -1,6 +1,6 @@
 package com.stratio.deep.rdd;
 
-import com.stratio.deep.extractor.core.IDeepRecordReader;
+
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.extractor.client.ExtractorClient;

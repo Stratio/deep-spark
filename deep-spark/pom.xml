@@ -10,11 +10,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>deep-commons</artifactId>
+    <artifactId>deep-spark</artifactId>
     <packaging>jar</packaging>
-    <name>deep commons</name>
+    <name>deep spark</name>
     <url>http://www.stratio.com</url>
-    <description>stratio deep common utility classes</description>
+    <description>stratio deep common utility classes for spark</description>
 
     <parent>
         <groupId>com.stratio.deep</groupId>
@@ -24,16 +24,6 @@
     </parent>
 
     <developers>
-        <developer>
-            <id>lucarosellini</id>
-            <name>Luca Rosellini</name>
-            <email>luca@stratio.com</email>
-            <roles>
-                <role>architect</role>
-                <role>developer</role>
-                <role>maintainer</role>
-            </roles>
-        </developer>
         <developer>
             <id>aagea</id>
             <name>Álvaro Agea</name>
@@ -57,22 +47,44 @@
 
     <dependencies>
         <dependency>
-            <groupId>de.javakaffee</groupId>
-            <artifactId>kryo-serializers</artifactId>
-            <version>0.26</version>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_2.10</artifactId>
+            <version>${spark.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>kryo</artifactId>
-                    <groupId>com.esotericsoftware.kryo</groupId>
+                    <artifactId>hadoop-client</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
-
+                <exclusion>
+                    <artifactId>avro</artifactId>
+                    <groupId>org.apache.avro</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>metrics-core</artifactId>
+                    <groupId>com.codahale.metrics</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>chill_2.10</artifactId>
+                    <groupId>com.twitter</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>chill-java</artifactId>
+                    <groupId>com.twitter</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
-  <!--      <dependency>
+        <dependency>
+            <groupId>com.stratio.deep</groupId>
+            <artifactId>deep-commons</artifactId>
+            <version>0.4.0</version>
+        </dependency>
+
+
+        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <version>4.0.23.Final</version>
-        </dependency> -->
+        </dependency>
 
     </dependencies>
 

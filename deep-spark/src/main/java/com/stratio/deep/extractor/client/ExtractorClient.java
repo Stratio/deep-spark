@@ -15,8 +15,10 @@
 package com.stratio.deep.extractor.client;
 
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.extractor.core.IDeepExtractor;
-import com.stratio.deep.extractor.core.IDeepRecordReader;
+
+import com.stratio.deep.rdd.IDeepRDD;
+import com.stratio.deep.rdd.IDeepRecordReader;
+
 import com.stratio.deep.utils.Pair;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -35,7 +37,7 @@ import java.util.Map;
  * Sends a list of continent/city pairs to a {@link } to get the local times of the
  * specified cities.
  */
-public class ExtractorClient<T> implements IDeepExtractor<T> {
+public class ExtractorClient<T> implements IDeepRDD<T> {
 
     static final boolean SSL = System.getProperty("ssl") != null;
     //  static final String HOST = System.getProperty("host", "172.19.0.133");
