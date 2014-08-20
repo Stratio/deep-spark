@@ -17,6 +17,7 @@ package com.stratio.deep.rdd;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
+
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;

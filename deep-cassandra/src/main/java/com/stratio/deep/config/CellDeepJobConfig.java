@@ -24,6 +24,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.rdd.RDD;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * Cell-based configuration object.
@@ -64,6 +65,18 @@ public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
         return null;
     }
 
+
+    public CellDeepJobConfig (DeepJobConfig deepJobConfig){
+
+        Map<String, String> values = deepJobConfig.getValues();
+
+        this.username(values.get("user")).host(values.get("host"))
+                .cqlPort(Integer.valueOf(values.get("cqlPort"))).table(values.get("table"))
+                .keyspace(values.get("keyspace")).rpcPort(Integer.valueOf(values.get("rpcPort")));
+        this.initialize();
+
+
+    }
 
 
 }

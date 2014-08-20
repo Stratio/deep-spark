@@ -14,8 +14,10 @@
  */
 package com.stratio.deep.extractor.client;
 
-import com.stratio.deep.extractor.actions.TransformElementAction;
-import com.stratio.deep.extractor.response.TransformElementResponse;
+import com.stratio.deep.config.DeepJobConfig;
+import com.stratio.deep.extractor.actions.*;
+import com.stratio.deep.extractor.response.*;
+import com.stratio.deep.rdd.IDeepPartition;
 import com.stratio.deep.rdd.IDeepRecordReader;
 import com.stratio.deep.utils.Pair;
 import io.netty.channel.Channel;
@@ -31,11 +33,6 @@ import org.apache.spark.Partition;
 import org.apache.spark.TaskContext;
 
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.extractor.actions.ComputeAction;
-import com.stratio.deep.extractor.actions.GetPartitionsAction;
-import com.stratio.deep.extractor.response.ComputeResponse;
-import com.stratio.deep.extractor.response.GetPartitionsResponse;
-import com.stratio.deep.extractor.response.Response;
 import com.stratio.deep.rdd.IDeepRDD;
 
 public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Response> implements
@@ -79,7 +76,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
    * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(org.apache.spark.broadcast.Broadcast, int)
    */
   @Override
-  public Partition[] getPartitions(IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config, int id) {
+  public Partition[] getPartitions(DeepJobConfig<T> config, int id) {
 
     GetPartitionsAction<T> getPartitionsAction = new GetPartitionsAction<>(config, id);
 
@@ -103,40 +100,112 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
     return ((GetPartitionsResponse) response).getPartitions();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.stratio.deep.rdd.IDeepRDD#compute(org.apache.spark.Partition,
-   * org.apache.spark.TaskContext, com.stratio.deep.config.IDeepJobConfig)
-   */
-  @Override
-  public java.util.Iterator<T> compute(IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader,
-                                       IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
 
-    ComputeAction<T> computeAction = new ComputeAction<>(recordReader, config);
 
-    channel.writeAndFlush(computeAction);
 
-    Response response;
-    boolean interrupted = false;
-    for (;;) {
-      try {
-        response = answer.take();
-        break;
-      } catch (InterruptedException ignore) {
-        interrupted = true;
-      }
+//    @Override
+    public java.util.Iterator<T> compute(TaskContext context, IDeepPartition partition, DeepJobConfig<T> config) {
+
+        ComputeAction<T> computeAction = new ComputeAction<>(context, partition, config);
+
+        channel.writeAndFlush(computeAction);
+
+        Response response;
+        boolean interrupted = false;
+        for (;;) {
+            try {
+                response = answer.take();
+                break;
+            } catch (InterruptedException ignore) {
+                interrupted = true;
+            }
+        }
+
+        if (interrupted) {
+            Thread.currentThread().interrupt();
+        }
+
+        return ((ComputeResponse<T>) response).getData();
     }
 
-    if (interrupted) {
-      Thread.currentThread().interrupt();
+    @Override
+    public boolean hasNext() {
+        HasNextAction hasNextAction = new HasNextAction<>();
+
+        channel.writeAndFlush(hasNextAction);
+
+        Response response;
+        boolean interrupted = false;
+        for (;;) {
+            try {
+                response = answer.take();
+                break;
+            } catch (InterruptedException ignore) {
+                interrupted = true;
+            }
+        }
+
+        if (interrupted) {
+            Thread.currentThread().interrupt();
+        }
+
+        return ((HasNextResponse) response).getData();
     }
 
-    return ((ComputeResponse<T>) response).getData();
-  }
+    @Override
+    public T next() {
+        NextAction<T> nextAction = new NextAction<>();
+
+        channel.writeAndFlush(nextAction);
+
+        Response response;
+        boolean interrupted = false;
+        for (;;) {
+            try {
+                response = answer.take();
+                break;
+            } catch (InterruptedException ignore) {
+                interrupted = true;
+            }
+        }
+
+        if (interrupted) {
+            Thread.currentThread().interrupt();
+        }
+
+        return ((NextResponse<T>) response).getData();
+    }
+
+    @Override
+    public void close() {
+
+    }
+
+    @Override
+    public void initIterator(IDeepPartition dp, DeepJobConfig<T> config) {
+        InitIteratorAction<T> initIteratorAction = new InitIteratorAction<>(dp, config);
+
+        channel.writeAndFlush(initIteratorAction);
+
+        Response response;
+        boolean interrupted = false;
+        for (;;) {
+            try {
+                response = answer.take();
+                break;
+            } catch (InterruptedException ignore) {
+                interrupted = true;
+            }
+        }
+
+        if (interrupted) {
+            Thread.currentThread().interrupt();
+        }
+        return ;
+    }
 
     public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader,
-                                         IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
+                                         DeepJobConfig<T> config) {
 
         TransformElementAction<T> transformElementAction = new TransformElementAction<>(recordReader, config);
 

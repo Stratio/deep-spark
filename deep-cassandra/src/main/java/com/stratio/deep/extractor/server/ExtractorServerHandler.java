@@ -14,8 +14,9 @@
  */
 package com.stratio.deep.extractor.server;
 
-import com.stratio.deep.extractor.actions.TransformElementAction;
-import com.stratio.deep.extractor.response.TransformElementResponse;
+import com.stratio.deep.config.DeepJobConfig;
+import com.stratio.deep.extractor.actions.*;
+import com.stratio.deep.extractor.response.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -27,12 +28,6 @@ import org.apache.spark.Partition;
 import java.util.Iterator;
 
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.extractor.actions.Action;
-import com.stratio.deep.extractor.actions.ComputeAction;
-import com.stratio.deep.extractor.actions.GetPartitionsAction;
-import com.stratio.deep.extractor.response.ComputeResponse;
-import com.stratio.deep.extractor.response.GetPartitionsResponse;
-import com.stratio.deep.extractor.response.Response;
 import com.stratio.deep.rdd.CassandraRDD;
 
 public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Action> {
@@ -52,10 +47,23 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
         GetPartitionsAction<T> partitionsAction = (GetPartitionsAction<T>) action;
         response = new GetPartitionsResponse(this.getPartitions(partitionsAction));
         break;
-      case TRANSFORM_ELEMENT:
-          TransformElementAction<T> transformElementAction = (TransformElementAction<T>) action;
-          response = new TransformElementResponse(this.transformElement(transformElementAction));
+//      case TRANSFORM_ELEMENT:
+//          TransformElementAction<T> transformElementAction = (TransformElementAction<T>) action;
+//          response = new TransformElementResponse(this.transformElement(transformElementAction));
+//          break;
+      case HAS_NEXT:
+          HasNextAction<T> hasNextAction = (HasNextAction<T>) action;
+          response = new HasNextResponse(this.hastNext(hasNextAction));
           break;
+      case NEXT:
+          NextAction<T> nextAction = (NextAction<T>) action;
+          response = new NextResponse<T>(this.next(nextAction));
+          break;
+        case INIT_ITERATOR:
+            InitIteratorAction<T> initIteratorAction = (InitIteratorAction<T>) action;
+            this.initIterator(initIteratorAction);
+            response = new InitIteratorResponse();
+            break;
       default:
         break;
     }
@@ -75,14 +83,36 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
   }
   
   protected Iterator<T> compute(ComputeAction<T> computeAction) {
-    
+
     if (extractor == null) {
       this.initExtractor(computeAction.getConfig());
     }
-    
-    return extractor.compute(computeAction.getRecordReader(), computeAction.getConfig());
-    
+
+    return extractor.compute(computeAction.getContext(), computeAction.getPartition(), computeAction.getConfig());
+
   }
+
+    protected boolean hastNext(HasNextAction hasNextAction) {
+
+        return extractor.hasNext();
+
+    }
+
+    protected T next(NextAction<T> nextAction) {
+
+        return extractor.next();
+
+    }
+
+    protected void initIterator (InitIteratorAction<T> initIteratorAction) {
+        if (extractor == null) {
+            this.initExtractor(initIteratorAction.getConfig());
+        }
+
+        extractor.initIterator(initIteratorAction.getPartition(), initIteratorAction.getConfig());
+        return ;
+
+    }
   
   protected Partition[] getPartitions(GetPartitionsAction<T> getPartitionsAction){
     
@@ -93,20 +123,13 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
     return extractor.getPartitions(getPartitionsAction.getConfig(), getPartitionsAction.getId());
   }
 
-    protected T transformElement(TransformElementAction<T> transformElementAction){
 
-        if (extractor == null) {
-            this.initExtractor(transformElementAction.getConfig());
-        }
-
-        return extractor.transformElement(transformElementAction.getElement(), transformElementAction.getConfig());
-    }
 
   /**
    * @param config
    */
   @SuppressWarnings("unchecked")
-  private void initExtractor(IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
+  private void initExtractor(DeepJobConfig<T> config) {
 
     Class<T> rdd = (Class<T>) config.getRDDClass();
     try {

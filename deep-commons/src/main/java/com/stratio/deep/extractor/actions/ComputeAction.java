@@ -3,6 +3,8 @@
  */
 package com.stratio.deep.extractor.actions;
 
+import com.stratio.deep.config.DeepJobConfig;
+import com.stratio.deep.rdd.IDeepPartition;
 import com.stratio.deep.rdd.IDeepRecordReader;
 import com.stratio.deep.utils.Pair;
 import org.apache.spark.Partition;
@@ -21,21 +23,23 @@ public class ComputeAction<T> extends Action {
 
   private static final long serialVersionUID = -1270097974102584045L;
 
-  private IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config;
+  private DeepJobConfig<T> config;
 
   private IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
 
   private TaskContext context;
 
+    private IDeepPartition partition;
+
   public ComputeAction() {
     super();
   }
 
-  public ComputeAction(IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader,
-                       IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
+  public ComputeAction(TaskContext context, IDeepPartition partition, DeepJobConfig<T> config) {
     super(ActionType.COMPUTE);
-    this.recordReader = recordReader;
+    this.context = context;
     this.config = config;
+      this.partition=partition;
   }
 
     public IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> getRecordReader() {
@@ -46,8 +50,11 @@ public class ComputeAction<T> extends Action {
     return context;
   }
 
-  public IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> getConfig() {
+  public DeepJobConfig<T> getConfig() {
     return config;
   }
 
+    public IDeepPartition getPartition() {
+        return partition;
+    }
 }

@@ -20,6 +20,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+import com.stratio.deep.config.DeepJobConfig;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
@@ -111,22 +112,22 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
    * @param <T>
    * @return
    */
-  public <T> RDD<T> createRDD(final IDeepJobConfig deepJobConfig) {
+  public <T> RDD<T> createRDD(final DeepJobConfig deepJobConfig) {
     try {
 
       Class rdd = deepJobConfig.getRDDClass();
       final Constructor c = rdd.getConstructor();
       if (deepJobConfig.getInputFormatClass() != null) {
-        return new DeepGenericHadoopRDD(this.sc(), deepJobConfig, deepJobConfig.getInputFormatClass(),
-            (IDeepHadoopRDD) c.newInstance(), ClassTag$.MODULE$.<Cells>apply(deepJobConfig
-                .getEntityClass()), ClassTag$.MODULE$.Any(), ClassTag$.MODULE$.Any());
+          return null;
+//        return new DeepGenericHadoopRDD(this.sc(), deepJobConfig, deepJobConfig.getInputFormatClass(),
+//            (IDeepHadoopRDD) c.newInstance(), ClassTag$.MODULE$.<Cells>apply(deepJobConfig
+//                .getEntityClass()), ClassTag$.MODULE$.Any(), ClassTag$.MODULE$.Any());
       } else {
 
         return new DeepRDD<T>(this.sc(), deepJobConfig);
       }
 
-    } catch (InstantiationException | NoSuchMethodException | InvocationTargetException
-        | IllegalAccessException e) {
+    } catch (NoSuchMethodException e) {
       LOG.error("impossible to instance IDeepJobConfig, check configuration");
       throw new DeepInstantiationException(e.getMessage());
     }
@@ -137,11 +138,10 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
    * 
    * @param deepJobConfig
    * @param <T>
-   * @param <S>
    * @return
    */
-  public <T, S extends IDeepJobConfig<?, ?>> JavaRDD<T> createJavaRDD(
-      IDeepJobConfig<T, S> deepJobConfig) {
+  public <T> JavaRDD<T> createJavaRDD(
+      DeepJobConfig<T> deepJobConfig) {
     return new DeepJavaRDD((DeepRDD<T>) createRDD(deepJobConfig));
   }
 

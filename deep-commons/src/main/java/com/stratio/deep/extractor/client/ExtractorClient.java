@@ -14,6 +14,8 @@
  */
 package com.stratio.deep.extractor.client;
 
+import com.stratio.deep.config.DeepJobConfig;
+import com.stratio.deep.rdd.IDeepPartition;
 import com.stratio.deep.rdd.IDeepRecordReader;
 import com.stratio.deep.utils.Pair;
 import io.netty.bootstrap.Bootstrap;
@@ -77,21 +79,35 @@ public class ExtractorClient<T> implements IDeepRDD<T> {
     group.shutdownGracefully();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.stratio.deep.rdd.IDeepRDD#compute(org.apache.spark.Partition,
-   * org.apache.spark.TaskContext, com.stratio.deep.config.IDeepJobConfig)
-   */
-  @Override
-  public java.util.Iterator<T> compute(IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader,
-                                       IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
-    return this.handler.compute(recordReader, config);
-  }
 
 //    @Override
+    public java.util.Iterator<T> compute(TaskContext context, IDeepPartition partition, DeepJobConfig<T> config) {
+        return this.handler.compute(context, partition, config);
+    }
+
+    @Override
+    public boolean hasNext() {
+        return handler.hasNext();
+    }
+
+    @Override
+    public T next() {
+        return handler.next();
+    }
+
+    @Override
+    public void close() {
+        handler.close();
+    }
+
+    @Override
+    public void initIterator(IDeepPartition dp, DeepJobConfig<T> config) {
+        handler.initIterator(dp,config);
+    }
+
+    //    @Override
     public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader,
-                                         IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
+                                         DeepJobConfig<T> config) {
         return this.handler.transformElement(recordReader, config);
     }
   /*
@@ -100,7 +116,7 @@ public class ExtractorClient<T> implements IDeepRDD<T> {
    * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(com.stratio.deep.config.IDeepJobConfig, int)
    */
   @Override
-  public Partition[] getPartitions(IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config, int id) {
+  public Partition[] getPartitions(DeepJobConfig<T> config, int id) {
     return this.handler.getPartitions(config, id);
   }
 

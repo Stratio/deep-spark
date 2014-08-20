@@ -29,8 +29,4 @@ public class DeepGenericHadoopRDD<T, K,V> extends DeepHadoopRDD<T,K,V> {
         this.innerDeepRDD = innerDeepRDD;
     }
 
-    @Override
-    public T transformElement(Tuple2<K, V> tuple, Broadcast<IDeepJobConfig<T, ? extends IDeepJobConfig<?,?>>>  config) {
-        return innerDeepRDD.transformElement(tuple, config);
-    }
 }

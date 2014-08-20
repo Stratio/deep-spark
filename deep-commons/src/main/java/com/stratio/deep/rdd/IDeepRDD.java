@@ -1,5 +1,6 @@
 package com.stratio.deep.rdd;
 
+import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.utils.Pair;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.spark.Partition;
@@ -18,13 +19,21 @@ import java.util.Map;
  */
 public interface IDeepRDD<T> extends Serializable{
 
-    Iterator<T> compute(IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader,
-                        IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config);
-
-    Partition[] getPartitions(IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config, int id);
 
 
-//    IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> createRecordReader();
+    Partition[] getPartitions(DeepJobConfig<T> config, int id);
+
+    Iterator<T> compute(TaskContext context, IDeepPartition partition, DeepJobConfig<T> config);
+
+
+    boolean hasNext();
+
+    T next();
+
+    void close();
+
+    void initIterator(final IDeepPartition dp,
+                 DeepJobConfig<T> config);
 
   // TODO Implement and document
   // void write(Cells rawKey, Cells data);

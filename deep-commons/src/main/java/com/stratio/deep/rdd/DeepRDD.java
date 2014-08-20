@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 import javax.net.ssl.SSLException;
 
+import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.utils.Pair;
 import org.apache.spark.InterruptibleIterator;
@@ -34,20 +35,18 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
 
   private static final long serialVersionUID = -5360986039609466526L;
 
-//  private Broadcast<ExtractorClient<T>> extractorClient;
 
     private transient ExtractorClient<T> extractorClient;
 
 
-    protected Broadcast<IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>>> config;
+    protected Broadcast<DeepJobConfig<T>> config;
 
-  public DeepRDD(SparkContext sc,
-      IDeepJobConfig<T, IDeepJobConfig<T, ? extends IDeepJobConfig>> config) {
+  public DeepRDD(SparkContext sc,DeepJobConfig<T> config) {
     super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config
         .getEntityClass()));
     this.config =
         sc.broadcast(config, ClassTag$.MODULE$
-            .<IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>>>apply(config.getClass()));
+            .<DeepJobConfig<T>>apply(config.getClass()));
 
       try {
           ExtractorClient<T> extractor = new ExtractorClient<>();
@@ -66,31 +65,27 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
 
   @Override
   public Iterator<T> compute(Partition split, TaskContext context) {
-      final IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader = initRecordReader(context, (IDeepPartition)split, config.value());
-    if (extractorClient == null) {
-      extractorClient = new ExtractorClient<>();
-      try {
-        extractorClient.initialize();
-      } catch (SSLException | InterruptedException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+
+      if (extractorClient == null) {
+          extractorClient = new ExtractorClient<>();
+          try {
+              extractorClient.initialize();
+          } catch (SSLException | InterruptedException e) {
+              // TODO Auto-generated catch block
+              e.printStackTrace();
+          }
       }
-    }
-
-
-      /**
-       * Creates a new anonymous iterator inner class and returns it as a scala iterator.
-       */
-      java.util.Iterator<T> recordReaderIterator = new java.util.Iterator<T>() {
+      extractorClient.initIterator((IDeepPartition)split, config.getValue());
+      java.util.Iterator<T> iterator = new DeepIterator<T>() {
 
           @Override
           public boolean hasNext() {
-              return recordReader.hasNext();
+              return extractorClient.hasNext();
           }
 
           @Override
           public T next() {
-              return extractorClient.transformElement(recordReader.next(), config.value());
+              return extractorClient.next();
           }
 
           @Override
@@ -101,17 +96,15 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
       };
 
 
-//      new InterruptibleIterator<T>(ctx, asScalaIterator(recordReaderIterator));
-//      return new InterruptibleIterator<>(context , asScalaIterator(extractorClient.compute(IDeepRecordReader, config.getValue()))) ;
-      return new InterruptibleIterator<>(context , asScalaIterator(recordReaderIterator)) ;
 
-//    return new InterruptibleIterator<>(context , asScalaIterator(extractorClient.value().compute(IDeepRecordReader, config.getValue()))) ;
+      return new InterruptibleIterator<>(context , asScalaIterator(iterator)) ;
+
   }
 
   @Override
   public Partition[] getPartitions() {
-    
-    if (extractorClient == null) {
+
+      if (extractorClient == null) {
       extractorClient = new ExtractorClient<>();
       try {
         extractorClient.initialize();
@@ -120,40 +113,13 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         e.printStackTrace();
       }
     }
-
       return extractorClient.getPartitions(config.getValue(), id());
 //    return extractorClient.value().getPartitions(config.getValue(), id());
   }
 
-  public Broadcast<IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>>> getConfig() {
+  public Broadcast<DeepJobConfig<T>> getConfig() {
     return config;
   }
 
-    /**
-     * Instantiates a new deep record reader object associated to the provided partition.
-     *
-     * @param ctx the spark task context.
-     * @param dp a spark deep partition
-     * @return the deep record reader associated to the provided partition.
-     */
-    private IDeepRecordReader initRecordReader(TaskContext ctx, final IDeepPartition dp,
-                                              IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
-        Class<?> recordReaderClass = config.getRecordReaderClass();
-        Constructor c = recordReaderClass.getConstructors()[0];
-//        new DeepRecordReader(config, dp.splitWrapper());
-        try {
-            IDeepRecordReader recordReader= (IDeepRecordReader)c.newInstance(config, dp.splitWrapper());
-            ctx.addOnCompleteCallback(new OnComputedRDDCallback(recordReader));
-            return recordReader;
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-       ;
-        return null;
 
-    }
 }

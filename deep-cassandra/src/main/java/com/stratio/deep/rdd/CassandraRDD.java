@@ -16,11 +16,18 @@ package com.stratio.deep.rdd;
 
 import static scala.collection.JavaConversions.asScalaBuffer;
 
+import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
+import com.stratio.deep.config.CellDeepJobConfig;
+import com.stratio.deep.config.DeepJobConfig;
+import com.stratio.deep.extractor.client.ExtractorClient;
 import org.apache.spark.Partition;
+import org.apache.spark.TaskContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.rdd.RDD;
 
@@ -38,6 +45,8 @@ import com.stratio.deep.functions.CellList2TupleFunction;
 import com.stratio.deep.functions.DeepType2TupleFunction;
 import com.stratio.deep.partition.impl.DeepPartition;
 import com.stratio.deep.utils.Pair;
+
+import javax.net.ssl.SSLException;
 import java.util.Iterator;
 
 
@@ -48,12 +57,14 @@ import java.util.Iterator;
  */
 public abstract class CassandraRDD<T> implements IDeepRDD<T> {
 
-  /**
-   * RDD configuration. This config is broadcasted to all the Sparks machines.
-   */
-  // protected final Broadcast<ICassandraDeepJobConfig<T>> config;
 
 
+  IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
+
+    IDeepPartition dp;
+
+    DeepJobConfig<T> config;
+    IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> cellDeepJobConfig ;
   /**
    * Persists the given RDD to the underlying Cassandra datastore using the java cql3 driver.<br/>
    * Beware: this method does not perform a distributed write as
@@ -122,20 +133,40 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
   }
 
 
-  /**
-   * Computes the current RDD over the given data partition. Returns an iterator of Scala tuples.
-   */
-  @Override
-  public Iterator<T> compute(final IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader,
-                             final IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
 
 
+//  @Override
+  public Iterator<T> compute(TaskContext context, IDeepPartition partition, final DeepJobConfig<T> config) {
 
-
-    return null;
+      return null;
   }
 
-  public abstract T transformElement(
+    @Override
+    public boolean hasNext() {
+        return recordReader.hasNext();
+    }
+
+    @Override
+    public T next() {
+        return transformElement(recordReader.next(), ( IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>>) cellDeepJobConfig);
+    }
+
+    @Override
+    public void close(){
+        recordReader.close();
+    }
+
+
+    @Override
+    public void initIterator(final IDeepPartition dp,
+                     DeepJobConfig<T> config){
+        this.config = config;
+        this.dp = dp;
+        this.cellDeepJobConfig = (IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>>) new CellDeepJobConfig(config).initialize();
+        recordReader= initRecordReader(dp, cellDeepJobConfig);
+    }
+
+    public abstract T transformElement(
       Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
       IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config);
 
@@ -160,9 +191,12 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
    * configured in cassandra.yaml + 1.
    */
   @Override
-  public Partition[] getPartitions(IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config, int id) {
+  public Partition[] getPartitions(DeepJobConfig<T> config, int id) {
 
-    List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits(config);
+
+    CellDeepJobConfig cellDeepJobConfig = new CellDeepJobConfig(config);
+
+    List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits(cellDeepJobConfig);
 
     Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
 
@@ -190,5 +224,32 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
     return asScalaBuffer(locations);
   }
 
+
+    /**
+     * Instantiates a new deep record reader object associated to the provided partition.
+     *
+     * @param dp a spark deep partition
+     * @return the deep record reader associated to the provided partition.
+     */
+    private IDeepRecordReader initRecordReader(final IDeepPartition dp,
+                                               IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
+        Class<?> recordReaderClass = config.getRecordReaderClass();
+        Constructor c = recordReaderClass.getConstructors()[0];
+//        new DeepRecordReader(config, dp.splitWrapper());
+        try {
+            IDeepRecordReader recordReader= (IDeepRecordReader)c.newInstance(config, dp.splitWrapper());
+//            ctx.addOnCompleteCallback(new OnComputedRDDCallback(recordReader));
+            return recordReader;
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        ;
+        return null;
+
+    }
 
 }

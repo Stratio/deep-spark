@@ -19,9 +19,12 @@ package com.stratio.deep.examples.java;
 import com.google.common.collect.Lists;
 
 import com.stratio.deep.config.CassandraConfigFactory;
+import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.entity.Cells;
+import com.stratio.deep.rdd.CassandraCellRDD;
+import com.stratio.deep.rdd.CassandraRDD;
 import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
@@ -35,6 +38,8 @@ import scala.Tuple2;
 import scala.Tuple3;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -77,11 +82,20 @@ public final class AggregatingData {
 	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // Creating a configuration for the RDD and initialize it
-        ICassandraDeepJobConfig<Cells> config = CassandraConfigFactory.create()
+        DeepJobConfig<Cells> config = new DeepJobConfig();
+
+        config.setRDDClass(CassandraCellRDD.class);
+        Map<String, String> values = new HashMap<>();
+        values.put("keyspace", "twitter");
+        values.put("table", "tweets");
+        values.put("cqlPort", "9042");
+        values.put("rpcPort", "9160");
+        values.put("host", "127.0.0.1");
+        config.setValues(values);
 //                .host("172.19.0.133").cqlPort(9042).rpcPort(9160)
-                .host("172.19.0.166").cqlPort(9042).rpcPort(9160)
-                .keyspace("twitter").table("tweets")
-                .initialize();
+//                .host("172.19.0.166").cqlPort(9042).rpcPort(9160)
+//                .keyspace("twitter").table("tweets")
+//                .initialize();
 
         // Creating the RDD
         RDD<Cells> rdd = deepContext.createRDD(config);
