@@ -75,10 +75,6 @@ public class ExtractorClient<T> implements IDeepRDD<T> {
     }
 
 
-    //    @Override
-    public java.util.Iterator<T> compute(TaskContext context, IDeepPartition partition, DeepJobConfig<T> config) {
-        return this.handler.compute(context, partition, config);
-    }
 
     @Override
     public boolean hasNext() {
@@ -90,20 +86,16 @@ public class ExtractorClient<T> implements IDeepRDD<T> {
         return handler.next();
     }
 
-    @Override
-    public void close() {
-        handler.close();
-    }
 
     @Override
     public void initIterator(IDeepPartition dp, DeepJobConfig<T> config) {
         handler.initIterator(dp, config);
     }
 
-    //    @Override
-    public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader,
-                              DeepJobConfig<T> config) {
-        return this.handler.transformElement(recordReader, config);
+    @Override
+    public void close() {
+        handler.close();
+        return ;
     }
 
     /*

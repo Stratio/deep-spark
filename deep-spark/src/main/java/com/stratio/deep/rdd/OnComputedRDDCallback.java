@@ -1,5 +1,6 @@
 package com.stratio.deep.rdd;
 
+import com.stratio.deep.extractor.client.ExtractorClient;
 import scala.runtime.AbstractFunction0;
 
 /**
@@ -7,20 +8,20 @@ import scala.runtime.AbstractFunction0;
  * simply closes the {@link org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader} passed as an
  * argument.
  *
- * @param <R>
+ * @param <T>
  * @author Luca Rosellini <luca@strat.io>
  */
-public class OnComputedRDDCallback<R> extends AbstractFunction0<R> {
-    private final IDeepRecordReader recordReader;
+public class OnComputedRDDCallback<T> extends AbstractFunction0<T> {
+    private final ExtractorClient<T> extractorClient;
 
-    public OnComputedRDDCallback(IDeepRecordReader recordReader) {
+    public OnComputedRDDCallback(ExtractorClient<T> extractorClient) {
         super();
-        this.recordReader = recordReader;
+        this.extractorClient = extractorClient;
     }
 
     @Override
-    public R apply() {
-        recordReader.close();
+    public T apply() {
+        extractorClient.close();
 
         return null;
     }

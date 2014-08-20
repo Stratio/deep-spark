@@ -96,32 +96,30 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return ((GetPartitionsResponse) response).getPartitions();
     }
 
+    @Override
+    public void close() {
+        CloseAction closeAction = new CloseAction();
 
-    //    @Override
-    public java.util.Iterator<T> compute(TaskContext context, IDeepPartition partition, DeepJobConfig<T> config) {
-//
-////        ComputeAction<T> computeAction = new ComputeAction<T>(context, partition, config);
-//
-//        channel.writeAndFlush(computeAction);
-//
-//        Response response;
-//        boolean interrupted = false;
-//        for (;;) {
-//            try {
-//                response = answer.take();
-//                break;
-//            } catch (InterruptedException ignore) {
-//                interrupted = true;
-//            }
-//        }
-//
-//        if (interrupted) {
-//            Thread.currentThread().interrupt();
-//        }
-//
-//        return ((ComputeResponse<T>) response).getData();
-        return null;
+        channel.writeAndFlush(closeAction);
+
+        Response response;
+        boolean interrupted = false;
+        for (; ; ) {
+            try {
+                response = answer.take();
+                break;
+            } catch (InterruptedException ignore) {
+                interrupted = true;
+            }
+        }
+
+        if (interrupted) {
+            Thread.currentThread().interrupt();
+        }
+
+        return ;
     }
+
 
     @Override
     public boolean hasNext() {
@@ -171,10 +169,6 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return ((NextResponse<T>) response).getData();
     }
 
-    @Override
-    public void close() {
-
-    }
 
     @Override
     public void initIterator(IDeepPartition dp, DeepJobConfig<T> config) {
@@ -199,29 +193,5 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return;
     }
 
-    public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader,
-                              DeepJobConfig<T> config) {
-
-        TransformElementAction<T> transformElementAction = new TransformElementAction<>(recordReader, config);
-
-        channel.writeAndFlush(transformElementAction);
-
-        Response response;
-        boolean interrupted = false;
-        for (; ; ) {
-            try {
-                response = answer.take();
-                break;
-            } catch (InterruptedException ignore) {
-                interrupted = true;
-            }
-        }
-
-        if (interrupted) {
-            Thread.currentThread().interrupt();
-        }
-
-        return ((TransformElementResponse<T>) response).getData();
-    }
 
 }

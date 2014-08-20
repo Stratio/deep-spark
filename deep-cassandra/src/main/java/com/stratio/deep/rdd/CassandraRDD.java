@@ -161,17 +161,6 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
             Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
             IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config);
 
-    /**
-     * Gets an instance of the callback that will be used on the completion of the computation of this
-     * RDD.
-     *
-     * @param recordReader the deep record reader.
-     * @return an instance of the callback that will be used on the completion of the computation of
-     * this RDD.
-     */
-    protected AbstractFunction0<BoxedUnit> getComputeCallback(IDeepRecordReader recordReader) {
-        return new OnComputedRDDCallback<>(recordReader);
-    }
 
     /**
      * Returns the partitions on which this RDD depends on.
@@ -199,7 +188,6 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
             // log().debug("Detected partition: " + partitions[i]);
             ++i;
         }
-
         return partitions;
     }
 

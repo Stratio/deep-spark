@@ -57,6 +57,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
     @Override
     public Iterator<T> compute(Partition split, TaskContext context) {
 
+
         if (extractorClient == null) {
             extractorClient = new ExtractorClient<>();
             try {
@@ -66,6 +67,9 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
                 e.printStackTrace();
             }
         }
+
+        context.addOnCompleteCallback(new OnComputedRDDCallback(extractorClient));
+
         extractorClient.initIterator((IDeepPartition) split, config.getValue());
         java.util.Iterator<T> iterator = new DeepIterator<T>() {
 

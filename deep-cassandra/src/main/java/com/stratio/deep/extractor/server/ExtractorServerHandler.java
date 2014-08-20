@@ -38,10 +38,10 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
                 GetPartitionsAction<T> partitionsAction = (GetPartitionsAction<T>) action;
                 response = new GetPartitionsResponse(this.getPartitions(partitionsAction));
                 break;
-//      case TRANSFORM_ELEMENT:
-//          TransformElementAction<T> transformElementAction = (TransformElementAction<T>) action;
-//          response = new TransformElementResponse(this.transformElement(transformElementAction));
-//          break;
+            case CLOSE:
+                this.close();
+                response = new CloseResponse();
+                break;
             case HAS_NEXT:
                 HasNextAction<T> hasNextAction = (HasNextAction<T>) action;
                 response = new HasNextResponse(this.hastNext(hasNextAction));
@@ -74,6 +74,7 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
     }
 
 
+
     protected boolean hastNext(HasNextAction hasNextAction) {
 
         return extractor.hasNext();
@@ -83,6 +84,12 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
     protected T next(NextAction<T> nextAction) {
 
         return extractor.next();
+
+    }
+
+    protected void close() {
+        extractor.close();
+        return;
 
     }
 

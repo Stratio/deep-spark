@@ -15,8 +15,6 @@ public interface IDeepRDD<T> extends Serializable {
 
     Partition[] getPartitions(DeepJobConfig<T> config, int id);
 
-    Iterator<T> compute(TaskContext context, IDeepPartition partition, DeepJobConfig<T> config);
-
 
     boolean hasNext();
 
