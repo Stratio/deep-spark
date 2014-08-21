@@ -4,6 +4,7 @@
 package com.stratio.deep.extractor.actions;
 
 import com.stratio.deep.config.DeepJobConfig;
+import com.stratio.deep.rdd.DeepTokenRange;
 import com.stratio.deep.rdd.IDeepPartition;
 
 /**
@@ -16,13 +17,13 @@ public class InitIteratorAction<T> extends Action {
     private DeepJobConfig<T> config;
 
 
-    private IDeepPartition partition;
+    private DeepTokenRange partition;
 
     public InitIteratorAction() {
         super();
     }
 
-    public InitIteratorAction(IDeepPartition partition, DeepJobConfig<T> config) {
+    public InitIteratorAction(DeepTokenRange partition, DeepJobConfig<T> config) {
         super(ActionType.INIT_ITERATOR);
         this.config = config;
         this.partition = partition;
@@ -33,7 +34,7 @@ public class InitIteratorAction<T> extends Action {
         return config;
     }
 
-    public IDeepPartition getPartition() {
+    public DeepTokenRange getPartition() {
         return partition;
     }
 }

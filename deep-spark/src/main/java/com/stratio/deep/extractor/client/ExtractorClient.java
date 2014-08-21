@@ -15,6 +15,7 @@
 package com.stratio.deep.extractor.client;
 
 import com.stratio.deep.config.DeepJobConfig;
+import com.stratio.deep.rdd.DeepTokenRange;
 import com.stratio.deep.rdd.IDeepPartition;
 import com.stratio.deep.rdd.IDeepRDD;
 import com.stratio.deep.utils.Pair;
@@ -75,10 +76,6 @@ public class ExtractorClient<T> implements IDeepRDD<T> {
     }
 
 
-    //    @Override
-    public java.util.Iterator<T> compute(TaskContext context, IDeepPartition partition, DeepJobConfig<T> config) {
-        return this.handler.compute(context, partition, config);
-    }
 
     @Override
     public boolean hasNext() {
@@ -90,20 +87,16 @@ public class ExtractorClient<T> implements IDeepRDD<T> {
         return handler.next();
     }
 
-    @Override
-    public void close() {
-        handler.close();
-    }
 
     @Override
-    public void initIterator(IDeepPartition dp, DeepJobConfig<T> config) {
+    public void initIterator(DeepTokenRange dp, DeepJobConfig<T> config) {
         handler.initIterator(dp, config);
     }
 
-    //    @Override
-    public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader,
-                              DeepJobConfig<T> config) {
-        return this.handler.transformElement(recordReader, config);
+    @Override
+    public void close() {
+        handler.close();
+        return ;
     }
 
     /*
@@ -112,8 +105,8 @@ public class ExtractorClient<T> implements IDeepRDD<T> {
      * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(com.stratio.deep.config.IDeepJobConfig, int)
      */
     @Override
-    public Partition[] getPartitions(DeepJobConfig<T> config, int id) {
-        return this.handler.getPartitions(config, id);
+    public DeepTokenRange[] getPartitions(DeepJobConfig<T> config) {
+        return this.handler.getPartitions(config);
     }
 
 //    @Override

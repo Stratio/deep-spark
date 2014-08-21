@@ -18,25 +18,18 @@ import com.stratio.deep.config.CellDeepJobConfig;
 import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.cql.DeepRecordReader;
 import com.stratio.deep.cql.RangeUtils;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.functions.CellList2TupleFunction;
 import com.stratio.deep.functions.DeepType2TupleFunction;
-import com.stratio.deep.partition.impl.DeepPartition;
 import com.stratio.deep.utils.Pair;
-import org.apache.spark.Partition;
-import org.apache.spark.TaskContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.rdd.RDD;
 import scala.collection.Seq;
-import scala.runtime.AbstractFunction0;
-import scala.runtime.BoxedUnit;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +46,7 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
 
     IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
 
-    IDeepPartition dp;
+    DeepTokenRange dp;
 
     DeepJobConfig<T> config;
     IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> cellDeepJobConfig;
@@ -126,12 +119,6 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
     }
 
 
-    //  @Override
-    public Iterator<T> compute(TaskContext context, IDeepPartition partition, final DeepJobConfig<T> config) {
-
-        return null;
-    }
-
     @Override
     public boolean hasNext() {
         return recordReader.hasNext();
@@ -139,7 +126,7 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
 
     @Override
     public T next() {
-        return transformElement(recordReader.next(), (IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>>) cellDeepJobConfig);
+        return transformElement(recordReader.next(), cellDeepJobConfig);
     }
 
     @Override
@@ -149,7 +136,7 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
 
 
     @Override
-    public void initIterator(final IDeepPartition dp,
+    public void initIterator(final DeepTokenRange dp,
                              DeepJobConfig<T> config) {
         this.config = config;
         this.dp = dp;
@@ -161,17 +148,6 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
             Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
             IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config);
 
-    /**
-     * Gets an instance of the callback that will be used on the completion of the computation of this
-     * RDD.
-     *
-     * @param recordReader the deep record reader.
-     * @return an instance of the callback that will be used on the completion of the computation of
-     * this RDD.
-     */
-    protected AbstractFunction0<BoxedUnit> getComputeCallback(IDeepRecordReader recordReader) {
-        return new OnComputedRDDCallback<>(recordReader);
-    }
 
     /**
      * Returns the partitions on which this RDD depends on.
@@ -182,34 +158,22 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
      * configured in cassandra.yaml + 1.
      */
     @Override
-    public Partition[] getPartitions(DeepJobConfig<T> config, int id) {
+    public DeepTokenRange[] getPartitions(DeepJobConfig<T> config) {
 
 
         CellDeepJobConfig cellDeepJobConfig = new CellDeepJobConfig(config);
 
         List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits(cellDeepJobConfig);
 
-        Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
-
-        int i = 0;
-
-        for (DeepTokenRange split : underlyingInputSplits) {
-            partitions[i] = new DeepPartition(id, i, split);
-
-            // log().debug("Detected partition: " + partitions[i]);
-            ++i;
-        }
-
-        return partitions;
+        return underlyingInputSplits.toArray(new DeepTokenRange[underlyingInputSplits.size()]);
     }
 
     /**
      * Returns a list of hosts on which the given split resides.
      */
-    public Seq<String> getPreferredLocations(Partition split) {
-        DeepPartition p = (DeepPartition) split;
+    public Seq<String> getPreferredLocations(DeepTokenRange tokenRange) {
 
-        List<String> locations = p.splitWrapper().getReplicas();
+        List<String> locations = tokenRange.getReplicas();
         // log().debug("getPreferredLocations: " + p);
 
         return asScalaBuffer(locations);
@@ -222,24 +186,12 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
      * @param dp a spark deep partition
      * @return the deep record reader associated to the provided partition.
      */
-    private IDeepRecordReader initRecordReader(final IDeepPartition dp,
+    private IDeepRecordReader initRecordReader(final DeepTokenRange dp,
                                                IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
-        Class<?> recordReaderClass = config.getRecordReaderClass();
-        Constructor c = recordReaderClass.getConstructors()[0];
-//        new DeepRecordReader(config, dp.splitWrapper());
-        try {
-            IDeepRecordReader recordReader = (IDeepRecordReader) c.newInstance(config, dp.splitWrapper());
-//            ctx.addOnCompleteCallback(new OnComputedRDDCallback(recordReader));
-            return recordReader;
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        ;
-        return null;
+
+        IDeepRecordReader recordReader = new DeepRecordReader(config, dp);
+
+        return recordReader;
 
     }
 

@@ -25,11 +25,31 @@
 
     <developers>
         <developer>
-            <id>aagea</id>
-            <name>Álvaro Agea</name>
-            <email>alvaro@stratio.com</email>
+            <id>rcrespo</id>
+            <name>Ricardo Crespo</name>
+            <email>rcrespo@stratio.com</email>
             <roles>
                 <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>dgomez</id>
+            <name>David Gomez</name>
+            <email>dgomez@stratio.com</email>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+                <role>contributor</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>jmgomez</id>
+            <name>Jose Manuel Gomez</name>
+            <email>jmgomez@stratio.com</email>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
                 <role>contributor</role>
             </roles>
         </developer>

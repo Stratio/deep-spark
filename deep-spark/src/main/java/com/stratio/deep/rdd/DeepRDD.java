@@ -4,6 +4,7 @@ package com.stratio.deep.rdd;
 import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.extractor.client.ExtractorClient;
+import com.stratio.deep.partition.impl.DeepPartition;
 import org.apache.spark.InterruptibleIterator;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
@@ -42,10 +43,8 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         try {
             ExtractorClient<T> extractor = new ExtractorClient<>();
             extractor.initialize();
-//          this.extractorClient =sc.broadcast(extractor, ClassTag$.MODULE$.<ExtractorClient<T>>apply(extractor.getClass()));
-        } catch (SSLException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (SSLException | InterruptedException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -57,16 +56,11 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
     @Override
     public Iterator<T> compute(Partition split, TaskContext context) {
 
-        if (extractorClient == null) {
-            extractorClient = new ExtractorClient<>();
-            try {
-                extractorClient.initialize();
-            } catch (SSLException | InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        extractorClient.initIterator((IDeepPartition) split, config.getValue());
+        initExtractorClient();
+
+        context.addOnCompleteCallback(new OnComputedRDDCallback(extractorClient));
+
+        extractorClient.initIterator(((IDeepPartition) split).splitWrapper(), config.getValue());
         java.util.Iterator<T> iterator = new DeepIterator<T>() {
 
             @Override
@@ -93,7 +87,28 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
 
     @Override
     public Partition[] getPartitions() {
+        initExtractorClient();
 
+        DeepTokenRange[] tokenRanges = extractorClient.getPartitions(config.getValue());
+
+        Partition[] partitions = new DeepPartition[tokenRanges.length];
+
+        int i = 0;
+
+        for (DeepTokenRange split : tokenRanges) {
+            partitions[i] = new DeepPartition(id(), i, split);
+            ++i;
+        }
+
+        return partitions;
+    }
+
+    public Broadcast<DeepJobConfig<T>> getConfig() {
+        return config;
+    }
+
+
+    private void initExtractorClient(){
         if (extractorClient == null) {
             extractorClient = new ExtractorClient<>();
             try {
@@ -103,11 +118,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
                 e.printStackTrace();
             }
         }
-        return extractorClient.getPartitions(config.getValue(), id());
-    }
 
-    public Broadcast<DeepJobConfig<T>> getConfig() {
-        return config;
     }
 
 

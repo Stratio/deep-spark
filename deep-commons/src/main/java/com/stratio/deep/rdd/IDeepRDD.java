@@ -13,9 +13,7 @@ import java.util.Iterator;
 public interface IDeepRDD<T> extends Serializable {
 
 
-    Partition[] getPartitions(DeepJobConfig<T> config, int id);
-
-    Iterator<T> compute(TaskContext context, IDeepPartition partition, DeepJobConfig<T> config);
+    DeepTokenRange[] getPartitions(DeepJobConfig<T> config);
 
 
     boolean hasNext();
@@ -24,7 +22,7 @@ public interface IDeepRDD<T> extends Serializable {
 
     void close();
 
-    void initIterator(final IDeepPartition dp,
+    void initIterator(final DeepTokenRange dp,
                       DeepJobConfig<T> config);
 
     // TODO Implement and document

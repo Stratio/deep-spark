@@ -4,14 +4,14 @@
 package com.stratio.deep.extractor.actions;
 
 /**
- * @author Óscar Puertas
+ * Created by rcrespo on 20/08/14.
  */
-public class HasNextAction<T> extends Action {
+public class CloseAction extends Action {
 
     private static final long serialVersionUID = -1270097974102584045L;
 
 
-    public HasNextAction() {
-        super(ActionType.HAS_NEXT);
+    public CloseAction() {
+        super(ActionType.CLOSE);
     }
 }

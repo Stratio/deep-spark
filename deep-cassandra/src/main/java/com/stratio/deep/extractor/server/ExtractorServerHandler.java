@@ -18,9 +18,9 @@ import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.extractor.actions.*;
 import com.stratio.deep.extractor.response.*;
 import com.stratio.deep.rdd.CassandraRDD;
+import com.stratio.deep.rdd.DeepTokenRange;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.apache.spark.Partition;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -38,10 +38,10 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
                 GetPartitionsAction<T> partitionsAction = (GetPartitionsAction<T>) action;
                 response = new GetPartitionsResponse(this.getPartitions(partitionsAction));
                 break;
-//      case TRANSFORM_ELEMENT:
-//          TransformElementAction<T> transformElementAction = (TransformElementAction<T>) action;
-//          response = new TransformElementResponse(this.transformElement(transformElementAction));
-//          break;
+            case CLOSE:
+                this.close();
+                response = new CloseResponse();
+                break;
             case HAS_NEXT:
                 HasNextAction<T> hasNextAction = (HasNextAction<T>) action;
                 response = new HasNextResponse(this.hastNext(hasNextAction));
@@ -86,6 +86,12 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
 
     }
 
+    protected void close() {
+        extractor.close();
+        return;
+
+    }
+
     protected void initIterator(InitIteratorAction<T> initIteratorAction) {
         if (extractor == null) {
             this.initExtractor(initIteratorAction.getConfig());
@@ -96,13 +102,13 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
 
     }
 
-    protected Partition[] getPartitions(GetPartitionsAction<T> getPartitionsAction) {
+    protected DeepTokenRange[] getPartitions(GetPartitionsAction<T> getPartitionsAction) {
 
         if (extractor == null) {
             this.initExtractor(getPartitionsAction.getConfig());
         }
 
-        return extractor.getPartitions(getPartitionsAction.getConfig(), getPartitionsAction.getId());
+        return extractor.getPartitions(getPartitionsAction.getConfig());
     }
 
 

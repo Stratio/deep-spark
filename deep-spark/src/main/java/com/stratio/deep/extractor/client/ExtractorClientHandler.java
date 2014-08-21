@@ -17,6 +17,7 @@ package com.stratio.deep.extractor.client;
 import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.extractor.actions.*;
 import com.stratio.deep.extractor.response.*;
+import com.stratio.deep.rdd.DeepTokenRange;
 import com.stratio.deep.rdd.IDeepPartition;
 import com.stratio.deep.rdd.IDeepRDD;
 import com.stratio.deep.utils.Pair;
@@ -72,9 +73,9 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
      * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(org.apache.spark.broadcast.Broadcast, int)
      */
     @Override
-    public Partition[] getPartitions(DeepJobConfig<T> config, int id) {
+    public DeepTokenRange[] getPartitions(DeepJobConfig<T> config) {
 
-        GetPartitionsAction<T> getPartitionsAction = new GetPartitionsAction<>(config, id);
+        GetPartitionsAction<T> getPartitionsAction = new GetPartitionsAction<>(config);
 
         channel.writeAndFlush(getPartitionsAction);
 
@@ -96,32 +97,30 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return ((GetPartitionsResponse) response).getPartitions();
     }
 
+    @Override
+    public void close() {
+        CloseAction closeAction = new CloseAction();
 
-    //    @Override
-    public java.util.Iterator<T> compute(TaskContext context, IDeepPartition partition, DeepJobConfig<T> config) {
-//
-////        ComputeAction<T> computeAction = new ComputeAction<T>(context, partition, config);
-//
-//        channel.writeAndFlush(computeAction);
-//
-//        Response response;
-//        boolean interrupted = false;
-//        for (;;) {
-//            try {
-//                response = answer.take();
-//                break;
-//            } catch (InterruptedException ignore) {
-//                interrupted = true;
-//            }
-//        }
-//
-//        if (interrupted) {
-//            Thread.currentThread().interrupt();
-//        }
-//
-//        return ((ComputeResponse<T>) response).getData();
-        return null;
+        channel.writeAndFlush(closeAction);
+
+        Response response;
+        boolean interrupted = false;
+        for (; ; ) {
+            try {
+                response = answer.take();
+                break;
+            } catch (InterruptedException ignore) {
+                interrupted = true;
+            }
+        }
+
+        if (interrupted) {
+            Thread.currentThread().interrupt();
+        }
+
+        return ;
     }
+
 
     @Override
     public boolean hasNext() {
@@ -171,13 +170,9 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return ((NextResponse<T>) response).getData();
     }
 
-    @Override
-    public void close() {
-
-    }
 
     @Override
-    public void initIterator(IDeepPartition dp, DeepJobConfig<T> config) {
+    public void initIterator(DeepTokenRange dp, DeepJobConfig<T> config) {
         InitIteratorAction<T> initIteratorAction = new InitIteratorAction<>(dp, config);
 
         channel.writeAndFlush(initIteratorAction);
@@ -199,29 +194,5 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return;
     }
 
-    public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader,
-                              DeepJobConfig<T> config) {
-
-        TransformElementAction<T> transformElementAction = new TransformElementAction<>(recordReader, config);
-
-        channel.writeAndFlush(transformElementAction);
-
-        Response response;
-        boolean interrupted = false;
-        for (; ; ) {
-            try {
-                response = answer.take();
-                break;
-            } catch (InterruptedException ignore) {
-                interrupted = true;
-            }
-        }
-
-        if (interrupted) {
-            Thread.currentThread().interrupt();
-        }
-
-        return ((TransformElementResponse<T>) response).getData();
-    }
 
 }
