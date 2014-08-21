@@ -16,28 +16,14 @@
 
 package com.stratio.deep.examples.java;
 
-import com.google.common.collect.Lists;
-
-import com.stratio.deep.config.CassandraConfigFactory;
-import com.stratio.deep.config.DeepJobConfig;
-import com.stratio.deep.config.ICassandraDeepJobConfig;
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.rdd.CassandraCellRDD;
-import com.stratio.deep.rdd.CassandraRDD;
-import com.stratio.deep.testentity.TweetEntity;
+import com.stratio.deep.rdd.CassandraCellExtractor;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
-import scala.Tuple2;
-import scala.Tuple3;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,9 +68,9 @@ public final class AggregatingData {
 	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // Creating a configuration for the RDD and initialize it
-        DeepJobConfig<Cells> config = new DeepJobConfig();
+        ExtractorConfig<Cells> config = new ExtractorConfig();
 
-        config.setRDDClass(CassandraCellRDD.class);
+        config.setRDDClass(CassandraCellExtractor.class);
         Map<String, String> values = new HashMap<>();
         values.put("keyspace", "twitter");
         values.put("table", "tweets");

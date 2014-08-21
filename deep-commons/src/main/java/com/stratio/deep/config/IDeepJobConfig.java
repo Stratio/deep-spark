@@ -107,6 +107,8 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?, ?>> extends Seria
      */
     S initialize();
 
+    S initialize(ExtractorConfig deepJobConfig);
+
     /**
      * Defines a projection over the CF columns. <br/>
      * Key columns will always be returned, even if not specified in the columns input array.
@@ -140,14 +142,14 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?, ?>> extends Seria
     int getPageSize();
 
 
-    /**
-     * In case you want to add custom configuration to hadoop-connector, this override any other configuration,
-     * these configurations are not validated, so be careful
-     *
-     * @param customConfiguration
-     * @return
-     */
-    S customConfiguration(Map<String, Object> customConfiguration);
+//    /**
+//     * In case you want to add custom configuration to hadoop-connector, this override any other configuration,
+//     * these configurations are not validated, so be careful
+//     *
+//     * @param customConfiguration
+//     * @return
+//     */
+//    S customConfiguration(Map<String, Object> customConfiguration);
 
     Class<?> getRDDClass();
 

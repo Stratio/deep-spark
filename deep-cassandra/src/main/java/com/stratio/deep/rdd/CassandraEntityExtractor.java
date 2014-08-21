@@ -36,7 +36,7 @@ import java.util.Map;
  *
  * @author Luca Rosellini <luca@strat.io>
  */
-public final class CassandraEntityRDD<T extends IDeepType> extends CassandraRDD<T> {
+public final class CassandraEntityExtractor<T extends IDeepType> extends CassandraExtractor<T> {
 
     private static final long serialVersionUID = -3208994171892747470L;
 
@@ -87,6 +87,11 @@ public final class CassandraEntityRDD<T extends IDeepType> extends CassandraRDD<
         }
 
         return instance;
+    }
+
+    @Override
+    public Class getConfigClass() {
+        return EntityDeepJobConfig.class;
     }
 
 }

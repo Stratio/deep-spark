@@ -15,7 +15,7 @@
 package com.stratio.deep.context;
 
 
-import com.stratio.deep.config.DeepJobConfig;
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepInstantiationException;
 import com.stratio.deep.rdd.DeepJavaRDD;
@@ -104,7 +104,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * @param <T>
      * @return
      */
-    public <T> RDD<T> createRDD(final DeepJobConfig deepJobConfig) {
+    public <T> RDD<T> createRDD(final ExtractorConfig deepJobConfig) {
         try {
 
             Class rdd = deepJobConfig.getRDDClass();
@@ -132,7 +132,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * @return
      */
     public <T> JavaRDD<T> createJavaRDD(
-            DeepJobConfig<T> deepJobConfig) {
+            ExtractorConfig<T> deepJobConfig) {
         return new DeepJavaRDD((DeepRDD<T>) createRDD(deepJobConfig));
     }
 

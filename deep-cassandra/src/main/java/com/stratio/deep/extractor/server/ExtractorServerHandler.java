@@ -14,10 +14,10 @@
  */
 package com.stratio.deep.extractor.server;
 
-import com.stratio.deep.config.DeepJobConfig;
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.extractor.actions.*;
 import com.stratio.deep.extractor.response.*;
-import com.stratio.deep.rdd.CassandraRDD;
+import com.stratio.deep.rdd.CassandraExtractor;
 import com.stratio.deep.rdd.DeepTokenRange;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -27,7 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Action> {
 
-    private CassandraRDD<T> extractor;
+    private CassandraExtractor<T> extractor;
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Action action) throws Exception {
@@ -116,12 +116,12 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
      * @param config
      */
     @SuppressWarnings("unchecked")
-    private void initExtractor(DeepJobConfig<T> config) {
+    private void initExtractor(ExtractorConfig<T> config) {
 
         Class<T> rdd = (Class<T>) config.getRDDClass();
         try {
             final Constructor<T> c = rdd.getConstructor();
-            this.extractor = (CassandraRDD<T>) c.newInstance();
+            this.extractor = (CassandraExtractor<T>) c.newInstance();
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             // TODO Auto-generated catch block
