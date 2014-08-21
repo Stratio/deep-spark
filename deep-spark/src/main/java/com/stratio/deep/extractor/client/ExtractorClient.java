@@ -16,9 +16,7 @@ package com.stratio.deep.extractor.client;
 
 import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.rdd.DeepTokenRange;
-import com.stratio.deep.rdd.IDeepPartition;
-import com.stratio.deep.rdd.IDeepRDD;
-import com.stratio.deep.utils.Pair;
+import com.stratio.deep.rdd.IExtractor;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -26,18 +24,14 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import org.apache.spark.Partition;
-import org.apache.spark.TaskContext;
 
 import javax.net.ssl.SSLException;
-import java.nio.ByteBuffer;
-import java.util.Map;
 
 /**
  * Sends a list of continent/city pairs to a {@link } to get the local times of the
  * specified cities.
  */
-public class ExtractorClient<T> implements IDeepRDD<T> {
+public class ExtractorClient<T> implements IExtractor<T> {
 
     static final boolean SSL = System.getProperty("ssl") != null;
     //  static final String HOST = System.getProperty("host", "172.19.0.133");

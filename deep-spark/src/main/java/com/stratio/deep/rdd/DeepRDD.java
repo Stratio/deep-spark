@@ -40,13 +40,6 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
                 sc.broadcast(config, ClassTag$.MODULE$
                         .<DeepJobConfig<T>>apply(config.getClass()));
 
-        try {
-            ExtractorClient<T> extractor = new ExtractorClient<>();
-            extractor.initialize();
-        } catch (SSLException | InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     public DeepRDD(SparkContext sc, Class entityClass) {
@@ -61,7 +54,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         context.addOnCompleteCallback(new OnComputedRDDCallback(extractorClient));
 
         extractorClient.initIterator(((IDeepPartition) split).splitWrapper(), config.getValue());
-        java.util.Iterator<T> iterator = new DeepIterator<T>() {
+        java.util.Iterator<T> iterator = new java.util.Iterator<T>() {
 
             @Override
             public boolean hasNext() {

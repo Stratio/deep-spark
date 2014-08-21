@@ -18,22 +18,16 @@ import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.extractor.actions.*;
 import com.stratio.deep.extractor.response.*;
 import com.stratio.deep.rdd.DeepTokenRange;
-import com.stratio.deep.rdd.IDeepPartition;
-import com.stratio.deep.rdd.IDeepRDD;
-import com.stratio.deep.utils.Pair;
+import com.stratio.deep.rdd.IExtractor;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.apache.spark.Partition;
-import org.apache.spark.TaskContext;
 
-import java.nio.ByteBuffer;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Response> implements
-        IDeepRDD<T> {
+        IExtractor<T> {
 
     // Stateful properties
     private volatile Channel channel;
