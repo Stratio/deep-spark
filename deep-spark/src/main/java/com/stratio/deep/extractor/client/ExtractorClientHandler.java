@@ -17,6 +17,7 @@ package com.stratio.deep.extractor.client;
 import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.extractor.actions.*;
 import com.stratio.deep.extractor.response.*;
+import com.stratio.deep.rdd.DeepTokenRange;
 import com.stratio.deep.rdd.IDeepPartition;
 import com.stratio.deep.rdd.IDeepRDD;
 import com.stratio.deep.utils.Pair;
@@ -72,9 +73,9 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
      * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(org.apache.spark.broadcast.Broadcast, int)
      */
     @Override
-    public Partition[] getPartitions(DeepJobConfig<T> config, int id) {
+    public DeepTokenRange[] getPartitions(DeepJobConfig<T> config) {
 
-        GetPartitionsAction<T> getPartitionsAction = new GetPartitionsAction<>(config, id);
+        GetPartitionsAction<T> getPartitionsAction = new GetPartitionsAction<>(config);
 
         channel.writeAndFlush(getPartitionsAction);
 
@@ -171,7 +172,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
 
     @Override
-    public void initIterator(IDeepPartition dp, DeepJobConfig<T> config) {
+    public void initIterator(DeepTokenRange dp, DeepJobConfig<T> config) {
         InitIteratorAction<T> initIteratorAction = new InitIteratorAction<>(dp, config);
 
         channel.writeAndFlush(initIteratorAction);

@@ -18,9 +18,9 @@ import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.extractor.actions.*;
 import com.stratio.deep.extractor.response.*;
 import com.stratio.deep.rdd.CassandraRDD;
+import com.stratio.deep.rdd.DeepTokenRange;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.apache.spark.Partition;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -74,7 +74,6 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
     }
 
 
-
     protected boolean hastNext(HasNextAction hasNextAction) {
 
         return extractor.hasNext();
@@ -103,13 +102,13 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
 
     }
 
-    protected Partition[] getPartitions(GetPartitionsAction<T> getPartitionsAction) {
+    protected DeepTokenRange[] getPartitions(GetPartitionsAction<T> getPartitionsAction) {
 
         if (extractor == null) {
             this.initExtractor(getPartitionsAction.getConfig());
         }
 
-        return extractor.getPartitions(getPartitionsAction.getConfig(), getPartitionsAction.getId());
+        return extractor.getPartitions(getPartitionsAction.getConfig());
     }
 
 

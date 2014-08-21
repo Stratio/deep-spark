@@ -99,8 +99,8 @@ public final class AggregatingData {
 
         // Creating the RDD
         RDD<Cells> rdd = deepContext.createRDD(config);
-        LOG.info("count: " + rdd.count());
-        LOG.info("first: " + rdd.first());
+//        LOG.info("count: " + rdd.count());
+//        LOG.info("first: " + rdd.first());
 
         System.out.println("count: " + rdd.count());
         System.out.println("first: " + rdd.first());
