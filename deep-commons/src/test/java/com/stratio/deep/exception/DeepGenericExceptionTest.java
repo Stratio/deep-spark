@@ -31,7 +31,7 @@ public class DeepGenericExceptionTest  {
     private final Throwable throwsmessage = new Throwable(message);
 
 
-    @Test(expectedExceptions = { DeepGenericException.class })
+    @Test
     public void deepGenericExceptionTest(){
 
 
@@ -46,7 +46,7 @@ public class DeepGenericExceptionTest  {
 
     }
 
-    @Test(expectedExceptions = { DeepGenericException.class })
+    @Test
     public void deepGenericExceptionTest2(){
 
 

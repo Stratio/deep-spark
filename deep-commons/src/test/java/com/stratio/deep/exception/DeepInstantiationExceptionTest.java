@@ -32,34 +32,37 @@ public class DeepInstantiationExceptionTest {
     private final Throwable throwsmessage = new Throwable(message);
 
 
-    @Test(expectedExceptions = { DeepIllegalAccessException.class })
-    public void deepGenericExceptionTest(){
+    @Test(expectedExceptions = { DeepInstantiationException.class })
+    public void deepInstantiationExceptionTest(){
 
 
 
         try {
-            throw new DeepIllegalAccessException(message);
+            throw new DeepInstantiationException(message);
 
 
-        } catch (DeepIllegalAccessException e) {
+        } catch (DeepInstantiationException e) {
             Assert.assertEquals(e.getMessage(), message);
         }
+        throw new DeepInstantiationException(message);
 
     }
 
-    @Test(expectedExceptions = { DeepIllegalAccessException.class })
-    public void deepGenericExceptionTest2(){
+    @Test(expectedExceptions = { DeepInstantiationException.class })
+    public void deepInstantiationExceptionTest2(){
 
 
 
         try {
-            throw new DeepIllegalAccessException(message,throwsmessage);
+            throw new DeepInstantiationException(message,throwsmessage);
 
 
-        } catch (DeepIllegalAccessException e) {
+        } catch (DeepInstantiationException e) {
             Assert.assertEquals(e.getMessage(), message);
             Assert.assertEquals(e.getCause(), throwsmessage);
         }
+
+        throw new DeepInstantiationException(message);
 
     }
 }

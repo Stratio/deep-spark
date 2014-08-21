@@ -46,6 +46,7 @@ public class DeepIllegalAccessExceptionTest {
             Assert.assertEquals(e.getMessage(), message);
         }
 
+        throw new DeepIllegalAccessException(message);
     }
 
     @Test(expectedExceptions = { DeepIllegalAccessException.class })
@@ -61,6 +62,8 @@ public class DeepIllegalAccessExceptionTest {
             Assert.assertEquals(e.getMessage(), message);
             Assert.assertEquals(e.getCause(), throwsmessage);
         }
+
+        throw new DeepIllegalAccessException(message,throwsmessage);
 
     }
 

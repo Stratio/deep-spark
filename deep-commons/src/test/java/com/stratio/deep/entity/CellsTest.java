@@ -35,7 +35,7 @@ public class CellsTest {
         cells = new Cells("defaultTable");
         assertEquals(cells.getDefaultTableName(), "defaultTable");
 
-        assertEquals(cells.size(), 1);
+        assertEquals(cells.size(), 0);
 
     }
 

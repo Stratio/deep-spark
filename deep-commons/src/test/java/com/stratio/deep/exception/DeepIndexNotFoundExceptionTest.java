@@ -41,6 +41,8 @@ public class DeepIndexNotFoundExceptionTest {
             Assert.assertEquals(e.getMessage(), message);
         }
 
+        throw new DeepIndexNotFoundException(message);
+
     }
 
     @Test(expectedExceptions = { DeepIndexNotFoundException.class })

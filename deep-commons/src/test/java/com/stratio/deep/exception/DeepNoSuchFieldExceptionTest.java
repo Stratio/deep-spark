@@ -30,34 +30,36 @@ public class DeepNoSuchFieldExceptionTest {
     private final Throwable throwsmessage = new Throwable(message);
 
 
-    @Test(expectedExceptions = { DeepIllegalAccessException.class })
-    public void deepGenericExceptionTest(){
+    @Test(expectedExceptions = { DeepNoSuchFieldException.class })
+    public void deepNoSuchFieldExceptionTest(){
 
 
 
         try {
-            throw new DeepIllegalAccessException(message);
+            throw new DeepNoSuchFieldException(message);
 
 
-        } catch (DeepIllegalAccessException e) {
+        } catch (DeepNoSuchFieldException e) {
             Assert.assertEquals(e.getMessage(), message);
         }
+        throw new DeepNoSuchFieldException(message,throwsmessage);
 
     }
 
-    @Test(expectedExceptions = { DeepIllegalAccessException.class })
-    public void deepGenericExceptionTest2(){
+    @Test(expectedExceptions = { DeepNoSuchFieldException.class })
+    public void deepNoSuchFieldExceptionTest2(){
 
 
 
         try {
-            throw new DeepIllegalAccessException(message,throwsmessage);
+            throw new DeepNoSuchFieldException(message,throwsmessage);
 
 
-        } catch (DeepIllegalAccessException e) {
+        } catch (DeepNoSuchFieldException e) {
             Assert.assertEquals(e.getMessage(), message);
             Assert.assertEquals(e.getCause(), throwsmessage);
         }
+        throw new DeepNoSuchFieldException(message,throwsmessage);
 
     }
 

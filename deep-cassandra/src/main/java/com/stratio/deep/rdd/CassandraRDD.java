@@ -28,7 +28,7 @@ import com.stratio.deep.utils.Pair;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.rdd.RDD;
 import scala.collection.Seq;
-import com.stratio.deep.extractor.core.IDeepRecordReader;
+import com.stratio.deep.rdd.IDeepRecordReader;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;

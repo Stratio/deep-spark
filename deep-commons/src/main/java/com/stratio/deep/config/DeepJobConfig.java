@@ -2,14 +2,10 @@ package com.stratio.deep.config;
 
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.exception.DeepIllegalAccessException;
-import com.stratio.deep.extractor.utils.ExtractorConfig;
 import com.stratio.deep.rdd.IDeepPartition;
-import com.stratio.deep.extractor.core.IDeepRecordReader;
+import com.stratio.deep.rdd.IDeepRecordReader;
 import org.apache.hadoop.conf.Configuration;
-import sun.awt.image.VolatileSurfaceManager;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -18,7 +14,7 @@ import java.util.Map;
  */
 public class DeepJobConfig<T> implements IDeepJobConfig {
 
-    Map<ExtractorConfig, String> values;
+    Map<String, String> values;
 
     Class<IDeepJobConfig<T, ?>> config;
 
@@ -38,11 +34,11 @@ public class DeepJobConfig<T> implements IDeepJobConfig {
         this.entityClass = entityClass;
     }
 
-    public Map<ExtractorConfig, String> getValues() {
+    public Map<String, String> getValues() {
         return values;
     }
 
-    public void setValues(Map<ExtractorConfig, String> values) {
+    public void setValues(Map<String, String> values) {
         this.values = values;
     }
 

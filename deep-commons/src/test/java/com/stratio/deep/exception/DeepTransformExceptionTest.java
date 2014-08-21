@@ -30,34 +30,34 @@ public class DeepTransformExceptionTest {
     private final Throwable throwsmessage = new Throwable(message);
 
 
-    @Test(expectedExceptions = { DeepIllegalAccessException.class })
-    public void deepGenericExceptionTest(){
+    @Test(expectedExceptions = {  DeepTransformException.class })
+    public void deepTransformExceptionTest(){
 
 
 
         try {
-            throw new DeepIllegalAccessException(message);
+            throw new  DeepTransformException(message);
 
 
-        } catch (DeepIllegalAccessException e) {
+        } catch ( DeepTransformException e) {
             Assert.assertEquals(e.getMessage(), message);
         }
-
+        throw new  DeepTransformException(message);
     }
 
-    @Test(expectedExceptions = { DeepIllegalAccessException.class })
-    public void deepGenericExceptionTest2(){
+    @Test(expectedExceptions = {  DeepTransformException.class })
+    public void deepTransformExceptionTest2(){
 
 
 
         try {
-            throw new DeepIllegalAccessException(message,throwsmessage);
+            throw new  DeepTransformException(message,throwsmessage);
 
 
-        } catch (DeepIllegalAccessException e) {
+        } catch ( DeepTransformException e) {
             Assert.assertEquals(e.getMessage(), message);
             Assert.assertEquals(e.getCause(), throwsmessage);
         }
-
+        throw new  DeepTransformException(message);
     }
 }

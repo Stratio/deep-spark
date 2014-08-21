@@ -29,35 +29,37 @@ public class DeepIOExceptionTest  {
     private final Throwable throwsmessage = new Throwable(message);
 
 
-    @Test(expectedExceptions = { DeepIllegalAccessException.class })
-    public void deepGenericExceptionTest(){
+    @Test(expectedExceptions = { DeepIOException.class })
+    public void deepIOExceptionTest(){
 
 
 
         try {
-            throw new DeepIllegalAccessException(message);
+            throw new DeepIOException(message);
 
 
-        } catch (DeepIllegalAccessException e) {
+        } catch (DeepIOException e) {
             Assert.assertEquals(e.getMessage(), message);
         }
+        throw new DeepIOException(message);
 
     }
 
-    @Test(expectedExceptions = { DeepIllegalAccessException.class })
-    public void deepGenericExceptionTest2(){
+    @Test(expectedExceptions = { DeepIOException.class })
+    public void deepIOException2(){
 
 
 
         try {
-            throw new DeepIllegalAccessException(message,throwsmessage);
+            throw new DeepIOException(message,throwsmessage);
 
 
-        } catch (DeepIllegalAccessException e) {
+        } catch (DeepIOException e) {
             Assert.assertEquals(e.getMessage(), message);
             Assert.assertEquals(e.getCause(), throwsmessage);
         }
 
+        throw new DeepIOException(message,throwsmessage);
     }
 
 }

@@ -34,6 +34,7 @@ public class ExceptionTest {
         } catch (DeepGenericException e) {
             Assert.assertEquals(e.getMessage(), message);
         }
+        throw new DeepGenericException(message);
 
     }
 

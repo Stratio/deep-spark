@@ -3,10 +3,19 @@ package com.stratio.deep.extractor.utils;
 /**
  * Created by dgomez on 19/08/14.
  */
-public enum ExtractorConfig {
+public final class ExtractorConfig {
 
-    PASSWORD, HOST, PORT, INPUT_COLUMNS, USERNAME, PAGE_SIZE,
-    SESSION, KEYSPACE,TABLE, RPCPORT, CQLPORT
+    public static  String PASSWORD;
+    public static  String HOST;
+    public static  String PORT;
+    public static  String INPUT_COLUMNS;
+    public static  String USERNAME;
+    public static  String PAGE_SIZE;
+    public static  String SESSION;
+    public static  String KEYSPACE;
+    public static  String TABLE;
+    public static  String RPCPORT;
+    public static  String CQLPORT;
 
 
 }
