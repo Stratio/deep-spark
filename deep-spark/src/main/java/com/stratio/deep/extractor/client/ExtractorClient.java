@@ -14,7 +14,7 @@
  */
 package com.stratio.deep.extractor.client;
 
-import com.stratio.deep.config.DeepJobConfig;
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.rdd.DeepTokenRange;
 import com.stratio.deep.rdd.IExtractor;
 import io.netty.bootstrap.Bootstrap;
@@ -83,9 +83,10 @@ public class ExtractorClient<T> implements IExtractor<T> {
 
 
     @Override
-    public void initIterator(DeepTokenRange dp, DeepJobConfig<T> config) {
+    public void initIterator(DeepTokenRange dp, ExtractorConfig<T> config) {
         handler.initIterator(dp, config);
     }
+
 
     @Override
     public void close() {
@@ -99,12 +100,9 @@ public class ExtractorClient<T> implements IExtractor<T> {
      * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(com.stratio.deep.config.IDeepJobConfig, int)
      */
     @Override
-    public DeepTokenRange[] getPartitions(DeepJobConfig<T> config) {
+    public DeepTokenRange[] getPartitions(ExtractorConfig<T> config) {
         return this.handler.getPartitions(config);
     }
 
-//    @Override
-//    public IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> createRecordReader() {
-//        return null;
-//    }
+
 }

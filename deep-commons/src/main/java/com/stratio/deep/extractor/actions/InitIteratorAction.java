@@ -3,9 +3,8 @@
  */
 package com.stratio.deep.extractor.actions;
 
-import com.stratio.deep.config.DeepJobConfig;
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.rdd.DeepTokenRange;
-import com.stratio.deep.rdd.IDeepPartition;
 
 /**
  * @author Óscar Puertas
@@ -14,7 +13,7 @@ public class InitIteratorAction<T> extends Action {
 
     private static final long serialVersionUID = -1270097974102584045L;
 
-    private DeepJobConfig<T> config;
+    private ExtractorConfig<T> config;
 
 
     private DeepTokenRange partition;
@@ -23,14 +22,14 @@ public class InitIteratorAction<T> extends Action {
         super();
     }
 
-    public InitIteratorAction(DeepTokenRange partition, DeepJobConfig<T> config) {
+    public InitIteratorAction(DeepTokenRange partition, ExtractorConfig<T> config) {
         super(ActionType.INIT_ITERATOR);
         this.config = config;
         this.partition = partition;
     }
 
 
-    public DeepJobConfig<T> getConfig() {
+    public ExtractorConfig<T> getConfig() {
         return config;
     }
 

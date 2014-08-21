@@ -53,7 +53,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
      * {@inheritDoc}
      */
     @Override
-    public DeepJobConfig<T> initialize() {
+    public ICassandraDeepJobConfig<T> initialize() {
         super.initialize();
 
         Map<String, String> tmpMap = new HashMap<>();

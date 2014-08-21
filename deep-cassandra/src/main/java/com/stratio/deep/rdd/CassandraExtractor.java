@@ -14,8 +14,7 @@
 
 package com.stratio.deep.rdd;
 
-import com.stratio.deep.config.CellDeepJobConfig;
-import com.stratio.deep.config.DeepJobConfig;
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.cql.DeepRecordReader;
@@ -41,20 +40,20 @@ import static scala.collection.JavaConversions.asScalaBuffer;
  * Implementors should only provide a way to convert an object of type T to a
  * {@link com.stratio.deep.entity.Cells} element.
  */
-public abstract class CassandraRDD<T> implements IExtractor<T> {
+public abstract class CassandraExtractor<T> implements IExtractor<T> {
 
 
-    IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
+    private IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
 
-    DeepTokenRange dp;
+    private DeepTokenRange dp;
 
-    DeepJobConfig<T> config;
-    IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> cellDeepJobConfig;
+    private ExtractorConfig<T> config;
+    protected ICassandraDeepJobConfig<T> cassandraJobConfig;
 
     /**
      * Persists the given RDD to the underlying Cassandra datastore using the java cql3 driver.<br/>
      * Beware: this method does not perform a distributed write as
-     * {@link com.stratio.deep.rdd.CassandraRDD#saveRDDToCassandra} does, uses the Datastax Java
+     * {@link CassandraExtractor#saveRDDToCassandra} does, uses the Datastax Java
      * Driver to perform a batch write to the Cassandra server.<br/>
      * This currently scans the partitions one by one, so it will be slow if a lot of partitions are
      * required.
@@ -64,7 +63,7 @@ public abstract class CassandraRDD<T> implements IExtractor<T> {
      */
     @SuppressWarnings("unchecked")
     public static <W, T extends IDeepType> void cql3SaveRDDToCassandra(RDD<W> rdd,
-                                                                       DeepJobConfig<W> writeConfig) {
+                                                                       ExtractorConfig<W> writeConfig) {
         if (IDeepType.class.isAssignableFrom(writeConfig.getEntityClass())) {
             ICassandraDeepJobConfig<T> c = (ICassandraDeepJobConfig<T>) writeConfig;
             RDD<T> r = (RDD<T>) rdd;
@@ -90,7 +89,7 @@ public abstract class CassandraRDD<T> implements IExtractor<T> {
      */
     @SuppressWarnings("unchecked")
     public static <W, T extends IDeepType> void saveRDDToCassandra(RDD<W> rdd,
-                                                                   DeepJobConfig<W> writeConfig) {
+                                                                   ExtractorConfig<W> writeConfig) {
         if (IDeepType.class.isAssignableFrom(writeConfig.getEntityClass())) {
             ICassandraDeepJobConfig<T> c = (ICassandraDeepJobConfig<T>) writeConfig;
             RDD<T> r = (RDD<T>) rdd;
@@ -114,7 +113,7 @@ public abstract class CassandraRDD<T> implements IExtractor<T> {
      * @param writeConfig the write configuration object.
      * @param <W>         the generic type associated to the provided configuration object.
      */
-    public static <W> void saveRDDToCassandra(JavaRDD<W> rdd, DeepJobConfig<W> writeConfig) {
+    public static <W> void saveRDDToCassandra(JavaRDD<W> rdd, ExtractorConfig<W> writeConfig) {
         saveRDDToCassandra(rdd.rdd(), writeConfig);
     }
 
@@ -126,7 +125,7 @@ public abstract class CassandraRDD<T> implements IExtractor<T> {
 
     @Override
     public T next() {
-        return transformElement(recordReader.next(), cellDeepJobConfig);
+        return transformElement(recordReader.next(), cassandraJobConfig);
     }
 
     @Override
@@ -137,17 +136,24 @@ public abstract class CassandraRDD<T> implements IExtractor<T> {
 
     @Override
     public void initIterator(final DeepTokenRange dp,
-                             DeepJobConfig<T> config) {
+                             ExtractorConfig<T> config) {
         this.config = config;
         this.dp = dp;
-        this.cellDeepJobConfig = (IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>>) new CellDeepJobConfig(config).initialize();
-        recordReader = initRecordReader(dp, cellDeepJobConfig);
+        this.cassandraJobConfig = initCustomConfig(config);
+        recordReader = initRecordReader(dp, cassandraJobConfig);
+    }
+
+
+
+    private ICassandraDeepJobConfig<T> initCustomConfig(ExtractorConfig<T> config){
+        return cassandraJobConfig.initialize(config);
     }
 
     public abstract T transformElement(
             Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
             IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config);
 
+    public abstract Class getConfigClass();
 
     /**
      * Returns the partitions on which this RDD depends on.
@@ -158,10 +164,10 @@ public abstract class CassandraRDD<T> implements IExtractor<T> {
      * configured in cassandra.yaml + 1.
      */
     @Override
-    public DeepTokenRange[] getPartitions(DeepJobConfig<T> config) {
+    public DeepTokenRange[] getPartitions(ExtractorConfig<T> config) {
 
 
-        CellDeepJobConfig cellDeepJobConfig = new CellDeepJobConfig(config);
+        ICassandraDeepJobConfig<T> cellDeepJobConfig = initCustomConfig(config);
 
         List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits(cellDeepJobConfig);
 

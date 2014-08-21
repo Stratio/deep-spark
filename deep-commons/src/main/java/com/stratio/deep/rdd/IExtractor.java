@@ -1,11 +1,8 @@
 package com.stratio.deep.rdd;
 
-import com.stratio.deep.config.DeepJobConfig;
-import org.apache.spark.Partition;
-import org.apache.spark.TaskContext;
+import com.stratio.deep.config.ExtractorConfig;
 
 import java.io.Serializable;
-import java.util.Iterator;
 
 /**
  * Created by rcrespo on 4/08/14.
@@ -13,7 +10,7 @@ import java.util.Iterator;
 public interface IExtractor<T> extends Serializable {
 
 
-    DeepTokenRange[] getPartitions(DeepJobConfig<T> config);
+    DeepTokenRange[] getPartitions(ExtractorConfig<T> config);
 
 
     boolean hasNext();
@@ -22,9 +19,10 @@ public interface IExtractor<T> extends Serializable {
 
     void close();
 
-    void initIterator(final DeepTokenRange dp,
-                      DeepJobConfig<T> config);
+    void initIterator(DeepTokenRange dp,ExtractorConfig<T> config);
 
-    // TODO Implement and document
-    // void write(Cells rawKey, Cells data);
+
+//    void save(Cells rawKey, Cells data);
+
+//    Class getConfigClass();
 }

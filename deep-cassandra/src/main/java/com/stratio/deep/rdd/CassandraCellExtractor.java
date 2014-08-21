@@ -14,6 +14,7 @@
 
 package com.stratio.deep.rdd;
 
+import com.stratio.deep.config.CellDeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
@@ -28,9 +29,15 @@ import java.util.Map;
  * Concrete implementation of a CassandraRDD representing an RDD of
  * {@link com.stratio.deep.entity.Cells} element.<br/>
  */
-public class CassandraCellRDD extends CassandraRDD<Cells> {
+public class CassandraCellExtractor extends CassandraExtractor<Cells> {
 
     private static final long serialVersionUID = -738528971629963221L;
+
+
+    public CassandraCellExtractor(){
+        super();
+        this.cassandraJobConfig = new CellDeepJobConfig(true);
+    }
 
 
     /**
@@ -60,6 +67,11 @@ public class CassandraCellRDD extends CassandraRDD<Cells> {
         }
 
         return cells;
+    }
+
+    @Override
+    public Class getConfigClass() {
+        return CellDeepJobConfig.class;
     }
 
 

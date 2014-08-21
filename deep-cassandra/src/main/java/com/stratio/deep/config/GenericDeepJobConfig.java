@@ -46,10 +46,10 @@ import static com.stratio.deep.utils.Utils.quote;
 
 /**
  * Base class for all config implementations providing default implementations for methods
- * defined in {@link com.stratio.deep.config.IDeepJobConfig}.
+ * defined in {@link com.stratio.deep.config.ICassandraDeepJobConfig}.
  */
-public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implements AutoCloseable {
-    private static final Logger LOG = Logger.getLogger("com.stratio.deep.config.GenericDeepJobConfig");
+public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassandraDeepJobConfig<T> {
+    private static final Logger LOG = Logger.getLogger("com.stratio.deep.config.GenericICassandraDeepJobConfig");
     private static final long serialVersionUID = -7179376653643603038L;
     private String partitionerClassName = "org.apache.cassandra.dht.Murmur3Partitioner";
 
@@ -138,7 +138,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
      * {@inheritDoc}
      */
 
-    public DeepJobConfig<T> session(Session session) {
+    public ICassandraDeepJobConfig<T> session(Session session) {
         this.session = session;
         return this;
     }
@@ -187,7 +187,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
      */
     protected void checkInitialized() {
         if (!isInitialized) {
-            throw new DeepIllegalAccessException("DeepJobConfig has not been initialized!");
+            throw new DeepIllegalAccessException("ICassandraDeepJobConfig has not been initialized!");
         }
     }
 
@@ -331,25 +331,25 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
     }
 
     /* (non-Javadoc)
-     * @see com.stratio.deep.config.IDeepJobConfig#columnFamily(java.lang.String)
+     * @see com.stratio.deep.config.IICassandraDeepJobConfig#columnFamily(java.lang.String)
      */
 
-    public DeepJobConfig<T> columnFamily(String columnFamily) {
+    public ICassandraDeepJobConfig<T> columnFamily(String columnFamily) {
         this.columnFamily = columnFamily;
 
         return this;
     }
 
     /* (non-Javadoc)
-     * @see com.stratio.deep.config.IDeepJobConfig#columnFamily(java.lang.String)
+     * @see com.stratio.deep.config.IICassandraDeepJobConfig#columnFamily(java.lang.String)
      */
 
-    public DeepJobConfig<T> table(String table) {
+    public ICassandraDeepJobConfig<T> table(String table) {
         return columnFamily(table);
     }
 
     /* (non-Javadoc)
-    * @see com.stratio.deep.config.IDeepJobConfig#getColumnFamily()
+    * @see com.stratio.deep.config.IICassandraDeepJobConfig#getColumnFamily()
     */
 
 
@@ -359,7 +359,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
     }
 
     /* (non-Javadoc)
-     * @see com.stratio.deep.config.IDeepJobConfig#getColumnFamily()
+     * @see com.stratio.deep.config.IICassandraDeepJobConfig#getColumnFamily()
      */
 
     public String getTable() {
@@ -367,7 +367,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
     }
 
     /* (non-Javadoc)
-     * @see com.stratio.deep.config.IDeepJobConfig#getHost()
+     * @see com.stratio.deep.config.IICassandraDeepJobConfig#getHost()
      */
 
     public String getHost() {
@@ -382,7 +382,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
     }
 
     /* (non-Javadoc)
-     * @see com.stratio.deep.config.IDeepJobConfig#getKeyspace()
+     * @see com.stratio.deep.config.IICassandraDeepJobConfig#getKeyspace()
      */
 
     public String getKeyspace() {
@@ -397,7 +397,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
     }
 
     /* (non-Javadoc)
-    * @see com.stratio.deep.config.IDeepJobConfig#getPassword()
+    * @see com.stratio.deep.config.IICassandraDeepJobConfig#getPassword()
     */
 
     public String getPassword() {
@@ -406,7 +406,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
     }
 
     /* (non-Javadoc)
-    * @see com.stratio.deep.config.IDeepJobConfig#getRpcPort()
+    * @see com.stratio.deep.config.IICassandraDeepJobConfig#getRpcPort()
     */
 
     public Integer getRpcPort() {
@@ -436,7 +436,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
      * {@inheritDoc}
      */
 
-    public DeepJobConfig<T> host(String hostname) {
+    public ICassandraDeepJobConfig<T> host(String hostname) {
         this.host = hostname;
 
         return this;
@@ -446,7 +446,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
      * {@inheritDoc}
      */
 
-    public DeepJobConfig<T> initialize() {
+    public ICassandraDeepJobConfig<T> initialize() {
         if (isInitialized) {
             return this;
         }
@@ -469,11 +469,23 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
         return this;
     }
 
+    public ICassandraDeepJobConfig<T> initialize(ExtractorConfig deepJobConfig) {
+
+        Map<String, String> values = deepJobConfig.getValues();
+
+        this.username(values.get("user")).host(values.get("host"))
+                .cqlPort(Integer.valueOf(values.get("cqlPort"))).table(values.get("table"))
+                .keyspace(values.get("keyspace")).rpcPort(Integer.valueOf(values.get("rpcPort")));
+        this.initialize();
+
+        return this;
+    }
+
     /**
      * {@inheritDoc}
      */
 
-    public DeepJobConfig<T> inputColumns(String... columns) {
+    public ICassandraDeepJobConfig<T> inputColumns(String... columns) {
         this.inputColumns = columns;
 
         return this;
@@ -483,13 +495,13 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
      * {@inheritDoc}
      */
 
-    public DeepJobConfig<T> keyspace(String keyspace) {
+    public ICassandraDeepJobConfig<T> keyspace(String keyspace) {
         this.keyspace = keyspace;
         return this;
     }
 
 
-    public DeepJobConfig<T> bisectFactor(int bisectFactor) {
+    public ICassandraDeepJobConfig<T> bisectFactor(int bisectFactor) {
         this.bisectFactor = bisectFactor;
         return this;
     }
@@ -498,7 +510,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
      * {@inheritDoc}
      */
 
-    public DeepJobConfig<T> partitioner(String partitionerClassName) {
+    public ICassandraDeepJobConfig<T> partitioner(String partitionerClassName) {
         this.partitionerClassName = partitionerClassName;
         return this;
     }
@@ -508,7 +520,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
      */
 
 
-    public DeepJobConfig<T> password(String password) {
+    public ICassandraDeepJobConfig<T> password(String password) {
         this.password = password;
 
         return this;
@@ -518,7 +530,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
      * {@inheritDoc}
      */
 
-    public DeepJobConfig<T> rpcPort(Integer port) {
+    public ICassandraDeepJobConfig<T> rpcPort(Integer port) {
         this.rpcPort = port;
 
         return this;
@@ -528,7 +540,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
      * {@inheritDoc}
      */
 
-    public DeepJobConfig<T> cqlPort(Integer port) {
+    public ICassandraDeepJobConfig<T> cqlPort(Integer port) {
         this.cqlPort = port;
 
         return this;
@@ -538,7 +550,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
      * {@inheritDoc}
      */
 
-    public DeepJobConfig<T> username(String username) {
+    public ICassandraDeepJobConfig<T> username(String username) {
         this.username = username;
 
         return this;
@@ -663,7 +675,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
      * {@inheritDoc}
      */
 
-    public DeepJobConfig<T> batchSize(int batchSize) {
+    public ICassandraDeepJobConfig<T> batchSize(int batchSize) {
         this.batchSize = batchSize;
         return this;
     }
@@ -680,7 +692,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
      * {@inheritDoc}
      */
 
-    public DeepJobConfig<T> createTableOnWrite(Boolean createTableOnWrite) {
+    public ICassandraDeepJobConfig<T> createTableOnWrite(Boolean createTableOnWrite) {
         this.createTableOnWrite = createTableOnWrite;
 
         return this;
@@ -703,14 +715,14 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
      * {@inheritDoc}
      */
 
-    public DeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue) {
+    public ICassandraDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue) {
         /* check if there's an index specified on the provided column */
         additionalFilters.put(filterColumnName, filterValue);
         return this;
     }
 
 
-    public DeepJobConfig<T> pageSize(int pageSize) {
+    public ICassandraDeepJobConfig<T> pageSize(int pageSize) {
         this.pageSize = pageSize;
         return this;
     }
@@ -735,7 +747,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
      * {@inheritDoc}
      */
 
-    public DeepJobConfig<T> readConsistencyLevel(String level) {
+    public ICassandraDeepJobConfig<T> readConsistencyLevel(String level) {
         this.readConsistencyLevel = level;
 
         return this;
@@ -745,7 +757,7 @@ public abstract class GenericDeepJobConfig<T>  extends DeepJobConfig<T> implemen
      * {@inheritDoc}
      */
 
-    public DeepJobConfig<T> writeConsistencyLevel(String level) {
+    public ICassandraDeepJobConfig<T> writeConsistencyLevel(String level) {
         this.writeConsistencyLevel = level;
         return this;
     }

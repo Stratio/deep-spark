@@ -17,11 +17,10 @@
 package com.stratio.deep.config;
 
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.rdd.CassandraCellRDD;
+import com.stratio.deep.rdd.CassandraCellExtractor;
 import org.apache.hadoop.conf.Configuration;
 
 import java.lang.reflect.Method;
-import java.util.Map;
 
 /**
  * Cell-based configuration object.
@@ -49,7 +48,7 @@ public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
 
     @Override
     public Class<?> getRDDClass() {
-        return CassandraCellRDD.class;
+        return CassandraCellExtractor.class;
     }
 
 
@@ -63,17 +62,7 @@ public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
     }
 
 
-    public CellDeepJobConfig(DeepJobConfig deepJobConfig) {
 
-        Map<String, String> values = deepJobConfig.getValues();
-
-        this.username(values.get("user")).host(values.get("host"))
-                .cqlPort(Integer.valueOf(values.get("cqlPort"))).table(values.get("table"))
-                .keyspace(values.get("keyspace")).rpcPort(Integer.valueOf(values.get("rpcPort")));
-        this.initialize();
-
-
-    }
 
 
 }

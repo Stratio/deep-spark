@@ -1,7 +1,7 @@
 package com.stratio.deep.rdd;
 
 
-import com.stratio.deep.config.DeepJobConfig;
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.extractor.client.ExtractorClient;
 import com.stratio.deep.partition.impl.DeepPartition;
@@ -31,14 +31,14 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
     private transient ExtractorClient<T> extractorClient;
 
 
-    protected Broadcast<DeepJobConfig<T>> config;
+    protected Broadcast<ExtractorConfig<T>> config;
 
-    public DeepRDD(SparkContext sc, DeepJobConfig<T> config) {
+    public DeepRDD(SparkContext sc, ExtractorConfig<T> config) {
         super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config
                 .getEntityClass()));
         this.config =
                 sc.broadcast(config, ClassTag$.MODULE$
-                        .<DeepJobConfig<T>>apply(config.getClass()));
+                        .<ExtractorConfig<T>>apply(config.getClass()));
 
     }
 
@@ -96,7 +96,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         return partitions;
     }
 
-    public Broadcast<DeepJobConfig<T>> getConfig() {
+    public Broadcast<ExtractorConfig<T>> getConfig() {
         return config;
     }
 
