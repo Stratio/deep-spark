@@ -26,7 +26,7 @@ import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.rdd.IDeepPartition;
-import com.stratio.deep.rdd.IDeepRecordReader;
+import com.stratio.deep.extractor.core.IDeepRecordReader;
 import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.commons.lang.ArrayUtils;

@@ -30,7 +30,7 @@ import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.partition.impl.DeepPartitionLocationComparator;
 import com.stratio.deep.rdd.DeepTokenRange;
-import com.stratio.deep.rdd.IDeepRecordReader;
+import com.stratio.deep.extractor.core.IDeepRecordReader;
 import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
