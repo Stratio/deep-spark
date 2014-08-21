@@ -21,6 +21,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import com.stratio.deep.config.CassandraConfigFactory;
+import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.context.DeepSparkContext;
@@ -75,7 +76,7 @@ public final class WritingCellToCassandra {
 
 
         // --- INPUT RDD
-        ICassandraDeepJobConfig<Cells> inputConfig = CassandraConfigFactory.create()
+        DeepJobConfig<Cells> inputConfig = CassandraConfigFactory.create()
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
@@ -106,7 +107,7 @@ public final class WritingCellToCassandra {
 
 
         // --- OUTPUT RDD
-        ICassandraDeepJobConfig<Cells> outputConfig = CassandraConfigFactory.createWriteConfig()
+        DeepJobConfig<Cells> outputConfig = CassandraConfigFactory.createWriteConfig()
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(outputTableName)
                 .createTableOnWrite(true);

@@ -20,6 +20,7 @@ import com.datastax.driver.core.*;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
+import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepGenericException;
@@ -139,7 +140,7 @@ public class RangeUtils {
      * @param config the Deep configuration object.
      * @return the list of computed token ranges.
      */
-    public static List<DeepTokenRange> getSplits(IDeepJobConfig config) {
+    public static List<DeepTokenRange> getSplits(DeepJobConfig config) {
         Map<String, Iterable<Comparable>> tokens = new HashMap<>();
         IPartitioner p = getPartitioner((ICassandraDeepJobConfig) config);
 

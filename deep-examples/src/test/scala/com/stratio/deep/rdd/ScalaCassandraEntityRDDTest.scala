@@ -17,34 +17,15 @@
 package com.stratio.deep.rdd
 
 import com.datastax.driver.core.{Cluster, ResultSet, Row, Session}
-import com.stratio.deep.config.{CassandraConfigFactory, ICassandraDeepJobConfig}
+import com.stratio.deep.config.{CassandraConfigFactory, DeepJobConfig}
 import com.stratio.deep.context.AbstractDeepSparkContextTest
 import com.stratio.deep.embedded.CassandraServer
 import com.stratio.deep.testentity.DeepScalaPageEntity
-import com.stratio.deep.utils.Constants
-import com.stratio.deep.utils.Utils
+import com.stratio.deep.utils.{Constants, Utils}
 import org.apache.spark.Partition
 import org.apache.spark.rdd.RDD
-import org.testng.annotations.{BeforeClass, Test}
-import java.util.List
-import com.datastax.driver.core.Cluster
-import com.datastax.driver.core.ResultSet
-import com.datastax.driver.core.Row
-import com.datastax.driver.core.Session
-import com.stratio.deep.config.CassandraConfigFactory
-import com.stratio.deep.config.ICassandraDeepJobConfig
-import com.stratio.deep.embedded.CassandraServer
-import com.stratio.deep.entity.CassandraCell
-import com.stratio.deep.entity.Cells
-import com.stratio.deep.exception.DeepIOException
-import com.stratio.deep.functions.AbstractSerializableFunction
-import com.stratio.deep.utils.Constants
-import org.apache.log4j.Logger
-import org.apache.spark.rdd.RDD
-import org.testng.annotations.Test
-import scala.Function1
-import scala.reflect.ClassTag$
 import org.testng.Assert._
+import org.testng.annotations.{BeforeClass, Test}
 
 /**
  * Created by luca on 20/03/14.
@@ -52,8 +33,8 @@ import org.testng.Assert._
 @Test(suiteName = "cassandraRddTests", dependsOnGroups = Array("CassandraJavaRDDTest"), groups = Array("ScalaCassandraEntityRDDTest"))
 class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
   private var rdd: RDD[DeepScalaPageEntity] = _
-  private var rddConfig: ICassandraDeepJobConfig[DeepScalaPageEntity] = _
-  private var writeConfig: ICassandraDeepJobConfig[DeepScalaPageEntity] = _
+  private var rddConfig: DeepJobConfig[DeepScalaPageEntity] = _
+  private var writeConfig: DeepJobConfig[DeepScalaPageEntity] = _
   private val OUTPUT_COLUMN_FAMILY: String = "out_scalatest_page"
 
   @BeforeClass
@@ -108,7 +89,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
     checkSimpleTestData()
   }
 
-  private def initWriteConfig(): ICassandraDeepJobConfig[DeepScalaPageEntity] = {
+  private def initWriteConfig(): DeepJobConfig[DeepScalaPageEntity] = {
 
     writeConfig =
       CassandraConfigFactory
@@ -124,7 +105,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
     writeConfig.initialize
   }
 
-  private def initReadConfig(): ICassandraDeepJobConfig[DeepScalaPageEntity] = {
+  private def initReadConfig(): DeepJobConfig[DeepScalaPageEntity] = {
     rddConfig =
       CassandraConfigFactory
         .create(classOf[DeepScalaPageEntity])

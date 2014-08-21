@@ -26,7 +26,6 @@ import org.apache.cassandra.io.util.FileUtils;
 import org.apache.cassandra.service.CassandraDaemon;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.thrift.transport.TTransportException;
 
 import java.io.*;
 import java.util.concurrent.ExecutorService;
@@ -91,7 +90,7 @@ public class CassandraServer {
      *
      * @param resource
      * @param directory
-     * @throws IOException
+     * @throws java.io.IOException
      */
     private static void copy(String resource, String directory) throws IOException {
         mkdir(directory);
@@ -112,7 +111,7 @@ public class CassandraServer {
      * Creates a directory
      *
      * @param dir
-     * @throws IOException
+     * @throws java.io.IOException
      */
     private static void mkdir(String dir) throws IOException {
         FileUtils.createDirectory(dir);
@@ -175,8 +174,8 @@ public class CassandraServer {
     /**
      * Set embedded cassandra up and spawn it in a new thread.
      *
-     * @throws TTransportException
-     * @throws IOException
+     * @throws org.apache.thrift.transport.TTransportException
+     * @throws java.io.IOException
      * @throws InterruptedException
      */
     public void start() throws IOException, InterruptedException, ConfigurationException {

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.CharacterCodingException;
 
+import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import org.apache.cassandra.exceptions.ConfigurationException;
@@ -43,8 +44,8 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     private Logger logger = Logger.getLogger(getClass());
 
     protected RDD<W> rdd;
-    private ICassandraDeepJobConfig<W> rddConfig;
-    private ICassandraDeepJobConfig<W> writeConfig;
+    private DeepJobConfig<W> rddConfig;
+    private DeepJobConfig<W> writeConfig;
 
     protected int testBisectFactor = 8;
 
@@ -58,19 +59,19 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
         return this.rdd;
     }
 
-    protected ICassandraDeepJobConfig<W> getReadConfig() {
+    protected DeepJobConfig<W> getReadConfig() {
         return rddConfig;
     }
 
-    protected ICassandraDeepJobConfig<W> getWriteConfig() {
+    protected DeepJobConfig<W> getWriteConfig() {
         return writeConfig;
     }
 
     protected abstract RDD<W> initRDD();
 
-    protected abstract ICassandraDeepJobConfig<W> initReadConfig();
+    protected abstract DeepJobConfig<W> initReadConfig();
 
-    protected abstract ICassandraDeepJobConfig<W> initWriteConfig();
+    protected abstract DeepJobConfig<W> initWriteConfig();
 
     @BeforeClass
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
