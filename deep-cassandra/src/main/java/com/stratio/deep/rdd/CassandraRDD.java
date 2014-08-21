@@ -41,7 +41,7 @@ import static scala.collection.JavaConversions.asScalaBuffer;
  * Implementors should only provide a way to convert an object of type T to a
  * {@link com.stratio.deep.entity.Cells} element.
  */
-public abstract class CassandraRDD<T> implements IDeepRDD<T> {
+public abstract class CassandraRDD<T> implements IExtractor<T> {
 
 
     IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
