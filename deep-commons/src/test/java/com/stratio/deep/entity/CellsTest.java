@@ -16,6 +16,7 @@
 
 package com.stratio.deep.entity;
 
+import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepGenericExceptionTest;
 import org.testng.annotations.Test;
 
@@ -47,7 +48,7 @@ public class CellsTest {
             cells.add(null);
 
             fail();
-        } catch (DeepGenericExceptionTest dge) {
+        } catch (DeepGenericException dge) {
             // ok
         } catch (Exception e) {
             fail();

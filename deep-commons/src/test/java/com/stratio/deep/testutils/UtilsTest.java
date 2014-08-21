@@ -17,7 +17,9 @@
 package com.stratio.deep.testutils;
 
 import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepGenericExceptionTest;
+import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIOExceptionTest;
 import com.stratio.deep.testentity.CommonsTestEntity;
 import com.stratio.deep.utils.AnnotationUtils;
@@ -116,7 +118,7 @@ public class UtilsTest {
             newTypeInstance(NotInstantiable.class);
 
             fail();
-        } catch (DeepGenericExceptionTest e) {
+        } catch (DeepGenericException e) {
             // OK
         } catch (Exception e) {
             fail();
@@ -180,7 +182,7 @@ public class UtilsTest {
             findSetter("not_existent_field", TestSetterClass.class, BigInteger.class);
 
             fail();
-        } catch (DeepIOExceptionTest e) {
+        } catch (DeepIOException e) {
             // ok;
         }
 
@@ -188,7 +190,7 @@ public class UtilsTest {
             findSetter("description", TestSetterClass.class, String.class);
 
             fail();
-        } catch (DeepIOExceptionTest e) {
+        } catch (DeepIOException e) {
             // ok;
         }
 
