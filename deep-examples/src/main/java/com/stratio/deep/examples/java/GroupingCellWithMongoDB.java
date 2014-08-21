@@ -16,6 +16,7 @@
 
 package com.stratio.deep.examples.java;
 
+import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.config.MongoConfigFactory;
 import com.stratio.deep.context.DeepSparkContext;
@@ -25,9 +26,7 @@ import com.stratio.deep.entity.MongoCell;
 import com.stratio.deep.rdd.mongodb.MongoCellRDD;
 import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
-import com.stratio.deep.testentity.BookEntity;
-import com.stratio.deep.testentity.CantoEntity;
-import com.stratio.deep.testentity.WordCount;
+
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -72,8 +71,8 @@ public final class GroupingCellWithMongoDB {
 	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
-
-        IMongoDeepJobConfig<Cells> inputConfigEntity =
+//TODO review
+       /** DeepJobConfig<Cells> inputConfigEntity =
 				        MongoConfigFactory.createMongoDB().host(host).database(database).collection(inputCollection).initialize();
 
         RDD<Cells> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
@@ -120,6 +119,7 @@ public final class GroupingCellWithMongoDB {
 
         MongoCellRDD.saveCell(outputRDD.rdd(), outputConfigEntity);
 
-        deepContext.stop();
+        deepContext.stop();*/
+
     }
 }

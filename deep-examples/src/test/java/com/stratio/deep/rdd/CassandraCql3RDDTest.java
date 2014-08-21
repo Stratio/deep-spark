@@ -17,24 +17,26 @@
 package com.stratio.deep.rdd;
 
 import java.util.List;
-
+import scala.reflect.ClassTag$;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.CassandraConfigFactory;
-import com.stratio.deep.config.ICassandraDeepJobConfig;
+import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
+
 import com.stratio.deep.testentity.Cql3TestEntity;
 import com.stratio.deep.utils.Constants;
 import org.apache.spark.rdd.RDD;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import scala.Function1;
-import scala.reflect.ClassTag$;
+
 
 import static org.testng.Assert.*;
 
@@ -67,8 +69,8 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
                     && e.getAnimal().equals("monkey")) {
                 assertNull(e.getColor());
                 assertNull(e.getLucene());
-                assertEquals(e.getFood(), "donuts");
-                assertEquals(e.getPassword(), "abc");
+                Assert.assertEquals(e.getFood(), "donuts");
+                Assert.assertEquals(e.getPassword(), "abc");
                 found = true;
                 break;
             }
@@ -119,7 +121,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
         int allElements = entities.length;
         assertTrue(allElements > 1);
 
-        ICassandraDeepJobConfig<Cql3TestEntity> config = CassandraConfigFactory
+        DeepJobConfig<Cql3TestEntity> config = CassandraConfigFactory
                 .create(Cql3TestEntity.class)
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -134,11 +136,11 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
         entities = (Cql3TestEntity[]) otherRDD.collect();
 
         assertEquals(entities.length, 1);
-        assertEquals(entities[0].getFood(), "donuts");
-        assertEquals(entities[0].getName(), "pepito_3");
-        assertEquals(entities[0].getGender(), "male");
-        assertEquals(entities[0].getAge(), Integer.valueOf(-2));
-        assertEquals(entities[0].getAnimal(), "monkey");
+        Assert.assertEquals(entities[0].getFood(), "donuts");
+        Assert.assertEquals(entities[0].getName(), "pepito_3");
+        Assert.assertEquals(entities[0].getGender(), "male");
+        Assert.assertEquals(entities[0].getAge(), Integer.valueOf(-2));
+        Assert.assertEquals(entities[0].getAnimal(), "monkey");
 
         config = CassandraConfigFactory
                 .create(Cql3TestEntity.class)
@@ -216,7 +218,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
     }
 
     @Override
-    protected ICassandraDeepJobConfig<Cql3TestEntity> initReadConfig() {
+    protected DeepJobConfig<Cql3TestEntity> initReadConfig() {
         return CassandraConfigFactory.create(Cql3TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST).bisectFactor(testBisectFactor)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
 				        .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -225,7 +227,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
     }
 
     @Override
-    protected ICassandraDeepJobConfig<Cql3TestEntity> initWriteConfig() {
+    protected com.stratio.deep.config.DeepJobConfig<Cql3TestEntity> initWriteConfig() {
 
         return CassandraConfigFactory.createWriteConfig(Cql3TestEntity.class).host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(OUTPUT_KEYSPACE_NAME)
@@ -236,8 +238,10 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
     @Override
     public void testSaveToCassandra() {
         Function1<Cql3TestEntity, Cql3TestEntity> mappingFunc = new TestEntityAbstractSerializableFunction();
-        RDD<Cql3TestEntity> mappedRDD = getRDD().map(mappingFunc,
-                ClassTag$.MODULE$.<Cql3TestEntity>apply(Cql3TestEntity.class));
+//        ClassTag$.MODULE$.<T>apply(config
+//                .getEntityClass())
+        RDD<Cql3TestEntity> mappedRDD = getRDD().map(mappingFunc, ClassTag$.MODULE$.<Cql3TestEntity>apply(Cql3TestEntity.class));
+
         try {
             executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + CQL3_ENTITY_OUTPUT_COLUMN_FAMILY);
         } catch (Exception e) {
@@ -245,7 +249,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
 
         assertTrue(mappedRDD.count() > 0);
 
-        ICassandraDeepJobConfig<Cql3TestEntity> writeConfig = getWriteConfig();
+        DeepJobConfig<Cql3TestEntity> writeConfig = getWriteConfig();
         writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
@@ -267,7 +271,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
         } catch (Exception e) {
         }
 
-        ICassandraDeepJobConfig<Cql3TestEntity> writeConfig = getWriteConfig();
+        DeepJobConfig<Cql3TestEntity> writeConfig = getWriteConfig();
         writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
@@ -291,7 +295,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
         } catch (Exception e) {
         }
 
-        ICassandraDeepJobConfig<Cql3TestEntity> writeConfig = getWriteConfig();
+        DeepJobConfig<Cql3TestEntity> writeConfig = getWriteConfig();
 
         CassandraRDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
         checkSimpleTestData();

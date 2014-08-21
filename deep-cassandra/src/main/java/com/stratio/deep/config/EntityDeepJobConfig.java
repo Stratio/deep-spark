@@ -53,7 +53,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
      * {@inheritDoc}
      */
     @Override
-    public ICassandraDeepJobConfig<T> initialize() {
+    public DeepJobConfig<T> initialize() {
         super.initialize();
 
         Map<String, String> tmpMap = new HashMap<>();
@@ -77,12 +77,12 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         return null;
     }
 
-    @Override
+
     public Method getSaveMethod() throws NoSuchMethodException {
         return null;
     }
 
-    @Override
+
     public Configuration getHadoopConfiguration() {
         return null;
     }

@@ -63,8 +63,9 @@ public final class WritingEntityToMongoDB {
 	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
+        //TODO Review
 
-        IMongoDeepJobConfig<MessageEntity> inputConfigEntity =
+    /*    IMongoDeepJobConfig<MessageEntity> inputConfigEntity =
 				        MongoConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(inputCollection).readPreference(readPreference).initialize();
 
         RDD<MessageEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
@@ -77,7 +78,7 @@ public final class WritingEntityToMongoDB {
         MongoEntityRDD.saveEntity(inputRDDEntity, outputConfigEntityPruebaGuardado);
 
 
-        deepContext.stop();
+        deepContext.stop();*/
     }
 
 

@@ -52,12 +52,12 @@ public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
         return CassandraCellRDD.class;
     }
 
-    @Override
+
     public Method getSaveMethod() throws NoSuchMethodException {
         return null;
     }
 
-    @Override
+
     public Configuration getHadoopConfiguration() {
         return null;
     }

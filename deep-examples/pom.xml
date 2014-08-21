@@ -37,7 +37,7 @@
     <dependencies>
         <dependency>
             <groupId>com.stratio.deep</groupId>
-            <artifactId>deep-cassandra</artifactId>
+            <artifactId>deep-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -45,6 +45,12 @@
             <artifactId>deep-spark</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.stratio.deep</groupId>
+            <artifactId>deep-cassandra</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.stratio.deep</groupId>
             <artifactId>deep-mongodb</artifactId>

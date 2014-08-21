@@ -16,135 +16,85 @@
 
 package com.stratio.deep.rdd;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.*;
-
-import com.google.common.io.Resources;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.datastax.driver.core.querybuilder.Batch;
-import com.datastax.driver.core.querybuilder.Insert;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.stratio.deep.config.CassandraConfigFactory;
+import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
+import com.stratio.deep.entity.CassandraCell;
+import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.testentity.Cql3CollectionsTestEntity;
 import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import scala.Function1;
 import scala.reflect.ClassTag$;
 
-import static com.stratio.deep.utils.Utils.quote;
 import static org.testng.Assert.*;
 
 /**
- * Integration tests for entity RDDs where cells contain Cassandra's collections.
+ * Integration tests for generic cell RDDs where cells contain Cassandra's collections.
  */
-@Test(suiteName = "cassandraRddTests", dependsOnGroups = "ScalaCassandraEntityRDDTest",
-        groups = "CassandraCollectionsEntityTest")
-public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3CollectionsTestEntity> {
-
-    private static Logger logger = Logger.getLogger(CassandraCollectionsEntityTest.class);
-
+@Test(suiteName = "cassandraRddTests", dependsOnGroups = "CassandraCollectionsEntityTest",
+        groups = "CassandraCollectionsCellsTest")
+public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
     @BeforeClass
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
             InterruptedException {
         super.initServerAndRDD();
 
-        loadCollectionsData();
-    }
-
-    static void loadCollectionsData() {
-        truncateCf(KEYSPACE_NAME, CQL3_COLLECTION_COLUMN_FAMILY);
-
-        URL cql3TestData = Resources.getResource("cql3_collections_test_data.csv");
-
-        Batch batch = QueryBuilder.batch();
-
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(
-                cql3TestData.toURI()))))) {
-            String line;
-
-            int idx = 0;
-            final int emailsStartPos = 3;
-
-            while ((line = br.readLine()) != null) {
-                String[] fields = line.split(",");
-
-                Set<String> emails = new HashSet<String>();
-                List<String> phones = new ArrayList<String>();
-                Map<UUID, Integer> uuid2id = new HashMap<>();
-
-                for (int k = emailsStartPos; k < emailsStartPos + 2; k++) {
-                    emails.add(fields[k]);
-                }
-
-                for (int k = emailsStartPos + 2; k < emailsStartPos + 4; k++) {
-                    phones.add(fields[k]);
-                }
-
-                UUID uuid = UUID.fromString(fields[emailsStartPos + 4]);
-                Integer id = Integer.parseInt(fields[0]);
-
-                uuid2id.put(uuid, id);
-
-                Insert stmt = QueryBuilder.insertInto(CQL3_COLLECTION_COLUMN_FAMILY).values(
-                        new String[]{"id", "first_name", "last_name", "emails", "phones", "uuid2id"},
-                        new Object[]{Integer.parseInt(fields[0]), fields[1], fields[2], emails, phones, uuid2id});
-
-                batch.add(stmt);
-                ++idx;
-            }
-
-            logger.debug("idx: " + idx);
-        } catch (Exception e) {
-            logger.error("Error", e);
-        }
-
-
-        Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
-                .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
-        Session session = cluster.connect(quote(KEYSPACE_NAME));
-        session.execute(batch);
+        CassandraCollectionsEntityTest.loadCollectionsData();
     }
 
     @Override
-    protected void checkComputedData(Cql3CollectionsTestEntity[] entities) {
+    protected void checkComputedData(Cells[] entities) {
 
         boolean found = false;
 
         assertEquals(entities.length, 500);
 
-        for (Cql3CollectionsTestEntity e : entities) {
-            if (e.getId().equals(470)) {
-                assertEquals(e.getFirstName(), "Amalda");
-                assertEquals(e.getLastName(), "Banks");
-                assertNotNull(e.getEmails());
-                assertEquals(e.getEmails().size(), 2);
-                assertEquals(e.getPhones().size(), 2);
-                assertEquals(e.getUuid2id().size(), 1);
-                assertEquals(e.getUuid2id().get(UUID.fromString("AE47FBFD-A086-47C2-8C73-77D8A8E99F35")),
+	    String keyspace = getReadConfig().getKeyspace();
+
+        for (Cells e : entities) {
+            Integer id = (Integer) e.getCellByName("id").getCellValue();
+
+            if (id.equals(470)) {
+                String firstName = (String) e.getCellByName("first_name").getCellValue();
+                String lastName = (String) e.getCellByName("last_name").getCellValue();
+
+                Collection<String> emails = (Collection<String>) e.getCellByName("emails").getCellValue();
+                Collection<String> phones = (Collection<String>) e.getCellByName("phones").getCellValue();
+                Map<UUID, Integer> uuid2id = (Map<UUID, Integer>) e.getCellByName("uuid2id").getCellValue();
+
+                assertEquals(firstName, "Amalda");
+                assertEquals(lastName, "Banks");
+                assertNotNull(emails);
+                assertEquals(emails.size(), 2);
+                assertEquals(phones.size(), 2);
+                assertEquals(uuid2id.size(), 1);
+                assertEquals(uuid2id.get(UUID.fromString("AE47FBFD-A086-47C2-8C73-77D8A8E99F35")),
                         Integer.valueOf(470));
 
-                Iterator<String> emails = e.getEmails().iterator();
-                Iterator<String> phones = e.getPhones().iterator();
+                Iterator<String> emailsIter = emails.iterator();
+                Iterator<String> phonesIter = phones.iterator();
 
-                assertEquals(emails.next(), "AmaldaBanks@teleworm.us");
-                assertEquals(emails.next(), "MarcioColungaPichardo@dayrep.com");
+                assertEquals(emailsIter.next(), "AmaldaBanks@teleworm.us");
+                assertEquals(emailsIter.next(), "MarcioColungaPichardo@dayrep.com");
 
-                assertEquals(phones.next(), "801-527-1039");
-                assertEquals(phones.next(), "925-348-9339");
+                assertEquals(phonesIter.next(), "801-527-1039");
+                assertEquals(phonesIter.next(), "925-348-9339");
                 found = true;
                 break;
             }
@@ -153,7 +103,6 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
         if (!found) {
             fail();
         }
-
     }
 
     @Override
@@ -193,28 +142,26 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
         assertEquals(uuid2id.get(UUID.fromString("BAB7F03E-0D9F-4466-BD8A-5F7373802610")).intValue(), 351);
 
         session.close();
-
     }
 
     @Override
-    protected RDD<Cql3CollectionsTestEntity> initRDD() {
+    protected RDD<Cells> initRDD() {
         return context.createRDD(getReadConfig());
     }
 
     @Override
-    protected ICassandraDeepJobConfig<Cql3CollectionsTestEntity> initReadConfig() {
-        ICassandraDeepJobConfig<Cql3CollectionsTestEntity> config = CassandraConfigFactory.create(Cql3CollectionsTestEntity.class)
+    protected DeepJobConfig<Cells> initReadConfig() {
+        DeepJobConfig<Cells> config = CassandraConfigFactory.create()
                 .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).bisectFactor(testBisectFactor)
-                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME)
-				        .pageSize(DEFAULT_PAGE_SIZE).columnFamily(CQL3_COLLECTION_COLUMN_FAMILY);
+				        .pageSize(DEFAULT_PAGE_SIZE).cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily
+                        (CQL3_COLLECTION_COLUMN_FAMILY);
 
         return config.initialize();
     }
 
     @Override
-    protected ICassandraDeepJobConfig<Cql3CollectionsTestEntity> initWriteConfig() {
-        ICassandraDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = CassandraConfigFactory.createWriteConfig
-				        (Cql3CollectionsTestEntity.class)
+    protected DeepJobConfig<Cells> initWriteConfig() {
+        DeepJobConfig<Cells> writeConfig = CassandraConfigFactory.createWriteConfig()
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
@@ -227,13 +174,11 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
 
     @Override
     public void testSaveToCassandra() {
-
-        Function1<Cql3CollectionsTestEntity, Cql3CollectionsTestEntity> mappingFunc =
+        Function1<Cells, Cells> mappingFunc =
                 new TestEntityAbstractSerializableFunction();
 
-        RDD<Cql3CollectionsTestEntity> mappedRDD =
-                getRDD().map(mappingFunc, ClassTag$.MODULE$.<Cql3CollectionsTestEntity>apply
-                        (Cql3CollectionsTestEntity.class));
+        RDD<Cells> mappedRDD =
+                getRDD().map(mappingFunc, ClassTag$.MODULE$.<Cells>apply(Cql3CollectionsTestEntity.class));
 
         try {
             executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
@@ -242,7 +187,7 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
 
         assertTrue(mappedRDD.count() > 0);
 
-        ICassandraDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = getWriteConfig();
+        DeepJobConfig<Cells> writeConfig = getWriteConfig();
         writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
@@ -251,7 +196,6 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
             fail();
         } catch (DeepIOException e) {
             // ok
-            logger.info("Correctly catched DeepIOException: " + e.getMessage());
             writeConfig.createTableOnWrite(Boolean.TRUE);
         }
 
@@ -302,7 +246,7 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
 
     @Override
     public void testSimpleSaveToCassandra() {
-        ICassandraDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = getWriteConfig();
+        DeepJobConfig<Cells> writeConfig = getWriteConfig();
         writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
@@ -316,7 +260,6 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
             fail();
         } catch (Exception e) {
             // ok
-            logger.info("Correctly catched Exception: " + e.getMessage());
             writeConfig.createTableOnWrite(Boolean.TRUE);
         }
 
@@ -327,50 +270,55 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
 
     @Override
     public void testCql3SaveToCassandra() {
-
         try {
             executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
         } catch (Exception e) {
         }
 
-        ICassandraDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = getWriteConfig();
+        DeepJobConfig<Cells> writeConfig = getWriteConfig();
 
         CassandraRDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
         checkSimpleTestData();
-
     }
 
     private static class TestEntityAbstractSerializableFunction extends
-            AbstractSerializableFunction<Cql3CollectionsTestEntity, Cql3CollectionsTestEntity> {
+            AbstractSerializableFunction<Cells, Cells> {
 
         private static final long serialVersionUID = -1555102599662015841L;
 
         @Override
-        public Cql3CollectionsTestEntity apply(Cql3CollectionsTestEntity e) {
-            Cql3CollectionsTestEntity out = new Cql3CollectionsTestEntity();
+        public Cells apply(Cells e) {
+            Cell id = e.getCellByName("id");
+            Cell fn = e.getCellByName("first_name");
+            Cell ln = e.getCellByName("last_name");
+            Cell em = e.getCellByName("emails");
+            Cell ph = e.getCellByName("phones");
+            Cell uu = e.getCellByName("uuid2id");
 
-            out.setId(e.getId());
-            out.setFirstName(e.getFirstName() + "_out");
-            out.setLastName(e.getLastName() + "_out");
+            Cell newid = CassandraCell.create(id, id.getCellValue());
 
-            Set<String> emails = e.getEmails();
+            Cell newfn = CassandraCell.create(fn, fn.getCellValue() + "_out");
+
+            Cell newln = CassandraCell.create(ln, ln.getCellValue() + "_out");
+
+            Set<String> emails = (Set<String>) em.getCellValue();
             emails.add("klv@email.com");
 
-            out.setEmails(emails);
+            Cell newem = CassandraCell.create(em, emails);
 
-            List<String> phones = e.getPhones();
+            List<String> phones = (List<String>) ph.getCellValue();
             phones.add("111-111-1111112");
 
-            out.setPhones(phones);
+            Cell newph = CassandraCell.create(ph, phones);
 
-            Map<UUID, Integer> uuid2id = e.getUuid2id();
+            Map<UUID, Integer> uuid2id = (Map<UUID, Integer>) uu.getCellValue();
             for (Map.Entry<UUID, Integer> entry : uuid2id.entrySet()) {
                 entry.setValue(entry.getValue() + 10);
             }
+            Cell newuu = CassandraCell.create(uu, uuid2id);
 
-            out.setUuid2id(uuid2id);
-
-            return out;
+            return new Cells(e.getDefaultTableName(), newid, newfn, newln, newem, newph, newuu);
         }
     }
+
 }

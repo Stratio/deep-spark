@@ -29,6 +29,7 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.CassandraConfigFactory;
+import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
@@ -47,6 +48,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import scala.Tuple2;
@@ -61,7 +63,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     private Logger logger = Logger.getLogger(getClass());
 
     private JavaRDD<TestEntity> rdd;
-    protected ICassandraDeepJobConfig<TestEntity> rddConfig;
+    protected DeepJobConfig<TestEntity> rddConfig;
 
     JavaRDD<TestEntity> slowPages = null;
     JavaRDD<TestEntity> quickPages = null;
@@ -108,9 +110,9 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
         for (TestEntity e : entities) {
             if (e.getId().equals("e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7")) {
-                assertEquals(e.getUrl(), "http://11870.com/k/es/de");
-                assertEquals(e.getResponseTime(), new Integer(421));
-                assertEquals(e.getDownloadTime(), new Long(1380802049275L));
+                Assert.assertEquals(e.getUrl(), "http://11870.com/k/es/de");
+                Assert.assertEquals(e.getResponseTime(), new Integer(421));
+                Assert.assertEquals(e.getDownloadTime(), new Long(1380802049275L));
                 found = true;
                 break;
             }

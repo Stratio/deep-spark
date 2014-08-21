@@ -16,6 +16,7 @@
 
 package com.stratio.deep.examples.java;
 
+import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.config.MongoConfigFactory;
 import com.stratio.deep.context.DeepSparkContext;
@@ -74,7 +75,8 @@ public final class ReadingEntityFromMongoDBReplicaSet {
 
 
         // can give a list of host.
-        IMongoDeepJobConfig inputConfigEntity = MongoConfigFactory.createMongoDB(MessageEntity.class).host(host1).host(host2).host(host3)
+        //TODO Review
+   /**     DeepJobConfig inputConfigEntity = MongoConfigFactory.createMongoDB(MessageEntity.class).host(host1).host(host2).host(host3)
                 .database(database).collection(inputCollection).replicaSet(replicaSet).readPreference(readPreference).initialize();
 
 
@@ -85,6 +87,6 @@ public final class ReadingEntityFromMongoDBReplicaSet {
         LOG.info("count : " + inputRDDEntity.cache().count());
 
 
-        deepContext.stop();
+        deepContext.stop();**/
     }
 }

@@ -18,6 +18,7 @@ package com.stratio.deep.examples.java;
 
 import java.util.List;
 
+import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.config.MongoConfigFactory;
 import com.stratio.deep.context.DeepSparkContext;
@@ -57,8 +58,9 @@ public final class ReadingEntityFromMongoDB {
 	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
-
-        IMongoDeepJobConfig<MessageEntity> inputConfigEntity =
+        //TODO review
+/**
+        DeepJobConfig<MessageEntity> inputConfigEntity =
 				        MongoConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(inputCollection).initialize();
 
         RDD<MessageEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
@@ -68,5 +70,6 @@ public final class ReadingEntityFromMongoDB {
         LOG.info("count : " + inputRDDEntity.first());
 
         deepContext.stop();
+ **/
     }
 }

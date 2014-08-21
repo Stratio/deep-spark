@@ -25,9 +25,7 @@ import com.stratio.deep.config.MongoConfigFactory;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
 import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
-import com.stratio.deep.testentity.BookEntity;
-import com.stratio.deep.testentity.CantoEntity;
-import com.stratio.deep.testentity.WordCount;
+
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -69,7 +67,9 @@ public final class GroupingEntityWithMongoDB {
                 p.getJars());
 
 
-        IMongoDeepJobConfig<BookEntity> inputConfigEntity =
+        //TODO REVIEW
+
+    /*    IMongoDeepJobConfig<BookEntity> inputConfigEntity =
 				        MongoConfigFactory.createMongoDB(BookEntity.class).host(host).database(database).collection(inputCollection).initialize();
 
         RDD<BookEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
@@ -114,6 +114,6 @@ public final class GroupingEntityWithMongoDB {
 
         MongoEntityRDD.saveEntity(outputRDD.rdd(),outputConfigEntity);
 
-        deepContext.stop();
+        deepContext.stop(); */
     }
 }

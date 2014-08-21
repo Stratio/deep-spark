@@ -71,7 +71,7 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
      */
     @SuppressWarnings("unchecked")
     public static <W, T extends IDeepType> void cql3SaveRDDToCassandra(RDD<W> rdd,
-                                                                       ICassandraDeepJobConfig<W> writeConfig) {
+                                                                       DeepJobConfig<W> writeConfig) {
         if (IDeepType.class.isAssignableFrom(writeConfig.getEntityClass())) {
             ICassandraDeepJobConfig<T> c = (ICassandraDeepJobConfig<T>) writeConfig;
             RDD<T> r = (RDD<T>) rdd;
@@ -97,7 +97,7 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
      */
     @SuppressWarnings("unchecked")
     public static <W, T extends IDeepType> void saveRDDToCassandra(RDD<W> rdd,
-                                                                   ICassandraDeepJobConfig<W> writeConfig) {
+                                                                   DeepJobConfig<W> writeConfig) {
         if (IDeepType.class.isAssignableFrom(writeConfig.getEntityClass())) {
             ICassandraDeepJobConfig<T> c = (ICassandraDeepJobConfig<T>) writeConfig;
             RDD<T> r = (RDD<T>) rdd;
@@ -121,7 +121,7 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
      * @param writeConfig the write configuration object.
      * @param <W>         the generic type associated to the provided configuration object.
      */
-    public static <W> void saveRDDToCassandra(JavaRDD<W> rdd, ICassandraDeepJobConfig<W> writeConfig) {
+    public static <W> void saveRDDToCassandra(JavaRDD<W> rdd, DeepJobConfig<W> writeConfig) {
         saveRDDToCassandra(rdd.rdd(), writeConfig);
     }
 
@@ -243,4 +243,6 @@ public abstract class CassandraRDD<T> implements IDeepRDD<T> {
 
     }
 
+    public static void saveRDDToCassandra(JavaRDD<Cells> outRDD, ICassandraDeepJobConfig<Cells> writeConfig) {
+    }
 }

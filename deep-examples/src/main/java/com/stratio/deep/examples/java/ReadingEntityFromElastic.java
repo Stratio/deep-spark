@@ -16,17 +16,17 @@
 
 package com.stratio.deep.examples.java;
 
-import com.stratio.deep.config.ESConfigFactory;
-import com.stratio.deep.config.IESDeepJobConfig;
+
+import com.stratio.deep.config.DeepJobConfig;
 import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.context.ESDeepSparkContext;
+
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.ESCell;
-import com.stratio.deep.rdd.ESEntityRDD;
-import com.stratio.deep.testentity.TweetES;
+
+
+
 import com.stratio.deep.testutils.ContextProperties;
-import com.stratio.deep.utils.UtilES;
+
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import org.json.simple.JSONObject;
@@ -60,13 +60,14 @@ public final class ReadingEntityFromElastic {
         String database = "twitter/tweet";
         String inputCollection = "input";
 
+        //TODO Review ES* classes not fount in project
         // Creating the Deep Context where args are Spark Master and Job Name
-        ContextProperties p = new ContextProperties(args);
+       /* ContextProperties p = new ContextProperties(args);
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
 
-        IESDeepJobConfig<Cells> inputConfigEntity =
+        DeepJobConfig<Cells> inputConfigEntity =
                 ESConfigFactory.createES()
                         .filterQuery("?q=user:ricardo")
                         .database(database)
@@ -136,6 +137,6 @@ public final class ReadingEntityFromElastic {
         LOG.info("count : " + inputRDDEntity2.first());
 
         deepContext.saveRDD(inputRDDEntity2, outputConfigEntity2);
-        deepContext.stop();
+        deepContext.stop();*/
     }
 }
