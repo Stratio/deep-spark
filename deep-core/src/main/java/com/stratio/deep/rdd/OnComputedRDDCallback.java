@@ -12,9 +12,9 @@ import scala.runtime.AbstractFunction0;
  * @author Luca Rosellini <luca@strat.io>
  */
 public class OnComputedRDDCallback<T> extends AbstractFunction0<T> {
-    private final ExtractorClient<T> extractorClient;
+    private final IExtractorClient<T> extractorClient;
 
-    public OnComputedRDDCallback(ExtractorClient<T> extractorClient) {
+    public OnComputedRDDCallback(IExtractorClient<T> extractorClient) {
         super();
         this.extractorClient = extractorClient;
     }

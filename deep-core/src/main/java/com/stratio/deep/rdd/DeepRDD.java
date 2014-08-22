@@ -2,6 +2,7 @@ package com.stratio.deep.rdd;
 
 
 import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.exception.DeepExtractorinitializationException;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.extractor.client.ExtractorClient;
 import com.stratio.deep.partition.impl.DeepPartition;
@@ -27,7 +28,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
 
     private static final long serialVersionUID = -5360986039609466526L;
 
-    private transient ExtractorClient<T> extractorClient;
+    private transient IExtractorClient<T> extractorClient;
 
     protected Broadcast<ExtractorConfig<T>> config;
 
@@ -42,13 +43,9 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
                 sc.broadcast(config, ClassTag$.MODULE$
                         .<ExtractorConfig<T>>apply(config.getClass()));
 
-        try {
-            ExtractorClient<T> extractor = new ExtractorClient<>();
-            extractor.initialize();
-        } catch (SSLException | InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        
+            initExtractorClient();
+
     }
 
     public DeepRDD(SparkContext sc, Class entityClass) {
@@ -106,7 +103,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
                 extractorClient = new ExtractorClient<>();
                 extractorClient.initialize();
             }
-        } catch (SSLException | InterruptedException e) {
+        } catch (DeepExtractorinitializationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

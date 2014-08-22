@@ -16,8 +16,10 @@ package com.stratio.deep.extractor.client;
 
 
 import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.exception.DeepExtractorinitializationException;
 import com.stratio.deep.rdd.DeepTokenRange;
-import com.stratio.deep.rdd.IDeepRDD;
+
+import com.stratio.deep.rdd.IExtractorClient;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -32,7 +34,7 @@ import javax.net.ssl.SSLException;
  * Sends a list of continent/city pairs to a {@link } to get the local times of the
  * specified cities.
  */
-public class ExtractorClient<T> implements IDeepRDD<T> {
+public class ExtractorClient<T> implements IExtractorClient<T> {
 
     static final boolean SSL = System.getProperty("ssl") != null;
 
@@ -45,24 +47,31 @@ public class ExtractorClient<T> implements IDeepRDD<T> {
 
     private ExtractorClientHandler<T> handler;
 
-    public void initialize() throws SSLException, InterruptedException {
+    public void initialize() throws DeepExtractorinitializationException {
+        try {
+            // Configure SSL.
+            final SslContext sslCtx;
+            if (SSL) {
 
-        // Configure SSL.
-        final SslContext sslCtx;
-        if (SSL) {
-            sslCtx = SslContext.newClientContext(InsecureTrustManagerFactory.INSTANCE);
-        } else {
-            sslCtx = null;
+                    sslCtx = SslContext.newClientContext(InsecureTrustManagerFactory.INSTANCE);
+
+            } else {
+                sslCtx = null;
+            }
+
+            Bootstrap b = new Bootstrap();
+            b.group(group).channel(NioSocketChannel.class).handler(new ExtractorClientInitializer<T>(sslCtx));
+
+            // Make a new connection.
+            this.ch = b.connect(HOST, PORT).sync().channel();
+
+            // Get the handler instance to initiate the request.
+            this.handler = ch.pipeline().get(ExtractorClientHandler.class);
+        } catch (SSLException | InterruptedException e) {
+            //TODO
+            throw new DeepExtractorinitializationException(e);
+
         }
-
-        Bootstrap b = new Bootstrap();
-        b.group(group).channel(NioSocketChannel.class).handler(new ExtractorClientInitializer<T>(sslCtx));
-
-        // Make a new connection.
-        this.ch = b.connect(HOST, PORT).sync().channel();
-
-        // Get the handler instance to initiate the request.
-        this.handler = ch.pipeline().get(ExtractorClientHandler.class);
     }
 
     public void finish() {
