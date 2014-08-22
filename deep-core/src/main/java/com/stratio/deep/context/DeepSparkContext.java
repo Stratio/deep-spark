@@ -22,12 +22,10 @@ import com.stratio.deep.rdd.DeepJavaRDD;
 import com.stratio.deep.rdd.DeepRDD;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
 
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
@@ -95,6 +93,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String[] jars,
                             Map<String, String> environment) {
+
         super(master, appName, sparkHome, jars, environment);
     }
 
@@ -104,25 +103,29 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * @param <T>
      * @return
      */
-    public <T> RDD<T> createRDD(final ExtractorConfig deepJobConfig) {
-        try {
+    public <T> DeepRDD<T> createRDD(final ExtractorConfig deepJobConfig) {
+        // try {
 
-            Class rdd = deepJobConfig.getRDDClass();
-            final Constructor c = rdd.getConstructor();
-            if (deepJobConfig.getInputFormatClass() != null) {
-                return null;
+        Class rdd = deepJobConfig.getRDDClass();
+        //final Constructor c = rdd.getConstructor();
+
+
+        if (deepJobConfig.getInputFormatClass() != null) {
+            return null; //TODO review
 //        return new DeepGenericHadoopRDD(this.sc(), deepJobConfig, deepJobConfig.getInputFormatClass(),
 //            (IDeepHadoopRDD) c.newInstance(), ClassTag$.MODULE$.<Cells>apply(deepJobConfig
 //                .getEntityClass()), ClassTag$.MODULE$.Any(), ClassTag$.MODULE$.Any());
-            } else {
+        } else {
 
-                return new DeepRDD<T>(this.sc(), deepJobConfig);
-            }
+            return new DeepRDD(this.sc(), deepJobConfig);
 
-        } catch (NoSuchMethodException e) {
-            LOG.error("impossible to instance IDeepJobConfig, check configuration");
-            throw new DeepInstantiationException(e.getMessage());
         }
+
+        //  } catch (NoSuchMethodException e) {
+//            String message = "impossible to instance IDeepJobConfig, check configuration. ";
+        //           LOG.error(message);
+        //          throw new DeepInstantiationException(message+e.getMessage(),e);
+        //      }
 
     }
 
@@ -131,14 +134,12 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * @param <T>
      * @return
      */
-    public <T> JavaRDD<T> createJavaRDD(
-            ExtractorConfig<T> deepJobConfig) {
+    public <T> DeepJavaRDD<T> createJavaRDD(ExtractorConfig<T> deepJobConfig) {
         return new DeepJavaRDD((DeepRDD<T>) createRDD(deepJobConfig));
     }
 
 
-    public <T, S extends IDeepJobConfig<?, ?>> void saveRDD(RDD<T> rdd,
-                                                            IDeepJobConfig<T, S> deepJobConfig) {
+    public <T, S extends IDeepJobConfig<?, ?>> void saveRDD(RDD<T> rdd, IDeepJobConfig<T, S> deepJobConfig) {
         try {
             deepJobConfig.getSaveMethod().invoke(null, rdd, deepJobConfig);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
