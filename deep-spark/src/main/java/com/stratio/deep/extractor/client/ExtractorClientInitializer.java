@@ -33,7 +33,7 @@ public class ExtractorClientInitializer<T> extends ChannelInitializer<SocketChan
     public void initChannel(SocketChannel ch) {
         ChannelPipeline p = ch.pipeline();
         if (sslCtx != null) {
-            p.addLast(sslCtx.newHandler(ch.alloc(), ExtractorClient.HOST, ExtractorClient.PORT));
+            p.addLast(sslCtx.newHandler(ch.alloc(), ExtractorClientBack.HOST, ExtractorClientBack.PORT));
         }
 
         p.addLast(new ResponseDecoder());

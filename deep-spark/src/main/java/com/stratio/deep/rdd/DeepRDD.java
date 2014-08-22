@@ -1,23 +1,27 @@
 package com.stratio.deep.rdd;
 
 
-import com.stratio.deep.config.ExtractorConfig;
-import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.extractor.client.ExtractorClient;
-import com.stratio.deep.partition.impl.DeepPartition;
+import static scala.collection.JavaConversions.asScalaIterator;
+
+import java.io.Serializable;
+
+import javax.net.ssl.SSLException;
+
 import org.apache.spark.InterruptibleIterator;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.rdd.RDD;
+
 import scala.collection.Iterator;
 import scala.reflect.ClassTag$;
 
-import javax.net.ssl.SSLException;
-import java.io.Serializable;
-
-import static scala.collection.JavaConversions.asScalaIterator;
+import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.exception.DeepIOException;
+import com.stratio.deep.extractor.client.ExtractorClient;
+import com.stratio.deep.extractor.client.ExtractorClientBack;
+import com.stratio.deep.partition.impl.DeepPartition;
 
 
 /**
@@ -103,16 +107,8 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
 
     private void initExtractorClient(){
         if (extractorClient == null) {
-            extractorClient = new ExtractorClient<>();
-            try {
-                extractorClient.initialize();
-            } catch (SSLException | InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            extractorClient = new ExtractorClient("172.19.0.249:2552", org$apache$spark$rdd$RDD$$evidence$1);
         }
 
     }
-
-
 }

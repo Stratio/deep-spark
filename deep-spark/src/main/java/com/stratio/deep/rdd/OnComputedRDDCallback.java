@@ -1,7 +1,9 @@
 package com.stratio.deep.rdd;
 
-import com.stratio.deep.extractor.client.ExtractorClient;
 import scala.runtime.AbstractFunction0;
+
+import com.stratio.deep.extractor.client.ExtractorClient;
+import com.stratio.deep.extractor.client.ExtractorClientBack;
 
 /**
  * Helper callback class called by Spark when the current RDD is computed successfully. This class

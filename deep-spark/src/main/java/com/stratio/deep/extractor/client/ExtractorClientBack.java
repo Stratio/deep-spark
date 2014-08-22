@@ -31,7 +31,7 @@ import javax.net.ssl.SSLException;
  * Sends a list of continent/city pairs to a {@link } to get the local times of the
  * specified cities.
  */
-public class ExtractorClient<T> implements IExtractor<T> {
+public class ExtractorClientBack<T> implements IExtractor<T> {
 
     static final boolean SSL = System.getProperty("ssl") != null;
     //  static final String HOST = System.getProperty("host", "172.19.0.133");
