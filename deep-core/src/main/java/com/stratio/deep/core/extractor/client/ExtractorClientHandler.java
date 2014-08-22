@@ -12,7 +12,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.stratio.deep.extractor.client;
+package com.stratio.deep.core.extractor.client;
 
 
 import com.stratio.deep.config.ExtractorConfig;
@@ -21,6 +21,8 @@ import com.stratio.deep.extractor.response.GetPartitionsResponse;
 import com.stratio.deep.extractor.response.HasNextResponse;
 import com.stratio.deep.extractor.response.NextResponse;
 import com.stratio.deep.extractor.response.Response;
+import com.stratio.deep.extractor.actions.HasNextAction;
+import com.stratio.deep.extractor.actions.InitIteratorAction;
 import com.stratio.deep.rdd.DeepTokenRange;
 import com.stratio.deep.rdd.IDeepRDD;
 import io.netty.channel.Channel;

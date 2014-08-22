@@ -1,4 +1,4 @@
-package com.stratio.deep.rdd;
+package com.stratio.deep.core.rdd;
 
 import com.stratio.deep.config.IDeepJobConfig;
 import org.apache.spark.broadcast.Broadcast;

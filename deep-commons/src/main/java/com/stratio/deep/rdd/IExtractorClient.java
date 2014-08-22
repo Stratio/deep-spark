@@ -20,8 +20,7 @@ public interface IExtractorClient<T> extends Serializable {
 
     void close();
 
-    void initIterator(final DeepTokenRange dp,
-                      ExtractorConfig<T> config);
+    void initIterator(final DeepTokenRange dp,    ExtractorConfig<T> config);
 
     void initialize() throws DeepExtractorinitializationException;
 

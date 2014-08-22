@@ -1,11 +1,15 @@
-package com.stratio.deep.rdd;
+package com.stratio.deep.core.rdd;
 
 
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.exception.DeepExtractorinitializationException;
 import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.extractor.client.ExtractorClient;
+import com.stratio.deep.core.extractor.client.ExtractorClient;
 import com.stratio.deep.partition.impl.DeepPartition;
+import com.stratio.deep.rdd.DeepIterator;
+import com.stratio.deep.rdd.DeepTokenRange;
+import com.stratio.deep.rdd.IDeepPartition;
+import com.stratio.deep.rdd.IExtractorClient;
 import org.apache.spark.InterruptibleIterator;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
@@ -15,7 +19,6 @@ import org.apache.spark.rdd.RDD;
 import scala.collection.Iterator;
 import scala.reflect.ClassTag$;
 
-import javax.net.ssl.SSLException;
 import java.io.Serializable;
 
 import static scala.collection.JavaConversions.asScalaIterator;
@@ -43,7 +46,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
                 sc.broadcast(config, ClassTag$.MODULE$
                         .<ExtractorConfig<T>>apply(config.getClass()));
 
-        
+
             initExtractorClient();
 
     }

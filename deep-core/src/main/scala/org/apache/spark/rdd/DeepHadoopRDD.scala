@@ -18,7 +18,7 @@
 package org.apache.spark.rdd
 
 import com.stratio.deep.config.IDeepJobConfig
-import com.stratio.deep.rdd.DeepRDD
+import com.stratio.deep.core.rdd.DeepRDD
 import org.apache.hadoop.io.Writable
 import org.apache.hadoop.mapreduce._
 import org.apache.spark._

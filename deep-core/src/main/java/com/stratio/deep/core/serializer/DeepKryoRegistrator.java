@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.serializer;
+package com.stratio.deep.core.serializer;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.stratio.deep.entity.Cell;

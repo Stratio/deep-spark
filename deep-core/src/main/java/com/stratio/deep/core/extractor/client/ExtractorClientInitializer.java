@@ -12,7 +12,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.stratio.deep.extractor.client;
+package com.stratio.deep.core.extractor.client;
 
 import com.stratio.deep.extractor.client.codecs.ActionEncoder;
 import com.stratio.deep.extractor.client.codecs.ResponseDecoder;

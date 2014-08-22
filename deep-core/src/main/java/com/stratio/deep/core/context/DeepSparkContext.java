@@ -12,14 +12,14 @@
  * the License.
  */
 
-package com.stratio.deep.context;
+package com.stratio.deep.core.context;
 
 
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepInstantiationException;
-import com.stratio.deep.rdd.DeepJavaRDD;
-import com.stratio.deep.rdd.DeepRDD;
+import com.stratio.deep.core.rdd.DeepJavaRDD;
+import com.stratio.deep.core.rdd.DeepRDD;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaSparkContext;

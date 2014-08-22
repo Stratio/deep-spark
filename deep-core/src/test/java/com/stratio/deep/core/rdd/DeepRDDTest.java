@@ -1,16 +1,16 @@
-package com.stratio.deep.rdd; 
+package com.stratio.deep.core.rdd;
 
 import com.stratio.deep.config.ExtractorConfig;
-import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.extractor.client.ExtractorClient;
+import com.stratio.deep.core.extractor.client.ExtractorClient;
 
+import com.stratio.deep.core.rdd.*;
+import com.stratio.deep.rdd.DeepTokenRange;
+import com.stratio.deep.rdd.IDeepPartition;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
 import org.apache.spark.broadcast.Broadcast;
 import org.junit.Test;
-import org.junit.Before; 
-import org.junit.After;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -21,13 +21,10 @@ import com.stratio.deep.partition.impl.DeepPartition;
 import static junit.framework.Assert.*;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Method;
 
 /** 
 * DeepRDD Tester. 
@@ -115,7 +112,7 @@ public void testCompute() throws Exception {
 
     private TaskContext createTaskContext() {
         TaskContext taskcontext = mock(TaskContext.class);
-        doNothing().when(taskcontext).addOnCompleteCallback(any(OnComputedRDDCallback.class));
+        doNothing().when(taskcontext).addOnCompleteCallback(any(com.stratio.deep.core.rdd.OnComputedRDDCallback.class));
         return taskcontext;
     }
 

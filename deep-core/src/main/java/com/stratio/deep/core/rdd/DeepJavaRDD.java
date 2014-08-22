@@ -1,4 +1,4 @@
-package com.stratio.deep.rdd;
+package com.stratio.deep.core.rdd;
 
 import org.apache.spark.api.java.JavaRDD;
 import scala.reflect.ClassTag;

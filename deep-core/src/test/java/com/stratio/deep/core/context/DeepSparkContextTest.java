@@ -14,11 +14,11 @@
         * limitations under the License.
         */
 
-package com.stratio.deep.context;
+package com.stratio.deep.core.context;
 
 import com.stratio.deep.config.ExtractorConfig;
-import com.stratio.deep.rdd.DeepJavaRDD;
-import com.stratio.deep.rdd.DeepRDD;
+import com.stratio.deep.core.rdd.DeepJavaRDD;
+import com.stratio.deep.core.rdd.DeepRDD;
 import org.apache.spark.SparkContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;

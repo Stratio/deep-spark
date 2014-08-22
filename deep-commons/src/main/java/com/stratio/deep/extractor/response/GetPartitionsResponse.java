@@ -5,7 +5,6 @@ package com.stratio.deep.extractor.response;
 
 import com.stratio.deep.extractor.actions.ActionType;
 import com.stratio.deep.rdd.DeepTokenRange;
-import org.apache.spark.Partition;
 
 /**
  * @author Óscar Puertas

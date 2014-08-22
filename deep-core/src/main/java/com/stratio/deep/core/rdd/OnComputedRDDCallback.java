@@ -1,6 +1,6 @@
-package com.stratio.deep.rdd;
+package com.stratio.deep.core.rdd;
 
-import com.stratio.deep.extractor.client.ExtractorClient;
+import com.stratio.deep.rdd.IExtractorClient;
 import scala.runtime.AbstractFunction0;
 
 /**

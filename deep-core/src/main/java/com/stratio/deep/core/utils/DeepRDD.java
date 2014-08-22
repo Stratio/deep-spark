@@ -1,4 +1,4 @@
-package com.stratio.deep.utils;
+package com.stratio.deep.core.utils;
 
 /**
  * Created by rcrespo on 10/07/14.
