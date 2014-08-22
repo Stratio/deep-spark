@@ -12,7 +12,8 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations
  * under the License.
- */
+ *//*
+
 package com.stratio.deep.extractor.server;
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -24,10 +25,12 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 
+*/
 /**
  * Receives a list of continent/city pairs from a {@link } to
  * get the local times of the specified cities.
- */
+ *//*
+
 public final class ExtractorServer {
 
     static final boolean SSL = System.getProperty("ssl") != null;
@@ -59,3 +62,4 @@ public final class ExtractorServer {
         }
     }
 }
+*/
