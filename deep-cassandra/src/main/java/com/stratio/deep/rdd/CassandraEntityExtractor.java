@@ -14,6 +14,7 @@
 
 package com.stratio.deep.rdd;
 
+import com.stratio.deep.config.CellDeepJobConfig;
 import com.stratio.deep.config.EntityDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
@@ -40,16 +41,11 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
 
     private static final long serialVersionUID = -3208994171892747470L;
 
-    /**
-     * This constructor should not be called explicitly.<br/>
-     * Use {@link com.stratio.deep.context.DeepSparkContext} instead to create an RDD.
-     *
-     * @param sc parent spark context
-     * @param config the configuration object
-     */
-    // public CassandraEntityRDD(SparkContext sc, ICassandraDeepJobConfig<T> config) {
-    // super(sc, config);
-    // }
+    public CassandraEntityExtractor(Class t){
+        super();
+        this.cassandraJobConfig = new EntityDeepJobConfig(t, true);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -95,3 +91,4 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
     }
 
 }
+

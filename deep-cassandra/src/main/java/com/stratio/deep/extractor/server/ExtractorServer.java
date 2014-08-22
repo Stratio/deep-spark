@@ -33,7 +33,11 @@ public final class ExtractorServer {
     static final boolean SSL = System.getProperty("ssl") != null;
     static final int PORT = Integer.parseInt(System.getProperty("port", "8463"));
 
-    public static void main(String[] args) throws Exception {
+    private static EventLoopGroup bossGroup;
+    private static EventLoopGroup workerGroup;
+
+
+    public  static void main(String[] args) throws Exception {
         // Configure SSL.
         final SslContext sslCtx;
         if (SSL) {
@@ -43,8 +47,8 @@ public final class ExtractorServer {
             sslCtx = null;
         }
 
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        bossGroup = new NioEventLoopGroup(1);
+        workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
@@ -54,8 +58,16 @@ public final class ExtractorServer {
 
             b.bind(PORT).sync().channel().closeFuture().sync();
         } finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
+
+            close();
         }
     }
+
+    public static void close() {
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
+
+    }
+
+
 }

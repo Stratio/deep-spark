@@ -15,6 +15,7 @@
 package com.stratio.deep.extractor.server;
 
 import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.extractor.actions.*;
 import com.stratio.deep.extractor.response.*;
 import com.stratio.deep.rdd.CassandraExtractor;
@@ -120,8 +121,16 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
 
         Class<T> rdd = (Class<T>) config.getRDDClass();
         try {
-            final Constructor<T> c = rdd.getConstructor();
-            this.extractor = (CassandraExtractor<T>) c.newInstance();
+            Constructor<T> c = null;
+            if (config.getEntityClass().isAssignableFrom(Cells.class)){
+                c = rdd.getConstructor();
+                this.extractor = (CassandraExtractor<T>) c.newInstance();
+            }else{
+                c = rdd.getConstructor(Class.class);
+                this.extractor = (CassandraExtractor<T>) c.newInstance(config.getEntityClass());
+            }
+
+
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             // TODO Auto-generated catch block
