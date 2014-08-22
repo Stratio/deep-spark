@@ -14,9 +14,10 @@
  */
 package com.stratio.deep.extractor.client;
 
+
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.rdd.DeepTokenRange;
-import com.stratio.deep.rdd.IExtractor;
+import com.stratio.deep.rdd.IDeepRDD;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -31,10 +32,10 @@ import javax.net.ssl.SSLException;
  * Sends a list of continent/city pairs to a {@link } to get the local times of the
  * specified cities.
  */
-public class ExtractorClient<T> implements IExtractor<T> {
+public class ExtractorClient<T> implements IDeepRDD<T> {
 
     static final boolean SSL = System.getProperty("ssl") != null;
-    //  static final String HOST = System.getProperty("host", "172.19.0.133");
+
     static final String HOST = System.getProperty("host", "127.0.0.1");
     static final int PORT = Integer.parseInt(System.getProperty("port", "8463"));
 
@@ -70,7 +71,6 @@ public class ExtractorClient<T> implements IExtractor<T> {
     }
 
 
-
     @Override
     public boolean hasNext() {
         return handler.hasNext();
@@ -87,11 +87,10 @@ public class ExtractorClient<T> implements IExtractor<T> {
         handler.initIterator(dp, config);
     }
 
-
     @Override
     public void close() {
         handler.close();
-        return ;
+        return;
     }
 
     /*
@@ -104,5 +103,8 @@ public class ExtractorClient<T> implements IExtractor<T> {
         return this.handler.getPartitions(config);
     }
 
-
+//    @Override
+//    public IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> createRecordReader() {
+//        return null;
+//    }
 }

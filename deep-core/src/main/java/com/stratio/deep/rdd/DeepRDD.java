@@ -40,6 +40,13 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
                 sc.broadcast(config, ClassTag$.MODULE$
                         .<ExtractorConfig<T>>apply(config.getClass()));
 
+        try {
+            ExtractorClient<T> extractor = new ExtractorClient<>();
+            extractor.initialize();
+        } catch (SSLException | InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public DeepRDD(SparkContext sc, Class entityClass) {
@@ -54,28 +61,32 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         context.addOnCompleteCallback(new OnComputedRDDCallback(extractorClient));
 
         extractorClient.initIterator(((IDeepPartition) split).splitWrapper(), config.getValue());
-        java.util.Iterator<T> iterator = new java.util.Iterator<T>() {
-
-            @Override
-            public boolean hasNext() {
-                return extractorClient.hasNext();
-            }
-
-            @Override
-            public T next() {
-                return extractorClient.next();
-            }
-
-            @Override
-            public void remove() {
-                throw new DeepIOException(
-                        "Method not implemented (and won't be implemented anytime soon!!!)");
-            }
-        };
+        java.util.Iterator<T> iterator = createScalaIterator();
 
 
         return new InterruptibleIterator<>(context, asScalaIterator(iterator));
 
+    }
+
+    private java.util.Iterator<T> createScalaIterator() {
+        return new DeepIterator<T>() {
+
+                @Override
+                public boolean hasNext() {
+                    return extractorClient.hasNext();
+                }
+
+                @Override
+                public T next() {
+                    return extractorClient.next();
+                }
+
+                @Override
+                public void remove() {
+                    throw new DeepIOException(
+                            "Method not implemented (and won't be implemented anytime soon!!!)");
+                }
+            };
     }
 
     @Override
@@ -101,7 +112,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
     }
 
 
-    private void initExtractorClient(){
+    private void initExtractorClient() {
         if (extractorClient == null) {
             extractorClient = new ExtractorClient<>();
             try {

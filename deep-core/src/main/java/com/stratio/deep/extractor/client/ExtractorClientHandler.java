@@ -14,11 +14,15 @@
  */
 package com.stratio.deep.extractor.client;
 
+
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.extractor.actions.*;
-import com.stratio.deep.extractor.response.*;
+import com.stratio.deep.extractor.response.GetPartitionsResponse;
+import com.stratio.deep.extractor.response.HasNextResponse;
+import com.stratio.deep.extractor.response.NextResponse;
+import com.stratio.deep.extractor.response.Response;
 import com.stratio.deep.rdd.DeepTokenRange;
-import com.stratio.deep.rdd.IExtractor;
+import com.stratio.deep.rdd.IDeepRDD;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -27,7 +31,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Response> implements
-        IExtractor<T> {
+        IDeepRDD<T> {
 
     // Stateful properties
     private volatile Channel channel;
@@ -112,7 +116,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
             Thread.currentThread().interrupt();
         }
 
-        return ;
+        return;
     }
 
 
@@ -187,5 +191,6 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         }
         return;
     }
+
 
 }
