@@ -17,10 +17,11 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import scala.collection.Iterator;
-
+import com.stratio.deep.partition.impl.DeepPartition;
 import static junit.framework.Assert.*;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -36,21 +37,13 @@ import java.lang.reflect.Method;
 * @version 1.0 
 */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(value = {ExtractorClient.class,DeepRDD.class})
+@PrepareForTest(value = {ExtractorClient.class, DeepPartition.class, DeepRDD.class})
 public class DeepRDDTest {
 
     public static final Object FIRST_RESULT = "FirstResult";
     private static final Object SECOND_RESULT = "SecondResult";
 
-    @Before
-public void before() throws Exception { 
-} 
-
-@After
-public void after() throws Exception { 
-} 
-
-/** 
+    /**
 * 
 * Method: compute(Partition split, TaskContext context) 
 * 
@@ -62,7 +55,7 @@ public void testCompute() throws Exception {
     DeepTokenRange deepTokenRange = mock(DeepTokenRange.class);
     ExtractorConfig extractorConfig = mock(ExtractorConfig.class);
 
-    createExtractorClient(deepTokenRange, extractorConfig);
+    configureExtractorCompute(deepTokenRange, extractorConfig);
     Broadcast config = createConfig(extractorConfig);
     deepRDD.config = config;
 
@@ -82,6 +75,43 @@ public void testCompute() throws Exception {
 
 
 }
+
+
+    /**
+     *
+     * Method: getPartitions()
+     *
+     */
+    @Test
+    public void testGetPartitions() throws Exception {
+        DeepRDD deepRDD = createDeepRDD();
+
+        ExtractorClient extractorClient = createExtractorClient();
+        ExtractorConfig extractorConfig = mock(ExtractorConfig.class);
+
+        DeepTokenRange deepTokenRange = mock(DeepTokenRange.class);
+        DeepTokenRange otherDeepTokenRange = mock(DeepTokenRange.class);
+        DeepTokenRange[] aDeepTokenRange = {deepTokenRange,otherDeepTokenRange};
+        when(extractorClient.getPartitions(extractorConfig)).thenReturn(aDeepTokenRange);
+
+        DeepPartition deepPartition = mock(DeepPartition.class);
+        DeepPartition otherDeepPartition = mock(DeepPartition.class);
+        whenNew(DeepPartition.class).withArguments(0, 0, deepTokenRange).thenReturn(deepPartition);
+        whenNew(DeepPartition.class).withArguments(0, 1, otherDeepTokenRange).thenReturn(otherDeepPartition);
+
+        Broadcast config = createConfig(extractorConfig);
+        deepRDD.config = config;
+
+        Partition[] partitions = deepRDD.getPartitions();
+
+        assertNotNull("The partitions is not null", partitions);
+        assertEquals("The partition length is correct",aDeepTokenRange.length,partitions.length);
+        assertEquals("The first partition is correct",deepPartition,partitions[0]);
+        assertEquals("The second partition is correct",otherDeepPartition,partitions[1]);
+
+    }
+
+
 
     private TaskContext createTaskContext() {
         TaskContext taskcontext = mock(TaskContext.class);
@@ -104,26 +134,28 @@ public void testCompute() throws Exception {
         return config;
     }
 
-    private void createExtractorClient(DeepTokenRange deepTokenRange, ExtractorConfig extractorConfig) throws Exception {
+    private ExtractorClient configureExtractorCompute(DeepTokenRange deepTokenRange, ExtractorConfig extractorConfig ) throws Exception {
+        ExtractorClient extractorClient = createExtractorClient();
+        when(extractorClient.hasNext()).thenReturn(true,true,false);
+        when(extractorClient.next()).thenReturn(FIRST_RESULT, SECOND_RESULT);
+
+        DeepTokenRange[] aDeepTokenRange = {deepTokenRange};
+        when(extractorClient.getPartitions(extractorConfig)).thenReturn(aDeepTokenRange);
+
+        doNothing().when(extractorClient).initIterator(deepTokenRange, extractorConfig);
+
+        return extractorClient;
+    }
+
+    private ExtractorClient createExtractorClient() throws Exception {
         ExtractorClient extractorClient = mock(ExtractorClient.class);
         whenNew(ExtractorClient.class).withAnyArguments().thenReturn(extractorClient);
         doNothing().when(extractorClient).initialize();
-        when(extractorClient.hasNext()).thenReturn(true,true,false);
-        when(extractorClient.next()).thenReturn(FIRST_RESULT, SECOND_RESULT);
-        doNothing().when(extractorClient).initIterator(deepTokenRange, extractorConfig);
+        return extractorClient;
     }
 
-    /**
-* 
-* Method: getPartitions() 
-* 
-*/ 
-@Test
-public void testGetPartitions() throws Exception { 
-//TODO: Test goes here... 
-} 
 
-/** 
+    /**
 * 
 * Method: getConfig() 
 * 
@@ -155,7 +187,7 @@ try {
 }
     private DeepRDD createDeepRDD() throws Exception {
 
-//        PowerMockito.suppress(PowerMockito.constructor(DeepRDD.class, SparkContext.class,ExtractorConfig.class));
+
         PowerMockito.suppress(PowerMockito.constructor(DeepRDD.class, SparkContext.class,Class.class));
         return  Whitebox.newInstance(DeepRDD.class);
     }

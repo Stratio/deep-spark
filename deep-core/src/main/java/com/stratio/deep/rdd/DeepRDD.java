@@ -27,11 +27,13 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
 
     private static final long serialVersionUID = -5360986039609466526L;
 
-
     private transient ExtractorClient<T> extractorClient;
 
-
     protected Broadcast<ExtractorConfig<T>> config;
+
+    public Broadcast<ExtractorConfig<T>> getConfig() {
+        return config;
+    }
 
     public DeepRDD(SparkContext sc, ExtractorConfig<T> config) {
         super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config
@@ -59,70 +61,80 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         initExtractorClient();
 
         context.addOnCompleteCallback(new OnComputedRDDCallback(extractorClient));
-
-        extractorClient.initIterator(((IDeepPartition) split).splitWrapper(), config.getValue());
+        initRemoteIterator((IDeepPartition) split);
         java.util.Iterator<T> iterator = createScalaIterator();
-
 
         return new InterruptibleIterator<>(context, asScalaIterator(iterator));
 
-    }
-
-    private java.util.Iterator<T> createScalaIterator() {
-        return new DeepIterator<T>() {
-
-                @Override
-                public boolean hasNext() {
-                    return extractorClient.hasNext();
-                }
-
-                @Override
-                public T next() {
-                    return extractorClient.next();
-                }
-
-                @Override
-                public void remove() {
-                    throw new DeepIOException(
-                            "Method not implemented (and won't be implemented anytime soon!!!)");
-                }
-            };
     }
 
     @Override
     public Partition[] getPartitions() {
         initExtractorClient();
 
-        DeepTokenRange[] tokenRanges = extractorClient.getPartitions(config.getValue());
+        DeepTokenRange[] tokenRanges = recoverRemotePartitions();
 
+        Partition[] partitions = createSparkPartitions(tokenRanges);
+
+        return partitions;
+    }
+
+
+
+
+    private Partition[] createSparkPartitions(DeepTokenRange[] tokenRanges) {
         Partition[] partitions = new DeepPartition[tokenRanges.length];
 
         int i = 0;
 
         for (DeepTokenRange split : tokenRanges) {
+
             partitions[i] = new DeepPartition(id(), i, split);
             ++i;
         }
-
         return partitions;
     }
 
-    public Broadcast<ExtractorConfig<T>> getConfig() {
-        return config;
+    private DeepTokenRange[] recoverRemotePartitions() {
+        return extractorClient.getPartitions(config.getValue());
     }
 
 
     private void initExtractorClient() {
-        if (extractorClient == null) {
-            extractorClient = new ExtractorClient<>();
-            try {
+        try {
+            if (extractorClient == null) {
+                extractorClient = new ExtractorClient<>();
                 extractorClient.initialize();
-            } catch (SSLException | InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             }
+        } catch (SSLException | InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
+    }
+
+    private void initRemoteIterator(IDeepPartition split) {
+        extractorClient.initIterator(((IDeepPartition) split).splitWrapper(), config.getValue());
+    }
+    private java.util.Iterator<T> createScalaIterator() {
+        return new DeepIterator<T>() {
+
+            @Override
+            public boolean hasNext() {
+                return extractorClient.hasNext();
+            }
+
+            @Override
+            public T next() {
+                return extractorClient.next();
+            }
+
+            @Override
+            public void remove() {
+                throw new DeepIOException(
+                        "Method not implemented (and won't be implemented anytime soon!!!)");
+            }
+        };
     }
 
 
