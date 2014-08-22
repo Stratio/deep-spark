@@ -4,8 +4,6 @@ import java.lang.reflect.Constructor
 
 import akka.actor.Actor
 import com.stratio.deep.config.ExtractorConfig
-import com.stratio.deep.extractor.message._
-import com.stratio.deep.extractor.response._
 import com.stratio.deep.rdd.{DeepTokenRange, CassandraExtractor, IExtractor}
 import scala.reflect.ClassTag
 
@@ -14,29 +12,27 @@ import scala.reflect.ClassTag
  */
 class ExtractorServer[T: ClassTag] extends Actor{ //with ActionSystemMessage{
 
-  protected var extractor: CassandraExtractor[T] = null
+  protected var extractorA: CassandraExtractor[T] = null
 
   //private var extractor1: IExtractor = null
 
   def receive = {
 
+
     case CloseAction() =>
-    //  sender() ! AddResult(n1, n2, n1 + n2)
+      println("message received")
+      extractorA.close()
+      sender ! new CloseResponse(true)
+
+
     case GetPartitionsAction(config) =>
-    //  val partitionsAction: GetPartitionsAction[T] = action.asInstanceOf[GetPartitionsAction[T]]
-      //response = new GetPartitionsResponse(this.getPartitions(partitionsAction))
-    //  sender() ! SubtractResult(n1, n2, n1 - n2)
-    case  HasNextAction() =>
-    //  sender() ! MultiplicationResult(n1, n2, n1 * n2)
-    case InitIteratorAction(partition , config[T]) =>
+      println("message received")
 
-
-      if (extractor == null) {
-
+      if (extractorA == null) {
         val rdd: Class[T] = config.getRDDClass.asInstanceOf[Class[T]]
         try {
-          val extractor = rdd.newInstance().asInstanceOf[CassandraExtractor[T]]
-          //extractor = c.newInstance.asInstanceOf[CassandraExtractor[T]]
+          extractorA = rdd.newInstance().asInstanceOf[CassandraExtractor[T]]
+
         }
         catch {
           case e: Any => {
@@ -45,53 +41,40 @@ class ExtractorServer[T: ClassTag] extends Actor{ //with ActionSystemMessage{
         }
 
       }
-      extractor.initIterator(partition, config)
+      sender ! new GetPartitionsResponse(extractorA.getPartitions(config.asInstanceOf[ExtractorConfig[T]]));
+
+
+    case  HasNextAction() =>
+      println("message received")
+      sender ! new HasNextResponse(extractorA.hasNext)
 
 
 
+    case InitIteratorAction(partition,config) =>
+      println("message received")
+      if (extractorA == null) {
+        val rdd: Class[T] = config.getRDDClass.asInstanceOf[Class[T]]
+        try {
+          extractorA = rdd.newInstance().asInstanceOf[CassandraExtractor[T]]
 
-      sender() ! new InitIteratorResponse()
+        }
+        catch {
+          case e: Any => {
+            e.printStackTrace
+          }
+        }
+
+      }
+      extractorA.initIterator(partition, config.asInstanceOf[ExtractorConfig[T]])
+
+      sender ! new InitIteratorResponse(true);
+
     case NextAction() =>
+     sender ! new NextResponse(extractorA.next().asInstanceOf[T])
      // this.next()
      // sender() ! DivisionResult(n1, n2, n1 / n2)
   }
 
-  protected def next(nextAction: NextAction[T]): T = {
-    return extractor.next
-  }
 
-  protected def close {
-    extractor.close
-    return
-  }
-
-  /*protected def initIterator(partition: DeepTokenRange, config: ExtractorConfig[T]) {
-    if (extractor == null) {
-      this.initExtractor(partition)
-    }
-    extractor.initIterator(partition, config)
-    return
-  }
-
-*/
-  /**
-   * @param config
-   */
-  /*@SuppressWarnings(Array("unchecked"))
-  private def initExtractor(config: ExtractorConfig[T]) {
-
-    val rdd: Class[T] = config.getRDDClass.asInstanceOf[Class[T]]
-    try {
-      val c: Constructor[T] = rdd.getConstructor
-      this.extractor = c.newInstance.asInstanceOf[CassandraExtractor[T]]
-    }
-    catch {
-      case e: Any => {
-        e.printStackTrace
-      }
-    }
-  }
-
-*/
 
 }
