@@ -16,8 +16,8 @@ package com.stratio.deep.core.extractor.client;
 
 
 import com.stratio.deep.config.ExtractorConfig;
-import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepExtractorinitializationException;
+import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.rdd.IExtractor;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -54,7 +54,7 @@ public class ExtractorClient<T> implements IExtractor<T> {
             final SslContext sslCtx;
             if (SSL) {
 
-                    sslCtx = SslContext.newClientContext(InsecureTrustManagerFactory.INSTANCE);
+                sslCtx = SslContext.newClientContext(InsecureTrustManagerFactory.INSTANCE);
 
             } else {
                 sslCtx = null;
