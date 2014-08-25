@@ -16,21 +16,8 @@
 
 package com.stratio.deep.examples.java;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
 import com.google.common.collect.Lists;
-
-import com.stratio.deep.config.CassandraConfigFactory;
-
 import com.stratio.deep.config.ExtractorConfig;
-import com.stratio.deep.config.ICassandraDeepJobConfig;
-
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
@@ -38,7 +25,6 @@ import com.stratio.deep.entity.Cells;
 import com.stratio.deep.extractor.server.ExtractorServer;
 import com.stratio.deep.rdd.CassandraCellExtractor;
 import com.stratio.deep.rdd.CassandraExtractor;
-
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -47,6 +33,10 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Author: Emmanuelle Raffenne

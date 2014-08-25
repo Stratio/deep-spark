@@ -26,8 +26,6 @@ import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
-import java.util.List;
-
 /**
  * Example class to read a collection from mongoDB
  */
