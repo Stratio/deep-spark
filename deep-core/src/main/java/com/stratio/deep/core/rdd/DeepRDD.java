@@ -17,13 +17,9 @@ package com.stratio.deep.core.rdd;
 
 
 import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.core.extractor.client.ExtractorClient;
 import com.stratio.deep.exception.DeepExtractorinitializationException;
 import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.core.extractor.client.ExtractorClient;
-import com.stratio.deep.partition.impl.DeepPartition;
-import com.stratio.deep.rdd.DeepIterator;
-import com.stratio.deep.rdd.DeepTokenRange;
-import com.stratio.deep.rdd.IDeepPartition;
 import com.stratio.deep.rdd.IExtractor;
 import org.apache.spark.InterruptibleIterator;
 import org.apache.spark.Partition;
@@ -63,7 +59,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
                         .<ExtractorConfig<T>>apply(config.getClass()));
 
 
-            initExtractorClient();
+        initExtractorClient();
 
     }
 
@@ -114,7 +110,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         try {
             if (extractorClient == null) {
                 extractorClient = new ExtractorClient<>();
-                ((ExtractorClient)extractorClient).initialize();
+                ((ExtractorClient) extractorClient).initialize();
             }
         } catch (DeepExtractorinitializationException e) {
             // TODO Auto-generated catch block
@@ -122,8 +118,6 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         }
 
     }
-
-
 
 
 }

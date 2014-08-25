@@ -47,7 +47,6 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
     private IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
 
 
-
     protected ICassandraDeepJobConfig<T> cassandraJobConfig;
 
     /**
@@ -142,8 +141,7 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
     }
 
 
-
-    private ICassandraDeepJobConfig<T> initCustomConfig(ExtractorConfig<T> config){
+    private ICassandraDeepJobConfig<T> initCustomConfig(ExtractorConfig<T> config) {
         return cassandraJobConfig.initialize(config);
     }
 

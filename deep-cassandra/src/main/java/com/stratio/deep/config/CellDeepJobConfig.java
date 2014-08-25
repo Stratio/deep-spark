@@ -62,7 +62,4 @@ public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
     }
 
 
-
-
-
 }

@@ -14,7 +14,6 @@
 
 package com.stratio.deep.rdd;
 
-import com.stratio.deep.config.CellDeepJobConfig;
 import com.stratio.deep.config.EntityDeepJobConfig;
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.IDeepJobConfig;
@@ -44,7 +43,7 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
     private static final long serialVersionUID = -3208994171892747470L;
 
 
-    public CassandraEntityExtractor(T t){
+    public CassandraEntityExtractor(T t) {
         super();
         this.cassandraJobConfig = new EntityDeepJobConfig(t.getClass(), true);
     }
