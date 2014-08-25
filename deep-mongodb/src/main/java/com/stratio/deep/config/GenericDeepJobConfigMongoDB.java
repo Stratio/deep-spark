@@ -360,11 +360,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
         return 0;
     }
 
-    @Override
-    public IMongoDeepJobConfig<T> customConfiguration (Map<String, Object> customConfiguration){
-        this.customConfiguration=customConfiguration;
-        return this;
-    }
 
 
     /**
@@ -529,11 +524,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     }
 
 
-//    @Override
-//    public IMongoDeepJobConfig<T> InputFormat(InputFormat inputFormat) {
-//        this.inputFormat = inputFormat;
-//        return this;
-//    }
     @Override
     public Class<? extends InputFormat<?,?>> getInputFormatClass() {
         return inputFormat;
@@ -547,5 +537,18 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     @Override
     public Class<? extends IDeepRecordReader> getRecordReaderClass() {
         return null;
+    }
+
+
+    @Override
+    public IMongoDeepJobConfig<T> initialize(ExtractorConfig deepJobConfig) {
+        Map<String, String> values = deepJobConfig.getValues();
+
+        this.username(values.get("user")).host(values.get("host"))
+                .collection(values.get("collection"))
+                .database(values.get("database"));
+        this.initialize();
+
+        return this;
     }
 }

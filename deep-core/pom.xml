@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>deep-core</artifactId>
     <packaging>jar</packaging>
-    <name>deep spark</name>
+    <name>deep core</name>
     <url>http://www.stratio.com</url>
     <description>stratio deep core classes</description>
 

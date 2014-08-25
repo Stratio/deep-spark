@@ -17,9 +17,7 @@
 package com.stratio.deep.config;
 
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.rdd.mongodb.MongoCellRDD;
-import org.apache.hadoop.mapreduce.InputFormat;
-import org.apache.spark.rdd.RDD;
+import com.stratio.deep.extractor.MongoCellExtractor;
 
 import java.lang.reflect.Method;
 
@@ -44,9 +42,11 @@ public class CellDeepJobConfigMongoDB extends GenericDeepJobConfigMongoDB<Cells>
         return (Class<Cells>) dummyCells.getClass();
     }
 
+
+
     @Override
     public Class<?> getRDDClass() {
-        return MongoCellRDD.class;
+        return MongoCellExtractor.class;
     }
 
 

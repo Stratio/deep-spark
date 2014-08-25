@@ -17,6 +17,7 @@
 package com.stratio.deep.rdd;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -51,6 +52,13 @@ public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable 
         this.replicas = replicas;
     }
 
+    /**
+     * Construct a new token range with replica information
+     * @param replicas
+     */
+    public DeepTokenRange(String [] replicas) {
+        this.replicas = Arrays.asList(replicas);
+    }
     /**
      * {@inheritDoc}
      */

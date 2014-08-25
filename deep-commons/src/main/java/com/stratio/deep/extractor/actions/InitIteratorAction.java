@@ -5,6 +5,7 @@ package com.stratio.deep.extractor.actions;
 
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.rdd.DeepTokenRange;
+import org.apache.spark.Partition;
 
 /**
  * @author Óscar Puertas
@@ -16,13 +17,13 @@ public class InitIteratorAction<T> extends Action {
     private ExtractorConfig<T> config;
 
 
-    private DeepTokenRange partition;
+    private Partition partition;
 
     public InitIteratorAction() {
         super();
     }
 
-    public InitIteratorAction(DeepTokenRange partition, ExtractorConfig<T> config) {
+    public InitIteratorAction(Partition partition, ExtractorConfig<T> config) {
         super(ActionType.INIT_ITERATOR);
         this.config = config;
         this.partition = partition;
@@ -33,7 +34,7 @@ public class InitIteratorAction<T> extends Action {
         return config;
     }
 
-    public DeepTokenRange getPartition() {
+    public Partition getPartition() {
         return partition;
     }
 }

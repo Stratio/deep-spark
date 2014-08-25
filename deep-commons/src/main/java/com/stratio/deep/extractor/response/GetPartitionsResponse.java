@@ -14,18 +14,18 @@ public class GetPartitionsResponse extends Response {
 
     private static final long serialVersionUID = -7728817078374511478L;
 
-    private DeepTokenRange[] partitions;
+    private Partition[] partitions;
 
     public GetPartitionsResponse() {
         super();
     }
 
-    public GetPartitionsResponse(DeepTokenRange[] partitions) {
+    public GetPartitionsResponse(Partition[] partitions) {
         super(ActionType.GET_PARTITIONS);
         this.partitions = partitions;
     }
 
-    public DeepTokenRange[] getPartitions() {
+    public Partition[] getPartitions() {
         return partitions;
     }
 }

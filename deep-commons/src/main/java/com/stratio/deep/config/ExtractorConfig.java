@@ -13,9 +13,7 @@ public class ExtractorConfig<T> implements Serializable {
 
     private Map<String, String> values;
 
-    private Class RDDClass;
-
-    private Class inputFormatClass;
+    private Class ExtractorImplClass;
 
     private Class entityClass;
 
@@ -36,29 +34,25 @@ public class ExtractorConfig<T> implements Serializable {
         this.values = values;
     }
 
-    public Class getRDDClass() {
-        return RDDClass;
+    public Class getExtractorImplClass() {
+        return ExtractorImplClass;
     }
 
-    public void setRDDClass(Class RDDClass) {
-        this.RDDClass = RDDClass;
+    public void setExtractorImplClass(Class extractorImplClass) {
+        ExtractorImplClass = extractorImplClass;
     }
-
-    public Class getInputFormatClass() {
-        return inputFormatClass;
-    }
-
-    public void setInputFormatClass(Class inputFormatClass) {
-        this.inputFormatClass = inputFormatClass;
-    }
-
 
     public Class getEntityClass() {
         return entityClass;
     }
 
-//    public void setEntityClass(Class entityClass) {
-//        this.entityClass = entityClass;
-//    }
+    public void setEntityClass(Class entityClass) {
+        this.entityClass = entityClass;
+    }
+
+    public void putValue(String key, String value){
+        values.put(key, value);
+    }
+
 }
 

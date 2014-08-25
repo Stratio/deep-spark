@@ -15,12 +15,14 @@
 package com.stratio.deep.rdd;
 
 import com.stratio.deep.config.CellDeepJobConfig;
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.utils.Pair;
+import org.apache.spark.rdd.RDD;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -75,4 +77,13 @@ public class CassandraCellExtractor extends CassandraExtractor<Cells> {
     }
 
 
+    @Override
+    public IExtractor<Cells> getExtractorInstance(ExtractorConfig<Cells> config) {
+        return null;
+    }
+
+    @Override
+    public void saveRDD(RDD<Cells> rdd, ExtractorConfig<Cells> config) {
+
+    }
 }

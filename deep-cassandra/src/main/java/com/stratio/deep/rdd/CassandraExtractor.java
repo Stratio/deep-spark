@@ -24,6 +24,7 @@ import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.functions.CellList2TupleFunction;
 import com.stratio.deep.functions.DeepType2TupleFunction;
 import com.stratio.deep.utils.Pair;
+import org.apache.spark.Partition;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.rdd.RDD;
 import scala.collection.Seq;
@@ -45,9 +46,8 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
 
     private IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
 
-    private DeepTokenRange dp;
 
-    private ExtractorConfig<T> config;
+
     protected ICassandraDeepJobConfig<T> cassandraJobConfig;
 
     /**
@@ -135,12 +135,10 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
 
 
     @Override
-    public void initIterator(final DeepTokenRange dp,
+    public void initIterator(final Partition dp,
                              ExtractorConfig<T> config) {
-        this.config = config;
-        this.dp = dp;
         this.cassandraJobConfig = initCustomConfig(config);
-        recordReader = initRecordReader(dp, cassandraJobConfig);
+        recordReader = initRecordReader((DeepTokenRange) dp, cassandraJobConfig);
     }
 
 
@@ -164,14 +162,14 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
      * configured in cassandra.yaml + 1.
      */
     @Override
-    public DeepTokenRange[] getPartitions(ExtractorConfig<T> config) {
+    public Partition[] getPartitions(ExtractorConfig<T> config) {
 
 
         ICassandraDeepJobConfig<T> cellDeepJobConfig = initCustomConfig(config);
 
         List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits(cellDeepJobConfig);
 
-        return underlyingInputSplits.toArray(new DeepTokenRange[underlyingInputSplits.size()]);
+        return underlyingInputSplits.toArray(new Partition[underlyingInputSplits.size()]);
     }
 
     /**
@@ -201,6 +199,5 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
 
     }
 
-    public static void saveRDDToCassandra(JavaRDD<Cells> outRDD, ICassandraDeepJobConfig<Cells> writeConfig) {
-    }
+
 }

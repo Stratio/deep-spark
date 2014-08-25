@@ -17,8 +17,13 @@
 package com.stratio.deep.examples.java;
 
 import com.stratio.deep.config.ExtractorConfig;
-import com.stratio.deep.context.DeepSparkContext;
+
+
+import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.entity.Cell;
+
+
+
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.extractor.server.ExtractorServer;
 import com.stratio.deep.extractor.utils.ExtractorConstants;
@@ -95,7 +100,7 @@ public final class AggregatingData {
         // Creating a configuration for the RDD and initialize it
         ExtractorConfig<TweetEntity> config = new ExtractorConfig<>(TweetEntity.class);
 
-        config.setRDDClass(CassandraEntityExtractor.class);
+        config.setExtractorImplClass(CassandraCellExtractor.class);
 
         Map<String, String> values = new HashMap<>();
         values.put(ExtractorConstants.KEYSPACE, keyspaceName);
