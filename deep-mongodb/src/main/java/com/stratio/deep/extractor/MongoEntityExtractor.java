@@ -17,15 +17,14 @@
 package com.stratio.deep.extractor;
 
 import com.mongodb.hadoop.MongoOutputFormat;
-import com.stratio.deep.config.*;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.config.EntityDeepJobConfigMongoDB;
+import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.exception.DeepTransformException;
 import com.stratio.deep.rdd.IExtractor;
 import com.stratio.deep.utils.UtilMongoDB;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
 import org.slf4j.Logger;
@@ -43,8 +42,7 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
     private static final long serialVersionUID = -3208994171892747470L;
 
 
-
-    public MongoEntityExtractor(T t){
+    public MongoEntityExtractor(T t) {
         super();
         this.mongoJobConfig = new EntityDeepJobConfigMongoDB(t.getClass());
     }
@@ -53,7 +51,7 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T transformElement(Tuple2<Object, BSONObject> tuple, IMongoDeepJobConfig<T> config ) {
+    public T transformElement(Tuple2<Object, BSONObject> tuple, IMongoDeepJobConfig<T> config) {
 
 
         try {
@@ -64,7 +62,6 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
         }
 
     }
-
 
 
     @Override

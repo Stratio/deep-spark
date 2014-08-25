@@ -1,14 +1,25 @@
+/*
+ * Copyright 2014, Stratio.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.stratio.deep.core.rdd;
 
 
 import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.core.extractor.client.ExtractorClient;
 import com.stratio.deep.exception.DeepExtractorinitializationException;
 import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.core.extractor.client.ExtractorClient;
-import com.stratio.deep.partition.impl.DeepPartition;
-import com.stratio.deep.rdd.DeepIterator;
-import com.stratio.deep.rdd.DeepTokenRange;
-import com.stratio.deep.rdd.IDeepPartition;
 import com.stratio.deep.rdd.IExtractor;
 import org.apache.spark.InterruptibleIterator;
 import org.apache.spark.Partition;
@@ -48,7 +59,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
                         .<ExtractorConfig<T>>apply(config.getClass()));
 
 
-            initExtractorClient();
+        initExtractorClient();
 
     }
 
@@ -94,49 +105,12 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         return extractorClient.getPartitions(config.getValue());
     }
 
-//    @Override
-//    public Partition[] getPartitions() {
-//        initExtractorClient();
-//
-//        DeepTokenRange[] tokenRanges = extractorClient.getPartitions(config.getValue());
-//
-//        Partition[] partitions = new DeepPartition[tokenRanges.length];
-//
-//        int i = 0;
-//
-//        for (DeepTokenRange split : tokenRanges) {
-//            partitions[i] = new DeepPartition(id(), i, split);
-//            ++i;
-//        }
-//
-//        return partitions;
-//    }
-
-
-//
-//    private Partition[] createSparkPartitions(DeepTokenRange[] tokenRanges) {
-//        Partition[] partitions = new DeepPartition[tokenRanges.length];
-//
-//        int i = 0;
-//
-//        for (DeepTokenRange split : tokenRanges) {
-//
-//            partitions[i] = new DeepPartition(id(), i, split);
-//            ++i;
-//        }
-//        return partitions;
-//    }
-//
-//    private Partition[] recoverRemotePartitions() {
-//        return extractorClient.getPartitions(config.getValue());
-//    }
-
 
     private void initExtractorClient() {
         try {
             if (extractorClient == null) {
                 extractorClient = new ExtractorClient<>();
-                ((ExtractorClient)extractorClient).initialize();
+                ((ExtractorClient) extractorClient).initialize();
             }
         } catch (DeepExtractorinitializationException e) {
             // TODO Auto-generated catch block
@@ -144,29 +118,6 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         }
 
     }
-
-//
-//
-//    private java.util.Iterator<T> createScalaIterator() {
-//        return new DeepIterator<T>() {
-//
-//            @Override
-//            public boolean hasNext() {
-//                return extractorClient.hasNext();
-//            }
-//
-//            @Override
-//            public T next() {
-//                return extractorClient.next();
-//            }
-//
-//            @Override
-//            public void remove() {
-//                throw new DeepIOException(
-//                        "Method not implemented (and won't be implemented anytime soon!!!)");
-//            }
-//        };
-//    }
 
 
 }

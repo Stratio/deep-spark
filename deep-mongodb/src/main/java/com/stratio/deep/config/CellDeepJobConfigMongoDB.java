@@ -35,24 +35,10 @@ public class CellDeepJobConfigMongoDB extends GenericDeepJobConfigMongoDB<Cells>
     }
 
 
-
     @SuppressWarnings("unchecked")
     @Override
     public Class<Cells> getEntityClass() {
         return (Class<Cells>) dummyCells.getClass();
-    }
-
-
-
-    @Override
-    public Class<?> getRDDClass() {
-        return MongoCellExtractor.class;
-    }
-
-
-    @Override
-    public Method getSaveMethod() throws NoSuchMethodException {
-        return null;
     }
 
 

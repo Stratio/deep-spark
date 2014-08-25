@@ -18,8 +18,6 @@ package com.stratio.deep.core.extractor.client;
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.extractor.actions.*;
 import com.stratio.deep.extractor.response.*;
-import com.stratio.deep.extractor.actions.HasNextAction;
-import com.stratio.deep.extractor.actions.InitIteratorAction;
 import com.stratio.deep.rdd.IExtractor;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -213,7 +211,8 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
             Thread.currentThread().interrupt();
         }
 
-        return ((ExtractorInstanceResponse<T>) response).getData();    }
+        return ((ExtractorInstanceResponse<T>) response).getData();
+    }
 
     @Override
     public void saveRDD(RDD<T> rdd, ExtractorConfig<T> config) {

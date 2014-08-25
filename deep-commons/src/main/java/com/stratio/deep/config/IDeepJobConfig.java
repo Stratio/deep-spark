@@ -17,13 +17,8 @@
 package com.stratio.deep.config;
 
 import com.stratio.deep.entity.Cell;
-import com.stratio.deep.rdd.IDeepPartition;
-import com.stratio.deep.rdd.IDeepRecordReader;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapreduce.InputFormat;
-
 import java.io.Serializable;
-import java.lang.reflect.Method;
+
 import java.util.Map;
 
 /**
@@ -142,36 +137,11 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?, ?>> extends Seria
     int getPageSize();
 
 
-//    /**
-//     * In case you want to add custom configuration to hadoop-connector, this override any other configuration,
-//     * these configurations are not validated, so be careful
-//     *
-//     * @param customConfiguration
-//     * @return
-//     */
-//    S customConfiguration(Map<String, Object> customConfiguration);
-
-    Class<?> getRDDClass();
 
 
-    Method getSaveMethod() throws NoSuchMethodException;
 
 
-    //    /**
-//     * Just in case you have a hadoopInputFormat
-//     * @return
-//     */
-    Configuration getHadoopConfiguration();
 
-
-//    S InputFormat(InputFormat inputFormat);
-
-    Class<? extends InputFormat<?, ?>> getInputFormatClass();
-
-
-    Class<? extends IDeepPartition> getPatitionClass();
-
-    Class<? extends IDeepRecordReader> getRecordReaderClass();
 
 
 }

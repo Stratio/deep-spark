@@ -20,15 +20,11 @@ import com.mongodb.QueryBuilder;
 import com.mongodb.hadoop.MongoInputFormat;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.rdd.IDeepPartition;
-import com.stratio.deep.extractor.core.IDeepRecordReader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
-import java.lang.reflect.Method;
 import java.util.*;
 
 
@@ -113,7 +109,7 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     private String sort;
 
 
-    private Class<? extends InputFormat<?,?>> inputFormat = MongoInputFormat.class;
+    private Class<? extends InputFormat<?, ?>> inputFormat = MongoInputFormat.class;
 
     /**
      * Shard key
@@ -361,7 +357,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     }
 
 
-
     /**
      * {@inheritDoc}
      */
@@ -471,7 +466,7 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
             configHadoop.set(MongoConfigUtil.AUTH_URI, connection.toString());
         }
 
-        if (customConfiguration !=null ) {
+        if (customConfiguration != null) {
             Set<Map.Entry<String, Object>> set = customConfiguration.entrySet();
             Iterator<Map.Entry<String, Object>> iterator = set.iterator();
             while (iterator.hasNext()) {
@@ -521,22 +516,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
             initialize();
         }
         return configHadoop;
-    }
-
-
-    @Override
-    public Class<? extends InputFormat<?,?>> getInputFormatClass() {
-        return inputFormat;
-    }
-
-    @Override
-    public Class<? extends IDeepPartition> getPatitionClass(){
-        return null;
-    }
-
-    @Override
-    public Class<? extends IDeepRecordReader> getRecordReaderClass() {
-        return null;
     }
 
 

@@ -28,7 +28,6 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
 
-import javax.net.ssl.SSLException;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.Map;
