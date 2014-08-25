@@ -21,6 +21,7 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.google.common.io.Resources;
+import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;

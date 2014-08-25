@@ -43,10 +43,12 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
     private static final long serialVersionUID = -3208994171892747470L;
 
 
+
     public CassandraEntityExtractor(T t) {
         super();
         this.cassandraJobConfig = new EntityDeepJobConfig(t.getClass(), true);
     }
+
 
     /**
      * {@inheritDoc}
@@ -101,3 +103,4 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
 
     }
 }
+

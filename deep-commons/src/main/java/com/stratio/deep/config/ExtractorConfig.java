@@ -32,9 +32,16 @@ public class ExtractorConfig<T> implements Serializable {
 
     private Class ExtractorImplClass;
 
+    private Class entityClass;
 
-    private Class entityClass = Cells.class;
+    public ExtractorConfig (Class t){
+        super();
+        entityClass = t;
+    }
 
+    public ExtractorConfig(){
+        entityClass = Cells.class;
+    }
 
     public Map<String, String> getValues() {
         return values;
@@ -64,4 +71,6 @@ public class ExtractorConfig<T> implements Serializable {
         values.put(key, value);
         return this;
     }
+
 }
+
