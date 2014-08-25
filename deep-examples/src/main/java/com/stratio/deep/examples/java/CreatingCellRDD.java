@@ -20,8 +20,7 @@ import com.stratio.deep.config.CassandraConfigFactory;
 
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.extractor.server.ExtractorServer;
 import com.stratio.deep.extractor.utils.ExtractorConstants;
@@ -101,7 +100,7 @@ public final class CreatingCellRDD {
         // Creating a configuration for the RDD and initialize it
         ExtractorConfig<Cells> config = new ExtractorConfig();
 
-        config.setRDDClass(CassandraCellExtractor.class);
+        config.setEntityClass(CassandraCellExtractor.class);
 
         Map<String, String> values = new HashMap<>();
         values.put(ExtractorConstants.KEYSPACE,keyspaceName);

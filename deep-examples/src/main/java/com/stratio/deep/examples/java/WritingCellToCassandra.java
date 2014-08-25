@@ -30,8 +30,8 @@ import com.stratio.deep.config.CassandraConfigFactory;
 
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.context.DeepSparkContext;
+
+import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
@@ -97,7 +97,7 @@ public final class WritingCellToCassandra {
         // --- INPUT RDD
         ExtractorConfig<Cells> inputConfig = new ExtractorConfig();
 
-        inputConfig.setRDDClass(CassandraCellExtractor.class);
+        inputConfig.setExtractorImplClass(CassandraCellExtractor.class);
         Map<String, String> values = new HashMap<>();
         values.put("keyspace",keyspaceName);
         values.put("table", inputTableName);
@@ -133,7 +133,7 @@ public final class WritingCellToCassandra {
         // --- OUTPUT RDD
         ExtractorConfig<Cells> outputConfig = new ExtractorConfig();
 
-        outputConfig.setRDDClass(CassandraCellExtractor.class);
+        outputConfig.setExtractorImplClass(CassandraCellExtractor.class);
 
         values = new HashMap<>();
         values.put("keyspace",keyspaceName);
