@@ -14,33 +14,17 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.config;
+package com.stratio.deep.rdd;
 
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.extractor.MongoCellExtractor;
-
-import java.lang.reflect.Method;
-
-
-public class CellDeepJobConfigMongoDB extends GenericDeepJobConfigMongoDB<Cells> {
-
-    private static final long serialVersionUID = -598862509865396541L;
-    private Cells dummyCells;
-
-    public CellDeepJobConfigMongoDB() {
-    }
-
-    {
-        dummyCells = new Cells();
-    }
+/**
+ * Created by rcrespo on 25/08/14.
+ */
+public interface IDeepRecordReader<T> {
 
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public Class<Cells> getEntityClass() {
-        return (Class<Cells>) dummyCells.getClass();
-    }
+    boolean hasNext();
 
+    T next();
 
-
+    void close();
 }

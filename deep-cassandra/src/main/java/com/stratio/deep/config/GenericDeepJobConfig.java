@@ -26,12 +26,10 @@ import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.rdd.IDeepPartition;
-import com.stratio.deep.rdd.IDeepRecordReader;
 import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
@@ -783,16 +781,6 @@ public abstract class GenericDeepJobConfig<T> implements AutoCloseable, ICassand
         return bisectFactor;
     }
 
-
-    @Override
-    public Class<? extends InputFormat<?, ?>> getInputFormatClass() {
-        return null;
-    }
-
-
-    public Class<? extends IDeepRecordReader> getRecordReaderClass() {
-        return DeepRecordReader.class;
-    }
 
 
     public Class<? extends IDeepPartition> getPatitionClass() {

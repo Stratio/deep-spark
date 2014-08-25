@@ -20,6 +20,7 @@ package com.stratio.deep.config;
 import com.stratio.deep.entity.Cells;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -27,7 +28,7 @@ import java.util.Map;
  */
 public class ExtractorConfig<T> implements Serializable {
 
-    private Map<String, String> values;
+    private Map<String, String> values = new HashMap<>();
 
     private Class ExtractorImplClass;
 

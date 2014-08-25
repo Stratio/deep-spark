@@ -17,11 +17,9 @@
 package com.stratio.deep.config;
 
 import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.extractor.MongoEntityExtractor;
 import com.stratio.deep.utils.AnnotationUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -75,24 +73,12 @@ public final class EntityDeepJobConfigMongoDB<T extends IDeepType> extends Gener
     }
 
 
-
-
     public Map<String, String> getMapDBNameToEntityName() {
         return mapDBNameToEntityName;
     }
 
     public void setMapDBNameToEntityName(Map<String, String> mapDBNameToEntityName) {
         this.mapDBNameToEntityName = mapDBNameToEntityName;
-    }
-
-    @Override
-    public Class<?> getRDDClass() {
-        return MongoEntityExtractor.class;
-    }
-
-    @Override
-    public Method getSaveMethod() throws NoSuchMethodException {
-        return null;
     }
 
 
