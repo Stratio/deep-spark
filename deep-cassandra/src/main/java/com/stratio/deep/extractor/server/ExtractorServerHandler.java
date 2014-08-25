@@ -21,6 +21,7 @@ import com.stratio.deep.rdd.CassandraExtractor;
 import com.stratio.deep.rdd.DeepTokenRange;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.apache.spark.Partition;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -102,7 +103,7 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
 
     }
 
-    protected DeepTokenRange[] getPartitions(GetPartitionsAction<T> getPartitionsAction) {
+    protected Partition[] getPartitions(GetPartitionsAction<T> getPartitionsAction) {
 
         if (extractor == null) {
             this.initExtractor(getPartitionsAction.getConfig());
@@ -118,7 +119,7 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
     @SuppressWarnings("unchecked")
     private void initExtractor(ExtractorConfig<T> config) {
 
-        Class<T> rdd = (Class<T>) config.getRDDClass();
+        Class<T> rdd = (Class<T>) config.getExtractorImplClass();
         try {
             final Constructor<T> c = rdd.getConstructor();
             this.extractor = (CassandraExtractor<T>) c.newInstance();

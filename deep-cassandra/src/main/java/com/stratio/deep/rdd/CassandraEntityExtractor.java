@@ -16,6 +16,7 @@ package com.stratio.deep.rdd;
 
 import com.stratio.deep.config.CellDeepJobConfig;
 import com.stratio.deep.config.EntityDeepJobConfig;
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
@@ -24,6 +25,7 @@ import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
+import org.apache.spark.rdd.RDD;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -90,4 +92,13 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
         return EntityDeepJobConfig.class;
     }
 
+    @Override
+    public IExtractor<T> getExtractorInstance(ExtractorConfig<T> config) {
+        return null;
+    }
+
+    @Override
+    public void saveRDD(RDD<T> rdd, ExtractorConfig<T> config) {
+
+    }
 }

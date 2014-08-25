@@ -14,7 +14,6 @@ public interface IExtractor<T> extends Serializable {
 
     Partition[] getPartitions(ExtractorConfig<T> config);
 
-
     boolean hasNext();
 
     T next();
@@ -24,7 +23,7 @@ public interface IExtractor<T> extends Serializable {
     void initIterator(Partition dp, ExtractorConfig<T> config);
 
 
-    IExtractor getExtractorInstance(ExtractorConfig<T> config);
+    IExtractor<T> getExtractorInstance(ExtractorConfig<T> config);
 
     void saveRDD(RDD<T> rdd, ExtractorConfig<T> config);
 
