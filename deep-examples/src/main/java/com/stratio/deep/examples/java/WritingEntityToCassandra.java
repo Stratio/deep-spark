@@ -16,16 +16,11 @@
 
 package com.stratio.deep.examples.java;
 
-import java.util.List;
-
 import com.google.common.collect.Lists;
-
 import com.stratio.deep.config.CassandraConfigFactory;
-import com.stratio.deep.config.DeepJobConfig;
-import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.rdd.CassandraRDD;
+
+import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.testentity.DomainEntity;
 import com.stratio.deep.testentity.PageEntity;
 import com.stratio.deep.testutils.ContextProperties;
@@ -36,6 +31,8 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
+
+import java.util.List;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -75,10 +72,7 @@ public final class WritingEntityToCassandra {
 
 
         // --- INPUT RDD
-        DeepJobConfig<PageEntity> inputConfig = CassandraConfigFactory.create(PageEntity.class)
-                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
-                .keyspace(keyspaceName).table(inputTableName)
-                .initialize();
+        ExtractorConfig<PageEntity> inputConfig = new ExtractorConfig(PageEntity.class);
 
         RDD<PageEntity> inputRDD = deepContext.createRDD(inputConfig);
 
@@ -105,10 +99,7 @@ public final class WritingEntityToCassandra {
         }
 
         // --- OUTPUT RDD
-        DeepJobConfig<DomainEntity> outputConfig = CassandraConfigFactory.createWriteConfig(DomainEntity.class)
-                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
-                .keyspace(keyspaceName).table(outputTableName)
-                .createTableOnWrite(true).initialize();
+        ExtractorConfig<DomainEntity> outputConfig = new ExtractorConfig(DomainEntity.class);
 
         JavaRDD<DomainEntity> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, DomainEntity>() {
             @Override
@@ -120,7 +111,7 @@ public final class WritingEntityToCassandra {
             }
         });
 
-        CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig);
+        //deepContext.saveRDD(outputRDD, outputConfig);
 
         deepContext.stop();
     }

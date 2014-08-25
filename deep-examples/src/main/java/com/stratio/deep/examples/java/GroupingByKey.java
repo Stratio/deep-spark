@@ -17,12 +17,8 @@
 package com.stratio.deep.examples.java;
 
 import com.google.common.collect.Lists;
-
-import com.stratio.deep.config.CassandraConfigFactory;
-import com.stratio.deep.config.DeepJobConfig;
-import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.rdd.CassandraJavaRDD;
+import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
@@ -72,11 +68,7 @@ public final class GroupingByKey {
 
 
         // Creating a configuration for the RDD and initialize it
-        DeepJobConfig<TweetEntity> config = CassandraConfigFactory.create(TweetEntity.class)
-                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
-                .keyspace(keyspaceName).table(tableName)
-                .initialize();
-
+        ExtractorConfig<TweetEntity> config = new ExtractorConfig(TweetEntity.class);
         // Creating the RDD
         RDD<TweetEntity> rdd =  deepContext.createRDD(config);
 

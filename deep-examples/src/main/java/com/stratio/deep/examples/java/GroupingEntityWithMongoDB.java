@@ -16,25 +16,8 @@
 
 package com.stratio.deep.examples.java;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import com.stratio.deep.config.IMongoDeepJobConfig;
-import com.stratio.deep.config.MongoConfigFactory;
-import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
-import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
-
+import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.testutils.ContextProperties;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.rdd.RDD;
-import scala.Tuple2;
 
 /**
  * Created by rcrespo on 25/06/14.

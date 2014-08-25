@@ -16,21 +16,20 @@
 
 package com.stratio.deep.examples.java;
 
-import java.util.List;
 
-import com.stratio.deep.config.CassandraConfigFactory;
-import com.stratio.deep.config.DeepJobConfig;
-import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.context.DeepSparkContext;
+
+import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
+
+import java.util.List;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -70,10 +69,7 @@ public final class MapReduceJob {
 
 
         // Creating a configuration for the RDD and initialize it
-        DeepJobConfig<TweetEntity> config = CassandraConfigFactory.create(TweetEntity.class)
-                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
-                .keyspace(keyspaceName).table(tableName)
-                .initialize();
+        ExtractorConfig<TweetEntity> config = new ExtractorConfig(TweetEntity.class);
 
         // Creating the RDD
         RDD<TweetEntity> rdd = deepContext.createRDD(config);
