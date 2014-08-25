@@ -42,7 +42,7 @@
         </dependency>
         <dependency>
             <groupId>com.stratio.deep</groupId>
-            <artifactId>deep-spark</artifactId>
+            <artifactId>deep-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
