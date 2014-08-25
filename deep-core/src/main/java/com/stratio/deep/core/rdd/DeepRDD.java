@@ -94,23 +94,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         return extractorClient.getPartitions(config.getValue());
     }
 
-//    @Override
-//    public Partition[] getPartitions() {
-//        initExtractorClient();
-//
-//        DeepTokenRange[] tokenRanges = extractorClient.getPartitions(config.getValue());
-//
-//        Partition[] partitions = new DeepPartition[tokenRanges.length];
-//
-//        int i = 0;
-//
-//        for (DeepTokenRange split : tokenRanges) {
-//            partitions[i] = new DeepPartition(id(), i, split);
-//            ++i;
-//        }
-//
-//        return partitions;
-//    }
+
 
 
 //

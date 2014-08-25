@@ -20,6 +20,7 @@ import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
 import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.JavaRDD;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -65,7 +66,7 @@ public class DeepSparkContextTest {
         DeepRDD deepRDD = createDeepRDD(deepSparkContext.sc(), deepJobConfig);
         DeepJavaRDD javaRdd = createDeepJAvaRDD(deepRDD);
 
-        DeepJavaRDD javaRDdReturn = deepSparkContext.createJavaRDD(deepJobConfig);
+        JavaRDD javaRDdReturn = deepSparkContext.createJavaRDD(deepJobConfig);
 
         assertSame("The DeepJavaRDD is Same", javaRdd, javaRDdReturn);
     }
@@ -105,10 +106,10 @@ public class DeepSparkContextTest {
     }
 
     private ExtractorConfig createDeepJobConfig() {
-        ExtractorConfig deepJobConfig = mock(ExtractorConfig.class);
-        when(deepJobConfig.getRDDClass()).thenReturn(new Object().getClass());
-        when(deepJobConfig.getInputFormatClass()).thenReturn(null);
-        return deepJobConfig;
+        ExtractorConfig extractorConfig = mock(ExtractorConfig.class);
+        when(extractorConfig.getExtractorImplClass()).thenReturn(new Object().getClass());
+        //when(extractorConfig.getInputFormatClass()).thenReturn(null);
+        return extractorConfig;
     }
 
     private DeepRDD createDeepRDD(SparkContext sc, ExtractorConfig deepJobConfig) throws Exception {

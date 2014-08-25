@@ -3,9 +3,10 @@ package com.stratio.deep.core.rdd;
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.extractor.client.ExtractorClient;
 
-import com.stratio.deep.core.rdd.*;
+
 import com.stratio.deep.rdd.DeepTokenRange;
 import com.stratio.deep.rdd.IDeepPartition;
+import com.stratio.deep.rdd.IExtractor;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
@@ -49,19 +50,22 @@ public class DeepRDDTest {
 public void testCompute() throws Exception {
     DeepRDD deepRDD = createDeepRDD();
 
-    DeepTokenRange deepTokenRange = mock(DeepTokenRange.class);
+    Partition partition = mock(Partition.class);
     ExtractorConfig extractorConfig = mock(ExtractorConfig.class);
 
-    configureExtractorCompute(deepTokenRange, extractorConfig);
+    configureExtractorCompute(partition, extractorConfig);
     Broadcast config = createConfig(extractorConfig);
     deepRDD.config = config;
 
-    IDeepPartition partition = createPartition(deepTokenRange);
+
+    DeepTokenRange deepTokenRange = mock(DeepTokenRange.class);
+
+    IDeepPartition deepPartition = createPartition(deepTokenRange);
     TaskContext taskcontext = createTaskContext();
 
 
 
-    Iterator iterator = deepRDD.compute(partition, taskcontext);
+    Iterator iterator = deepRDD.compute(deepPartition, taskcontext);
 
     assertNotNull("iterator is not null",iterator);
     assertTrue("Iterator has one object", iterator.hasNext());
@@ -83,21 +87,15 @@ public void testCompute() throws Exception {
     public void testGetPartitions() throws Exception {
         DeepRDD deepRDD = createDeepRDD();
 
-        ExtractorClient extractorClient = createExtractorClient();
+        IExtractor extractorClient = createExtractorClient();
         ExtractorConfig extractorConfig = mock(ExtractorConfig.class);
-
-        DeepTokenRange deepTokenRange = mock(DeepTokenRange.class);
-        DeepTokenRange otherDeepTokenRange = mock(DeepTokenRange.class);
-        DeepTokenRange[] aDeepTokenRange = {deepTokenRange,otherDeepTokenRange};
-        when(extractorClient.getPartitions(extractorConfig)).thenReturn(aDeepTokenRange);
-
-        DeepPartition deepPartition = mock(DeepPartition.class);
-        DeepPartition otherDeepPartition = mock(DeepPartition.class);
-        whenNew(DeepPartition.class).withArguments(0, 0, deepTokenRange).thenReturn(deepPartition);
-        whenNew(DeepPartition.class).withArguments(0, 1, otherDeepTokenRange).thenReturn(otherDeepPartition);
-
         Broadcast config = createConfig(extractorConfig);
         deepRDD.config = config;
+        DeepPartition deepPartition = mock(DeepPartition.class);
+        DeepPartition otherDeepPartition = mock(DeepPartition.class);
+        Partition[] aDeepTokenRange = {deepPartition,otherDeepPartition};
+        when(extractorClient.getPartitions(extractorConfig)).thenReturn(aDeepTokenRange);
+
 
         Partition[] partitions = deepRDD.getPartitions();
 
@@ -131,12 +129,12 @@ public void testCompute() throws Exception {
         return config;
     }
 
-    private ExtractorClient configureExtractorCompute(DeepTokenRange deepTokenRange, ExtractorConfig extractorConfig ) throws Exception {
+    private ExtractorClient configureExtractorCompute(Partition deepTokenRange, ExtractorConfig extractorConfig ) throws Exception {
         ExtractorClient extractorClient = createExtractorClient();
         when(extractorClient.hasNext()).thenReturn(true,true,false);
         when(extractorClient.next()).thenReturn(FIRST_RESULT, SECOND_RESULT);
 
-        DeepTokenRange[] aDeepTokenRange = {deepTokenRange};
+        Partition[] aDeepTokenRange = {deepTokenRange};
         when(extractorClient.getPartitions(extractorConfig)).thenReturn(aDeepTokenRange);
 
         doNothing().when(extractorClient).initIterator(deepTokenRange, extractorConfig);
