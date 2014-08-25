@@ -17,6 +17,7 @@
 package com.stratio.deep.examples.java;
 
 import com.stratio.deep.config.ExtractorConfig;
+
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.rdd.CassandraCellExtractor;

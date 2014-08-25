@@ -17,15 +17,16 @@
 package com.stratio.deep.examples.java;
 
 import com.mongodb.QueryBuilder;
-import com.stratio.deep.config.DeepJobConfig;
-import com.stratio.deep.config.IMongoDeepJobConfig;
-import com.stratio.deep.config.MongoConfigFactory;
-import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
+
+import java.util.List;
 
 /**
  * Example class to read a collection from mongoDB
@@ -67,24 +68,28 @@ public final class ReadingCellFromMongoDB {
         bsonFields.put("_id",0);
         //TODO review
 
-/*
-        DeepJobConfig inputConfigEntity = MongoConfigFactory.createMongoDB().host(host).database(database)
-                .collection(inputCollection)
-                .createInputSplit(false)
-                .filterQuery(query)
-                .sort(bsonSort).fields(bsonFields).initialize();
 
-        RDD inputRDDEntity = deepContext.createRDD(inputConfigEntity);
+        ExtractorConfig<Cells> extractorConfig = new ExtractorConfig<>();
 
-        LOG.info("****************************************************************************");
-        LOG.info("****************************************************************************");
-        LOG.info("****************************************************************************");
-        LOG.info("****************************************************************************");
-        LOG.info("****************************************************************************");
-	    LOG.error("count : " + inputRDDEntity.count());
-	    LOG.error("prints first cell  : " + inputRDDEntity.first());
+        extractorConfig.putValue("collection", "input").putValue("database", "test").putValue("host","localhost:27017");
 
 
-        deepContext.stop();*/
+
+
+
+        RDD<Cells> inputRDDEntity = deepContext.createRDD(extractorConfig);
+
+	    LOG.info("count : " + inputRDDEntity.count());
+	    LOG.info("prints first cell  : " + inputRDDEntity.first());
+
+        Cells[] list = (Cells[] )inputRDDEntity.collect();
+
+        for(int i = 0 ; i< list.length ; i++){
+            LOG.info("prints cell  : " + list[i]);
+        }
+
+
+
+        deepContext.stop();
     }
 }
