@@ -16,22 +16,20 @@
 
 package com.stratio.deep.examples.java;
 
-<<<<<<< HEAD
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.extractor.server.ExtractorServer;
 import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.rdd.CassandraCellExtractor;
-=======
+
 import com.stratio.deep.config.CassandraConfigFactory;
-import com.stratio.deep.config.DeepJobConfig;
+
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.context.DeepSparkContext;
+
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.rdd.CassandraJavaRDD;
->>>>>>> d4dc9b8912edfeaba739b6728b492603144b8cc6
+
+
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
@@ -88,13 +86,7 @@ public final class CreatingCellRDD {
 	    DeepSparkContext deepContext = new DeepSparkContext(sc);
 
         // Configuration and initialization
-        DeepJobConfig<Cells> config = CassandraConfigFactory.create()
-                .host(p.getCassandraHost())
-                .cqlPort(p.getCassandraCqlPort())
-                .rpcPort(p.getCassandraThriftPort())
-                .keyspace(keyspaceName)
-                .table(tableName)
-                .initialize();
+        ExtractorConfig<Cells> config = new ExtractorConfig<>();
 
         // Creating the RDD
         RDD rdd =  deepContext.createRDD(config);
