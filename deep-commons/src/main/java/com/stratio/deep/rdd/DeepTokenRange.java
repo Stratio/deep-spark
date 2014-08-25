@@ -54,13 +54,11 @@ public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable 
 
     /**
      * Construct a new token range with replica information
-     *
      * @param replicas
      */
-    public DeepTokenRange(String[] replicas) {
+    public DeepTokenRange(String [] replicas) {
         this.replicas = Arrays.asList(replicas);
     }
-
     /**
      * {@inheritDoc}
      */

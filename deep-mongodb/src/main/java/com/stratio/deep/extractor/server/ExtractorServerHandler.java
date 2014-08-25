@@ -18,6 +18,7 @@ import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.extractor.MongoExtractor;
 import com.stratio.deep.extractor.actions.*;
 import com.stratio.deep.extractor.response.*;
+import com.stratio.deep.rdd.DeepTokenRange;
 import com.stratio.deep.rdd.IExtractor;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;

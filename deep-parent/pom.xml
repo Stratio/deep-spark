@@ -358,9 +358,8 @@
     <modules>
        <module>../deep-commons</module>
         <module>../deep-cassandra</module>
-        <module>../deep-mongodb</module>
         <module>../deep-core</module>
-        <module>../deep-examples</module>
+          <module>../deep-examples</module> 
     </modules>
 
     <profiles>

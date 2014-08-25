@@ -62,7 +62,7 @@ public final class ExtractorServer {
         }
     }
 
-    public static void close() {
+    public static void close(){
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
     }

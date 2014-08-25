@@ -17,11 +17,17 @@
 package com.stratio.deep.examples.java;
 
 import com.stratio.deep.config.ExtractorConfig;
+
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.extractor.server.ExtractorServer;
+
 import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.rdd.CassandraCellExtractor;
 import com.stratio.deep.testentity.TweetEntity;
+
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.rdd.CassandraCellExtractor;
+
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
@@ -50,7 +56,7 @@ public final class AggregatingData {
      *
      * @param args the arguments passed to the application.
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         doMain(args);
     }
 
@@ -59,11 +65,11 @@ public final class AggregatingData {
      *
      * @param args
      */
-    public static void doMain(String[] args) throws Exception{
+    public static void doMain(String[] args) {
         String job = "java:aggregatingData";
 
-        String keyspaceName = "test";
-        String tableName    = "tweets";
+        String keyspaceName = "twitter";
+        String tableName = "tweets";
 
 //        //Call async the Extractor netty Server
 //        ExecutorService es = Executors.newFixedThreadPool(3);
@@ -80,10 +86,9 @@ public final class AggregatingData {
 	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // Creating a configuration for the RDD and initialize it
-        ExtractorConfig<TweetEntity> config = new ExtractorConfig<>(TweetEntity.class);
+        ExtractorConfig<Cells> config = new ExtractorConfig();
 
         config.setExtractorImplClass(CassandraCellExtractor.class);
-
         Map<String, String> values = new HashMap<>();
         values.put(ExtractorConstants.KEYSPACE, keyspaceName);
         values.put(ExtractorConstants.TABLE,    tableName);
@@ -91,19 +96,23 @@ public final class AggregatingData {
         values.put(ExtractorConstants.RPCPORT,  "9160");
         values.put(ExtractorConstants.HOST,     "127.0.0.1");
         config.setValues(values);
+//                .host("172.19.0.133").cqlPort(9042).rpcPort(9160)
+//                .host("172.19.0.166").cqlPort(9042).rpcPort(9160)
+//                .keyspace("twitter").table("tweets")
+//                .initialize();
 
         // Creating the RDD
-        RDD<TweetEntity> rdd = deepContext.createRDD(config);
+        RDD<Cells> rdd = deepContext.createRDD(config);
+//        LOG.info("count: " + rdd.count());
+//        LOG.info("first: " + rdd.first());
 
-        LOG.info("count: " + rdd.count());
-        LOG.info("first: " + rdd.first());
+        System.out.println("count: " + rdd.count());
+        System.out.println("first: " + rdd.first());
 
-
-
-//        // grouping to get key-value pairs
-//        JavaPairRDD<String, Integer> groups = rdd.toJavaRDD().groupBy(new Function<Cell, String>() {
+        // grouping to get key-value pairs
+//        JavaPairRDD<String, Integer> groups = rdd.toJavaRDD().groupBy(new Function<TweetEntity, String>() {
 //            @Override
-//            public String call(Cell tableEntity) {
+//            public String call(TweetEntity tableEntity) {
 //                return tableEntity.getAuthor();
 //            }
 //        }).mapToPair(new PairFunction<Tuple2<String, Iterable<TweetEntity>>, String, Integer>() {
@@ -155,7 +164,6 @@ public final class AggregatingData {
 //        LOG.info("variance: " + variance.toString());
 //        LOG.info("stddev: " + stddev.toString());
 
-        ExtractorServer.close();
         deepContext.stop();
     }
 

@@ -28,7 +28,7 @@ import org.apache.spark.Partition;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.rdd.RDD;
 import scala.collection.Seq;
-import com.stratio.deep.rdd.IDeepRecordReader;
+
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +45,7 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
 
 
     private IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
+
 
 
     protected ICassandraDeepJobConfig<T> cassandraJobConfig;
@@ -141,7 +142,8 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
     }
 
 
-    private ICassandraDeepJobConfig<T> initCustomConfig(ExtractorConfig<T> config) {
+
+    private ICassandraDeepJobConfig<T> initCustomConfig(ExtractorConfig<T> config){
         return cassandraJobConfig.initialize(config);
     }
 

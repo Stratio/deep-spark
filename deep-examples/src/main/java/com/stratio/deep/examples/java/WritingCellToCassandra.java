@@ -16,6 +16,7 @@
 
 package com.stratio.deep.examples.java;
 
+<<<<<<< HEAD
 import com.google.common.collect.Lists;
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
@@ -25,6 +26,21 @@ import com.stratio.deep.entity.Cells;
 import com.stratio.deep.extractor.server.ExtractorServer;
 import com.stratio.deep.rdd.CassandraCellExtractor;
 import com.stratio.deep.rdd.CassandraExtractor;
+=======
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
+import com.stratio.deep.config.CassandraConfigFactory;
+import com.stratio.deep.config.DeepJobConfig;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
+import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.entity.CassandraCell;
+import com.stratio.deep.entity.Cell;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.rdd.CassandraRDD;
+>>>>>>> d4dc9b8912edfeaba739b6728b492603144b8cc6
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -70,31 +86,17 @@ public final class WritingCellToCassandra {
         String inputTableName = "Page";
         final String outputTableName = "newlistdomains";
 
-        //Call async the Extractor netty Server
-//        ExecutorService es = Executors.newFixedThreadPool(3);
-//        final Future future = es.submit(new Callable() {
-//            public Object call() throws Exception {
-//                ExtractorServer.main(null);
-//                return null;
-//            }
-//        });
-
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
 	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
 
         // --- INPUT RDD
-        ExtractorConfig<Cells> inputConfig = new ExtractorConfig();
+        DeepJobConfig<Cells> inputConfig = CassandraConfigFactory.create()
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
+                .keyspace(keyspaceName).table(inputTableName)
+                .initialize();
 
-        inputConfig.setExtractorImplClass(CassandraCellExtractor.class);
-        Map<String, String> values = new HashMap<>();
-        values.put("keyspace",keyspaceName);
-        values.put("table", inputTableName);
-        values.put("cqlPort", "9042");
-        values.put("rpcPort", "9160");
-        values.put("host", "127.0.0.1");
-        inputConfig.setValues(values);
         RDD<Cells> inputRDD = deepContext.createRDD(inputConfig);
 
         JavaPairRDD<String, Cells> pairRDD = inputRDD.toJavaRDD().mapToPair(new PairFunction<Cells, String, Cells>() {
@@ -121,19 +123,12 @@ public final class WritingCellToCassandra {
 
 
         // --- OUTPUT RDD
-        ExtractorConfig<Cells> outputConfig = new ExtractorConfig();
+        DeepJobConfig<Cells> outputConfig = CassandraConfigFactory.createWriteConfig()
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
+                .keyspace(keyspaceName).table(outputTableName)
+                .createTableOnWrite(true);
 
-        outputConfig.setExtractorImplClass(CassandraCellExtractor.class);
-
-        values = new HashMap<>();
-        values.put("keyspace",keyspaceName);
-        values.put("table", inputTableName);
-        values.put("cqlPort", "9042");
-        values.put("rpcPort", "9160");
-        values.put("host", "127.0.0.1");
-        outputConfig.setValues(values);
-
-        //outputConfig.initialize();
+        outputConfig.initialize();
 
         JavaRDD<Cells> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
@@ -144,9 +139,8 @@ public final class WritingCellToCassandra {
             }
         });
 
-        CassandraExtractor.saveRDDToCassandra(outputRDD, outputConfig);
+        CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig);
 
         deepContext.stop();
-        ExtractorServer.close();
     }
 }

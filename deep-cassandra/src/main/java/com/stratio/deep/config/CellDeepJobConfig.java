@@ -46,6 +46,23 @@ public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
         return (Class<Cells>) dummyCells.getClass();
     }
 
+    @Override
+    public Class<?> getRDDClass() {
+        return CassandraCellExtractor.class;
+    }
+
+
+    public Method getSaveMethod() throws NoSuchMethodException {
+        return null;
+    }
+
+
+    public Configuration getHadoopConfiguration() {
+        return null;
+    }
+
+
+
 
 
 }

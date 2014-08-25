@@ -16,24 +16,27 @@
 
 package com.stratio.deep.examples.java;
 
+<<<<<<< HEAD
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.extractor.server.ExtractorServer;
 import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.rdd.CassandraCellExtractor;
+=======
+import com.stratio.deep.config.CassandraConfigFactory;
+import com.stratio.deep.config.DeepJobConfig;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
+import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.context.DeepSparkContext;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.rdd.CassandraJavaRDD;
+>>>>>>> d4dc9b8912edfeaba739b6728b492603144b8cc6
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.rdd.RDD;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -67,15 +70,6 @@ public final class CreatingCellRDD {
         String keyspaceName = "test";
         String tableName = "tweets";
 
-        //Call async the Extractor netty Server
-        ExecutorService es = Executors.newFixedThreadPool(3);
-        final Future future = es.submit(new Callable() {
-            public Object call() throws Exception {
-                ExtractorServer.main(null);
-                return null;
-            }
-        });
-
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
         SparkConf sparkConf = new SparkConf()
@@ -93,20 +87,14 @@ public final class CreatingCellRDD {
 
 	    DeepSparkContext deepContext = new DeepSparkContext(sc);
 
-        // Creating a configuration for the RDD and initialize it
-        ExtractorConfig<Cells> config = new ExtractorConfig();
-
-        config.setEntityClass(CassandraCellExtractor.class);
-
-        Map<String, String> values = new HashMap<>();
-        values.put(ExtractorConstants.KEYSPACE,keyspaceName);
-        values.put(ExtractorConstants.TABLE, tableName);
-        values.put(ExtractorConstants.CQLPORT, "9042");
-        values.put(ExtractorConstants.RPCPORT, "9160");
-        values.put(ExtractorConstants.HOST, p.getCassandraHost());
-
-
-        config.setValues(values);
+        // Configuration and initialization
+        DeepJobConfig<Cells> config = CassandraConfigFactory.create()
+                .host(p.getCassandraHost())
+                .cqlPort(p.getCassandraCqlPort())
+                .rpcPort(p.getCassandraThriftPort())
+                .keyspace(keyspaceName)
+                .table(tableName)
+                .initialize();
 
         // Creating the RDD
         RDD rdd =  deepContext.createRDD(config);
@@ -116,7 +104,6 @@ public final class CreatingCellRDD {
         LOG.info("Num of rows: " + counts);
 
         deepContext.stop();
-        ExtractorServer.close();
     }
 
     public static Long getCounts() {

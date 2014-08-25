@@ -18,7 +18,6 @@ package com.stratio.deep.context;
 
 
 
-import com.stratio.deep.core.context.DeepSparkContext;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.testng.annotations.Test;

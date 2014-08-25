@@ -36,7 +36,7 @@ public class CassandraCellExtractor extends CassandraExtractor<Cells> {
     private static final long serialVersionUID = -738528971629963221L;
 
 
-    public CassandraCellExtractor() {
+    public CassandraCellExtractor(){
         super();
         this.cassandraJobConfig = new CellDeepJobConfig(true);
     }

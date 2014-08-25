@@ -144,7 +144,7 @@ public class RangeUtils {
 
         Pair<Session, String> sessionWithHost =
                 CassandraClientProvider.getSession(
-                        config.getHost(), config, false);
+                        config.getHost(),config, false);
 
         String queryLocal = "select tokens from system.local";
         tokens.putAll(fetchTokens(queryLocal, sessionWithHost, p));

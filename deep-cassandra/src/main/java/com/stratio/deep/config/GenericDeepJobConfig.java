@@ -26,10 +26,12 @@ import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.rdd.IDeepPartition;
+import com.stratio.deep.rdd.IDeepRecordReader;
 import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
@@ -46,7 +48,7 @@ import static com.stratio.deep.utils.Utils.quote;
  * Base class for all config implementations providing default implementations for methods
  * defined in {@link com.stratio.deep.config.ICassandraDeepJobConfig}.
  */
-public abstract class GenericDeepJobConfig<T> implements AutoCloseable, ICassandraDeepJobConfig<T> {
+public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassandraDeepJobConfig<T> {
     private static final Logger LOG = Logger.getLogger("com.stratio.deep.config.GenericICassandraDeepJobConfig");
     private static final long serialVersionUID = -7179376653643603038L;
     private String partitionerClassName = "org.apache.cassandra.dht.Murmur3Partitioner";
@@ -779,6 +781,20 @@ public abstract class GenericDeepJobConfig<T> implements AutoCloseable, ICassand
     @Override
     public int getBisectFactor() {
         return bisectFactor;
+    }
+
+
+
+
+
+    @Override
+    public Class<? extends InputFormat<?, ?>> getInputFormatClass() {
+        return null;
+    }
+
+
+    public Class<? extends IDeepRecordReader> getRecordReaderClass() {
+        return DeepRecordReader.class;
     }
 
 

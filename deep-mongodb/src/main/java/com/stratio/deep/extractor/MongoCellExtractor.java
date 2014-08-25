@@ -40,10 +40,11 @@ public final class MongoCellExtractor extends MongoExtractor<Cells> {
     private static final Logger LOG = LoggerFactory.getLogger(MongoCellExtractor.class);
     private static final long serialVersionUID = -3208994171892747470L;
 
-    public MongoCellExtractor() {
+    public MongoCellExtractor(){
         super();
         this.mongoJobConfig = new CellDeepJobConfigMongoDB();
     }
+
 
 
     /**

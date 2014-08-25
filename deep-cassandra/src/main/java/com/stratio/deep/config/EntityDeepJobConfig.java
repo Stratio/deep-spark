@@ -72,6 +72,20 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         return this;
     }
 
+    @Override
+    public Class<? extends RDD<T>> getRDDClass() {
+        return null;
+    }
+
+
+    public Method getSaveMethod() throws NoSuchMethodException {
+        return null;
+    }
+
+
+    public Configuration getHadoopConfiguration() {
+        return null;
+    }
 
 
     /**

@@ -33,13 +33,10 @@ public final class ExtractorServer {
     static final boolean SSL = System.getProperty("ssl") != null;
     static final int PORT = Integer.parseInt(System.getProperty("port", "8463"));
 
-
-    private static EventLoopGroup bossGroup;
     private static EventLoopGroup workerGroup;
+    private static EventLoopGroup bossGroup;
 
-
-    public  static void main(String[] args) throws Exception {
-
+    public static void main(String[] args) throws Exception {
         // Configure SSL.
         final SslContext sslCtx;
         if (SSL) {
@@ -61,17 +58,12 @@ public final class ExtractorServer {
             b.bind(PORT).sync().channel().closeFuture().sync();
 
         } finally {
-
             close();
         }
     }
 
-    public static void close() {
+    public static void close(){
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
-
     }
-
-
-
 }

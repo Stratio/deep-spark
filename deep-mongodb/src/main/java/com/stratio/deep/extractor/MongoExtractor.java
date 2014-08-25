@@ -1,24 +1,26 @@
 package com.stratio.deep.extractor;
 
 import com.mongodb.hadoop.MongoInputFormat;
-import com.mongodb.hadoop.input.MongoRecordReader;
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.rdd.DeepTokenRange;
+import com.stratio.deep.rdd.IDeepRecordReader;
 import com.stratio.deep.rdd.IExtractor;
 import com.stratio.deep.utils.DeepSparkHadoopMapReduceUtil;
-import org.apache.hadoop.conf.Configuration;
+import com.stratio.deep.utils.Pair;
 import org.apache.hadoop.mapreduce.*;
 import org.apache.spark.Partition;
 import org.apache.spark.rdd.NewHadoopPartition;
 import org.apache.spark.rdd.RDD;
-import org.bson.BSONObject;
-import scala.Tuple2;
-
+import org.bson.BSON;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import org.apache.hadoop.conf.Configuration;
+import com.mongodb.hadoop.input.MongoRecordReader;
+import org.bson.BSONObject;
+import scala.Tuple2;
 
 /**
  * Created by rcrespo on 21/08/14.
@@ -69,13 +71,13 @@ public abstract class MongoExtractor<T> implements IExtractor<T> {
             List<InputSplit> splits = inputFormat.getSplits(jobContext);
 
             DeepTokenRange[] tokens = new DeepTokenRange[splits.size()];
-            for (int i = 0; i < splits.size(); i++) {
-                tokens[i] = new DeepTokenRange(splits.get(i).getLocations());
+            for(int i = 0; i < splits.size() ; i++){
+                tokens[i] =  new DeepTokenRange(splits.get(i).getLocations());
             }
 
 
             Partition[] partitions = new Partition[(splits.size())];
-            for (int i = 0; i < splits.size(); i++) {
+            for (int i = 0 ; i < splits.size(); i++) {
                 partitions[i] = new NewHadoopPartition(id, i, splits.get(i));
             }
 
@@ -107,7 +109,7 @@ public abstract class MongoExtractor<T> implements IExtractor<T> {
         }
         havePair = false;
 
-        Tuple2<Object, BSONObject> tuple = new Tuple2<>(reader.getCurrentKey(), reader.getCurrentValue());
+        Tuple2<Object, BSONObject> tuple = new Tuple2<>(reader.getCurrentKey(),reader.getCurrentValue());
         return transformElement(tuple, mongoJobConfig);
     }
 
@@ -122,7 +124,7 @@ public abstract class MongoExtractor<T> implements IExtractor<T> {
         mongoJobConfig = mongoJobConfig.initialize(config);
 
         int id = Integer.parseInt(config.getValues().get("spark.rdd.id"));
-        NewHadoopPartition split = (NewHadoopPartition) dp;
+        NewHadoopPartition split = (NewHadoopPartition)dp;
 
         TaskAttemptID attemptId = DeepSparkHadoopMapReduceUtil.newTaskAttemptID(jobTrackerId, id, true, split.index(), 0);
 
