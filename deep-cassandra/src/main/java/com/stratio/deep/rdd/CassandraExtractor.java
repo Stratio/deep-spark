@@ -45,9 +45,8 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
 
     private IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
 
-    private DeepTokenRange dp;
 
-    private ExtractorConfig<T> config;
+
     protected ICassandraDeepJobConfig<T> cassandraJobConfig;
 
     /**
@@ -137,8 +136,6 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
     @Override
     public void initIterator(final DeepTokenRange dp,
                              ExtractorConfig<T> config) {
-        this.config = config;
-        this.dp = dp;
         this.cassandraJobConfig = initCustomConfig(config);
         recordReader = initRecordReader(dp, cassandraJobConfig);
     }
@@ -201,6 +198,5 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
 
     }
 
-    public static void saveRDDToCassandra(JavaRDD<Cells> outRDD, ICassandraDeepJobConfig<Cells> writeConfig) {
-    }
+
 }

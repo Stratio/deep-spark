@@ -14,52 +14,44 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.rdd.mongodb;
+package com.stratio.deep.extractor;
 
 import com.mongodb.hadoop.MongoOutputFormat;
-import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.config.CellDeepJobConfigMongoDB;
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.IMongoDeepJobConfig;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepTransformException;
-import com.stratio.deep.rdd.IDeepHadoopRDD;
+import com.stratio.deep.rdd.IExtractor;
 import com.stratio.deep.utils.UtilMongoDB;
-import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.broadcast.Broadcast;
-import org.apache.spark.rdd.DeepMongoRDD;
 import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
-import scala.reflect.ClassTag$;
 
 /**
  * CellRDD to interact with mongoDB
  */
-public final class MongoCellRDD implements IDeepHadoopRDD<Cells, Object, BSONObject> {
+public final class MongoCellExtractor extends MongoExtractor<Cells> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MongoCellRDD.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MongoCellExtractor.class);
     private static final long serialVersionUID = -3208994171892747470L;
 
+    public MongoCellExtractor(){
+        super();
+        this.mongoJobConfig = new CellDeepJobConfigMongoDB();
+    }
 
-//    /**
-//     * Public constructor that builds a new MongoCellRDD RDD given the context and the configuration file.
-//     *
-//     * @param sc     the spark context to which the RDD will be bound to.
-//     * @param config the deep configuration object.
-//     */
-//    @SuppressWarnings("unchecked")
-//    public MongoCellRDD(SparkContext sc, IDeepJobConfig<Cells, IMongoDeepJobConfig<Cells>> config) {
-//        super(sc, (IMongoDeepJobConfig<Cells>) config, ClassTag$.MODULE$.<Cells>apply(config.getEntityClass()));
-//    }
+
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Cells transformElement(Tuple2<Object, BSONObject> tuple, Broadcast<IDeepJobConfig<Cells, ? extends IDeepJobConfig<?,?>>> config) {
+    public Cells transformElement(Tuple2<Object, BSONObject> tuple, IMongoDeepJobConfig<Cells> config) {
 
 
         try {
@@ -70,6 +62,11 @@ public final class MongoCellRDD implements IDeepHadoopRDD<Cells, Object, BSONObj
         }
     }
 
+    @Override
+    public IExtractor getExtractorInstance(ExtractorConfig<Cells> config) {
+        return this;
+    }
+
 
     /**
      * Save a RDD to MongoDB
@@ -77,7 +74,10 @@ public final class MongoCellRDD implements IDeepHadoopRDD<Cells, Object, BSONObj
      * @param rdd
      * @param config
      */
-    public static void saveCell(RDD rdd, IMongoDeepJobConfig<Cells> config) {
+    @Override
+    public void saveRDD(RDD<Cells> rdd, ExtractorConfig<Cells> config) {
+
+        mongoJobConfig = mongoJobConfig.initialize(config);
 
         JavaPairRDD<Object, BSONObject> save = rdd.toJavaRDD().mapToPair(new PairFunction<Cells, Object, BSONObject>() {
 
@@ -90,7 +90,8 @@ public final class MongoCellRDD implements IDeepHadoopRDD<Cells, Object, BSONObj
 
 
         // Only MongoOutputFormat and config are relevant
-        save.saveAsNewAPIHadoopFile("file:///cell", Object.class, Object.class, MongoOutputFormat.class, config.getHadoopConfiguration());
+        save.saveAsNewAPIHadoopFile("file:///cell", Object.class, Object.class, MongoOutputFormat.class, mongoJobConfig.getHadoopConfiguration());
     }
+
 
 }

@@ -8,7 +8,7 @@ import scala.reflect.ClassTag;
 /**
  * Created by rcrespo on 12/08/14.
  */
-public class DeepGenericHadoopRDD<T, K, V> extends DeepHadoopRDD<T, K, V> {
+public abstract class DeepGenericHadoopRDD<T, K, V> extends DeepHadoopRDD<T, K, V> {
 
 
     private IDeepHadoopRDD<T, K, V> innerDeepRDD;

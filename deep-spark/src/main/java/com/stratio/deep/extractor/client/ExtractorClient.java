@@ -15,6 +15,7 @@
 package com.stratio.deep.extractor.client;
 
 import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.rdd.DeepTokenRange;
 import com.stratio.deep.rdd.IExtractor;
 import io.netty.bootstrap.Bootstrap;
@@ -24,6 +25,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import org.apache.spark.Partition;
+import org.apache.spark.rdd.RDD;
 
 import javax.net.ssl.SSLException;
 
@@ -83,8 +86,18 @@ public class ExtractorClient<T> implements IExtractor<T> {
 
 
     @Override
-    public void initIterator(DeepTokenRange dp, ExtractorConfig<T> config) {
+    public void initIterator(Partition dp, ExtractorConfig<T> config) {
         handler.initIterator(dp, config);
+    }
+
+    @Override
+    public IExtractor getExtractorInstance(ExtractorConfig<T> config) {
+        return handler.getExtractorInstance(config);
+    }
+
+    @Override
+    public void saveRDD(RDD<T> rdd, ExtractorConfig<T> config) {
+        throw new DeepGenericException("Not implemented");
     }
 
 
@@ -100,7 +113,7 @@ public class ExtractorClient<T> implements IExtractor<T> {
      * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(com.stratio.deep.config.IDeepJobConfig, int)
      */
     @Override
-    public DeepTokenRange[] getPartitions(ExtractorConfig<T> config) {
+    public Partition[] getPartitions(ExtractorConfig<T> config) {
         return this.handler.getPartitions(config);
     }
 

@@ -112,7 +112,7 @@ public final class UtilMongoDB {
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
-    public static <T extends IDeepType> BSONObject getBsonFromObject(T t) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    public static <T> BSONObject getBsonFromObject(T t) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Field[] fields = AnnotationUtils.filterDeepFields(t.getClass());
 
         BSONObject bson = new BasicBSONObject();

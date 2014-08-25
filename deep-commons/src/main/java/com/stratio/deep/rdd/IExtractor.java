@@ -1,6 +1,8 @@
 package com.stratio.deep.rdd;
 
 import com.stratio.deep.config.ExtractorConfig;
+import org.apache.spark.Partition;
+import org.apache.spark.rdd.RDD;
 
 import java.io.Serializable;
 
@@ -10,7 +12,7 @@ import java.io.Serializable;
 public interface IExtractor<T> extends Serializable {
 
 
-    DeepTokenRange[] getPartitions(ExtractorConfig<T> config);
+    Partition[] getPartitions(ExtractorConfig<T> config);
 
 
     boolean hasNext();
@@ -19,10 +21,11 @@ public interface IExtractor<T> extends Serializable {
 
     void close();
 
-    void initIterator(DeepTokenRange dp,ExtractorConfig<T> config);
+    void initIterator(Partition dp, ExtractorConfig<T> config);
 
 
-//    void save(Cells rawKey, Cells data);
+    IExtractor getExtractorInstance(ExtractorConfig<T> config);
 
-//    Class getConfigClass();
+    void saveRDD(RDD<T> rdd, ExtractorConfig<T> config);
+
 }

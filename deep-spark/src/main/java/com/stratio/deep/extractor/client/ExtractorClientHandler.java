@@ -22,6 +22,8 @@ import com.stratio.deep.rdd.IExtractor;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.apache.spark.Partition;
+import org.apache.spark.rdd.RDD;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -67,7 +69,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
      * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(org.apache.spark.broadcast.Broadcast, int)
      */
     @Override
-    public DeepTokenRange[] getPartitions(ExtractorConfig<T> config) {
+    public Partition[] getPartitions(ExtractorConfig<T> config) {
 
         GetPartitionsAction<T> getPartitionsAction = new GetPartitionsAction<>(config);
 
@@ -166,7 +168,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
 
     @Override
-    public void initIterator(DeepTokenRange dp, ExtractorConfig<T> config) {
+    public void initIterator(Partition dp, ExtractorConfig<T> config) {
         InitIteratorAction<T> initIteratorAction = new InitIteratorAction<>(dp, config);
 
         channel.writeAndFlush(initIteratorAction);
@@ -186,6 +188,34 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
             Thread.currentThread().interrupt();
         }
         return;
+    }
+
+    @Override
+    public IExtractor getExtractorInstance(ExtractorConfig<T> config) {
+        ExtractorInstanceAction<T> instanceAction = new ExtractorInstanceAction<>(config);
+
+        channel.writeAndFlush(instanceAction);
+
+        Response response;
+        boolean interrupted = false;
+        for (; ; ) {
+            try {
+                response = answer.take();
+                break;
+            } catch (InterruptedException ignore) {
+                interrupted = true;
+            }
+        }
+
+        if (interrupted) {
+            Thread.currentThread().interrupt();
+        }
+
+        return ((ExtractorInstanceResponse<T>) response).getData();    }
+
+    @Override
+    public void saveRDD(RDD<T> rdd, ExtractorConfig<T> config) {
+
     }
 
 }

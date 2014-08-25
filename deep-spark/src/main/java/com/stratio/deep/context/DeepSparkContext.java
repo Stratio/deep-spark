@@ -18,14 +18,17 @@ package com.stratio.deep.context;
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.exception.DeepInstantiationException;
+import com.stratio.deep.extractor.client.ExtractorClient;
 import com.stratio.deep.rdd.DeepJavaRDD;
 import com.stratio.deep.rdd.DeepRDD;
+import com.stratio.deep.rdd.IExtractor;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
 
+import javax.net.ssl.SSLException;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -100,24 +103,16 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
 
     /**
-     * @param deepJobConfig
+     * @param extractorConfig
      * @param <T>
      * @return
      */
-    public <T> RDD<T> createRDD(final ExtractorConfig deepJobConfig) {
+    public <T> RDD<T> createRDD(final ExtractorConfig extractorConfig) {
         try {
 
-            Class rdd = deepJobConfig.getRDDClass();
-            final Constructor c = rdd.getConstructor();
-            if (deepJobConfig.getInputFormatClass() != null) {
-                return null;
-//        return new DeepGenericHadoopRDD(this.sc(), deepJobConfig, deepJobConfig.getInputFormatClass(),
-//            (IDeepHadoopRDD) c.newInstance(), ClassTag$.MODULE$.<Cells>apply(deepJobConfig
-//                .getEntityClass()), ClassTag$.MODULE$.Any(), ClassTag$.MODULE$.Any());
-            } else {
-
-                return new DeepRDD<T>(this.sc(), deepJobConfig);
-            }
+            Class extractorImplClass = extractorConfig.getExtractorImplClass();
+            final Constructor c = extractorImplClass.getConstructor();
+            return new DeepRDD<T>(this.sc(), extractorConfig);
 
         } catch (NoSuchMethodException e) {
             LOG.error("impossible to instance IDeepJobConfig, check configuration");
@@ -127,22 +122,35 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
     }
 
     /**
-     * @param deepJobConfig
+     * @param extractorConfig
      * @param <T>
      * @return
      */
     public <T> JavaRDD<T> createJavaRDD(
-            ExtractorConfig<T> deepJobConfig) {
-        return new DeepJavaRDD((DeepRDD<T>) createRDD(deepJobConfig));
+            ExtractorConfig<T> extractorConfig) {
+        return new DeepJavaRDD((DeepRDD<T>) createRDD(extractorConfig));
     }
 
 
-    public <T, S extends IDeepJobConfig<?, ?>> void saveRDD(RDD<T> rdd,
-                                                            IDeepJobConfig<T, S> deepJobConfig) {
+    /**
+     *
+     * @param rdd
+     * @param extractorConfig
+     * @param <T>
+     */
+    public <T> void saveRDD(RDD<T> rdd, ExtractorConfig<T> extractorConfig) {
         try {
-            deepJobConfig.getSaveMethod().invoke(null, rdd, deepJobConfig);
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            throw new DeepInstantiationException(e.getMessage());
+
+
+            ExtractorClient<T> extractorClient = new ExtractorClient<>();
+            extractorClient.initialize();
+            IExtractor<T> extractorImpl = extractorClient.getExtractorInstance(extractorConfig);
+            extractorImpl.saveRDD(rdd, extractorConfig);
+//            extractorConfig.getExtractorImplClass(). getSaveMethod().invoke(null, rdd, extractorConfig);
+//        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+//            throw new DeepInstantiationException(e.getMessage());
+        } catch (InterruptedException | SSLException e) {
+            e.printStackTrace();
         }
     }
 }

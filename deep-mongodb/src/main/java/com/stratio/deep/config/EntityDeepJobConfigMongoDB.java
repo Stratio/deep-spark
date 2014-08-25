@@ -16,13 +16,9 @@
 
 package com.stratio.deep.config;
 
-import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.rdd.IDeepRecordReader;
-import com.stratio.deep.rdd.mongodb.MongoCellRDD;
-import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
+import com.stratio.deep.extractor.MongoEntityExtractor;
 import com.stratio.deep.utils.AnnotationUtils;
-import org.apache.spark.rdd.RDD;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -91,7 +87,7 @@ public final class EntityDeepJobConfigMongoDB<T extends IDeepType> extends Gener
 
     @Override
     public Class<?> getRDDClass() {
-        return MongoEntityRDD.class;
+        return MongoEntityExtractor.class;
     }
 
     @Override

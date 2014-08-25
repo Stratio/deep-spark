@@ -36,6 +36,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
     public DeepRDD(SparkContext sc, ExtractorConfig<T> config) {
         super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config
                 .getEntityClass()));
+        config.putValue("spark.rdd.id", String.valueOf(id()));
         this.config =
                 sc.broadcast(config, ClassTag$.MODULE$
                         .<ExtractorConfig<T>>apply(config.getClass()));
@@ -53,7 +54,8 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
 
         context.addOnCompleteCallback(new OnComputedRDDCallback(extractorClient));
 
-        extractorClient.initIterator(((IDeepPartition) split).splitWrapper(), config.getValue());
+
+        extractorClient.initIterator(split, config.getValue());
         java.util.Iterator<T> iterator = new java.util.Iterator<T>() {
 
             @Override
@@ -82,19 +84,26 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
     public Partition[] getPartitions() {
         initExtractorClient();
 
-        DeepTokenRange[] tokenRanges = extractorClient.getPartitions(config.getValue());
-
-        Partition[] partitions = new DeepPartition[tokenRanges.length];
-
-        int i = 0;
-
-        for (DeepTokenRange split : tokenRanges) {
-            partitions[i] = new DeepPartition(id(), i, split);
-            ++i;
-        }
-
-        return partitions;
+        return extractorClient.getPartitions(config.getValue());
     }
+
+//    @Override
+//    public Partition[] getPartitions() {
+//        initExtractorClient();
+//
+//        DeepTokenRange[] tokenRanges = extractorClient.getPartitions(config.getValue());
+//
+//        Partition[] partitions = new DeepPartition[tokenRanges.length];
+//
+//        int i = 0;
+//
+//        for (DeepTokenRange split : tokenRanges) {
+//            partitions[i] = new DeepPartition(id(), i, split);
+//            ++i;
+//        }
+//
+//        return partitions;
+//    }
 
     public Broadcast<ExtractorConfig<T>> getConfig() {
         return config;
@@ -113,6 +122,5 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         }
 
     }
-
 
 }
