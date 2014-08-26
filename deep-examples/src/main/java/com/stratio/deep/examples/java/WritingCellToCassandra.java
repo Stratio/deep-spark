@@ -16,7 +16,7 @@
 
 package com.stratio.deep.examples.java;
 
-<<<<<<< HEAD
+
 import com.google.common.collect.Lists;
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
@@ -26,21 +26,11 @@ import com.stratio.deep.entity.Cells;
 import com.stratio.deep.extractor.server.ExtractorServer;
 import com.stratio.deep.rdd.CassandraCellExtractor;
 import com.stratio.deep.rdd.CassandraExtractor;
-=======
+
 import java.util.List;
 
-import com.google.common.collect.Lists;
 
-import com.stratio.deep.config.CassandraConfigFactory;
-import com.stratio.deep.config.DeepJobConfig;
-import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.context.DeepSparkContext;
-import com.stratio.deep.entity.CassandraCell;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.rdd.CassandraRDD;
->>>>>>> d4dc9b8912edfeaba739b6728b492603144b8cc6
+
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -92,10 +82,7 @@ public final class WritingCellToCassandra {
 
 
         // --- INPUT RDD
-        DeepJobConfig<Cells> inputConfig = CassandraConfigFactory.create()
-                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
-                .keyspace(keyspaceName).table(inputTableName)
-                .initialize();
+        ExtractorConfig<Cells> inputConfig = new ExtractorConfig();
 
         RDD<Cells> inputRDD = deepContext.createRDD(inputConfig);
 
@@ -123,12 +110,8 @@ public final class WritingCellToCassandra {
 
 
         // --- OUTPUT RDD
-        DeepJobConfig<Cells> outputConfig = CassandraConfigFactory.createWriteConfig()
-                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
-                .keyspace(keyspaceName).table(outputTableName)
-                .createTableOnWrite(true);
+        ExtractorConfig<Cells> outputConfig = new ExtractorConfig();
 
-        outputConfig.initialize();
 
         JavaRDD<Cells> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
@@ -139,7 +122,7 @@ public final class WritingCellToCassandra {
             }
         });
 
-        CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig);
+        //CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig);
 
         deepContext.stop();
     }

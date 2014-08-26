@@ -17,13 +17,15 @@
 package com.stratio.deep.rdd;
 
 import java.util.List;
+
+import com.stratio.deep.config.ExtractorConfig;
 import scala.reflect.ClassTag$;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.CassandraConfigFactory;
-import com.stratio.deep.config.DeepJobConfig;
+
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
@@ -121,15 +123,7 @@ public class CassandraCql3RDDTest extends CassandraRDDTest<Cql3TestEntity> {
         int allElements = entities.length;
         assertTrue(allElements > 1);
 
-        DeepJobConfig<Cql3TestEntity> config = CassandraConfigFactory
-                .create(Cql3TestEntity.class)
-                .host(Constants.DEFAULT_CASSANDRA_HOST)
-                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-                .keyspace(KEYSPACE_NAME)
-                .columnFamily(CQL3_COLUMN_FAMILY)
-                .filterByField("food", "donuts")
-                .initialize();
+        ExtractorConfig<Cql3TestEntity> config = new ExtractorConfig<>(Cql3TestEntity.class);
 
         RDD<Cql3TestEntity> otherRDD = context.createRDD(config);
 

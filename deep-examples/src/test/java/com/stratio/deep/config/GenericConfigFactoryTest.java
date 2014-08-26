@@ -17,6 +17,8 @@
 package com.stratio.deep.config;
 
 import java.lang.annotation.AnnotationTypeMismatchException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
@@ -24,6 +26,8 @@ import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
+import com.stratio.deep.extractor.utils.ExtractorConstants;
+import com.stratio.deep.rdd.CassandraCellExtractor;
 import com.stratio.deep.testentity.TestEntity;
 import com.stratio.deep.testentity.WronglyMappedTestEntity;
 import com.stratio.deep.utils.Constants;
@@ -44,9 +48,17 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
 
     @Test
     public void testWriteConfigValidation() {
-        DeepJobConfig<TestEntity> djc = CassandraConfigFactory.createWriteConfig(TestEntity.class);
+        ExtractorConfig<TestEntity> djc = new ExtractorConfig(TestEntity.class);
 
-        djc.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
+
+        Map<String, String> values = new HashMap<>();
+        values.put(ExtractorConstants.KEYSPACE, KEYSPACE_NAME);
+        values.put(ExtractorConstants.COLUMN_FAMILY, "inexistent_test_page");
+        values.put(ExtractorConstants.CQLPORT,  CassandraServer.CASSANDRA_CQL_PORT);
+        values.put(ExtractorConstants.RPCPORT,  CassandraServer.CASSANDRA_THRIFT_PORT);
+
+        djc.setValues(values);
+        djc.rpcPort().cqlPort()
                 .columnFamily("inexistent_test_page").keyspace(KEYSPACE_NAME);
 
         try {
