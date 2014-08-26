@@ -80,5 +80,4 @@ public interface IESDeepJobConfig<T> extends IDeepJobConfig<T, IESDeepJobConfig<
     List<String> getHostList();
 
 
-//    DeepElasticSearchRDD<T> elasticRDD(DeepSparkContext sparkContext);
 }

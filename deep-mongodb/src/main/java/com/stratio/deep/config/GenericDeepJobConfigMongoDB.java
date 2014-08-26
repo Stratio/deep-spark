@@ -525,22 +525,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
 
 
     @Override
-    public Class<? extends InputFormat<?,?>> getInputFormatClass() {
-        return inputFormat;
-    }
-
-    @Override
-    public Class<? extends IDeepPartition> getPatitionClass(){
-        return null;
-    }
-
-    @Override
-    public Class<? extends IDeepRecordReader> getRecordReaderClass() {
-        return null;
-    }
-
-
-    @Override
     public IMongoDeepJobConfig<T> initialize(ExtractorConfig deepJobConfig) {
         Map<String, String> values = deepJobConfig.getValues();
 

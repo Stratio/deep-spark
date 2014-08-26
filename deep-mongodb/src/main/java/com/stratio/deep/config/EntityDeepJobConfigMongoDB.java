@@ -85,15 +85,5 @@ public final class EntityDeepJobConfigMongoDB<T extends IDeepType> extends Gener
         this.mapDBNameToEntityName = mapDBNameToEntityName;
     }
 
-    @Override
-    public Class<?> getRDDClass() {
-        return MongoEntityExtractor.class;
-    }
-
-    @Override
-    public Method getSaveMethod() throws NoSuchMethodException {
-        return null;
-    }
-
 
 }

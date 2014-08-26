@@ -14,52 +14,49 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.rdd;
+package com.stratio.deep.extractor;
 
+import com.stratio.deep.config.CellDeepJobConfigES;
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.IESDeepJobConfig;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepTransformException;
+import com.stratio.deep.extractor.impl.GenericHadoopExtractor;
+import com.stratio.deep.rdd.IExtractor;
 import com.stratio.deep.utils.UtilES;
-import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.rdd.DeepElasticSearchRDD;
 import org.apache.spark.rdd.RDD;
+import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
 import org.elasticsearch.hadoop.mr.LinkedMapWritable;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
-import scala.reflect.ClassTag$;
-
 
 /**
- * Created by rcrespo on 29/07/14.
+ * CellRDD to interact with ES
  */
-public final class ESCellRDD extends DeepElasticSearchRDD<Cells> {
+public final class ESCellExtractor extends GenericHadoopExtractor<Cells, Object, LinkedMapWritable> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ESCellRDD.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ESCellExtractor.class);
     private static final long serialVersionUID = -3208994171892747470L;
 
-
-    /**
-     * Public constructor that builds a new ESRDD given the context and the configuration file.
-     *
-     * @param sc     the spark context to which the RDD will be bound to.
-     * @param config the deep configuration object.
-     */
-    @SuppressWarnings("unchecked")
-    public ESCellRDD(SparkContext sc, IDeepJobConfig<Cells, IESDeepJobConfig<Cells>> config) {
-        super(sc, (IESDeepJobConfig<Cells>) config, ClassTag$.MODULE$.<Cells>apply(config.getEntityClass()));
+    public ESCellExtractor(){
+        super();
+        this.deepJobConfig = new CellDeepJobConfigES();
+        this.inputFormat = new EsInputFormat<>() ;
     }
+
+
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Cells transformElement(Tuple2<Object, LinkedMapWritable> tuple) {
+    public Cells transformElement(Tuple2<Object, LinkedMapWritable> tuple, IDeepJobConfig<Cells, ? extends IDeepJobConfig> config) {
 
         try {
             return UtilES.getCellFromJson(tuple._2());
@@ -68,6 +65,7 @@ public final class ESCellRDD extends DeepElasticSearchRDD<Cells> {
             throw new DeepTransformException("Could not transform from Json to Cell " + e.getMessage());
         }
     }
+
 
 
     /**
