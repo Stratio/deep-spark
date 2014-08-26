@@ -19,6 +19,7 @@ package com.stratio.deep.rdd;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.CharacterCodingException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,14 +30,17 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.CassandraConfigFactory;
-import com.stratio.deep.config.DeepJobConfig;
+
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
+import com.stratio.deep.core.extractor.client.ExtractorClient;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
+import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.testentity.StrippedTestEntity;
 import com.stratio.deep.testentity.TestEntity;
 import com.stratio.deep.utils.Constants;
@@ -63,7 +67,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     private Logger logger = Logger.getLogger(getClass());
 
     private JavaRDD<TestEntity> rdd;
-    protected DeepJobConfig<TestEntity> rddConfig;
+    protected ExtractorConfig<TestEntity> config;
 
     JavaRDD<TestEntity> slowPages = null;
     JavaRDD<TestEntity> quickPages = null;
@@ -72,21 +76,25 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
             InterruptedException {
 
-        rddConfig = CassandraConfigFactory.create(TestEntity.class)
-                .host(Constants.DEFAULT_CASSANDRA_HOST)
-                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-                .keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY)
-                .partitioner("org.apache.cassandra.dht.Murmur3Partitioner")
-                .username("")
-                .password("");
+        config = new ExtractorConfig<>(TestEntity.class);
 
-        rddConfig.initialize();
+        Map<String, String> values = new HashMap<>();
+        values.put(ExtractorConstants.HOST,    Constants.DEFAULT_CASSANDRA_HOST);
+        values.put(ExtractorConstants.KEYSPACE, KEYSPACE_NAME);
+        values.put(ExtractorConstants.COLUMN_FAMILY,  COLUMN_FAMILY);
+        values.put(ExtractorConstants.CQLPORT,  String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
+        //createTableOnWrite(Boolean.TRUE)
+        values.put(ExtractorConstants.USERNAME,    "");
+        values.put(ExtractorConstants.PASSWORD,    "");
 
-        logger.info("Constructed configuration object: " + rddConfig);
+        config.setValues(values);
+
+
+        logger.info("Constructed configuration object: " + config);
         logger.info("Constructiong cassandraRDD");
 
-        rdd = context.createJavaRDD(rddConfig);
+        rdd = context.createJavaRDD(config);
     }
 
     @Test
@@ -244,7 +252,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
         JavaRDD<Cells> cells = reducedRDD
                 .map(new Tuple2CellsFunction());
 
-        CassandraRDD.saveRDDToCassandra(cells, writeConfig);
+        //CassandraRDD.saveRDDToCassandra(cells, writeConfig);
 
         checkOutputTestData();
 
@@ -267,7 +275,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
         JavaRDD<Cells> outRDD = pairRDD.map(new WrongSensors2CellsFunction());
 
         try {
-            CassandraRDD.saveRDDToCassandra(outRDD, writeConfig);
+            //CassandraRDD.saveRDDToCassandra(outRDD, writeConfig);
 
             fail();
         } catch (DeepNoSuchFieldException e) {
@@ -276,7 +284,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
         }
 
         outRDD = pairRDD.map(new Sensors2CellsFunction());
-        CassandraRDD.saveRDDToCassandra(outRDD, writeConfig);
+        //CassandraRDD.saveRDDToCassandra(outRDD, writeConfig);
     }
 
     private void checkOutputTestData() {
