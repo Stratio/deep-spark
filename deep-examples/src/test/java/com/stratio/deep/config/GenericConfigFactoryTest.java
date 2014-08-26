@@ -54,58 +54,70 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
         Map<String, String> values = new HashMap<>();
         values.put(ExtractorConstants.KEYSPACE, KEYSPACE_NAME);
         values.put(ExtractorConstants.COLUMN_FAMILY, "inexistent_test_page");
-        values.put(ExtractorConstants.CQLPORT,  CassandraServer.CASSANDRA_CQL_PORT);
-        values.put(ExtractorConstants.RPCPORT,  CassandraServer.CASSANDRA_THRIFT_PORT);
+        values.put(ExtractorConstants.CQLPORT,  String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.RPCPORT,  String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
 
-        djc.setValues(values);
-        djc.rpcPort().cqlPort()
-                .columnFamily("inexistent_test_page").keyspace(KEYSPACE_NAME);
+
 
         try {
-            djc.initialize();
+            djc.setValues(values);
             fail();
         } catch (IllegalArgumentException iae) {
             // OK
             log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
-            djc.createTableOnWrite(true);
+            values = djc.getValues();
+            values.put(ExtractorConstants.CREATE_ON_WRITE,String.valueOf(true));
+            djc.setValues(values);
         } catch (Exception e) {
             fail(e.getMessage());
         }
 
-        djc.initialize();
+
     }
 
     @Test
     public void testInputColumnsExist() {
-        DeepJobConfig<Cells> djc = CassandraConfigFactory.create();
+        ExtractorConfig<Cells> djc = new ExtractorConfig<>();
 
-        djc.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-                .columnFamily(COLUMN_FAMILY).keyspace(KEYSPACE_NAME).inputColumns("not_existent_col1",
-                "not_existent_col2");
+        Map<String, String> values = new HashMap<>();
+        values.put(ExtractorConstants.KEYSPACE, KEYSPACE_NAME);
+        values.put(ExtractorConstants.COLUMN_FAMILY, COLUMN_FAMILY);
+        values.put(ExtractorConstants.CQLPORT,  String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.RPCPORT,  String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
+        values.put(ExtractorConstants.INPUT_COLUMNS,"not_existent_col1");
+
+        djc.setValues(values);
 
         try {
-            djc.initialize();
+
             fail();
         } catch (DeepNoSuchFieldException iae) {
             // OK
             log.info("Correctly catched DeepNoSuchFieldException: " + iae.getLocalizedMessage());
-            djc.inputColumns("domain_name", "response_time", "url");
+//            djc.inputColumns("domain_name", "response_time", "url");
         } catch (Exception e) {
             fail(e.getMessage());
         }
 
-        djc.initialize();
+
     }
 
     @Test
     public void testValidation() {
 
-        DeepJobConfig<TestEntity> djc = CassandraConfigFactory.create(TestEntity.class);
+        ExtractorConfig<TestEntity> djc = new ExtractorConfig<>(TestEntity.class);
 
-        djc.host(null).rpcPort(null).pageSize(0).bisectFactor(3);
+        Map<String, String> values = new HashMap<>();
+        values.put(ExtractorConstants.PAGE_SIZE,String.valueOf(0));
+
+        values.put(ExtractorConstants.HOST,  null);
+        values.put(ExtractorConstants.RPCPORT,  null);
+        values.put(ExtractorConstants.BISECT_FACTOR,String.valueOf(3));
+
+        djc.setValues(values);
 
         try {
-            djc.getKeyspace();
+            djc.getValues().get(ExtractorConstants.KEYSPACE);
         } catch (DeepIllegalAccessException e) {
             log.info("Correctly catched DeepIllegalAccessException: " + e.getLocalizedMessage());
         } catch (Exception e) {
@@ -114,7 +126,7 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
         }
 
         try {
-            djc.getHost();
+            djc.getValues().get(ExtractorConstants.HOST);
         } catch (DeepIllegalAccessException e) {
             log.info("Correctly catched DeepIllegalAccessException: " + e.getLocalizedMessage());
         } catch (Exception e) {
@@ -123,7 +135,7 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
         }
 
         try {
-            djc.getRpcPort();
+            djc.getValues().get(ExtractorConstants.RPCPORT);
         } catch (DeepIllegalAccessException e) {
             log.info("Correctly catched DeepIllegalAccessException: " + e.getLocalizedMessage());
         } catch (Exception e) {
@@ -132,7 +144,7 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
         }
 
         try {
-            djc.getUsername();
+            djc.getValues().get(ExtractorConstants.USERNAME);
         } catch (DeepIllegalAccessException e) {
             log.info("Correctly catched DeepIllegalAccessException: " + e.getLocalizedMessage());
         } catch (Exception e) {
@@ -141,7 +153,7 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
         }
 
         try {
-            djc.getPassword();
+            djc.getValues().get(ExtractorConstants.PASSWORD);
         } catch (DeepIllegalAccessException e) {
             log.info("Correctly catched DeepIllegalAccessException: " + e.getLocalizedMessage());
         } catch (Exception e) {
@@ -150,7 +162,7 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
         }
 
         try {
-            djc.getColumnFamily();
+            djc.getValues().get(ExtractorConstants.COLUMN_FAMILY);
         } catch (DeepIllegalAccessException e) {
             log.info("Correctly catched DeepIllegalAccessException: " + e.getLocalizedMessage());
         } catch (Exception e) {
@@ -159,7 +171,7 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
         }
 
         try {
-            djc.getPageSize();
+            djc.getValues().get(ExtractorConstants.PAGE_SIZE);
         } catch (DeepIllegalAccessException e) {
             log.info("Correctly catched DeepIllegalAccessException: " + e.getLocalizedMessage());
         } catch (Exception e) {
@@ -167,7 +179,7 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
         }
 
         try {
-            djc.getPageSize();
+            djc.getValues().get(ExtractorConstants.PAGE_SIZE);
         } catch (DeepIllegalAccessException e) {
             log.info("Correctly catched DeepIllegalAccessException: " + e.getLocalizedMessage());
         } catch (Exception e) {
@@ -185,7 +197,7 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
         }
 
         try {
-            djc.initialize();
+
             fail();
         } catch (IllegalArgumentException iae) {
             // OK
@@ -194,10 +206,10 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
             fail(e.getMessage());
         }
 
-        djc.host("localhost");
+        djc.getValues().put(ExtractorConstants.HOST,"localhost");
 
         try {
-            djc.initialize();
+
             fail();
         } catch (IllegalArgumentException iae) {
             // OK
@@ -205,12 +217,12 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
         } catch (Exception e) {
             fail(e.getMessage());
         }
+        djc.getValues().put(ExtractorConstants.RPCPORT,String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
+        djc.getValues().put(ExtractorConstants.CQLPORT,String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
 
-        djc.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT);
 
         try {
-            djc.initialize();
+
             fail();
         } catch (IllegalArgumentException iae) {
             // OK
@@ -218,11 +230,11 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
         } catch (Exception e) {
             fail(e.getMessage());
         }
+        djc.getValues().put(ExtractorConstants.KEYSPACE,KEYSPACE_NAME);
 
-        djc.keyspace(KEYSPACE_NAME);
 
         try {
-            djc.initialize();
+
             fail();
         } catch (IllegalArgumentException iae) {
             // OK
@@ -230,23 +242,12 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
         } catch (Exception e) {
             fail(e.getMessage());
         }
+        djc.getValues().put(ExtractorConstants.COLUMN_FAMILY,"test_page");
 
-        djc.columnFamily("test_page");
-
-        try {
-            djc.readConsistencyLevel("not valid CL");
-            djc.initialize();
-            fail();
-        } catch (IllegalArgumentException iae) {
-            // OK
-            log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
 
         try {
-            djc.pageSize(0);
-            djc.initialize();
+            //djc.readConsistencyLevel("not valid CL");
+
             fail();
         } catch (IllegalArgumentException iae) {
             // OK
@@ -256,68 +257,88 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
         }
 
         try {
-            djc.pageSize(1 + Constants.DEFAULT_MAX_PAGE_SIZE);
-            djc.initialize();
+           /* djc.pageSize(0);
+            djc.initialize();*/
             fail();
         } catch (IllegalArgumentException iae) {
             // OK
             log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
-
-            djc.pageSize(10);
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-
-
-        djc.readConsistencyLevel(ConsistencyLevel.LOCAL_ONE.name());
-
-        try {
-            djc.writeConsistencyLevel("not valid CL");
-            djc.initialize();
-            fail();
-        } catch (IllegalArgumentException iae) {
-            // OK
-            log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-
-        djc.writeConsistencyLevel(ConsistencyLevel.LOCAL_ONE.name());
-
-        try {
-            djc.initialize();
-            fail();
-        } catch (IllegalArgumentException iae) {
-            // OK
-            log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
-            djc.columnFamily(COLUMN_FAMILY);
         } catch (Exception e) {
             fail(e.getMessage());
         }
 
         try {
-            djc.initialize();
+           /* djc.pageSize(1 + Constants.DEFAULT_MAX_PAGE_SIZE);
+            djc.initialize();*/
             fail();
         } catch (IllegalArgumentException iae) {
             // OK
             log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
-            djc.bisectFactor(4);
+
+//            djc.pageSize(10);
         } catch (Exception e) {
             fail(e.getMessage());
         }
 
-        djc.initialize();
+
+        //djc.readConsistencyLevel(ConsistencyLevel.LOCAL_ONE.name());
+
+        try {
+//            djc.writeConsistencyLevel("not valid CL");
+//            djc.initialize();
+            fail();
+        } catch (IllegalArgumentException iae) {
+            // OK
+            log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+
+//        djc.writeConsistencyLevel(ConsistencyLevel.LOCAL_ONE.name());
+
+        try {
+
+            fail();
+        } catch (IllegalArgumentException iae) {
+            // OK
+            log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+
+        try {
+//            djc.initialize();
+            fail();
+        } catch (IllegalArgumentException iae) {
+            // OK
+            log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
+            djc.getValues().put(ExtractorConstants.BISECT_FACTOR,"4");
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+
+
     }
 
     @Test
     public void testWronglyMappedField() {
 
-        DeepJobConfig<WronglyMappedTestEntity> djc = CassandraConfigFactory.create(WronglyMappedTestEntity.class).host
-                (Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY);
+        ExtractorConfig<WronglyMappedTestEntity> djc = new ExtractorConfig<>(WronglyMappedTestEntity.class);
+
+        Map<String, String> values = new HashMap<>();
+        values.put(ExtractorConstants.KEYSPACE,KEYSPACE_NAME);
+        values.put(ExtractorConstants.COLUMN_FAMILY,COLUMN_FAMILY);
+
+        values.put(ExtractorConstants.HOST,  Constants.DEFAULT_CASSANDRA_HOST);
+        values.put(ExtractorConstants.RPCPORT,  String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
+        values.put(ExtractorConstants.CQLPORT,  String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.BISECT_FACTOR,String.valueOf(3));
+
+        djc.setValues(values);
 
         try {
-            djc.initialize();
+            djc.setValues(values);
 
             fail();
         } catch (DeepNoSuchFieldException e) {
@@ -328,10 +349,18 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
 
     @Test
     public void testValidationNotAnnotadedTestEntity() {
-        DeepJobConfig<NotAnnotatedTestEntity> djc = CassandraConfigFactory.create(NotAnnotatedTestEntity.class)
-                .keyspace("a").columnFamily("cf");
+        ExtractorConfig<NotAnnotatedTestEntity> djc = new ExtractorConfig<>(NotAnnotatedTestEntity.class);
+
+        Map<String, String> values = new HashMap<>();
+        values.put(ExtractorConstants.KEYSPACE,"a");
+        values.put(ExtractorConstants.COLUMN_FAMILY,"cf");
+
+
+
+        djc.setValues(values);
+
+
         try {
-            djc.initialize();
 
             fail();
         } catch (AnnotationTypeMismatchException iae) {
