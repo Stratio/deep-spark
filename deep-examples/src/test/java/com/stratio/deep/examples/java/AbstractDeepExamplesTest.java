@@ -24,7 +24,8 @@ import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.google.common.io.Resources;
-import com.stratio.deep.context.DeepSparkContext;
+
+import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;

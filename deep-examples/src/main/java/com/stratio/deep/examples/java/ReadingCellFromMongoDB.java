@@ -17,13 +17,13 @@
 package com.stratio.deep.examples.java;
 
 import com.mongodb.QueryBuilder;
-import com.stratio.deep.config.DeepJobConfig;
-import com.stratio.deep.config.IMongoDeepJobConfig;
-import com.stratio.deep.config.MongoConfigFactory;
-import com.stratio.deep.context.DeepSparkContext;
+
+
+
+import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
-import org.apache.spark.rdd.RDD;
+
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 

@@ -25,13 +25,15 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.CassandraConfigFactory;
-import com.stratio.deep.config.DeepJobConfig;
+
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepIOException;
+import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.testentity.Cql3CollectionsTestEntity;
 import com.stratio.deep.utils.Constants;
@@ -65,7 +67,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
 
         assertEquals(entities.length, 500);
 
-	    String keyspace = getReadConfig().getKeyspace();
+	    String keyspace = getReadConfig().getValues().get(ExtractorConstants.KEYSPACE);
 
         for (Cells e : entities) {
             Integer id = (Integer) e.getCellByName("id").getCellValue();
@@ -150,26 +152,43 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
     }
 
     @Override
-    protected DeepJobConfig<Cells> initReadConfig() {
-        DeepJobConfig<Cells> config = CassandraConfigFactory.create()
-                .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).bisectFactor(testBisectFactor)
-				        .pageSize(DEFAULT_PAGE_SIZE).cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily
-                        (CQL3_COLLECTION_COLUMN_FAMILY);
+    protected ExtractorConfig<Cells> initReadConfig() {
+        ExtractorConfig<Cells> config = new ExtractorConfig<>();
 
-        return config.initialize();
+        Map<String, String> values = new HashMap<>();
+        values.put(ExtractorConstants.KEYSPACE, KEYSPACE_NAME);
+        values.put(ExtractorConstants.COLUMN_FAMILY,  CQL3_COLLECTION_COLUMN_FAMILY);
+        values.put(ExtractorConstants.PAGE_SIZE,     String.valueOf(DEFAULT_PAGE_SIZE));
+        values.put(ExtractorConstants.CQLPORT,       String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.RPCPORT,       String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
+        values.put(ExtractorConstants.HOST,          Constants.DEFAULT_CASSANDRA_HOST);
+        values.put(ExtractorConstants.BISECT_FACTOR, String.valueOf(testBisectFactor));
+
+        //bisectFactor(testBisectFactor)
+        config.setValues(values);
+
+        return config;
     }
 
     @Override
-    protected DeepJobConfig<Cells> initWriteConfig() {
-        DeepJobConfig<Cells> writeConfig = CassandraConfigFactory.createWriteConfig()
-                .host(Constants.DEFAULT_CASSANDRA_HOST)
-                .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-                .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-                .keyspace(OUTPUT_KEYSPACE_NAME)
-                .columnFamily(OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY)
-                .batchSize(2)
-                .createTableOnWrite(Boolean.TRUE);
-        return writeConfig.initialize();
+    protected ExtractorConfig<Cells> initWriteConfig() {
+
+        ExtractorConfig<Cells> config = new ExtractorConfig<>();
+
+        Map<String, String> values = new HashMap<>();
+        values.put(ExtractorConstants.KEYSPACE, KEYSPACE_NAME);
+        values.put(ExtractorConstants.COLUMN_FAMILY,  OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
+        values.put(ExtractorConstants.PAGE_SIZE,     String.valueOf(DEFAULT_PAGE_SIZE));
+        values.put(ExtractorConstants.CQLPORT,       String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.RPCPORT,       String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
+        values.put(ExtractorConstants.HOST,          Constants.DEFAULT_CASSANDRA_HOST);
+        values.put(ExtractorConstants.BATCHSIZE   ,  String.valueOf(2));
+        values.put(ExtractorConstants.CREATE_ON_WRITE, String.valueOf(Boolean.TRUE));
+
+        //bisectFactor(testBisectFactor)
+        config.setValues(values);
+
+        return config;
     }
 
     @Override
@@ -187,8 +206,10 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
 
         assertTrue(mappedRDD.count() > 0);
 
-        DeepJobConfig<Cells> writeConfig = getWriteConfig();
-        writeConfig.createTableOnWrite(Boolean.FALSE);
+        ExtractorConfig<Cells> writeConfig = getWriteConfig();
+
+        Map<String, String> values = new HashMap<>();
+        values.put(ExtractorConstants.CREATE_ON_WRITE, String.valueOf(Boolean.FALSE));
 
         try {
             CassandraRDD.saveRDDToCassandra(mappedRDD, writeConfig);
@@ -246,8 +267,11 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
 
     @Override
     public void testSimpleSaveToCassandra() {
-        DeepJobConfig<Cells> writeConfig = getWriteConfig();
-        writeConfig.createTableOnWrite(Boolean.FALSE);
+        ExtractorConfig<Cells> writeConfig = getWriteConfig();
+
+        Map<String, String> values = writeConfig.getValues();
+        values.put(ExtractorConstants.CREATE_ON_WRITE, String.valueOf(Boolean.FALSE));
+        writeConfig.setValues(values);
 
         try {
             executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
@@ -275,7 +299,8 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
         } catch (Exception e) {
         }
 
-        DeepJobConfig<Cells> writeConfig = getWriteConfig();
+        ExtractorConfig<Cells> writeConfig = getWriteConfig();
+
 
         CassandraRDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
         checkSimpleTestData();
