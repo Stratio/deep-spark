@@ -101,7 +101,7 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
     }
 
-    @Override
+
     public IESDeepJobConfig<T> customConfiguration (Map<String, Object> customConfiguration){
         this.customConfiguration=customConfiguration;
         return this;
@@ -293,17 +293,9 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
 
 
-    @Override
-    public Class<? extends InputFormat<?,?>> getInputFormatClass() {
-        return null;
-    }
-
-    public Class<? extends IDeepPartition> getPatitionClass(){
-        return null;
-    }
 
     @Override
-    public Class<? extends IDeepRecordReader> getRecordReaderClass() {
+    public IESDeepJobConfig<T> initialize(ExtractorConfig deepJobConfig) {
         return null;
     }
 }

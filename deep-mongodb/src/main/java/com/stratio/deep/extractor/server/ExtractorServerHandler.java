@@ -15,7 +15,7 @@
 package com.stratio.deep.extractor.server;
 
 import com.stratio.deep.config.ExtractorConfig;
-import com.stratio.deep.extractor.MongoExtractor;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.extractor.actions.*;
 import com.stratio.deep.extractor.response.*;
 import com.stratio.deep.rdd.DeepTokenRange;
@@ -29,7 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Action> {
 
-    private MongoExtractor<T> extractor;
+    private IExtractor<T> extractor;
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Action action) throws Exception {
@@ -126,15 +126,22 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
 
         Class<T> rdd = (Class<T>) config.getExtractorImplClass();
         try {
-            final Constructor<T> c = rdd.getConstructor();
-            this.extractor = (MongoExtractor<T>) c.newInstance();
+            Constructor<T> c = null;
+            if (config.getEntityClass().isAssignableFrom(Cells.class)){
+                c = rdd.getConstructor();
+                this.extractor = (IExtractor<T>) c.newInstance();
+            }else{
+                c = rdd.getConstructor(Class.class);
+                this.extractor = (IExtractor<T>) c.newInstance(config.getEntityClass());
+            }
+
+
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
-
     private IExtractor<T> getExtractorInstace(ExtractorInstanceAction<T> extractorInstanceAction) {
 
         if (extractor == null) {

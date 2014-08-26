@@ -41,16 +41,16 @@ public abstract class GenericHadoopExtractor<T, K, V> implements IExtractor<T> {
 
     protected IDeepJobConfig<T, ? extends IDeepJobConfig> deepJobConfig;
 
-    private transient RecordReader reader;
+    protected transient RecordReader reader;
 
-    private transient InputFormat<K,V> inputFormat;
+    protected transient InputFormat<K,V> inputFormat;
 
 
-    private transient String jobTrackerId;
+    protected transient String jobTrackerId;
 
-    boolean havePair = false;
+    protected boolean havePair = false;
 
-    boolean finished = false;
+    protected boolean finished = false;
 
     protected transient JobID jobId = null;
 
@@ -166,6 +166,14 @@ public abstract class GenericHadoopExtractor<T, K, V> implements IExtractor<T> {
 
     public abstract T transformElement(Tuple2<K, V> tuple, IDeepJobConfig<T, ? extends IDeepJobConfig> config);
 
+    @Override
+    public IExtractor getExtractorInstance(ExtractorConfig<T> config) {
+        return this;
+    }
 
-    public abstract void saveRDD(RDD<T> rdd, ExtractorConfig<T> config);
+    @Override
+
+    public  void saveRDD(RDD<T> rdd, ExtractorConfig<T> config){
+        return;
+    }
 }

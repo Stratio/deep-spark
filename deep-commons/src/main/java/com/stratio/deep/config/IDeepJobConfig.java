@@ -151,10 +151,7 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?, ?>> extends Seria
 //     */
 //    S customConfiguration(Map<String, Object> customConfiguration);
 
-    Class<?> getRDDClass();
 
-
-    Method getSaveMethod() throws NoSuchMethodException;
 
 
     //    /**
@@ -162,16 +159,6 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?, ?>> extends Seria
 //     * @return
 //     */
     Configuration getHadoopConfiguration();
-
-
-//    S InputFormat(InputFormat inputFormat);
-
-    Class<? extends InputFormat<?, ?>> getInputFormatClass();
-
-
-    Class<? extends IDeepPartition> getPatitionClass();
-
-    Class<? extends IDeepRecordReader> getRecordReaderClass();
 
 
 }

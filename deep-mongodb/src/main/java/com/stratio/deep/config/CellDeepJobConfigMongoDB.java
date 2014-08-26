@@ -44,17 +44,5 @@ public class CellDeepJobConfigMongoDB extends GenericDeepJobConfigMongoDB<Cells>
 
 
 
-    @Override
-    public Class<?> getRDDClass() {
-        return MongoCellExtractor.class;
-    }
-
-
-    @Override
-    public Method getSaveMethod() throws NoSuchMethodException {
-        return null;
-    }
-
-
 
 }

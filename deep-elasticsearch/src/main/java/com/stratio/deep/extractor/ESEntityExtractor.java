@@ -14,60 +14,64 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.rdd;
+package com.stratio.deep.extractor;
 
+import com.stratio.deep.config.EntityDeepJobConfigES;
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.config.IESDeepJobConfig;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepTransformException;
+import com.stratio.deep.extractor.impl.GenericHadoopExtractor;
+import com.stratio.deep.rdd.IExtractor;
 import com.stratio.deep.utils.UtilES;
-import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.rdd.DeepElasticSearchRDD;
 import org.apache.spark.rdd.RDD;
+import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
 import org.elasticsearch.hadoop.mr.LinkedMapWritable;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
-import scala.reflect.ClassTag$;
 
 /**
- * Created by rcrespo on 29/07/14.
+ * EntityRDD to interact with mongoDB
+ *
+ * @param <T>
  */
-public final class ESEntityRDD<T extends IDeepType> extends DeepElasticSearchRDD<T> {
+public final class ESEntityExtractor<T> extends GenericHadoopExtractor<T,  Object, LinkedMapWritable> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ESEntityRDD.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ESEntityExtractor.class);
     private static final long serialVersionUID = -3208994171892747470L;
 
 
-    /**
-     * Public constructor that builds a new ESRDD given the context and the configuration file.
-     *
-     * @param sc     the spark context to which the RDD will be bound to.
-     * @param config the deep configuration object.
-     */
-    @SuppressWarnings("unchecked")
-    public ESEntityRDD(SparkContext sc, IDeepJobConfig<T, IESDeepJobConfig<T>> config) {
-        super(sc, (IESDeepJobConfig<T>) config, ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
+
+    public ESEntityExtractor(T t){
+        super();
+        this.deepJobConfig = new EntityDeepJobConfigES(t.getClass());
+        this.inputFormat = new EsInputFormat<>() ;
+
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public T transformElement(Tuple2<Object, LinkedMapWritable> tuple) {
+    public T transformElement(Tuple2<Object, LinkedMapWritable> tuple, IDeepJobConfig<T, ? extends IDeepJobConfig>config ) {
+
 
         try {
-            return UtilES.getObjectFromJson(this.getConf().getEntityClass(), tuple._2());
+            return UtilES.getObjectFromJson(config.getEntityClass(), tuple._2());
         } catch (Exception e) {
             LOG.error("Cannot convert JSON: ", e);
             throw new DeepTransformException("Could not transform from Json to Entity " + e.getMessage());
         }
 
     }
+
 
 
     /**
