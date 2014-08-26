@@ -21,10 +21,7 @@ import com.stratio.deep.config.CellDeepJobConfigMongoDB;
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.extractor.utils.ExtractorConstants;
-import com.stratio.deep.rdd.CassandraCellExtractor;
 
-import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 

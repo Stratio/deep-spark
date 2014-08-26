@@ -16,10 +16,13 @@
 
 package com.stratio.deep.rdd
 
+import java.util
+
 import com.datastax.driver.core.{Cluster, ResultSet, Row, Session}
-import com.stratio.deep.config.{CassandraConfigFactory, DeepJobConfig}
+import com.stratio.deep.config.{CassandraConfigFactory, ExtractorConfig}
 import com.stratio.deep.context.AbstractDeepSparkContextTest
 import com.stratio.deep.embedded.CassandraServer
+import com.stratio.deep.extractor.utils.ExtractorConstants
 import com.stratio.deep.testentity.DeepScalaPageEntity
 import com.stratio.deep.utils.{Constants, Utils}
 import org.apache.spark.Partition
@@ -33,8 +36,8 @@ import org.testng.annotations.{BeforeClass, Test}
 @Test(suiteName = "cassandraRddTests", dependsOnGroups = Array("CassandraJavaRDDTest"), groups = Array("ScalaCassandraEntityRDDTest"))
 class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
   private var rdd: RDD[DeepScalaPageEntity] = _
-  private var rddConfig: DeepJobConfig[DeepScalaPageEntity] = _
-  private var writeConfig: DeepJobConfig[DeepScalaPageEntity] = _
+  private var rddConfig: ExtractorConfig[DeepScalaPageEntity] = _
+  private var writeConfig: ExtractorConfig[DeepScalaPageEntity] = _
   private val OUTPUT_COLUMN_FAMILY: String = "out_scalatest_page"
 
   @BeforeClass
@@ -89,34 +92,36 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
     checkSimpleTestData()
   }
 
-  private def initWriteConfig(): DeepJobConfig[DeepScalaPageEntity] = {
+  private def initWriteConfig(): ExtractorConfig[DeepScalaPageEntity] = {
+    writeConfig =new ExtractorConfig[DeepScalaPageEntity]()
 
-    writeConfig =
-      CassandraConfigFactory
-        .createWriteConfig(classOf[DeepScalaPageEntity])
-        .host(Constants.DEFAULT_CASSANDRA_HOST)
-        .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-        .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-        .keyspace(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME)
-        .columnFamily(OUTPUT_COLUMN_FAMILY)
-        .batchSize(2)
-        .createTableOnWrite(true)
+    val values: Map[String, String] = new util.HashMap[String, String]
+    alues.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST);
+    values.put(ExtractorConstants.KEYSPACE, AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME)
+    values.put(ExtractorConstants.COLUMN_FAMILY, OUTPUT_COLUMN_FAMILY)
+    values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT))
+    values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT))
+    values.put(ExtractorConstants.CREATE_ON_WRITE, String.valueOf(true))
+    values.put(ExtractorConstants.BATCHSIZE, String.valueOf(2))
 
-    writeConfig.initialize
+    writeConfig.setValues(values)
+
   }
 
-  private def initReadConfig(): DeepJobConfig[DeepScalaPageEntity] = {
-    rddConfig =
-      CassandraConfigFactory
-        .create(classOf[DeepScalaPageEntity])
-        .host(Constants.DEFAULT_CASSANDRA_HOST)
-        .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-        .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-        .keyspace(AbstractDeepSparkContextTest.KEYSPACE_NAME)
-        .columnFamily(AbstractDeepSparkContextTest.COLUMN_FAMILY)
+  private def initReadConfig(): ExtractorConfig[DeepScalaPageEntity] = {
+    rddConfig =new ExtractorConfig[DeepScalaPageEntity]()
 
-    rddConfig.initialize()
-  }
+    val values: Map[String, String] = new util.HashMap[String, String]
+    values.put(ExtractorConstants.KEYSPACE, AbstractDeepSparkContextTest.KEYSPACE_NAME)
+    values.put(ExtractorConstants.COLUMN_FAMILY, AbstractDeepSparkContextTest.COLUMN_FAMILY)
+    values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT))
+    values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT))
+    values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST)
+
+    rddConfig.setValues(values)
+
+
+  } 
 
   private def initRDD(): RDD[DeepScalaPageEntity] = {
     getContext
