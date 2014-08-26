@@ -18,7 +18,6 @@ package com.stratio.deep.extractor.impl;
 
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.rdd.DeepTokenRange;
 import com.stratio.deep.rdd.IExtractor;
 import com.stratio.deep.utils.DeepSparkHadoopMapReduceUtil;
 import org.apache.hadoop.conf.Configuration;
@@ -78,11 +77,6 @@ public abstract class GenericHadoopExtractor<T, K, V> implements IExtractor<T> {
 
         try {
             List<InputSplit> splits = inputFormat.getSplits(jobContext);
-
-            DeepTokenRange[] tokens = new DeepTokenRange[splits.size()];
-            for(int i = 0; i < splits.size() ; i++){
-                tokens[i] =  new DeepTokenRange(splits.get(i).getLocations());
-            }
 
 
             Partition[] partitions = new Partition[(splits.size())];

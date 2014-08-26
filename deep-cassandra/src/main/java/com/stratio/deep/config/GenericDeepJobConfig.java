@@ -786,21 +786,4 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
 
 
 
-
-    @Override
-    public Class<? extends InputFormat<?, ?>> getInputFormatClass() {
-        return null;
-    }
-
-
-    public Class<? extends IDeepRecordReader> getRecordReaderClass() {
-        return DeepRecordReader.class;
-    }
-
-
-
-    public Class<? extends IDeepPartition> getPatitionClass() {
-        return null;
-    }
-
 }
