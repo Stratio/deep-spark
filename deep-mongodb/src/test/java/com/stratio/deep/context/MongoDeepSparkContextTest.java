@@ -21,9 +21,7 @@ import com.stratio.deep.config.EntityDeepJobConfigMongoDB;
 import com.stratio.deep.config.GenericDeepJobConfigMongoDB;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.rdd.mongodb.MongoCellRDD;
-import com.stratio.deep.rdd.mongodb.MongoEntityRDD;
-import com.stratio.deep.rdd.mongodb.MongoJavaRDD;
+
 import com.stratio.deep.testentity.BookEntity;
 
 
@@ -34,140 +32,140 @@ import com.stratio.deep.testentity.BookEntity;
 public class MongoDeepSparkContextTest {
 
     private Logger log = Logger.getLogger(getClass());
-
-    @Test()
-    public void mongoRDDTest() {
-        DeepSparkContext sc = new DeepSparkContext("local", "DeepSparkContextTest");
-
-        RDD deepMongoRDD = sc.createRDD(new CellDeepJobConfigMongoDB());
-
-//        assertTrue(deepMongoRDD instanceof MongoCellRDD);
 //
-//        assertFalse(deepMongoRDD instanceof MongoEntityRDD);
-
-
-        deepMongoRDD = sc.createRDD(new EntityDeepJobConfigMongoDB(BookEntity.class));
-
-//        assertTrue(deepMongoRDD instanceof MongoEntityRDD);
+//    @Test()
+//    public void mongoRDDTest() {
+//        DeepSparkContext sc = new DeepSparkContext("local", "DeepSparkContextTest");
 //
-//        assertFalse(deepMongoRDD instanceof MongoCellRDD);
-
-
-        JavaRDD<Cells> javaRDDCells = sc.createJavaRDD(new CellDeepJobConfigMongoDB());
-
-        assertNotNull(javaRDDCells);
-
-        assertTrue(javaRDDCells instanceof JavaRDD);
-
-        assertTrue(javaRDDCells instanceof MongoJavaRDD);
-
-
-        JavaRDD<BookEntity> javaRDDEntity = sc.createJavaRDD(new EntityDeepJobConfigMongoDB(BookEntity.class));
-
-        assertNotNull(javaRDDEntity);
-
-        assertTrue(javaRDDEntity instanceof JavaRDD);
-
-        assertTrue(javaRDDEntity instanceof MongoJavaRDD);
+//        RDD deepMongoRDD = sc.createRDD(new CellDeepJobConfigMongoDB());
 //
-//        try {
-//            DeepMongoRDD failRDD = sc.createRDD(new GenericDeepJobConfigMongoDB());
-//            fail();
-//        } catch (DeepGenericException e) {
-//            log.info("Correctly catched DeepGenericException: " + e.getLocalizedMessage());
-//        }
-
-
-        sc.stop();
-
-
-    }
-
-    @Test
-    public void testInstantiationBySparkContext() {
-        DeepSparkContext sc = new DeepSparkContext(new SparkContext("local", "myapp1", new SparkConf()));
-
-        assertNotNull(sc);
-
-        RDD deepMongoRDD = sc.createRDD(new CellDeepJobConfigMongoDB());
+////        assertTrue(deepMongoRDD instanceof MongoCellRDD);
+////
+////        assertFalse(deepMongoRDD instanceof MongoEntityRDD);
 //
-//        assertTrue(deepMongoRDD instanceof MongoCellRDD);
 //
-//        assertFalse(deepMongoRDD instanceof MongoEntityRDD);
-
-
-        deepMongoRDD = sc.createRDD(new EntityDeepJobConfigMongoDB(BookEntity.class));
+//        deepMongoRDD = sc.createRDD(new EntityDeepJobConfigMongoDB(BookEntity.class));
 //
-//        assertTrue(deepMongoRDD instanceof MongoEntityRDD);
+////        assertTrue(deepMongoRDD instanceof MongoEntityRDD);
+////
+////        assertFalse(deepMongoRDD instanceof MongoCellRDD);
 //
-//        assertFalse(deepMongoRDD instanceof MongoCellRDD);
-
-        sc.stop();
-    }
-
-    @Test
-    public void testInstantiationWithJar() {
-        DeepSparkContext sc = new DeepSparkContext("local", "myapp1", "/tmp", "");
-        assertNotNull(sc);
-
-        RDD deepMongoRDD = sc.createRDD(new CellDeepJobConfigMongoDB());
-
-//        assertTrue(deepMongoRDD instanceof MongoCellRDD);
 //
-//        assertFalse(deepMongoRDD instanceof MongoEntityRDD);
-
-
-        deepMongoRDD = sc.createRDD(new EntityDeepJobConfigMongoDB(BookEntity.class));
-
-//        assertTrue(deepMongoRDD instanceof MongoEntityRDD);
+//        JavaRDD<Cells> javaRDDCells = sc.createJavaRDD(new CellDeepJobConfigMongoDB());
 //
-//        assertFalse(deepMongoRDD instanceof MongoCellRDD);
-
-        sc.stop();
-    }
-
-    @Test
-    public void testInstantiationWithJars() {
-        DeepSparkContext sc = new DeepSparkContext("local", "myapp1", "/tmp", new String[]{"", ""});
-        assertNotNull(sc);
-
-        RDD deepMongoRDD = sc.createRDD(new CellDeepJobConfigMongoDB());
-
-//        assertTrue(deepMongoRDD instanceof MongoCellRDD);
+//        assertNotNull(javaRDDCells);
 //
-//        assertFalse(deepMongoRDD instanceof MongoEntityRDD);
-
-
-        deepMongoRDD = sc.createRDD(new EntityDeepJobConfigMongoDB(BookEntity.class));
-
-//        assertTrue(deepMongoRDD instanceof MongoEntityRDD);
+//        assertTrue(javaRDDCells instanceof JavaRDD);
 //
-//        assertFalse(deepMongoRDD instanceof MongoCellRDD);
-
-        sc.stop();
-    }
-
-    @Test
-    public void testInstantiationWithJarsAndEnv() {
-        Map<String, String> env = new HashMap<>();
-
-        DeepSparkContext sc = new DeepSparkContext("local", "myapp1", "/tmp", new String[]{"", ""}, env);
-
-        assertNotNull(sc);
-        RDD deepMongoRDD = sc.createRDD(new CellDeepJobConfigMongoDB());
-
-//        assertTrue(deepMongoRDD instanceof MongoCellRDD);
+//        assertTrue(javaRDDCells instanceof MongoJavaRDD);
 //
-//        assertFalse(deepMongoRDD instanceof MongoEntityRDD);
-
-
-        deepMongoRDD = sc.createRDD(new EntityDeepJobConfigMongoDB(BookEntity.class));
-
-//        assertTrue(deepMongoRDD instanceof MongoEntityRDD);
 //
-//        assertFalse(deepMongoRDD instanceof MongoCellRDD);
-
-
-        sc.stop();
-    }
+//        JavaRDD<BookEntity> javaRDDEntity = sc.createJavaRDD(new EntityDeepJobConfigMongoDB(BookEntity.class));
+//
+//        assertNotNull(javaRDDEntity);
+//
+//        assertTrue(javaRDDEntity instanceof JavaRDD);
+//
+//        assertTrue(javaRDDEntity instanceof MongoJavaRDD);
+////
+////        try {
+////            DeepMongoRDD failRDD = sc.createRDD(new GenericDeepJobConfigMongoDB());
+////            fail();
+////        } catch (DeepGenericException e) {
+////            log.info("Correctly catched DeepGenericException: " + e.getLocalizedMessage());
+////        }
+//
+//
+//        sc.stop();
+//
+//
+//    }
+//
+//    @Test
+//    public void testInstantiationBySparkContext() {
+//        DeepSparkContext sc = new DeepSparkContext(new SparkContext("local", "myapp1", new SparkConf()));
+//
+//        assertNotNull(sc);
+//
+//        RDD deepMongoRDD = sc.createRDD(new CellDeepJobConfigMongoDB());
+////
+////        assertTrue(deepMongoRDD instanceof MongoCellRDD);
+////
+////        assertFalse(deepMongoRDD instanceof MongoEntityRDD);
+//
+//
+//        deepMongoRDD = sc.createRDD(new EntityDeepJobConfigMongoDB(BookEntity.class));
+////
+////        assertTrue(deepMongoRDD instanceof MongoEntityRDD);
+////
+////        assertFalse(deepMongoRDD instanceof MongoCellRDD);
+//
+//        sc.stop();
+//    }
+//
+//    @Test
+//    public void testInstantiationWithJar() {
+//        DeepSparkContext sc = new DeepSparkContext("local", "myapp1", "/tmp", "");
+//        assertNotNull(sc);
+//
+//        RDD deepMongoRDD = sc.createRDD(new CellDeepJobConfigMongoDB());
+//
+////        assertTrue(deepMongoRDD instanceof MongoCellRDD);
+////
+////        assertFalse(deepMongoRDD instanceof MongoEntityRDD);
+//
+//
+//        deepMongoRDD = sc.createRDD(new EntityDeepJobConfigMongoDB(BookEntity.class));
+//
+////        assertTrue(deepMongoRDD instanceof MongoEntityRDD);
+////
+////        assertFalse(deepMongoRDD instanceof MongoCellRDD);
+//
+//        sc.stop();
+//    }
+//
+//    @Test
+//    public void testInstantiationWithJars() {
+//        DeepSparkContext sc = new DeepSparkContext("local", "myapp1", "/tmp", new String[]{"", ""});
+//        assertNotNull(sc);
+//
+//        RDD deepMongoRDD = sc.createRDD(new CellDeepJobConfigMongoDB());
+//
+////        assertTrue(deepMongoRDD instanceof MongoCellRDD);
+////
+////        assertFalse(deepMongoRDD instanceof MongoEntityRDD);
+//
+//
+//        deepMongoRDD = sc.createRDD(new EntityDeepJobConfigMongoDB(BookEntity.class));
+//
+////        assertTrue(deepMongoRDD instanceof MongoEntityRDD);
+////
+////        assertFalse(deepMongoRDD instanceof MongoCellRDD);
+//
+//        sc.stop();
+//    }
+//
+//    @Test
+//    public void testInstantiationWithJarsAndEnv() {
+//        Map<String, String> env = new HashMap<>();
+//
+//        DeepSparkContext sc = new DeepSparkContext("local", "myapp1", "/tmp", new String[]{"", ""}, env);
+//
+//        assertNotNull(sc);
+//        RDD deepMongoRDD = sc.createRDD(new CellDeepJobConfigMongoDB());
+//
+////        assertTrue(deepMongoRDD instanceof MongoCellRDD);
+////
+////        assertFalse(deepMongoRDD instanceof MongoEntityRDD);
+//
+//
+//        deepMongoRDD = sc.createRDD(new EntityDeepJobConfigMongoDB(BookEntity.class));
+//
+////        assertTrue(deepMongoRDD instanceof MongoEntityRDD);
+////
+////        assertFalse(deepMongoRDD instanceof MongoCellRDD);
+//
+//
+//        sc.stop();
+//    }
 }
