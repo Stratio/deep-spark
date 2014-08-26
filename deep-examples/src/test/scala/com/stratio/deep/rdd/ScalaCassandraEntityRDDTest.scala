@@ -20,7 +20,8 @@ import java.util
 
 import com.datastax.driver.core.{Cluster, ResultSet, Row, Session}
 import com.stratio.deep.config.{CassandraConfigFactory, ExtractorConfig}
-import com.stratio.deep.context.AbstractDeepSparkContextTest
+import com.stratio.deep.core.context.AbstractDeepSparkContextTest
+import com.stratio.deep.core.embedded.CassandraServer
 import com.stratio.deep.embedded.CassandraServer
 import com.stratio.deep.extractor.utils.ExtractorConstants
 import com.stratio.deep.testentity.DeepScalaPageEntity
