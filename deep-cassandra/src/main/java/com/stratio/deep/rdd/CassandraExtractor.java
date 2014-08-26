@@ -14,6 +14,18 @@
 
 package com.stratio.deep.rdd;
 
+import static scala.collection.JavaConversions.asScalaBuffer;
+
+import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.spark.Partition;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.rdd.RDD;
+
+import scala.collection.Seq;
+
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.config.IDeepJobConfig;
@@ -23,17 +35,8 @@ import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.functions.CellList2TupleFunction;
 import com.stratio.deep.functions.DeepType2TupleFunction;
+import com.stratio.deep.partition.impl.DeepPartition;
 import com.stratio.deep.utils.Pair;
-import org.apache.spark.Partition;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.rdd.RDD;
-import scala.collection.Seq;
-
-import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.Map;
-
-import static scala.collection.JavaConversions.asScalaBuffer;
 
 
 /**
@@ -138,7 +141,7 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
     public void initIterator(final Partition dp,
                              ExtractorConfig<T> config) {
         this.cassandraJobConfig = initCustomConfig(config);
-        recordReader = initRecordReader((DeepTokenRange) dp, cassandraJobConfig);
+    recordReader = initRecordReader((DeepPartition) dp, cassandraJobConfig);
     }
 
 
@@ -164,12 +167,23 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
     @Override
     public Partition[] getPartitions(ExtractorConfig<T> config) {
 
-
+    int id = Integer.parseInt(config.getValues().get("spark.rdd.id"));
         ICassandraDeepJobConfig<T> cellDeepJobConfig = initCustomConfig(config);
 
         List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits(cellDeepJobConfig);
 
-        return underlyingInputSplits.toArray(new Partition[underlyingInputSplits.size()]);
+    Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
+
+    int i = 0;
+
+    for (DeepTokenRange split : underlyingInputSplits) {
+      partitions[i] = new DeepPartition(id, i, split);
+
+      // log().debug("Detected partition: " + partitions[i]);
+      ++i;
+    }
+
+    return partitions;
     }
 
     /**
@@ -190,10 +204,10 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
      * @param dp a spark deep partition
      * @return the deep record reader associated to the provided partition.
      */
-    private IDeepRecordReader initRecordReader(final DeepTokenRange dp,
+  private IDeepRecordReader initRecordReader(final DeepPartition dp,
                                                IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
 
-        IDeepRecordReader recordReader = new DeepRecordReader(config, dp);
+    IDeepRecordReader recordReader = new DeepRecordReader(config, dp.splitWrapper());
 
         return recordReader;
 
