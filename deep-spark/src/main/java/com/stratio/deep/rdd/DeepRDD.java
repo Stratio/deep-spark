@@ -20,7 +20,6 @@ import scala.reflect.ClassTag$;
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.extractor.client.ExtractorClient;
-import com.stratio.deep.extractor.client.ExtractorClientBack;
 import com.stratio.deep.partition.impl.DeepPartition;
 
 

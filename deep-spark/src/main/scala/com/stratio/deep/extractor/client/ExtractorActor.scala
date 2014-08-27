@@ -1,18 +1,27 @@
-package com.stratio.deep.extractor.server
+package com.stratio.deep.extractor.client
 
 import java.lang.reflect.Constructor
-
 import akka.actor.Actor
 import com.stratio.deep.config.ExtractorConfig
-import com.stratio.deep.rdd.{DeepTokenRange, CassandraExtractor, IExtractor}
+import com.stratio.deep.rdd.{DeepTokenRange, IExtractor}
 import scala.reflect.ClassTag
+import com.stratio.deep.extractor.message.NextResponse
+import com.stratio.deep.extractor.message.HasNextResponse
+import com.stratio.deep.extractor.message.GetPartitionsAction
+import com.stratio.deep.extractor.message.GetPartitionsResponse
+import com.stratio.deep.extractor.message.CloseAction
+import com.stratio.deep.extractor.message.CloseResponse
+import com.stratio.deep.extractor.message.InitIteratorResponse
+import com.stratio.deep.extractor.message.InitIteratorAction
+import com.stratio.deep.extractor.message.HasNextAction
+import com.stratio.deep.extractor.message.NextAction
 
 /**
  * Created by darroyo on 22/08/14.
  */
-class ExtractorServer[T: ClassTag] extends Actor{ //with ActionSystemMessage{
+class ExtractorActor[T: ClassTag] extends Actor{ //with ActionSystemMessage{
 
-  protected var extractorA: CassandraExtractor[T] = null
+  protected var extractorA: IExtractor[T] = null
 
   //private var extractor1: IExtractor = null
 
@@ -31,7 +40,7 @@ class ExtractorServer[T: ClassTag] extends Actor{ //with ActionSystemMessage{
       if (extractorA == null) {
         val rdd: Class[T] = config.getRDDClass.asInstanceOf[Class[T]]
         try {
-          extractorA = rdd.newInstance().asInstanceOf[CassandraExtractor[T]]
+          extractorA = rdd.newInstance().asInstanceOf[IExtractor[T]]
 
         }
         catch {
@@ -55,7 +64,7 @@ class ExtractorServer[T: ClassTag] extends Actor{ //with ActionSystemMessage{
       if (extractorA == null) {
         val rdd: Class[T] = config.getRDDClass.asInstanceOf[Class[T]]
         try {
-          extractorA = rdd.newInstance().asInstanceOf[CassandraExtractor[T]]
+          extractorA = rdd.newInstance().asInstanceOf[IExtractor[T]]
 
         }
         catch {
