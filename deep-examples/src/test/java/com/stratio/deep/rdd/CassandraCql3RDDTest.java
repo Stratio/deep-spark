@@ -21,8 +21,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.core.embedded.CassandraServer;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.extractor.utils.ExtractorConstants;
+import com.stratio.deep.testentity.Cql3TestEntity;
 import scala.reflect.ClassTag$;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
@@ -30,13 +32,12 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.CassandraConfigFactory;
 
-import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.functions.AbstractSerializableFunction;
 
-import com.stratio.deep.testentity.Cql3TestEntity;
+
 import com.stratio.deep.utils.Constants;
 import org.apache.spark.rdd.RDD;
 import org.testng.Assert;

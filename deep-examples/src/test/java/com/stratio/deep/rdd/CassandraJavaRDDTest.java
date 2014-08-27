@@ -34,8 +34,9 @@ import com.stratio.deep.config.CassandraConfigFactory;
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
+import com.stratio.deep.core.embedded.CassandraServer;
 import com.stratio.deep.core.extractor.client.ExtractorClient;
-import com.stratio.deep.embedded.CassandraServer;
+
 import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
