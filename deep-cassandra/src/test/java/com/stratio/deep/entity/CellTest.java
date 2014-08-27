@@ -29,14 +29,15 @@ import com.stratio.deep.exception.DeepInstantiationException;
 import com.stratio.deep.testentity.CommonsTestEntity;
 import org.apache.cassandra.db.marshal.*;
 import org.apache.log4j.Logger;
-import org.testng.annotations.Test;
+import org.junit.Test;
+
 
 import static org.testng.Assert.*;
 
 /**
  * Created by luca on 04/02/14.
  */
-@Test
+
 public class CellTest {
     private Logger logger = Logger.getLogger(getClass());
 

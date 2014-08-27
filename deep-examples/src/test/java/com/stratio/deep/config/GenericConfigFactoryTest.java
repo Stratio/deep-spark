@@ -21,7 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
-import com.stratio.deep.embedded.CassandraServer;
+
+import com.stratio.deep.core.embedded.CassandraServer;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepIllegalAccessException;

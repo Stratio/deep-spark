@@ -34,7 +34,7 @@ import com.stratio.deep.config.CassandraConfigFactory;
 
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.embedded.CassandraServer;
+import com.stratio.deep.core.embedded.CassandraServer;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.functions.AbstractSerializableFunction;

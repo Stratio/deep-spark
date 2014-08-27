@@ -25,11 +25,12 @@ import com.stratio.deep.exception.DeepGenericException;
 import org.apache.cassandra.db.marshal.Int32Type;
 import org.apache.cassandra.db.marshal.LongType;
 import org.apache.cassandra.db.marshal.UTF8Type;
-import org.testng.annotations.Test;
+import org.junit.Test;
+
 
 import static org.testng.Assert.*;
 
-@Test
+
 public class CellsTest {
 
     @Test
