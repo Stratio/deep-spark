@@ -191,7 +191,7 @@
 
         <!-- test -->
 
-     <dependency>
+   <!--  <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>6.8.7</version>
@@ -209,7 +209,7 @@
             <artifactId>mockito-all</artifactId>
             <version>1.9.5</version>
             <scope>test</scope>
-        </dependency>
+        </dependency> -->
 
 
 
@@ -361,10 +361,20 @@
         <module>../deep-core</module>
         <module>../deep-mongodb</module>
         <module>../deep-elasticsearch</module>
-        <module>../deep-examples</module>
     </modules>
 
     <profiles>
+        <profile>
+            <id>integration</id>
+            <modules>
+    		   <module>../deep-commons</module>
+        	   <module>../deep-cassandra</module>
+                   <module>../deep-core</module>
+                   <module>../deep-mongodb</module>
+                   <module>../deep-elasticsearch</module>
+                   <module>../deep-examples</module>
+            </modules>
+        </profile>
         <profile>
             <id>release</id>
             <build>
