@@ -27,16 +27,18 @@ import javax.management.relation.RoleList;
 import javax.management.relation.RoleUnresolvedList;
 import javax.print.attribute.standard.PrinterStateReasons;
 import org.apache.cassandra.db.marshal.*;
-import org.testng.annotations.Test;
+import org.junit.Test;
+
 
 import static com.stratio.deep.entity.CellValidator.Kind;
 import static com.stratio.deep.entity.CellValidator.cellValidator;
-import static org.testng.Assert.*;
+import static org.junit.Assert.*;
+
 
 /**
  * Created by luca on 25/03/14.
  */
-@Test
+
 public class CellValidatorTest {
 
     public void testEmptyInstantiation() {

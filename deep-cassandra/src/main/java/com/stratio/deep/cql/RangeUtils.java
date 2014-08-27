@@ -61,8 +61,7 @@ public class RangeUtils {
      * @return a map containing, for each cluster machine, the list of tokens. Tokens are not returned in any
      * particular order.
      */
-    static Map<String, Iterable<Comparable>> fetchTokens(
-            String query, final Pair<Session, String> sessionWithHost, IPartitioner partitioner) {
+    static Map<String, Iterable<Comparable>> fetchTokens(String query, final Pair<Session, String> sessionWithHost, IPartitioner partitioner) {
 
         ResultSet rSet = sessionWithHost.left.execute(query);
 
@@ -179,7 +178,7 @@ public class RangeUtils {
     }
 
     /**
-     * Recursive function that splits a given token range to a given number of tolen ranges.
+     * Recursive function that splits a given token range to a given number of token ranges.
      *
      * @param range        the token range to be splitted.
      * @param partitioner  the cassandra partitioner.

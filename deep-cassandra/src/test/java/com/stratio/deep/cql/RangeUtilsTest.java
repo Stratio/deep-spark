@@ -35,15 +35,16 @@ import com.datastax.driver.core.Session;
 import com.stratio.deep.utils.Pair;
 import javax.annotation.Nullable;
 import org.apache.cassandra.dht.Murmur3Partitioner;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+
 
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
 
-@Test
+
 public class RangeUtilsTest {
 
     private final Set<String> localTokens1 = Sets.newHashSet("-1818244161861818887", "-3328157778230026742",
@@ -216,7 +217,7 @@ public class RangeUtilsTest {
 	private ResultSet mockLocalTokensResultSet3;
 
 
-    @BeforeMethod
+    @Before
     protected void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 

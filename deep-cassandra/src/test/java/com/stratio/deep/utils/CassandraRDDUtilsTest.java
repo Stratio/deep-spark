@@ -21,7 +21,8 @@ import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.testentity.CommonsTestEntity;
-import org.testng.annotations.Test;
+
+import org.junit.Test;
 import scala.Tuple2;
 
 import static com.stratio.deep.rdd.CassandraRDDUtils.createTableQueryGenerator;
