@@ -3,7 +3,7 @@ package com.stratio.deep.exception;
 /**
  * Created by jmgomez on 22/08/14.
  */
-public class DeepExtractorinitializationException extends Exception {
+public class DeepExtractorinitializationException extends RuntimeException {
 
     /**
      * Default constructor.

@@ -55,9 +55,9 @@ public class DeepSparkHadoopMapReduceUtil {
                 try {
 
                     // If that failed, look for the new constructor that takes a TaskType (not available in 1.x)
-                    Class taskTypeClass = Class.forName("org.apache.hadoop.mapreduce.TaskType");
-
-                    Method taskType = taskTypeClass.getMethod("valueOf", String.class);
+//                    Class taskTypeClass = Class.forName("org.apache.hadoop.mapreduce.TaskType");
+//
+//                    Method taskType = taskTypeClass.getMethod("valueOf", String.class);
 
 
                     TaskType type = null;
@@ -70,11 +70,11 @@ public class DeepSparkHadoopMapReduceUtil {
 //                        taskType.invoke(taskTypeClass, "REDUCE");
                     }
 
-                    Constructor constructor = clazz.getDeclaredConstructor(String.class, int.class, taskTypeClass,
+                    Constructor constructor = clazz.getDeclaredConstructor(String.class, int.class, TaskType.class,
                             int.class, int.class);
                     return (TaskAttemptID) constructor.newInstance(jtIdentifier, jobId, type, taskId,
                             attemptId);
-                } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e1) {
+                } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e1) {
                     e.printStackTrace();
                     e1.printStackTrace();
                 }

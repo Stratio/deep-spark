@@ -165,9 +165,14 @@ public abstract class GenericHadoopExtractor<T, K, V> implements IExtractor<T> {
         return this;
     }
 
-    @Override
 
-    public  void saveRDD(RDD<T> rdd, ExtractorConfig<T> config){
+    @Override
+    public  void saveRDD(T t){
         return;
+    }
+
+    @Override
+    public void initSave(ExtractorConfig<T> config, T first){
+        //TODO implement
     }
 }

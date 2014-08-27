@@ -53,7 +53,7 @@ public class CellValidator {
     private static final String DEFAULT_VALIDATOR_CLASSNAME = "org.apache.cassandra.db.marshal.UTF8Type";
 
 
-    private static final Map<Class, CQL3Type.Native> MAP_JAVA_TYPE_TO_CQL_TYPE =
+    public static final Map<Class, CQL3Type.Native> MAP_JAVA_TYPE_TO_CQL_TYPE =
             ImmutableMap.<Class, CQL3Type.Native>builder()
                     .put(String.class, CQL3Type.Native.TEXT)
                     .put(Integer.class, CQL3Type.Native.INT)
@@ -69,6 +69,23 @@ public class CellValidator {
                     .put(BigInteger.class, CQL3Type.Native.VARINT)
                     .put(UUID.class, CQL3Type.Native.UUID)
                     .build();
+//
+//    public static final Map<CQL3Type.Native, Class> CQL_TYPE_TO_MAP_JAVA_TYPE =
+//            ImmutableMap.<CQL3Type.Native, Class>builder()
+//                    .put(CQL3Type.Native.TEXT, String.class)
+//                    .put(CQL3Type.Native.INT, Integer.class)
+//                    .put(CQL3Type.Native.BOOLEAN, Boolean.class)
+//                    .put(CQL3Type.Native.TIMESTAMP, Date.class)
+//                    .put(CQL3Type.Native.DECIMAL, BigDecimal.class)
+//                    .put(CQL3Type.Native.BIGINT, Long.class)
+//                    .put(CQL3Type.Native.DOUBLE, Double.class)
+//                    .put(CQL3Type.Native.FLOAT, Float.class)
+//                    .put(CQL3Type.Native.INET, InetAddress.class)
+//                    .put(CQL3Type.Native.INET, Inet4Address.class)
+//                    .put(CQL3Type.Native.INET, Inet6Address.class)
+//                    .put(CQL3Type.Native.VARINT, BigInteger.class)
+//                    .put(CQL3Type.Native.UUID, UUID.class)
+//                    .build();
 
     private static final Map<String, DataType.Name> MAP_JAVA_TYPE_TO_DATA_TYPE_NAME =
             ImmutableMap.<String, DataType.Name>builder()

@@ -22,6 +22,7 @@ import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
+import com.stratio.deep.functions.DeepType2TupleFunction;
 import com.stratio.deep.utils.Pair;
 import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
@@ -46,7 +47,8 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
 
     public CassandraEntityExtractor(T t){
         super();
-        this.cassandraJobConfig = new EntityDeepJobConfig(t.getClass(), true);
+        this.cassandraJobConfig = new EntityDeepJobConfig(t.getClass());
+        this.transformer = new DeepType2TupleFunction<T>();
     }
 
     /**
@@ -97,8 +99,5 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
         return null;
     }
 
-    @Override
-    public void saveRDD(RDD<T> rdd, ExtractorConfig<T> config) {
 
-    }
 }

@@ -215,9 +215,54 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
     }
 
     @Override
-    public void saveRDD(RDD<T> rdd, ExtractorConfig<T> config) {
+    public void saveRDD(T t) {
+        SaveAction<T> saveAction = new SaveAction<>(t);
 
+        channel.writeAndFlush(saveAction);
+
+        Response response;
+        boolean interrupted = false;
+        for (; ; ) {
+            try {
+                response = answer.take();
+                break;
+            } catch (InterruptedException ignore) {
+                interrupted = true;
+            }
+        }
+
+        if (interrupted) {
+            Thread.currentThread().interrupt();
+        }
+
+        return ;
     }
+
+    @Override
+    public void initSave(ExtractorConfig<T> config, T first) {
+        InitSaveAction<T> initSaveAction = new InitSaveAction<>(config, first);
+
+        channel.writeAndFlush(initSaveAction);
+
+        Response response;
+        boolean interrupted = false;
+        for (; ; ) {
+            try {
+                response = answer.take();
+                break;
+            } catch (InterruptedException ignore) {
+                interrupted = true;
+            }
+        }
+
+        if (interrupted) {
+            Thread.currentThread().interrupt();
+        }
+
+        return;
+    }
+
+
 
 
 }

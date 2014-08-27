@@ -21,8 +21,11 @@ import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
+import com.stratio.deep.functions.CellList2TupleFunction;
+import com.stratio.deep.functions.DeepType2TupleFunction;
 import com.stratio.deep.utils.Pair;
 import org.apache.spark.rdd.RDD;
+import scala.Tuple2;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -38,7 +41,8 @@ public class CassandraCellExtractor extends CassandraExtractor<Cells> {
 
     public CassandraCellExtractor(){
         super();
-        this.cassandraJobConfig = new CellDeepJobConfig(true);
+        this.cassandraJobConfig = new CellDeepJobConfig();
+        this.transformer = new CellList2TupleFunction();
     }
 
 
@@ -82,8 +86,5 @@ public class CassandraCellExtractor extends CassandraExtractor<Cells> {
         return null;
     }
 
-    @Override
-    public void saveRDD(RDD<Cells> rdd, ExtractorConfig<Cells> config) {
 
-    }
 }

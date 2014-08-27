@@ -25,6 +25,7 @@ import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepIndexNotFoundException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
+import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.rdd.IDeepPartition;
 import com.stratio.deep.rdd.IDeepRecordReader;
 import com.stratio.deep.utils.Constants;
@@ -217,9 +218,9 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * we need to get at least one element of the output RDD.
      * </p>
      *
-     * @param tupleRDD the pair RDD.
+     * @param first the pair RDD.
      */
-    public void createOutputTableIfNeeded(RDD<Tuple2<Cells, Cells>> tupleRDD) {
+    public void createOutputTableIfNeeded(Tuple2<Cells, Cells> first) {
 
         TableMetadata metadata = getSession()
                 .getCluster()
@@ -236,7 +237,6 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
             return;
         }
 
-        Tuple2<Cells, Cells> first = tupleRDD.first();
 
         if (first._1() == null || first._1().isEmpty()) {
             throw new DeepNoSuchFieldException("no key structure found on row metadata");
@@ -473,9 +473,15 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
 
         Map<String, String> values = deepJobConfig.getValues();
 
-        this.username(values.get("user")).host(values.get("host"))
-                .cqlPort(Integer.valueOf(values.get("cqlPort"))).table(values.get("table"))
-                .keyspace(values.get("keyspace")).rpcPort(Integer.valueOf(values.get("rpcPort")));
+        username(values.get("user"));
+        host(values.get(ExtractorConstants.HOST));
+        cqlPort(Integer.valueOf(values.get(ExtractorConstants.CQLPORT)));
+        table(values.get(ExtractorConstants.TABLE));
+        keyspace(values.get(ExtractorConstants.KEYSPACE));
+        rpcPort(Integer.valueOf(values.get(ExtractorConstants.RPCPORT)));
+        createTableOnWrite(true);
+//                .writ
+//        ;
         this.initialize();
 
         return this;
@@ -694,6 +700,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
 
     public ICassandraDeepJobConfig<T> createTableOnWrite(Boolean createTableOnWrite) {
         this.createTableOnWrite = createTableOnWrite;
+        this.isWriteConfig = createTableOnWrite;
 
         return this;
     }

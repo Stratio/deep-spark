@@ -22,10 +22,7 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.stratio.deep.config.GenericDeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cql.DeepCqlRecordWriter;
-import com.stratio.deep.entity.CassandraCell;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.entity.*;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.functions.AbstractSerializableFunction2;
 import com.stratio.deep.utils.AnnotationUtils;
@@ -71,7 +68,7 @@ public class CassandraRDDUtils {
         RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
                 ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
 
-        ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD);
+        ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD.first());
 
         final int pageSize = writeConfig.getBatchSize();
         int offset = 0;
@@ -116,7 +113,7 @@ public class CassandraRDDUtils {
         final RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
                 ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
 
-        ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD);
+        ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD.first());
 
         ClassTag<Integer> uClassTag = ClassTag$.MODULE$.apply(Integer.class);
 
@@ -126,7 +123,7 @@ public class CassandraRDDUtils {
                     @Override
                     public Integer apply(TaskContext context, Iterator<Tuple2<Cells, Cells>> rows) {
 
-                        try (DeepCqlRecordWriter writer = new DeepCqlRecordWriter(context, writeConfig)) {
+                        try (DeepCqlRecordWriter writer = new DeepCqlRecordWriter(writeConfig)) {
                             while (rows.hasNext()) {
                                 Tuple2<Cells, Cells> row = rows.next();
                                 writer.write(row._1(), row._2());
@@ -251,7 +248,8 @@ public class CassandraRDDUtils {
                 sb.append(", ");
             }
 
-            sb.append(cellName).append(" ").append(((CassandraCell) key).marshaller().asCQL3Type().toString());
+//            CellValidator cellValidator = CellValidator.cellValidator(key.getCellValue());
+            sb.append(cellName).append(" ").append(((CassandraCell)key).getCql3TypeClassName());
 
             if (((CassandraCell) key).isPartitionKey()) {
                 partitionKey.add(cellName);
@@ -265,7 +263,7 @@ public class CassandraRDDUtils {
         if (values != null) {
             for (Cell key : values) {
                 sb.append(", ");
-                sb.append(quote(key.getCellName())).append(" ").append(((CassandraCell) key).marshaller().asCQL3Type().toString());
+                sb.append(quote(key.getCellName())).append(" ").append(((CassandraCell)key).getCql3TypeClassName());
             }
         }
 

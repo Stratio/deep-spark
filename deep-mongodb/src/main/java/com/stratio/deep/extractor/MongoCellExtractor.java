@@ -73,7 +73,7 @@ public final class MongoCellExtractor extends GenericHadoopExtractor<Cells, Obje
      * @param rdd
      * @param config
      */
-    @Override
+//    @Override
     public void saveRDD(RDD<Cells> rdd, ExtractorConfig<Cells> config) {
 
 //        mongoJobConfig = mongoJobConfig.initialize(config);

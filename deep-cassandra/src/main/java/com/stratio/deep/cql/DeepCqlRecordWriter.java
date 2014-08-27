@@ -21,6 +21,7 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
+import com.stratio.deep.entity.CellValidator;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
@@ -72,10 +73,9 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     /**
      * Con
      *
-     * @param context
      * @param writeConfig
      */
-    public DeepCqlRecordWriter(TaskContext context, ICassandraDeepJobConfig writeConfig) {
+    public DeepCqlRecordWriter(ICassandraDeepJobConfig writeConfig) {
         this.clients = new HashMap<>();
         this.removedClients = new HashMap<>();
         this.writeConfig = writeConfig;
@@ -127,7 +127,9 @@ public class DeepCqlRecordWriter implements AutoCloseable {
 
             partitionKey = CompositeType.build(keys);
         } else {
-            partitionKey = ((CassandraCell) cells.getCellByIdx(0)).getDecomposedCellValue();
+            CassandraCell cell = ((CassandraCell) cells.getCellByIdx(0));
+            cell.setCellValidator(CellValidator.cellValidator(cell.getCellValue()));
+            partitionKey = cell.getDecomposedCellValue();
         }
         return partitionKey;
     }

@@ -32,6 +32,8 @@ public class CassandraCell extends Cell {
 
     private transient CellValidator cellValidator;
 
+
+    private String cql3TypeClassName;
     /**
      * Factory method, creates a new CassandraCell from its value and metadata information<br/>
      *
@@ -151,6 +153,8 @@ public class CassandraCell extends Cell {
         this.isClusterKey = isClusterKey;
         this.isPartitionKey = isPartitionKey;
         this.cellValidator = getValueType(cellValue);
+        this.cql3TypeClassName = cellValidator.getAbstractType().asCQL3Type().toString();
+
     }
 
     /**
@@ -161,6 +165,8 @@ public class CassandraCell extends Cell {
         this.isClusterKey = isClusterKey;
         this.isPartitionKey = isPartitionKey;
         this.cellValidator = getValueType(cellType);
+        this.cql3TypeClassName = cellValidator.getAbstractType().asCQL3Type().toString();
+
     }
 
     /**
@@ -174,6 +180,8 @@ public class CassandraCell extends Cell {
         if (cellValue != null) {
             this.cellValue = ((CassandraCell) metadata).marshaller().compose(cellValue);
         }
+        this.cql3TypeClassName = cellValidator.getAbstractType().asCQL3Type().toString();
+
     }
 
     /**
@@ -188,6 +196,7 @@ public class CassandraCell extends Cell {
         this.isClusterKey = ((CassandraCell) metadata).isClusterKey;
         this.isPartitionKey = ((CassandraCell) metadata).isPartitionKey;
         this.cellValidator = ((CassandraCell) metadata).cellValidator;
+        this.cql3TypeClassName = cellValidator.getAbstractType().asCQL3Type().toString();
         this.cellValue = cellValue;
     }
 
@@ -202,6 +211,8 @@ public class CassandraCell extends Cell {
         this.isClusterKey = annotation.isPartOfClusterKey();
         this.isPartitionKey = annotation.isPartOfPartitionKey();
         this.cellValidator = CellValidator.cellValidator(field);
+        this.cql3TypeClassName = cellValidator.getAbstractType().asCQL3Type().toString();
+
     }
 
 
@@ -323,14 +334,26 @@ public class CassandraCell extends Cell {
         }
     }
 
+    public String getCql3TypeClassName() {
+        return cql3TypeClassName;
+    }
 
-    /**
-     * {@inheritDoc}
-     */
+    public void setCql3TypeClassName(String cql3TypeClassName) {
+        this.cql3TypeClassName = cql3TypeClassName;
+    }
+
     @Override
     public String toString() {
-        return "Cell{" + "cellName='" + cellName + '\'' + ", cellValue=" + (cellValue != null ? cellValue : "") + ", " +
-                "isPartitionKey="
-                + isPartitionKey + ", isClusterKey=" + isClusterKey + ", cellValidator='" + cellValidator + '\'' + '}';
+        final StringBuffer sb = new StringBuffer("CassandraCell{");
+        sb.append("isPartitionKey=").append(isPartitionKey);
+        sb.append(", isClusterKey=").append(isClusterKey);
+        sb.append(", cellValidator=").append(cellValidator);
+        sb.append(", cql3TypeClassName='").append(cql3TypeClassName).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
+    public void setCellValidator(CellValidator cellValidator) {
+        this.cellValidator = cellValidator;
     }
 }

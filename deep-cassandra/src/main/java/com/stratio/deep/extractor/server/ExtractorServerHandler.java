@@ -34,6 +34,7 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
     public void channelRead0(ChannelHandlerContext ctx, Action action) throws Exception {
 
         Response response = null;
+
         switch (action.getType()) {
             case GET_PARTITIONS:
                 GetPartitionsAction<T> partitionsAction = (GetPartitionsAction<T>) action;
@@ -55,6 +56,16 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
                 InitIteratorAction<T> initIteratorAction = (InitIteratorAction<T>) action;
                 this.initIterator(initIteratorAction);
                 response = new InitIteratorResponse();
+                break;
+            case SAVE:
+                SaveAction<T> SaveAction = (SaveAction<T>) action;
+                this.save(SaveAction);
+                response = new SaveResponse();
+                break;
+            case INIT_SAVE:
+                InitSaveAction<T> initSave = (InitSaveAction<T>) action;
+                this.initSave(initSave);
+                response = new InitSaveResponse();
                 break;
             default:
                 break;
@@ -136,5 +147,21 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    protected void initSave(InitSaveAction<T> initSaveAction) {
+        if (extractor == null) {
+            this.initExtractor(initSaveAction.getConfig());
+        }
+
+        extractor.initSave(initSaveAction.getConfig(), initSaveAction.getFirst());
+        return;
+
+    }
+
+    protected void save(SaveAction<T> saveAction) {
+        extractor.saveRDD(saveAction.getRecord());
+        return;
+
     }
 }

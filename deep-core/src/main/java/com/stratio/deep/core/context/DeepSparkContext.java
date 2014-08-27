@@ -17,20 +17,27 @@ package com.stratio.deep.core.context;
 
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.extractor.client.ExtractorClient;
+import com.stratio.deep.core.function.SaveFunction;
+import com.stratio.deep.core.function.SavePartitionFunction;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
 import com.stratio.deep.exception.DeepExtractorinitializationException;
 import com.stratio.deep.exception.DeepInstantiationException;
 import com.stratio.deep.rdd.IExtractor;
 import org.apache.log4j.Logger;
+import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
+import org.apache.spark.TaskContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.rdd.RDD;
+import scala.collection.Iterator;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Entry point to the Cassandra-aware Spark context.
@@ -106,14 +113,14 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * @param <T>
      * @return
      */
-    public <T> RDD<T> createRDD(final ExtractorConfig extractorConfig) {
+    public <T> RDD<T> createRDD(final ExtractorConfig<T> extractorConfig) {
         try {
 
             Class extractorImplClass = extractorConfig.getExtractorImplClass();
             final Constructor c = extractorImplClass.getConstructor();
             return new DeepRDD<T>(this.sc(), extractorConfig);
         } catch (NoSuchMethodException e) {
-            String message = "impossible to instance IDeepJobConfig, check configuration. ";
+            String message = "impossible to instance ExtractorConfig, check configuration. ";
             LOG.error(message);
             throw new DeepInstantiationException(message + e.getMessage(), e);
         }
@@ -134,18 +141,23 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
     public <T> void saveRDD(RDD<T> rdd, ExtractorConfig<T> extractorConfig) {
 
 
-        try {
 
-            ExtractorClient<T> extractorClient = new ExtractorClient<>();
-            extractorClient.initialize();
-            IExtractor<T> extractorImpl = extractorClient.getExtractorInstance(extractorConfig);
-            extractorImpl.saveRDD(rdd, extractorConfig);
-//            extractorConfig.getExtractorImplClass(). getSaveMethod().invoke(null, rdd, extractorConfig);
-//        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-//            throw new DeepInstantiationException(e.getMessage());
+        ExtractorClient<T> extractorClient = new ExtractorClient<T>();
+        extractorClient.initialize();
+        extractorClient.initSave(extractorConfig, rdd.first());
+        Partition[] partitions = rdd.partitions();
 
-        } catch (DeepExtractorinitializationException e) {
-            e.printStackTrace();
+        for(Partition partition : partitions){
+
+            TaskContext taskContext = new TaskContext(0, partition.index(), 0L, false, null);
+            Iterator<T> iterator = rdd.compute(partition, taskContext);
+                    while(iterator.hasNext()){
+                        extractorClient.saveRDD(iterator.next());
+                    }
         }
+
+        extractorClient.close();
+
+
     }
 }

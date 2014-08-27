@@ -19,11 +19,16 @@ import static scala.collection.JavaConversions.asScalaBuffer;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.stratio.deep.config.GenericDeepJobConfig;
+import com.stratio.deep.cql.DeepCqlRecordWriter;
+import com.stratio.deep.functions.AbstractSerializableFunction;
 import org.apache.spark.Partition;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.rdd.RDD;
 
+import scala.Tuple2;
 import scala.collection.Seq;
 
 import com.stratio.deep.config.ExtractorConfig;
@@ -47,78 +52,14 @@ import com.stratio.deep.utils.Pair;
 public abstract class CassandraExtractor<T> implements IExtractor<T> {
 
 
-    private IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
+    protected transient IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
 
-
+    protected transient DeepCqlRecordWriter writer;
 
     protected ICassandraDeepJobConfig<T> cassandraJobConfig;
 
-    /**
-     * Persists the given RDD to the underlying Cassandra datastore using the java cql3 driver.<br/>
-     * Beware: this method does not perform a distributed write as
-     * {@link CassandraExtractor#saveRDDToCassandra} does, uses the Datastax Java
-     * Driver to perform a batch write to the Cassandra server.<br/>
-     * This currently scans the partitions one by one, so it will be slow if a lot of partitions are
-     * required.
-     *
-     * @param rdd         the RDD to persist.
-     * @param writeConfig the write configuration object.
-     */
-    @SuppressWarnings("unchecked")
-    public static <W, T extends IDeepType> void cql3SaveRDDToCassandra(RDD<W> rdd,
-                                                                       ExtractorConfig<W> writeConfig) {
-        if (IDeepType.class.isAssignableFrom(writeConfig.getEntityClass())) {
-            ICassandraDeepJobConfig<T> c = (ICassandraDeepJobConfig<T>) writeConfig;
-            RDD<T> r = (RDD<T>) rdd;
+    protected transient AbstractSerializableFunction transformer;
 
-            CassandraRDDUtils.doCql3SaveToCassandra(r, c, new DeepType2TupleFunction<T>());
-        } else if (Cells.class.isAssignableFrom(writeConfig.getEntityClass())) {
-            ICassandraDeepJobConfig<Cells> c = (ICassandraDeepJobConfig<Cells>) writeConfig;
-            RDD<Cells> r = (RDD<Cells>) rdd;
-
-            CassandraRDDUtils.doCql3SaveToCassandra(r, c, new CellList2TupleFunction());
-        } else {
-            throw new IllegalArgumentException(
-                    "Provided RDD must be an RDD of Cells or an RDD of IDeepType");
-        }
-    }
-
-    /**
-     * Persists the given RDD of Cells to the underlying Cassandra datastore, using configuration
-     * options provided by <i>writeConfig</i>.
-     *
-     * @param rdd         the RDD to persist.
-     * @param writeConfig the write configuration object.
-     */
-    @SuppressWarnings("unchecked")
-    public static <W, T extends IDeepType> void saveRDDToCassandra(RDD<W> rdd,
-                                                                   ExtractorConfig<W> writeConfig) {
-        if (IDeepType.class.isAssignableFrom(writeConfig.getEntityClass())) {
-            ICassandraDeepJobConfig<T> c = (ICassandraDeepJobConfig<T>) writeConfig;
-            RDD<T> r = (RDD<T>) rdd;
-
-            CassandraRDDUtils.doSaveToCassandra(r, c, new DeepType2TupleFunction<T>());
-        } else if (Cells.class.isAssignableFrom(writeConfig.getEntityClass())) {
-            ICassandraDeepJobConfig<Cells> c = (ICassandraDeepJobConfig<Cells>) writeConfig;
-            RDD<Cells> r = (RDD<Cells>) rdd;
-
-            CassandraRDDUtils.doSaveToCassandra(r, c, new CellList2TupleFunction());
-        } else {
-            throw new IllegalArgumentException(
-                    "Provided RDD must be an RDD of Cells or an RDD of IDeepType");
-        }
-    }
-
-    /**
-     * Persists the given JavaRDD to the underlying Cassandra datastore.
-     *
-     * @param rdd         the RDD to persist.
-     * @param writeConfig the write configuration object.
-     * @param <W>         the generic type associated to the provided configuration object.
-     */
-    public static <W> void saveRDDToCassandra(JavaRDD<W> rdd, ExtractorConfig<W> writeConfig) {
-        saveRDDToCassandra(rdd.rdd(), writeConfig);
-    }
 
 
     @Override
@@ -133,7 +74,14 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
 
     @Override
     public void close() {
-        recordReader.close();
+        if(recordReader!=null){
+            recordReader.close();
+        }
+
+        if(writer!=null){
+            writer.close();
+        }
+
     }
 
 
@@ -212,6 +160,22 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
         return recordReader;
 
     }
+
+
+    @Override
+    public void initSave(ExtractorConfig<T> config, T first){
+
+        cassandraJobConfig = cassandraJobConfig.initialize(config);
+        ((GenericDeepJobConfig)cassandraJobConfig).createOutputTableIfNeeded( (Tuple2<Cells,Cells> )transformer.apply(first));
+        writer = new DeepCqlRecordWriter(cassandraJobConfig);
+    }
+
+    @Override
+    public void saveRDD(T t) {
+        Tuple2<Cells,Cells> tuple= (Tuple2<Cells,Cells> )transformer.apply(t);
+        writer.write(tuple._1(), tuple._2());
+    }
+
 
 
 }

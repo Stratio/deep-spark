@@ -25,6 +25,7 @@ public interface IExtractor<T> extends Serializable {
 
     IExtractor<T> getExtractorInstance(ExtractorConfig<T> config);
 
-    void saveRDD(RDD<T> rdd, ExtractorConfig<T> config);
+    void saveRDD(T t);
 
+    void initSave(ExtractorConfig<T> config, T first);
 }

@@ -103,9 +103,15 @@ public class ExtractorClient<T> implements IExtractor<T> {
     }
 
     @Override
-    public void saveRDD(RDD<T> rdd, ExtractorConfig<T> config) {
-        throw new DeepGenericException("Not implemented");
+    public void saveRDD(T t) {
+        handler.saveRDD(t);
     }
+
+    @Override
+    public void initSave(ExtractorConfig<T> config, T first) {
+        handler.initSave(config, first);
+    }
+
 
 
     @Override

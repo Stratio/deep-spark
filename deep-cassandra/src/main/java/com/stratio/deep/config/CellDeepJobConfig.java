@@ -32,8 +32,8 @@ public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
     private static final long serialVersionUID = -598862509865396541L;
     private Cells dummyCells;
 
-    public CellDeepJobConfig(Boolean isWriteConfig) {
-        this.isWriteConfig = isWriteConfig;
+    public CellDeepJobConfig() {
+//        this.isWriteConfig = isWriteConfig;
     }
 
     {

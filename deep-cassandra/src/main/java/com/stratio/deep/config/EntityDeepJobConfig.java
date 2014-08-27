@@ -82,12 +82,12 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
      * Public constructor. Constructs a job object with the specified entity class.
      *
      * @param entityClass   IDeepType entity Class object
-     * @param isWriteConfig boolean specifing if the constructed object is suitable for writes.
+//     * @param isWriteConfig boolean specifing if the constructed object is suitable for writes.
      */
-    public EntityDeepJobConfig(Class<T> entityClass, Boolean isWriteConfig) {
+    public EntityDeepJobConfig(Class<T> entityClass) {
         super();
         this.entityClass = entityClass;
-        this.isWriteConfig = isWriteConfig;
+//        this.isWriteConfig = isWriteConfig;
     }
 
     /* (non-Javadoc)
