@@ -271,6 +271,7 @@
                 <version>2.17</version>
                 <configuration>
                     <argLine>-noverify</argLine>
+                    <testFailureIgnore>true</testFailureIgnore>
                 </configuration>
             </plugin>
 
