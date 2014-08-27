@@ -1,11 +1,20 @@
 package com.stratio.deep.extractor.server
 
-import java.lang.reflect.Constructor
-
-import akka.actor.Actor
-import com.stratio.deep.config.ExtractorConfig
-import com.stratio.deep.rdd.{DeepTokenRange, CassandraExtractor, IExtractor}
 import scala.reflect.ClassTag
+import com.stratio.deep.config.ExtractorConfig
+import com.stratio.deep.rdd.CassandraExtractor
+import akka.actor.Actor
+import akka.actor.actorRef2Scala
+import com.stratio.deep.extractor.message.CloseAction
+import com.stratio.deep.extractor.message.CloseResponse
+import com.stratio.deep.extractor.message.NextResponse
+import com.stratio.deep.extractor.message.HasNextResponse
+import com.stratio.deep.extractor.message.GetPartitionsAction
+import com.stratio.deep.extractor.message.GetPartitionsResponse
+import com.stratio.deep.extractor.message.InitIteratorResponse
+import com.stratio.deep.extractor.message.InitIteratorAction
+import com.stratio.deep.extractor.message.HasNextAction
+import com.stratio.deep.extractor.message.NextAction
 
 /**
  * Created by darroyo on 22/08/14.
