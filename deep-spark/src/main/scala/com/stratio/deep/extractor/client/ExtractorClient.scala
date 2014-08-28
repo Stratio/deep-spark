@@ -20,14 +20,21 @@ import com.stratio.deep.extractor.message.HasNextResponse
 import com.stratio.deep.extractor.message.GetPartitionsResponse
 import com.stratio.deep.extractor.message.CloseResponse
 import com.stratio.deep.extractor.message.InitIteratorResponse
+import akka.actor.Deploy
+import akka.remote.RemoteScope
+import akka.actor.Address
+import com.typesafe.config.ConfigFactory
 
-class ExtractorClient[T: ClassTag](inetAddr: String) {
+class ExtractorClient[T: ClassTag](host: String, port: Integer) {
 
-  implicit val system = ActorSystem()
+  implicit val system = ActorSystem("ExtractorWorkerSystem", ConfigFactory.load("extractor"))
   implicit val timeout = Timeout(5 seconds)
 
-  val extractor = system.actorOf(Props(classOf[ExtractorActor[T]], ClassTag$.MODULE$.Any), "extractor")
-  //  val extractor = system.actorSelection("akka.tcp://ExtractorWorkerSystem@" + inetAddr + "/user/extractor")
+  val inetAddr = Address("akka.tcp", "ExtractorWorkerSystem", host, port)
+  val extractor = system.actorOf(Props(classOf[ExtractorActor[T]], ClassTag$.MODULE$.Any).withDeploy(Deploy(scope = RemoteScope(inetAddr))), "extractorActor")
+//  val extractor = system.actorOf(Props(classOf[ExtractorActor[T]], ClassTag$.MODULE$.Any), "extractorActor")
+//  val extractor = system.actorFor("akka://HelloRemoteSystem@" + inetAddr + "/user/ExtractorActor")
+//  val extractor = system.actorSelection("akka.tcp://ExtractorWorkerSystem@" + inetAddr + "/user/extractor")
 
   def getPartitions(config: ExtractorConfig[T]): Array[DeepTokenRange] = {
     val response = extractor ? GetPartitionsAction(config)
