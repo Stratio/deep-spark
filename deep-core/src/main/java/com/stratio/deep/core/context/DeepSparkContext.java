@@ -145,7 +145,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
             extractorConfig.putValue(SPARK_PARTITION_ID, String.valueOf(partition.index()));
             extractorClient.initSave(extractorConfig, rdd.first());
             TaskContext taskContext = new TaskContext(0, partition.index(), 0L, false, null);
-            Iterator<T> iterator = rdd.compute(partition, taskContext);
+            Iterator<T> iterator = rdd.iterator(partition, taskContext);
                     while(iterator.hasNext()){
                         extractorClient.saveRDD(iterator.next());
                     }
