@@ -16,6 +16,23 @@
 
 package com.stratio.deep.config;
 
+import static com.stratio.deep.extractor.utils.ExtractorConstants.PASSWORD;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.HOST;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.PORT;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.USERNAME;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.PAGE_SIZE;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.SESSION;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.KEYSPACE;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.TABLE;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.RPCPORT;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.CQLPORT;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.COLUMN_FAMILY;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.BISECT_FACTOR;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.CREATE_ON_WRITE;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.BATCHSIZE;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.READ_CONSISTENCY_LEVEL;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.WRITE_CONSISTENCY_LEVEL;
 import com.datastax.driver.core.*;
 import com.stratio.deep.cql.DeepRecordReader;
 import com.stratio.deep.entity.CassandraCell;
@@ -471,20 +488,88 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
 
     public ICassandraDeepJobConfig<T> initialize(ExtractorConfig deepJobConfig) {
 
+//TODO: Add filters
+
         Map<String, String> values = deepJobConfig.getValues();
 
-        username(values.get("user"));
-        host(values.get(ExtractorConstants.HOST));
-        cqlPort(Integer.valueOf(values.get(ExtractorConstants.CQLPORT)));
-        table(values.get(ExtractorConstants.TABLE));
-        keyspace(values.get(ExtractorConstants.KEYSPACE));
-        rpcPort(Integer.valueOf(values.get(ExtractorConstants.RPCPORT)));
-        createTableOnWrite(true);
-//                .writ
-//        ;
+        if(values.get(USERNAME)!=null){
+            username(values.get(USERNAME));
+        }
+
+        if(values.get(PASSWORD)!=null){
+            password(values.get(PASSWORD));
+        }
+
+        if(values.get(HOST)!=null){
+            host(values.get(HOST));
+        }
+
+        if(values.get(BATCHSIZE)!=null){
+            batchSize(getIntegerValue(values.get(BATCHSIZE)));
+        }
+
+
+        if(values.get(CQLPORT)!=null){
+            cqlPort(getIntegerValue(values.get(CQLPORT)));
+        }
+        if(values.get(TABLE)!=null){
+            table(values.get(TABLE));
+        }
+        if(values.get(KEYSPACE)!=null){
+            keyspace(values.get(KEYSPACE));
+        }
+        if(values.get(COLUMN_FAMILY)!=null){
+            columnFamily(values.get(COLUMN_FAMILY));
+        }
+
+
+        if(values.get(RPCPORT)!=null){
+            rpcPort(getIntegerValue(values.get(RPCPORT)));
+        }
+
+
+        if(values.get(CREATE_ON_WRITE)!=null){
+            createTableOnWrite(getBooleanValue(values.get(CREATE_ON_WRITE)));
+        }
+
+
+        if(values.get(PAGE_SIZE)!=null){
+            pageSize(getIntegerValue(values.get(PAGE_SIZE)));
+        }
+
+
+        if(values.get(READ_CONSISTENCY_LEVEL)!=null){
+            readConsistencyLevel(values.get(READ_CONSISTENCY_LEVEL));
+        }
+
+        if(values.get(WRITE_CONSISTENCY_LEVEL)!=null){
+            writeConsistencyLevel(values.get(WRITE_CONSISTENCY_LEVEL));
+        }
+
+
+        if(values.get(INPUT_COLUMNS)!=null){
+            inputColumns(getStringArray(values.get(INPUT_COLUMNS)));
+        }
+
+
+        if(values.get(BISECT_FACTOR)!=null){
+            bisectFactor(getIntegerValue(values.get(BISECT_FACTOR)));
+        }
         this.initialize();
 
         return this;
+    }
+
+    private Integer getIntegerValue(String value){
+        return value!=null?Integer.valueOf(value):null;
+    }
+
+    private Boolean getBooleanValue(String value){
+        return value!=null?Boolean.valueOf(value):false;
+    }
+
+    private String[] getStringArray(String value){
+        return value!=null?value.split(","):new String[0];
     }
 
     /**

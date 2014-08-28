@@ -1,5 +1,7 @@
 package com.stratio.deep.extractor.utils;
 
+import org.apache.cassandra.db.ConsistencyLevel;
+
 /**
  * Created by dgomez on 25/08/14.
  */
@@ -16,9 +18,12 @@ public class ExtractorConstants {
     public static  String TABLE    = "table";
     public static  String RPCPORT  = "rpcPort";
     public static  String CQLPORT  = "cqlPort";
-    public static  String COLUMN_FAMILY  = "COLUMN_FAMILY";
-    public static  String BISECT_FACTOR  = "COLUMN_FAMILY";
-    public static  String CREATE_ON_WRITE  = "COLUMN_FAMILY";
+    public static  String COLUMN_FAMILY  = "columnFamily";
+    public static  String BISECT_FACTOR  = "bisecFactor";
+    public static  String CREATE_ON_WRITE  = "createOnWrite";
     public static  String BATCHSIZE  = "batchSize";
+    public static  String READ_CONSISTENCY_LEVEL = "readConsistencyLevel";
+
+    public static String WRITE_CONSISTENCY_LEVEL = "writeConsistencyLevel";
 
 }
