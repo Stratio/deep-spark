@@ -18,6 +18,7 @@ import static com.stratio.deep.utils.Constants.SPARK_PARTITION_ID;
 import static com.stratio.deep.utils.Constants.SPARK_RDD_ID;
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.extractor.client.ExtractorClient;
+import com.stratio.deep.core.function.PrepareSaveFunction;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
 import com.stratio.deep.exception.DeepExtractorinitializationException;
@@ -129,31 +130,8 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
 
     public <T> void saveRDD(RDD<T> rdd, ExtractorConfig<T> extractorConfig) {
-
-
-
-        ExtractorClient<T> extractorClient = new ExtractorClient<T>();
-        extractorClient.initialize();
-        Partition[] partitions = rdd.partitions();
-
         extractorConfig.putValue(SPARK_RDD_ID, String.valueOf(rdd.id()));
-
-
-
-
-        for(Partition partition : partitions){
-            extractorConfig.putValue(SPARK_PARTITION_ID, String.valueOf(partition.index()));
-            extractorClient.initSave(extractorConfig, rdd.first());
-            TaskContext taskContext = new TaskContext(0, partition.index(), 0L, false, null);
-            Iterator<T> iterator = rdd.iterator(partition, taskContext);
-                    while(iterator.hasNext()){
-                        extractorClient.saveRDD(iterator.next());
-                    }
-            extractorClient.close();
-        }
-
-        extractorClient.close();
-
+        rdd.foreachPartition(new PrepareSaveFunction<T>(extractorConfig, rdd.first()));
 
     }
 }
