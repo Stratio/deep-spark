@@ -16,6 +16,8 @@
 package com.stratio.deep.core.rdd;
 
 
+import static com.stratio.deep.utils.Constants.SPARK_RDD_ID;
+
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.extractor.client.ExtractorClient;
 import com.stratio.deep.exception.DeepExtractorinitializationException;
@@ -53,7 +55,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
     public DeepRDD(SparkContext sc, ExtractorConfig<T> config) {
         super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config
                 .getEntityClass()));
-        config.putValue("spark.rdd.id", String.valueOf(id()));
+        config.putValue(SPARK_RDD_ID, String.valueOf(id()));
         this.config =
                 sc.broadcast(config, ClassTag$.MODULE$
                         .<ExtractorConfig<T>>apply(config.getClass()));

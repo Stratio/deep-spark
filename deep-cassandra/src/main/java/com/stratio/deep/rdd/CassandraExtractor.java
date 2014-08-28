@@ -14,6 +14,8 @@
 
 package com.stratio.deep.rdd;
 
+import static com.stratio.deep.utils.Constants.SPARK_RDD_ID;
+
 import static scala.collection.JavaConversions.asScalaBuffer;
 
 import java.nio.ByteBuffer;
@@ -115,7 +117,7 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
     @Override
     public Partition[] getPartitions(ExtractorConfig<T> config) {
 
-    int id = Integer.parseInt(config.getValues().get("spark.rdd.id"));
+    int id = Integer.parseInt(config.getValues().get(SPARK_RDD_ID));
         ICassandraDeepJobConfig<T> cellDeepJobConfig = initCustomConfig(config);
 
         List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits(cellDeepJobConfig);

@@ -1,12 +1,12 @@
 /*
  * Copyright 2012 The Netty Project
- * 
+ *
  * The Netty Project licenses this file to you under the Apache License, version 2.0 (the
  * "License"); you may not use this file except in compliance with the License. You may obtain a
  * copy of the License at:
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -18,7 +18,6 @@ import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.extractor.actions.*;
 import com.stratio.deep.extractor.response.*;
-import com.stratio.deep.rdd.DeepTokenRange;
 import com.stratio.deep.rdd.IExtractor;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -35,6 +34,7 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
     public void channelRead0(ChannelHandlerContext ctx, Action action) throws Exception {
 
         Response response = null;
+
         switch (action.getType()) {
             case GET_PARTITIONS:
                 GetPartitionsAction<T> partitionsAction = (GetPartitionsAction<T>) action;
@@ -57,9 +57,15 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
                 this.initIterator(initIteratorAction);
                 response = new InitIteratorResponse();
                 break;
-            case EXTRACTOR_INSTANCE:
-                ExtractorInstanceAction<T> instanceAction = (ExtractorInstanceAction<T>) action;
-                response = new ExtractorInstanceResponse<T>(this.getExtractorInstace(instanceAction));
+            case SAVE:
+                SaveAction<T> SaveAction = (SaveAction<T>) action;
+                this.save(SaveAction);
+                response = new SaveResponse();
+                break;
+            case INIT_SAVE:
+                InitSaveAction<T> initSave = (InitSaveAction<T>) action;
+                this.initSave(initSave);
+                response = new InitSaveResponse();
                 break;
             default:
                 break;
@@ -142,11 +148,19 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
             e.printStackTrace();
         }
     }
-    private IExtractor<T> getExtractorInstace(ExtractorInstanceAction<T> extractorInstanceAction) {
 
+    protected void initSave(InitSaveAction<T> initSaveAction) {
         if (extractor == null) {
-            this.initExtractor(extractorInstanceAction.getConfig());
+            this.initExtractor(initSaveAction.getConfig());
         }
-        return extractor.getExtractorInstance(extractorInstanceAction.getConfig());
+        extractor.initSave(initSaveAction.getConfig(), initSaveAction.getFirst());
+        return;
+
+    }
+
+    protected void save(SaveAction<T> saveAction) {
+        extractor.saveRDD(saveAction.getRecord());
+        return;
+
     }
 }

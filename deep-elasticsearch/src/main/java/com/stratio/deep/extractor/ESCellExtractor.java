@@ -36,6 +36,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * CellRDD to interact with ES
  */
@@ -66,27 +68,16 @@ public final class ESCellExtractor extends GenericHadoopExtractor<Cells, Object,
         }
     }
 
+    @Override
+    public Tuple2<Object, LinkedMapWritable> transformElement(Cells record) {
+//        try{
+            return null;
+//            return new Tuple2<>(null, UtilES.getJsonFromCell(record));
+//        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+//            LOG.error(e.getMessage());
+//            throw new DeepTransformException(e.getMessage());
+//        }
 
-
-    /**
-     * Save a RDD to ES
-     *
-     * @param rdd
-     * @param config
-     */
-    public static void saveRDD(RDD rdd, IDeepJobConfig<Cells, IESDeepJobConfig<Cells>> config) {
-
-        JavaPairRDD<Object, JSONObject> save = rdd.toJavaRDD().mapToPair(new PairFunction<Cells, Object, JSONObject>() {
-
-
-            @Override
-            public Tuple2<Object, JSONObject> call(Cells t) throws Exception {
-                return new Tuple2<>(null, UtilES.getJsonFromCell(t));
-            }
-        });
-
-
-        save.saveAsNewAPIHadoopFile("file:///cell", Object.class, Object.class, EsOutputFormat.class, ((IESDeepJobConfig)config).getHadoopConfiguration());
     }
 
 

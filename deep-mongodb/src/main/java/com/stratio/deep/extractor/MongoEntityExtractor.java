@@ -34,12 +34,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * EntityRDD to interact with mongoDB
  *
  * @param <T>
  */
-public final class MongoEntityExtractor<T> extends GenericHadoopExtractor<T, Object, BSONObject> {
+public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoEntityExtractor.class);
     private static final long serialVersionUID = -3208994171892747470L;
@@ -49,7 +51,6 @@ public final class MongoEntityExtractor<T> extends GenericHadoopExtractor<T, Obj
     public MongoEntityExtractor(T t){
         super();
         this.deepJobConfig = new EntityDeepJobConfigMongoDB(t.getClass());
-        this.inputFormat = new MongoInputFormat();
     }
 
     /**
@@ -68,31 +69,14 @@ public final class MongoEntityExtractor<T> extends GenericHadoopExtractor<T, Obj
 
     }
 
-
-
-    /**
-     * Save a RDD to MongoDB
-     *
-     * @param rdd
-     * @param config
-     */
-    public void saveRDD(RDD<T> rdd, ExtractorConfig<T> config) {
-//
-//        mongoJobConfig = mongoJobConfig.initialize(config);
-//
-//        JavaPairRDD<Object, BSONObject> save = rdd.toJavaRDD().mapToPair(new PairFunction<T, Object, BSONObject>() {
-//
-//
-//            @Override
-//            public Tuple2<Object, BSONObject> call(T t) throws Exception {
-//                return new Tuple2<>(null, UtilMongoDB.getBsonFromObject(t));
-//            }
-//        });
-//
-//
-//        // Only MongoOutputFormat and config are relevant
-//        save.saveAsNewAPIHadoopFile("file:///entity", Object.class, Object.class, MongoOutputFormat.class, mongoJobConfig.getHadoopConfiguration());
+    @Override
+    public Tuple2<Object, BSONObject> transformElement(T record) {
+        try {
+            return new Tuple2<>(null, UtilMongoDB.getBsonFromObject(record));
+        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            LOG.error(e.getMessage());
+            throw new DeepTransformException(e.getMessage());
+        }
     }
-
 
 }

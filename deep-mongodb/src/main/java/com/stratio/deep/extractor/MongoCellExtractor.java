@@ -18,6 +18,7 @@ package com.stratio.deep.extractor;
 
 import com.mongodb.hadoop.MongoInputFormat;
 import com.mongodb.hadoop.MongoOutputFormat;
+import com.mongodb.hadoop.output.MongoRecordWriter;
 import com.stratio.deep.config.CellDeepJobConfigMongoDB;
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.IDeepJobConfig;
@@ -35,10 +36,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * CellRDD to interact with mongoDB
  */
-public final class MongoCellExtractor extends GenericHadoopExtractor<Cells, Object, BSONObject> {
+public final class MongoCellExtractor extends MongoExtractor<Cells> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoCellExtractor.class);
     private static final long serialVersionUID = -3208994171892747470L;
@@ -46,7 +49,6 @@ public final class MongoCellExtractor extends GenericHadoopExtractor<Cells, Obje
     public MongoCellExtractor(){
         super();
         this.deepJobConfig = new CellDeepJobConfigMongoDB();
-        this.inputFormat = new MongoInputFormat();
     }
 
 
@@ -66,31 +68,17 @@ public final class MongoCellExtractor extends GenericHadoopExtractor<Cells, Obje
         }
     }
 
-
-    /**
-     * Save a RDD to MongoDB
-     *
-     * @param rdd
-     * @param config
-     */
-//    @Override
-    public void saveRDD(RDD<Cells> rdd, ExtractorConfig<Cells> config) {
-
-//        mongoJobConfig = mongoJobConfig.initialize(config);
-//
-//        JavaPairRDD<Object, BSONObject> save = rdd.toJavaRDD().mapToPair(new PairFunction<Cells, Object, BSONObject>() {
-//
-//
-//            @Override
-//            public Tuple2<Object, BSONObject> call(Cells t) throws Exception {
-//                return new Tuple2<>(null, UtilMongoDB.getBsonFromCell(t));
-//            }
-//        });
-//
-//
-//        // Only MongoOutputFormat and config are relevant
-//        save.saveAsNewAPIHadoopFile("file:///cell", Object.class, Object.class, MongoOutputFormat.class, mongoJobConfig.getHadoopConfiguration());
+    @Override
+    public Tuple2<Object, BSONObject> transformElement(Cells record) {
+        try{
+            return new Tuple2<>(null, UtilMongoDB.getBsonFromCell(record));
+        } catch (IllegalAccessException | InvocationTargetException| InstantiationException e) {
+            LOG.error(e.getMessage());
+            throw new DeepTransformException(e.getMessage());
+        }
     }
+
+
 
 
 }

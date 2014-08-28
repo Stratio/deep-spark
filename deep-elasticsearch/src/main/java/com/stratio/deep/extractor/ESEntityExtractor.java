@@ -72,6 +72,10 @@ public final class ESEntityExtractor<T> extends GenericHadoopExtractor<T,  Objec
 
     }
 
+    @Override
+    public Tuple2<Object, LinkedMapWritable> transformElement(T record) {
+        return null;
+    }
 
 
     /**

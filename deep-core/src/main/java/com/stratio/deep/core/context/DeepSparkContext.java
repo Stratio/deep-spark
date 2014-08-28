@@ -14,11 +14,10 @@
 
 package com.stratio.deep.core.context;
 
-
+import static com.stratio.deep.utils.Constants.SPARK_PARTITION_ID;
+import static com.stratio.deep.utils.Constants.SPARK_RDD_ID;
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.extractor.client.ExtractorClient;
-import com.stratio.deep.core.function.SaveFunction;
-import com.stratio.deep.core.function.SavePartitionFunction;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
 import com.stratio.deep.exception.DeepExtractorinitializationException;
@@ -114,16 +113,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * @return
      */
     public <T> RDD<T> createRDD(final ExtractorConfig<T> extractorConfig) {
-        try {
-
-            Class extractorImplClass = extractorConfig.getExtractorImplClass();
-            final Constructor c = extractorImplClass.getConstructor();
-            return new DeepRDD<T>(this.sc(), extractorConfig);
-        } catch (NoSuchMethodException e) {
-            String message = "impossible to instance ExtractorConfig, check configuration. ";
-            LOG.error(message);
-            throw new DeepInstantiationException(message + e.getMessage(), e);
-        }
+        return new DeepRDD<T>(this.sc(), extractorConfig);
     }
 
 
@@ -144,16 +134,22 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
         ExtractorClient<T> extractorClient = new ExtractorClient<T>();
         extractorClient.initialize();
-        extractorClient.initSave(extractorConfig, rdd.first());
         Partition[] partitions = rdd.partitions();
 
-        for(Partition partition : partitions){
+        extractorConfig.putValue(SPARK_RDD_ID, String.valueOf(rdd.id()));
 
+
+
+
+        for(Partition partition : partitions){
+            extractorConfig.putValue(SPARK_PARTITION_ID, String.valueOf(partition.index()));
+            extractorClient.initSave(extractorConfig, rdd.first());
             TaskContext taskContext = new TaskContext(0, partition.index(), 0L, false, null);
             Iterator<T> iterator = rdd.compute(partition, taskContext);
                     while(iterator.hasNext()){
                         extractorClient.saveRDD(iterator.next());
                     }
+            extractorClient.close();
         }
 
         extractorClient.close();
