@@ -24,6 +24,9 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 
+import javax.net.ssl.SSLException;
+import java.security.cert.CertificateException;
+
 /**
  * Receives a list of continent/city pairs from a {@link } to
  * get the local times of the specified cities.
@@ -37,6 +40,16 @@ public final class ExtractorServer {
     private static EventLoopGroup bossGroup;
 
     public static void main(String[] args) throws Exception {
+
+        try {
+            start();
+
+        } finally {
+            close();
+        }
+    }
+
+    public static void start() throws CertificateException, SSLException, InterruptedException {
         // Configure SSL.
         final SslContext sslCtx;
         if (SSL) {
@@ -48,18 +61,14 @@ public final class ExtractorServer {
 
         bossGroup = new NioEventLoopGroup(1);
         workerGroup = new NioEventLoopGroup();
-        try {
-            ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new ExtractorServerInitializer(sslCtx));
 
-            b.bind(PORT).sync().channel().closeFuture().sync();
+        ServerBootstrap b = new ServerBootstrap();
+        b.group(bossGroup, workerGroup)
+                .channel(NioServerSocketChannel.class)
+                .handler(new LoggingHandler(LogLevel.INFO))
+                .childHandler(new ExtractorServerInitializer(sslCtx));
 
-        } finally {
-            close();
-        }
+        b.bind(PORT).sync().channel().closeFuture().sync();
     }
 
     public static void close(){

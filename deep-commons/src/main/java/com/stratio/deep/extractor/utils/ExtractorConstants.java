@@ -8,6 +8,8 @@ import org.apache.cassandra.db.ConsistencyLevel;
 public class ExtractorConstants {
 
     public static  String PASSWORD = "password";
+    public static  String DATABASE = "database";
+    public static  String COLLECTION = "collection";
     public static  String HOST     = "host";
     public static  String PORT     = "port";
     public static  String INPUT_COLUMNS;

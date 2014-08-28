@@ -21,6 +21,7 @@ import static com.stratio.deep.utils.Constants.SPARK_RDD_ID;
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.Cells;
+import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.functions.AbstractSerializableFunction;
 import com.stratio.deep.rdd.IExtractor;
 import com.stratio.deep.utils.DeepSparkHadoopMapReduceUtil;
@@ -84,7 +85,6 @@ public abstract class GenericHadoopExtractor<T, K, V> implements IExtractor<T> {
 
 
         JobContext jobContext = DeepSparkHadoopMapReduceUtil.newJobContext(conf, jobId);
-
 
         try {
             List<InputSplit> splits = inputFormat.getSplits(jobContext);

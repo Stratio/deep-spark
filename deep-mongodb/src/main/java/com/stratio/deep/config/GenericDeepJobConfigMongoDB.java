@@ -16,6 +16,26 @@
 
 package com.stratio.deep.config;
 
+
+import static com.stratio.deep.extractor.utils.ExtractorConstants.PASSWORD;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.HOST;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.PORT;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.USERNAME;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.PAGE_SIZE;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.SESSION;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.KEYSPACE;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.TABLE;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.RPCPORT;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.CQLPORT;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.COLUMN_FAMILY;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.BISECT_FACTOR;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.CREATE_ON_WRITE;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.BATCHSIZE;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.READ_CONSISTENCY_LEVEL;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.WRITE_CONSISTENCY_LEVEL;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.DATABASE;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.COLLECTION;
 import com.mongodb.QueryBuilder;
 import com.mongodb.hadoop.MongoInputFormat;
 import com.mongodb.hadoop.util.MongoConfigUtil;
@@ -27,7 +47,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
-
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -528,9 +547,11 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     public IMongoDeepJobConfig<T> initialize(ExtractorConfig deepJobConfig) {
         Map<String, String> values = deepJobConfig.getValues();
 
-        this.username(values.get("user")).host(values.get("host"))
-                .collection(values.get("collection"))
-                .database(values.get("database"));
+        this.
+//                username(values.get(USERNAME)).
+                host(values.get(HOST))
+                .collection(values.get(COLLECTION))
+                .database(values.get(DATABASE));
         this.initialize();
 
         return this;
