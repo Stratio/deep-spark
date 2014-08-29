@@ -26,6 +26,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.security.cert.CertificateException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.testng.Assert.assertEquals;
 
@@ -119,12 +123,16 @@ public class MongoJavaRDDTest {
 
 
         dataSetImport();
-        //TODO: Uncomment
-//        try {
-//            ExtractorServer.start();
-//        } catch (CertificateException | InterruptedException e) {
-//            e.printStackTrace();
-//        }
+
+
+        ExecutorService es = Executors.newFixedThreadPool(3);
+        final Future future = es.submit(new Callable() {
+            public Object call() throws Exception {
+                ExtractorServer.start();
+                return null;
+            }
+        });
+
 
     }
 
@@ -169,6 +177,6 @@ public class MongoJavaRDDTest {
         }
 
         Files.forceDelete(new File(DB_FOLDER_NAME));
-//        ExtractorServer.close();
+        ExtractorServer.close();
     }
 }

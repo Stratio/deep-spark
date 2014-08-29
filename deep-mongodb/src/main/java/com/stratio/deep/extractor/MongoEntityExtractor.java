@@ -48,9 +48,9 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
 
 
 
-    public MongoEntityExtractor(T t){
+    public MongoEntityExtractor(Class<T> t){
         super();
-        this.deepJobConfig = new EntityDeepJobConfigMongoDB(t.getClass());
+        this.deepJobConfig = new EntityDeepJobConfigMongoDB(t);
     }
 
     /**

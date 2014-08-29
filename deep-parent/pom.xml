@@ -363,6 +363,7 @@
         <module>../deep-mongodb</module>
         <module>../deep-elasticsearch</module>
         <module>../deep-examples</module>
+        <module>../deep-examples-cassandra</module>
         <module>../deep-examples-mongodb</module>
     </modules>
 

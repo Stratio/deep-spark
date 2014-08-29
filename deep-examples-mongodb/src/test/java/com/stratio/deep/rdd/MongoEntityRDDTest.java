@@ -20,6 +20,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.extractor.MongoCellExtractor;
+import com.stratio.deep.extractor.MongoEntityExtractor;
 import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.testentity.BookEntity;
 import com.stratio.deep.testentity.CantoEntity;
@@ -60,6 +62,7 @@ public class MongoEntityRDDTest implements Serializable {
 
         ExtractorConfig<MessageTestEntity> inputConfigEntity = new ExtractorConfig(MessageTestEntity.class);
         inputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, DATABASE).putValue(ExtractorConstants.COLLECTION,COLLECTION_INPUT);
+        inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
 
 
@@ -83,14 +86,14 @@ public class MongoEntityRDDTest implements Serializable {
 
         ExtractorConfig<MessageTestEntity> inputConfigEntity = new ExtractorConfig(MessageTestEntity.class);
         inputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, DATABASE).putValue(ExtractorConstants.COLLECTION,COLLECTION_INPUT);
-
+        inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
 
         RDD<MessageTestEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
 
         ExtractorConfig<MessageTestEntity> outputConfigEntity = new ExtractorConfig(MessageTestEntity.class);
         outputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, DATABASE).putValue(ExtractorConstants.COLLECTION,COLLECTION_OUTPUT);
-
+        outputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
 
 
@@ -120,6 +123,7 @@ public class MongoEntityRDDTest implements Serializable {
 
         ExtractorConfig<BookEntity> inputConfigEntity = new ExtractorConfig(BookEntity.class);
         inputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book").putValue(ExtractorConstants.COLLECTION,"input");
+        inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
 
         RDD<BookEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
@@ -192,6 +196,7 @@ public class MongoEntityRDDTest implements Serializable {
 
         ExtractorConfig<WordCount> outputConfigEntity = new ExtractorConfig(WordCount.class);
         outputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book").putValue(ExtractorConstants.COLLECTION,"output");
+        outputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
 
         context.saveRDD(outputRDD.rdd(), outputConfigEntity);
@@ -215,6 +220,7 @@ public class MongoEntityRDDTest implements Serializable {
 
         ExtractorConfig<BookEntity> inputConfigEntity = new ExtractorConfig(BookEntity.class);
         inputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book").putValue(ExtractorConstants.COLLECTION,"input").putValue("inputColumns", "metadata");
+        inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
         RDD<BookEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
 
@@ -229,7 +235,8 @@ public class MongoEntityRDDTest implements Serializable {
 
 
         ExtractorConfig<BookEntity> inputConfigEntity2 = new ExtractorConfig(BookEntity.class);
-        inputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book").putValue(ExtractorConstants.COLLECTION,"input").putValue("inputColumns", "cantos");
+        inputConfigEntity2.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book").putValue(ExtractorConstants.COLLECTION,"input").putValue("inputColumns", "cantos");
+        inputConfigEntity2.setExtractorImplClass(MongoEntityExtractor.class);
 
 
         RDD<BookEntity> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
@@ -251,7 +258,8 @@ public class MongoEntityRDDTest implements Serializable {
 //                .host(hostConcat).database("book").collection("input").fields(bson).initialize();
 
         ExtractorConfig<BookEntity> inputConfigEntity3 = new ExtractorConfig(BookEntity.class);
-        inputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book").putValue(ExtractorConstants.COLLECTION,"input").putValue("fields", bson.toString());
+        inputConfigEntity3.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book").putValue(ExtractorConstants.COLLECTION,"input").putValue("fields", bson.toString());
+        inputConfigEntity3.setExtractorImplClass(MongoEntityExtractor.class);
 
 
         RDD<BookEntity> inputRDDEntity3 = context.createRDD(inputConfigEntity3);
