@@ -19,16 +19,14 @@ package com.stratio.deep.examples.java;
 import com.stratio.deep.config.ExtractorConfig;
 
 import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.extractor.server.ExtractorServer;
 
 import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.rdd.CassandraCellExtractor;
-import com.stratio.deep.testentity.TweetEntity;
 
 import com.stratio.deep.entity.Cells;
-import com.stratio.deep.rdd.CassandraCellExtractor;
 
-import com.stratio.deep.testutils.ContextProperties;
+import com.stratio.deep.rdd.CassandraEntityExtractor;
+import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 
@@ -70,6 +68,7 @@ public final class AggregatingData {
 
         String keyspaceName = "twitter";
         String tableName = "tweets";
+        String tableNameSave = "tweets2";
 
 //        //Call async the Extractor netty Server
 //        ExecutorService es = Executors.newFixedThreadPool(3);
@@ -84,6 +83,9 @@ public final class AggregatingData {
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
 	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
+
+//        ExtractorConfig<TweetEntity> config = new ExtractorConfig(TweetEntity.class);
+
 
         // Creating a configuration for the RDD and initialize it
         ExtractorConfig<Cells> config = new ExtractorConfig();
@@ -102,13 +104,32 @@ public final class AggregatingData {
 //                .initialize();
 
         // Creating the RDD
+
+//        RDD<TweetEntity> rdd = deepContext.createRDD(config);
+
+
         RDD<Cells> rdd = deepContext.createRDD(config);
-//        LOG.info("count: " + rdd.count());
+        LOG.info("count: " + rdd.count());
 //        LOG.info("first: " + rdd.first());
 
-        System.out.println("count: " + rdd.count());
+//        System.out.println("count: " + rdd.count());
         System.out.println("first: " + rdd.first());
 
+
+        ExtractorConfig<Cells> configSave = new ExtractorConfig();
+
+        configSave.setExtractorImplClass(CassandraCellExtractor.class);
+        Map<String, String> valuesSave = new HashMap<>();
+        valuesSave.put(ExtractorConstants.KEYSPACE, keyspaceName);
+        valuesSave.put(ExtractorConstants.TABLE,    tableNameSave);
+        valuesSave.put(ExtractorConstants.CQLPORT,  "9042");
+        valuesSave.put(ExtractorConstants.RPCPORT,  "9160");
+        valuesSave.put(ExtractorConstants.HOST,     "127.0.0.1");
+        valuesSave.put(ExtractorConstants.CREATE_ON_WRITE,     "true");
+
+        configSave.setValues(valuesSave);
+
+        deepContext.saveRDD(rdd, configSave);
         // grouping to get key-value pairs
 //        JavaPairRDD<String, Integer> groups = rdd.toJavaRDD().groupBy(new Function<TweetEntity, String>() {
 //            @Override
