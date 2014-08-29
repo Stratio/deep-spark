@@ -73,4 +73,21 @@ public abstract class Cell implements Serializable {
         return null;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Cell cell = (Cell) o;
+
+        boolean isCellName = this.getCellName().equals(cell.getCellName());
+        boolean isCellValue = this.getCellValue().equals(cell.getCellValue());
+
+        return isCellName && isCellValue;
+    }
+
 }
