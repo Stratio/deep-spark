@@ -22,10 +22,16 @@ import com.mongodb.hadoop.MongoOutputFormat;
 import com.stratio.deep.extractor.impl.GenericHadoopExtractor;
 import org.bson.BSONObject;
 
+import java.io.Serializable;
+
 /**
  * Created by rcrespo on 27/08/14.
  */
-public abstract class MongoExtractor<T> extends GenericHadoopExtractor<T, Object, BSONObject>{
+public abstract class MongoExtractor<T> extends GenericHadoopExtractor<T, Object, BSONObject> implements Serializable{
+
+
+    private static final long serialVersionUID = 298122755783328212L;
+
 
     public MongoExtractor(){
         super();

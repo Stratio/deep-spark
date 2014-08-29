@@ -84,17 +84,9 @@ public final class ReadingCellFromMongoDB {
 
         RDD<Cells> inputRDDEntity = deepContext.createRDD(config);
 
-        LOG.info("****************************************************************************");
-        LOG.info("****************************************************************************");
-        LOG.info("****************************************************************************");
-        LOG.info("****************************************************************************");
-        LOG.info("****************************************************************************");
-        LOG.info("****************************************************************************");
         LOG.info("count : " + inputRDDEntity.count());
-        LOG.info("****************************************************************************");
+
         LOG.info("prints first cell  : " + inputRDDEntity.first());
-
-
 
         ExtractorConfig<Cells> configSave = new ExtractorConfig();
 
@@ -104,14 +96,12 @@ public final class ReadingCellFromMongoDB {
         valuesSave.put("collection",    "output");
         valuesSave.put("host",  "localhost:27017");
 
-//        System.out.println("vemos el config " + configSave.getValues().get("host"));
+
 
         configSave.setValues(valuesSave);
 
-
-        System.out.println("intentaremos guardar ");
         deepContext.saveRDD(inputRDDEntity, configSave);
-        System.out.println("termina el  guardar ");
-//        deepContext.stop();
+
+        deepContext.stop();
     }
 }

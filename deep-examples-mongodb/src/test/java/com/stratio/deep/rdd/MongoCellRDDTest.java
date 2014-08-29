@@ -45,39 +45,40 @@ public class MongoCellRDDTest {
 
 
 
-//    @Test
-//    public void testWritingRDD() {
-//
-//
-//        String hostConcat = HOST.concat(":").concat(PORT.toString());
-//
-//        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
-//
-//        ExtractorConfig<Cells> inputConfigEntity = new ExtractorConfig();
-//        inputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, DATABASE).putValue(ExtractorConstants.COLLECTION, COLLECTION_INPUT);
-//        inputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
-//
-//        RDD<Cells> inputRDDEntity = context.createRDD(inputConfigEntity);
-//
-//        ExtractorConfig<Cells> outputConfigEntity = new ExtractorConfig();
-//        inputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, DATABASE).putValue(ExtractorConstants.COLLECTION,COLLECTION_OUTPUT_CELL);
-//        outputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
-//
-//
-//        //Save RDD in MongoDB
-//        context.saveRDD(inputRDDEntity, outputConfigEntity);
-//
-//        RDD<Cells> outputRDDEntity = context.createRDD(outputConfigEntity);
-//
-//
-//        assertEquals(MongoJavaRDDTest.mongo.getDB(DATABASE).getCollection(COLLECTION_OUTPUT_CELL).findOne().get("message"),
-//                outputRDDEntity.first().getCellByName("message").getCellValue());
-//
-//
-//        context.stop();
-//
-//
-//    }
+    @Test
+    public void testWritingRDD() {
+
+
+        String hostConcat = HOST.concat(":").concat(PORT.toString());
+
+        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
+
+        ExtractorConfig<Cells> inputConfigEntity = new ExtractorConfig();
+        inputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, DATABASE).putValue(ExtractorConstants.COLLECTION, COLLECTION_INPUT);
+        inputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
+
+        RDD<Cells> inputRDDEntity = context.createRDD(inputConfigEntity);
+
+        ExtractorConfig<Cells> outputConfigEntity = new ExtractorConfig();
+        outputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, DATABASE).putValue(ExtractorConstants.COLLECTION,COLLECTION_OUTPUT_CELL);
+        outputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
+
+
+        //Save RDD in MongoDB
+        context.saveRDD(inputRDDEntity, outputConfigEntity);
+
+
+        RDD<Cells> outputRDDEntity = context.createRDD(outputConfigEntity);
+
+
+        assertEquals(MongoJavaRDDTest.mongo.getDB(DATABASE).getCollection(COLLECTION_OUTPUT_CELL).findOne().get("message"),
+                outputRDDEntity.first().getCellByName("message").getCellValue());
+
+
+        context.stop();
+
+
+    }
 
 
 
