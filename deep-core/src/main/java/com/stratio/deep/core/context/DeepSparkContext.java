@@ -131,6 +131,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
     public <T> void saveRDD(RDD<T> rdd, ExtractorConfig<T> extractorConfig) {
         extractorConfig.putValue(SPARK_RDD_ID, String.valueOf(rdd.id()));
+        extractorConfig.putValue(SPARK_PARTITION_ID, "0");
         rdd.foreachPartition(new PrepareSaveFunction<T>(extractorConfig, rdd.first()));
 
     }

@@ -26,6 +26,8 @@ import scala.runtime.BoxedUnit;
 
 import java.io.Serializable;
 
+import static com.stratio.deep.utils.Constants.SPARK_PARTITION_ID;
+
 /**
  * Created by rcrespo on 28/08/14.
  */
@@ -51,6 +53,7 @@ public class PrepareSaveFunction<T> extends AbstractFunction1<Iterator<T>, Boxed
         while(v1.hasNext()){
             extractorClient.saveRDD(v1.next());
         }
+        extractorConfig.putValue(SPARK_PARTITION_ID, String.valueOf(Integer.parseInt(extractorConfig.getValues().get(SPARK_PARTITION_ID))+1)) ;
         extractorClient.close();
         return null;
     }

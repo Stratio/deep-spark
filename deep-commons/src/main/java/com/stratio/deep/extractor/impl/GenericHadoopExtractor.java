@@ -201,6 +201,7 @@ public abstract class GenericHadoopExtractor<T, K, V> implements IExtractor<T> {
 
         int partitionIndex = Integer.parseInt(config.getValues().get(SPARK_PARTITION_ID));
 
+
         TaskAttemptID attemptId = DeepSparkHadoopMapReduceUtil.newTaskAttemptID(jobTrackerId, id, true, partitionIndex, 0);
 
         hadoopAttemptContext = DeepSparkHadoopMapReduceUtil.newTaskAttemptContext(deepJobConfig.initialize(config).getHadoopConfiguration(), attemptId);
