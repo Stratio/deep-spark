@@ -82,7 +82,7 @@
         <dependency>
             <groupId>com.stratio.deep</groupId>
             <artifactId>deep-commons</artifactId>
-            <version>${project.version}</version>
+            <version>0.4.0</version>
         </dependency>
 
         <!-- Logging with SLF4J & LogBack -->
