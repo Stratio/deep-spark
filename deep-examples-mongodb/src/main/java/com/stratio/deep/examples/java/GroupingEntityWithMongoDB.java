@@ -22,7 +22,6 @@ import com.stratio.deep.extractor.MongoEntityExtractor;
 import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.testentity.BookEntity;
 import com.stratio.deep.testentity.CantoEntity;
-import com.stratio.deep.testentity.MessageEntity;
 import com.stratio.deep.testentity.WordCount;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -117,8 +116,8 @@ public final class GroupingEntityWithMongoDB {
 
 
         ExtractorConfig<WordCount> outputConfigEntity = new ExtractorConfig(WordCount.class);
-        inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, outputCollection);
-        inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
+        outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, outputCollection);
+        outputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
         deepContext.saveRDD(outputRDD.rdd(),outputConfigEntity);
 

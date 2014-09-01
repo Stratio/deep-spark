@@ -36,6 +36,13 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.rdd.RDD;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 /**
  * Author: Emmanuelle Raffenne
  * Date..: 19-feb-2014
@@ -65,8 +72,20 @@ public final class CreatingCellRDD {
     public static void doMain(String[] args) {
         String job = "java:creatingCellRDD";
 
-        String keyspaceName = "test";
-        String tableName = "tweets";
+        String KEYSPACENAME = "test";
+        String TABLENAME    = "tweets";
+        String CQLPORT      = "9042";
+        String RPCPORT      = "9160";
+        String HOST         = "127.0.0.1";
+
+        //Call async the Extractor netty Server
+        ExecutorService es = Executors.newFixedThreadPool(3);
+        final Future future = es.submit(new Callable() {
+            public Object call() throws Exception {
+                ExtractorServer.main(null);
+                return null;
+            }
+        });
 
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
@@ -75,8 +94,8 @@ public final class CreatingCellRDD {
                 .setAppName(job)
                 .setJars(p.getJars())
                 .setSparkHome(p.getSparkHome())
-                .set("spark.serializer","org.apache.spark.serializer.KryoSerializer")
-                .set("spark.kryo.registrator","com.stratio.deep.serializer.DeepKryoRegistrator");
+                .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+                .set("spark.kryo.registrator", "com.stratio.deep.serializer.DeepKryoRegistrator");
 
         SparkContext sc = new SparkContext(p.getCluster(), job, sparkConf);
 
@@ -85,8 +104,19 @@ public final class CreatingCellRDD {
 
 	    DeepSparkContext deepContext = new DeepSparkContext(sc);
 
-        // Configuration and initialization
-        ExtractorConfig<Cells> config = new ExtractorConfig<>();
+        // Creating a configuration for the Extractor and initialize it
+        ExtractorConfig<Cells> config = new ExtractorConfig();
+
+        config.setExtractorImplClass(CassandraCellExtractor.class);
+
+        Map<String, String> values = new HashMap<>();
+        values.put(ExtractorConstants.KEYSPACE, KEYSPACENAME);
+        values.put(ExtractorConstants.TABLE,    TABLENAME);
+        values.put(ExtractorConstants.CQLPORT,  CQLPORT);
+        values.put(ExtractorConstants.RPCPORT,  RPCPORT);
+        values.put(ExtractorConstants.HOST,     HOST );
+
+        config.setValues(values);
 
         // Creating the RDD
         RDD rdd =  deepContext.createRDD(config);

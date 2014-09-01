@@ -21,7 +21,6 @@ import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.extractor.MongoEntityExtractor;
 import com.stratio.deep.extractor.utils.ExtractorConstants;
-import com.stratio.deep.testentity.MessageEntity;
 import com.stratio.deep.testentity.MessageTestEntity;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
@@ -29,6 +28,9 @@ import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
 import java.util.List;
+
+import static com.stratio.deep.extractor.server.ExtractorServer.initExtractorServer;
+import static com.stratio.deep.extractor.server.ExtractorServer.stopExtractorServer;
 
 /**
  * Example class to write an entity to mongoDB
@@ -60,27 +62,30 @@ public final class WritingEntityToMongoDB {
 
         String readPreference = "nearest";
 
+        initExtractorServer();
+
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
 	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
 
-        ExtractorConfig<MessageEntity> inputConfigEntity = new ExtractorConfig(MessageEntity.class);
+        ExtractorConfig<MessageTestEntity> inputConfigEntity = new ExtractorConfig(MessageTestEntity.class);
         inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, inputCollection);
         inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
-        RDD<MessageEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
+        RDD<MessageTestEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
 
 
 
-        ExtractorConfig<MessageEntity> outputConfigEntity = new ExtractorConfig(MessageEntity.class);
-        inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, outputCollection);
-        inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
+        ExtractorConfig<MessageTestEntity> outputConfigEntity = new ExtractorConfig(MessageTestEntity.class);
+        outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, outputCollection);
+        outputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
 
         deepContext.saveRDD(inputRDDEntity, outputConfigEntity);
 
+        stopExtractorServer();
 
         deepContext.stop();
     }

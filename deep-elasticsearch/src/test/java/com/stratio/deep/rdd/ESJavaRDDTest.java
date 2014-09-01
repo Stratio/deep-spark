@@ -18,11 +18,14 @@ package com.stratio.deep.rdd;
 
 import com.google.common.io.Resources;
 import static org.elasticsearch.node.NodeBuilder.*;
+import static org.testng.AssertJUnit.assertEquals;
+
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.count.CountRequest;
 import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
 import org.testng.annotations.AfterSuite;
@@ -56,7 +59,7 @@ public class ESJavaRDDTest {
     private static Client client = null;
     @BeforeSuite
     public static void init() throws IOException, ExecutionException, InterruptedException {
-        node = nodeBuilder().local(true).clusterName("clusterTest").node();
+        node = nodeBuilder().clusterName("localhost").node();
         client = node.client();
         dataSetImport();
     }
@@ -76,17 +79,19 @@ public class ESJavaRDDTest {
                 .execute()
                 .actionGet();
         try {
-            CountResponse action = client.prepareCount("twitter").setTypes("tweet")
+            SearchResponse action = client.prepareSearch("book").setTypes("test")
                     .execute()
                     .actionGet();
+            System.out.println(" COUNT -->" + action.getCount());
+            assertEquals(action.getCount(), 5);
         }catch (Exception e){
             e.printStackTrace();
         }
     }
-    @AfterSuite
+
     public static void cleanup() {
-        node.stop();
-        File file = new File("data");
-        file.delete();
+//        node.stop();
+//        File file = new File("data");
+//        file.delete();
     }
 }
