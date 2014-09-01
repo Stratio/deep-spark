@@ -109,9 +109,6 @@ public final class AggregatingData {
         LOG.info("count: " + rdd.count());
         LOG.info("first: " + rdd.first());
 
-        System.out.println("count: " + rdd.count());
-        System.out.println("first: " + rdd.first());
-
 
         //ExtractorServer.close();
         deepContext.stop();

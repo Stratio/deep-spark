@@ -48,19 +48,10 @@ public class ContextProperties {
     private String[] jar;
 
     /**
-     * Endpoint of the cassandra cluster against which the examples will be run. Defaults to 'localhost'.
+     * Endpoint of the mongo cluster against which the examples will be run. Defaults to 'localhost'.
      */
-    private String cassandraHost;
+    private String mongoHost;
 
-    /**
-     * Cassandra's cql port. Defaults to 9042.
-     */
-    private int cassandraCqlPort;
-
-    /**
-     * Cassandra's cql port. Defaults to 9160.
-     */
-    private int cassandraThriftPort;
 
     /**
      * Public constructor.
@@ -70,11 +61,11 @@ public class ContextProperties {
 
         options.addOption("m","master", true, "The spark's master endpoint");
         options.addOption("h","sparkHome", true, "The spark's home, eg. /opt/spark");
-        options.addOption("H","cassandraHost", true, "Cassandra endpoint");
+        options.addOption("H","mongoHost", true, "Mongo endpoint");
 
-        options.addOption(OptionBuilder.hasArg().withType(Integer.class).withLongOpt("cassandraCqlPort").withArgName("cassandra_cql_port").withDescription("cassandra's cql port, defaults to 9042").create());
-        options.addOption(OptionBuilder.hasArg().withType(Integer.class).withLongOpt("cassandraThriftPort")
-                .withArgName("cassandra_thrift_port").withDescription("cassandra's thrift port, " +
+        options.addOption(OptionBuilder.hasArg().withType(Integer.class).withLongOpt("mongoCqlPort").withArgName("mongo_cql_port").withDescription("mongo's cql port, defaults to 9042").create());
+        options.addOption(OptionBuilder.hasArg().withType(Integer.class).withLongOpt("mongoThriftPort")
+                .withArgName("mongo_thrift_port").withDescription("mongo's thrift port, " +
                         "defaults to 9160").create());
         options.addOption(OptionBuilder.hasArg().withValueSeparator(',').withLongOpt("jars")
                 .withArgName("jars_to_add").withDescription("comma separated list of jars to add").create());
@@ -96,9 +87,8 @@ public class ContextProperties {
             jar = (line.hasOption("jars") ? line.getOptionValues("jars") : new String[]{});
             cluster = line.getOptionValue ("master", defaultIfEmpty(System.getProperty("spark.master"), "local"));
             sparkHome = line.getOptionValue ("sparkHome", defaultIfEmpty(System.getProperty("spark.home"), ""));
-            cassandraHost = line.getOptionValue ("cassandraHost", Constants.DEFAULT_CASSANDRA_HOST);
-            cassandraCqlPort = line.hasOption ("cassandraCqlPort") ? Integer.parseInt(line.getOptionValue("cassandraCqlPort")): Constants.DEFAULT_CASSANDRA_CQL_PORT;
-            cassandraThriftPort = line.hasOption ("cassandraThriftPort") ? Integer.parseInt(line.getOptionValue("cassandraThriftPort")): Constants.DEFAULT_CASSANDRA_RPC_PORT;
+            mongoHost = line.getOptionValue ("mongoHost", Constants.DEFAULT_MONGO_HOST);
+
 
         } catch (ParseException e) {
             formatter.printHelp( "", options );
@@ -118,15 +108,8 @@ public class ContextProperties {
         return jar;
     }
 
-    public String getCassandraHost() {
-        return cassandraHost;
+    public String getMongoHost() {
+        return mongoHost;
     }
 
-    public int getCassandraCqlPort() {
-        return cassandraCqlPort;
-    }
-
-    public int getCassandraThriftPort() {
-        return cassandraThriftPort;
-    }
 }

@@ -17,9 +17,15 @@
 package com.stratio.deep.examples.java;
 
 
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.extractor.MongoEntityExtractor;
+import com.stratio.deep.extractor.utils.ExtractorConstants;
+import com.stratio.deep.testentity.MessageEntity;
+import com.stratio.deep.testentity.MessageTestEntity;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
+import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
 import java.util.List;
@@ -59,22 +65,24 @@ public final class WritingEntityToMongoDB {
 	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
-        //TODO Review
 
-    /*    IMongoDeepJobConfig<MessageEntity> inputConfigEntity =
-				        MongoConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(inputCollection).readPreference(readPreference).initialize();
+        ExtractorConfig<MessageEntity> inputConfigEntity = new ExtractorConfig(MessageEntity.class);
+        inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, inputCollection);
+        inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
         RDD<MessageEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
 
 
-        IMongoDeepJobConfig<MessageEntity> outputConfigEntityPruebaGuardado =
-				        MongoConfigFactory.createMongoDB(MessageEntity.class).host(host).database(database).collection(outputCollection).readPreference(readPreference).initialize();
+
+        ExtractorConfig<MessageEntity> outputConfigEntity = new ExtractorConfig(MessageEntity.class);
+        inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, outputCollection);
+        inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
 
-        MongoEntityRDD.saveEntity(inputRDDEntity, outputConfigEntityPruebaGuardado);
+        deepContext.saveRDD(inputRDDEntity, outputConfigEntity);
 
 
-        deepContext.stop();*/
+        deepContext.stop();
     }
 
 

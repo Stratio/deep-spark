@@ -17,8 +17,34 @@
 package com.stratio.deep.examples.java;
 
 
+import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.config.MongoConfigFactory;
 import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.entity.MongoCell;
+import com.stratio.deep.extractor.MongoCellExtractor;
+import com.stratio.deep.extractor.server.ExtractorServer;
+import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.utils.ContextProperties;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
+import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.rdd.RDD;
+import scala.Tuple2;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import static com.stratio.deep.extractor.server.ExtractorServer.initExtractorServer;
+import static com.stratio.deep.extractor.server.ExtractorServer.stopExtractorServer;
 
 /**
  * Created by rcrespo on 25/06/14.
@@ -50,9 +76,12 @@ public final class GroupingCellWithMongoDB {
 	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
-//TODO review
-       /** DeepJobConfig<Cells> inputConfigEntity =
-				        MongoConfigFactory.createMongoDB().host(host).database(database).collection(inputCollection).initialize();
+
+        initExtractorServer();
+
+        ExtractorConfig<Cells> inputConfigEntity = new ExtractorConfig<>();
+        inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, inputCollection);
+        inputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
 
         RDD<Cells> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
 
@@ -93,12 +122,19 @@ public final class GroupingCellWithMongoDB {
         });
 
 
-        IMongoDeepJobConfig<Cells> outputConfigEntity =
-				        MongoConfigFactory.createMongoDB().host(host).database(database).collection(outputCollection).initialize();
+        ExtractorConfig<Cells> outputConfigEntity = new ExtractorConfig<>();
+        outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, outputCollection);
+        outputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
 
-        MongoCellRDD.saveCell(outputRDD.rdd(), outputConfigEntity);
 
-        deepContext.stop();*/
+        deepContext.saveRDD(outputRDD.rdd(), outputConfigEntity);
+
+        stopExtractorServer();
+        deepContext.stop();
 
     }
+
+
+
+
 }

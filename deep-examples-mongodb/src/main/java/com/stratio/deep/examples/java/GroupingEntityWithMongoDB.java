@@ -16,8 +16,30 @@
 
 package com.stratio.deep.examples.java;
 
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.extractor.MongoEntityExtractor;
+import com.stratio.deep.extractor.utils.ExtractorConstants;
+import com.stratio.deep.testentity.BookEntity;
+import com.stratio.deep.testentity.CantoEntity;
+import com.stratio.deep.testentity.MessageEntity;
+import com.stratio.deep.testentity.WordCount;
 import com.stratio.deep.utils.ContextProperties;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
+import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.rdd.RDD;
+import scala.Tuple2;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static com.stratio.deep.extractor.server.ExtractorServer.initExtractorServer;
+import static com.stratio.deep.extractor.server.ExtractorServer.stopExtractorServer;
 
 /**
  * Created by rcrespo on 25/06/14.
@@ -43,6 +65,7 @@ public final class GroupingEntityWithMongoDB {
         String inputCollection = "input";
         String outputCollection = "output";
 
+        initExtractorServer();
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -50,10 +73,11 @@ public final class GroupingEntityWithMongoDB {
                 p.getJars());
 
 
-        //TODO REVIEW
 
-    /*    IMongoDeepJobConfig<BookEntity> inputConfigEntity =
-				        MongoConfigFactory.createMongoDB(BookEntity.class).host(host).database(database).collection(inputCollection).initialize();
+
+        ExtractorConfig<BookEntity> inputConfigEntity = new ExtractorConfig(BookEntity.class);
+        inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, inputCollection);
+        inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
         RDD<BookEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
         JavaRDD<String> words =inputRDDEntity.toJavaRDD().flatMap(new FlatMapFunction<BookEntity, String>() {
@@ -92,11 +116,14 @@ public final class GroupingEntityWithMongoDB {
         });
 
 
-        IMongoDeepJobConfig<WordCount> outputConfigEntity =
-				        MongoConfigFactory.createMongoDB(WordCount.class).host(host).database(database).collection(outputCollection).initialize();
+        ExtractorConfig<WordCount> outputConfigEntity = new ExtractorConfig(WordCount.class);
+        inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, outputCollection);
+        inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
-        MongoEntityRDD.saveEntity(outputRDD.rdd(),outputConfigEntity);
+        deepContext.saveRDD(outputRDD.rdd(),outputConfigEntity);
 
-        deepContext.stop(); */
+        stopExtractorServer();
+
+        deepContext.stop();
     }
 }

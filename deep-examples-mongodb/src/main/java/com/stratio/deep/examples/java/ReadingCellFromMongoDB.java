@@ -30,6 +30,9 @@ import org.bson.BasicBSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.stratio.deep.extractor.server.ExtractorServer.initExtractorServer;
+import static com.stratio.deep.extractor.server.ExtractorServer.stopExtractorServer;
+
 /**
  * Example class to read a collection from mongoDB
  */
@@ -52,6 +55,9 @@ public final class ReadingCellFromMongoDB {
 
         String database = "test";
         String inputCollection = "input";
+
+
+        initExtractorServer();
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -101,6 +107,8 @@ public final class ReadingCellFromMongoDB {
         configSave.setValues(valuesSave);
 
         deepContext.saveRDD(inputRDDEntity, configSave);
+
+        stopExtractorServer();
 
         deepContext.stop();
     }

@@ -12,7 +12,7 @@ public class ExtractorConstants {
     public static  String COLLECTION = "collection";
     public static  String HOST     = "host";
     public static  String PORT     = "port";
-    public static  String INPUT_COLUMNS;
+    public static  String INPUT_COLUMNS = "inputColumns";
     public static  String USERNAME  ="user";
     public static  String PAGE_SIZE = "page";
     public static  String SESSION  = "session";
@@ -25,7 +25,19 @@ public class ExtractorConstants {
     public static  String CREATE_ON_WRITE  = "createOnWrite";
     public static  String BATCHSIZE  = "batchSize";
     public static  String READ_CONSISTENCY_LEVEL = "readConsistencyLevel";
-
     public static String WRITE_CONSISTENCY_LEVEL = "writeConsistencyLevel";
+
+    public static String REPLICA_SET = "replicaSet";
+
+    public static String READ_PREFERENCE = "readPreference";
+
+    public static String SORT = "sort";
+
+    public static String FILTER_QUERY = "filterQuery";
+
+    public static String INPUT_KEY = "inputKey";
+
+    public static String IGNORE_ID_FIELD = "ignoreIdField";
+
 
 }

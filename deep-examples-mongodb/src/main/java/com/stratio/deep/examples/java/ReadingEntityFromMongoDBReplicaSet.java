@@ -17,9 +17,17 @@
 package com.stratio.deep.examples.java;
 
 
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.extractor.MongoCellExtractor;
+import com.stratio.deep.extractor.utils.ExtractorConstants;
+import com.stratio.deep.testentity.MessageEntity;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
+import org.apache.spark.rdd.RDD;
+
+import static com.stratio.deep.extractor.server.ExtractorServer.initExtractorServer;
+import static com.stratio.deep.extractor.server.ExtractorServer.stopExtractorServer;
 
 
 /**
@@ -57,6 +65,8 @@ public final class ReadingEntityFromMongoDBReplicaSet {
         // replica set name
         String replicaSet = "s1";
 
+        initExtractorServer();
+
         // Recommended read preference. If the primary node go down, can still read from secundaries
         String readPreference = "primaryPreferred";
 
@@ -71,9 +81,12 @@ public final class ReadingEntityFromMongoDBReplicaSet {
 
         // can give a list of host.
         //TODO Review
-   /**     DeepJobConfig inputConfigEntity = MongoConfigFactory.createMongoDB(MessageEntity.class).host(host1).host(host2).host(host3)
-                .database(database).collection(inputCollection).replicaSet(replicaSet).readPreference(readPreference).initialize();
+//        DeepJobConfig inputConfigEntity = MongoConfigFactory.createMongoDB(MessageEntity.class).host(host1).host(host2).host(host3)
+//                .database(database).collection(inputCollection).replicaSet(replicaSet).readPreference(readPreference).initialize();
 
+        ExtractorConfig<MessageEntity> inputConfigEntity = new ExtractorConfig<>(MessageEntity.class);
+        inputConfigEntity.putValue(ExtractorConstants.HOST, host1).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, inputCollection);
+        inputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
 
         // MongoJavaRDD
         RDD<MessageEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
@@ -81,7 +94,10 @@ public final class ReadingEntityFromMongoDBReplicaSet {
 
         LOG.info("count : " + inputRDDEntity.cache().count());
 
+        stopExtractorServer();
 
-        deepContext.stop();**/
+        deepContext.stop();
+
+
     }
 }

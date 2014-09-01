@@ -17,9 +17,14 @@
 package com.stratio.deep.examples.java;
 
 
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.extractor.MongoCellExtractor;
+import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
+import org.apache.spark.rdd.RDD;
 
 /**
  * Example class to write a RDD to mongoDB
@@ -51,20 +56,23 @@ public final class WritingCellToMongoDB {
 	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
-        //TODO review
 
-      /**  DeepJobConfig inputConfigEntity = MongoConfigFactory.createMongoDB().host(host).database(database).collection(inputCollection).initialize();
 
-        RDD inputRDDCell = deepContext.createRDD(inputConfigEntity);
+        ExtractorConfig<Cells> inputConfigEntity = new ExtractorConfig<>();
+        inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, inputCollection);
+        inputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
+
+        RDD<Cells> inputRDDCell = deepContext.createRDD(inputConfigEntity);
 
 
 	    LOG.info("count : " + inputRDDCell.count());
 	    LOG.info("prints first cell : " + inputRDDCell.first());
 
-        IMongoDeepJobConfig outputConfigEntity = MongoConfigFactory.createMongoDB().host(host).database(database).collection(outputCollection).initialize();
+        ExtractorConfig<Cells> outputConfigEntity = new ExtractorConfig<>();
+        outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, inputCollection);
+        outputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
 
-
-        MongoCellRDD.saveCell(inputRDDCell, outputConfigEntity);
+        deepContext.saveRDD(inputRDDCell, outputConfigEntity);
 
 
         RDD outputRDDCell = deepContext.createRDD(outputConfigEntity);
@@ -72,6 +80,6 @@ public final class WritingCellToMongoDB {
         LOG.info("count output : " + outputRDDCell.count());
 	    LOG.info("prints first output cell: " + outputRDDCell.first());
 
-        deepContext.stop();*/
+        deepContext.stop();
     }
 }

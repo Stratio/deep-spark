@@ -26,6 +26,10 @@ import io.netty.handler.ssl.util.SelfSignedCertificate;
 
 import javax.net.ssl.SSLException;
 import java.security.cert.CertificateException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Receives a list of continent/city pairs from a {@link } to
@@ -74,5 +78,19 @@ public final class ExtractorServer {
     public static void close(){
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
+    }
+
+    public static void initExtractorServer (){
+        ExecutorService es = Executors.newFixedThreadPool(1);
+        final Future future = es.submit(new Callable() {
+            public Object call() throws Exception {
+                start();
+                return null;
+            }
+        });
+    }
+
+    public static void stopExtractorServer (){
+        close();
     }
 }

@@ -125,7 +125,7 @@ public class MongoJavaRDDTest {
         dataSetImport();
 
 
-        ExecutorService es = Executors.newFixedThreadPool(3);
+        ExecutorService es = Executors.newFixedThreadPool(1);
         final Future future = es.submit(new Callable() {
             public Object call() throws Exception {
                 ExtractorServer.start();

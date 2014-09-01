@@ -26,6 +26,8 @@ public final class Constants {
     public static final int DEFAULT_CASSANDRA_RPC_PORT = 9160;
     public static final int DEFAULT_CASSANDRA_CQL_PORT = 9042;
 
+    public static final String DEFAULT_MONGO_HOST = "localhost:27017";
+
     public static final int DEFAULT_BATCH_SIZE = 100;
 
     public static final int DEFAULT_PAGE_SIZE = 1000;
