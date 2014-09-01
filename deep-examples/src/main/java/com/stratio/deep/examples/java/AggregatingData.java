@@ -26,7 +26,8 @@ import com.stratio.deep.rdd.CassandraCellExtractor;
 import com.stratio.deep.entity.Cells;
 
 import com.stratio.deep.rdd.CassandraEntityExtractor;
-import com.stratio.deep.utils.ContextProperties;
+
+import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 
