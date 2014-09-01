@@ -31,39 +31,52 @@ class ExtractorClient[T: ClassTag](host: String, port: Integer) {
   implicit val system = ActorSystem("ExtractorWorkerSystem-1", ConfigFactory.load("extractor"))
   implicit val timeout = Timeout(600 seconds)
 
+  println("New actor...")
+  println(System.currentTimeMillis())
   val inetAddr = Address("akka.tcp", "ExtractorWorkerSystem", host, port)
   val extractor = system.actorOf(Props(classOf[ExtractorActor[T]], ClassTag$.MODULE$.Any).withDeploy(Deploy(scope = RemoteScope(inetAddr))), name = "extractorActor")
-//  val extractor = system.actorSelection("akka.tcp://ExtractorWorkerSystem@172.19.0.133:2552/user/extractorActor")
-//  val extractor = system.actorOf(Props(classOf[ExtractorActor[T]], ClassTag$.MODULE$.Any), "extractorActor")
-//  val extractor = system.actorFor("akka://HelloRemoteSystem@" + inetAddr + "/user/ExtractorActor")
-//  val extractor = system.actorSelection("akka.tcp://ExtractorWorkerSystem@" + inetAddr + "/user/extractor")
+  //  val extractor = system.actorSelection("akka.tcp://ExtractorWorkerSystem@172.19.0.133:2552/user/extractorActor")
+  //    val extractor = system.actorOf(Props(classOf[ExtractorActor[T]], ClassTag$.MODULE$.Any), "extractorActor")
+  println(System.currentTimeMillis())
+  //  val extractor = system.actorFor("akka://HelloRemoteSystem@" + inetAddr + "/user/ExtractorActor")
+  //  val extractor = system.actorSelection("akka.tcp://ExtractorWorkerSystem@" + inetAddr + "/user/extractor")
 
   def getPartitions(config: ExtractorConfig[T]): Array[DeepTokenRange] = {
     val response = extractor ? GetPartitionsAction(config)
+    println("getPartitions")
+    println(System.currentTimeMillis())
     val result = Await.result(response, timeout.duration).asInstanceOf[GetPartitionsResponse]
     result.partitions
   }
 
-  def hasNext(): Boolean ={
+  def hasNext(): Boolean = {
     val response = extractor ? HasNextAction()
+    println("hasNext")
+    println(System.currentTimeMillis())
     val result = Await.result(response, timeout.duration).asInstanceOf[HasNextResponse]
     result.hasNext
   }
 
   def next(): T = {
     val response = extractor ? NextAction()
+    println("next")
+    println(System.currentTimeMillis())
     val result = Await.result(response, timeout.duration).asInstanceOf[NextResponse[T]]
     result.data
   }
 
   def close(): Boolean = {
     val response = extractor ? CloseAction()
+    println("close")
+    println(System.currentTimeMillis())
     val result = Await.result(response, timeout.duration).asInstanceOf[CloseResponse]
     result.isClosed
   }
 
   def initIterator(dp: DeepTokenRange, config: ExtractorConfig[T]): Boolean = {
     val response = extractor ? InitIteratorAction(dp, config)
+    println("initIterator")
+    println(System.currentTimeMillis())
     val result = Await.result(response, timeout.duration).asInstanceOf[InitIteratorResponse]
     result.isInitialized
   }
