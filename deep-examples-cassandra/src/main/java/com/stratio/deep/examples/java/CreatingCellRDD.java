@@ -73,13 +73,8 @@ public final class CreatingCellRDD {
         String HOST         = "127.0.0.1";
 
 //        //Call async the Extractor netty Server
-//        ExecutorService es = Executors.newFixedThreadPool(3);
-//        final Future future = es.submit(new Callable() {
-//            public Object call() throws Exception {
-//                ExtractorServer.main(null);
-//                return null;
-//            }
-//        });
+        ExtractorServer.initExtractorServer();
+
 
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
@@ -118,6 +113,7 @@ public final class CreatingCellRDD {
         counts = rdd.count();
 
         LOG.info("Num of rows: " + counts);
+        ExtractorServer.close();
 
         deepContext.stop();
     }
