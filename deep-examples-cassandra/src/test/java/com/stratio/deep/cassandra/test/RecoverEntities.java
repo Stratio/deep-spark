@@ -48,13 +48,8 @@ public class RecoverEntities {
 
 
         //Call async the Extractor netty Server
-        ExecutorService es = Executors.newFixedThreadPool(3);
-        final Future future = es.submit(new Callable() {
-            public Object call() throws Exception {
-                ExtractorServer.main(null);
-                return null;
-            }
-        });
+        ExtractorServer.initExtractorServer();
+
     }
 
     /**

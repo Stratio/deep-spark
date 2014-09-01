@@ -48,7 +48,7 @@ import static org.testng.Assert.*;
 /**
  * Integration tests for entity RDDs where cells contain Cassandra's collections.
  */
-@Test(suiteName = "cassandraRddTests", dependsOnGroups = "ScalaCassandraEntityRDDTest",
+@Test(suiteName = "cassandraRddTests",
         groups = "CassandraCollectionsEntityTest")
 public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3CollectionsTestEntity> {
 

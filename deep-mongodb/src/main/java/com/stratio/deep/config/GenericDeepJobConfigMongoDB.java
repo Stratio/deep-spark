@@ -579,27 +579,27 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
         }
 
         if(values.get(DATABASE)!=null){
-            collection(values.get(DATABASE));
+            database(values.get(DATABASE));
         }
 
         if(values.get(REPLICA_SET)!=null){
-            collection(values.get(REPLICA_SET));
+            replicaSet(values.get(REPLICA_SET));
         }
 
         if(values.get(READ_PREFERENCE)!=null){
-            collection(values.get(READ_PREFERENCE));
+            readPreference(values.get(READ_PREFERENCE));
         }
 
         if(values.get(SORT)!=null){
-            collection(values.get(SORT));
+            sort(values.get(SORT));
         }
 
         if(values.get(FILTER_QUERY)!=null){
-            collection(values.get(FILTER_QUERY));
+            filterQuery(values.get(FILTER_QUERY));
         }
 
         if(values.get(INPUT_KEY)!=null){
-            collection(values.get(INPUT_KEY));
+            inputKey(values.get(INPUT_KEY));
         }
 
         if(values.get(IGNORE_ID_FIELD)!=null&&getBooleanValue(values.get(IGNORE_ID_FIELD))==true){
