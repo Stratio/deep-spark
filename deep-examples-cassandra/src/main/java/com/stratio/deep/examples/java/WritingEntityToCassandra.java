@@ -36,10 +36,6 @@ import scala.Tuple2;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -78,13 +74,8 @@ public final class WritingEntityToCassandra {
         final String outputTableName = "newlistdomains";
 
         //        //Call async the Extractor netty Server
-        ExecutorService es = Executors.newFixedThreadPool(3);
-        final Future future = es.submit(new Callable() {
-            public Object call() throws Exception {
-                ExtractorServer.main(null);
-                return null;
-            }
-        });
+        ExtractorServer.initExtractorServer();
+
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -146,6 +137,7 @@ public final class WritingEntityToCassandra {
         deepContext.saveRDD(outputRDD.rdd(), outputConfig);
 
         ExtractorServer.close();
+
         deepContext.stop();
     }
 }

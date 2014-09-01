@@ -77,13 +77,8 @@ public final class MapReduceJob {
         String HOST         = "127.0.0.1";
 
         //Call async the Extractor netty Server
-        ExecutorService es = Executors.newFixedThreadPool(3);
-        final Future future = es.submit(new Callable() {
-            public Object call() throws Exception {
-                ExtractorServer.main(null);
-                return null;
-            }
-        });
+        ExtractorServer.initExtractorServer();
+
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);

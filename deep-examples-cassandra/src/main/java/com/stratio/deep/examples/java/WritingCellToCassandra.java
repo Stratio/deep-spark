@@ -24,6 +24,7 @@ import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.Cell;
 import com.stratio.deep.entity.Cells;
 
+import com.stratio.deep.extractor.server.ExtractorServer;
 import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.rdd.CassandraCellExtractor;
 import com.stratio.deep.utils.ContextProperties;
@@ -76,13 +77,8 @@ public final class WritingCellToCassandra {
         final String outputTableName = "newlistdomains";
 
 //        //Call async the Extractor netty Server
-//        ExecutorService es = Executors.newFixedThreadPool(3);
-//        final Future future = es.submit(new Callable() {
-//            public Object call() throws Exception {
-//                ExtractorServer.main(null);
-//                return null;
-//            }
-//        });
+        ExtractorServer.initExtractorServer();
+
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -152,6 +148,7 @@ public final class WritingCellToCassandra {
 
 
         deepContext.saveRDD(outputRDD.rdd(), outputConfig);
+        ExtractorServer.close();
 
         deepContext.stop();
     }
