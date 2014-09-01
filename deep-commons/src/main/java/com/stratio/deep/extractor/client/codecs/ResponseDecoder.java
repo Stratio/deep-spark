@@ -14,6 +14,7 @@
  */
 package com.stratio.deep.extractor.client.codecs;
 
+import com.esotericsoftware.kryo.Kryo;
 import com.stratio.deep.extractor.response.Response;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -26,6 +27,8 @@ import java.io.ObjectInputStream;
 import java.util.List;
 
 public class ResponseDecoder extends ByteToMessageDecoder {
+
+
 
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
 

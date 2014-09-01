@@ -14,6 +14,7 @@
  */
 package com.stratio.deep.extractor.client.codecs;
 
+import com.esotericsoftware.kryo.Kryo;
 import com.stratio.deep.extractor.response.Response;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -25,6 +26,8 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 
 public class ResponseEncoder extends MessageToByteEncoder<Response> {
+    private Kryo kryo;
+
 
     protected void encode(ChannelHandlerContext ctx, Response response, ByteBuf out) {
 

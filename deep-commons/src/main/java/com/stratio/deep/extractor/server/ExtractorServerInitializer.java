@@ -14,6 +14,7 @@
  */
 package com.stratio.deep.extractor.server;
 
+import com.esotericsoftware.kryo.Kryo;
 import com.stratio.deep.extractor.client.codecs.ActionDecoder;
 import com.stratio.deep.extractor.client.codecs.ResponseEncoder;
 import io.netty.channel.ChannelInitializer;
@@ -35,6 +36,7 @@ public class ExtractorServerInitializer<T> extends ChannelInitializer<SocketChan
         if (sslCtx != null) {
             p.addLast(sslCtx.newHandler(ch.alloc()));
         }
+
 
         p.addLast(new ActionDecoder());
         p.addLast(new ResponseEncoder());
