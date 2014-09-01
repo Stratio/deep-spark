@@ -26,6 +26,9 @@ import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 
+import static com.stratio.deep.extractor.server.ExtractorServer.initExtractorServer;
+import static com.stratio.deep.extractor.server.ExtractorServer.stopExtractorServer;
+
 /**
  * Example class to write a RDD to mongoDB
  */
@@ -51,6 +54,8 @@ public final class WritingCellToMongoDB {
 
         String outputCollection = "output";
 
+        initExtractorServer();
+
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
 	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
@@ -69,7 +74,7 @@ public final class WritingCellToMongoDB {
 	    LOG.info("prints first cell : " + inputRDDCell.first());
 
         ExtractorConfig<Cells> outputConfigEntity = new ExtractorConfig<>();
-        outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, inputCollection);
+        outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, outputCollection);
         outputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
 
         deepContext.saveRDD(inputRDDCell, outputConfigEntity);
@@ -79,6 +84,8 @@ public final class WritingCellToMongoDB {
 
         LOG.info("count output : " + outputRDDCell.count());
 	    LOG.info("prints first output cell: " + outputRDDCell.first());
+
+        stopExtractorServer();
 
         deepContext.stop();
     }

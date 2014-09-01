@@ -80,9 +80,9 @@ public final class ReadingCellFromMongoDB {
 
         config.setExtractorImplClass(MongoCellExtractor.class);
         Map<String, String> values = new HashMap<>();
-        values.put("database", "test");
-        values.put("collection",    "input");
-        values.put("host",  "localhost:27017");
+        values.put("database", database);
+        values.put("collection",    inputCollection);
+        values.put("host",  host);
 
         config.setValues(values);
 
@@ -94,19 +94,7 @@ public final class ReadingCellFromMongoDB {
 
         LOG.info("prints first cell  : " + inputRDDEntity.first());
 
-        ExtractorConfig<Cells> configSave = new ExtractorConfig();
 
-        configSave.setExtractorImplClass(MongoCellExtractor.class);
-        Map<String, String> valuesSave = new HashMap<>();
-        valuesSave.put("database", "test");
-        valuesSave.put("collection",    "output");
-        valuesSave.put("host",  "localhost:27017");
-
-
-
-        configSave.setValues(valuesSave);
-
-        deepContext.saveRDD(inputRDDEntity, configSave);
 
         stopExtractorServer();
 

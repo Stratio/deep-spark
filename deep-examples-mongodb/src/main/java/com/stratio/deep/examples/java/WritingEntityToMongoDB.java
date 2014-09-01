@@ -29,6 +29,9 @@ import scala.Tuple2;
 
 import java.util.List;
 
+import static com.stratio.deep.extractor.server.ExtractorServer.initExtractorServer;
+import static com.stratio.deep.extractor.server.ExtractorServer.stopExtractorServer;
+
 /**
  * Example class to write an entity to mongoDB
  */
@@ -59,6 +62,8 @@ public final class WritingEntityToMongoDB {
 
         String readPreference = "nearest";
 
+        initExtractorServer();
+
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
 	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
@@ -74,12 +79,13 @@ public final class WritingEntityToMongoDB {
 
 
         ExtractorConfig<MessageTestEntity> outputConfigEntity = new ExtractorConfig(MessageTestEntity.class);
-        inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, outputCollection);
-        inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
+        outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, outputCollection);
+        outputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
 
         deepContext.saveRDD(inputRDDEntity, outputConfigEntity);
 
+        stopExtractorServer();
 
         deepContext.stop();
     }
