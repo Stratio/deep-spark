@@ -29,6 +29,10 @@ import org.elasticsearch.hadoop.mr.EsOutputFormat;
 
 import java.util.*;
 
+import static com.stratio.deep.extractor.utils.ExtractorConstants.*;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.BISECT_FACTOR;
+import static com.stratio.deep.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
+
 
 /**
  * @param <T>
@@ -292,10 +296,70 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
 
 
-
-
     @Override
     public IESDeepJobConfig<T> initialize(ExtractorConfig deepJobConfig) {
-        return null;
+
+        //TODO: Add filters
+
+        Map<String, String> values = deepJobConfig.getValues();
+
+        if(values.get(USERNAME)!=null){
+            username(values.get(USERNAME));
+        }
+
+        if(values.get(PASSWORD)!=null){
+            password(values.get(PASSWORD));
+        }
+
+        if(values.get(HOST)!=null){
+            host(values.get(HOST));
+        }
+        if(values.get(DATABASE)!=null){
+            database(values.get(DATABASE));
+       }
+        if(values.get(COLLECTION)!=null){
+            database(values.get(COLLECTION));
+        }
+
+
+//        if(values.get(TABLE)!=null){
+//            table(values.get(TABLE));
+//        }
+//        if(values.get(KEYSPACE)!=null){
+//            keyspace(values.get(KEYSPACE));
+//        }
+//        if(values.get(COLUMN_FAMILY)!=null){
+//            columnFamily(values.get(COLUMN_FAMILY));
+//        }
+//
+//        if(values.get(CREATE_ON_WRITE)!=null){
+//            createTableOnWrite(getBooleanValue(values.get(CREATE_ON_WRITE)));
+//        }
+//
+//        if(values.get(PAGE_SIZE)!=null){
+//            pageSize(getIntegerValue(values.get(PAGE_SIZE)));
+//        }
+//
+//        if(values.get(READ_CONSISTENCY_LEVEL)!=null){
+//            readConsistencyLevel(values.get(READ_CONSISTENCY_LEVEL));
+//        }
+//
+//        if(values.get(WRITE_CONSISTENCY_LEVEL)!=null){
+//            writeConsistencyLevel(values.get(WRITE_CONSISTENCY_LEVEL));
+//        }
+//
+//
+//        if(values.get(INPUT_COLUMNS)!=null){
+//            inputColumns(getStringArray(values.get(INPUT_COLUMNS)));
+//        }
+//
+//
+//        if(values.get(BISECT_FACTOR)!=null){
+//            bisectFactor(getIntegerValue(values.get(BISECT_FACTOR)));
+//        }
+        this.initialize();
+
+        return this;
     }
+
 }
