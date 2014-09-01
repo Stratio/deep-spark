@@ -21,7 +21,6 @@ import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.extractor.MongoEntityExtractor;
 import com.stratio.deep.extractor.utils.ExtractorConstants;
-import com.stratio.deep.testentity.MessageEntity;
 import com.stratio.deep.testentity.MessageTestEntity;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
@@ -66,15 +65,15 @@ public final class WritingEntityToMongoDB {
                 p.getJars());
 
 
-        ExtractorConfig<MessageEntity> inputConfigEntity = new ExtractorConfig(MessageEntity.class);
+        ExtractorConfig<MessageTestEntity> inputConfigEntity = new ExtractorConfig(MessageTestEntity.class);
         inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, inputCollection);
         inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
-        RDD<MessageEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
+        RDD<MessageTestEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
 
 
 
-        ExtractorConfig<MessageEntity> outputConfigEntity = new ExtractorConfig(MessageEntity.class);
+        ExtractorConfig<MessageTestEntity> outputConfigEntity = new ExtractorConfig(MessageTestEntity.class);
         inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, outputCollection);
         inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 

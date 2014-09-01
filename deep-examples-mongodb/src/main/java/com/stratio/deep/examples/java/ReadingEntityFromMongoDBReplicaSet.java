@@ -20,8 +20,9 @@ package com.stratio.deep.examples.java;
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.extractor.MongoCellExtractor;
+import com.stratio.deep.extractor.MongoEntityExtractor;
 import com.stratio.deep.extractor.utils.ExtractorConstants;
-import com.stratio.deep.testentity.MessageEntity;
+import com.stratio.deep.testentity.MessageTestEntity;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
@@ -84,12 +85,12 @@ public final class ReadingEntityFromMongoDBReplicaSet {
 //        DeepJobConfig inputConfigEntity = MongoConfigFactory.createMongoDB(MessageEntity.class).host(host1).host(host2).host(host3)
 //                .database(database).collection(inputCollection).replicaSet(replicaSet).readPreference(readPreference).initialize();
 
-        ExtractorConfig<MessageEntity> inputConfigEntity = new ExtractorConfig<>(MessageEntity.class);
+        ExtractorConfig<MessageTestEntity> inputConfigEntity = new ExtractorConfig<>(MessageTestEntity.class);
         inputConfigEntity.putValue(ExtractorConstants.HOST, host1).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, inputCollection);
-        inputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
+        inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
         // MongoJavaRDD
-        RDD<MessageEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
+        RDD<MessageTestEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
 
 
         LOG.info("count : " + inputRDDEntity.cache().count());

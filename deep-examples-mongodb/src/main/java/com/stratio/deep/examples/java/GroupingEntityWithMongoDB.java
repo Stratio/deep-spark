@@ -22,7 +22,6 @@ import com.stratio.deep.extractor.MongoEntityExtractor;
 import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.testentity.BookEntity;
 import com.stratio.deep.testentity.CantoEntity;
-import com.stratio.deep.testentity.MessageEntity;
 import com.stratio.deep.testentity.WordCount;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.spark.api.java.JavaPairRDD;
