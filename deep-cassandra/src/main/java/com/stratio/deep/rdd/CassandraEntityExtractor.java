@@ -45,9 +45,9 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
     private static final long serialVersionUID = -3208994171892747470L;
 
 
-    public CassandraEntityExtractor(T t){
+    public CassandraEntityExtractor(Class<T> t){
         super();
-        this.cassandraJobConfig = new EntityDeepJobConfig(t.getClass());
+        this.cassandraJobConfig = new EntityDeepJobConfig(t);
         this.transformer = new DeepType2TupleFunction<T>();
     }
 

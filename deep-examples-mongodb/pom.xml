@@ -42,6 +42,11 @@
         </dependency>
         <dependency>
             <groupId>com.stratio.deep</groupId>
+            <artifactId>deep-examples</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.stratio.deep</groupId>
             <artifactId>deep-core</artifactId>
             <version>${project.version}</version>
         </dependency>

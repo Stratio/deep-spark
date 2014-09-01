@@ -18,6 +18,7 @@ package com.stratio.deep.examples.java;
 
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.entity.Cells;
 import com.stratio.deep.extractor.server.ExtractorServer;
 import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.rdd.CassandraCellExtractor;
@@ -69,7 +70,7 @@ public final class AggregatingData {
     public static void doMain(String[] args) {
         String job = "java:aggregatingData";
 
-        String KEYSPACENAME = "test";
+        String KEYSPACENAME = "twitter";
         String TABLENAME    = "tweets";
         String CQLPORT      = "9042";
         String RPCPORT      = "9160";
@@ -83,10 +84,10 @@ public final class AggregatingData {
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // Creating a configuration for the Extractor and initialize it
-        ExtractorConfig<TweetEntity> config = new ExtractorConfig(TweetEntity.class);
+        ExtractorConfig<Cells> config = new ExtractorConfig<>();
 
-        config.setExtractorImplClass(CassandraEntityExtractor.class);
-        config.setEntityClass(TweetEntity.class);
+        config.setExtractorImplClass(CassandraCellExtractor.class);
+//        config.setEntityClass(TweetEntity.class);
 
         Map<String, String> values = new HashMap<>();
         values.put(ExtractorConstants.KEYSPACE, KEYSPACENAME);
@@ -99,7 +100,7 @@ public final class AggregatingData {
 
 
         // Creating the RDD
-        RDD<TweetEntity> rdd = deepContext.createRDD(config);
+        RDD<Cells> rdd = deepContext.createRDD(config);
         LOG.info("count: " + rdd.count());
         LOG.info("first: " + rdd.first());
 
