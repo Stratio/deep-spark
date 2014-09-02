@@ -68,8 +68,8 @@ public final class UtilES {
             Method method = Utils.findSetter(field.getName(), classEntity, field.getType());
 
             Class<?> classField = field.getType();
-            String a = AnnotationUtils.deepFieldName(field);
-            Text text = new org.apache.hadoop.io.Text(a);
+            String key = AnnotationUtils.deepFieldName(field);
+            Text text = new org.apache.hadoop.io.Text(key);
             Writable currentJson = jsonObject.get( text );
             if (currentJson != null) {
 
@@ -233,6 +233,35 @@ public final class UtilES {
         return object;
     }
 
+
+    /**
+     * Returns the object inside Writable
+     * @param object
+     * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws InvocationTargetException
+     * @throws NoSuchMethodException
+     */
+    private static Writable getWritableFromObject(Object object) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+
+
+        Writable writable = null;
+
+
+        if(object instanceof String ) {
+            writable = new Text(object.toString());
+        }
+
+        else {
+
+//            Method method = writable.getClass().getMethod("get");
+//            object = method.invoke(writable);
+
+        }
+        writable = writable!=null?writable:new Text("");
+        return writable;
+    }
 
     /**
      * converts from cell class to JSONObject

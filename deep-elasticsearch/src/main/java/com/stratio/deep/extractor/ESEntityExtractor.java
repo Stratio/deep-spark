@@ -51,10 +51,11 @@ public final class ESEntityExtractor<T> extends GenericHadoopExtractor<T,  Objec
 
 
 
-    public ESEntityExtractor(T t){
+    public ESEntityExtractor(Class<T> t){
         super();
-        this.deepJobConfig = new EntityDeepJobConfigES(t.getClass());
+        this.deepJobConfig = new EntityDeepJobConfigES(t);
         this.inputFormat = new EsInputFormat<>() ;
+        this.outputFormat = new EsOutputFormat() ;
 
     }
 

@@ -50,6 +50,7 @@ public final class ESCellExtractor extends GenericHadoopExtractor<Cells, Object,
         super();
         this.deepJobConfig = new CellDeepJobConfigES();
         this.inputFormat = new EsInputFormat<>() ;
+        this.outputFormat = new EsOutputFormat() ;
     }
 
 

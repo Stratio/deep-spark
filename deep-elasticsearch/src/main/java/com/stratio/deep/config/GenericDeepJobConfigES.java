@@ -165,7 +165,7 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
         configHadoop.setInputFormat(EsInputFormat.class);
         configHadoop.setOutputFormat(EsOutputFormat.class);
         configHadoop.set("es.resource", database);
-        configHadoop.set("es.field.read.empty.as.null", "true");
+        configHadoop.set("es.field.read.empty.as.null", "false");
 
         if(query!=null){
 //            "?q=message:first"

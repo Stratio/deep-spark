@@ -26,18 +26,32 @@ import com.stratio.deep.entity.IDeepType;
 @DeepEntity
 public class WordCount implements IDeepType {
 
+    @DeepField(fieldName = "_id")
+    private String id;
+
     @DeepField
     private String word;
 
     @DeepField
-    private Integer count;
+    private Double count;
+
+
 
     public WordCount() {
+
     }
 
-    public WordCount(String word, Integer count) {
+    public WordCount(String word, Double count) {
         this.word = word;
         this.count = count;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getWord() {
@@ -48,11 +62,11 @@ public class WordCount implements IDeepType {
         this.word = word;
     }
 
-    public Integer getCount() {
+    public Double getCount() {
         return count;
     }
 
-    public void setCount(Integer count) {
+    public void setCount(Double count) {
         this.count = count;
     }
 
