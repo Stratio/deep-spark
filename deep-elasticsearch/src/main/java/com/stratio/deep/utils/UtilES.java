@@ -121,7 +121,7 @@ public final class UtilES {
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
-    public static <T extends IDeepType> JSONObject getJsonFromObject(T t) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    public static <T> JSONObject getJsonFromObject(T t) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Field[] fields = AnnotationUtils.filterDeepFields(t.getClass());
 
         JSONObject json = new JSONObject();

@@ -40,18 +40,18 @@ import java.util.List;
 /**
  * Created by rcrespo on 26/08/14.
  */
-public abstract class GenericHadoopExtractor<T, K, V> implements IExtractor<T> {
+public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IExtractor<T> {
 
 
     protected IDeepJobConfig<T, ? extends IDeepJobConfig> deepJobConfig;
 
     protected transient RecordReader<K, V> reader;
 
-    protected transient RecordWriter<K, V> writer;
+    protected transient RecordWriter<KOut, VOut> writer;
 
     protected transient InputFormat<K,V> inputFormat;
 
-    protected transient OutputFormat<K,V> outputFormat;
+    protected transient OutputFormat<KOut,VOut> outputFormat;
 
     protected transient String jobTrackerId;
 
@@ -184,7 +184,7 @@ public abstract class GenericHadoopExtractor<T, K, V> implements IExtractor<T> {
 
     @Override
     public  void saveRDD(T t){
-        Tuple2<K, V> tuple = transformElement(t);
+        Tuple2<KOut, VOut> tuple = transformElement(t);
         try {
             writer.write(tuple._1(),tuple._2());
 
@@ -212,5 +212,5 @@ public abstract class GenericHadoopExtractor<T, K, V> implements IExtractor<T> {
         }
     }
 
-    public abstract Tuple2<K, V>  transformElement(T record);
+    public abstract Tuple2<KOut, VOut>  transformElement(T record);
 }

@@ -37,12 +37,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * EntityRDD to interact with mongoDB
  *
  * @param <T>
  */
-public final class ESEntityExtractor<T> extends GenericHadoopExtractor<T,  Object, LinkedMapWritable> {
+public final class ESEntityExtractor<T> extends GenericHadoopExtractor<T,  Object, LinkedMapWritable, Object, JSONObject> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ESEntityExtractor.class);
     private static final long serialVersionUID = -3208994171892747470L;
@@ -73,32 +75,13 @@ public final class ESEntityExtractor<T> extends GenericHadoopExtractor<T,  Objec
     }
 
     @Override
-    public Tuple2<Object, LinkedMapWritable> transformElement(T record) {
-        return null;
+    public Tuple2<Object, JSONObject> transformElement(T record) {
+        try {
+            return new Tuple2<>(null, UtilES.getJsonFromObject(record));
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            LOG.error(e.getMessage());
+            throw new DeepTransformException(e.getMessage());
+        }
     }
-
-
-    /**
-     * Save a RDD to ES
-     *
-     * @param rdd
-     * @param config
-     * @param <T>
-     */
-    public static <T extends IDeepType> void saveRDD(RDD<T> rdd, IDeepJobConfig<T, IESDeepJobConfig<T>> config) {
-
-        JavaPairRDD<Object, JSONObject> save = rdd.toJavaRDD().mapToPair(new PairFunction<T, Object, JSONObject>() {
-
-
-            @Override
-            public Tuple2<Object, JSONObject> call(T t) throws Exception {
-                return new Tuple2<>(null, UtilES.getJsonFromObject(t));
-            }
-        });
-
-
-        save.saveAsNewAPIHadoopFile("file:///entity", Object.class, Object.class, EsOutputFormat.class, ((IESDeepJobConfig)config).getHadoopConfiguration());
-    }
-
 
 }

@@ -41,7 +41,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * CellRDD to interact with ES
  */
-public final class ESCellExtractor extends GenericHadoopExtractor<Cells, Object, LinkedMapWritable> {
+public final class ESCellExtractor extends GenericHadoopExtractor<Cells, Object, LinkedMapWritable, Object, JSONObject> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ESCellExtractor.class);
     private static final long serialVersionUID = -3208994171892747470L;
@@ -69,14 +69,13 @@ public final class ESCellExtractor extends GenericHadoopExtractor<Cells, Object,
     }
 
     @Override
-    public Tuple2<Object, LinkedMapWritable> transformElement(Cells record) {
-//        try{
-            return null;
-//            return new Tuple2<>(null, UtilES.getJsonFromCell(record));
-//        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-//            LOG.error(e.getMessage());
-//            throw new DeepTransformException(e.getMessage());
-//        }
+    public Tuple2<Object, JSONObject> transformElement(Cells record) {
+        try{
+            return new Tuple2<>(null, UtilES.getJsonFromCell(record));
+        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            LOG.error(e.getMessage());
+            throw new DeepTransformException(e.getMessage());
+        }
 
     }
 
