@@ -17,8 +17,13 @@
 package com.stratio.deep.examples.java;
 
 import com.stratio.deep.config.CassandraConfigFactory;
+import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.context.CassandraDeepSparkContext;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.entity.Cells;
+import com.stratio.deep.extractor.server.ExtractorServer;
+import com.stratio.deep.extractor.utils.ExtractorConstants;
+import com.stratio.deep.rdd.CassandraCellExtractor;
 import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.testutils.ContextProperties;
 import org.apache.log4j.Logger;
@@ -27,8 +32,18 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.rdd.RDD;
+import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 import scala.Tuple3;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Future;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Callable;
+import java.util.logging.LogManager;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -64,6 +79,8 @@ public final class AggregatingData {
 
         long initTime = System.currentTimeMillis();
 
+        org.slf4j.Logger root = (org.slf4j.Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+
         String job = "java:aggregatingData";
 
         String keyspaceName = "test";
@@ -72,7 +89,7 @@ public final class AggregatingData {
 
         //Call async the Extractor netty Server
         ExecutorService es = Executors.newFixedThreadPool(1);
-        final Future future = es.submit(new Callable() {
+        final java.util.concurrent.Future future = es.submit(new Callable() {
             public Object call() throws Exception {
                 ExtractorServer.main(null);
                 return null;
@@ -119,8 +136,8 @@ public final class AggregatingData {
         System.out.println("***********************");
         System.out.println(System.currentTimeMillis()-initTime);
 
-
-        /*ExtractorConfig<Cells> configSave = new ExtractorConfig();
+/*
+        ExtractorConfig<Cells> configSave = new ExtractorConfig();
 
         configSave.setExtractorImplClass(CassandraCellExtractor.class);
         Map<String, String> valuesSave = new HashMap<>();
@@ -135,8 +152,8 @@ public final class AggregatingData {
 
 
         deepContext.saveRDD(rdd, configSave);
-        */
 
+*/
         // grouping to get key-value pairs
 //        JavaPairRDD<String, Integer> groups = rdd.toJavaRDD().groupBy(new Function<TweetEntity, String>() {
 //            @Override

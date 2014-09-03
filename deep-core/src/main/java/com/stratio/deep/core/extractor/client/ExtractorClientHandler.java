@@ -60,6 +60,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Response msg) throws Exception {
+
         answer.add(msg);
     }
 
@@ -120,6 +121,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
     @Override
     public boolean hasNext() {
+
         HasNextAction hasNextAction = new HasNextAction<>();
 
         channel.writeAndFlush(hasNextAction);
@@ -140,6 +142,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         }
 
         return ((HasNextResponse) response).getData();
+
     }
 
     @Override

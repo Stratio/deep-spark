@@ -18,6 +18,8 @@ import static com.stratio.deep.utils.AnnotationUtils.*;
  */
 public class CassandraCell extends Cell {
 
+    private CassandraCell(){
+    }
     /**
      * flag that tells if this cell is part of the partition key.
      * Defaults to FALSE.

@@ -15,6 +15,7 @@
 package com.stratio.deep.extractor.client.codecs;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
 import com.stratio.deep.extractor.response.Response;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -29,48 +30,36 @@ import java.util.List;
 public class ResponseDecoder extends ByteToMessageDecoder {
 
 
+    private final Kryo kryo;
+    private final Input input = new Input();
+    private int length = -1;
+
+    public ResponseDecoder(Kryo kryo) {
+        this.kryo = kryo;
+    }
 
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+        byte[] decoded = null;
 
-        // Wait until the length prefix is available.
-        if (in.readableBytes() < 5) {
-            return;
+
+        if (length == -1) {
+            // Read length.
+            if (in.readableBytes() < 4) return;
+            length = in.readInt();
         }
 
-        // Wait until the whole data is available.
-        int dataLength = in.readInt();
-        if (in.readableBytes() < dataLength) {
-            in.resetReaderIndex();
-            return;
-        }
+        if (in.readableBytes() < length) return;
+        decoded = new byte[length];
+        length = -1;
 
-        // Convert the received data into a new BigInteger.
-        byte[] decoded = new byte[dataLength];
         in.readBytes(decoded);
+        input.setBuffer(decoded);
 
-        ByteArrayInputStream bis = new ByteArrayInputStream(decoded);
-        ObjectInput inObj = null;
-        Response response = null;
-        try {
-            inObj = new ObjectInputStream(bis);
-            response = (Response) inObj.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                bis.close();
-            } catch (IOException ex) {
-                // ignore close exception
-            }
-            try {
-                if (inObj != null) {
-                    inObj.close();
-                }
-            } catch (IOException ex) {
-                // ignore close exception
-            }
-        }
+        Object object = kryo.readClassAndObject(input);
+        in.readerIndex(input.position()+4);
 
-        out.add(response);
+        out.add((Response) object);
+
+        int dummy = in.readableBytes();
     }
 }

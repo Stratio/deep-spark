@@ -28,6 +28,16 @@ public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable 
     private Comparable endToken;
     private List<String> replicas;
 
+
+    /*
+    *TODO
+     */
+
+    private DeepTokenRange() {
+        startToken=null;
+        endToken=null;
+        replicas=null;
+    }
     /**
      * Construct a new token range with no replica information.
      *

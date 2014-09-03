@@ -11,7 +11,7 @@ public class GetPartitionsAction<T> extends Action {
 
     private ExtractorConfig<T> config;
 
-    public GetPartitionsAction() {
+    private GetPartitionsAction() {
         super();
     }
 

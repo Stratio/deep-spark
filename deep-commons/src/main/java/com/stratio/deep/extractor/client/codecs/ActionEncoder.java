@@ -28,37 +28,26 @@ import java.io.ObjectOutputStream;
 
 public class ActionEncoder extends MessageToByteEncoder<Action> {
 
+    private final Output output;
+    private final Kryo kryo;
+
+
+    public ActionEncoder(Kryo kryo, int bufferSize, int maxBufferSize){
+        this.kryo = kryo;
+        output= new Output(bufferSize,maxBufferSize);
+    }
 
     protected void encode(ChannelHandlerContext ctx, Action action, ByteBuf out) {
 
+        byte[] encodedObj;
 
-
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutput outObj = null;
-
-        try {
-            outObj = new ObjectOutputStream(bos);
-            outObj.writeObject(action);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (outObj != null) {
-                    outObj.close();
-                }
-            } catch (IOException ex) {
-                // ignore close exception
-            }
-            try {
-                bos.close();
-            } catch (IOException ex) {
-                // ignore close exception
-            }
-        }
-
-        byte[] encodedObj = bos.toByteArray();
-        int dataLength = encodedObj.length;
-        out.writeInt(dataLength);
-        out.writeBytes(encodedObj);
+        output.clear();
+        output.setPosition(4);
+        kryo.writeClassAndObject(output, action);
+        int total = output.position();
+        output.setPosition(0);
+        output.writeInt(total - 4);
+        encodedObj = output.getBuffer();
+        out.writeBytes(encodedObj,0,total);
     }
 }

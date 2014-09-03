@@ -15,6 +15,7 @@
 package com.stratio.deep.extractor.client.codecs;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Output;
 import com.stratio.deep.extractor.response.Response;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -26,37 +27,27 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 
 public class ResponseEncoder extends MessageToByteEncoder<Response> {
-    private Kryo kryo;
 
+
+    private final Output output;
+    private final Kryo kryo;
+
+
+    public ResponseEncoder(Kryo kryo, int bufferSize, int maxBufferSize){
+        this.kryo = kryo;
+        output= new Output(bufferSize,maxBufferSize);
+    }
 
     protected void encode(ChannelHandlerContext ctx, Response response, ByteBuf out) {
 
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutput outObj = null;
-
-        try {
-            outObj = new ObjectOutputStream(bos);
-            outObj.writeObject(response);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (outObj != null) {
-                    outObj.close();
-                }
-            } catch (IOException ex) {
-                // ignore close exception
-            }
-            try {
-                bos.close();
-            } catch (IOException ex) {
-                // ignore close exception
-            }
-        }
-
-        byte[] encodedObj = bos.toByteArray();
-        int dataLength = encodedObj.length;
-        out.writeInt(dataLength);
-        out.writeBytes(encodedObj);
+        byte[] encodedObj;
+        output.clear();
+        output.setPosition(4);
+        kryo.writeClassAndObject(output, response);
+        int total = output.position();
+        output.setPosition(0);
+        output.writeInt(total - 4);
+        encodedObj = output.getBuffer();
+        out.writeBytes(encodedObj,0,total);
     }
 }

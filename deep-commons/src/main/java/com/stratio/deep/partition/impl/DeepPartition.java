@@ -45,6 +45,14 @@ public class DeepPartition implements IDeepPartition {
      */
     private final DeepTokenRange splitWrapper;
 
+    /*
+     * TODO empty constructor for netty reflection
+     */
+    private DeepPartition(){
+        rddId=0;
+        idx=0;
+        splitWrapper=null;
+    }
     /**
      * Public constructor.
      *
