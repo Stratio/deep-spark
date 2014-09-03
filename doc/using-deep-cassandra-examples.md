@@ -24,17 +24,17 @@ Local context
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java }
+```scala
 val cluster = "local"
 val job = "myjobname"
 val sparkHome = "/path/to/StratioDeep"
 val jarList = Array("/path/to/myfirstjar.jar", "/path/to/mysecondjar.jar")
 
 val deepContext: DeepSparkContext = new DeepSparkContext(cluster, job, sparkHome, jarList)
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 String cluster = "local";
 String job = "myJobName";
 String sparkHome = "/path/to/StratioDeep";
@@ -42,7 +42,7 @@ String[] jarList = {"/path/to/myfirstjar.jar","/path/to/mysecondjar.jar"};
 
 // Creating the Deep Context where args are Spark Master and Job Name
 DeepSparkContext deepContext = new DeepSparkContext(cluster, job, sparkHome, jarList);
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -51,7 +51,7 @@ Cluster context
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 val cluster = "spark://hostname:port"
 val job = "myjobname"
 
@@ -59,10 +59,10 @@ val deepContext: DeepSparkContext = new DeepSparkContext(cluster, job)
 
 // Add jars to the context
 deepContext.addJar("/path/to/jarfile.jar")
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 String cluster = "spark://hostname:port";
 String job = "myJobName";
 
@@ -71,7 +71,7 @@ DeepSparkContext deepContext = new DeepSparkContext(cluster, job);
 
 // Add jars to the context
 deepContext.addJar("/path/to/jarfile.jar")
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -86,7 +86,7 @@ columns are bound to generic cells that include metadata along with the values.
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 // Creating the Deep Context
 val deepContext: DeepSparkContext = new DeepSparkContext(cluster, job)
 
@@ -98,10 +98,10 @@ val config: ICassandraDeepJobConfig[Cells] = DeepJobConfigFactory.create()
 
 // Creating the RDD
 val rdd: CassandraRDD[Cells] = deepContext.cassandraGenericRDD(config)
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 // Creating the Deep Context
 DeepSparkContext deepContext = new DeepSparkContext(cluster, job, sparkHome, jarList);
 
@@ -113,7 +113,7 @@ ICassandraDeepJobConfig<Cells> config = DeepJobConfigFactory.create()
 
 // Creating the RDD
 CassandraJavaRDD rdd = deepContext.cassandraJavaRDD(config);
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -124,7 +124,7 @@ When working with entity objects, an entity RDD must be used.
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 // Create the Deep Context
 val deepContext: DeepSparkContext = new DeepSparkContext(cluster, job)
 
@@ -136,10 +136,10 @@ val config = DeepJobConfigFactory.create(classOf[TableEntity])
 
 // Create the RDD
 val rdd: CassandraRDD[TableEntity] = deepContext.cassandraEntityRDD(config)
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 // Creating the Deep Context
 DeepSparkContext deepContext = new DeepSparkContext(cluster, job);
 
@@ -151,7 +151,7 @@ ICassandraDeepJobConfig<TableEntity> config = DeepJobConfigFactory.create(TableE
 
 // Creating the RDD
 CassandraJavaRDD rdd = deepContext.cassandraJavaRDD(config);
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -163,7 +163,7 @@ Using GroupBy
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 // grouping
 val groups: RDD[(String, Iterable[TableEntity])] = rdd groupBy  {t:TableEntity => t.getKey}
 
@@ -172,10 +172,10 @@ val counts: RDD[(String, Int)] = groups map {t:(String, Iterable[TableEntity]) =
 
 // fetching results
 val result: Array[(String, Int)] = counts.collect()
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 // grouping
 JavaPairRDD<String, Iterable<TableEntity>> groups = rdd.groupBy(new Function<TableEntity, String>() {
     @Override
@@ -195,7 +195,7 @@ JavaPairRDD<String,Integer> counts = groups.mapToPair(new PairFunction<Tuple2<St
 
 // fetching the results
 List<Tuple2<String,Integer>> results = counts.collect();
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -204,7 +204,7 @@ Using GroupByKey
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 // !!! IMPORTANT !!!
 import org.apache.spark.SparkContext._ 
 
@@ -221,10 +221,10 @@ val counts: RDD[(String, Int)] = groups map {t:(String, Iterable[TableEntity]) =
 
 // fetching results
 val result: Array[(String, Int)] = counts.collect()
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 // creating a key-value pairs RDD
 JavaPairRDD<String,TableEntity> pairsRDD = rdd.mapToPair(new PairFunction<TableEntity, String, TableEntity>() {
     @Override
@@ -247,7 +247,7 @@ JavaPairRDD<String,Integer> counts = groups.mapToPair(new PairFunction<Tuple2<St
 
 // fetching results
 List<Tuple2<String, Integer>> result = counts.collect();
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -256,7 +256,7 @@ Map and Reduce
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 // Important imports
 import org.apache.spark.SparkContext._
 import com.example.TableEntity
@@ -271,10 +271,10 @@ val counts: RDD[(String, Int)] = pairsRDD reduceByKey {_ + _}
 
 // Fetching the results
 val results: Array[(String, Int)] = counts.collect()
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 // Map stage: Getting key-value pairs from the RDD
 JavaPairRDD<String, Integer> pairsRDD = rdd.mapToPair(new PairFunction<TableEntity, String, Integer>() {
     @Override
@@ -293,7 +293,7 @@ JavaPairRDD<String, Integer> counts = pairsRDD.reduceByKey(new Function2<Integer
 
 // Fetching the results
 List<Tuple2<String,Integer>> results = counts.collect();
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -305,7 +305,7 @@ Writing a Cell RDD
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 // --- INPUT RDD
 val inputConfig = DeepJobConfigFactory.create()
     .host(cassandraHost).rpcPort(cassandraPort)
@@ -336,10 +336,10 @@ val outputRDD: RDD[Cells] = numPerKey map { t: (String, Int) =>
 
 // Write to Cassandra
 CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig)
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 // --- INPUT RDD
 ICassandraDeepJobConfig<Cells> inputConfig = DeepJobConfigFactory.create()
         .host(cassandraHost).rpcPort(cassandraPort)
@@ -383,7 +383,7 @@ JavaRDD<Cells> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, C
 
 // Write to Cassandra
 CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig);
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -392,7 +392,7 @@ Writing an Entity RDD
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 // --- INPUT RDD
 val inputConfig = DeepJobConfigFactory.create(classOf[InputTableEntity])
     .host(cassandraHost).rpcPort(cassandraPort)
@@ -418,10 +418,10 @@ val outputRDD: RDD[OutputTableEntity] = numPerKey map { t: (String, Int) =>
 
 // Write to Cassandra
 CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig)
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 // --- INPUT RDD
 ICassandraDeepJobConfig<InputEntity> inputConfig = DeepJobConfigFactory.create(InputEntity.class)
         .host(cassandraHost).rpcPort(cassandraPort)
@@ -464,7 +464,7 @@ JavaRDD<OutputEntity> outputRDD = numPerKey.map(new Function<Tuple2<String, Inte
 
 // Write to Cassandra
 CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig);
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}
 
@@ -473,7 +473,7 @@ Aggregation
 
 {% tabgroup %}
 {% tab Scala %}
-~~~~ {prettyprint lang-java}
+```scala
 // grouping to get key-value pairs
 val groups: RDD[(String,Int)] = rdd groupBy  {t:TableEntity => t.getKey}
     .map {t:(String, Iterable[TableEntity]) => (t._1, t._2.size)}
@@ -490,10 +490,10 @@ val (sumOfX, n, sumOfSquares): (Int,Int,Double) = groups.aggregate(0:Int,0:Int,0
 val avg: Double = sumOfX.toDouble / n.toDouble
 val variance: Double = (sumOfSquares.toDouble / n.toDouble) - pow(avg,2)
 val stddev: Double = sqrt(variance)
-~~~~
+```
 {% endtab %}
 {% tab Java %}
-~~~~ {prettyprint lang-java}
+```java
 // grouping to get key-value pairs
 JavaPairRDD<String,Integer> groups = rdd.groupBy(new Function<TableEntity, String>() {
     @Override
@@ -538,6 +538,6 @@ Double sumOfSquares = results._3();
 Double avg = sumOfX / numOfX;
 Double variance = (sumOfSquares / numOfX) - Math.pow(avg,2);
 Double stddev = Math.sqrt(variance);
-~~~~
+```
 {% endtab %}
 {% endtabgroup %}

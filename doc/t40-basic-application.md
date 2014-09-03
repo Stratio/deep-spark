@@ -114,17 +114,17 @@ any yet, create a keyspace and table for that purpose:
 
 -   Launch the Cassandra shell in the Sandbox:
 
-~~~~ {code}
+```shell-session
 $ cqlsh
 Connected to Test Cluster at localhost:9160.
 [cqlsh 4.1.1 | Cassandra 2.0.53 | CQL spec 3.1.1 | Thrift protocol 19.39.0]
 Use HELP for help.
 cqlsh>
-~~~~
+```
 
 -   Then create a keyspace, a table and fill it with at least one row:
 
-~~~~ {code}
+```shell-session
 cqlsh> CREATE KEYSPACE test WITH replication = {
       'class': 'SimpleStrategy',
       'replication_factor': '1'
@@ -135,7 +135,7 @@ cqlsh:test> CREATE TABLE mytable (
    description text);
 cqlsh:test> INSERT INTO mytable (thekey, description) values ('001', 'My first table');
 cqlsh:test> exit
-~~~~
+```
 
 Step 1: Configure the context
 -----------------------------
@@ -149,7 +149,7 @@ already set to work with the Stratio VM ([skip to Step 2](#runningStep2)).
 
 ### Alt 1: Local instance
 
-~~~~ {prettyprint lang-java}
+```java
 // context properties
 String cluster = "local";
 String jobName = "stratioDeepExample";
@@ -159,13 +159,13 @@ String cassandraHost = "localhost";
 int cassandraPort = 9160;
 String keyspaceName = "test";
 String tableName = "mytable";
-~~~~
+```
 
 ### Alt 2: Standalone cluster
 
 Point your browser to the web UI of your cluster and copy the address of your master. It should look like spark://YOURHOSTNAME:7077.
 
-~~~~ {prettyprint lang-java}
+```java
 // context properties
 String cluster = "spark://YOURHOSTNAME:7077";
 String jobName = "stratioDeepExample";
@@ -175,7 +175,7 @@ String cassandraHost = "localhost";
 int cassandraPort = 9160;
 String keyspaceName = "test";
 String tableName = "mytable";
-~~~~
+```
 
 Step 2: Build the application
 -----------------------------
@@ -195,7 +195,7 @@ Once compiled, the jar can be packaged:
 
 For a Java or Scala project, the result should be similar to the following:
 
-~~~~ {code}
+```shell-session
 Results :
 
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
@@ -204,11 +204,11 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-~~~~
+```
 
 And as follow for a mixed one:
 
-~~~~ {code}
+```shell-session
 Results :
 
 Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
@@ -217,36 +217,36 @@ Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-~~~~
+```
 
 Finally, copy the jar to the same location that has been set in "[Step 1: Configure the Context](#step-1-configure-the-context)" 
 (variable "jar"):
 
-~~~~ {code}
+```shell-session
 $ cp /PATH/TO/ECLIPSE_WORKSPACE/MyProject/target/MyProject-0.0.1.jar /PATH/TO/JAR
-~~~~
+```
 
 Step 3: Run it
 --------------
 
 In a terminal, enter at the prompt:
 
-~~~~ {code}
+```shell-session
 # For a Java or mixed project:
 $ bin/spark-submit --master CLUSTER_ADDRESS --class com.stratio.examples.JavaExample --jars /PATH/TO/JAR/MyProject-0.0.1.jar /PATH/TO/JAR/MyProject-0.0.1.jar
 
 # For a Scala or mixed project:
 $ bin/spark-submit --master CLUSTER_ADDRESS --class com.stratio.examples.ScalaExample --jars /PATH/TO/JAR/MyProject-0.0.1.jar /PATH/TO/JAR/MyProject-0.0.1.jar
-~~~~
+```
 
 where CLUSTER_ADDRESS should be replaced with “local” or “spark://YOURHOSTNAME:7077″ and /PATH/TO/JAR with the path of your jar file.
 
 In both case the last lines of the output should be similar to:
 
-~~~~ {code}
+```shell-session
 14/03/2014 17:32:49 INFO SparkContext: Successfully stopped SparkContext
 Rows in the RDD (JavaClass): 1
-~~~~
+```
 
 Congratulations! You successfully completed this tutorial.
 

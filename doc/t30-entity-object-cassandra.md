@@ -63,23 +63,23 @@ Step 2: Creating the table
 
 Start the CQL shell:
 
-~~~~ {code}
+```shell-session
 $ cqlsh
-~~~~
+```
 
 Create a keyspace:
 
-~~~~ {code}
+```shell-session
 cqlsh> CREATE KEYSPACE IF NOT EXISTS test 
 WITH replication = {
   'class': 'SimpleStrategy',
   'replication_factor': '1'
 };
-~~~~
+```
 
 Create the table where tweets will be stored:
 
-~~~~ {code}
+```shell-session
 cqlsh> use test;
 cqlsh:test> CREATE TABLE IF NOT EXISTS tweets (
   tweet_id uuid PRIMARY KEY,
@@ -90,7 +90,7 @@ cqlsh:test> CREATE TABLE IF NOT EXISTS tweets (
   content text,
   truncated boolean
 );
-~~~~
+```
 
 Step 3: Populating the table
 ----------------------------
@@ -98,10 +98,10 @@ Step 3: Populating the table
 Import the tweets dataset ([test-tweets.csv](http://docs.openstratio.org/resources/datasets/test-tweets.csv "Tweets in CSV format")) 
 to populate the table you just created:
 
-~~~~ {code}
+```shell-session
 cqlsh> use test;
 cqlsh:test> copy tweets (tweet_id, tweet_date, author, hashtags, favorite_count, content, truncated) from '/PATH/TO/FILE/test-tweets.csv';
-~~~~
+```
 
 There should be 4892 imported rows.
 
@@ -148,7 +148,7 @@ and Version (replace it with the current version) as shown in the screenshot bel
 Finally, click on the “pom.xml” tab to check that the following has been added to the XML (where DEEP-VERSION should 
 be your version of Deep, e.g.: 0.3.1):
 
-~~~~ {prettyprint lang-xml}
+```xml
 <dependencies>
   <dependency>
     <groupId>com.stratio.deep</groupId>
@@ -156,7 +156,7 @@ be your version of Deep, e.g.: 0.3.1):
     <version>DEEP-VERSION</version>
   </dependency>
 </dependencies>
-~~~~
+```
 
 Save the pom.xml file. A new folder “Maven Dependencies” should have appeared in the Project Explorer window, containing 
 libraries such as Stratio Deep core, cassandra-all and many more.
@@ -176,10 +176,10 @@ The import statement for the IDeepType interface has been added automatically.
 To inform Stratio Deep that the entity object corresponds to a Cassandra table and its properties to Cassandra columns, 
 annotations are used: DeepEntity for the class and DeepField for properties. Add the import statements below the existing one:
 
-~~~~ {prettyprint lang-java}
+```java
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.annotations.DeepField;
-~~~~
+```
 
 Before adding properties and their corresponding setters and getters, we need to choose the Java type 
 for each of our Cassandra column. To do so, we will use the [mapping table](#cassandra-java-datatype-mapping) 
@@ -255,14 +255,14 @@ included in the annexe:
 Validation types are implemented in the org.apache.cassandra.db.marshal package, part of the cassandra-all jar that has 
 been added automatically by Maven. Add imports for these classes:
 
-~~~~ {prettyprint lang-java}
+```java
 import org.apache.cassandra.db.marshal.BooleanType;
 import org.apache.cassandra.db.marshal.Int32Type;
 import org.apache.cassandra.db.marshal.SetType;
 import org.apache.cassandra.db.marshal.TimestampType;
 import org.apache.cassandra.db.marshal.UTF8Type;
 import org.apache.cassandra.db.marshal.UUIDType;
-~~~~
+```
 
 We are now set to code the body of our entity.
 
@@ -284,7 +284,7 @@ to have an attribute ignored by Stratio Deep:
 
 Now we can declare each property along with their annotation:
 
-~~~~ {prettyprint lang-java}
+```java
 @DeepEntity
 public class TweetEntity implements IDeepType {
 
@@ -311,7 +311,7 @@ public class TweetEntity implements IDeepType {
     @DeepField(fieldName = "truncated", validationClass = BooleanType.class)
     private Boolean isTruncated;
 }
-~~~~
+```
 
 To add setters and getters for these properties, the code generator of Eclipse will be used. Place the cursor 
 somewhere in the body of the class and in the main menu click on “Source”, then choose “Generate getters and setters…”.
@@ -329,20 +329,20 @@ Step 4: Package the Entity
 Navigate to the directory that contains your TweetPojo project. It contains two subdirectories (src and target) 
 and the pom.xml file:
 
-~~~~ {code}
+```shell-session
 $ ls
 pom.xml   src/   target/
-~~~~
+```
 
 Use Maven to package the TweetPojo project:
 
-~~~~ {code}
+```shell-session
 $ mvn package
-~~~~
+```
 
 You should get an output similar to the following:
 
-~~~~ {code}
+```shell-session
 [INFO] Scanning for projects...
 [INFO] 
 [INFO] ----------------------------------------------------------------------
@@ -378,14 +378,14 @@ Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Finished at: Thu Feb 06 12:24:58 CET 2014
 [INFO] Final Memory: 11M/215M
 [INFO] ----------------------------------------------------------------------
-~~~~
+```
 
 The jar has been placed in the target subdirectory:
 
-~~~~ {code}
+```shell-session
 $ ls target/
 classes  maven-archiver  surefire  test-classes  TweetPojo-0.0.1-SNAPSHOT.jar
-~~~~
+```
 
 Congrats! Your entity object is ready for being used with Stratio Deep.
 
@@ -395,45 +395,45 @@ Using the Entity with Stratio Deep
 If you are using the Stratio Sandbox, copy the TweetPojo jar to the virtual machine. Also, to use the TweetEntity 
 in the Stratio Deep shell, we have to add it to the Spark classpath:
 
-~~~~ {code}
+```shell-session
 $ export SPARK_CLASSPATH=/path/to/jars/TweetPojo-0.0.1-SNAPSHOT.jar
-~~~~
+```
 
 Then start the Stratio Deep shell:
 
-~~~~ {code}
+```shell-session
 $ stratio-deep-shell
-~~~~
+```
 
 In the Stratio Deep shell, a special interpreter-aware DeepSparkContext is already created for you, in the 
 variable called deepContext. The TweetPojo JAR has to be added to this context so the workers can use 
 TweetEntity objects.
 
-~~~~ {code}
+```shell-session
 scala> deepContext.addJar("/path/to/jars/TweetPojo-0.0.1-SNAPSHOT.jar")
-~~~~
+```
 
 Import the entity object:
 
-~~~~ {code}
+```shell-session
 scala> import com.example.TweetEntity
-~~~~
+```
 
 TweetEntity can now be used to create a RDD out of the Cassandra table “tweets”:
 
-~~~~ {code}
+```shell-session
 scala> val config = Cfg.create(classOf[TweetEntity]).host("localhost").rpcPort(9160).keyspace("test").table("tweets").initialize
-~~~~
+```
 
-~~~~ {code}
+```shell-session
 scala> val rdd = deepContext.cassandraEntityRDD(config)
-~~~~
+```
 
 Check the number of tweet objects in the RDD:
 
-~~~~ {code}
+```shell-session
 scala> rdd.count
-~~~~
+```
 
 If you get “4892″ then congratulations, you successfully completed this tutorial.
 
