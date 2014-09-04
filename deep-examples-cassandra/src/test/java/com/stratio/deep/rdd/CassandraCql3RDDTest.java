@@ -22,7 +22,7 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.config.CassandraConfigFactory;
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.embedded.CassandraServer;
+import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.exception.DeepIndexNotFoundException;
 import com.stratio.deep.commons.exception.DeepNoSuchFieldException;

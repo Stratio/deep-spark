@@ -22,7 +22,7 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.google.common.io.Resources;
 import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.core.embedded.CassandraServer;
+import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.commons.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;

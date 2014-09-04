@@ -25,7 +25,7 @@ import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.google.common.io.Resources;
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.embedded.CassandraServer;
+import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
 import com.stratio.deep.testentity.Cql3CollectionsTestEntity;

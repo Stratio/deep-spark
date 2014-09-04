@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.core.embedded;
+package com.stratio.deep.embedded;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;

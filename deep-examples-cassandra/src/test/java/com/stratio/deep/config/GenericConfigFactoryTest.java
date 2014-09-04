@@ -21,7 +21,7 @@ import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.testentity.TestEntity;
 import com.stratio.deep.testentity.WronglyMappedTestEntity;
 
-import com.stratio.deep.core.embedded.CassandraServer;
+import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.exception.DeepIllegalAccessException;

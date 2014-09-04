@@ -22,7 +22,7 @@ import com.stratio.deep.commons.config.ExtractorConfig
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants
 import com.stratio.deep.commons.utils.{Constants, Utils}
 import com.stratio.deep.core.context.AbstractDeepSparkContextTest
-import com.stratio.deep.core.embedded.CassandraServer
+import com.stratio.deep.embedded.CassandraServer
 import com.stratio.deep.testentity.DeepScalaPageEntity
 import org.apache.spark.Partition
 import org.apache.spark.rdd.RDD
