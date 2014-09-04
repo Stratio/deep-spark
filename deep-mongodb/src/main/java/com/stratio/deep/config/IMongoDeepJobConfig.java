@@ -17,6 +17,7 @@
 package com.stratio.deep.config;
 
 import com.mongodb.QueryBuilder;
+import com.stratio.deep.commons.config.IDeepJobConfig;
 import org.apache.hadoop.conf.Configuration;
 import org.bson.BSONObject;
 

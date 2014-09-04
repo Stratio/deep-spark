@@ -17,11 +17,10 @@
 package com.stratio.deep.examples.java;
 
 
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.extractor.MongoCellExtractor;
 import com.stratio.deep.extractor.MongoEntityExtractor;
-import com.stratio.deep.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.testentity.MessageTestEntity;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
@@ -30,8 +29,8 @@ import scala.Tuple2;
 
 import java.util.List;
 
-import static com.stratio.deep.extractor.server.ExtractorServer.initExtractorServer;
-import static com.stratio.deep.extractor.server.ExtractorServer.stopExtractorServer;
+import static com.stratio.deep.commons.extractor.server.ExtractorServer.initExtractorServer;
+import static com.stratio.deep.commons.extractor.server.ExtractorServer.stopExtractorServer;
 
 /**
  * Example class to read an entity from mongoDB

@@ -16,6 +16,7 @@
 
 package com.stratio.deep.entity;
 
+import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.utils.UtilMongoDB;
 
 /**

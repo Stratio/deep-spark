@@ -15,7 +15,7 @@
  */
 package com.stratio.deep.core.rdd;
 
-import com.stratio.deep.rdd.IDeepPartition;
+import com.stratio.deep.commons.rdd.IDeepPartition;
 import org.apache.spark.Partition;
 
 /**

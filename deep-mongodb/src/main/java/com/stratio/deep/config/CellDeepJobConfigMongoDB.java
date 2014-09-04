@@ -16,10 +16,7 @@
 
 package com.stratio.deep.config;
 
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.extractor.MongoCellExtractor;
-
-import java.lang.reflect.Method;
+import com.stratio.deep.commons.entity.Cells;
 
 
 public class CellDeepJobConfigMongoDB extends GenericDeepJobConfigMongoDB<Cells> {

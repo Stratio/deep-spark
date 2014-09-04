@@ -16,7 +16,7 @@
 
 package com.stratio.deep.core.context;
 
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
 import org.apache.spark.SparkContext;

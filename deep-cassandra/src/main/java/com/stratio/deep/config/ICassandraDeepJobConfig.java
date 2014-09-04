@@ -17,6 +17,7 @@
 package com.stratio.deep.config;
 
 import com.datastax.driver.core.Session;
+import com.stratio.deep.commons.config.IDeepJobConfig;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -36,9 +37,9 @@ public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T, ICassandra
      * @param filterValue      the value of the filter to use. May be any expression,
      *                         depends on the actual index implementation.
      * @return this configuration object.
-     * @throws com.stratio.deep.exception.DeepIndexNotFoundException if the specified field has not been indexed in
+     * @throws com.stratio.deep.commons.exception.DeepIndexNotFoundException if the specified field has not been indexed in
      *                                                               Cassandra.
-     * @throws com.stratio.deep.exception.DeepNoSuchFieldException   if the specified field is not a valid column in
+     * @throws com.stratio.deep.commons.exception.DeepNoSuchFieldException   if the specified field is not a valid column in
      *                                                               Cassandra.
      */
     public ICassandraDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue);

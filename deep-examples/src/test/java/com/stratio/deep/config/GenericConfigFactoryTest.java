@@ -20,19 +20,18 @@ import java.lang.annotation.AnnotationTypeMismatchException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 
 import com.stratio.deep.core.embedded.CassandraServer;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.exception.DeepIllegalAccessException;
-import com.stratio.deep.exception.DeepNoSuchFieldException;
-import com.stratio.deep.extractor.utils.ExtractorConstants;
-import com.stratio.deep.rdd.CassandraCellExtractor;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.exception.DeepIllegalAccessException;
+import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.testentity.TestEntity;
 import com.stratio.deep.testentity.WronglyMappedTestEntity;
-import com.stratio.deep.utils.Constants;
-import org.apache.cassandra.db.ConsistencyLevel;
+import com.stratio.deep.commons.utils.Constants;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
 

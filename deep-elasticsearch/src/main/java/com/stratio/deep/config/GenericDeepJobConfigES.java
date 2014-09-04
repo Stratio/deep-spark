@@ -17,21 +17,16 @@
 package com.stratio.deep.config;
 
 
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.rdd.IDeepPartition;
-import com.stratio.deep.rdd.IDeepRecordReader;
-import com.stratio.deep.utils.Utils;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.utils.Utils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapreduce.InputFormat;
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
 
 import java.util.*;
-
-import static com.stratio.deep.extractor.utils.ExtractorConstants.*;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.BISECT_FACTOR;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
 
 
 /**
@@ -304,22 +299,22 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
         Map<String, String> values = deepJobConfig.getValues();
 
-        if(values.get(USERNAME)!=null){
-            username(values.get(USERNAME));
+        if(values.get(ExtractorConstants.USERNAME)!=null){
+            username(values.get(ExtractorConstants.USERNAME));
         }
 
-        if(values.get(PASSWORD)!=null){
-            password(values.get(PASSWORD));
+        if(values.get(ExtractorConstants.PASSWORD)!=null){
+            password(values.get(ExtractorConstants.PASSWORD));
         }
 
-        if(values.get(HOST)!=null){
-            host(values.get(HOST));
+        if(values.get(ExtractorConstants.HOST)!=null){
+            host(values.get(ExtractorConstants.HOST));
         }
-        if(values.get(DATABASE)!=null){
-            database(values.get(DATABASE));
+        if(values.get(ExtractorConstants.DATABASE)!=null){
+            database(values.get(ExtractorConstants.DATABASE));
        }
-        if(values.get(COLLECTION)!=null){
-            database(values.get(COLLECTION));
+        if(values.get(ExtractorConstants.COLLECTION)!=null){
+            database(values.get(ExtractorConstants.COLLECTION));
         }
 
 

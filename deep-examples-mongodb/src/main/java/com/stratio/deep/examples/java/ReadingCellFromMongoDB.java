@@ -17,9 +17,9 @@
 package com.stratio.deep.examples.java;
 
 import com.mongodb.QueryBuilder;
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.entity.Cells;
+import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.extractor.MongoCellExtractor;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
@@ -30,8 +30,8 @@ import org.bson.BasicBSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.stratio.deep.extractor.server.ExtractorServer.initExtractorServer;
-import static com.stratio.deep.extractor.server.ExtractorServer.stopExtractorServer;
+import static com.stratio.deep.commons.extractor.server.ExtractorServer.initExtractorServer;
+import static com.stratio.deep.commons.extractor.server.ExtractorServer.stopExtractorServer;
 
 /**
  * Example class to read a collection from mongoDB

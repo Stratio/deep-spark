@@ -14,19 +14,18 @@
 
 package com.stratio.deep.rdd;
 
-import com.stratio.deep.config.CellDeepJobConfig;
+import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.config.EntityDeepJobConfig;
-import com.stratio.deep.config.ExtractorConfig;
-import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.exception.DeepNoSuchFieldException;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
 import com.stratio.deep.functions.DeepType2TupleFunction;
-import com.stratio.deep.utils.Pair;
-import com.stratio.deep.utils.Utils;
+import com.stratio.deep.commons.utils.Pair;
+import com.stratio.deep.commons.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.spark.rdd.RDD;
 
 import java.nio.ByteBuffer;
 import java.util.Map;

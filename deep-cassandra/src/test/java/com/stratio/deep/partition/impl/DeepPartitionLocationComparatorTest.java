@@ -16,8 +16,8 @@
 
 package com.stratio.deep.partition.impl;
 
-import com.stratio.deep.exception.DeepInstantiationException;
-import org.junit.Test;
+import com.stratio.deep.commons.exception.DeepInstantiationException;
+import com.stratio.deep.commons.impl.DeepPartitionLocationComparator;
 
 
 import java.net.InetAddress;

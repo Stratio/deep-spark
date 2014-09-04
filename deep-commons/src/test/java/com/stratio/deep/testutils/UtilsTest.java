@@ -16,13 +16,13 @@
 
 package com.stratio.deep.testutils;
 
-import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepIOException;
+import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.testentity.CommonsTestEntity;
-import com.stratio.deep.utils.AnnotationUtils;
-import com.stratio.deep.utils.Pair;
-import com.stratio.deep.utils.Utils;
+import com.stratio.deep.commons.utils.AnnotationUtils;
+import com.stratio.deep.commons.utils.Pair;
+import com.stratio.deep.commons.utils.Utils;
 import org.testng.annotations.Test;
 
 import java.io.Serializable;
@@ -30,7 +30,7 @@ import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.util.*;
 
-import static com.stratio.deep.utils.Utils.*;
+import static com.stratio.deep.commons.utils.Utils.*;
 import static org.testng.Assert.*;
 
 public class UtilsTest {

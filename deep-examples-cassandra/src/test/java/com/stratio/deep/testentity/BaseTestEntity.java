@@ -16,8 +16,8 @@
 
 package com.stratio.deep.testentity;
 
-import com.stratio.deep.annotations.DeepField;
-import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.commons.annotations.DeepField;
+import com.stratio.deep.commons.entity.IDeepType;
 
 /**
  * Abstract Test Entity class, used to test the system works correctly with domain entities that inherit from

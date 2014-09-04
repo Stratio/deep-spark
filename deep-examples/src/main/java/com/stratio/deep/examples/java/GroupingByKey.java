@@ -17,7 +17,7 @@
 package com.stratio.deep.examples.java;
 
 import com.google.common.collect.Lists;
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.testutils.ContextProperties;

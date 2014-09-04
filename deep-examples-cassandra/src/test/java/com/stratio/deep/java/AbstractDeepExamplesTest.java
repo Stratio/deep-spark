@@ -26,7 +26,7 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.google.common.io.Resources;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.embedded.CassandraServer;
-import com.stratio.deep.utils.Constants;
+import com.stratio.deep.commons.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -40,7 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
-import static com.stratio.deep.utils.Utils.quote;
+import static com.stratio.deep.commons.utils.Utils.quote;
 import static org.testng.Assert.assertEquals;
 
 /**

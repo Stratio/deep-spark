@@ -16,13 +16,10 @@
 
 package com.stratio.deep.config;
 
-import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.utils.AnnotationUtils;
-import org.apache.hadoop.mapreduce.InputFormat;
-import org.apache.spark.rdd.RDD;
+import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.utils.AnnotationUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

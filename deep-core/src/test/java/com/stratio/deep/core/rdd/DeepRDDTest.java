@@ -1,12 +1,12 @@
 package com.stratio.deep.core.rdd;
 
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.extractor.client.ExtractorClient;
 
 
-import com.stratio.deep.rdd.DeepTokenRange;
-import com.stratio.deep.rdd.IDeepPartition;
-import com.stratio.deep.rdd.IExtractor;
+import com.stratio.deep.commons.rdd.DeepTokenRange;
+import com.stratio.deep.commons.rdd.IDeepPartition;
+import com.stratio.deep.commons.rdd.IExtractor;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
@@ -18,7 +18,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import scala.collection.Iterator;
-import com.stratio.deep.partition.impl.DeepPartition;
+import com.stratio.deep.commons.impl.DeepPartition;
 import static junit.framework.Assert.*;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;

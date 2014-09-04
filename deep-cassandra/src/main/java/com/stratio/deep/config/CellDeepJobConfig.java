@@ -16,11 +16,8 @@
 
 package com.stratio.deep.config;
 
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.rdd.CassandraCellExtractor;
+import com.stratio.deep.commons.entity.Cells;
 import org.apache.hadoop.conf.Configuration;
-
-import java.lang.reflect.Method;
 
 /**
  * Cell-based configuration object.

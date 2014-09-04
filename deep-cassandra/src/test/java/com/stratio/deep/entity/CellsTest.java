@@ -21,7 +21,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepGenericException;
 import org.apache.cassandra.db.marshal.Int32Type;
 import org.apache.cassandra.db.marshal.LongType;
 import org.apache.cassandra.db.marshal.UTF8Type;

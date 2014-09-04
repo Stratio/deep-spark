@@ -17,43 +17,28 @@
 package com.stratio.deep.config;
 
 
-import static com.stratio.deep.extractor.utils.ExtractorConstants.PASSWORD;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.HOST;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.PORT;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.USERNAME;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.PAGE_SIZE;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.SESSION;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.KEYSPACE;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.TABLE;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.RPCPORT;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.CQLPORT;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.COLUMN_FAMILY;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.BISECT_FACTOR;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.CREATE_ON_WRITE;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.BATCHSIZE;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.READ_CONSISTENCY_LEVEL;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.WRITE_CONSISTENCY_LEVEL;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.DATABASE;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.COLLECTION;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.REPLICA_SET;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.READ_PREFERENCE;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.SORT;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.INPUT_KEY;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.FILTER_QUERY;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.IGNORE_ID_FIELD;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.HOST;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNAME;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.DATABASE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.COLLECTION;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.REPLICA_SET;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.READ_PREFERENCE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.SORT;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_KEY;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.FILTER_QUERY;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.IGNORE_ID_FIELD;
 import com.mongodb.QueryBuilder;
 import com.mongodb.hadoop.MongoInputFormat;
 import com.mongodb.hadoop.util.MongoConfigUtil;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.rdd.IDeepPartition;
-import com.stratio.deep.rdd.IDeepRecordReader;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cell;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
-import java.lang.reflect.Method;
+
 import java.util.*;
 
 

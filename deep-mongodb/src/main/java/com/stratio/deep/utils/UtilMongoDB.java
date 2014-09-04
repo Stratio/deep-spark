@@ -16,9 +16,11 @@
 
 package com.stratio.deep.utils;
 
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.utils.AnnotationUtils;
+import com.stratio.deep.commons.utils.Utils;
 import com.stratio.deep.entity.MongoCell;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;

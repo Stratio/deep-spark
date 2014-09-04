@@ -15,15 +15,14 @@
 package com.stratio.deep.core.extractor.client;
 
 
-import com.stratio.deep.config.ExtractorConfig;
-import com.stratio.deep.extractor.actions.*;
-import com.stratio.deep.extractor.response.*;
-import com.stratio.deep.rdd.IExtractor;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.extractor.actions.*;
+import com.stratio.deep.commons.extractor.response.*;
+import com.stratio.deep.commons.rdd.IExtractor;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.apache.spark.Partition;
-import org.apache.spark.rdd.RDD;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;

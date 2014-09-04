@@ -16,6 +16,8 @@
 
 package com.stratio.deep.entity;
 
+import com.stratio.deep.commons.entity.Cell;
+
 /**
  * Created by rcrespo on 29/07/14.
  */

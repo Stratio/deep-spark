@@ -24,12 +24,12 @@ import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.google.common.io.Resources;
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.embedded.CassandraServer;
-import com.stratio.deep.extractor.utils.ExtractorConstants;
-import com.stratio.deep.functions.AbstractSerializableFunction;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.functions.AbstractSerializableFunction;
 import com.stratio.deep.testentity.Cql3CollectionsTestEntity;
-import com.stratio.deep.utils.Constants;
+import com.stratio.deep.commons.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
@@ -42,7 +42,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
-import static com.stratio.deep.utils.Utils.quote;
+import static com.stratio.deep.commons.utils.Utils.quote;
 import static org.testng.Assert.*;
 
 /**

@@ -20,10 +20,12 @@ package com.stratio.deep.utils;
  * Several utilities to work used in the Spark <=> ElasticSearch integration.
  */
 
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.utils.AnnotationUtils;
+import com.stratio.deep.commons.utils.Utils;
 import com.stratio.deep.entity.ESCell;
-import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.commons.entity.IDeepType;
 import org.apache.hadoop.io.*;
 import org.elasticsearch.hadoop.mr.LinkedMapWritable;
 import org.json.simple.JSONObject;

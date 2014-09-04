@@ -17,10 +17,10 @@
 package com.stratio.deep.examples.java;
 
 import com.google.common.collect.Lists;
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.extractor.server.ExtractorServer;
-import com.stratio.deep.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.extractor.server.ExtractorServer;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.rdd.CassandraEntityExtractor;
 import com.stratio.deep.testentity.TweetEntity;
 
@@ -35,10 +35,6 @@ import scala.Tuple2;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 // !!Important!!
 

@@ -16,42 +16,35 @@
 
 package com.stratio.deep.config;
 
-import static com.stratio.deep.extractor.utils.ExtractorConstants.PASSWORD;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.HOST;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.PORT;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.USERNAME;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.PAGE_SIZE;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.SESSION;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.KEYSPACE;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.TABLE;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.RPCPORT;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.CQLPORT;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.COLUMN_FAMILY;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.BISECT_FACTOR;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.CREATE_ON_WRITE;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.BATCHSIZE;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.READ_CONSISTENCY_LEVEL;
-import static com.stratio.deep.extractor.utils.ExtractorConstants.WRITE_CONSISTENCY_LEVEL;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.HOST;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNAME;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PAGE_SIZE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.KEYSPACE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.TABLE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.RPCPORT;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.CQLPORT;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.COLUMN_FAMILY;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.BISECT_FACTOR;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.CREATE_ON_WRITE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.BATCHSIZE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.READ_CONSISTENCY_LEVEL;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.WRITE_CONSISTENCY_LEVEL;
 import com.datastax.driver.core.*;
-import com.stratio.deep.cql.DeepRecordReader;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.entity.CassandraCell;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.exception.DeepIllegalAccessException;
-import com.stratio.deep.exception.DeepIndexNotFoundException;
-import com.stratio.deep.exception.DeepNoSuchFieldException;
-import com.stratio.deep.extractor.utils.ExtractorConstants;
-import com.stratio.deep.rdd.IDeepPartition;
-import com.stratio.deep.rdd.IDeepRecordReader;
-import com.stratio.deep.utils.Constants;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.exception.DeepIllegalAccessException;
+import com.stratio.deep.commons.exception.DeepIndexNotFoundException;
+import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
+import com.stratio.deep.commons.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.log4j.Logger;
-import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
 import java.io.Serializable;
@@ -60,7 +53,7 @@ import java.net.UnknownHostException;
 import java.util.*;
 
 import static com.stratio.deep.rdd.CassandraRDDUtils.createTableQueryGenerator;
-import static com.stratio.deep.utils.Utils.quote;
+import static com.stratio.deep.commons.utils.Utils.quote;
 
 /**
  * Base class for all config implementations providing default implementations for methods
@@ -201,7 +194,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
     /**
      * Checks if this configuration object has been initialized or not.
      *
-     * @throws com.stratio.deep.exception.DeepIllegalAccessException if not initialized
+     * @throws com.stratio.deep.commons.exception.DeepIllegalAccessException if not initialized
      */
     protected void checkInitialized() {
         if (!isInitialized) {

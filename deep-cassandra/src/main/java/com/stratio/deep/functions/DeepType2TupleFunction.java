@@ -16,8 +16,9 @@
 
 package com.stratio.deep.functions;
 
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.functions.AbstractSerializableFunction;
 import scala.Tuple2;
 
 import static com.stratio.deep.rdd.CassandraRDDUtils.deepType2tuple;

@@ -18,7 +18,7 @@ package com.stratio.deep.core.embedded;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
-import com.stratio.deep.utils.Constants;
+import com.stratio.deep.commons.utils.Constants;
 import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.commitlog.CommitLog;
 import org.apache.cassandra.exceptions.ConfigurationException;

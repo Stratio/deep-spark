@@ -24,8 +24,9 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 import com.datastax.driver.core.DataType;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepInstantiationException;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.exception.DeepInstantiationException;
 import com.stratio.deep.testentity.CommonsTestEntity;
 import org.apache.cassandra.db.marshal.*;
 import org.apache.log4j.Logger;

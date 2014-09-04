@@ -16,10 +16,10 @@
 
 package com.stratio.deep.examples.java;
 
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.extractor.MongoEntityExtractor;
-import com.stratio.deep.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.testentity.BookEntity;
 import com.stratio.deep.testentity.CantoEntity;
 import com.stratio.deep.testentity.WordCount;
@@ -37,8 +37,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.stratio.deep.extractor.server.ExtractorServer.initExtractorServer;
-import static com.stratio.deep.extractor.server.ExtractorServer.stopExtractorServer;
+import static com.stratio.deep.commons.extractor.server.ExtractorServer.initExtractorServer;
+import static com.stratio.deep.commons.extractor.server.ExtractorServer.stopExtractorServer;
 
 /**
  * Created by rcrespo on 25/06/14.

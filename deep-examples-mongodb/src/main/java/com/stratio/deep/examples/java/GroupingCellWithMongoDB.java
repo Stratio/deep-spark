@@ -17,14 +17,12 @@
 package com.stratio.deep.examples.java;
 
 
-import com.stratio.deep.config.ExtractorConfig;
-import com.stratio.deep.config.MongoConfigFactory;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.entity.Cells;
+import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.entity.MongoCell;
 import com.stratio.deep.extractor.MongoCellExtractor;
-import com.stratio.deep.extractor.server.ExtractorServer;
-import com.stratio.deep.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -38,13 +36,9 @@ import scala.Tuple2;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
-import static com.stratio.deep.extractor.server.ExtractorServer.initExtractorServer;
-import static com.stratio.deep.extractor.server.ExtractorServer.stopExtractorServer;
+import static com.stratio.deep.commons.extractor.server.ExtractorServer.initExtractorServer;
+import static com.stratio.deep.commons.extractor.server.ExtractorServer.stopExtractorServer;
 
 /**
  * Created by rcrespo on 25/06/14.

@@ -16,17 +16,15 @@
 
 package com.stratio.deep.core.function;
 
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.extractor.client.ExtractorClient;
-import org.apache.spark.api.java.function.Function2;
-import scala.Function1;
 import scala.collection.Iterator;
 import scala.runtime.AbstractFunction1;
 import scala.runtime.BoxedUnit;
 
 import java.io.Serializable;
 
-import static com.stratio.deep.utils.Constants.SPARK_PARTITION_ID;
+import static com.stratio.deep.commons.utils.Constants.SPARK_PARTITION_ID;
 
 /**
  * Created by rcrespo on 28/08/14.

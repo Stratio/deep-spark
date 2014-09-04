@@ -20,7 +20,7 @@ package com.stratio.deep.java;
 import com.datastax.driver.core.ResultSet;
 import com.stratio.deep.core.embedded.CassandraServer;
 import com.stratio.deep.examples.java.*;
-import com.stratio.deep.utils.Constants;
+import com.stratio.deep.commons.utils.Constants;
 import org.testng.annotations.Test;
 import scala.Tuple2;
 

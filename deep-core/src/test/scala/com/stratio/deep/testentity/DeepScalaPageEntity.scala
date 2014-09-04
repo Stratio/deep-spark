@@ -16,8 +16,9 @@
 
 package com.stratio.deep.testentity
 
-import com.stratio.deep.annotations.{DeepEntity, DeepField}
-import com.stratio.deep.entity.IDeepType
+import com.stratio.deep.commons.annotations.DeepField
+import com.stratio.deep.commons.annotations.{DeepField, DeepEntity}
+import com.stratio.deep.commons.entity.IDeepType
 import org.apache.cassandra.db.marshal.{Int32Type, LongType}
 
 import scala.beans.BeanProperty

@@ -1,9 +1,9 @@
 package com.stratio.deep.cassandra.test;
 
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.extractor.server.ExtractorServer;
-import com.stratio.deep.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.extractor.server.ExtractorServer;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.rdd.CassandraEntityExtractor;
 import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.utils.ContextProperties;
@@ -15,10 +15,6 @@ import org.testng.annotations.Test;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * Created by dgomez on 28/08/14.

@@ -24,22 +24,20 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.stratio.deep.config.CassandraConfigFactory;
 
 
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.embedded.CassandraServer;
 import com.stratio.deep.entity.CassandraCell;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.extractor.utils.ExtractorConstants;
-import com.stratio.deep.functions.AbstractSerializableFunction;
-import com.stratio.deep.utils.Constants;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.functions.AbstractSerializableFunction;
+import com.stratio.deep.commons.utils.Constants;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import org.testng.annotations.Test;
 import scala.Function1;
-import scala.reflect.ClassTag$;
 
 import static org.testng.Assert.*;
 

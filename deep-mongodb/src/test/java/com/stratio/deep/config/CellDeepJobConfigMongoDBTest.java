@@ -1,7 +1,7 @@
 package com.stratio.deep.config;
 
 
-import com.stratio.deep.entity.Cells;
+import com.stratio.deep.commons.entity.Cells;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;

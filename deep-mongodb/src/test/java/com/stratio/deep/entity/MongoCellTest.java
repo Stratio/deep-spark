@@ -1,5 +1,6 @@
 package com.stratio.deep.entity;
 
+import com.stratio.deep.commons.entity.Cell;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;

@@ -16,9 +16,7 @@
 
 package com.stratio.deep.config;
 
-import com.stratio.deep.config.CellDeepJobConfigES;
-import com.stratio.deep.config.GenericDeepJobConfigES;
-import com.stratio.deep.entity.Cells;
+import com.stratio.deep.commons.entity.Cells;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;

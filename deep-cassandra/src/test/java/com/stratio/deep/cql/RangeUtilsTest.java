@@ -32,7 +32,7 @@ import com.google.common.collect.Sets;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.stratio.deep.utils.Pair;
+import com.stratio.deep.commons.utils.Pair;
 import javax.annotation.Nullable;
 import org.apache.cassandra.dht.Murmur3Partitioner;
 import org.junit.Before;

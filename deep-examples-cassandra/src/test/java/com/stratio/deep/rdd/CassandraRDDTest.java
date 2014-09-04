@@ -16,7 +16,7 @@
 
 package com.stratio.deep.rdd;
 
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.CharacterCodingException;
 
-import static com.stratio.deep.utils.Utils.quote;
+import static com.stratio.deep.commons.utils.Utils.quote;
 import static org.testng.Assert.assertNotNull;
 
 /**

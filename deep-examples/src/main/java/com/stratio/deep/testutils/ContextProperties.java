@@ -18,8 +18,8 @@ package com.stratio.deep.testutils;
 
 import org.apache.commons.cli.*;
 
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.utils.Constants;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.utils.Constants;
 import org.apache.log4j.Logger;
 
 import static org.apache.commons.lang.StringUtils.defaultIfEmpty;

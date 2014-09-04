@@ -1,8 +1,8 @@
 package com.stratio.deep.testentity;
 
-import com.stratio.deep.annotations.DeepEntity;
-import com.stratio.deep.annotations.DeepField;
-import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.commons.annotations.DeepEntity;
+import com.stratio.deep.commons.annotations.DeepField;
+import com.stratio.deep.commons.entity.IDeepType;
 
 /**
  * Created by rcrespo on 18/06/14.

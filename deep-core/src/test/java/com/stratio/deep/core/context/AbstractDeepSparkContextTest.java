@@ -22,7 +22,7 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.google.common.io.Resources;
 import com.stratio.deep.core.embedded.CassandraServer;
-import com.stratio.deep.utils.Constants;
+import com.stratio.deep.commons.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -33,7 +33,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.stratio.deep.utils.Utils.quote;
+import static com.stratio.deep.commons.utils.Utils.quote;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 

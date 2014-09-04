@@ -16,12 +16,7 @@
 
 package com.stratio.deep.rdd;
 
-import com.stratio.deep.config.IESDeepJobConfig;
-import com.stratio.deep.config.ESConfigFactory;
-import com.stratio.deep.entity.Cells;
 import org.apache.log4j.Logger;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.rdd.RDD;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 

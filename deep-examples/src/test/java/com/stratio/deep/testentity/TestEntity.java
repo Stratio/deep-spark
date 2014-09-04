@@ -16,8 +16,8 @@
 
 package com.stratio.deep.testentity;
 
-import com.stratio.deep.annotations.DeepEntity;
-import com.stratio.deep.annotations.DeepField;
+import com.stratio.deep.commons.annotations.DeepEntity;
+import com.stratio.deep.commons.annotations.DeepField;
 import org.apache.cassandra.db.marshal.Int32Type;
 import org.apache.cassandra.db.marshal.LongType;
 

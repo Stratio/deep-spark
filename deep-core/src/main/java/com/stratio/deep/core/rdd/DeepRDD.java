@@ -16,13 +16,13 @@
 package com.stratio.deep.core.rdd;
 
 
-import static com.stratio.deep.utils.Constants.SPARK_RDD_ID;
+import static com.stratio.deep.commons.utils.Constants.SPARK_RDD_ID;
 
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.extractor.client.ExtractorClient;
-import com.stratio.deep.exception.DeepExtractorinitializationException;
-import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.rdd.IExtractor;
+import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.rdd.IExtractor;
 import org.apache.spark.InterruptibleIterator;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;

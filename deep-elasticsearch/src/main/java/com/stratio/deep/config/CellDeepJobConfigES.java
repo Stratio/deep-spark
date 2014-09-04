@@ -16,9 +16,7 @@
 
 package com.stratio.deep.config;
 
-import com.stratio.deep.entity.Cells;
-
-import java.lang.reflect.Method;
+import com.stratio.deep.commons.entity.Cells;
 
 /**
  * Created by rcrespo on 29/07/14.

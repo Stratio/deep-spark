@@ -14,25 +14,23 @@
 
 package com.stratio.deep.rdd;
 
+import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.config.CellDeepJobConfig;
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.functions.CellList2TupleFunction;
-import com.stratio.deep.functions.DeepType2TupleFunction;
-import com.stratio.deep.utils.Pair;
-import org.apache.spark.rdd.RDD;
-import scala.Tuple2;
+import com.stratio.deep.commons.utils.Pair;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
 
 /**
  * Concrete implementation of a CassandraRDD representing an RDD of
- * {@link com.stratio.deep.entity.Cells} element.<br/>
+ * {@link com.stratio.deep.commons.entity.Cells} element.<br/>
  */
 public class CassandraCellExtractor extends CassandraExtractor<Cells> {
 

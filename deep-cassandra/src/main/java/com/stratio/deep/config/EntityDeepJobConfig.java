@@ -16,17 +16,16 @@
 
 package com.stratio.deep.config;
 
-import com.stratio.deep.annotations.DeepEntity;
+import com.stratio.deep.commons.annotations.DeepEntity;
 import com.stratio.deep.entity.CassandraCell;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepNoSuchFieldException;
-import com.stratio.deep.utils.AnnotationUtils;
-import com.stratio.deep.utils.Utils;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
+import com.stratio.deep.commons.utils.AnnotationUtils;
+import com.stratio.deep.commons.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.spark.rdd.RDD;
 
 import java.lang.annotation.AnnotationTypeMismatchException;
 import java.lang.reflect.Field;
@@ -91,7 +90,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
     }
 
     /* (non-Javadoc)
-     * @see com.stratio.deep.config.IDeepJobConfig#getEntityClass()
+     * @see IDeepJobConfig#getEntityClass()
      */
     @Override
     public Class<T> getEntityClass() {
@@ -100,7 +99,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
     }
 
     /* (non-Javadoc)
-       * @see com.stratio.deep.config.IDeepJobConfig#validate()
+       * @see IDeepJobConfig#validate()
        */
     @Override
     public void validate() {

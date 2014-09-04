@@ -16,7 +16,7 @@
 
 package com.stratio.deep.testutils;
 
-import com.stratio.deep.utils.Pair;
+import com.stratio.deep.commons.utils.Pair;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;

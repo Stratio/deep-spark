@@ -16,7 +16,8 @@
 
 package com.stratio.deep.functions;
 
-import com.stratio.deep.entity.Cells;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.functions.AbstractSerializableFunction;
 import scala.Tuple2;
 
 /**

@@ -23,16 +23,16 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.stratio.deep.config.GenericDeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.exception.DeepIllegalAccessException;
-import com.stratio.deep.partition.impl.DeepPartitionLocationComparator;
-import com.stratio.deep.rdd.DeepTokenRange;
-import com.stratio.deep.rdd.IDeepRecordReader;
-import com.stratio.deep.utils.Pair;
-import com.stratio.deep.utils.Utils;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.exception.DeepIllegalAccessException;
+import com.stratio.deep.commons.impl.DeepPartitionLocationComparator;
+import com.stratio.deep.commons.rdd.DeepTokenRange;
+import com.stratio.deep.commons.rdd.IDeepRecordReader;
+import com.stratio.deep.commons.utils.Pair;
+import com.stratio.deep.commons.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.dht.IPartitioner;
@@ -46,7 +46,7 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 import static com.stratio.deep.cql.CassandraClientProvider.trySessionForLocation;
-import static com.stratio.deep.utils.Utils.additionalFilterGenerator;
+import static com.stratio.deep.commons.utils.Utils.additionalFilterGenerator;
 
 /**
  * Implements a cassandra record reader with pagination capabilities.

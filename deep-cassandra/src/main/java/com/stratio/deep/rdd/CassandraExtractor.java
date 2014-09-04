@@ -14,42 +14,39 @@
 
 package com.stratio.deep.rdd;
 
-import static com.stratio.deep.utils.Constants.SPARK_RDD_ID;
+import static com.stratio.deep.commons.utils.Constants.SPARK_RDD_ID;
 
 import static scala.collection.JavaConversions.asScalaBuffer;
 
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import com.stratio.deep.commons.rdd.DeepTokenRange;
+import com.stratio.deep.commons.rdd.IDeepRecordReader;
+import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.config.GenericDeepJobConfig;
 import com.stratio.deep.cql.DeepCqlRecordWriter;
-import com.stratio.deep.functions.AbstractSerializableFunction;
+import com.stratio.deep.commons.functions.AbstractSerializableFunction;
 import org.apache.spark.Partition;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.rdd.RDD;
 
 import scala.Tuple2;
 import scala.collection.Seq;
 
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.config.IDeepJobConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.cql.DeepRecordReader;
 import com.stratio.deep.cql.RangeUtils;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.entity.IDeepType;
-import com.stratio.deep.functions.CellList2TupleFunction;
-import com.stratio.deep.functions.DeepType2TupleFunction;
-import com.stratio.deep.partition.impl.DeepPartition;
-import com.stratio.deep.utils.Pair;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.impl.DeepPartition;
+import com.stratio.deep.commons.utils.Pair;
 
 
 /**
  * Base class that abstracts the complexity of interacting with the Cassandra Datastore.<br/>
  * Implementors should only provide a way to convert an object of type T to a
- * {@link com.stratio.deep.entity.Cells} element.
+ * {@link com.stratio.deep.commons.entity.Cells} element.
  */
 public abstract class CassandraExtractor<T> implements IExtractor<T> {
 

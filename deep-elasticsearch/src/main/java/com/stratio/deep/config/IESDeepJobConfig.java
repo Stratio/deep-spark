@@ -16,6 +16,7 @@
 
 package com.stratio.deep.config;
 
+import com.stratio.deep.commons.config.IDeepJobConfig;
 import org.apache.hadoop.conf.Configuration;
 
 import java.util.List;

@@ -17,7 +17,7 @@
 package com.stratio.deep.writer;
 
 import com.mongodb.hadoop.mapred.output.MongoRecordWriter;
-import com.stratio.deep.rdd.IWriter;
+import com.stratio.deep.commons.rdd.IWriter;
 import org.apache.hadoop.mapreduce.JobID;
 
 import java.io.IOException;

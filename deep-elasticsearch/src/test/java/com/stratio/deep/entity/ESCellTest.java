@@ -16,8 +16,7 @@
 
 package com.stratio.deep.entity;
 
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.ESCell;
+import com.stratio.deep.commons.entity.Cell;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;

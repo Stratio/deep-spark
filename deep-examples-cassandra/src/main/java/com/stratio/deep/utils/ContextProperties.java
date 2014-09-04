@@ -16,8 +16,8 @@
 
 package com.stratio.deep.utils;
 
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.utils.Constants;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.utils.Constants;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 

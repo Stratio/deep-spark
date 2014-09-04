@@ -14,31 +14,20 @@
 
 package com.stratio.deep.core.context;
 
-import static com.stratio.deep.utils.Constants.SPARK_PARTITION_ID;
-import static com.stratio.deep.utils.Constants.SPARK_RDD_ID;
-import com.stratio.deep.config.ExtractorConfig;
-import com.stratio.deep.core.extractor.client.ExtractorClient;
+import static com.stratio.deep.commons.utils.Constants.SPARK_PARTITION_ID;
+import static com.stratio.deep.commons.utils.Constants.SPARK_RDD_ID;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.function.PrepareSaveFunction;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
-import com.stratio.deep.exception.DeepExtractorinitializationException;
-import com.stratio.deep.exception.DeepInstantiationException;
-import com.stratio.deep.rdd.IExtractor;
-import com.sun.tools.doclets.formats.html.SourceToHTMLConverter;
 import org.apache.log4j.Logger;
-import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
-import org.apache.spark.TaskContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.rdd.RDD;
-import scala.collection.Iterator;
 
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Entry point to the Cassandra-aware Spark context.

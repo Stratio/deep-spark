@@ -21,10 +21,10 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.rdd.DeepTokenRange;
-import com.stratio.deep.utils.Pair;
-import com.stratio.deep.utils.Utils;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.rdd.DeepTokenRange;
+import com.stratio.deep.commons.utils.Pair;
+import com.stratio.deep.commons.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.dht.Token;
@@ -35,7 +35,7 @@ import java.net.InetAddress;
 import java.util.*;
 
 import static com.google.common.collect.Iterables.*;
-import static com.stratio.deep.utils.Utils.quote;
+import static com.stratio.deep.commons.utils.Utils.quote;
 
 /**
  * {@link CqlPagingRecordReader} implementation that returns an instance of a

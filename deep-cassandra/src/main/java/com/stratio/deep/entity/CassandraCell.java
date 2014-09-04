@@ -1,16 +1,18 @@
 package com.stratio.deep.entity;
 
 import com.datastax.driver.core.DataType;
-import com.stratio.deep.annotations.DeepField;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepInstantiationException;
+import com.stratio.deep.commons.annotations.DeepField;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.exception.DeepInstantiationException;
 import org.apache.cassandra.db.marshal.AbstractType;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 
-import static com.stratio.deep.utils.AnnotationUtils.*;
+import static com.stratio.deep.commons.utils.AnnotationUtils.*;
 
 
 /**
@@ -108,7 +110,7 @@ public class CassandraCell extends Cell {
     }
 
     /**
-     * Constructs a Cell from a {@link com.stratio.deep.annotations.DeepField} property.
+     * Constructs a Cell from a {@link com.stratio.deep.commons.annotations.DeepField} property.
      *
      * @param e     instance of the testentity whose field is going to generate a Cell.
      * @param field field that will generate the Cell.

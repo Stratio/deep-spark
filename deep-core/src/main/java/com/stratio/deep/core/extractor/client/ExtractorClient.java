@@ -15,10 +15,9 @@
 package com.stratio.deep.core.extractor.client;
 
 
-import com.stratio.deep.config.ExtractorConfig;
-import com.stratio.deep.exception.DeepExtractorinitializationException;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.rdd.IExtractor;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
+import com.stratio.deep.commons.rdd.IExtractor;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -27,7 +26,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.apache.spark.Partition;
-import org.apache.spark.rdd.RDD;
 
 import javax.net.ssl.SSLException;
 
@@ -123,7 +121,7 @@ public class ExtractorClient<T> implements IExtractor<T> {
     /*
      * (non-Javadoc)
      *
-     * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(com.stratio.deep.config.IDeepJobConfig, int)
+     * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(IDeepJobConfig, int)
      */
     @Override
     public Partition[] getPartitions(ExtractorConfig<T> config) {

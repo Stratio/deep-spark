@@ -17,9 +17,8 @@
 package com.stratio.deep.examples.java;
 
 import com.google.common.collect.Lists;
-import com.stratio.deep.config.CassandraConfigFactory;
 
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.testentity.DomainEntity;
 import com.stratio.deep.testentity.PageEntity;

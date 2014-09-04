@@ -21,8 +21,8 @@ import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.LoadBalancingPolicy;
 import com.datastax.driver.core.policies.Policies;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.utils.Pair;
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.stratio.deep.utils.Utils.quote;
+import static com.stratio.deep.commons.utils.Utils.quote;
 
 /**
  * Created by luca on 09/04/14.

@@ -17,9 +17,7 @@
 package com.stratio.deep.config;
 
 
-import com.stratio.deep.config.ESConfigFactory;
-import com.stratio.deep.config.IESDeepJobConfig;
-import com.stratio.deep.entity.Cells;
+import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.testentity.MessageTestEntity;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;

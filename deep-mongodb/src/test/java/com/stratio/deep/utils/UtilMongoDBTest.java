@@ -16,8 +16,8 @@
 
 package com.stratio.deep.utils;
 
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.entity.MongoCell;
 import com.stratio.deep.testentity.*;
 import org.bson.BSONObject;

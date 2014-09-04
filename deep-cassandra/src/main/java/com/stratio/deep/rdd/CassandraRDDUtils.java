@@ -19,15 +19,18 @@ package com.stratio.deep.rdd;
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.config.GenericDeepJobConfig;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cql.DeepCqlRecordWriter;
 import com.stratio.deep.entity.*;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.functions.AbstractSerializableFunction2;
-import com.stratio.deep.utils.AnnotationUtils;
-import com.stratio.deep.utils.Pair;
-import com.stratio.deep.utils.Utils;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.functions.AbstractSerializableFunction2;
+import com.stratio.deep.commons.utils.AnnotationUtils;
+import com.stratio.deep.commons.utils.Pair;
+import com.stratio.deep.commons.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.TimeUUIDType;
 import org.apache.cassandra.db.marshal.UUIDType;
@@ -44,8 +47,8 @@ import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-import static com.stratio.deep.utils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
-import static com.stratio.deep.utils.Utils.quote;
+import static com.stratio.deep.commons.utils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
+import static com.stratio.deep.commons.utils.Utils.quote;
 
 /**
  * Created by luca on 16/04/14.
@@ -143,7 +146,7 @@ public class CassandraRDDUtils {
      * @param obj the object to use to resolve the cassandra marshaller.
      * @param <T> the generic object type.
      * @return an instance of the Cassandra validator that matches the provided object.
-     * @throws com.stratio.deep.exception.DeepGenericException if no validator can be found for the specified object.
+     * @throws com.stratio.deep.commons.exception.DeepGenericException if no validator can be found for the specified object.
      */
     public static <T> AbstractType<?> marshallerInstance(T obj) {
         AbstractType<?> abstractType = MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(obj.getClass());

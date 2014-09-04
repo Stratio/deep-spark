@@ -18,11 +18,11 @@ package com.stratio.deep.entity;
 
 import com.datastax.driver.core.DataType;
 import com.google.common.collect.ImmutableMap;
-import com.stratio.deep.annotations.DeepField;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepInstantiationException;
+import com.stratio.deep.commons.annotations.DeepField;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.exception.DeepInstantiationException;
 import com.stratio.deep.rdd.CassandraRDDUtils;
-import com.stratio.deep.utils.AnnotationUtils;
+import com.stratio.deep.commons.utils.AnnotationUtils;
 import org.apache.cassandra.cql3.CQL3Type;
 import org.apache.cassandra.db.marshal.*;
 import org.apache.commons.collections.CollectionUtils;
@@ -43,7 +43,7 @@ import static java.util.Collections.unmodifiableCollection;
  * Defines a serializable CellValidator. <br/>
  * <p/>
  * This object wraps the complexity of obtaining the Cassandra's AbstractType
- * associated to a {@link com.stratio.deep.entity.Cell}.
+ * associated to a {@link com.stratio.deep.commons.entity.Cell}.
  * <p/>
  * In the case of collection types, a simple cassandra marshaller qualified name
  * is not enough to fully generate an AbstractType, we also need the type(s) the

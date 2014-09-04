@@ -22,12 +22,12 @@ import com.datastax.driver.core.Session;
 import com.stratio.deep.config.ICassandraDeepJobConfig;
 import com.stratio.deep.entity.CassandraCell;
 import com.stratio.deep.entity.CellValidator;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.exception.DeepInstantiationException;
-import com.stratio.deep.utils.Pair;
-import com.stratio.deep.utils.Utils;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.exception.DeepInstantiationException;
+import com.stratio.deep.commons.utils.Pair;
+import com.stratio.deep.commons.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.db.marshal.LongType;
@@ -38,7 +38,6 @@ import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.exceptions.SyntaxException;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.commons.io.IOUtils;
-import org.apache.spark.TaskContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +49,7 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 import static com.stratio.deep.rdd.CassandraRDDUtils.updateQueryGenerator;
-import static com.stratio.deep.utils.Utils.quote;
+import static com.stratio.deep.commons.utils.Utils.quote;
 
 /**
  * Handles the distributed write to cassandra in batch.

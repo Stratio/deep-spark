@@ -18,8 +18,8 @@ import java.util.Date;
 import java.util.UUID;
 
 import com.stratio.deep.entity.CassandraCell;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.testentity.CommonsTestEntity;
 
 import org.junit.Test;
@@ -28,7 +28,7 @@ import scala.Tuple2;
 import static com.stratio.deep.rdd.CassandraRDDUtils.createTableQueryGenerator;
 import static com.stratio.deep.rdd.CassandraRDDUtils.deepType2tuple;
 import static com.stratio.deep.rdd.CassandraRDDUtils.updateQueryGenerator;
-import static com.stratio.deep.utils.Utils.prepareTuple4CqlDriver;
+import static com.stratio.deep.commons.utils.Utils.prepareTuple4CqlDriver;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;

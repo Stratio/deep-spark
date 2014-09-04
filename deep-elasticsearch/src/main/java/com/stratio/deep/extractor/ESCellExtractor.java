@@ -17,17 +17,11 @@
 package com.stratio.deep.extractor;
 
 import com.stratio.deep.config.CellDeepJobConfigES;
-import com.stratio.deep.config.ExtractorConfig;
-import com.stratio.deep.config.IDeepJobConfig;
-import com.stratio.deep.config.IESDeepJobConfig;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.exception.DeepTransformException;
-import com.stratio.deep.extractor.impl.GenericHadoopExtractor;
-import com.stratio.deep.rdd.IExtractor;
+import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepTransformException;
+import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
 import com.stratio.deep.utils.UtilES;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.rdd.RDD;
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
 import org.elasticsearch.hadoop.mr.LinkedMapWritable;

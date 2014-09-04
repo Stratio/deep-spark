@@ -18,11 +18,10 @@ package com.stratio.deep.rdd;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.extractor.MongoCellExtractor;
 import com.stratio.deep.extractor.MongoEntityExtractor;
-import com.stratio.deep.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.testentity.BookEntity;
 import com.stratio.deep.testentity.CantoEntity;
 import com.stratio.deep.testentity.MessageTestEntity;

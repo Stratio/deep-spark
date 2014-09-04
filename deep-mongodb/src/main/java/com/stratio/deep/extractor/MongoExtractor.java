@@ -19,7 +19,7 @@ package com.stratio.deep.extractor;
 
 import com.mongodb.hadoop.MongoInputFormat;
 import com.mongodb.hadoop.MongoOutputFormat;
-import com.stratio.deep.extractor.impl.GenericHadoopExtractor;
+import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
 import org.bson.BSONObject;
 
 import java.io.Serializable;

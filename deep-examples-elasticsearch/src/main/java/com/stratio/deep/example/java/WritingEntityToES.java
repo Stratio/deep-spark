@@ -17,11 +17,11 @@
 package com.stratio.deep.example.java;
 
 
-import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.extractor.ESEntityExtractor;
-import com.stratio.deep.extractor.server.ExtractorServer;
-import com.stratio.deep.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.extractor.server.ExtractorServer;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.testentity.BookEntity;
 import com.stratio.deep.testentity.CantoEntity;
 import com.stratio.deep.testentity.WordCount;
