@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.extractor;
+package com.stratio.deep.mongodb.extractor;
 
 
 import com.mongodb.hadoop.MongoInputFormat;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.writer;
+package com.stratio.deep.mongodb.writer;
 
 import com.mongodb.hadoop.mapred.output.MongoRecordWriter;
 import com.stratio.deep.commons.rdd.IWriter;

@@ -1,6 +1,7 @@
 package com.stratio.deep.entity;
 
 import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.mongodb.entity.MongoCell;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;

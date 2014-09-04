@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.extractor;
+package com.stratio.deep.mongodb.extractor;
 
 import com.stratio.deep.commons.config.IDeepJobConfig;
-import com.stratio.deep.config.*;
 import com.stratio.deep.commons.exception.DeepTransformException;
-import com.stratio.deep.utils.UtilMongoDB;
+import com.stratio.deep.mongodb.config.EntityDeepJobConfigMongoDB;
+import com.stratio.deep.mongodb.utils.UtilMongoDB;
 import org.bson.BSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

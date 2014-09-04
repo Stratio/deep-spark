@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.config;
+package com.stratio.deep.mongodb.config;
 
 import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.utils.AnnotationUtils;

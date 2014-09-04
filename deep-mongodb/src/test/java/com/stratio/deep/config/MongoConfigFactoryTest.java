@@ -1,5 +1,6 @@
 package com.stratio.deep.config;
 
+import com.stratio.deep.mongodb.config.MongoConfigFactory;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Constructor;

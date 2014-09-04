@@ -14,25 +14,32 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.entity;
+package com.stratio.deep.mongodb.config;
 
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.utils.UtilMongoDB;
+import com.stratio.deep.commons.entity.Cells;
 
-/**
- * Created by rcrespo on 2/07/14.
- */
-public class MongoCell extends Cell {
-    private MongoCell(String cellName, Object cellValue) {
-        super(cellName, cellValue);
+
+public class CellDeepJobConfigMongoDB extends GenericDeepJobConfigMongoDB<Cells> {
+
+    private static final long serialVersionUID = -598862509865396541L;
+    private Cells dummyCells;
+
+    public CellDeepJobConfigMongoDB() {
     }
 
+    {
+        dummyCells = new Cells();
+    }
+
+
+
+    @SuppressWarnings("unchecked")
     @Override
-    public Boolean isKey() {
-        return cellName.equals(UtilMongoDB.MONGO_DEFAULT_ID);
+    public Class<Cells> getEntityClass() {
+        return (Class<Cells>) dummyCells.getClass();
     }
 
-    public static Cell create(String cellName, Object cellValue) {
-        return new MongoCell(cellName, cellValue);
-    }
+
+
+
 }

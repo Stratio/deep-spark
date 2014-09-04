@@ -1,6 +1,8 @@
 package com.stratio.deep.config;
 
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.mongodb.config.IMongoDeepJobConfig;
+import com.stratio.deep.mongodb.config.MongoConfigFactory;
 import com.stratio.deep.testentity.MessageTestEntity;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;

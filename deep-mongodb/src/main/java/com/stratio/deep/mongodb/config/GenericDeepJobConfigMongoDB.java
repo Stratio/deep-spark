@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.config;
+package com.stratio.deep.mongodb.config;
 
 
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;

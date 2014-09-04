@@ -3,7 +3,7 @@ package com.stratio.deep.rdd;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.extractor.MongoCellExtractor;
+import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;

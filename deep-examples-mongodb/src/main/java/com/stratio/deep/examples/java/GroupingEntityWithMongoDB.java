@@ -18,7 +18,7 @@ package com.stratio.deep.examples.java;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.extractor.MongoEntityExtractor;
+import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.testentity.BookEntity;
 import com.stratio.deep.testentity.CantoEntity;
