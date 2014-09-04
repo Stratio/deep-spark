@@ -149,7 +149,44 @@ public final class UtilES {
 
         return json;
     }
+    /**
+     * converts from an entity class with deep's anotations to JSONObject.
+     *
+     * @param t   an instance of an object of type T to convert to JSONObject.
+     * @param <T> the type of the object to convert.
+     * @return the provided object converted to JSONObject.
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws InvocationTargetException
+     */
+    public static <T> LinkedMapWritable getLinkedMapWritableFromObject(T t) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        Field[] fields = AnnotationUtils.filterDeepFields(t.getClass());
 
+        LinkedMapWritable linkedMapWritable = new LinkedMapWritable();
+
+        for (Field field : fields) {
+            Method method = Utils.findGetter(field.getName(), t.getClass());
+            Object object = method.invoke(t);
+            if (object != null) {
+                if (Collection.class.isAssignableFrom(field.getType())) {
+                    Collection c = (Collection) object;
+                    Iterator iterator = c.iterator();
+                    List<LinkedMapWritable> innerJsonList = new ArrayList<>();
+
+                    while (iterator.hasNext()) {
+                        innerJsonList.add(getLinkedMapWritableFromObject((IDeepType) iterator.next()));
+                    }
+                    //linkedMapWritable.put(new Text(AnnotationUtils.deepFieldName(field)), new LinkedMapWritable[innerJsonList.size()]);
+                } else if (IDeepType.class.isAssignableFrom(field.getType())) {
+                    linkedMapWritable.put(new Text(AnnotationUtils.deepFieldName(field)), getLinkedMapWritableFromObject((IDeepType) object));
+                } else {
+                    linkedMapWritable.put(new Text(AnnotationUtils.deepFieldName(field)), getWritableFromObject(object));
+                }
+            }
+        }
+
+        return linkedMapWritable;
+    }
     /**
      * returns the id value annotated with @DeepField(fieldName = "_id")
      *
@@ -213,25 +250,43 @@ public final class UtilES {
      * @throws InvocationTargetException
      * @throws NoSuchMethodException
      */
-    private static Object getObjectFromWritable(Writable writable) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
-
-
+    //TODO : Generic? reflection?
+    private static Object getObjectFromWritable(Writable writable) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Object object = null;
-        if(writable instanceof BytesWritable ) {
-            object = ((BytesWritable) writable).getBytes();
+
+        if(writable instanceof NullWritable ){
+            object = NullWritable.get();
+        }
+        else if(writable instanceof BooleanWritable ) {
+            object = ((BooleanWritable) writable).get();
         }
         else if(writable instanceof Text ){
             object = writable.toString();
         }
-        else {
-
-            Method method = writable.getClass().getMethod("get");
-            object = method.invoke(writable);
-
+        else if(writable instanceof ByteWritable ) {
+            object = ((ByteWritable) writable).get();
+        }
+        else if(writable instanceof IntWritable) {
+            object = ((IntWritable) writable).get();
+        }
+        else if(writable instanceof LongWritable) {
+            object = ((LongWritable) writable).get();
+        }
+        else if(writable instanceof BytesWritable ) {
+            object = ((BytesWritable) writable).getBytes();
+        }
+        else if(writable instanceof DoubleWritable ) {
+            object = ((DoubleWritable) writable).get();
+        }
+        else if(writable instanceof FloatWritable ) {
+            object = ((FloatWritable) writable).get();
+        }else {
+            //TODO : exception?
         }
 
         return object;
     }
+
 
 
     /**
@@ -243,7 +298,7 @@ public final class UtilES {
      * @throws InvocationTargetException
      * @throws NoSuchMethodException
      */
-    private static Writable getWritableFromObject(Object object) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+    private static Writable getWritableFromObject(Object object)  {
 
 
         Writable writable = null;
@@ -255,11 +310,10 @@ public final class UtilES {
 
         else {
 
-//            Method method = writable.getClass().getMethod("get");
-//            object = method.invoke(writable);
+            writable = new IntWritable((Integer)object);
 
         }
-        writable = writable!=null?writable:new Text("");
+       // writable = writable!=null?writable:new Text("");
         return writable;
     }
 

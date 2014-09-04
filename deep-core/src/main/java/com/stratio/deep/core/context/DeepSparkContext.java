@@ -24,6 +24,7 @@ import com.stratio.deep.core.rdd.DeepRDD;
 import com.stratio.deep.exception.DeepExtractorinitializationException;
 import com.stratio.deep.exception.DeepInstantiationException;
 import com.stratio.deep.rdd.IExtractor;
+import com.sun.tools.doclets.formats.html.SourceToHTMLConverter;
 import org.apache.log4j.Logger;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;

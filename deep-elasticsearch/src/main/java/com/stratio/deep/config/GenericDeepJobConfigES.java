@@ -166,6 +166,7 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
         configHadoop.setOutputFormat(EsOutputFormat.class);
         configHadoop.set("es.resource", database);
         configHadoop.set("es.field.read.empty.as.null", "false");
+        configHadoop.set("index.mapper.dynamic","false");
 
         if(query!=null){
 //            "?q=message:first"
@@ -174,7 +175,7 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
         }
 
         configHadoop.set("es.nodes", Utils.splitHosts(hostList));
-        configHadoop.set("es.input.json", "yes");
+        configHadoop.set("es.input.json", "no");
 
         if(false){
 //              index (default)

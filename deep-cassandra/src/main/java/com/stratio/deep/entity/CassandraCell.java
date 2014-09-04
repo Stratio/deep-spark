@@ -153,7 +153,7 @@ public class CassandraCell extends Cell {
         this.isClusterKey = isClusterKey;
         this.isPartitionKey = isPartitionKey;
         this.cellValidator = getValueType(cellValue);
-        this.cql3TypeClassName = cellValidator.getAbstractType().asCQL3Type().toString();
+        this.cql3TypeClassName = cellValidator!=null?cellValidator.getAbstractType().asCQL3Type().toString():null;
 
     }
 
