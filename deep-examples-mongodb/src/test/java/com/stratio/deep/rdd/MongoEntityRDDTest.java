@@ -218,7 +218,9 @@ public class MongoEntityRDDTest implements Serializable {
 
 
         ExtractorConfig<BookEntity> inputConfigEntity = new ExtractorConfig(BookEntity.class);
-        inputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book").putValue(ExtractorConstants.COLLECTION,"input").putValue("inputColumns", "metadata");
+        inputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book")
+                .putValue(ExtractorConstants.COLLECTION,"input").putValue(ExtractorConstants.INPUT_COLUMNS, "metadata")
+                .putValue(ExtractorConstants.IGNORE_ID_FIELD, "true");
         inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
         RDD<BookEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
