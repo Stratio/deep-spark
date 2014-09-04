@@ -220,7 +220,7 @@ public class MongoEntityRDDTest implements Serializable {
         ExtractorConfig<BookEntity> inputConfigEntity = new ExtractorConfig(BookEntity.class);
         inputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book")
                 .putValue(ExtractorConstants.COLLECTION,"input").putValue(ExtractorConstants.INPUT_COLUMNS, "metadata")
-                .putValue(ExtractorConstants.IGNORE_ID_FIELD, "true");
+                .putValue(ExtractorConstants.IGNORE_ID_FIELD, "false");
         inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
         RDD<BookEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
@@ -236,7 +236,11 @@ public class MongoEntityRDDTest implements Serializable {
 
 
         ExtractorConfig<BookEntity> inputConfigEntity2 = new ExtractorConfig(BookEntity.class);
-        inputConfigEntity2.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book").putValue(ExtractorConstants.COLLECTION,"input").putValue("inputColumns", "cantos");
+        inputConfigEntity2.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book")
+                .putValue(ExtractorConstants.COLLECTION,"input").putValue(ExtractorConstants.INPUT_COLUMNS, "cantos")
+                .putValue(ExtractorConstants.IGNORE_ID_FIELD, "true");
+
+        ;
         inputConfigEntity2.setExtractorImplClass(MongoEntityExtractor.class);
 
 
@@ -250,16 +254,20 @@ public class MongoEntityRDDTest implements Serializable {
         assertNotNull(bookEntity2.getCantoEntities());
 
 
-        BSONObject bson = new BasicBSONObject();
-
-        bson.put("_id", 0);
-        bson.put("cantos", 1);
+//        BSONObject bson = new BasicBSONObject();
+//
+//        bson.put("_id", 0);
+//        bson.put("cantos", 1);
 
 //        IMongoDeepJobConfig<BookEntity> inputConfigEntity3 = MongoConfigFactory.createMongoDB(BookEntity.class)
 //                .host(hostConcat).database("book").collection("input").fields(bson).initialize();
 
         ExtractorConfig<BookEntity> inputConfigEntity3 = new ExtractorConfig(BookEntity.class);
-        inputConfigEntity3.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book").putValue(ExtractorConstants.COLLECTION,"input").putValue("fields", bson.toString());
+        inputConfigEntity3.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book")
+                .putValue(ExtractorConstants.COLLECTION,"input").putValue(ExtractorConstants.INPUT_COLUMNS, "cantos")
+                .putValue(ExtractorConstants.IGNORE_ID_FIELD, "true");
+
+        ;
         inputConfigEntity3.setExtractorImplClass(MongoEntityExtractor.class);
 
 
