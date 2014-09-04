@@ -44,10 +44,10 @@ public class ExtractorClientInitializer<T> extends ChannelInitializer<SocketChan
         }
 
         Kryo kryo = new Kryo();
-        registerKryo(kryo);
+        registerKryoResponse(kryo);
 
         Kryo kryo2 = new Kryo();
-        registerKryo(kryo2);
+        registerKryoAction(kryo2);
 
 
         p.addLast(new ResponseDecoder(kryo));
@@ -57,14 +57,17 @@ public class ExtractorClientInitializer<T> extends ChannelInitializer<SocketChan
     }
 
 
-    private void registerKryo(Kryo kryo) {
-        registerEncoder(kryo);
-        registerDecoder(kryo);
+    private void registerKryoAction(Kryo kryo) {
+
+        registerAction(kryo);
+    }
+
+    private void registerKryoResponse(Kryo kryo) {
+        registerResponse(kryo);
         registerUtils(kryo);
     }
 
-
-    private void registerEncoder(Kryo kryo){
+    private void registerAction(Kryo kryo){
         kryo.register(CloseAction.class);
         kryo.register(ExtractorInstanceAction.class);
         kryo.register(GetPartitionsAction.class);
@@ -73,10 +76,9 @@ public class ExtractorClientInitializer<T> extends ChannelInitializer<SocketChan
         kryo.register(InitSaveAction.class);
         kryo.register(SaveAction.class);
 
-
     }
 
-    private void registerDecoder(Kryo kryo){
+    private void registerResponse(Kryo kryo){
         kryo.register(ExtractorInstanceResponse.class);
         kryo.register(GetPartitionsResponse.class);
         kryo.register(HasNextResponse.class);
@@ -94,29 +96,5 @@ public class ExtractorClientInitializer<T> extends ChannelInitializer<SocketChan
 
 
 
-    private void registerJavaEncoder(Kryo kryo){
-        //kryo.register(Action.class,new JavaSerializer());
-        kryo.register(CloseAction.class,new JavaSerializer());
-        kryo.register(ExtractorInstanceAction.class,new JavaSerializer());
-        kryo.register(GetPartitionsAction.class,new JavaSerializer());
-        kryo.register(HasNextAction.class,new JavaSerializer());
-        kryo.register(InitIteratorAction.class,new JavaSerializer());
-        kryo.register(InitSaveAction.class,new JavaSerializer());
-        kryo.register(SaveAction.class,new JavaSerializer());
-
-
-    }
-
-    private void registerJavaDecoder(Kryo kryo){
-
-        //kryo.register(Response.class,new JavaSerializer());
-        kryo.register(ExtractorInstanceResponse.class,new JavaSerializer());
-        kryo.register(GetPartitionsResponse.class,new JavaSerializer());
-        kryo.register(HasNextResponse.class,new JavaSerializer());
-        kryo.register(InitIteratorResponse.class,new JavaSerializer());
-        kryo.register(InitSaveResponse.class,new JavaSerializer());
-        kryo.register(SaveResponse.class,new JavaSerializer());
-
-    }
 
 }

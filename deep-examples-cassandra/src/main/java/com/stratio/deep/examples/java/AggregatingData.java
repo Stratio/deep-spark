@@ -74,10 +74,10 @@ public final class AggregatingData {
         String TABLENAME    = "tweets";
         String CQLPORT      = "9042";
         String RPCPORT      = "9160";
-        String HOST         = "127.0.0.1";
+        String HOST         = "172.19.0.133";
 
 
-        ExtractorServer.initExtractorServer();
+        //ExtractorServer.initExtractorServer();
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -105,7 +105,7 @@ public final class AggregatingData {
         LOG.info("first: " + rdd.first());
 
 
-        ExtractorServer.close();
+      //  ExtractorServer.close();
         deepContext.stop();
     }
 

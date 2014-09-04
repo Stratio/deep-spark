@@ -56,10 +56,9 @@ public class ResponseDecoder extends ByteToMessageDecoder {
         input.setBuffer(decoded);
 
         Object object = kryo.readClassAndObject(input);
-        in.readerIndex(input.position()+4);
 
         out.add((Response) object);
 
-        int dummy = in.readableBytes();
+
     }
 }

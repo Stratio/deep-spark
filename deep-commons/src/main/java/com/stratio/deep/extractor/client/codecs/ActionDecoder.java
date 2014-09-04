@@ -43,24 +43,6 @@ public class ActionDecoder extends ByteToMessageDecoder {
 
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
 
-/*
-        input.setBuffer(in.array(), in.readerIndex(), in.readableBytes());
-        if (length == -1) {
-            // Read length.
-            if (in.readableBytes() < 4) return;
-            length = input.readInt();
-            in.readerIndex(input.position());
-        }
-
-        if (in.readableBytes() < length) return;
-
-        length = -1;
-        Object object = kryo.readClassAndObject(input);
-        in.readerIndex(input.position());
-
-        out.add((Action) object);
-*/
-
                 byte[] decoded = null;
 
 
@@ -77,80 +59,10 @@ public class ActionDecoder extends ByteToMessageDecoder {
         in.readBytes(decoded);
         input.setBuffer(decoded);
         Object object = kryo.readClassAndObject(input);
-        in.readerIndex(input.position()+4);
-
-        out.add((Action) object);
-
-        int dummy = in.readableBytes();
-
-/*
-        byte[] decoded = null;
-
-
-        if (length == -1) {
-            // Read length.
-            if (in.readableBytes() < 4) return;
-            length = in.readInt();
-        }
-
-        if (in.readableBytes() < length){
-            return;
-        }
-        decoded = new byte[length];
-        length = -1;
-
-        in.readBytes(decoded);
-        input.setBuffer(decoded,0,decoded.length);
-
-        Object object = kryo.readClassAndObject(input);
 
         out.add((Action) object);
 
 
-        int dummy = in.readableBytes();
-        in.skipBytes(dummy);
-*/
 
-/*        // Wait until the length prefix is available.
-        if (in.readableBytes() < 5) {
-            return;
-        }
-
-        // Wait until the whole data is available.
-        int dataLength = in.readInt();
-        if (in.readableBytes() < dataLength) {
-            in.resetReaderIndex();
-            return;
-        }
-
-        // Convert the received data into a new BigInteger.
-        byte[] decoded = new byte[dataLength];
-        in.readBytes(decoded);
-
-        ByteArrayInputStream bis = new ByteArrayInputStream(decoded);
-        ObjectInput inObj = null;
-        Action action = null;
-        try {
-            inObj = new ObjectInputStream(bis);
-            action = (Action) inObj.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                bis.close();
-            } catch (IOException ex) {
-                // ignore close exception
-            }
-            try {
-                if (inObj != null) {
-                    inObj.close();
-                }
-            } catch (IOException ex) {
-                // ignore close exception
-            }
-        }
-
-        out.add(action);
-        */
     }
 }
