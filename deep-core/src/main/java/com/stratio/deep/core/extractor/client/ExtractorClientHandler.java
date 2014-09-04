@@ -1,12 +1,12 @@
 /*
  * Copyright 2012 The Netty Project
- *
+ * 
  * The Netty Project licenses this file to you under the Apache License, version 2.0 (the
  * "License"); you may not use this file except in compliance with the License. You may obtain a
  * copy of the License at:
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -15,256 +15,278 @@
 package com.stratio.deep.core.extractor.client;
 
 
-import com.stratio.deep.config.ExtractorConfig;
-import com.stratio.deep.extractor.actions.*;
-import com.stratio.deep.extractor.response.*;
-import com.stratio.deep.rdd.IExtractor;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.apache.spark.Partition;
-import org.apache.spark.rdd.RDD;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.spark.Partition;
+
+import com.stratio.deep.config.ExtractorConfig;
+import com.stratio.deep.extractor.actions.CloseAction;
+import com.stratio.deep.extractor.actions.ExtractorInstanceAction;
+import com.stratio.deep.extractor.actions.GetPartitionsAction;
+import com.stratio.deep.extractor.actions.HasNextAction;
+import com.stratio.deep.extractor.actions.InitIteratorAction;
+import com.stratio.deep.extractor.actions.InitSaveAction;
+import com.stratio.deep.extractor.actions.SaveAction;
+import com.stratio.deep.extractor.response.ExtractorInstanceResponse;
+import com.stratio.deep.extractor.response.GetPartitionsResponse;
+import com.stratio.deep.extractor.response.HasNextResponse;
+import com.stratio.deep.extractor.response.Response;
+import com.stratio.deep.rdd.IExtractor;
+
 public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Response> implements
-        IExtractor<T> {
+    IExtractor<T> {
 
-    // Stateful properties
-    private volatile Channel channel;
+  // Stateful properties
+  private volatile Channel channel;
 
-    private final BlockingQueue<Response> answer = new LinkedBlockingQueue<Response>();
+  private final ExecutorService es = Executors.newFixedThreadPool(1);
 
-    public ExtractorClientHandler() {
-        super(true);
+  private final BlockingQueue<Response> answer = new LinkedBlockingQueue<Response>();
+
+  private T futureNextValue;
+
+  private Boolean futureHasNextValue;
+
+  public ExtractorClientHandler() {
+    super(true);
+  }
+
+  @Override
+  public void channelRegistered(ChannelHandlerContext ctx) {
+    channel = ctx.channel();
+  }
+
+  @Override
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+    cause.printStackTrace();
+    ctx.close();
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext
+   * , java.lang.Object)
+   */
+  @Override
+  protected void channelRead0(ChannelHandlerContext ctx, Response msg) throws Exception {
+    answer.add(msg);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(org.apache.spark.broadcast.Broadcast, int)
+   */
+  @Override
+  public Partition[] getPartitions(ExtractorConfig<T> config) {
+
+    channel.writeAndFlush(new GetPartitionsAction<>(config));
+
+    Response response;
+    boolean interrupted = false;
+    for (;;) {
+      try {
+        response = answer.take();
+        break;
+      } catch (InterruptedException ignore) {
+        interrupted = true;
+      }
     }
 
-    @Override
-    public void channelRegistered(ChannelHandlerContext ctx) {
-        channel = ctx.channel();
+    if (interrupted) {
+      Thread.currentThread().interrupt();
     }
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
-        ctx.close();
+    return ((GetPartitionsResponse) response).getPartitions();
+  }
+
+  @Override
+  public void close() {
+
+    channel.writeAndFlush(new CloseAction());
+
+    boolean interrupted = false;
+    for (;;) {
+      try {
+        answer.take();
+        break;
+      } catch (InterruptedException ignore) {
+        interrupted = true;
+      }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext
-     * , java.lang.Object)
-     */
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Response msg) throws Exception {
-
-        answer.add(msg);
+    if (interrupted) {
+      Thread.currentThread().interrupt();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(org.apache.spark.broadcast.Broadcast, int)
-     */
-    @Override
-    public Partition[] getPartitions(ExtractorConfig<T> config) {
+    return;
+  }
 
-        GetPartitionsAction<T> getPartitionsAction = new GetPartitionsAction<>(config);
 
-        channel.writeAndFlush(getPartitionsAction);
+  @Override
+  public boolean hasNext() {
 
-        Response response;
-        boolean interrupted = false;
-        for (; ; ) {
-            try {
-                response = answer.take();
-                break;
-            } catch (InterruptedException ignore) {
-                interrupted = true;
-            }
-        }
+    if (this.futureHasNextValue == null) {
+      HasNextResponse<T> hasNextResponse = null;
+      try {
+        hasNextResponse = retrieveNextInformation();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      } catch (ExecutionException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
 
-        if (interrupted) {
-            Thread.currentThread().interrupt();
-        }
-
-        return ((GetPartitionsResponse) response).getPartitions();
+      this.futureNextValue = hasNextResponse.getData();
+      this.futureHasNextValue = hasNextResponse.getHasNext();
     }
 
-    @Override
-    public void close() {
-        CloseAction closeAction = new CloseAction();
+    return futureHasNextValue;
 
-        channel.writeAndFlush(closeAction);
+  }
 
-        Response response;
-        boolean interrupted = false;
-        for (; ; ) {
-            try {
-                response = answer.take();
-                break;
-            } catch (InterruptedException ignore) {
-                interrupted = true;
-            }
-        }
+  @SuppressWarnings("unchecked")
+  private HasNextResponse<T> retrieveNextInformation() throws InterruptedException,
+      ExecutionException {
 
-        if (interrupted) {
-            Thread.currentThread().interrupt();
-        }
+    Future<HasNextResponse<T>> future = es.submit(new Callable() {
+      public Object call() throws Exception {
+        channel.writeAndFlush(new HasNextAction<>());
+        return answer.take();
+      }
+    });
 
-        return;
+    HasNextResponse<T> response = null;
+    response = future.get();
+
+    return response;
+  }
+
+  @Override
+  public T next() {
+
+    HasNextResponse<T> hasNextResponse = null;
+    try {
+      hasNextResponse = retrieveNextInformation();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } catch (ExecutionException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
     }
 
+    T currentValue = this.futureNextValue;
 
-    @Override
-    public boolean hasNext() {
+    // TODO Handle when calling next but has next is false
+    // HINT - It seems hadoop interface doesn't control it...
 
-        HasNextAction hasNextAction = new HasNextAction<>();
 
-        channel.writeAndFlush(hasNextAction);
+    this.futureHasNextValue = hasNextResponse.getHasNext();
+    this.futureNextValue = hasNextResponse.getData();
 
-        Response response;
-        boolean interrupted = false;
-        for (; ; ) {
-            try {
-                response = answer.take();
-                break;
-            } catch (InterruptedException ignore) {
-                interrupted = true;
-            }
-        }
+    return currentValue;
+  }
 
-        if (interrupted) {
-            Thread.currentThread().interrupt();
-        }
 
-        return ((HasNextResponse) response).getData();
+  @Override
+  public void initIterator(Partition dp, ExtractorConfig<T> config) {
 
+    channel.writeAndFlush(new InitIteratorAction<>(dp, config));
+
+    boolean interrupted = false;
+    for (;;) {
+      try {
+        answer.take();
+        break;
+      } catch (InterruptedException ignore) {
+        interrupted = true;
+      }
     }
 
-    @Override
-    public T next() {
-        NextAction<T> nextAction = new NextAction<>();
+    if (interrupted) {
+      Thread.currentThread().interrupt();
+    }
+    return;
+  }
 
-        channel.writeAndFlush(nextAction);
+  @Override
+  public IExtractor<T> getExtractorInstance(ExtractorConfig<T> config) {
 
-        Response response;
-        boolean interrupted = false;
-        for (; ; ) {
-            try {
-                response = answer.take();
-                break;
-            } catch (InterruptedException ignore) {
-                interrupted = true;
-            }
-        }
+    channel.writeAndFlush(new ExtractorInstanceAction<>(config));
 
-        if (interrupted) {
-            Thread.currentThread().interrupt();
-        }
-
-        return ((NextResponse<T>) response).getData();
+    Response response;
+    boolean interrupted = false;
+    for (;;) {
+      try {
+        response = answer.take();
+        break;
+      } catch (InterruptedException ignore) {
+        interrupted = true;
+      }
     }
 
-
-    @Override
-    public void initIterator(Partition dp, ExtractorConfig<T> config) {
-        InitIteratorAction<T> initIteratorAction = new InitIteratorAction<>(dp, config);
-
-        channel.writeAndFlush(initIteratorAction);
-
-        Response response;
-        boolean interrupted = false;
-        for (; ; ) {
-            try {
-                response = answer.take();
-                break;
-            } catch (InterruptedException ignore) {
-                interrupted = true;
-            }
-        }
-
-        if (interrupted) {
-            Thread.currentThread().interrupt();
-        }
-        return;
+    if (interrupted) {
+      Thread.currentThread().interrupt();
     }
 
-    @Override
-    public IExtractor<T> getExtractorInstance(ExtractorConfig<T> config) {
-        ExtractorInstanceAction<T> instanceAction = new ExtractorInstanceAction<>(config);
+    return ((ExtractorInstanceResponse<T>) response).getData();
+  }
 
-        channel.writeAndFlush(instanceAction);
+  @Override
+  public void saveRDD(T t) {
 
-        Response response;
-        boolean interrupted = false;
-        for (; ; ) {
-            try {
-                response = answer.take();
-                break;
-            } catch (InterruptedException ignore) {
-                interrupted = true;
-            }
-        }
+    channel.writeAndFlush(new SaveAction<>(t));
 
-        if (interrupted) {
-            Thread.currentThread().interrupt();
-        }
-
-        return ((ExtractorInstanceResponse<T>) response).getData();
+    boolean interrupted = false;
+    for (;;) {
+      try {
+        answer.take();
+        break;
+      } catch (InterruptedException ignore) {
+        interrupted = true;
+      }
     }
 
-    @Override
-    public void saveRDD(T t) {
-        SaveAction<T> saveAction = new SaveAction<>(t);
-
-        channel.writeAndFlush(saveAction);
-
-        Response response;
-        boolean interrupted = false;
-        for (; ; ) {
-            try {
-                response = answer.take();
-                break;
-            } catch (InterruptedException ignore) {
-                interrupted = true;
-            }
-        }
-
-        if (interrupted) {
-            Thread.currentThread().interrupt();
-        }
-
-        return ;
+    if (interrupted) {
+      Thread.currentThread().interrupt();
     }
 
-    @Override
-    public void initSave(ExtractorConfig<T> config, T first) {
-        InitSaveAction<T> initSaveAction = new InitSaveAction<>(config, first);
+    return;
+  }
 
-        channel.writeAndFlush(initSaveAction);
+  @Override
+  public void initSave(ExtractorConfig<T> config, T first) {
 
-        Response response;
-        boolean interrupted = false;
-        for (; ; ) {
-            try {
-                response = answer.take();
-                break;
-            } catch (InterruptedException ignore) {
-                interrupted = true;
-            }
-        }
+    channel.writeAndFlush(new InitSaveAction<>(config, first));
 
-        if (interrupted) {
-            Thread.currentThread().interrupt();
-        }
-
-        return;
+    boolean interrupted = false;
+    for (;;) {
+      try {
+        answer.take();
+        break;
+      } catch (InterruptedException ignore) {
+        interrupted = true;
+      }
     }
 
+    if (interrupted) {
+      Thread.currentThread().interrupt();
+    }
+
+    return;
+  }
 
 
 

@@ -46,11 +46,7 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
                 break;
             case HAS_NEXT:
                 HasNextAction<T> hasNextAction = (HasNextAction<T>) action;
-                response = new HasNextResponse(this.hastNext(hasNextAction));
-                break;
-            case NEXT:
-                NextAction<T> nextAction = (NextAction<T>) action;
-                response = new NextResponse<T>(this.next(nextAction));
+                response = new HasNextResponse(this.hastNext(), this.next());
                 break;
             case INIT_ITERATOR:
                 InitIteratorAction<T> initIteratorAction = (InitIteratorAction<T>) action;
@@ -86,15 +82,15 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
     }
 
 
-    protected boolean hastNext(HasNextAction hasNextAction) {
+    protected boolean hastNext() {
 
         return extractor.hasNext();
 
     }
 
-    protected T next(NextAction<T> nextAction) {
+    protected T next() {
 
-        return extractor.next();
+        return extractor.hasNext() ? extractor.next() : null;
 
     }
 

@@ -8,22 +8,29 @@ import com.stratio.deep.extractor.actions.ActionType;
 /**
  * @author Óscar Puertas
  */
-public class HasNextResponse extends Response {
+public class HasNextResponse<T> extends Response {
 
-    private static final long serialVersionUID = -2647516898871636731L;
+  private static final long serialVersionUID = -2647516898871636731L;
 
-    private boolean data;
+  private boolean hasNext;
 
-    public HasNextResponse() {
-        super();
-    }
+  private T data;
 
-    public HasNextResponse(boolean data) {
-        super(ActionType.HAS_NEXT);
-        this.data = data;
-    }
+  public HasNextResponse() {
+    super();
+  }
 
-    public boolean getData() {
-        return data;
-    }
+  public HasNextResponse(boolean hasNext, T data) {
+    super(ActionType.HAS_NEXT);
+    this.hasNext = hasNext;
+    this.data = data;
+  }
+
+  public boolean getHasNext() {
+    return hasNext;
+  }
+
+  public T getData() {
+    return data;
+  }
 }

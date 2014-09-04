@@ -71,7 +71,6 @@ public class ExtractorClientInitializer<T> extends ChannelInitializer<SocketChan
         kryo.register(HasNextAction.class);
         kryo.register(InitIteratorAction.class);
         kryo.register(InitSaveAction.class);
-        kryo.register(NextAction.class);
         kryo.register(SaveAction.class);
 
 
@@ -83,7 +82,6 @@ public class ExtractorClientInitializer<T> extends ChannelInitializer<SocketChan
         kryo.register(HasNextResponse.class);
         kryo.register(InitIteratorResponse.class);
         kryo.register(InitSaveResponse.class);
-        kryo.register(NextResponse.class);
         kryo.register(SaveResponse.class);
 
 
@@ -104,7 +102,6 @@ public class ExtractorClientInitializer<T> extends ChannelInitializer<SocketChan
         kryo.register(HasNextAction.class,new JavaSerializer());
         kryo.register(InitIteratorAction.class,new JavaSerializer());
         kryo.register(InitSaveAction.class,new JavaSerializer());
-        kryo.register(NextAction.class,new JavaSerializer());
         kryo.register(SaveAction.class,new JavaSerializer());
 
 
@@ -118,7 +115,6 @@ public class ExtractorClientInitializer<T> extends ChannelInitializer<SocketChan
         kryo.register(HasNextResponse.class,new JavaSerializer());
         kryo.register(InitIteratorResponse.class,new JavaSerializer());
         kryo.register(InitSaveResponse.class,new JavaSerializer());
-        kryo.register(NextResponse.class,new JavaSerializer());
         kryo.register(SaveResponse.class,new JavaSerializer());
 
     }
