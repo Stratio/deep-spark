@@ -162,10 +162,9 @@ public class MongoJavaRDDTest {
     @AfterSuite
     public static void cleanup() {
         if (mongodExecutable != null) {
-
             mongo.close();
-            mongodExecutable.stop();
             mongod.stop();
+            mongodExecutable.stop();
         }
 
         Files.forceDelete(new File(DB_FOLDER_NAME));
