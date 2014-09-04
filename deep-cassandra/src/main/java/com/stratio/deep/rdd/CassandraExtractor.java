@@ -65,12 +65,12 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
 
 
     @Override
-    public boolean hasNext() {
+    public synchronized boolean hasNext() {
         return recordReader.hasNext();
     }
 
     @Override
-    public T next() {
+    public synchronized T next() {
         return transformElement(recordReader.next(), cassandraJobConfig);
     }
 

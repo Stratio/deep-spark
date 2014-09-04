@@ -49,13 +49,11 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
   // Stateful properties
   private volatile Channel channel;
 
-  private final ExecutorService es = Executors.newFixedThreadPool(1);
+  private ExecutorService executor;
 
   private final BlockingQueue<Response> answer = new LinkedBlockingQueue<Response>();
 
-  private T futureNextValue;
-
-  private Boolean futureHasNextValue;
+  private Future<HasNextResponse<T>> futureHasNextResponse = null;
 
   public ExtractorClientHandler() {
     super(true);
@@ -115,6 +113,8 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
   @Override
   public void close() {
 
+    executor.shutdown();
+
     channel.writeAndFlush(new CloseAction());
 
     boolean interrupted = false;
@@ -134,52 +134,71 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
     return;
   }
 
-
   @Override
   public boolean hasNext() {
 
-    if (this.futureHasNextValue == null) {
+    boolean hasNext = false;
+    if (this.futureHasNextResponse == null) {
       HasNextResponse<T> hasNextResponse = null;
-      try {
-        hasNextResponse = retrieveNextInformation();
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-      } catch (ExecutionException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
+      futureHasNextResponse = retrieveNextInformation();
 
-      this.futureNextValue = hasNextResponse.getData();
-      this.futureHasNextValue = hasNextResponse.getHasNext();
+
     }
 
-    return futureHasNextValue;
+    try {
+      hasNext = futureHasNextResponse.get().getHasNext();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } catch (ExecutionException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return hasNext;
+
+    // HasNextAction<T> hasNextAction = new HasNextAction<>();
+    //
+    // channel.writeAndFlush(hasNextAction);
+    //
+    // HasNextResponse<T> response;
+    // boolean interrupted = false;
+    // for (; ; ) {
+    // try {
+    // response = (HasNextResponse<T>) answer.take();
+    // break;
+    // } catch (InterruptedException ignore) {
+    // interrupted = true;
+    // }
+    // }
+    //
+    // if (interrupted) {
+    // Thread.currentThread().interrupt();
+    // }
+    //
+    // this.futureNextValue = response.getData();
+    //
+    // return response.getHasNext();
 
   }
 
   @SuppressWarnings("unchecked")
-  private HasNextResponse<T> retrieveNextInformation() throws InterruptedException,
-      ExecutionException {
+  private Future<HasNextResponse<T>> retrieveNextInformation() {
 
-    Future<HasNextResponse<T>> future = es.submit(new Callable() {
+    Future<HasNextResponse<T>> future = executor.submit(new Callable() {
       public Object call() throws Exception {
         channel.writeAndFlush(new HasNextAction<>());
         return answer.take();
       }
     });
 
-    HasNextResponse<T> response = null;
-    response = future.get();
-
-    return response;
+    return future;
   }
 
   @Override
   public T next() {
 
-    HasNextResponse<T> hasNextResponse = null;
+    T currentValue = null;
     try {
-      hasNextResponse = retrieveNextInformation();
+      currentValue = this.futureHasNextResponse.get().getData();
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     } catch (ExecutionException e) {
@@ -187,21 +206,21 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
       e.printStackTrace();
     }
 
-    T currentValue = this.futureNextValue;
-
     // TODO Handle when calling next but has next is false
     // HINT - It seems hadoop interface doesn't control it...
 
-
-    this.futureHasNextValue = hasNextResponse.getHasNext();
-    this.futureNextValue = hasNextResponse.getData();
+    this.futureHasNextResponse = retrieveNextInformation();
 
     return currentValue;
+
+    // return this.futureNextValue;
   }
 
 
   @Override
   public void initIterator(Partition dp, ExtractorConfig<T> config) {
+
+    this.executor = Executors.newFixedThreadPool(2);
 
     channel.writeAndFlush(new InitIteratorAction<>(dp, config));
 
