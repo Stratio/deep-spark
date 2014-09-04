@@ -365,6 +365,7 @@
         <module>../deep-examples</module>
         <module>../deep-examples-cassandra</module>
         <module>../deep-examples-mongodb</module>
+        <module>../deep-examples-elasticsearch</module>
     </modules>
 
     <profiles>
