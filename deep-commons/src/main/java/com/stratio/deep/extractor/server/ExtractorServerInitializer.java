@@ -14,102 +14,95 @@
  */
 package com.stratio.deep.extractor.server;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.serializers.JavaSerializer;
-import com.stratio.deep.extractor.actions.*;
-import com.stratio.deep.extractor.client.codecs.ActionDecoder;
-import com.stratio.deep.extractor.client.codecs.ResponseEncoder;
-import com.stratio.deep.extractor.response.*;
-import de.javakaffee.kryoserializers.UUIDSerializer;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.ssl.SslContext;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-
+import java.util.LinkedList;
 import java.util.UUID;
-import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.handler.codec.frame.FrameDecoder;
-import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
-import org.jboss.netty.handler.execution.ExecutionHandler;
-import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
+
+import com.esotericsoftware.kryo.Kryo;
+import com.stratio.deep.extractor.actions.CloseAction;
+import com.stratio.deep.extractor.actions.ExtractorInstanceAction;
+import com.stratio.deep.extractor.actions.GetPartitionsAction;
+import com.stratio.deep.extractor.actions.HasNextAction;
+import com.stratio.deep.extractor.actions.InitIteratorAction;
+import com.stratio.deep.extractor.actions.InitSaveAction;
+import com.stratio.deep.extractor.actions.SaveAction;
+import com.stratio.deep.extractor.client.codecs.ActionDecoder;
+import com.stratio.deep.extractor.client.codecs.ResponseEncoder;
+import com.stratio.deep.extractor.response.ExtractorInstanceResponse;
+import com.stratio.deep.extractor.response.GetPartitionsResponse;
+import com.stratio.deep.extractor.response.HasNextElement;
+import com.stratio.deep.extractor.response.HasNextResponse;
+import com.stratio.deep.extractor.response.InitIteratorResponse;
+import com.stratio.deep.extractor.response.InitSaveResponse;
+import com.stratio.deep.extractor.response.SaveResponse;
+
+import de.javakaffee.kryoserializers.UUIDSerializer;
 
 public class ExtractorServerInitializer<T> extends ChannelInitializer<SocketChannel> {
 
-    private final SslContext sslCtx;
+  private final SslContext sslCtx;
 
-    public ExtractorServerInitializer(SslContext sslCtx) {
-        this.sslCtx = sslCtx;
+  public ExtractorServerInitializer(SslContext sslCtx) {
+    this.sslCtx = sslCtx;
+  }
+
+  @Override
+  public void initChannel(SocketChannel ch) throws Exception {
+    ChannelPipeline p = ch.pipeline();
+    if (sslCtx != null) {
+      p.addLast(sslCtx.newHandler(ch.alloc()));
     }
 
-    @Override
-    public void initChannel(SocketChannel ch) throws Exception {
-        ChannelPipeline p = ch.pipeline();
-        if (sslCtx != null) {
-            p.addLast(sslCtx.newHandler(ch.alloc()));
-        }
+    Kryo kryo = new Kryo();
+    registerKryoResponse(kryo);
 
-        Kryo kryo = new Kryo();
-        registerKryoResponse(kryo);
-
-        Kryo kryo2 = new Kryo();
-        registerKryoAction(kryo2);
+    Kryo kryo2 = new Kryo();
+    registerKryoAction(kryo2);
 
 
-        p.addLast(new ActionDecoder(kryo2));
-        p.addLast(new ResponseEncoder(kryo,4 * 1024, 16 * 1024));
+    p.addLast(new ActionDecoder(kryo2));
+    p.addLast(new ResponseEncoder(kryo, 16 * 1024, -1));
 
-        p.addLast(new ExtractorServerHandler<T>());
-    }
+    p.addLast(new ExtractorServerHandler<T>());
+  }
 
-    private void registerKryoAction(Kryo kryo) {
-        registerAction(kryo);
-    }
+  private void registerKryoAction(Kryo kryo) {
+    registerAction(kryo);
+  }
 
-    private void registerKryoResponse(Kryo kryo) {
-        registerResponse(kryo);
-        registerUtils(kryo);
-    }
+  private void registerKryoResponse(Kryo kryo) {
+    registerResponse(kryo);
+    registerUtils(kryo);
+  }
 
+  private void registerAction(Kryo kryo) {
+    kryo.register(HasNextAction.class);
+    kryo.register(GetPartitionsAction.class);
+    kryo.register(ExtractorInstanceAction.class);
+    kryo.register(InitIteratorAction.class);
+    kryo.register(InitSaveAction.class);
+    kryo.register(SaveAction.class);
+    kryo.register(CloseAction.class);
+  }
 
-    private void registerAction(Kryo kryo){
-        kryo.register(CloseAction.class);
-        kryo.register(ExtractorInstanceAction.class);
-        kryo.register(GetPartitionsAction.class);
-        kryo.register(HasNextAction.class);
-        kryo.register(InitIteratorAction.class);
-        kryo.register(InitSaveAction.class);
-        kryo.register(SaveAction.class);
+  private void registerResponse(Kryo kryo) {
+    kryo.register(HasNextResponse.class);
+    kryo.register(LinkedList.class);
+    kryo.register(HasNextElement.class);
+    kryo.register(GetPartitionsResponse.class);
+    kryo.register(ExtractorInstanceResponse.class);
+    kryo.register(InitIteratorResponse.class);
+    kryo.register(InitSaveResponse.class);
+    kryo.register(SaveResponse.class);
+  }
 
-    }
-
-    private void registerResponse(Kryo kryo){
-        kryo.register(ExtractorInstanceResponse.class);
-        kryo.register(GetPartitionsResponse.class);
-        kryo.register(HasNextResponse.class);
-        kryo.register(InitIteratorResponse.class);
-        kryo.register(InitSaveResponse.class);
-        kryo.register(SaveResponse.class);
-
-
-    }
-    private void registerUtils(Kryo kryo){
-        kryo.register(UUID.class, new UUIDSerializer());
-    }
+  private void registerUtils(Kryo kryo) {
+    kryo.register(UUID.class, new UUIDSerializer());
+  }
 
 
 }

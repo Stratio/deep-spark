@@ -19,6 +19,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -39,6 +40,7 @@ import com.stratio.deep.extractor.actions.InitSaveAction;
 import com.stratio.deep.extractor.actions.SaveAction;
 import com.stratio.deep.extractor.response.ExtractorInstanceResponse;
 import com.stratio.deep.extractor.response.GetPartitionsResponse;
+import com.stratio.deep.extractor.response.HasNextElement;
 import com.stratio.deep.extractor.response.HasNextResponse;
 import com.stratio.deep.extractor.response.Response;
 import com.stratio.deep.rdd.IExtractor;
@@ -53,7 +55,11 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
   private final BlockingQueue<Response> answer = new LinkedBlockingQueue<Response>();
 
-  private Future<HasNextResponse<T>> futureHasNextResponse = null;
+  private HasNextElement<T> nextElement = null;
+
+  private LinkedList<HasNextElement<T>> currentPage;
+
+  private Future<LinkedList<HasNextElement<T>>> nextPage;
 
   public ExtractorClientHandler() {
     super(true);
@@ -137,53 +143,27 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
   @Override
   public boolean hasNext() {
 
-    boolean hasNext = false;
-    if (this.futureHasNextResponse == null) {
-      HasNextResponse<T> hasNextResponse = null;
-      futureHasNextResponse = retrieveNextInformation();
+    if (currentPage == null) {
+      try {
+        this.currentPage = retrieveNextInformation().get();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      } catch (ExecutionException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      this.nextPage = retrieveNextInformation();
 
-
+      this.nextElement = currentPage.poll();
     }
 
-    try {
-      hasNext = futureHasNextResponse.get().getHasNext();
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    } catch (ExecutionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    return hasNext;
-
-    // HasNextAction<T> hasNextAction = new HasNextAction<>();
-    //
-    // channel.writeAndFlush(hasNextAction);
-    //
-    // HasNextResponse<T> response;
-    // boolean interrupted = false;
-    // for (; ; ) {
-    // try {
-    // response = (HasNextResponse<T>) answer.take();
-    // break;
-    // } catch (InterruptedException ignore) {
-    // interrupted = true;
-    // }
-    // }
-    //
-    // if (interrupted) {
-    // Thread.currentThread().interrupt();
-    // }
-    //
-    // this.futureNextValue = response.getData();
-    //
-    // return response.getHasNext();
-
+    return nextElement.getHasNext();
   }
 
-  @SuppressWarnings("unchecked")
-  private Future<HasNextResponse<T>> retrieveNextInformation() {
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private Future<LinkedList<HasNextElement<T>>> retrieveNextInformation() {
 
-    Future<HasNextResponse<T>> future = executor.submit(new Callable() {
+    Future<LinkedList<HasNextElement<T>>> future = executor.submit(new Callable() {
       public Object call() throws Exception {
         channel.writeAndFlush(new HasNextAction<>());
         return answer.take();
@@ -196,26 +176,24 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
   @Override
   public T next() {
 
-    T currentValue = null;
-    try {
-      currentValue = this.futureHasNextResponse.get().getData();
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    } catch (ExecutionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    T currentValue = nextElement.getData();
+
+    if (currentPage.isEmpty()) {
+      try {
+        currentPage = nextPage.get();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      } catch (ExecutionException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      this.nextPage = retrieveNextInformation();
     }
 
-    // TODO Handle when calling next but has next is false
-    // HINT - It seems hadoop interface doesn't control it...
-
-    this.futureHasNextResponse = retrieveNextInformation();
+    nextElement = currentPage.poll();
 
     return currentValue;
-
-    // return this.futureNextValue;
   }
-
 
   @Override
   public void initIterator(Partition dp, ExtractorConfig<T> config) {

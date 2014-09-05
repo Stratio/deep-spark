@@ -30,7 +30,6 @@ import java.util.List;
 
 public class ActionDecoder extends ByteToMessageDecoder {
 
-
     private final Kryo kryo;
     private final Input input = new Input();
     private int length = -1;
@@ -52,7 +51,11 @@ public class ActionDecoder extends ByteToMessageDecoder {
             length = in.readInt();
         }
 
-        if (in.readableBytes() < length) return;
+        if (in.readableBytes() < length){
+          in.resetReaderIndex();
+          return;
+        }
+        
         decoded = new byte[length];
         length = -1;
 

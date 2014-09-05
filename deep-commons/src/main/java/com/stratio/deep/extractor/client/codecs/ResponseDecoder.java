@@ -48,7 +48,11 @@ public class ResponseDecoder extends ByteToMessageDecoder {
             length = in.readInt();
         }
 
-        if (in.readableBytes() < length) return;
+        if (in.readableBytes() < length){
+          in.resetReaderIndex();
+          return;
+        }
+        
         decoded = new byte[length];
         length = -1;
 

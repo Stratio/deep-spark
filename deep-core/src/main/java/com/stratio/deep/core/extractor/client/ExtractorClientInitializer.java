@@ -20,80 +20,79 @@ import com.stratio.deep.extractor.actions.*;
 import com.stratio.deep.extractor.client.codecs.ActionEncoder;
 import com.stratio.deep.extractor.client.codecs.ResponseDecoder;
 import com.stratio.deep.extractor.response.*;
+
 import de.javakaffee.kryoserializers.UUIDSerializer;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.ssl.SslContext;
 
+import java.util.LinkedList;
 import java.util.UUID;
 
 public class ExtractorClientInitializer<T> extends ChannelInitializer<SocketChannel> {
 
-    private final SslContext sslCtx;
+  private final SslContext sslCtx;
 
-    public ExtractorClientInitializer(SslContext sslCtx) {
-        this.sslCtx = sslCtx;
+  public ExtractorClientInitializer(SslContext sslCtx) {
+    this.sslCtx = sslCtx;
+  }
+
+  @Override
+  public void initChannel(SocketChannel ch) {
+    ChannelPipeline p = ch.pipeline();
+    if (sslCtx != null) {
+      p.addLast(sslCtx.newHandler(ch.alloc(), ExtractorClient.HOST, ExtractorClient.PORT));
     }
 
-    @Override
-    public void initChannel(SocketChannel ch) {
-        ChannelPipeline p = ch.pipeline();
-        if (sslCtx != null) {
-            p.addLast(sslCtx.newHandler(ch.alloc(), ExtractorClient.HOST, ExtractorClient.PORT));
-        }
+    Kryo kryo = new Kryo();
+    registerKryoResponse(kryo);
 
-        Kryo kryo = new Kryo();
-        registerKryoResponse(kryo);
-
-        Kryo kryo2 = new Kryo();
-        registerKryoAction(kryo2);
+    Kryo kryo2 = new Kryo();
+    registerKryoAction(kryo2);
 
 
-        p.addLast(new ResponseDecoder(kryo));
-        p.addLast(new ActionEncoder(kryo2, 4 * 1024, 16 * 1024));
+    p.addLast(new ResponseDecoder(kryo));
+    p.addLast(new ActionEncoder(kryo2, 4 * 1024, 16 * 1024));
 
-        p.addLast(new ExtractorClientHandler<T>());
-    }
-
-
-    private void registerKryoAction(Kryo kryo) {
-
-        registerAction(kryo);
-    }
-
-    private void registerKryoResponse(Kryo kryo) {
-        registerResponse(kryo);
-        registerUtils(kryo);
-    }
-
-    private void registerAction(Kryo kryo){
-        kryo.register(CloseAction.class);
-        kryo.register(ExtractorInstanceAction.class);
-        kryo.register(GetPartitionsAction.class);
-        kryo.register(HasNextAction.class);
-        kryo.register(InitIteratorAction.class);
-        kryo.register(InitSaveAction.class);
-        kryo.register(SaveAction.class);
-
-    }
-
-    private void registerResponse(Kryo kryo){
-        kryo.register(ExtractorInstanceResponse.class);
-        kryo.register(GetPartitionsResponse.class);
-        kryo.register(HasNextResponse.class);
-        kryo.register(InitIteratorResponse.class);
-        kryo.register(InitSaveResponse.class);
-        kryo.register(SaveResponse.class);
+    p.addLast(new ExtractorClientHandler<T>());
+  }
 
 
-    }
+  private void registerKryoAction(Kryo kryo) {
 
-    private void registerUtils(Kryo kryo){
-        kryo.register(UUID.class, new UUIDSerializer());
-    }
+    registerAction(kryo);
+  }
 
+  private void registerKryoResponse(Kryo kryo) {
+    registerResponse(kryo);
+    registerUtils(kryo);
+  }
 
+  private void registerAction(Kryo kryo) {
+    kryo.register(HasNextAction.class);
+    kryo.register(GetPartitionsAction.class);
+    kryo.register(ExtractorInstanceAction.class);
+    kryo.register(InitIteratorAction.class);
+    kryo.register(InitSaveAction.class);
+    kryo.register(SaveAction.class);
+    kryo.register(CloseAction.class);
+  }
+
+  private void registerResponse(Kryo kryo) {
+    kryo.register(HasNextResponse.class);
+    kryo.register(LinkedList.class);
+    kryo.register(HasNextElement.class);
+    kryo.register(GetPartitionsResponse.class);
+    kryo.register(ExtractorInstanceResponse.class);
+    kryo.register(InitIteratorResponse.class);
+    kryo.register(InitSaveResponse.class);
+    kryo.register(SaveResponse.class);
+  }
+
+  private void registerUtils(Kryo kryo) {
+    kryo.register(UUID.class, new UUIDSerializer());
+  }
 
 
 

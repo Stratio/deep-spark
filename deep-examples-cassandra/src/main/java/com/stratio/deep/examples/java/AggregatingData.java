@@ -16,26 +16,19 @@
 
 package com.stratio.deep.examples.java;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.apache.spark.rdd.RDD;
+
 import com.stratio.deep.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.entity.Cells;
 import com.stratio.deep.extractor.server.ExtractorServer;
 import com.stratio.deep.extractor.utils.ExtractorConstants;
 import com.stratio.deep.rdd.CassandraCellExtractor;
-
-import com.stratio.deep.rdd.CassandraEntityExtractor;
-import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.utils.ContextProperties;
-import org.apache.log4j.Logger;
-import org.apache.spark.rdd.RDD;
-
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -77,7 +70,7 @@ public final class AggregatingData {
         String HOST         = "172.19.0.133";
 
 
-        //ExtractorServer.initExtractorServer();
+        ExtractorServer.initExtractorServer();
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -105,7 +98,7 @@ public final class AggregatingData {
         LOG.info("first: " + rdd.first());
 
 
-      //  ExtractorServer.close();
+        ExtractorServer.close();
         deepContext.stop();
     }
 
