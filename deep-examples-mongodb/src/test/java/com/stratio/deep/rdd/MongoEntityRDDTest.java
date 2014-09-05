@@ -254,13 +254,7 @@ public class MongoEntityRDDTest implements Serializable {
         assertNotNull(bookEntity2.getCantoEntities());
 
 
-//        BSONObject bson = new BasicBSONObject();
-//
-//        bson.put("_id", 0);
-//        bson.put("cantos", 1);
 
-//        IMongoDeepJobConfig<BookEntity> inputConfigEntity3 = MongoConfigFactory.createMongoDB(BookEntity.class)
-//                .host(hostConcat).database("book").collection("input").fields(bson).initialize();
 
         ExtractorConfig<BookEntity> inputConfigEntity3 = new ExtractorConfig(BookEntity.class);
         inputConfigEntity3.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book")
