@@ -16,34 +16,51 @@
 
 package com.stratio.deep.cql;
 
+import static com.google.common.collect.Iterables.concat;
+import static com.google.common.collect.Iterables.indexOf;
+import static com.google.common.collect.Iterables.transform;
+import static com.stratio.deep.utils.Utils.quote;
+
 import java.net.InetAddress;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.*;
-
-import com.datastax.driver.core.*;
-import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.exception.DeepGenericException;
-import com.stratio.deep.utils.Pair;
-import com.stratio.deep.utils.Utils;
 import javax.annotation.Nullable;
+
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.dht.Token;
 import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
 
-import static com.google.common.collect.Iterables.*;
-import static com.stratio.deep.utils.Utils.quote;
+import com.datastax.driver.core.Host;
+import com.datastax.driver.core.Metadata;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
+import com.stratio.deep.config.ICassandraDeepJobConfig;
+import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.utils.Pair;
+import com.stratio.deep.utils.Utils;
 
 /**
  * {@link CqlPagingRecordReader} implementation that returns an instance of a
  * {@link com.stratio.deep.cql.DeepRecordReader}.
- *
+ * 
  * @author Luca Rosellini <luca@strat.io>
  */
 public class RangeUtils {
+
     /**
      * private constructor.
      */
@@ -53,24 +70,30 @@ public class RangeUtils {
     /**
      * Gets the list of token for each cluster machine.<br/>
      * The concrete class of the token depends on the partitioner used.<br/>
-     *
-     * @param query           the query to execute against the given session to obtain the list of tokens.
-     * @param sessionWithHost the pair object containing both the session and the name of the machine to which we're
-     *                        connected to.
-     * @param partitioner     the partitioner used in the cluster.
-     * @return a map containing, for each cluster machine, the list of tokens. Tokens are not returned in any
-     * particular order.
+     * 
+     * @param query
+     *            the query to execute against the given session to obtain the
+     *            list of tokens.
+     * @param sessionWithHost
+     *            the pair object containing both the session and the name of
+     *            the machine to which we're connected to.
+     * @param partitioner
+     *            the partitioner used in the cluster.
+     * @return a map containing, for each cluster machine, the list of tokens.
+     *         Tokens are not returned in any particular order.
      */
-    static Map<String, Iterable<Comparable>> fetchTokens(
-            String query, final Pair<Session, String> sessionWithHost, IPartitioner partitioner) {
+    static Map<String, Iterable<Comparable>> fetchTokens(String query,
+            final Pair<Session, String> sessionWithHost,
+            IPartitioner partitioner) {
 
         ResultSet rSet = sessionWithHost.left.execute(query);
 
         final AbstractType tkValidator = partitioner.getTokenValidator();
         final Map<String, Iterable<Comparable>> tokens = Maps.newHashMap();
 
-        Iterable<Pair<String, Iterable<Comparable>>> pairs =
-                transform(rSet.all(), new FetchTokensRowPairFunction(sessionWithHost, tkValidator));
+        Iterable<Pair<String, Iterable<Comparable>>> pairs = transform(
+                rSet.all(), new FetchTokensRowPairFunction(sessionWithHost,
+                        tkValidator));
 
         for (Pair<String, Iterable<Comparable>> pair : pairs) {
             tokens.put(pair.left, pair.right);
@@ -80,25 +103,30 @@ public class RangeUtils {
     }
 
     /**
-     * Merges the list of tokens for each cluster machine to a single list of token ranges.
-     *
-     * @param tokens      the map of tokens for each cluster machine.
-     * @param session     the connection to the cluster.
-     * @param p the partitioner used in the cluster.
-     * @return the merged lists of tokens transformed to DeepTokenRange(s). The returned collection is shuffled.
+     * Merges the list of tokens for each cluster machine to a single list of
+     * token ranges.
+     * 
+     * @param tokens
+     *            the map of tokens for each cluster machine.
+     * @param session
+     *            the connection to the cluster.
+     * @param p
+     *            the partitioner used in the cluster.
+     * @return the merged lists of tokens transformed to DeepTokenRange(s). The
+     *         returned collection is shuffled.
      */
-    static List<DeepTokenRange> mergeTokenRanges(Map<String, Iterable<Comparable>> tokens,
-                                                         final Session session,
-                                                         final IPartitioner p) {
-        final Iterable<Comparable> allRanges = Ordering.natural().sortedCopy(concat(tokens.values()));
-
-
+    static List<DeepTokenRange> mergeTokenRanges(
+            Map<String, Iterable<Comparable>> tokens, final Session session,
+            final IPartitioner p) {
+        final Iterable<Comparable> allRanges = Ordering.natural().sortedCopy(
+                concat(tokens.values()));
 
         final Comparable maxValue = Ordering.natural().max(allRanges);
-        final Comparable minValue = (Comparable) p.minValue(maxValue.getClass()).getToken().token;
+        final Comparable minValue = (Comparable) p
+                .minValue(maxValue.getClass()).getToken().token;
 
-        Function<Comparable, Set<DeepTokenRange>> map =
-				        new MergeTokenRangesFunction(maxValue, minValue, session, p, allRanges);
+        Function<Comparable, Set<DeepTokenRange>> map = new MergeTokenRangesFunction(
+                maxValue, minValue, session, p, allRanges);
 
         Iterable<DeepTokenRange> concatenated = concat(transform(allRanges, map));
 
@@ -109,44 +137,49 @@ public class RangeUtils {
 
     /**
      * Given a token, fetches the list of replica machines holding that token.
-     *
-     * @param token       the token whose replicas we want to fetch.
-     * @param session     the connection to the cluster.
-     * @param partitioner the partitioner used in the cluster.
+     * 
+     * @param token
+     *            the token whose replicas we want to fetch.
+     * @param session
+     *            the connection to the cluster.
+     * @param partitioner
+     *            the partitioner used in the cluster.
      * @return the list of replica machines holding that token.
      */
-    private static List<String> initReplicas(
-            final Comparable token, final Session session, final IPartitioner partitioner) {
+    private static List<String> initReplicas(final Comparable token,
+            final Session session, final IPartitioner partitioner) {
         final AbstractType tkValidator = partitioner.getTokenValidator();
         final Metadata metadata = session.getCluster().getMetadata();
 
         @SuppressWarnings("unchecked")
-        Set<Host> replicas = metadata.getTokenReplicas(quote(session.getLoggedKeyspace()), token.toString());
+        Set<Host> replicas = metadata.getTokenReplicas(
+                quote(session.getLoggedKeyspace()), token.toString());
 
-        return Lists.newArrayList(Iterables.transform(replicas, new Function<Host, String>() {
-            @Nullable
-            @Override
-            public String apply(@Nullable Host input) {
-                assert input != null;
-                return input.getAddress().getHostName();
-            }
-        }));
+        return Lists.newArrayList(Iterables.transform(replicas,
+                new Function<Host, String>() {
+
+                    @Nullable
+                    @Override
+                    public String apply(@Nullable Host input) {
+                        assert input != null;
+                        return input.getAddress().getHostName();
+                    }
+                }));
     }
 
     /**
      * Returns the token ranges that will be mapped to Spark partitions.
-     *
-     * @param config the Deep configuration object.
+     * 
+     * @param config
+     *            the Deep configuration object.
      * @return the list of computed token ranges.
      */
     public static List<DeepTokenRange> getSplits(ICassandraDeepJobConfig config) {
         Map<String, Iterable<Comparable>> tokens = new HashMap<>();
         IPartitioner p = getPartitioner(config);
 
-        Pair<Session, String> sessionWithHost =
-                CassandraClientProvider.getSession(
-				                config.getHost(),
-				                config, false);
+        Pair<Session, String> sessionWithHost = CassandraClientProvider
+                .getSession(config.getHost(), config, false);
 
         String queryLocal = "select tokens from system.local";
         tokens.putAll(fetchTokens(queryLocal, sessionWithHost, p));
@@ -154,23 +187,25 @@ public class RangeUtils {
         String queryPeers = "select peer, tokens from system.peers";
         tokens.putAll(fetchTokens(queryPeers, sessionWithHost, p));
 
-	    List<DeepTokenRange> merged = mergeTokenRanges(tokens, sessionWithHost.left, p);
-	    return splitRanges(merged, p, config.getBisectFactor());
+        List<DeepTokenRange> merged = mergeTokenRanges(tokens,
+                sessionWithHost.left, p);
+        return splitRanges(merged, p, config.getBisectFactor());
     }
 
     private static List<DeepTokenRange> splitRanges(
-				    final List<DeepTokenRange> ranges,
-				    final IPartitioner p,
-				    final int bisectFactor) {
+            final List<DeepTokenRange> ranges, final IPartitioner p,
+            final int bisectFactor) {
         if (bisectFactor == 1) {
             return ranges;
         }
 
-        Iterable<DeepTokenRange> bisectedRanges =
-                concat(transform(ranges, new Function<DeepTokenRange, List<DeepTokenRange>>() {
+        Iterable<DeepTokenRange> bisectedRanges = concat(transform(ranges,
+                new Function<DeepTokenRange, List<DeepTokenRange>>() {
+
                     @Nullable
                     @Override
-                    public List<DeepTokenRange> apply(@Nullable DeepTokenRange input) {
+                    public List<DeepTokenRange> apply(
+                            @Nullable DeepTokenRange input) {
                         final List<DeepTokenRange> splittedRanges = new ArrayList<>();
                         bisectTokeRange(input, p, bisectFactor, splittedRanges);
                         return splittedRanges;
@@ -180,27 +215,78 @@ public class RangeUtils {
         return Lists.newArrayList(bisectedRanges);
     }
 
-	/**
-	 * Recursive function that splits a given token range to a given number of tolen ranges.
-	 *
-	 * @param range the token range to be splitted.
-	 * @param partitioner the cassandra partitioner.
-	 * @param bisectFactor the actual number of pieces the original token range will be splitted to.
-	 * @param accumulator a token range accumulator (ne
-	 */
-    private static void bisectTokeRange(
-            DeepTokenRange range, final IPartitioner partitioner, final int bisectFactor, final List<DeepTokenRange> accumulator) {
+    /**
+     * Returns the token ranges that will be mapped to Spark partitions.
+     * 
+     * @param config
+     *            the Deep configuration object.
+     * @return the list of computed token ranges.
+     */
+    public static List<DeepTokenRange> getSplitsBySize(
+            ICassandraDeepJobConfig config) {
+
+        IPartitioner p = getPartitioner(config);
+        AbstractType tokenValidator = p.getTokenValidator();
+
+        Pair<Session, String> sessionWithHost = CassandraClientProvider
+                .getSession(config.getHost(), config, false);
+
+        String query = new StringBuilder("CALCULATE SPLITS FROM ")
+                .append(config.getKeyspace()).append(".")
+                .append(config.getTable()).append(" ESTIMATING ")
+                .append(config.getSplitSize()).toString();
+        ResultSet rSet = sessionWithHost.left.execute(query);
+
+        List<DeepTokenRange> tokens = new ArrayList<>();
+
+        for (Row row : rSet.all()) {
+            Comparable startToken = (Comparable) tokenValidator.compose(row
+                    .getBytesUnsafe("start_token"));
+            Comparable endToken = (Comparable) tokenValidator.compose(row
+                    .getBytesUnsafe("end_token"));
+            List<String> replicas = new ArrayList<>();
+            for (InetAddress addres : row.getList("preferred_locations",
+                    InetAddress.class)) {
+                replicas.add(addres.getHostName());
+            }
+            tokens.add(new DeepTokenRange(startToken, endToken, replicas));
+        }
+        return tokens;
+    }
+
+    /**
+     * Recursive function that splits a given token range to a given number of
+     * tolen ranges.
+     * 
+     * @param range
+     *            the token range to be splitted.
+     * @param partitioner
+     *            the cassandra partitioner.
+     * @param bisectFactor
+     *            the actual number of pieces the original token range will be
+     *            splitted to.
+     * @param accumulator
+     *            a token range accumulator (ne
+     */
+    private static void bisectTokeRange(DeepTokenRange range,
+            final IPartitioner partitioner, final int bisectFactor,
+            final List<DeepTokenRange> accumulator) {
 
         final AbstractType tkValidator = partitioner.getTokenValidator();
 
-        Token leftToken = partitioner.getTokenFactory().fromByteArray(tkValidator.decompose(range.getStartToken()));
-        Token rightToken = partitioner.getTokenFactory().fromByteArray(tkValidator.decompose(range.getEndToken()));
+        Token leftToken = partitioner.getTokenFactory().fromByteArray(
+                tkValidator.decompose(range.getStartToken()));
+        Token rightToken = partitioner.getTokenFactory().fromByteArray(
+                tkValidator.decompose(range.getEndToken()));
         Token midToken = partitioner.midpoint(leftToken, rightToken);
 
-        Comparable midpoint = (Comparable) tkValidator.compose(tkValidator.fromString(midToken.toString()));
+        Comparable midpoint = (Comparable) tkValidator.compose(tkValidator
+                .fromString(midToken.toString()));
 
-        DeepTokenRange left = new DeepTokenRange(range.getStartToken(), midpoint, range.getReplicas());
-        DeepTokenRange right = new DeepTokenRange(midpoint, range.getEndToken(), range.getReplicas());
+        DeepTokenRange left = new DeepTokenRange(range.getStartToken(),
+                midpoint, range.getReplicas());
+        DeepTokenRange right = new DeepTokenRange(midpoint,
+                range.getEndToken(), range.getReplicas());
 
         if (bisectFactor / 2 <= 1) {
             accumulator.add(left);
@@ -212,112 +298,131 @@ public class RangeUtils {
     }
 
     /**
-     * Creates a new instance of the cassandra partitioner configured in the configuration object.
-     *
-     * @param config the Deep configuration object.
-     * @return an instance of the cassandra partitioner configured in the configuration object.
+     * Creates a new instance of the cassandra partitioner configured in the
+     * configuration object.
+     * 
+     * @param config
+     *            the Deep configuration object.
+     * @return an instance of the cassandra partitioner configured in the
+     *         configuration object.
      */
     public static IPartitioner getPartitioner(ICassandraDeepJobConfig config) {
         try {
-            return (IPartitioner) Class.forName(config.getPartitionerClassName()).newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            return (IPartitioner) Class.forName(
+                    config.getPartitionerClassName()).newInstance();
+        } catch (ClassNotFoundException | InstantiationException
+                | IllegalAccessException e) {
             throw new DeepGenericException(e);
         }
     }
 
-	private static class FetchTokensRowPairFunction implements Function<Row, Pair<String, Iterable<Comparable>>> {
-		private final Pair<Session, String> sessionWithHost;
-		private final AbstractType tkValidator;
+    private static class FetchTokensRowPairFunction implements
+            Function<Row, Pair<String, Iterable<Comparable>>> {
 
-		public FetchTokensRowPairFunction(Pair<Session, String> sessionWithHost, AbstractType tkValidator) {
-			this.sessionWithHost = sessionWithHost;
-			this.tkValidator = tkValidator;
-		}
+        private final Pair<Session, String> sessionWithHost;
+        private final AbstractType tkValidator;
 
-		@Nullable
-		@Override
-		public Pair<String, Iterable<Comparable>> apply(final @Nullable Row row) {
-		    assert row != null;
-		    InetAddress host;
-		    try {
-		        host = row.getInet("peer");
-		    } catch (IllegalArgumentException e) {
-		        host = Utils.inetAddressFromLocation(sessionWithHost.right);
-		    }
+        public FetchTokensRowPairFunction(
+                Pair<Session, String> sessionWithHost, AbstractType tkValidator) {
+            this.sessionWithHost = sessionWithHost;
+            this.tkValidator = tkValidator;
+        }
 
-		    Iterable<Comparable> sortedTokens =
-		            transform(row.getSet("tokens", String.class), new Function<String, Comparable>() {
-		                        @Nullable
-		                        @Override
-		                        public Comparable apply(final @Nullable String token) {
-		                            return (Comparable) tkValidator.compose(tkValidator.fromString(token));
-		                        }
-		                    }
-		            );
+        @Nullable
+        @Override
+        public Pair<String, Iterable<Comparable>> apply(final @Nullable Row row) {
+            assert row != null;
+            InetAddress host;
+            try {
+                host = row.getInet("peer");
+            } catch (IllegalArgumentException e) {
+                host = Utils
+                        .inetAddressFromLocation(this.sessionWithHost.right);
+            }
 
-		    return Pair.create(host.getHostName(), sortedTokens);
-		}
-	}
+            Iterable<Comparable> sortedTokens = transform(
+                    row.getSet("tokens", String.class),
+                    new Function<String, Comparable>() {
 
-	/**
-	 * Function that converts a partitioner hash to a token range. Takes into account
-	 * the ring wrap-around range.
-	 */
-	private static class MergeTokenRangesFunction implements Function<Comparable, Set<DeepTokenRange>> {
-		private final Comparable maxValue;
-		private final Comparable minValue;
-		private final Session session;
-		private final IPartitioner partitioner;
-		private final Iterable<Comparable> allRanges;
+                        @Nullable
+                        @Override
+                        public Comparable apply(final @Nullable String token) {
+                            return (Comparable) FetchTokensRowPairFunction.this.tkValidator
+                                    .compose(FetchTokensRowPairFunction.this.tkValidator
+                                            .fromString(token));
+                        }
+                    });
 
-		public MergeTokenRangesFunction(Comparable maxValue,
-										Comparable minValue,
-										Session session,
-										IPartitioner partitioner,
-										Iterable<Comparable> allRanges) {
-			this.maxValue = maxValue;
-			this.minValue = minValue;
-			this.session = session;
-			this.partitioner = partitioner;
-			this.allRanges = allRanges;
-		}
+            return Pair.create(host.getHostName(), sortedTokens);
+        }
+    }
 
-		public Set<DeepTokenRange> apply(final Comparable elem) {
-		    Comparable nextValue;
-		    Comparable currValue = elem;
+    /**
+     * Function that converts a partitioner hash to a token range. Takes into
+     * account the ring wrap-around range.
+     */
+    private static class MergeTokenRangesFunction implements
+            Function<Comparable, Set<DeepTokenRange>> {
 
-		    Set<DeepTokenRange> result = new HashSet<>();
+        private final Comparable maxValue;
+        private final Comparable minValue;
+        private final Session session;
+        private final IPartitioner partitioner;
+        private final Iterable<Comparable> allRanges;
 
-		    if (currValue.equals(maxValue)) {
+        public MergeTokenRangesFunction(Comparable maxValue,
+                Comparable minValue, Session session, IPartitioner partitioner,
+                Iterable<Comparable> allRanges) {
+            this.maxValue = maxValue;
+            this.minValue = minValue;
+            this.session = session;
+            this.partitioner = partitioner;
+            this.allRanges = allRanges;
+        }
 
-		        result.add(new DeepTokenRange(currValue, minValue,
-		                initReplicas(currValue, session, partitioner)));
-		        currValue = minValue;
+        @Override
+        public Set<DeepTokenRange> apply(final Comparable elem) {
+            Comparable nextValue;
+            Comparable currValue = elem;
 
-		        nextValue = Iterables.find(allRanges, new Predicate<Comparable>() {
-			        @Override
-			        @SuppressWarnings("unchecked")
-			        public boolean apply(@Nullable Comparable input) {
-				        assert input != null;
-				        return input.compareTo(minValue) > 0;
-			        }
-		        });
+            Set<DeepTokenRange> result = new HashSet<>();
 
-		    } else {
+            if (currValue.equals(this.maxValue)) {
 
-		        int nextIdx = 1 + indexOf(allRanges, new Predicate<Comparable>() {
-		            @Override
-		            public boolean apply(@Nullable Comparable input) {
-		                assert input != null;
-		                return input.equals(elem);
-		            }
-		        });
-		        nextValue = Iterables.get(allRanges, nextIdx);
-		    }
+                result.add(new DeepTokenRange(currValue, this.minValue,
+                        initReplicas(currValue, this.session, this.partitioner)));
+                currValue = this.minValue;
 
-		    result.add(new DeepTokenRange(currValue, nextValue, initReplicas(currValue, session, partitioner)));
+                nextValue = Iterables.find(this.allRanges,
+                        new Predicate<Comparable>() {
 
-		    return result;
-		}
-	}
+                            @Override
+                            @SuppressWarnings("unchecked")
+                            public boolean apply(@Nullable Comparable input) {
+                                assert input != null;
+                                return input
+                                        .compareTo(MergeTokenRangesFunction.this.minValue) > 0;
+                            }
+                        });
+
+            } else {
+
+                int nextIdx = 1 + indexOf(this.allRanges,
+                        new Predicate<Comparable>() {
+
+                            @Override
+                            public boolean apply(@Nullable Comparable input) {
+                                assert input != null;
+                                return input.equals(elem);
+                            }
+                        });
+                nextValue = Iterables.get(this.allRanges, nextIdx);
+            }
+
+            result.add(new DeepTokenRange(currValue, nextValue, initReplicas(
+                    currValue, this.session, this.partitioner)));
+
+            return result;
+        }
+    }
 }
