@@ -166,7 +166,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
     Future<LinkedList<HasNextElement<T>>> future = executor.submit(new Callable() {
       public Object call() throws Exception {
         channel.writeAndFlush(new HasNextAction<>());
-        return answer.take();
+        return ((HasNextResponse) answer.take()).getHasNextElementsPage();
       }
     });
 
