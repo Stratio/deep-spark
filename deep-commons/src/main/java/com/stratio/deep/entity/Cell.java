@@ -36,41 +36,42 @@ public abstract class Cell implements Serializable {
      */
     protected Object cellValue;
 
-    protected Cell(){
+    protected Cell() {
         super();
     }
 
-    protected Cell(String cellName, Object cellValue){
+    protected Cell(String cellName, Object cellValue) {
         super();
         this.cellName = cellName;
         this.cellValue = cellValue;
     }
 
     public String getCellName() {
-        return cellName;
+        return this.cellName;
     }
 
     public Object getCellValue() {
-        return cellValue;
+        return this.cellValue;
     }
 
-	/**
-	 * @return true is the current cell is a key inside the datastore, false otherwise.
-	 */
-	public abstract Boolean isKey();
+    /**
+     * @return true is the current cell is a key inside the datastore, false
+     *         otherwise.
+     */
+    public abstract Boolean isKey();
 
-	@Override
+    @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("Cell{");
-        sb.append("cellName='").append(cellName).append('\'');
-        sb.append(", cellValue=").append(cellValue);
+        sb.append("cellName='").append(this.cellName).append('\'');
+        sb.append(", cellValue=").append(this.cellValue);
         sb.append('}');
         return sb.toString();
     }
 
-	@SuppressWarnings("unchecked")
-	public ByteBuffer getDecomposedCellValue() {
-		return null;
-	}
+    @SuppressWarnings("unchecked")
+    public ByteBuffer getDecomposedCellValue() {
+        return null;
+    }
 
 }
