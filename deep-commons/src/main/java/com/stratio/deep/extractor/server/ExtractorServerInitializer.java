@@ -14,6 +14,7 @@
  */
 package com.stratio.deep.extractor.server;
 
+import com.stratio.deep.extractor.utils.KryoRegister;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -57,51 +58,17 @@ public class ExtractorServerInitializer<T> extends ChannelInitializer<SocketChan
       p.addLast(sslCtx.newHandler(ch.alloc()));
     }
 
-    Kryo kryo = new Kryo();
-    registerKryoResponse(kryo);
+      Kryo kryo = new Kryo();
+      KryoRegister.registerResponse(kryo);
 
-    Kryo kryo2 = new Kryo();
-    registerKryoAction(kryo2);
+      Kryo kryo2 = new Kryo();
+      KryoRegister.registerAction(kryo2);
 
 
     p.addLast(new ActionDecoder(kryo2));
     p.addLast(new ResponseEncoder(kryo, 16 * 1024, -1));
 
     p.addLast(new ExtractorServerHandler<T>());
-  }
-
-  private void registerKryoAction(Kryo kryo) {
-    registerAction(kryo);
-  }
-
-  private void registerKryoResponse(Kryo kryo) {
-    registerResponse(kryo);
-    registerUtils(kryo);
-  }
-
-  private void registerAction(Kryo kryo) {
-    kryo.register(HasNextAction.class);
-    kryo.register(GetPartitionsAction.class);
-    kryo.register(ExtractorInstanceAction.class);
-    kryo.register(InitIteratorAction.class);
-    kryo.register(InitSaveAction.class);
-    kryo.register(SaveAction.class);
-    kryo.register(CloseAction.class);
-  }
-
-  private void registerResponse(Kryo kryo) {
-    kryo.register(HasNextResponse.class);
-    kryo.register(LinkedList.class);
-    kryo.register(HasNextElement.class);
-    kryo.register(GetPartitionsResponse.class);
-    kryo.register(ExtractorInstanceResponse.class);
-    kryo.register(InitIteratorResponse.class);
-    kryo.register(InitSaveResponse.class);
-    kryo.register(SaveResponse.class);
-  }
-
-  private void registerUtils(Kryo kryo) {
-    kryo.register(UUID.class, new UUIDSerializer());
   }
 
 

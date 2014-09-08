@@ -50,6 +50,7 @@ public class ResponseDecoder extends ByteToMessageDecoder {
 
         if (in.readableBytes() < length){
           in.resetReaderIndex();
+          in.readerIndex(4);
           return;
         }
         
