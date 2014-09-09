@@ -32,7 +32,7 @@ import java.util.LinkedList;
 public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Action> {
 
   // Max number of elements per page to return to the HasNextAction
-  private final static int MAX_ELEMENTS_PER_PAGE_CONSTANT = 100;
+  private final static int MAX_ELEMENTS_PER_PAGE_CONSTANT = 5000;
 
   private IExtractor<T> extractor;
 
@@ -54,8 +54,8 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
         HasNextAction<T> hasNextAction = (HasNextAction<T>) action;
         int numElements = 0;
         LinkedList<HasNextElement<T>> hasNextElementsPage = new LinkedList<>();
-        while (this.hasNext() && numElements < MAX_ELEMENTS_PER_PAGE_CONSTANT) {
-          T data = this.next();
+          while (this.hasNext() && numElements < MAX_ELEMENTS_PER_PAGE_CONSTANT) {
+          T data =this.next();
           hasNextElementsPage.add(new HasNextElement<>(this.hasNext(), data));
           numElements++;
         }

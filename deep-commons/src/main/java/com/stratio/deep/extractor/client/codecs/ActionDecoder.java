@@ -17,6 +17,7 @@ package com.stratio.deep.extractor.client.codecs;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.io.UnsafeInput;
 import com.stratio.deep.extractor.actions.Action;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -42,7 +43,7 @@ public class ActionDecoder extends ByteToMessageDecoder {
 
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
 
-                byte[] decoded = null;
+        byte[] decoded = null;
 
 
         if (length == -1) {
@@ -52,8 +53,8 @@ public class ActionDecoder extends ByteToMessageDecoder {
         }
 
         if (in.readableBytes() < length){
-          in.resetReaderIndex();
-          in.readerIndex(4);
+         // in.resetReaderIndex();
+         // in.readerIndex(4);
           return;
         }
         

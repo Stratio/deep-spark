@@ -52,7 +52,14 @@ public final class AggregatingData {
      * @param args the arguments passed to the application.
      */
     public static void main(String[] args) {
+       // doServer();
         doMain(args);
+    }
+
+    public static void doServer(){
+
+        ExtractorServer.initExtractorServer();
+
     }
 
     /**
@@ -63,12 +70,11 @@ public final class AggregatingData {
     public static void doMain(String[] args) {
         String job = "java:aggregatingData";
 
-        String KEYSPACENAME = "twitter";
+        String KEYSPACENAME = "test";
         String TABLENAME    = "tweets";
         String CQLPORT      = "9042";
         String RPCPORT      = "9160";
-        String HOST         = "172.19.0.133";
-
+        String HOST         = "127.0.0.1";
 
         ExtractorServer.initExtractorServer();
 

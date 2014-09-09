@@ -16,6 +16,7 @@ package com.stratio.deep.extractor.client.codecs;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.io.UnsafeOutput;
 import com.stratio.deep.extractor.response.Response;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -42,6 +43,35 @@ public class ResponseEncoder extends MessageToByteEncoder<Response> {
 
         byte[] encodedObj;
         output.clear();
+        //output.setPosition(4);
+        kryo.writeClassAndObject(output, response);
+        int total = output.position();
+        //output.setPosition(0);
+        out.writeInt(total);
+        encodedObj = output.getBuffer();
+        out.writeBytes(encodedObj,0,total);
+
+    }
+}
+
+
+/*
+public class ResponseEncoder extends MessageToByteEncoder<Response> {
+
+
+    private final Output output;
+    private final Kryo kryo;
+
+
+    public ResponseEncoder(Kryo kryo, int bufferSize, int maxBufferSize){
+        this.kryo = kryo;
+        output= new Output(bufferSize,maxBufferSize);
+    }
+
+    protected void encode(ChannelHandlerContext ctx, Response response, ByteBuf out) {
+
+        byte[] encodedObj;
+        output.clear();
         output.setPosition(4);
         kryo.writeClassAndObject(output, response);
         int total = output.position();
@@ -51,3 +81,4 @@ public class ResponseEncoder extends MessageToByteEncoder<Response> {
         out.writeBytes(encodedObj,0,total);
     }
 }
+*/

@@ -16,6 +16,7 @@ package com.stratio.deep.extractor.client.codecs;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.io.UnsafeOutput;
 import com.stratio.deep.extractor.actions.Action;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -42,11 +43,11 @@ public class ActionEncoder extends MessageToByteEncoder<Action> {
         byte[] encodedObj;
 
         output.clear();
-        output.setPosition(4);
+        //output.setPosition(4);
         kryo.writeClassAndObject(output, action);
         int total = output.position();
-        output.setPosition(0);
-        output.writeInt(total - 4);
+        //output.setPosition(0);
+        out.writeInt(total);
         encodedObj = output.getBuffer();
         out.writeBytes(encodedObj,0,total);
     }

@@ -66,7 +66,7 @@ public class ExtractorServerInitializer<T> extends ChannelInitializer<SocketChan
 
 
     p.addLast(new ActionDecoder(kryo2));
-    p.addLast(new ResponseEncoder(kryo, 16 * 1024, -1));
+    p.addLast(new ResponseEncoder(kryo, 256 * 1024, -1));
 
     p.addLast(new ExtractorServerHandler<T>());
   }

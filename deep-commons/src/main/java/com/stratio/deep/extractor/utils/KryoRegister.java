@@ -1,6 +1,8 @@
 package com.stratio.deep.extractor.utils;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.serializers.DeflateSerializer;
+import com.esotericsoftware.kryo.serializers.FieldSerializer;
 import com.stratio.deep.extractor.actions.*;
 import com.stratio.deep.extractor.response.*;
 import de.javakaffee.kryoserializers.UUIDSerializer;
@@ -28,7 +30,7 @@ public class KryoRegister {
 
     public static void registerResponse(Kryo kryo){
         kryo.register(Response.class);
-        kryo.register(ExtractorInstanceResponse.class);
+        kryo.register(ExtractorInstanceResponse.class);;
         kryo.register(GetPartitionsResponse.class);
         kryo.register(HasNextResponse.class);
         kryo.register(InitIteratorResponse.class);
@@ -42,9 +44,7 @@ public class KryoRegister {
 
     }
 
-    private static void registerUtils(Kryo kryo){
-
+    private static void registerUtils(Kryo kryo) {
         kryo.register(UUID.class, new UUIDSerializer());
     }
-
 }
