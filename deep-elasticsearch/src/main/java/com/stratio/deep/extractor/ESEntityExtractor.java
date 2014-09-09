@@ -24,6 +24,7 @@ import com.stratio.deep.utils.UtilES;
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
 import org.elasticsearch.hadoop.mr.LinkedMapWritable;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
@@ -35,7 +36,7 @@ import java.lang.reflect.InvocationTargetException;
  *
  * @param <T>
  */
-public final class ESEntityExtractor<T> extends GenericHadoopExtractor<T,  Object, LinkedMapWritable, Object, LinkedMapWritable> {
+public final class ESEntityExtractor<T> extends GenericHadoopExtractor<T,  Object, LinkedMapWritable, Object, JSONObject> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ESEntityExtractor.class);
     private static final long serialVersionUID = -3208994171892747470L;
@@ -67,9 +68,9 @@ public final class ESEntityExtractor<T> extends GenericHadoopExtractor<T,  Objec
     }
 
     @Override
-    public Tuple2<Object, LinkedMapWritable> transformElement(T record) {
+    public Tuple2<Object, JSONObject> transformElement(T record) {
         try {
-            return new Tuple2<>(null, UtilES.getLinkedMapWritableFromObject(record));
+            return new Tuple2<>(null, UtilES.getJsonFromObject(record));
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             LOG.error(e.getMessage());
             throw new DeepTransformException(e.getMessage());

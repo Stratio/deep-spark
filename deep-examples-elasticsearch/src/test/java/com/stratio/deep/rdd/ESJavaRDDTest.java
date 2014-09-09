@@ -68,14 +68,7 @@ public class ESJavaRDDTest {
         node = nodeBuilder().clusterName(HOST).node();
         client = node.client();
 
-        ExecutorService es = Executors.newFixedThreadPool(1);
-        final Future future = es.submit(new Callable() {
-            public Object call() throws Exception {
-                ExtractorServer.start();
-                return null;
-            }
-        });
-
+        ExtractorServer.initExtractorServer();
         dataSetImport();
 
 
@@ -148,6 +141,7 @@ public class ESJavaRDDTest {
         if (node != null) {
 
             node.stop();
+            client.close();
         }
         ExtractorServer.close();
         File file = new File("data");

@@ -162,7 +162,6 @@ public class MongoJavaRDDTest {
     @AfterSuite
     public static void cleanup() {
         if (mongodExecutable != null) {
-            mongo.close();
             mongod.stop();
             mongodExecutable.stop();
         }

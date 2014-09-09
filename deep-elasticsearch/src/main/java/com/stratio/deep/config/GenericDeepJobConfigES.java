@@ -170,7 +170,7 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
         }
 
         configHadoop.set("es.nodes", Utils.splitHosts(hostList));
-        configHadoop.set("es.input.json", "no");
+        configHadoop.set("es.input.json", "yes");
 
         if(false){
 //              index (default)
