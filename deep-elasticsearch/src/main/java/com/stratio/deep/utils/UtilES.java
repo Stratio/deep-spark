@@ -307,9 +307,14 @@ public final class UtilES {
 
 
         if(object instanceof String ) {
-            writable = new Text(object.toString());
-        }
 
+            writable = new Text(object.toString());
+
+        }else if(object instanceof Long ) {
+
+            writable = new LongWritable((Long)object);
+
+        }
         else {
 
             writable = new IntWritable((Integer)object);

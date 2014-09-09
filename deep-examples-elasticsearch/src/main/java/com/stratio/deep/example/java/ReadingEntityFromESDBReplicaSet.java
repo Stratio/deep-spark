@@ -38,50 +38,50 @@ public final class ReadingEntityFromESDBReplicaSet {
 
 
     public static void doMain(String[] args) {
-
-        // Spark jobName
-        String job = "java:readingEntityFromMongoDBReplicaSet";
-
-
-        // Connect to a replica set and provide three seed nodes
-        String host1 = "localhost:47017";
-        String host2 = "localhost:47018";
-        String host3 = "localhost:47019";
-
-        // database
-        String database = "test";
-
-        // collection
-        String inputCollection = "input";
-
-        // replica set name
-        String replicaSet = "s1";
-
-        // Recommended read preference. If the primary node go down, can still read from secundaries
-        String readPreference = "primaryPreferred";
-
-
-        // Creating the Deep Context where args are Spark Master and Job Name
-        ContextProperties p = new ContextProperties(args);
-
-        // creates Deep Spark Context (spark context wrapper)
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
-                p.getJars());
-
-
-        // can give a list of host.
-        //TODO Review
-   /**     DeepJobConfig inputConfigEntity = MongoConfigFactory.createMongoDB(MessageEntity.class).host(host1).host(host2).host(host3)
-                .database(database).collection(inputCollection).replicaSet(replicaSet).readPreference(readPreference).initialize();
-
-
-        // MongoJavaRDD
-        RDD<MessageEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
-
-
-        LOG.info("count : " + inputRDDEntity.cache().count());
-
-
-        deepContext.stop();**/
+//
+//        // Spark jobName
+//        String job = "java:readingEntityFromMongoDBReplicaSet";
+//
+//
+//        // Connect to a replica set and provide three seed nodes
+//        String host1 = "localhost:47017";
+//        String host2 = "localhost:47018";
+//        String host3 = "localhost:47019";
+//
+//        // database
+//        String database = "test";
+//
+//        // collection
+//        String inputCollection = "input";
+//
+//        // replica set name
+//        String replicaSet = "s1";
+//
+//        // Recommended read preference. If the primary node go down, can still read from secundaries
+//        String readPreference = "primaryPreferred";
+//
+//
+//        // Creating the Deep Context where args are Spark Master and Job Name
+//        ContextProperties p = new ContextProperties(args);
+//
+//        // creates Deep Spark Context (spark context wrapper)
+//	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+//                p.getJars());
+//
+//
+//        // can give a list of host.
+//        //TODO Review
+//   /**     DeepJobConfig inputConfigEntity = MongoConfigFactory.createMongoDB(MessageEntity.class).host(host1).host(host2).host(host3)
+//                .database(database).collection(inputCollection).replicaSet(replicaSet).readPreference(readPreference).initialize();
+//
+//
+//        // MongoJavaRDD
+//        RDD<MessageEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
+//
+//
+//        LOG.info("count : " + inputRDDEntity.cache().count());
+//
+//
+//        deepContext.stop();**/
     }
 }

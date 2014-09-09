@@ -69,24 +69,24 @@ public class ESJavaRDDTest {
      * @throws java.io.IOException
      */
     private static void dataSetImport() throws IOException, ExecutionException, InterruptedException {
-        String json = "{" +
-                "\"user\":\"kimchy\"," +
-                "\"postDate\":\"2013-01-30\"," +
-                "\"message\":\"trying out Elasticsearch\"" +
-                "}";
-        IndexResponse response = client.prepareIndex("twitter", "tweet").setCreate(true)
-                .setSource(json)
-                .execute()
-                .actionGet();
-        try {
-            SearchResponse action = client.prepareSearch("book").setTypes("test")
-                    .execute()
-                    .actionGet();
-            //System.out.println(" COUNT -->" + action.getCount());
-            //assertEquals(action.getCount(), 5);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+//        String json = "{" +
+//                "\"user\":\"kimchy\"," +
+//                "\"postDate\":\"2013-01-30\"," +
+//                "\"message\":\"trying out Elasticsearch\"" +
+//                "}";
+//        IndexResponse response = client.prepareIndex("twitter", "tweet").setCreate(true)
+//                .setSource(json)
+//                .execute()
+//                .actionGet();
+//        try {
+//            SearchResponse action = client.prepareSearch("book").setTypes("test")
+//                    .execute()
+//                    .actionGet();
+//            //System.out.println(" COUNT -->" + action.getCount());
+//            //assertEquals(action.getCount(), 5);
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
     }
 
     public static void cleanup() {

@@ -19,49 +19,50 @@ package com.stratio.deep.testentity;
 import com.stratio.deep.commons.annotations.DeepEntity;
 import com.stratio.deep.commons.annotations.DeepField;
 import com.stratio.deep.commons.entity.IDeepType;
+import org.apache.cassandra.db.marshal.Int32Type;
 
-/**
- * Created by rcrespo on 25/06/14.
- */
 @DeepEntity
-public class WordCount implements IDeepType {
+public class StrippedTestEntity implements IDeepType {
+
+    private static final long serialVersionUID = -7394476231513436262L;
 
     @DeepField
-    private String word;
+    private String id;
 
     @DeepField
-    private Long count;
+    private String url;
 
-    public WordCount() {
+    @DeepField(validationClass = Int32Type.class, fieldName = "response_time")
+    private Integer responseTime;
+
+    public StrippedTestEntity(TestEntity te) {
+        this.id = te.getId();
+        this.url = te.getUrl();
+        this.responseTime = te.getResponseTime();
     }
 
-    public WordCount(String word, Long count) {
-        this.word = word;
-        this.count = count;
+    String getId() {
+        return id;
     }
 
-    public String getWord() {
-        return word;
+    Integer getResponseTime() {
+        return responseTime;
     }
 
-    public void setWord(String word) {
-        this.word = word;
+    String getUrl() {
+        return url;
     }
 
-    public Long getCount() {
-        return count;
+    void setId(String id) {
+        this.id = id;
     }
 
-    public void setCount(Long count) {
-        this.count = count;
+    void setResponseTime(Integer responseTime) {
+        this.responseTime = responseTime;
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("WordCount{");
-        sb.append("word='").append(word).append('\'');
-        sb.append(", count=").append(count);
-        sb.append('}');
-        return sb.toString();
+    void setUrl(String url) {
+        this.url = url;
     }
+
 }

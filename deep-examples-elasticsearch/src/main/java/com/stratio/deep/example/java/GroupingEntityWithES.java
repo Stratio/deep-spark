@@ -60,7 +60,7 @@ public final class GroupingEntityWithES {
     public static void doMain(String[] args) {
         String job      = "java:groupingEntityWithES";
         String host     = "localhost:9200";
-        String database = "book/word";
+        String database = "entity/output";
         String index    = "book";
         String type     = "test";
         String databaseOutput = "entity/output";
