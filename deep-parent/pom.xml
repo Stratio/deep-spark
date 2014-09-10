@@ -26,6 +26,7 @@
     <description>Stratio deep parent project</description>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Cassandra -->
         <cassandra.version>2.0.8</cassandra.version>
         <datastax.driver.version>2.0.3</datastax.driver.version>
