@@ -49,28 +49,60 @@ public class ThriftRangeUtils
     private final int splitSize; // The number of rows per split
     private final String keyspace; // The Cassandra keyspace name
     private final String columnFamily; // The Cassandra column family name
-    private final IPartitioner partitioner; // The Cassandra cluster partitioner
     private final AbstractType tokenValidator; // The token validator/type
     private final TokenFactory tokenFactory; // The token factory
 
     /**
+     * Builds a new {@link com.stratio.deep.cql.ThriftRangeUtils}.
+     *
+     * @param partitioner
+     *            the Cassandra partitioner.
+     * @param host
+     *            the Cassandra host address.
+     * @param rpcPort
+     *            the Cassandra host RPC port.
+     * @param splitSize
+     *            the number of rows per split.
+     * @param keyspace
+     *            the Cassandra keyspace name.
+     * @param columnFamily
+     *            the Cassandra column family name.
+     */
+    public ThriftRangeUtils(IPartitioner partitioner,
+                            String host,
+                            int rpcPort,
+                            int splitSize,
+                            String keyspace,
+                            String columnFamily)
+    {
+        this.host = host;
+        this.rpcPort = rpcPort;
+        this.splitSize = splitSize;
+        this.keyspace = keyspace;
+        this.columnFamily = columnFamily;
+        tokenValidator = partitioner.getTokenValidator();
+        tokenFactory = partitioner.getTokenFactory();
+    }
+
+    /**
+     * Returns a new {@link com.stratio.deep.cql.ThriftRangeUtils} using the specified configuration.
      *
      * @param config
      *            the Deep configuration object.
      */
-    public ThriftRangeUtils(ICassandraDeepJobConfig config) {
-        host = config.getHost();
-        rpcPort = config.getRpcPort();
-        splitSize = config.getSplitSize();
-        keyspace = config.getKeyspace();
-        columnFamily = config.getColumnFamily();
+    public static ThriftRangeUtils build(ICassandraDeepJobConfig config) {
+        String host = config.getHost();
+        int rpcPort = config.getRpcPort();
+        int splitSize = config.getSplitSize();
+        String keyspace = config.getKeyspace();
+        String columnFamily = config.getColumnFamily();
+        IPartitioner partitioner;
         try {
             partitioner = (IPartitioner) Class.forName(config.getPartitionerClassName()).newInstance();
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             throw new DeepGenericException(e);
         }
-        tokenValidator = partitioner.getTokenValidator();
-        tokenFactory = partitioner.getTokenFactory();
+        return new ThriftRangeUtils(partitioner, host, rpcPort, splitSize, keyspace, columnFamily);
     }
 
     /**
@@ -172,7 +204,7 @@ public class ThriftRangeUtils
      *            a token represented as a {@link java.lang.String}.
      * @return the specified token as a {@link java.lang.Comparable}.
      */
-    private Comparable tokenAsComparable(String tokenAsString) {
+    public Comparable tokenAsComparable(String tokenAsString) {
         Token token = tokenFactory.fromString(tokenAsString);
         ByteBuffer bb = tokenFactory.toByteArray(token);
         return (Comparable) tokenValidator.compose(bb);
@@ -185,7 +217,7 @@ public class ThriftRangeUtils
      *            a token represented as a {@link java.lang.Comparable}.
      * @return the specified token as a {@link java.lang.String}.
      */
-    private String tokenAsString(Comparable tokenAsComparable) {
+    public String tokenAsString(Comparable tokenAsComparable) {
         ByteBuffer bb = tokenValidator.decompose(tokenAsComparable);
         Token token = tokenFactory.fromByteArray(bb);
         return tokenFactory.toString(token);

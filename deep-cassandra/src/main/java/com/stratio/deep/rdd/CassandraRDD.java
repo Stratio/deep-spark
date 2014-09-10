@@ -277,7 +277,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
         if (this.config.getValue().isBisectModeSet()) {
             underlyingInputSplits = RangeUtils.getSplits(this.config.value());
         } else {
-            underlyingInputSplits = new ThriftRangeUtils(this.config.value()).getSplits();
+            underlyingInputSplits = ThriftRangeUtils.build(this.config.value()).getSplits();
         }
         for (DeepTokenRange r : underlyingInputSplits) {
             this.log().info("SPLIT " + r);
