@@ -99,7 +99,7 @@ public abstract class ExtractorTest<T> implements Serializable {
      */
     @BeforeClass
     public void init(){
-//        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
+//        DeepSparkContext context = new DeepSparkContext("spark://conectores1:7077", "deepSparkContextTest");
     }
 
     /**
@@ -108,7 +108,7 @@ public abstract class ExtractorTest<T> implements Serializable {
     @Test
     public <W>void testRead(){
 
-        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
+        DeepSparkContext context = new DeepSparkContext("spark://conectores1:7077", "deepSparkContextTest", "/opt/stratio/spark", new String[0]);
 
         ExtractorConfig<W> inputConfigEntity = getReadExtractorConfig();
 
@@ -134,7 +134,7 @@ public abstract class ExtractorTest<T> implements Serializable {
     @Test
     public <W>void testWrite(){
 
-        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
+        DeepSparkContext context = new DeepSparkContext("spark://conectores1:7077", "deepSparkContextTest", "/opt/stratio/spark", new String[0]);
 
         ExtractorConfig<W> inputConfigEntity = getReadExtractorConfig();
 
@@ -169,7 +169,7 @@ public abstract class ExtractorTest<T> implements Serializable {
     @Test
     public <W> void testInputColumns(){
 
-        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
+        DeepSparkContext context = new DeepSparkContext("spark://conectores1:7077", "deepSparkContextTest");
 
         ExtractorConfig<W> inputConfigEntity = getInputColumnConfig("_id, metadata");
 
@@ -250,16 +250,13 @@ public abstract class ExtractorTest<T> implements Serializable {
 
     //TODO delete
 public static void main(String... args){
-    ExtractorTest extractorTest = new ExtractorTest(MongoCellExtractor.class, "localhost:27017", null, Cells.class, Cells.class, Cells.class){
+    ExtractorTest extractorTest = new ExtractorTest(MongoCellExtractor.class, "172.19.0.156:27017", null, Cells.class, Cells.class, Cells.class){
 
 
-        @Override
-        protected void testFilter() {
 
-        }
     };
 
-    extractorTest.testWrite();
+    extractorTest.testRead();
 
 }
     private <W> ExtractorConfig<W> getExtractorConfig(Class<W> clazz){
