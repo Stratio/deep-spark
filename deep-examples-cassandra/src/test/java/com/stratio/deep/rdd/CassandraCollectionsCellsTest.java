@@ -22,7 +22,7 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.entity.CassandraCell;
+import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepIOException;
