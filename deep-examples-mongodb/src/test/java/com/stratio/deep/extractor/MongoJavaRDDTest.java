@@ -42,7 +42,7 @@ public class MongoJavaRDDTest {
 
     public static final Integer PORT = 27890;
 
-    public static final String HOST = "localhost";
+    public static final String HOST = "conectores1";
 
     public static final String DATABASE = "test";
 

@@ -58,7 +58,7 @@ public class MongoEntityExtractorTest extends ExtractorTest {
     private static final Logger LOG = LoggerFactory.getLogger(MongoEntityExtractorTest.class);
 
     public MongoEntityExtractorTest() {
-        super(MongoEntityExtractor.class, "172.19.0.156:27890", null, MessageTestEntity.class, MessageTestEntity.class, BookEntity.class);
+        super(MongoEntityExtractor.class, "conectores1:27890", null, MessageTestEntity.class, MessageTestEntity.class, BookEntity.class);
     }
 
 
