@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
+import com.stratio.deep.cql.ThriftRangeUtils;
 import org.apache.spark.InterruptibleIterator;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
@@ -276,8 +277,10 @@ public abstract class CassandraRDD<T> extends RDD<T> {
         if (this.config.getValue().isBisectModeSet()) {
             underlyingInputSplits = RangeUtils.getSplits(this.config.value());
         } else {
-            underlyingInputSplits = RangeUtils.getSplitsBySize(this.config
-                    .value());
+            underlyingInputSplits = new ThriftRangeUtils(this.config.value()).getSplits();
+        }
+        for (DeepTokenRange r : underlyingInputSplits) {
+            this.log().info("SPLIT " + r);
         }
         Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
 

@@ -56,10 +56,10 @@ import com.stratio.deep.utils.Constants;
  * for methods defined in {@link com.stratio.deep.config.IDeepJobConfig}.
  */
 public abstract class GenericDeepJobConfig<T> implements
-        ICassandraDeepJobConfig<T>, AutoCloseable {
+                                              ICassandraDeepJobConfig<T>, AutoCloseable {
 
     private static final Logger LOG = Logger
-            .getLogger("com.stratio.deep.config.GenericDeepJobConfig");
+                                      .getLogger("com.stratio.deep.config.GenericDeepJobConfig");
     private static final long serialVersionUID = -7179376653643603038L;
     private String partitionerClassName = "org.apache.cassandra.dht.Murmur3Partitioner";
 
@@ -166,8 +166,8 @@ public abstract class GenericDeepJobConfig<T> implements
     public synchronized Session getSession() {
         if (this.session == null) {
             Cluster cluster = Cluster.builder().withPort(this.cqlPort)
-                    .addContactPoint(this.host)
-                    .withCredentials(this.username, this.password).build();
+                                     .addContactPoint(this.host)
+                                     .withCredentials(this.username, this.password).build();
 
             this.session = cluster.connect(quote(this.keyspace));
         }
@@ -188,34 +188,34 @@ public abstract class GenericDeepJobConfig<T> implements
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @Override protected void finalize() { LOG.debug("finalizing " +
      *           getClass().getCanonicalName()); close(); }
      */
     /**
      * Checks if this configuration object has been initialized or not.
-     * 
+     *
      * @throws com.stratio.deep.exception.DeepIllegalAccessException
      *             if not initialized
      */
     protected void checkInitialized() {
         if (!this.isInitialized) {
             throw new DeepIllegalAccessException(
-                    "DeepJobConfig has not been initialized!");
+                                                "DeepJobConfig has not been initialized!");
         }
     }
 
     /**
      * Fetches table metadata from the underlying datastore, using DataStax java
      * driver.
-     * 
+     *
      * @return the table metadata as returned by the driver.
      */
     public TableMetadata fetchTableMetadata() {
 
         Metadata metadata = this.getSession().getCluster().getMetadata();
         KeyspaceMetadata ksMetadata = metadata
-                .getKeyspace(quote(this.keyspace));
+                                      .getKeyspace(quote(this.keyspace));
 
         if (ksMetadata != null) {
             return ksMetadata.getTable(quote(this.columnFamily));
@@ -233,19 +233,19 @@ public abstract class GenericDeepJobConfig<T> implements
      * This is a very heavy operation since to obtain the schema we need to get
      * at least one element of the output RDD.
      * </p>
-     * 
+     *
      * @param tupleRDD
      *            the pair RDD.
      */
     public void createOutputTableIfNeeded(RDD<Tuple2<Cells, Cells>> tupleRDD) {
 
         TableMetadata metadata = this.getSession().getCluster().getMetadata()
-                .getKeyspace(this.keyspace).getTable(quote(this.columnFamily));
+                                     .getKeyspace(this.keyspace).getTable(quote(this.columnFamily));
 
         if (metadata == null && !this.createTableOnWrite) {
             throw new DeepIOException(
-                    "Cannot write RDD, output table does not exists and configuration object has "
-                            + "'createTableOnWrite' = false");
+                                     "Cannot write RDD, output table does not exists and configuration object has "
+                                     + "'createTableOnWrite' = false");
         }
 
         if (metadata != null) {
@@ -256,10 +256,10 @@ public abstract class GenericDeepJobConfig<T> implements
 
         if (first._1() == null || first._1().isEmpty()) {
             throw new DeepNoSuchFieldException(
-                    "no key structure found on row metadata");
+                                              "no key structure found on row metadata");
         }
         String createTableQuery = createTableQueryGenerator(first._1(),
-                first._2(), this.keyspace, quote(this.columnFamily));
+                                                            first._2(), this.keyspace, quote(this.columnFamily));
         this.getSession().execute(createTableQuery);
         this.waitForNewTableMetadata();
     }
@@ -273,16 +273,16 @@ public abstract class GenericDeepJobConfig<T> implements
         final int waitTime = 100;
         do {
             metadata = this.getSession().getCluster().getMetadata()
-                    .getKeyspace(this.keyspace)
-                    .getTable(quote(this.columnFamily));
+                           .getKeyspace(this.keyspace)
+                           .getTable(quote(this.columnFamily));
 
             if (metadata != null) {
                 continue;
             }
 
             LOG.warn(String
-                    .format("Metadata for new table %s.%s NOT FOUND, waiting %d millis",
-                            this.keyspace, this.columnFamily, waitTime));
+                     .format("Metadata for new table %s.%s NOT FOUND, waiting %d millis",
+                             this.keyspace, this.columnFamily, waitTime));
             try {
                 Thread.sleep(waitTime);
             } catch (InterruptedException e) {
@@ -293,7 +293,7 @@ public abstract class GenericDeepJobConfig<T> implements
 
             if (retries >= 10) {
                 throw new DeepIOException(
-                        "Cannot retrieve metadata for the newly created CF ");
+                                         "Cannot retrieve metadata for the newly created CF ");
             }
         } while (metadata == null);
     }
@@ -311,7 +311,7 @@ public abstract class GenericDeepJobConfig<T> implements
 
         if (tableMetadata == null && !this.createTableOnWrite) {
             LOG.warn("Configuration not suitable for writing RDD: output table does not exists and configuration "
-                    + "object has 'createTableOnWrite' = false");
+                     + "object has 'createTableOnWrite' = false");
 
             return null;
         } else if (tableMetadata == null) {
@@ -328,30 +328,30 @@ public abstract class GenericDeepJobConfig<T> implements
 
         List<ColumnMetadata> partitionKeys = tableMetadata.getPartitionKey();
         List<ColumnMetadata> clusteringKeys = tableMetadata
-                .getClusteringColumns();
+                                              .getClusteringColumns();
         List<ColumnMetadata> allColumns = tableMetadata.getColumns();
 
         for (ColumnMetadata key : partitionKeys) {
             Cell metadata = CassandraCell.create(key.getName(), key.getType(),
-                    Boolean.TRUE, Boolean.FALSE);
+                                                 Boolean.TRUE, Boolean.FALSE);
             this.columnDefinitionMap.put(key.getName(), metadata);
         }
 
         for (ColumnMetadata key : clusteringKeys) {
             Cell metadata = CassandraCell.create(key.getName(), key.getType(),
-                    Boolean.FALSE, Boolean.TRUE);
+                                                 Boolean.FALSE, Boolean.TRUE);
             this.columnDefinitionMap.put(key.getName(), metadata);
         }
 
         for (ColumnMetadata key : allColumns) {
             Cell metadata = CassandraCell.create(key.getName(), key.getType(),
-                    Boolean.FALSE, Boolean.FALSE);
+                                                 Boolean.FALSE, Boolean.FALSE);
             if (!this.columnDefinitionMap.containsKey(key.getName())) {
                 this.columnDefinitionMap.put(key.getName(), metadata);
             }
         }
         this.columnDefinitionMap = Collections
-                .unmodifiableMap(this.columnDefinitionMap);
+                                   .unmodifiableMap(this.columnDefinitionMap);
     }
 
     /*
@@ -414,7 +414,7 @@ public abstract class GenericDeepJobConfig<T> implements
     public String[] getInputColumns() {
         this.checkInitialized();
         return this.inputColumns == null ? new String[0] : this.inputColumns
-                .clone();
+                                                           .clone();
     }
 
     /*
@@ -499,7 +499,7 @@ public abstract class GenericDeepJobConfig<T> implements
             } catch (UnknownHostException e) {
                 LOG.warn("Cannot resolve local host canonical name, using \"localhost\"");
                 this.host = InetAddress.getLoopbackAddress()
-                        .getCanonicalHostName();
+                                       .getCanonicalHostName();
             }
         }
 
@@ -600,7 +600,7 @@ public abstract class GenericDeepJobConfig<T> implements
 
         if (this.pageSize > Constants.DEFAULT_MAX_PAGE_SIZE) {
             throw new IllegalArgumentException("pageSize cannot exceed "
-                    + Constants.DEFAULT_MAX_PAGE_SIZE);
+                                               + Constants.DEFAULT_MAX_PAGE_SIZE);
         }
 
         this.validateConsistencyLevels();
@@ -612,22 +612,22 @@ public abstract class GenericDeepJobConfig<T> implements
         if (!(this.isBisectModeSet && this.isSplitModeSet)) {
             if (this.isBisectModeSet) {
                 if (this.bisectFactor != Constants.DEFAULT_BISECT_FACTOR
-                        && !this.checkIsPowerOfTwo(this.bisectFactor)) {
+                    && !this.checkIsPowerOfTwo(this.bisectFactor)) {
                     throw new IllegalArgumentException(
-                            "Bisect factor should be greater than zero and a power of 2");
+                                                      "Bisect factor should be greater than zero and a power of 2");
                 }
             } else if (this.isSplitModeSet) {
                 if (this.splitSize <= 0) {
                     throw new IllegalArgumentException(
-                            "The split size must be a positve integer");
+                                                      "The split size must be a positve integer");
                 }
             } else {
                 throw new IllegalArgumentException(
-                        "One split mode must be defined, please choose between Split or Bisect");
+                                                  "One split mode must be defined, please choose between Split or Bisect");
             }
         } else {
             throw new IllegalArgumentException(
-                    "Only one split mode can be defined, please choose between Split or Bisect");
+                                              "Only one split mode can be defined, please choose between Split or Bisect");
         }
     }
 
@@ -653,15 +653,15 @@ public abstract class GenericDeepJobConfig<T> implements
 
         if (tableMetadata == null && !this.isWriteConfig) {
             throw new IllegalArgumentException(String.format(
-                    "Column family {%s.%s} does not exist", this.keyspace,
-                    this.columnFamily));
+                                                            "Column family {%s.%s} does not exist", this.keyspace,
+                                                            this.columnFamily));
         }
 
         if (tableMetadata == null && !this.createTableOnWrite) {
             throw new IllegalArgumentException(String.format(
-                    "Column family {%s.%s} does not exist and "
-                            + "createTableOnWrite = false", this.keyspace,
-                    this.columnFamily));
+                                                            "Column family {%s.%s} does not exist and "
+                                                            + "createTableOnWrite = false", this.keyspace,
+                                                            this.columnFamily));
         }
 
         if (!ArrayUtils.isEmpty(this.inputColumns)) {
@@ -671,8 +671,8 @@ public abstract class GenericDeepJobConfig<T> implements
 
                 if (columnMetadata == null) {
                     throw new DeepNoSuchFieldException("No column with name "
-                            + column + " has been found on table "
-                            + this.keyspace + "." + this.columnFamily);
+                                                       + column + " has been found on table "
+                                                       + this.keyspace + "." + this.columnFamily);
                 }
             }
         }
@@ -681,22 +681,22 @@ public abstract class GenericDeepJobConfig<T> implements
 
     private void validateAdditionalFilters(TableMetadata tableMetadata) {
         for (Map.Entry<String, Serializable> entry : this.additionalFilters
-                .entrySet()) {
+                                                     .entrySet()) {
             /* check if there's an index specified on the provided column */
             ColumnMetadata columnMetadata = tableMetadata.getColumn(entry
-                    .getKey());
+                                                                    .getKey());
 
             if (columnMetadata == null) {
                 throw new DeepNoSuchFieldException("No column with name "
-                        + entry.getKey() + " has been found on " + "table "
-                        + this.keyspace + "." + this.columnFamily);
+                                                   + entry.getKey() + " has been found on " + "table "
+                                                   + this.keyspace + "." + this.columnFamily);
             }
 
             if (columnMetadata.getIndex() == null) {
                 throw new DeepIndexNotFoundException(
-                        "No index has been found on column "
-                                + columnMetadata.getName() + " on table "
-                                + this.keyspace + "." + this.columnFamily);
+                                                    "No index has been found on column "
+                                                    + columnMetadata.getName() + " on table "
+                                                    + this.keyspace + "." + this.columnFamily);
             }
         }
     }
@@ -708,9 +708,9 @@ public abstract class GenericDeepJobConfig<T> implements
 
             } catch (Exception e) {
                 throw new IllegalArgumentException(
-                        "readConsistencyLevel not valid, "
-                                + "should be one of thos defined in org.apache.cassandra.db.ConsistencyLevel",
-                        e);
+                                                  "readConsistencyLevel not valid, "
+                                                  + "should be one of thos defined in org.apache.cassandra.db.ConsistencyLevel",
+                                                  e);
             }
         }
 
@@ -720,9 +720,9 @@ public abstract class GenericDeepJobConfig<T> implements
 
             } catch (Exception e) {
                 throw new IllegalArgumentException(
-                        "writeConsistencyLevel not valid, "
-                                + "should be one of those defined in org.apache.cassandra.db.ConsistencyLevel",
-                        e);
+                                                  "writeConsistencyLevel not valid, "
+                                                  + "should be one of those defined in org.apache.cassandra.db.ConsistencyLevel",
+                                                  e);
             }
         }
     }
@@ -753,7 +753,7 @@ public abstract class GenericDeepJobConfig<T> implements
      */
     @Override
     public ICassandraDeepJobConfig<T> createTableOnWrite(
-            Boolean createTableOnWrite) {
+                                                        Boolean createTableOnWrite) {
         this.createTableOnWrite = createTableOnWrite;
 
         return this;
@@ -778,7 +778,7 @@ public abstract class GenericDeepJobConfig<T> implements
      */
     @Override
     public ICassandraDeepJobConfig<T> filterByField(String filterColumnName,
-            Serializable filterValue) {
+                                                    Serializable filterValue) {
         /* check if there's an index specified on the provided column */
         this.additionalFilters.put(filterColumnName, filterValue);
         return this;
