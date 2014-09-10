@@ -90,4 +90,90 @@ public abstract class Cell implements Serializable {
         return isCellName && isCellValue;
     }
 
+
+
+    public String getName() {
+        return cellName;
+    }
+
+    public Object getValue() {
+        return cellValue;
+    }
+
+
+    /**
+     *   Returns true if value is NULL.
+     * @return
+     */
+    public boolean isNull(){
+        return cellValue==null;
+    }
+
+    /**
+     * Returns the value as a String.  This will throw an exception if the value is not a String
+     * @return
+     */
+    public String getString(){
+        return (String)cellValue;
+    }
+
+    /**
+     * Returns the value as a int.  This will throw an exception if the value is not a int
+     * @return
+     */
+    public int getInt(){
+        return (int)cellValue;
+    }
+
+
+    /**
+     * Returns the value as a long.  This will throw an exception if the value is not a long
+     *
+      * @return
+     */
+    public long getLong(){
+        return (long)cellValue;
+    }
+
+    /**
+     * Returns the value as a double.  This will throw an exception if the value is not a double
+     * @return
+     */
+    public double getDouble(){
+        return (double)cellValue;
+    }
+
+    /**
+     * Returns the value as a float.  This will throw an exception if the value is not a float
+     * @return
+     */
+    public float getFloat(){
+        return (float)cellValue;
+    }
+
+    /**
+     * Returns the value as a byte.  This will throw an exception if the value is not a byte
+     * @return
+     */
+    public byte getByte(){
+        return (byte)cellValue;
+    }
+
+    /**
+     * Returns the value as a short.  This will throw an exception if the value is not a short
+     * @return
+     */
+    public short getShort(){
+        return (short)cellValue;
+    }
+
+    /**
+     * Returns the value as a boolean.  This will throw an exception if the value is not a boolean
+     * @return
+     */
+    public boolean getBoolean(){
+        return (boolean)cellValue;
+    }
+
+
 }
