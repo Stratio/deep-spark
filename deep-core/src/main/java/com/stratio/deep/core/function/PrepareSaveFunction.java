@@ -17,6 +17,8 @@
 package com.stratio.deep.core.function;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
+import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.core.extractor.client.ExtractorClient;
 import scala.collection.Iterator;
 import scala.runtime.AbstractFunction1;
@@ -25,6 +27,8 @@ import scala.runtime.BoxedUnit;
 import java.io.Serializable;
 
 import static com.stratio.deep.commons.utils.Constants.SPARK_PARTITION_ID;
+import static com.stratio.deep.commons.utils.Utils.getExtractorInstance;
+import static com.stratio.deep.core.util.ExtractorClientUtil.getExtractorClient;
 
 /**
  * Created by rcrespo on 28/08/14.
@@ -45,14 +49,19 @@ public class PrepareSaveFunction<T> extends AbstractFunction1<Iterator<T>, Boxed
 
     @Override
     public BoxedUnit apply(Iterator<T> v1) {
-        ExtractorClient<T> extractorClient = new ExtractorClient<T>();
-        extractorClient.initialize();
-        extractorClient.initSave(extractorConfig, first);
+        IExtractor<T> extractor;
+        try{
+            extractor = getExtractorInstance(extractorConfig);
+        }catch (DeepExtractorinitializationException e){
+            extractor = getExtractorClient();
+        }
+
+        extractor.initSave(extractorConfig, first);
         while(v1.hasNext()){
-            extractorClient.saveRDD(v1.next());
+            extractor.saveRDD(v1.next());
         }
         extractorConfig.putValue(SPARK_PARTITION_ID, String.valueOf(Integer.parseInt(extractorConfig.getValues().get(SPARK_PARTITION_ID))+1)) ;
-        extractorClient.close();
+        extractor.close();
         return null;
     }
 

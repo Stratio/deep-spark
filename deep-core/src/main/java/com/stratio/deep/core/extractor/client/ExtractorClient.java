@@ -46,7 +46,7 @@ public class ExtractorClient<T> implements IExtractor<T> {
 
     private ExtractorClientHandler<T> handler;
 
-    public void initialize() throws DeepExtractorinitializationException {
+    public ExtractorClient initialize() throws DeepExtractorinitializationException {
         try {
             // Configure SSL.
             final SslContext sslCtx;
@@ -71,6 +71,7 @@ public class ExtractorClient<T> implements IExtractor<T> {
             throw new DeepExtractorinitializationException(e);
 
         }
+        return this;
     }
 
     public void finish() {
@@ -128,8 +129,5 @@ public class ExtractorClient<T> implements IExtractor<T> {
         return this.handler.getPartitions(config);
     }
 
-//    @Override
-//    public IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> createRecordReader() {
-//        return null;
-//    }
+
 }

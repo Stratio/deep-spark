@@ -34,6 +34,8 @@ import scala.reflect.ClassTag$;
 
 import java.io.Serializable;
 
+import static com.stratio.deep.commons.utils.Utils.getExtractorInstance;
+import static com.stratio.deep.core.util.ExtractorClientUtil.getExtractorClient;
 import static scala.collection.JavaConversions.asScalaIterator;
 
 
@@ -109,17 +111,19 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
     }
 
 
-
+    /**
+     * It tries to get an Extractor Instance,
+     * if there is any problem try to instance an extractorClient
+     */
     private void initExtractorClient() {
-        try {
+        try{
             if (extractorClient == null) {
-                extractorClient = new ExtractorClient<>();
-                ((ExtractorClient) extractorClient).initialize();
+                extractorClient = getExtractorInstance(config.getValue());
             }
-        } catch (DeepExtractorinitializationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        }catch (DeepExtractorinitializationException e){
+            extractorClient = getExtractorClient();
         }
+
 
     }
 

@@ -1,4 +1,4 @@
-package com.stratio.deep.rdd;
+package com.stratio.deep.extractor;
 
 
 import com.google.common.io.Resources;
@@ -116,16 +116,6 @@ public class MongoJavaRDDTest {
 
         dataSetImport();
 
-
-        ExecutorService es = Executors.newFixedThreadPool(1);
-        final Future future = es.submit(new Callable() {
-            public Object call() throws Exception {
-                ExtractorServer.start();
-                return null;
-            }
-        });
-
-
     }
 
     @Test
@@ -161,12 +151,13 @@ public class MongoJavaRDDTest {
 
     @AfterSuite
     public static void cleanup() {
-        if (mongodExecutable != null) {
-            mongod.stop();
-            mongodExecutable.stop();
+        try{
+            if (mongodExecutable != null) {
+                mongodExecutable.stop();
+            }
+        }finally{
+            Files.forceDelete(new File(DB_FOLDER_NAME));
         }
 
-        Files.forceDelete(new File(DB_FOLDER_NAME));
-        ExtractorServer.close();
     }
 }

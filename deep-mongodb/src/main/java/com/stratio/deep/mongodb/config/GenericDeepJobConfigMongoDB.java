@@ -34,6 +34,7 @@ import com.mongodb.hadoop.MongoInputFormat;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.bson.BSONObject;
@@ -518,8 +519,16 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     @Override
     public IMongoDeepJobConfig<T> inputColumns(String... columns) {
         BSONObject bsonFields = fields != null ? fields : new BasicBSONObject();
+        boolean isIdPresent=false;
         for (String column : columns) {
-            bsonFields.put(column, 1);
+            if(column.trim().equalsIgnoreCase("_id")){
+                isIdPresent=true;
+            }
+
+            bsonFields.put(column.trim(), 1);
+        }
+        if(!isIdPresent){
+            bsonFields.put("_id", 0);
         }
         fields = bsonFields;
         return this;
@@ -605,6 +614,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     }
 
     private String[] getStringArray(String value){
-        return value!=null?value.split(","):new String[0];
+        return value!=null?value.trim().split(","):new String[0];
     }
 }

@@ -16,17 +16,23 @@
 
 package com.stratio.deep.commons.utils;
 
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.exception.DeepInstantiationException;
+import com.stratio.deep.commons.rdd.IExtractor;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import scala.Tuple2;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -313,6 +319,27 @@ public final class Utils {
             firstHost = false;
         }
         return hostConnection.toString();
+    }
+
+    public static <T>IExtractor<T> getExtractorInstance(ExtractorConfig<T> config){
+
+        try {
+            Class<T> rdd = (Class<T>) config.getExtractorImplClass();
+            if(rdd==null){
+                rdd = (Class<T>) Class.forName(config.getExtractorImplClassName());
+            }
+            Constructor<T> c;
+            if (config.getEntityClass().isAssignableFrom(Cells.class)){
+                c = rdd.getConstructor();
+                return (IExtractor<T>) c.newInstance();
+            }else{
+                c = rdd.getConstructor(Class.class);
+                return (IExtractor<T>) c.newInstance(config.getEntityClass());
+            }
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+           throw new DeepExtractorinitializationException(e.getMessage());
+        }
     }
 
 }

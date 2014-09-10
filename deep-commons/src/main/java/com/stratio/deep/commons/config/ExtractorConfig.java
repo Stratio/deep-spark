@@ -30,11 +30,13 @@ public class ExtractorConfig<T> implements Serializable {
 
     private Map<String, String> values = new HashMap<>();
 
-    private Class ExtractorImplClass;
+    private Class extractorImplClass;
+
+    private String extractorImplClassName;
 
     private Class entityClass;
 
-    public ExtractorConfig (Class t){
+    public ExtractorConfig (Class<T> t){
         super();
         entityClass = t;
     }
@@ -52,11 +54,11 @@ public class ExtractorConfig<T> implements Serializable {
     }
 
     public Class getExtractorImplClass() {
-        return ExtractorImplClass;
+        return extractorImplClass;
     }
 
     public void setExtractorImplClass(Class extractorImplClass) {
-        ExtractorImplClass = extractorImplClass;
+        this.extractorImplClass = extractorImplClass;
     }
 
     public Class getEntityClass() {
@@ -72,5 +74,23 @@ public class ExtractorConfig<T> implements Serializable {
         return this;
     }
 
+    public String getExtractorImplClassName() {
+        return extractorImplClassName;
+    }
+
+    public void setExtractorImplClassName(String extractorImplClassName) {
+        this.extractorImplClassName = extractorImplClassName;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("ExtractorConfig{");
+        sb.append("values=").append(values);
+        sb.append(", extractorImplClass=").append(extractorImplClass);
+        sb.append(", extractorImplClassName='").append(extractorImplClassName).append('\'');
+        sb.append(", entityClass=").append(entityClass);
+        sb.append('}');
+        return sb.toString();
+    }
 }
 

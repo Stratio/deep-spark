@@ -59,7 +59,6 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
 
     protected transient JobID jobId = null;
 
-    protected AbstractSerializableFunction<T, Tuple2<K, V>> transformFunction;
 
     {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmm");
