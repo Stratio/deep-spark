@@ -1,4 +1,4 @@
-package com.stratio.deep.cql;
+package com.stratio.deep.thrift;
 
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.dht.Murmur3Partitioner;
@@ -25,12 +25,12 @@ public class ThriftRangeUtilsTest {
 
     private static void testStringComparableConversion(IPartitioner<?> partitioner) {
 
-        ThriftRangeUtils utils = new ThriftRangeUtils(partitioner, "", 0, 0, "", "");
+        ThriftRangeUtils utils = new ThriftRangeUtils(partitioner, "", 0, "", "", 0);
 
         Token<?> minToken = partitioner.getMinimumToken();
         Token<?> midPoint = partitioner.midpoint(minToken, minToken);
         Token<?> rndPoint = partitioner.getRandomToken();
-        
+
         testStringComparableConversion(utils, (Comparable) minToken.token);
         testStringComparableConversion(utils, (Comparable) midPoint.token);
         testStringComparableConversion(utils, (Comparable) rndPoint.token);

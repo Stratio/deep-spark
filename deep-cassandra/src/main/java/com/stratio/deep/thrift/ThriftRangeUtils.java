@@ -14,81 +14,75 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.cql;
-
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
+package com.stratio.deep.thrift;
 
 import com.stratio.deep.config.ICassandraDeepJobConfig;
+import com.stratio.deep.cql.DeepTokenRange;
 import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.dht.Token;
 import org.apache.cassandra.dht.Token.TokenFactory;
-import org.apache.cassandra.thrift.Cassandra;
-import org.apache.cassandra.thrift.Cassandra.Client;
 import org.apache.cassandra.thrift.CfSplit;
 import org.apache.cassandra.thrift.TokenRange;
+import org.apache.thrift.TApplicationException;
 import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.transport.TFramedTransport;
-import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class that provides several token range utilities using Cassandra's Thrift RPC API.
  *
  * @author Andres de la Pena <andres@stratio.com>
  */
-public class ThriftRangeUtils
-{
+public class ThriftRangeUtils {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ThriftRangeUtils.class);
+
     private final String host; // The Cassandra contact host name
     private final int rpcPort; // The Cassandra contact host RPC port
     private final int splitSize; // The number of rows per split
     private final String keyspace; // The Cassandra keyspace name
     private final String columnFamily; // The Cassandra column family name
-    private final AbstractType tokenValidator; // The token validator/type
+    private final AbstractType tokenType; // The token validator
     private final TokenFactory tokenFactory; // The token factory
+    private final Comparable minToken; // The partitioner's minimum token
 
     /**
-     * Builds a new {@link com.stratio.deep.cql.ThriftRangeUtils}.
+     * Builds a new {@link ThriftRangeUtils}.
      *
-     * @param partitioner
-     *            the Cassandra partitioner.
-     * @param host
-     *            the Cassandra host address.
-     * @param rpcPort
-     *            the Cassandra host RPC port.
-     * @param splitSize
-     *            the number of rows per split.
-     * @param keyspace
-     *            the Cassandra keyspace name.
-     * @param columnFamily
-     *            the Cassandra column family name.
+     * @param partitioner  the partitioner.
+     * @param host         the host address.
+     * @param rpcPort      the host RPC port.
+     * @param keyspace     the keyspace name.
+     * @param columnFamily the column family name.
+     * @param splitSize    the number of rows per split.
      */
-    public ThriftRangeUtils(IPartitioner partitioner,
-                            String host,
-                            int rpcPort,
-                            int splitSize,
-                            String keyspace,
-                            String columnFamily)
-    {
+    ThriftRangeUtils(IPartitioner partitioner,
+                     String host,
+                     int rpcPort,
+                     String keyspace,
+                     String columnFamily,
+                     int splitSize) {
         this.host = host;
         this.rpcPort = rpcPort;
         this.splitSize = splitSize;
         this.keyspace = keyspace;
         this.columnFamily = columnFamily;
-        tokenValidator = partitioner.getTokenValidator();
+        tokenType = partitioner.getTokenValidator();
         tokenFactory = partitioner.getTokenFactory();
+        minToken = (Comparable) partitioner.getMinimumToken().token;
     }
 
     /**
-     * Returns a new {@link com.stratio.deep.cql.ThriftRangeUtils} using the specified configuration.
+     * Returns a new {@link ThriftRangeUtils} using the specified configuration.
      *
-     * @param config
-     *            the Deep configuration object.
+     * @param config the Deep configuration object.
      */
     public static ThriftRangeUtils build(ICassandraDeepJobConfig config) {
         String host = config.getHost();
@@ -96,13 +90,9 @@ public class ThriftRangeUtils
         int splitSize = config.getSplitSize();
         String keyspace = config.getKeyspace();
         String columnFamily = config.getColumnFamily();
-        IPartitioner partitioner;
-        try {
-            partitioner = (IPartitioner) Class.forName(config.getPartitionerClassName()).newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            throw new DeepGenericException(e);
-        }
-        return new ThriftRangeUtils(partitioner, host, rpcPort, splitSize, keyspace, columnFamily);
+        String partitionerClassName = config.getPartitionerClassName();
+        IPartitioner partitioner = Utils.newTypeInstance(partitionerClassName, IPartitioner.class);
+        return new ThriftRangeUtils(partitioner, host, rpcPort, keyspace, columnFamily, splitSize);
     }
 
     /**
@@ -118,7 +108,7 @@ public class ThriftRangeUtils
         // Get the cluster token ranges splits
         List<DeepTokenRange> splits = new ArrayList<>();
         for (DeepTokenRange tokenRange : tokenRanges) {
-            List<DeepTokenRange> nodeSplits = getSplits( tokenRange);
+            List<DeepTokenRange> nodeSplits = getSplits(tokenRange);
             splits.addAll(nodeSplits);
         }
 
@@ -134,13 +124,18 @@ public class ThriftRangeUtils
     public List<DeepTokenRange> getRanges() {
         try {
 
-            TTransport transport = new TFramedTransport(new TSocket(host, rpcPort));
-            TProtocol protocol = new TBinaryProtocol(transport);
-            Client client = new Cassandra.Client(protocol);
-            transport.open();
-
-            // List<TokenRange> tokenRanges = client.describe_local_ring(config.getKeyspace());
-            List<TokenRange> tokenRanges = client.describe_ring(keyspace);
+            List<TokenRange> tokenRanges;
+            ThriftClient client = ThriftClient.build(host, rpcPort);
+            try {
+                tokenRanges = client.describe_local_ring(keyspace);
+            } catch (TApplicationException e) {
+                if (e.getType() == TApplicationException.UNKNOWN_METHOD) {
+                    tokenRanges = client.describe_ring(keyspace);
+                } else {
+                    throw new DeepGenericException("Unknown server error", e);
+                }
+            }
+            client.close();
 
             List<DeepTokenRange> deepTokenRanges = new ArrayList<>(tokenRanges.size());
             for (TokenRange tokenRange : tokenRanges) {
@@ -149,76 +144,73 @@ public class ThriftRangeUtils
                 deepTokenRanges.add(new DeepTokenRange(start, end, tokenRange.getEndpoints()));
             }
 
-            transport.close();
-
             return deepTokenRanges;
         } catch (TException e) {
-            throw new DeepGenericException("No available replicas for get token ranges", e);
+            throw new DeepGenericException("No available replicas for get ring token ranges", e);
         }
     }
 
     /**
      * Returns the computed token range splits of the specified token range.
      *
-     * @param deepTokenRange
-     *            the token range to be splitted.
+     * @param deepTokenRange the token range to be splitted.
      * @return the list of token range splits, which are also token ranges.
      */
     public List<DeepTokenRange> getSplits(DeepTokenRange deepTokenRange) {
 
         String start = tokenAsString(deepTokenRange.getStartToken());
         String end = tokenAsString(deepTokenRange.getEndToken());
-
         List<String> endpoints = deepTokenRange.getReplicas();
 
-        List<DeepTokenRange> result = new ArrayList<>();
         for (String endpoint : endpoints) {
-            try
-            {
-                TTransport transport = new TFramedTransport(new TSocket(endpoint, rpcPort));
-                TProtocol protocol = new TBinaryProtocol(transport);
-                Client client = new Cassandra.Client(protocol);
-                transport.open();
-                client.set_keyspace(keyspace);
-
+            try {
+                ThriftClient client = ThriftClient.build(endpoint, rpcPort, keyspace);
                 List<CfSplit> splits = client.describe_splits_ex(columnFamily, start, end, splitSize);
-                transport.close();
+                client.close();
+
+                List<DeepTokenRange> result = new ArrayList<>();
                 for (CfSplit split : splits) {
                     Comparable splitStart = tokenAsComparable(split.getStart_token());
                     Comparable splitEnd = tokenAsComparable(split.getEnd_token());
-                    result.add(new DeepTokenRange(splitStart, splitEnd, endpoints));
+                    if (splitStart.equals(splitEnd)) {
+                        result.add(new DeepTokenRange(minToken, minToken, endpoints));
+                    } else if (splitStart.compareTo(splitEnd) > 0) {
+                        result.add(new DeepTokenRange(splitStart, minToken, endpoints));
+                        result.add(new DeepTokenRange(minToken, splitEnd, endpoints));
+                    } else {
+                        result.add(new DeepTokenRange(splitStart, splitEnd, endpoints));
+                    }
                 }
-
                 return result;
             } catch (TException e) {
-                // Nothing to do
+                LOG.warn("Endpoint %s failed while splitting range %s", endpoint, deepTokenRange);
             }
         }
-        throw new DeepGenericException("No available replicas for split token range: " + deepTokenRange);
+        throw new DeepGenericException("No available replicas for splitting range " + deepTokenRange);
     }
 
     /**
      * Returns the specified token as a {@link java.lang.Comparable}.
      *
-     * @param tokenAsString
-     *            a token represented as a {@link java.lang.String}.
+     * @param tokenAsString a token represented as a {@link java.lang.String}.
      * @return the specified token as a {@link java.lang.Comparable}.
      */
+    @SuppressWarnings("unchecked")
     public Comparable tokenAsComparable(String tokenAsString) {
         Token token = tokenFactory.fromString(tokenAsString);
         ByteBuffer bb = tokenFactory.toByteArray(token);
-        return (Comparable) tokenValidator.compose(bb);
+        return (Comparable) tokenType.compose(bb);
     }
 
     /**
      * Returns the specified token as a {@link java.lang.String}.
      *
-     * @param tokenAsComparable
-     *            a token represented as a {@link java.lang.Comparable}.
+     * @param tokenAsComparable a token represented as a {@link java.lang.Comparable}.
      * @return the specified token as a {@link java.lang.String}.
      */
+    @SuppressWarnings("unchecked")
     public String tokenAsString(Comparable tokenAsComparable) {
-        ByteBuffer bb = tokenValidator.decompose(tokenAsComparable);
+        ByteBuffer bb = tokenType.decompose(tokenAsComparable);
         Token token = tokenFactory.fromByteArray(bb);
         return tokenFactory.toString(token);
     }
