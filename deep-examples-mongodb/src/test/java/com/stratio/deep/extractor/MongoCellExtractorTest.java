@@ -19,17 +19,12 @@ package com.stratio.deep.extractor;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.extractor.ExtractorTest;
 import com.stratio.deep.mongodb.entity.MongoCell;
 import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
-import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
-import com.stratio.deep.testentity.BookEntity;
-import com.stratio.deep.testentity.CantoEntity;
-import com.stratio.deep.testentity.MessageTestEntity;
-import com.stratio.deep.testentity.WordCount;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -43,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 import scala.Tuple2;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,7 +55,7 @@ public class MongoCellExtractorTest extends ExtractorTest {
     private static final Logger LOG = LoggerFactory.getLogger(MongoCellExtractorTest.class);
 
     public MongoCellExtractorTest() {
-        super(MongoCellExtractor.class, "conectores1:27890", null, Cells.class, Cells.class, Cells.class);
+        super(MongoCellExtractor.class, "localhost:27890", null, true);
     }
 
 

@@ -21,6 +21,7 @@ import com.mongodb.DBObject;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.extractor.ExtractorTest;
 import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
 import com.stratio.deep.testentity.BookEntity;
 import com.stratio.deep.testentity.CantoEntity;
@@ -41,7 +42,6 @@ import scala.Tuple2;
 
 import static com.stratio.deep.extractor.MongoJavaRDDTest.*;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,7 +58,7 @@ public class MongoEntityExtractorTest extends ExtractorTest {
     private static final Logger LOG = LoggerFactory.getLogger(MongoEntityExtractorTest.class);
 
     public MongoEntityExtractorTest() {
-        super(MongoEntityExtractor.class, "conectores1:27890", null, MessageTestEntity.class, MessageTestEntity.class, BookEntity.class);
+        super(MongoEntityExtractor.class, "localhost:27890", null, false);
     }
 
 

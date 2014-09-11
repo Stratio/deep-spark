@@ -14,22 +14,19 @@
  *  limitations under the License.
  */
 
-package com.stratio.deep.extractor;
+package com.stratio.deep.core.extractor;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
-import com.stratio.deep.testentity.BookEntity;
-import com.stratio.deep.testentity.MessageTestEntity;
+import com.stratio.deep.core.entity.BookEntity;
+import com.stratio.deep.core.entity.MessageTestEntity;
 import org.apache.spark.rdd.RDD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -95,11 +92,35 @@ public abstract class ExtractorTest<T> implements Serializable {
     }
 
     /**
+     *
+     * @param extractor
+     * @param host
+     * @param port
+     */
+    public ExtractorTest (Class<IExtractor<T>> extractor, String host, Integer port, boolean isCells){
+        super();
+        if(isCells){
+            this.inputEntity=Cells.class;
+            this.outputEntity=Cells.class;
+            this.configEntity=Cells.class;
+        }else{
+            this.inputEntity=MessageTestEntity.class;
+            this.outputEntity=MessageTestEntity.class;
+            this.configEntity=BookEntity.class;
+        }
+
+        this.host=host;
+        this.port=port;
+        this.extractor=extractor;
+    }
+
+
+    /**
      * It initializes spark's context
      */
     @BeforeClass
     public void init(){
-//        DeepSparkContext context = new DeepSparkContext("spark://conectores1:7077", "deepSparkContextTest");
+//        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
     }
 
     /**
@@ -108,7 +129,7 @@ public abstract class ExtractorTest<T> implements Serializable {
     @Test
     public <W>void testRead(){
 
-        DeepSparkContext context = new DeepSparkContext("spark://conectores1:7077", "deepSparkContextTest", "/opt/stratio/spark", new String[0]);
+        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
         ExtractorConfig<W> inputConfigEntity = getReadExtractorConfig();
 
@@ -134,7 +155,7 @@ public abstract class ExtractorTest<T> implements Serializable {
     @Test
     public <W>void testWrite(){
 
-        DeepSparkContext context = new DeepSparkContext("spark://conectores1:7077", "deepSparkContextTest", "/opt/stratio/spark", new String[0]);
+        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
         ExtractorConfig<W> inputConfigEntity = getReadExtractorConfig();
 
@@ -169,7 +190,7 @@ public abstract class ExtractorTest<T> implements Serializable {
     @Test
     public <W> void testInputColumns(){
 
-        DeepSparkContext context = new DeepSparkContext("spark://conectores1:7077", "deepSparkContextTest");
+        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
         ExtractorConfig<W> inputConfigEntity = getInputColumnConfig("_id, metadata");
 
@@ -248,17 +269,7 @@ public abstract class ExtractorTest<T> implements Serializable {
 
     }
 
-    //TODO delete
-public static void main(String... args){
-    ExtractorTest extractorTest = new ExtractorTest(MongoCellExtractor.class, "172.19.0.156:27017", null, Cells.class, Cells.class, Cells.class){
 
-
-
-    };
-
-    extractorTest.testRead();
-
-}
     private <W> ExtractorConfig<W> getExtractorConfig(Class<W> clazz){
         return new ExtractorConfig<>(clazz);
     }

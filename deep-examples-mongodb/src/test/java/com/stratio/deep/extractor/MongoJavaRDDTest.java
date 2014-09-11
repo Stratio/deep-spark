@@ -6,7 +6,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
-import com.stratio.deep.commons.extractor.server.ExtractorServer;
 import de.flapdoodle.embed.mongo.*;
 import de.flapdoodle.embed.mongo.config.*;
 import de.flapdoodle.embed.mongo.distribution.Version;
@@ -14,14 +13,9 @@ import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.io.file.Files;
 import de.flapdoodle.embed.process.runtime.Network;
 import org.testng.annotations.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import static org.testng.Assert.assertEquals;
 
@@ -29,7 +23,6 @@ import static org.testng.Assert.assertEquals;
  * Created by rcrespo on 16/07/14.
  */
 @Test(suiteName = "mongoRddTests", groups = {"MongoJavaRDDTest"})
-//@Test
 public class MongoJavaRDDTest {
 
 
@@ -42,7 +35,7 @@ public class MongoJavaRDDTest {
 
     public static final Integer PORT = 27890;
 
-    public static final String HOST = "conectores1";
+    public static final String HOST = "localhost";
 
     public static final String DATABASE = "test";
 
