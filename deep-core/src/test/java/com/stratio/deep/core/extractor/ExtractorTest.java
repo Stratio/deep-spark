@@ -18,6 +18,7 @@ package com.stratio.deep.core.extractor;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.core.context.DeepSparkContext;
@@ -60,7 +61,7 @@ public abstract class ExtractorTest<T> implements Serializable {
 
     private Integer port;
 
-    protected final String database = "test";
+    protected String database = "test";
 
     protected final String tableRead = "input";
 
@@ -92,12 +93,56 @@ public abstract class ExtractorTest<T> implements Serializable {
     }
 
     /**
+     * Constructor
+     * @param extractor
+     * @param host
+     * @param port
+     * @param database
+     * @param inputEntity
+     * @param outputEntity
+     */
+    public ExtractorTest (Class<IExtractor<T>> extractor, String host, Integer port,String database, Class inputEntity, Class outputEntity, Class configEntity){
+        super();
+        this.inputEntity=inputEntity;
+        this.outputEntity=outputEntity;
+        this.configEntity=configEntity;
+        this.host=host;
+        this.port=port;
+        this.extractor=extractor;
+        this.database=database;
+    }
+
+    /**
      *
      * @param extractor
      * @param host
      * @param port
      */
     public ExtractorTest (Class<IExtractor<T>> extractor, String host, Integer port, boolean isCells){
+        super();
+        if(isCells){
+            this.inputEntity=Cells.class;
+            this.outputEntity=Cells.class;
+            this.configEntity=Cells.class;
+        }else{
+            this.inputEntity = MessageTestEntity.class;
+            this.outputEntity= MessageTestEntity.class;
+            this.configEntity= BookEntity.class;
+        }
+
+        this.host=host;
+        this.port=port;
+        this.extractor=extractor;
+    }
+
+    /**
+     *
+     * @param extractor
+     * @param host
+     * @param port
+     * @param database
+     */
+    public ExtractorTest (Class<IExtractor<T>> extractor, String host, Integer port, String database, boolean isCells){
         super();
         if(isCells){
             this.inputEntity=Cells.class;
@@ -112,8 +157,8 @@ public abstract class ExtractorTest<T> implements Serializable {
         this.host=host;
         this.port=port;
         this.extractor=extractor;
+        this.database=database;
     }
-
 
     /**
      * It initializes spark's context
@@ -140,7 +185,9 @@ public abstract class ExtractorTest<T> implements Serializable {
         if(inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)){
             Assert.assertEquals(READ_FIELD_EXPECTED,((Cells)inputRDDEntity.first()).getCellByName("message").getCellValue());
         }else{
-            Assert.assertEquals(READ_FIELD_EXPECTED, ((MessageTestEntity)inputRDDEntity.first()).getMessage());
+
+
+            Assert.assertEquals(READ_FIELD_EXPECTED, ((MessageTestEntity) inputRDDEntity.first()).getMessage());
         }
         context.stop();
 
@@ -181,7 +228,8 @@ public abstract class ExtractorTest<T> implements Serializable {
         if(inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)){
             Assert.assertEquals(READ_FIELD_EXPECTED,((Cells)outputRDDEntity.first()).getCellByName("message").getCellValue());
         }else{
-            Assert.assertEquals(READ_FIELD_EXPECTED, ((MessageTestEntity)outputRDDEntity.first()).getMessage());
+
+            Assert.assertEquals(READ_FIELD_EXPECTED, ((MessageTestEntity) outputRDDEntity.first()).getMessage());
         }
         context.stop();
 
@@ -305,7 +353,7 @@ public abstract class ExtractorTest<T> implements Serializable {
 
         ExtractorConfig<W> extractorConfig = getExtractorConfig(configEntity);
         extractorConfig.putValue(ExtractorConstants.HOST, host)
-                .putValue(ExtractorConstants.DATABASE, "book")
+                .putValue(ExtractorConstants.DATABASE, database)
                 .putValue(ExtractorConstants.PORT, String.valueOf(port))
                 .putValue(ExtractorConstants.COLLECTION, tableRead)
                 .putValue(ExtractorConstants.INPUT_COLUMNS, inputColumns);

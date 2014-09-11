@@ -25,6 +25,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.util.*;
 
@@ -84,6 +86,8 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
     private String[] inputColumns;
 
+
+    private JSONObject fields;
     /**
      * OPTIONAL
      * filter query
@@ -136,7 +140,7 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
     @Override
     public String[] getInputColumns() {
-        return new String[0];
+        return (String[])fields.keySet().toArray(new String[fields.keySet().size()]);
     }
 
     @Override
@@ -166,11 +170,18 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
         if(query!=null){
 //            "?q=message:first"
 //            es.query = { "query" : { "term" : { "user" : "costinl" } } }
+//            "query": { "match_all": {} }
             configHadoop.set("es.query", query);
+        }
+
+        if (fields != null) {
+            //String query = { "query" : { "match_all" : {  } } }
+            configHadoop.set("es.query", fields.toString());
         }
 
         configHadoop.set("es.nodes", Utils.splitHosts(hostList));
         configHadoop.set("es.input.json", "yes");
+
 
         if(false){
 //              index (default)
@@ -217,7 +228,17 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
      */
     @Override
     public IESDeepJobConfig<T> inputColumns(String... columns) {
-        return null;
+        JSONObject jsonFields = fields != null ? fields : new JSONObject();
+        //jsonFields.put("query", "match_all");
+        JSONArray jsonArray = new JSONArray();
+        for (String column : columns) {
+            jsonArray.add(column);
+        }
+        jsonFields.put("fields", jsonArray);
+
+        fields = jsonFields;
+        System.out.printf(" -- "+fields.toJSONString());
+        return this;
     }
 
     @Override
@@ -313,10 +334,12 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
         if(values.get(ExtractorConstants.DATABASE)!=null){
             database(values.get(ExtractorConstants.DATABASE));
        }
-        if(values.get(ExtractorConstants.COLLECTION)!=null){
-            database(values.get(ExtractorConstants.COLLECTION));
-        }
-
+        //       if(values.get(ExtractorConstants.COLLECTION)!=null){
+        //        database(values.get(ExtractorConstants.COLLECTION));
+        //      }
+        //if(values.get(ExtractorConstants.INPUT_COLUMNS)!=null){
+        //        inputColumns(getStringArray(values.get(ExtractorConstants.INPUT_COLUMNS)));
+        //}
 
 //        if(values.get(TABLE)!=null){
 //            table(values.get(TABLE));
@@ -356,6 +379,10 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
         this.initialize();
 
         return this;
+    }
+
+    private String[] getStringArray(String value){
+        return value!=null?value.split(","):new String[0];
     }
 
 }

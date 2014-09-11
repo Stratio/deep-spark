@@ -16,21 +16,32 @@
 
 package com.stratio.deep.rdd;
 
+import com.google.common.io.Resources;
 import com.stratio.deep.commons.extractor.server.ExtractorServer;
+import org.apache.commons.io.FileDeleteStrategy;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.deletebyquery.DeleteByQueryResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.support.replication.ReplicationType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -53,6 +64,13 @@ public class ESJavaRDDTest {
     public static final String DATABASE = "twitter/tweet";
     public static final String ES_INDEX = "twitter";
     public static final String ES_TYPE = "tweet";
+    public static final String ES_INDEX_BOOK = "book";
+    public static final String ES_INDEX_MESSAGE = "test";
+    public static final String ES_TYPE_MESSAGE  = "test";
+    public static final String ES_SEPARATOR = "/";
+    public static final String ES_TYPE_INPUT = "input";
+    public static final String ES_TYPE_OUTPUT = "output";
+    public static final String DATABASE_BOOK = "book/input";
     public static final String DATABASE_OUTPUT = "twitter/tweet2";
     public static final String COLLECTION_OUTPUT = "output";
     public static final String COLLECTION_OUTPUT_CELL = "outputcell";
@@ -60,13 +78,21 @@ public class ESJavaRDDTest {
     public static final Long WORD_COUNT_SPECTED = 3833L;
     public static Node node = null;
     public static Client client = null;
+    public final static String DB_FOLDER_NAME = System.getProperty("user.home") +
+            File.separator + "ESEntityRDDTest";
 
     @BeforeSuite
-    public static void init() throws IOException, ExecutionException, InterruptedException {
+    public static void init() throws IOException, ExecutionException, InterruptedException, ParseException {
 
+        Settings settings = ImmutableSettings.settingsBuilder()
+                .put("path.logs","")
+                .put("path.data",DB_FOLDER_NAME)
+                .build();
 
-        node = nodeBuilder().clusterName(HOST).node();
+        node = nodeBuilder().settings(settings).data(true).local(true).clusterName(HOST).node();
         client = node.client();
+
+        LOG.info("Started local node at " + DB_FOLDER_NAME + " settings " + node.settings().getAsMap());
 
         ExtractorServer.initExtractorServer();
         dataSetImport();
@@ -79,8 +105,29 @@ public class ESJavaRDDTest {
      *
      * @throws java.io.IOException
      */
-    private static void dataSetImport() throws IOException, ExecutionException, InterruptedException {
+    private static void dataSetImport() throws IOException, ExecutionException,IOException, InterruptedException, ParseException {
 
+        JSONParser parser = new JSONParser();
+        URL url = Resources.getResource(DATA_SET_NAME);
+        Object obj = parser.parse(new FileReader(url.getFile()));
+
+        JSONObject jsonObject = (JSONObject) obj;
+
+        IndexResponse responseBook = client.prepareIndex(ES_INDEX_BOOK, ES_TYPE_INPUT,"1")
+                .setSource(jsonObject.toJSONString())
+                .execute()
+                .actionGet();
+
+        String json2 = "{" +
+
+                "\"message\":\""+MESSAGE_TEST+"\"" +
+                "}";
+
+
+        IndexResponse response2 = client.prepareIndex(ES_INDEX_MESSAGE, ES_TYPE_MESSAGE).setCreate(true)
+                .setSource(json2).setReplicationType(ReplicationType.ASYNC)
+                .execute()
+                .actionGet();
 
 
         String json = "{" +
@@ -88,6 +135,7 @@ public class ESJavaRDDTest {
                 "\"postDate\":\"2013-01-30\"," +
                 "\"message\":\"trying out Elasticsearch\"" +
                 "}";
+
         IndexResponse response = client.prepareIndex(ES_INDEX, ES_TYPE).setCreate(true)
                 .setSource(json)
                 .execute()
@@ -97,10 +145,15 @@ public class ESJavaRDDTest {
         String _type = response.getType();
         String _id = response.getId();
         try {
-            CountResponse searchResponse = client.prepareCount(ES_INDEX).setTypes(ES_TYPE)
+            CountResponse countResponse = client.prepareCount(ES_INDEX).setTypes(ES_TYPE)
                     .execute()
                     .actionGet();
 
+            SearchResponse searchResponse = client.prepareSearch(ES_INDEX_BOOK).setTypes(ES_TYPE_INPUT)
+                    .execute()
+                    .actionGet();
+
+            //searchResponse.getHits().hits();
             //assertEquals(searchResponse.getCount(), 1);
         }catch (AssertionError | Exception e){
             cleanup();
@@ -135,7 +188,7 @@ public class ESJavaRDDTest {
     }
 
     @AfterSuite
-    public static void cleanup() {
+    public static void cleanup() throws IOException {
 
         deleteDataSet();
         if (node != null) {
@@ -144,7 +197,9 @@ public class ESJavaRDDTest {
             client.close();
         }
         ExtractorServer.close();
-        File file = new File("data");
-        file.delete();
+
+        File file = new File(DB_FOLDER_NAME);
+        FileUtils.deleteDirectory(file);
+
     }
 }

@@ -101,7 +101,6 @@ public final class GroupingCellWithES {
         doMain(args);
     }
 
-
     public static void doMain(String[] args) {
 
         String job      = "java:groupingCellWithES";

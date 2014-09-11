@@ -95,19 +95,19 @@ public class ESCellRDDTest {
             outputConfigEntity.setExtractorImplClass(ESCellExtractor.class);
 
             //Save RDD in ES
-//            context.saveRDD(inputRdd, outputConfigEntity);
-//
-//            RDD<Cell> outputRDDEntity = context.createRDD(outputConfigEntity);
-//
-//            outputRDDEntity.count();
-//
-//            CountResponse response = ESJavaRDDTest.client.prepareCount("twitter")
-//                    .setQuery(termQuery("_type", "tweet2")).execute().actionGet();
-//
-//            LOG.info("-------------------------   Num of outputRDDEntity: " + outputRDDEntity.count() +" ------------------------------");
-//            LOG.info("-------------------------   Num of response count: " + response.getCount() +" ------------------------------");
-//
-//            assertEquals(response.getCount(),    outputRDDEntity.count());
+            context.saveRDD(inputRdd, outputConfigEntity);
+
+            RDD<Cell> outputRDDEntity = context.createRDD(outputConfigEntity);
+
+            outputRDDEntity.count();
+
+            CountResponse response = ESJavaRDDTest.client.prepareCount("twitter")
+                    .setQuery(termQuery("_type", "tweet2")).execute().actionGet();
+
+            LOG.info("-------------------------   Num of outputRDDEntity: " + outputRDDEntity.count() +" ------------------------------");
+            LOG.info("-------------------------   Num of response count: " + response.getCount() +" ------------------------------");
+
+            assertEquals(response.getCount(),    outputRDDEntity.count());
 
 
         }finally {

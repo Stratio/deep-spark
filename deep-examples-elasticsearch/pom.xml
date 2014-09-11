@@ -25,6 +25,12 @@
         </dependency>
         <dependency>
             <groupId>com.stratio.deep</groupId>
+            <artifactId>deep-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.stratio.deep</groupId>
             <artifactId>deep-elasticsearch</artifactId>
             <version>${project.version}</version>
         </dependency>
