@@ -12,10 +12,13 @@ import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.io.file.Files;
 import de.flapdoodle.embed.process.runtime.Network;
+import org.bson.BSONObject;
 import org.testng.annotations.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.testng.Assert.assertEquals;
 
@@ -104,7 +107,10 @@ public class MongoJavaRDDTest {
         mongo = new MongoClient(HOST, PORT);
         DB db = mongo.getDB(DATABASE);
         col = db.getCollection(COLLECTION_INPUT);
-        col.save(new BasicDBObject("message", MESSAGE_TEST));
+        Map<String, String> map = new HashMap<>();
+        map.put("_id", "messageTes");
+        map.put("message", MESSAGE_TEST);
+        col.save(new BasicDBObject(map));
 
 
         dataSetImport();

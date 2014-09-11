@@ -24,6 +24,8 @@ import com.stratio.deep.commons.utils.Utils;
 import com.stratio.deep.mongodb.entity.MongoCell;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -35,9 +37,11 @@ public final class UtilMongoDB {
 
     public static final String MONGO_DEFAULT_ID = "_id";
 
-    /**
-     * Private default constructor.
-     */
+    private static final Logger LOG = LoggerFactory.getLogger(UtilMongoDB.class);
+        /**
+         * Private default constructor.
+         */
+
     private UtilMongoDB() {
         throw new UnsupportedOperationException();
     }
@@ -56,33 +60,43 @@ public final class UtilMongoDB {
     public static <T> T getObjectFromBson(Class<T> classEntity, BSONObject bsonObject) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         T t = classEntity.newInstance();
 
-        Field[] fields = AnnotationUtils.filterDeepFields(classEntity);
-
-        Object insert;
-
-        for (Field field : fields) {
-            Method method = Utils.findSetter(field.getName(), classEntity, field.getType());
-
-            Class<?> classField = field.getType();
-
-            Object currentBson = bsonObject.get(AnnotationUtils.deepFieldName(field));
-            if (currentBson != null) {
-
-                if (Iterable.class.isAssignableFrom(classField)) {
-                    Type type = field.getGenericType();
-
-                    insert = subDocumentListCase(type, (List) bsonObject.get(AnnotationUtils.deepFieldName(field)));
 
 
-                } else if (IDeepType.class.isAssignableFrom(classField)) {
-                    insert = getObjectFromBson(classField, (BSONObject) bsonObject.get(AnnotationUtils.deepFieldName
-                            (field)));
-                } else {
-                    insert = currentBson;
+
+            Field[] fields = AnnotationUtils.filterDeepFields(classEntity);
+
+            Object insert;
+
+            for (Field field : fields) {
+                Object currentBson = null;
+                try {
+                    Method method = Utils.findSetter(field.getName(), classEntity, field.getType());
+
+                    Class<?> classField = field.getType();
+
+                    currentBson = bsonObject.get(AnnotationUtils.deepFieldName(field));
+                    if (currentBson != null) {
+
+                        if (Iterable.class.isAssignableFrom(classField)) {
+                            Type type = field.getGenericType();
+
+                            insert = subDocumentListCase(type, (List) bsonObject.get(AnnotationUtils.deepFieldName(field)));
+
+
+                        } else if (IDeepType.class.isAssignableFrom(classField)) {
+                            insert = getObjectFromBson(classField, (BSONObject) bsonObject.get(AnnotationUtils.deepFieldName
+                                    (field)));
+                        } else {
+                            insert = currentBson;
+                        }
+
+                        method.invoke(t, insert);
+                    }
+                }
+                catch ( IllegalAccessException | InstantiationException | InvocationTargetException | IllegalArgumentException e){
+                    LOG.error("impossible to create a java object from Bson field:"+field.getName()+" and type:"+field.getType()+" and value:"+t + "; bsonReceived:"+currentBson+", bsonClassReceived:"+currentBson.getClass());
                 }
 
-                method.invoke(t, insert);
-            }
         }
 
         return t;
@@ -186,18 +200,24 @@ public final class UtilMongoDB {
         Set<Map.Entry<String, Object>> entryBson = map.entrySet();
 
         for (Map.Entry<String, Object> entry : entryBson) {
+            try {
 
-            if (List.class.isAssignableFrom(entry.getValue().getClass())) {
-                List<Cells> innerCell = new ArrayList<>();
-                for (BSONObject innerBson : (List<BSONObject>) entry.getValue()) {
-                    innerCell.add(getCellFromBson(innerBson));
+
+                if (List.class.isAssignableFrom(entry.getValue().getClass())) {
+                    List<Cells> innerCell = new ArrayList<>();
+                    for (BSONObject innerBson : (List<BSONObject>) entry.getValue()) {
+                        innerCell.add(getCellFromBson(innerBson));
+                    }
+                    cells.add(MongoCell.create(entry.getKey(), innerCell));
+                } else if (BSONObject.class.isAssignableFrom(entry.getValue().getClass())) {
+                    Cells innerCells = getCellFromBson((BSONObject) entry.getValue());
+                    cells.add(MongoCell.create(entry.getKey(), innerCells));
+                } else {
+                    cells.add(MongoCell.create(entry.getKey(), entry.getValue()));
                 }
-                cells.add(MongoCell.create(entry.getKey(), innerCell));
-            } else if (BSONObject.class.isAssignableFrom(entry.getValue().getClass())) {
-                Cells innerCells = getCellFromBson((BSONObject) entry.getValue());
-                cells.add(MongoCell.create(entry.getKey(), innerCells));
-            } else {
-                cells.add(MongoCell.create(entry.getKey(), entry.getValue()));
+            }
+            catch ( IllegalAccessException | InstantiationException | InvocationTargetException | IllegalArgumentException e){
+                LOG.error("impossible to create a java cell from Bson field:"+entry.getKey()+", type:"+entry.getValue().getClass()+", value:"+entry.getValue());
             }
 
         }
