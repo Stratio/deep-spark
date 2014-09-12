@@ -95,7 +95,7 @@ public class ESJavaRDDTest {
         LOG.info("Started local node at " + DB_FOLDER_NAME + " settings " + node.settings().getAsMap());
 
         ExtractorServer.initExtractorServer();
-        dataSetImport();
+         dataSetImport();
 
 
 

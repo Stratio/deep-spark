@@ -30,12 +30,12 @@ public class WordCount implements IDeepType {
     private String word;
 
     @DeepField
-    private Integer count;
+    private Long count;
 
     public WordCount() {
     }
 
-    public WordCount(String word, Integer count) {
+    public WordCount(String word, Long count) {
         this.word = word;
         this.count = count;
     }
@@ -48,11 +48,11 @@ public class WordCount implements IDeepType {
         this.word = word;
     }
 
-    public Integer getCount() {
+    public Long getCount() {
         return count;
     }
 
-    public void setCount(Integer count) {
+    public void setCount(Long count) {
         this.count = count;
     }
 

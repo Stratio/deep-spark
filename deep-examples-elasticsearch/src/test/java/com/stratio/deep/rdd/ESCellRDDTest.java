@@ -20,9 +20,13 @@ import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.entity.BookEntity;
+import com.stratio.deep.core.entity.MessageTestEntity;
+import com.stratio.deep.core.extractor.ExtractorTest;
 import com.stratio.deep.extractor.ESCellExtractor;
 
 
+import com.stratio.deep.extractor.ESEntityExtractor;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import org.elasticsearch.action.count.CountResponse;
@@ -36,8 +40,13 @@ import static org.testng.AssertJUnit.assertEquals;
  * Created by rcrespo on 29/08/14.
  */
 @Test(suiteName = "ESRddTests", groups = {"ESCellRDDTest"}, dependsOnGroups = "ESJavaRDDTest")
-public class ESCellRDDTest {
+public class ESCellRDDTest extends ExtractorTest {
     private Logger LOG = Logger.getLogger(getClass());
+
+    public ESCellRDDTest() {
+        super(ESCellExtractor.class,"localhost:9200",null,ESJavaRDDTest.ES_INDEX_MESSAGE+ESJavaRDDTest.ES_SEPARATOR+ESJavaRDDTest.ES_TYPE_MESSAGE,
+                true);
+    }
 
     @Test
     public void testReadingRDD() {

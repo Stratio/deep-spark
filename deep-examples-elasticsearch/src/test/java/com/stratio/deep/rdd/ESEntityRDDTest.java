@@ -239,22 +239,22 @@ public class ESEntityRDDTest extends ExtractorTest implements Serializable{
             }
         });
 
-        JavaRDD<WordCountES> outputRDD = wordCountReduced.map(new Function<Tuple2<String, Long>, WordCountES>() {
+        JavaRDD<WordCount> outputRDD = wordCountReduced.map(new Function<Tuple2<String, Long>, WordCount>() {
             @Override
-            public WordCountES call(Tuple2<String, Long> stringIntegerTuple2) throws Exception {
-                return new WordCountES(stringIntegerTuple2._1(), stringIntegerTuple2._2());
+            public WordCount call(Tuple2<String, Long> stringIntegerTuple2) throws Exception {
+                return new WordCount(stringIntegerTuple2._1(), stringIntegerTuple2._2());
             }
         });
 
 
-        ExtractorConfig<WordCountES> outputConfigEntity = new ExtractorConfig(WordCountES.class);
+        ExtractorConfig<WordCount> outputConfigEntity = new ExtractorConfig(WordCount.class);
         outputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, "book/words");
         outputConfigEntity.setExtractorImplClass(ESEntityExtractor.class);
 
 
         context.saveRDD(outputRDD.rdd(), outputConfigEntity);
 
-        RDD<WordCountES> outputRDDEntity = context.createRDD(outputConfigEntity);
+        RDD<WordCount> outputRDDEntity = context.createRDD(outputConfigEntity);
 
         //Assert.assertEquals(((Long) outputRDDEntity.cache().count()).longValue(), ESJavaRDDTest.WORD_COUNT_SPECTED.longValue());
 
