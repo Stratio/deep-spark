@@ -25,9 +25,9 @@ import com.stratio.deep.testentity.CommonsTestEntity;
 import org.junit.Test;
 import scala.Tuple2;
 
-import static com.stratio.deep.cassandra.rdd.CassandraRDDUtils.createTableQueryGenerator;
-import static com.stratio.deep.cassandra.rdd.CassandraRDDUtils.deepType2tuple;
-import static com.stratio.deep.cassandra.rdd.CassandraRDDUtils.updateQueryGenerator;
+import static com.stratio.deep.cassandra.util.CassandraUtils.createTableQueryGenerator;
+import static com.stratio.deep.cassandra.util.CassandraUtils.deepType2tuple;
+import static com.stratio.deep.cassandra.util.CassandraUtils.updateQueryGenerator;
 import static com.stratio.deep.commons.utils.Utils.prepareTuple4CqlDriver;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;

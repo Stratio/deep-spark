@@ -18,10 +18,10 @@ package com.stratio.deep.cassandra.entity;
 
 import com.datastax.driver.core.DataType;
 import com.google.common.collect.ImmutableMap;
+import com.stratio.deep.cassandra.util.CassandraUtils;
 import com.stratio.deep.commons.annotations.DeepField;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepInstantiationException;
-import com.stratio.deep.cassandra.rdd.CassandraRDDUtils;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import org.apache.cassandra.cql3.CQL3Type;
 import org.apache.cassandra.db.marshal.*;
@@ -242,7 +242,7 @@ public class CellValidator {
         }
 
         Kind kind = Kind.objectToKind(obj);
-        AbstractType<?> tAbstractType = CassandraRDDUtils.marshallerInstance(obj);
+        AbstractType<?> tAbstractType = CassandraUtils.marshallerInstance(obj);
         String validatorClassName = tAbstractType.getClass().getCanonicalName();
         Collection<String> validatorTypes = null;
         DataType.Name cqlTypeName = MAP_JAVA_TYPE_TO_DATA_TYPE_NAME.get(validatorClassName);// tAbstractType.get

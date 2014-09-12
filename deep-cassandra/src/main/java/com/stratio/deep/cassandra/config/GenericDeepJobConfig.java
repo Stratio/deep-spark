@@ -52,7 +52,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
 
-import static com.stratio.deep.cassandra.rdd.CassandraRDDUtils.createTableQueryGenerator;
+import static com.stratio.deep.cassandra.util.CassandraUtils.createTableQueryGenerator;
 import static com.stratio.deep.commons.utils.Utils.quote;
 
 /**

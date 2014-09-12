@@ -21,7 +21,7 @@ import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
 import scala.Tuple2;
 
-import static com.stratio.deep.cassandra.rdd.CassandraRDDUtils.deepType2tuple;
+import static com.stratio.deep.cassandra.util.CassandraUtils.deepType2tuple;
 
 /**
  * Function that converts an IDeepType to tuple of two Cells.<br/>

@@ -21,7 +21,7 @@ import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.commons.extractor.server.ExtractorServer;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.cassandra.rdd.CassandraEntityExtractor;
+import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
 import com.stratio.deep.testentity.DomainEntity;
 
 import com.stratio.deep.utils.ContextProperties;
