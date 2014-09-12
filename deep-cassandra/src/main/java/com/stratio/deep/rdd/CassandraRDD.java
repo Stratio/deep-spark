@@ -279,10 +279,6 @@ public abstract class CassandraRDD<T> extends RDD<T> {
         } else {
             underlyingInputSplits = ThriftRangeUtils.build(this.config.value()).getSplits();
         }
-        for (DeepTokenRange r : underlyingInputSplits) {
-            this.log().info("SPLIT " + r);
-        }
-        this.log().info("NUM PARTITIONS " + underlyingInputSplits.size());
         Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
 
         int i = 0;

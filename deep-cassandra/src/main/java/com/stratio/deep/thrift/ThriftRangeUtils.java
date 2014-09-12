@@ -167,26 +167,39 @@ public class ThriftRangeUtils {
                 ThriftClient client = ThriftClient.build(endpoint, rpcPort, keyspace);
                 List<CfSplit> splits = client.describe_splits_ex(columnFamily, start, end, splitSize);
                 client.close();
-
-                List<DeepTokenRange> result = new ArrayList<>();
-                for (CfSplit split : splits) {
-                    Comparable splitStart = tokenAsComparable(split.getStart_token());
-                    Comparable splitEnd = tokenAsComparable(split.getEnd_token());
-                    if (splitStart.equals(splitEnd)) {
-                        result.add(new DeepTokenRange(minToken, minToken, endpoints));
-                    } else if (splitStart.compareTo(splitEnd) > 0) {
-                        result.add(new DeepTokenRange(splitStart, minToken, endpoints));
-                        result.add(new DeepTokenRange(minToken, splitEnd, endpoints));
-                    } else {
-                        result.add(new DeepTokenRange(splitStart, splitEnd, endpoints));
-                    }
-                }
-                return result;
+                return deepTokenRanges(splits, endpoints);
             } catch (TException e) {
                 LOG.warn("Endpoint %s failed while splitting range %s", endpoint, deepTokenRange);
             }
         }
         throw new DeepGenericException("No available replicas for splitting range " + deepTokenRange);
+    }
+
+    /**
+     * Returns the Deep splits represented by the specified Thrift splits using the specified endpoints for all of them.
+     * Note that the returned list can contain one more ranges than the specified because the range containing the
+     * partitioner's minimum token are divided into two ranges.
+     *
+     * @param splits    the Thrift splits to be converted.
+     * @param endpoints the endpoints list to be set in each generated Deep split
+     * @return the {@link com.stratio.deep.cql.DeepTokenRange}s represented by the specified
+     * {@link org.apache.cassandra.thrift.CfSplit}s
+     */
+    List<DeepTokenRange> deepTokenRanges(List<CfSplit> splits, List<String> endpoints) {
+        List<DeepTokenRange> result = new ArrayList<>();
+        for (CfSplit split : splits) {
+            Comparable splitStart = tokenAsComparable(split.getStart_token());
+            Comparable splitEnd = tokenAsComparable(split.getEnd_token());
+            if (splitStart.equals(splitEnd)) {
+                result.add(new DeepTokenRange(minToken, minToken, endpoints));
+            } else if (splitStart.compareTo(splitEnd) > 0) {
+                result.add(new DeepTokenRange(splitStart, minToken, endpoints));
+                result.add(new DeepTokenRange(minToken, splitEnd, endpoints));
+            } else {
+                result.add(new DeepTokenRange(splitStart, splitEnd, endpoints));
+            }
+        }
+        return result;
     }
 
     /**
