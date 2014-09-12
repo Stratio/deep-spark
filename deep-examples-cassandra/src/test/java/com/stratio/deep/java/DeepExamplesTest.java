@@ -29,7 +29,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * Test for the AggregatingData standalone example.
  */
-@Test(suiteName = "deepExamplesTests", groups = {"DeepExamplesTest"})
+//@Test(suiteName = "deepExamplesTests", groups = {"DeepExamplesTest"})
 public class DeepExamplesTest extends AbstractDeepExamplesTest {
     String[] args = new String[]{
             "-m",
@@ -41,7 +41,7 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
             "-cassandraThriftPort",
             "" + CassandraServer.CASSANDRA_THRIFT_PORT};
 
-    @Test
+//    @Test
     public void testAggregatingData() {
         AggregatingData.doMain(args);
 
@@ -51,13 +51,13 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
         assertEquals(AggregatingData.getStddev(), 3.775162360013285);
     }
 
-    @Test(dependsOnMethods = "testAggregatingData")
+//    @Test(dependsOnMethods = "testAggregatingData")
     public void testCreatingCellRDD() {
         CreatingCellRDD.doMain(args);
         assertEquals(CreatingCellRDD.getCounts(), Long.valueOf("4892"));
     }
 
-    @Test(dependsOnMethods = "testCreatingCellRDD")
+//    @Test(dependsOnMethods = "testCreatingCellRDD")
     public void testGroupingByColumn() {
         GroupingByColumn.doMain(args);
         assertEquals(GroupingByColumn.getResults().size(), 343);
@@ -70,7 +70,7 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
         }
     }
 
-    @Test(dependsOnMethods = "testGroupingByColumn")
+//    @Test(dependsOnMethods = "testGroupingByColumn")
     public void testGroupingByKey() {
         GroupingByKey.doMain(args);
         assertEquals(GroupingByKey.getResult().size(), 343);
@@ -86,7 +86,7 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
 
     }
 
-    @Test(dependsOnMethods = "testGroupingByKey")
+//    @Test(dependsOnMethods = "testGroupingByKey")
     public void testMapReduceJob() {
         MapReduceJob.doMain(args);
         assertEquals(MapReduceJob.results.size(), 343);
@@ -100,7 +100,7 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
 
     }
 
-    @Test(dependsOnMethods = "testMapReduceJob")
+//    @Test(dependsOnMethods = "testMapReduceJob")
     public void testWritingCellToCassandra() {
         WritingCellToCassandra.doMain(args);
         assertEquals(WritingCellToCassandra.results.size(), 26);
@@ -119,7 +119,7 @@ public class DeepExamplesTest extends AbstractDeepExamplesTest {
         assertEquals(rs.one().getLong(0), 26);
     }
 
-    @Test(dependsOnMethods = "testWritingCellToCassandra")
+//    @Test(dependsOnMethods = "testWritingCellToCassandra")
     public void testWritingEntityToCassandra() {
         WritingEntityToCassandra.doMain(args);
         assertEquals(WritingEntityToCassandra.results.size(), 26);

@@ -63,6 +63,8 @@ public abstract class ExtractorTest<T> implements Serializable {
 
     protected String database = "test";
 
+    protected String databaseInputColumns = "book";
+
     protected final String tableRead = "input";
 
     protected final String filter = "filter";
@@ -353,7 +355,7 @@ public abstract class ExtractorTest<T> implements Serializable {
 
         ExtractorConfig<W> extractorConfig = getExtractorConfig(configEntity);
         extractorConfig.putValue(ExtractorConstants.HOST, host)
-                .putValue(ExtractorConstants.DATABASE, database)
+                .putValue(ExtractorConstants.DATABASE, databaseInputColumns)
                 .putValue(ExtractorConstants.PORT, String.valueOf(port))
                 .putValue(ExtractorConstants.COLLECTION, tableRead)
                 .putValue(ExtractorConstants.INPUT_COLUMNS, inputColumns);
