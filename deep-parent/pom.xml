@@ -363,9 +363,7 @@
         <module>../deep-core</module>
         <module>../deep-mongodb</module>
         <module>../deep-elasticsearch</module>
-        <module>../deep-examples-cassandra</module>
-        <module>../deep-examples-mongodb</module>
-        <module>../deep-examples-elasticsearch</module>
+        <module>../deep-examples</module>
     </modules>
 
     <profiles>
@@ -377,9 +375,7 @@
                    <module>../deep-core</module>
                    <module>../deep-mongodb</module>
                    <module>../deep-elasticsearch</module>
-                   <module>../deep-examples-cassandra</module>
-                   <module>../deep-examples-mongodb</module>
-                   <module>../deep-examples-elasticsearch</module>
+                   <module>../deep-examples</module>
             </modules>
         </profile>
         <profile>
