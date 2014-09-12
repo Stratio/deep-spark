@@ -18,19 +18,25 @@ package com.stratio.deep.embedded;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
+import com.google.common.io.Files;
+import com.google.common.io.Resources;
 import com.stratio.deep.commons.utils.Constants;
 import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.commitlog.CommitLog;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.io.util.FileUtils;
 import org.apache.cassandra.service.CassandraDaemon;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.thrift.transport.TTransportException;
 
 import java.io.*;
+import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Embedded Cassandra Server helper class.
@@ -181,43 +187,43 @@ public class CassandraServer {
      */
     public void start() throws IOException, InterruptedException, ConfigurationException {
 
-//        File dir = Files.createTempDir();
-//        String dirPath = dir.getAbsolutePath();
-//        logger.info("Storing Cassandra files in " + dirPath);
+        File dir = Files.createTempDir();
+        String dirPath = dir.getAbsolutePath();
+        logger.info("Storing Cassandra files in " + dirPath);
 
-//        URL url = Resources.getResource("cassandra.yaml");
-//        String yaml = Resources.toString(url, Charsets.UTF_8);
-//        yaml = yaml.replaceAll("REPLACEDIR", dirPath);
-//        String yamlPath = dirPath + File.separatorChar + "cassandra.yaml";
-//        org.apache.commons.io.FileUtils.writeStringToFile(new File(yamlPath), yaml);
+        URL url = Resources.getResource("cassandra.yaml");
+        String yaml = Resources.toString(url, Charsets.UTF_8);
+        yaml = yaml.replaceAll("REPLACEDIR", dirPath);
+        String yamlPath = dirPath + File.separatorChar + "cassandra.yaml";
+        org.apache.commons.io.FileUtils.writeStringToFile(new File(yamlPath), yaml);
 
-        // make a tmp dir and copy cassandra.yaml and log4j.properties to it
-//        try {
-//            copy("/log4j.properties", dir.getAbsolutePath());
-//        } catch (Exception e1) {
-//            logger.error("Cannot copy log4j.properties");
-//        }
-//        System.setProperty("cassandra.config", "file:" + dirPath + yamlFilePath);
-//        System.setProperty("log4j.configuration", "file:" + dirPath + "/log4j.properties");
-//        System.setProperty("cassandra-foreground", "true");
-//        System.setProperty("cassandra.skip_wait_for_gossip_to_settle", "0");
-//
-//        cleanupAndLeaveDirs();
+//        make a tmp dir and copy cassandra.yaml and log4j.properties to it
+        try {
+            copy("/log4j.properties", dir.getAbsolutePath());
+        } catch (Exception e1) {
+            logger.error("Cannot copy log4j.properties");
+        }
+        System.setProperty("cassandra.config", "file:" + dirPath + yamlFilePath);
+        System.setProperty("log4j.configuration", "file:" + dirPath + "/log4j.properties");
+        System.setProperty("cassandra-foreground", "true");
+        System.setProperty("cassandra.skip_wait_for_gossip_to_settle", "0");
 
-//        try {
-//            executor.execute(new CassandraRunner());
-//        } catch (RejectedExecutionException e) {
-//            logger.error(e);
-//            return;
-//        }
-//
-//        try {
-//            TimeUnit.SECONDS.sleep(WAIT_SECONDS);
-//        } catch (InterruptedException e) {
-//            logger.error(e);
-//            throw new AssertionError(e);
-//        }
+        cleanupAndLeaveDirs();
 
-//        initKeySpace();
+        try {
+            executor.execute(new CassandraRunner());
+        } catch (RejectedExecutionException e) {
+            logger.error(e);
+            return;
+        }
+
+        try {
+            TimeUnit.SECONDS.sleep(WAIT_SECONDS);
+        } catch (InterruptedException e) {
+            logger.error(e);
+            throw new AssertionError(e);
+        }
+
+        initKeySpace();
     }
 }

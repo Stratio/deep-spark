@@ -16,16 +16,22 @@
 
 package com.stratio.deep.examples.java;
 
+import com.google.common.collect.Lists;
+import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.server.ExtractorServer;
+import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.cassandra.rdd.CassandraCellExtractor;
-
+import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
-import org.apache.spark.rdd.RDD;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
+import org.apache.spark.api.java.function.PairFunction;
+import scala.Tuple2;
+import scala.Tuple3;
 
 
 import java.util.HashMap;
@@ -64,13 +70,14 @@ public final class AggregatingData {
     public static void doMain(String[] args) {
         String job = "java:aggregatingData";
 
-        String KEYSPACENAME = "twitter";
-        String TABLENAME    = "tweets";
-        String CQLPORT      = "9042";
-        String RPCPORT      = "9160";
-        String HOST         = "127.0.0.1";
+        String keySpace = "test";
+        String tableName    = "tweets";
+        String cqlPort      = "9042";
+        String rcpPort      = "9160";
+        String host         = "127.0.0.1";
 
 
+       //Call async the Extractor netty Server
         ExtractorServer.initExtractorServer();
 
         // Creating the Deep Context where args are Spark Master and Job Name
@@ -78,28 +85,78 @@ public final class AggregatingData {
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // Creating a configuration for the Extractor and initialize it
-        ExtractorConfig<Cells> config = new ExtractorConfig<>();
+        ExtractorConfig<TweetEntity> config = new ExtractorConfig<>(TweetEntity.class);
 
-        config.setExtractorImplClass(CassandraCellExtractor.class);
-//        config.setEntityClass(TweetEntity.class);
+        config.setExtractorImplClass(CassandraEntityExtractor.class);
 
         Map<String, String> values = new HashMap<>();
-        values.put(ExtractorConstants.KEYSPACE, KEYSPACENAME);
-        values.put(ExtractorConstants.TABLE,    TABLENAME);
-        values.put(ExtractorConstants.CQLPORT,  CQLPORT);
-        values.put(ExtractorConstants.RPCPORT,  RPCPORT);
-        values.put(ExtractorConstants.HOST,     HOST );
+        values.put(ExtractorConstants.KEYSPACE, keySpace);
+        values.put(ExtractorConstants.TABLE,    tableName);
+        values.put(ExtractorConstants.CQLPORT,  cqlPort);
+        values.put(ExtractorConstants.RPCPORT,  rcpPort);
+        values.put(ExtractorConstants.HOST,     host );
 
         config.setValues(values);
 
 
         // Creating the RDD
-        RDD<Cells> rdd = deepContext.createRDD(config);
-        LOG.info("count: " + rdd.count());
-        LOG.info("first: " + rdd.first());
+        JavaRDD<TweetEntity> rdd = deepContext.createJavaRDD(config);
 
+        // grouping to get key-value pairs
+        JavaPairRDD<String, Integer> groups = rdd.groupBy(new Function<TweetEntity, String>() {
+            @Override
+            public String call(TweetEntity tableEntity) {
+                return tableEntity.getAuthor();
+            }
+        }).mapToPair(new PairFunction<Tuple2<String, Iterable<TweetEntity>>, String, Integer>() {
+            @Override
+            public Tuple2<String, Integer> call(Tuple2<String, Iterable<TweetEntity>> t) throws Exception {
+                return new Tuple2<>(t._1(), Lists.newArrayList(t._2()).size());
+            }
+        });
 
-        ExtractorServer.close();
+        // aggregating
+        Double zero = 0.0;
+        Tuple3<Double, Double, Double> initValues = new Tuple3<Double, Double, Double>(zero, zero, zero);
+        Tuple3<Double, Double, Double> results = groups.aggregate(initValues,
+                new Function2<Tuple3<Double, Double, Double>, Tuple2<String, Integer>, Tuple3<Double, Double,
+                        Double>>() {
+                    @Override
+                    public Tuple3<Double, Double, Double> call(Tuple3<Double, Double, Double> n, Tuple2<String,
+                            Integer> t) {
+                        Double sumOfX = n._1() + t._2();
+                        Double numOfX = n._2() + 1;
+                        Double sumOfSquares = n._3() + Math.pow(t._2(), 2);
+                        return new Tuple3<>(sumOfX, numOfX, sumOfSquares);
+                    }
+                }, new Function2<Tuple3<Double, Double, Double>, Tuple3<Double, Double, Double>, Tuple3<Double,
+                        Double, Double>>() {
+                    @Override
+                    public Tuple3<Double, Double, Double> call(Tuple3<Double, Double, Double> a, Tuple3<Double,
+                            Double, Double> b) {
+                        Double sumOfX = a._1() + b._1();
+                        Double numOfX = a._2() + b._2();
+                        Double sumOfSquares = a._3() + b._3();
+                        return new Tuple3<>(sumOfX, numOfX, sumOfSquares);
+                    }
+                }
+        );
+
+        // computing stats
+        Double sumOfX = results._1();
+        Double numOfX = results._2();
+        Double sumOfSquares = results._3();
+
+        count = sumOfX;
+        avg = sumOfX / numOfX;
+        variance = (sumOfSquares / numOfX) - Math.pow(avg, 2);
+        stddev = Math.sqrt(variance);
+
+        LOG.info("Results: (" + sumOfX.toString() + ", " + numOfX.toString() + ", " + sumOfSquares.toString() + ")");
+        LOG.info("average: " + avg.toString());
+        LOG.info("variance: " + variance.toString());
+        LOG.info("stddev: " + stddev.toString());
+
         deepContext.stop();
     }
 
