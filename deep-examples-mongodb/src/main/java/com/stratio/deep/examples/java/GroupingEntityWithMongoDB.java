@@ -92,24 +92,24 @@ public final class GroupingEntityWithMongoDB {
         });
 
 
-        JavaPairRDD<String, Integer> wordCount = words.mapToPair(new PairFunction<String, String, Integer>() {
+        JavaPairRDD<String, Long> wordCount = words.mapToPair(new PairFunction<String, String, Long>() {
             @Override
-            public Tuple2<String, Integer> call(String s) throws Exception {
-                return new Tuple2<String, Integer>(s,1);
+            public Tuple2<String, Long> call(String s) throws Exception {
+                return new Tuple2<String, Long>(s,1l);
             }
         });
 
 
-        JavaPairRDD<String, Integer>  wordCountReduced = wordCount.reduceByKey(new Function2<Integer, Integer, Integer>() {
+        JavaPairRDD<String, Long>  wordCountReduced = wordCount.reduceByKey(new Function2<Long, Long, Long>() {
             @Override
-            public Integer call(Integer integer, Integer integer2) throws Exception {
+            public Long call(Long integer, Long integer2) throws Exception {
                 return integer + integer2;
             }
         });
 
-        JavaRDD<WordCount>  outputRDD =  wordCountReduced.map(new Function<Tuple2<String, Integer>, WordCount>() {
+        JavaRDD<WordCount>  outputRDD =  wordCountReduced.map(new Function<Tuple2<String, Long>, WordCount>() {
             @Override
-            public WordCount call(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
+            public WordCount call(Tuple2<String, Long> stringIntegerTuple2) throws Exception {
                 return new WordCount(stringIntegerTuple2._1(), stringIntegerTuple2._2());
             }
         });
