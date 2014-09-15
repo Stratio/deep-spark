@@ -34,7 +34,7 @@ import java.util.Map;
  * Concrete implementation of a CassandraRDD representing an RDD of
  * {@link com.stratio.deep.entity.Cells} element.<br/>
  */
-public class CassandraCellExtractor extends CassandraExtractor<Cells> {
+public class                                                                                                                                                                                                                                                                              CassandraCellExtractor extends CassandraExtractor<Cells> {
 
     private static final long serialVersionUID = -738528971629963221L;
 

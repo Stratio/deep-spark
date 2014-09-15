@@ -37,7 +37,12 @@ import com.stratio.deep.rdd.IExtractor;
  */
 public class ExtractorClient<T> implements IExtractor<T> {
 
-    static final boolean SSL = System.getProperty("ssl") != null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5347523444393489454L;
+
+	static final boolean SSL = System.getProperty("ssl") != null;
 
     static final String HOST = System.getProperty("host", "127.0.0.1");
     static final int PORT = Integer.parseInt(System.getProperty("port", "8463"));

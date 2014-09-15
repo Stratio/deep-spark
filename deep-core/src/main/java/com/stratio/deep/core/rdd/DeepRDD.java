@@ -73,7 +73,6 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
     public Iterator<T> compute(Partition split, TaskContext context) {
 
         this.initExtractorClient();
-
         context.addOnCompleteCallback(new OnComputedRDDCallback(extractorClient));
 
 

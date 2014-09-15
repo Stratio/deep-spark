@@ -33,7 +33,12 @@ import static com.stratio.deep.utils.Constants.SPARK_PARTITION_ID;
  */
 public class PrepareSaveFunction<T> extends AbstractFunction1<Iterator<T>, BoxedUnit> implements Serializable {
 
-    private ExtractorConfig<T> extractorConfig;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4833090810550105400L;
+
+	private ExtractorConfig<T> extractorConfig;
 
     private T first;
 

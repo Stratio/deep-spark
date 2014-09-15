@@ -52,8 +52,11 @@ public final class AggregatingData {
      * @param args the arguments passed to the application.
      */
     public static void main(String[] args) {
-       // doServer();
-        doMain(args);
+
+        if(args.length > 0) {
+            doServer();
+        }else doMain(args);
+
     }
 
     public static void doServer(){

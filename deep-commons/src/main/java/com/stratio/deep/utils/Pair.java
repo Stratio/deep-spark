@@ -27,6 +27,11 @@ import java.io.Serializable;
  */
 public class Pair<L, R> implements Serializable {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 420785779155432356L;
+
+	/**
      * Left element of the pair.
      */
     public final L left;

@@ -26,4 +26,9 @@ import java.io.Serializable;
 public abstract class AbstractSerializableFunction2<T1, T2, R> extends AbstractFunction2<T1, T2,
         R> implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2199399663690149420L;
+
 }

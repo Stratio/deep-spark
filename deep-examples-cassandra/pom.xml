@@ -10,7 +10,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>deep-example-scassandra</artifactId>
+    <artifactId>deep-example-cassandra</artifactId>
     <name>deep examples cassandra</name>
 
     <dependencies>

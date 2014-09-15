@@ -43,7 +43,12 @@ import java.util.List;
 public abstract class GenericHadoopExtractor<T, K, V> implements IExtractor<T> {
 
 
-    protected IDeepJobConfig<T, ? extends IDeepJobConfig> deepJobConfig;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8323691718049277718L;
+
+	protected IDeepJobConfig<T, ? extends IDeepJobConfig> deepJobConfig;
 
     protected transient RecordReader<K, V> reader;
 

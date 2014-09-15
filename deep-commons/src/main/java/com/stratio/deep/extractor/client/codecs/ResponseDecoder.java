@@ -17,10 +17,12 @@ package com.stratio.deep.extractor.client.codecs;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.UnsafeInput;
+import com.stratio.deep.extractor.response.HasNextResponse;
 import com.stratio.deep.extractor.response.Response;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import org.apache.cassandra.thrift.Cassandra;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -64,7 +66,6 @@ public class ResponseDecoder extends ByteToMessageDecoder {
         Object object = kryo.readClassAndObject(input);
 
         out.add((Response) object);
-
 
 
 

@@ -57,7 +57,12 @@ import static com.stratio.deep.utils.Utils.additionalFilterGenerator;
  * @author Luca Rosellini <luca@strat.io>
  */
 public class DeepRecordReader implements IDeepRecordReader {
-    private static final Logger LOG = LoggerFactory.getLogger(DeepRecordReader.class);
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6807451412521159519L;
+
+	private static final Logger LOG = LoggerFactory.getLogger(DeepRecordReader.class);
 
     private DeepTokenRange split;
     private RowIterator rowIterator;

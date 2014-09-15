@@ -55,7 +55,13 @@ import static org.testng.Assert.*;
 public class MongoEntityRDDTest implements Serializable {
 
 
-    @Test
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1442230536776510128L;
+
+
+	@Test
     public void testReadingRDD() {
         String hostConcat = MongoJavaRDDTest.HOST.concat(":").concat(MongoJavaRDDTest.PORT.toString());
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");

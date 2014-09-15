@@ -47,7 +47,12 @@ import com.stratio.deep.utils.Pair;
 public abstract class CassandraExtractor<T> implements IExtractor<T> {
 
 
-    protected transient IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5695449574672303372L;
+
+	protected transient IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
 
     protected transient DeepCqlRecordWriter writer;
 

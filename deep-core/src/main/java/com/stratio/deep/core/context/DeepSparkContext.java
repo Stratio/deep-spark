@@ -46,7 +46,11 @@ import java.util.Set;
  */
 public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
-    private static final Logger LOG = Logger.getLogger(DeepSparkContext.class);
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3357801959581149679L;
+	private static final Logger LOG = Logger.getLogger(DeepSparkContext.class);
 
     /**
      * Overridden superclass constructor.

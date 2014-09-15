@@ -28,7 +28,12 @@ import java.util.Map;
  */
 public class ExtractorConfig<T> implements Serializable {
 
-    private Map<String, String> values = new HashMap<>();
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7227455997602589376L;
+
+	private Map<String, String> values = new HashMap<>();
 
     private Class ExtractorImplClass;
 
