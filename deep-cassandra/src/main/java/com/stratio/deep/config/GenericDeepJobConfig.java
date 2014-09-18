@@ -144,12 +144,6 @@ public abstract class GenericDeepJobConfig<T> implements
 
     private int bisectFactor = Constants.DEFAULT_BISECT_FACTOR;
 
-    private int splitSize = Constants.DEFAULT_SPLIT_SIZE;
-
-    private boolean isSplitModeSet = false;
-
-    private boolean isBisectModeSet = false;
-
     /**
      * {@inheritDoc}
      */
@@ -532,7 +526,6 @@ public abstract class GenericDeepJobConfig<T> implements
 
     @Override
     public ICassandraDeepJobConfig<T> bisectFactor(int bisectFactor) {
-        this.isBisectModeSet = true;
         this.bisectFactor = bisectFactor;
         return this;
     }
@@ -609,25 +602,10 @@ public abstract class GenericDeepJobConfig<T> implements
 
         this.validateTableMetadata(tableMetadata);
         this.validateAdditionalFilters(tableMetadata);
-        if (!(this.isBisectModeSet && this.isSplitModeSet)) {
-            if (this.isBisectModeSet) {
-                if (this.bisectFactor != Constants.DEFAULT_BISECT_FACTOR
-                        && !this.checkIsPowerOfTwo(this.bisectFactor)) {
-                    throw new IllegalArgumentException(
-                            "Bisect factor should be greater than zero and a power of 2");
-                }
-            } else if (this.isSplitModeSet) {
-                if (this.splitSize <= 0) {
-                    throw new IllegalArgumentException(
-                            "The split size must be a positve integer");
-                }
-            } else {
-                throw new IllegalArgumentException(
-                        "One split mode must be defined, please choose between Split or Bisect");
-            }
-        } else {
+        if (this.bisectFactor != Constants.DEFAULT_BISECT_FACTOR
+                && !this.checkIsPowerOfTwo(this.bisectFactor)) {
             throw new IllegalArgumentException(
-                    "Only one split mode can be defined, please choose between Split or Bisect");
+                    "Bisect factor should be greater than zero and a power of 2");
         }
     }
 
@@ -844,28 +822,6 @@ public abstract class GenericDeepJobConfig<T> implements
     @Override
     public int getBisectFactor() {
         return this.bisectFactor;
-    }
-
-    @Override
-    public ICassandraDeepJobConfig<T> splitSize(int splitSize) {
-        this.isSplitModeSet = true;
-        this.splitSize = splitSize;
-        return this;
-    }
-
-    @Override
-    public Integer getSplitSize() {
-        return this.splitSize;
-    }
-
-    @Override
-    public boolean isSplitModeSet() {
-        return this.isSplitModeSet;
-    }
-
-    @Override
-    public boolean isBisectModeSet() {
-        return this.isBisectModeSet;
     }
 
 }

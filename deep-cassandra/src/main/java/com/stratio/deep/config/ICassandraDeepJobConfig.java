@@ -183,15 +183,6 @@ public interface ICassandraDeepJobConfig<T> extends
     public abstract ICassandraDeepJobConfig<T> bisectFactor(int bisectFactor);
 
     /**
-     * Sets the split size. The provided number must be a greater than 0.
-     * 
-     * @param splitSize
-     *            the number of rows per Cassandra partition.
-     * @return this configuration object.
-     */
-    public abstract ICassandraDeepJobConfig<T> splitSize(int splitSize);
-
-    /**
      * @return the configured bisect factor.
      */
     public int getBisectFactor();
@@ -286,22 +277,4 @@ public interface ICassandraDeepJobConfig<T> extends
      *            the session to use.
      */
     public abstract ICassandraDeepJobConfig<T> session(Session session);
-
-    public abstract Integer getSplitSize();
-
-    /**
-     * Returns whether or not in this configuration object we specify SplitSize
-     * as mode to split partitions.
-     * 
-     * @return true if SplitSize mode is defined as split mode.
-     */
-    boolean isSplitModeSet();
-
-    /**
-     * Returns whether or not in this configuration object we specify Bisect as
-     * mode to split partitions.
-     * 
-     * @return true if Bisect mode is defined as split mode.
-     */
-    boolean isBisectModeSet();
 }
