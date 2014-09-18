@@ -216,45 +216,6 @@ public class RangeUtils {
     }
 
     /**
-     * Returns the token ranges that will be mapped to Spark partitions.
-     * 
-     * @param config
-     *            the Deep configuration object.
-     * @return the list of computed token ranges.
-     */
-    public static List<DeepTokenRange> getSplitsBySize(
-            ICassandraDeepJobConfig config) {
-
-        IPartitioner p = getPartitioner(config);
-        AbstractType tokenValidator = p.getTokenValidator();
-
-        Pair<Session, String> sessionWithHost = CassandraClientProvider
-                .getSession(config.getHost(), config, false);
-
-        String query = new StringBuilder("CALCULATE SPLITS FROM ")
-                .append(config.getKeyspace()).append(".")
-                .append(config.getTable()).append(" ESTIMATING ")
-                .append(config.getSplitSize()).toString();
-        ResultSet rSet = sessionWithHost.left.execute(query);
-
-        List<DeepTokenRange> tokens = new ArrayList<>();
-
-        for (Row row : rSet.all()) {
-            Comparable startToken = (Comparable) tokenValidator.compose(row
-                    .getBytesUnsafe("start_token"));
-            Comparable endToken = (Comparable) tokenValidator.compose(row
-                    .getBytesUnsafe("end_token"));
-            List<String> replicas = new ArrayList<>();
-            for (InetAddress addres : row.getList("preferred_locations",
-                    InetAddress.class)) {
-                replicas.add(addres.getHostName());
-            }
-            tokens.add(new DeepTokenRange(startToken, endToken, replicas));
-        }
-        return tokens;
-    }
-
-    /**
      * Recursive function that splits a given token range to a given number of
      * tolen ranges.
      * 

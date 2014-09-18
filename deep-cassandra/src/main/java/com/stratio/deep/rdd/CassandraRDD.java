@@ -272,13 +272,7 @@ public abstract class CassandraRDD<T> extends RDD<T> {
     @Override
     public Partition[] getPartitions() {
 
-        List<DeepTokenRange> underlyingInputSplits = null;
-        if (this.config.getValue().isBisectModeSet()) {
-            underlyingInputSplits = RangeUtils.getSplits(this.config.value());
-        } else {
-            underlyingInputSplits = RangeUtils.getSplitsBySize(this.config
-                    .value());
-        }
+        List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits(this.config.value());
         Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
 
         int i = 0;
