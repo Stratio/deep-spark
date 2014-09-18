@@ -40,6 +40,7 @@ import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.exception.DeepIllegalAccessException;
 import com.stratio.deep.commons.exception.DeepIndexNotFoundException;
 import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.commons.lang.ArrayUtils;
@@ -548,6 +549,12 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
         if(values.get(BISECT_FACTOR)!=null){
             bisectFactor(getIntegerValue(values.get(BISECT_FACTOR)));
         }
+
+
+        if(values.get(ExtractorConstants.FILTER_FIELD)!=null){
+            String[] filterFields=getStringArray(values.get(ExtractorConstants.FILTER_FIELD));
+            filterByField(filterFields[0].trim(), filterFields[1].trim());
+        }
         this.initialize();
 
         return this;
@@ -564,6 +571,11 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
     private String[] getStringArray(String value){
         return value!=null?value.split(","):new String[0];
     }
+
+    private String[] getStringFilter(String value){
+        return value!=null?value.split("="):new String[0];
+    }
+
 
     /**
      * {@inheritDoc}

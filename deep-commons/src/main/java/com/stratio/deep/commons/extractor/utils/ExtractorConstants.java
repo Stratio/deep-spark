@@ -33,6 +33,9 @@ public class ExtractorConstants {
 
     public static String SORT = "sort";
 
+    public static String FILTER_FIELD = "filterField";
+
+
     public static String FILTER_QUERY = "filterQuery";
 
     public static String INPUT_KEY = "inputKey";
