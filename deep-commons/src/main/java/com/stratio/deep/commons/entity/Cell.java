@@ -16,8 +16,15 @@
 
 package com.stratio.deep.commons.entity;
 
+import com.datastax.driver.core.ResultSet;
+
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.URL;
 import java.nio.ByteBuffer;
+import java.util.*;
 
 /**
  * Created by rcrespo on 2/07/14.
@@ -47,23 +54,220 @@ public abstract class Cell implements Serializable {
     }
 
     public String getCellName() {
-        return cellName;
+        return this.cellName;
     }
 
     public Object getCellValue() {
-        return cellValue;
+        return this.cellValue;
     }
 
     /**
-     * @return true is the current cell is a key inside the datastore, false otherwise.
+     * Returns the cell name.
+     *
+     * @return the cell name.
+     */
+    public String getName() {
+        return this.cellName;
+    }
+
+    public Object getValue() {
+        return this.cellValue;
+    }
+
+    /**
+     * Returns the cell value casted to the specified class.
+     *
+     * @param clazz the expected class
+     * @param <T>   the return type
+     * @return the cell value casted to the specified class
+     */
+    public <T> T getValue(Class<T> clazz) {
+        if (this.cellValue == null) {
+            return null;
+        } else {
+            return (T) this.cellValue;
+        }
+    }
+
+    /**
+     * Returns the cell value casted as a {@code String}.
+     *
+     * @return the cell value casted as a {@code String}.
+     */
+    public String getString() {
+        return getValue(String.class);
+    }
+
+    /**
+     * Returns the cell value casted as a {@code Boolean}.
+     *
+     * @return the cell value casted as a {@code Boolean}.
+     */
+    public Boolean getBoolean() {
+        return getValue(Boolean.class);
+    }
+
+    /**
+     * Returns the cell value casted as a {@code Date}.
+     *
+     * @return the cell value casted as a {@code Date}.
+     */
+    public Date getDate() {
+        return getValue(Date.class);
+    }
+
+    /**
+     * Returns the cell value casted as a {@code UUID}.
+     *
+     * @return the cell value casted as a {@code UUID}.
+     */
+    public UUID getUUID() {
+        return getValue(UUID.class);
+    }
+
+    /**
+     * Returns the cell value casted as a {@code Short}.
+     *
+     * @return the cell value casted as a {@code Short}.
+     */
+    public Short getShort() {
+        return getValue(Short.class);
+    }
+
+    /**
+     * Returns the cell value casted as a {@code Byte}.
+     *
+     * @return the cell value casted as a {@code Byte}.
+     */
+    public Byte getByte() {
+        return getValue(Byte.class);
+    }
+
+    /**
+     * Returns the cell value casted as a {@code Byte[]}.
+     *
+     * @return the cell value casted as a {@code Byte[]}.
+     */
+    public Byte[] getBytes() {
+        return getValue(Byte[].class);
+    }
+
+    /**
+     * Returns the cell value casted as a {@code Character}.
+     *
+     * @return the cell value casted as a {@code Character}.
+     */
+    public Character getCharacter() {
+        return getValue(Character.class);
+    }
+
+    /**
+     * Returns the cell value casted as a {@code Integer}.
+     *
+     * @return the cell value casted as a {@code Integer}.
+     */
+    public Integer getInteger() {
+        return getValue(Integer.class);
+    }
+
+    /**
+     * Returns the cell value casted as a {@code Long}.
+     *
+     * @return the cell value casted as a {@code Long}.
+     */
+    public Long getLong() {
+        return getValue(Long.class);
+    }
+
+    /**
+     * Returns the cell value casted as a {@code BigInteger}.
+     *
+     * @return the cell value casted as a {@code BigInteger}.
+     */
+    public BigInteger getBigInteger() {
+        return getValue(BigInteger.class);
+    }
+
+    /**
+     * Returns the cell value casted as a {@code Float}.
+     *
+     * @return the cell value casted as a {@code Float}.
+     */
+    public Float getFloat() {
+        return getValue(Float.class);
+    }
+
+    /**
+     * Returns the cell value casted as a {@code Double}.
+     *
+     * @return the cell value casted as a {@code Double}.
+     */
+    public Double getDouble() {
+        return getValue(Double.class);
+    }
+
+    /**
+     * Returns the cell value casted as a {@code BigDecimal}.
+     *
+     * @return the cell value casted as a {@code BigDecimal}.
+     */
+    public BigDecimal getBigDecimal() {
+        return getValue(BigDecimal.class);
+    }
+
+    /**
+     * Returns the cell value casted as a {@code URL}.
+     *
+     * @return the cell value casted as a {@code URL}.
+     */
+    public URL getURL() {
+        return getValue(URL.class);
+    }
+
+    /**
+     * Returns the cell value casted as a {@code InetAddress}.
+     *
+     * @return the cell value casted as a {@code InetAddress}.
+     */
+    public InetAddress getInetAddress() {
+        return getValue(InetAddress.class);
+    }
+
+    public <T> List<T> getList(Class<T> clazz) {
+        if (this.cellValue == null) {
+            return null;
+        } else {
+            return (List<T>) this.cellValue;
+        }
+    }
+
+    public <T> Set<T> getSet(Class<T> clazz) {
+        if (this.cellValue == null) {
+            return null;
+        } else {
+            return (Set<T>) this.cellValue;
+        }
+    }
+
+    public <K, V> Map<K, V> getMap(Class<K> keysClass, Class<V> valuesClass) {
+        if (this.cellValue == null) {
+            return null;
+        } else {
+            return (Map<K, V>) this.cellValue;
+        }
+    }
+
+    /**
+     * @return true is the current cell is a key inside the datastore, false
+     *         otherwise.
      */
     public abstract Boolean isKey();
 
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("Cell{");
-        sb.append("cellName='").append(cellName).append('\'');
-        sb.append(", cellValue=").append(cellValue);
+        sb.append("cellName='").append(this.cellName).append('\'');
+        sb.append(", cellValue=").append(this.cellValue);
         sb.append('}');
         return sb.toString();
     }
@@ -72,108 +276,5 @@ public abstract class Cell implements Serializable {
     public ByteBuffer getDecomposedCellValue() {
         return null;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Cell cell = (Cell) o;
-
-        boolean isCellName = this.getCellName().equals(cell.getCellName());
-        boolean isCellValue = this.getCellValue().equals(cell.getCellValue());
-
-        return isCellName && isCellValue;
-    }
-
-
-
-    public String getName() {
-        return cellName;
-    }
-
-    public Object getValue() {
-        return cellValue;
-    }
-
-
-    /**
-     *   Returns true if value is NULL.
-     * @return
-     */
-    public boolean isNull(){
-        return cellValue==null;
-    }
-
-    /**
-     * Returns the value as a String.  This will throw an exception if the value is not a String
-     * @return
-     */
-    public String getString(){
-        return (String)cellValue;
-    }
-
-    /**
-     * Returns the value as a int.  This will throw an exception if the value is not a int
-     * @return
-     */
-    public int getInt(){
-        return (int)cellValue;
-    }
-
-
-    /**
-     * Returns the value as a long.  This will throw an exception if the value is not a long
-     *
-      * @return
-     */
-    public long getLong(){
-        return (long)cellValue;
-    }
-
-    /**
-     * Returns the value as a double.  This will throw an exception if the value is not a double
-     * @return
-     */
-    public double getDouble(){
-        return (double)cellValue;
-    }
-
-    /**
-     * Returns the value as a float.  This will throw an exception if the value is not a float
-     * @return
-     */
-    public float getFloat(){
-        return (float)cellValue;
-    }
-
-    /**
-     * Returns the value as a byte.  This will throw an exception if the value is not a byte
-     * @return
-     */
-    public byte getByte(){
-        return (byte)cellValue;
-    }
-
-    /**
-     * Returns the value as a short.  This will throw an exception if the value is not a short
-     * @return
-     */
-    public short getShort(){
-        return (short)cellValue;
-    }
-
-    /**
-     * Returns the value as a boolean.  This will throw an exception if the value is not a boolean
-     * @return
-     */
-    public boolean getBoolean(){
-        return (boolean)cellValue;
-    }
-
 
 }

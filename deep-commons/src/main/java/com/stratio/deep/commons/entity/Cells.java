@@ -1,11 +1,11 @@
 /*
  * Copyright 2014, Stratio.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -18,6 +18,10 @@ import com.stratio.deep.commons.exception.DeepGenericException;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -564,4 +568,940 @@ public class Cells implements Iterable<Cell>, Serializable {
     public String getDefaultTableName() {
         return defaultTableName;
     }
+
+    /**
+     * Returns the casted value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @param cellClass the class of the cell's value
+     * @param <T>       the type of the cell's value
+     * @return the casted value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public <T> T getValue(String tableName, int idx, Class<T> cellClass) {
+        Cell cell = getCellByIdx(tableName, idx);
+        return cell == null ? null : cell.getValue(cellClass);
+    }
+
+    /**
+     * Returns the casted value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object.
+     *
+     * @param idx       the index position of the Cell we want to retrieve
+     * @param cellClass the class of the cell's value
+     * @param <T>       the type of the cell's value
+     * @return the casted value of the  {@link Cell} at position {@code idx} in the list of Cell object
+     */
+    public <T> T getValue(int idx, Class<T> cellClass) {
+        Cell cell = getCellByIdx(idx);
+        return cell == null ? null : cell.getValue(cellClass);
+    }
+
+    /**
+     * Returns the casted value of the {@link Cell} (associated to {@code table}) whose name is
+     * cellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @param cellClass the class of the cell's value
+     * @param <T>       the type of the cell's value
+     * @return the casted value of the {@link Cell} (associated to {@code table}) whose name is
+     * cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public <T> T getValue(String tableName, String cellName, Class<T> cellClass) {
+        Cell cell = getCellByName(tableName, cellName);
+        return cell == null ? null : cell.getValue(cellClass);
+    }
+
+    /**
+     * Returns the casted value of the {@link Cell} whose name is cellName, or null if this Cells
+     * object contains no cell whose name is cellName.
+     *
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @param cellClass the class of the cell's value
+     * @param <T>       the type of the cell's value
+     * @return the casted value of the {@link Cell} whose name is cellName, or null if this Cells
+     * object contains no cell whose name is cellName
+     */
+    public <T> T getValue(String cellName, Class<T> cellClass) {
+        Cell cell = getCellByName(cellName);
+        return cell == null ? null : cell.getValue(cellClass);
+    }
+
+
+    public <T> List<T> getList(String tableName, int idx, Class<T> elementsClass) {
+        Cell cell = getCellByIdx(tableName, idx);
+        return cell == null ? null : cell.getList(elementsClass);
+    }
+
+    public <T> List<T> getList(int idx, Class<T> elementsClass) {
+        Cell cell = getCellByIdx(idx);
+        return cell == null ? null : cell.getList(elementsClass);
+    }
+
+    public <T> List<T> getList(String tableName, String cellName, Class<T> elementsClass) {
+        Cell cell = getCellByName(tableName, cellName);
+        return cell == null ? null : cell.getList(elementsClass);
+    }
+
+    public <T> List<T> getList(String cellName, Class<T> elementsClass) {
+        Cell cell = getCellByName(cellName);
+        return cell == null ? null : cell.getList(elementsClass);
+    }
+
+
+    public <T> Set<T> getSet(String tableName, int idx, Class<T> elementsClass) {
+        Cell cell = getCellByIdx(tableName, idx);
+        return cell == null ? null : cell.getSet(elementsClass);
+    }
+
+    public <T> Set<T> getSet(int idx, Class<T> elementsClass) {
+        Cell cell = getCellByIdx(idx);
+        return cell == null ? null : cell.getSet(elementsClass);
+    }
+
+    public <T> Set<T> getSet(String tableName, String cellName, Class<T> elementsClass) {
+        Cell cell = getCellByName(tableName, cellName);
+        return cell == null ? null : cell.getSet(elementsClass);
+    }
+
+    public <T> Set<T> getSet(String cellName, Class<T> elementsClass) {
+        Cell cell = getCellByName(cellName);
+        return cell == null ? null : cell.getSet(elementsClass);
+    }
+
+
+    public <K, V> Map<K, V> getMap(String tableName,
+                                   int idx,
+                                   Class<K> keysClass,
+                                   Class<V> valuesClass) {
+        Cell cell = getCellByIdx(tableName, idx);
+        return cell == null ? null : cell.getMap(keysClass, valuesClass);
+    }
+
+    public <K, V> Map<K, V> getMap(int idx, Class<K> keysClass, Class<V> valuesClass) {
+        Cell cell = getCellByIdx(idx);
+        return cell == null ? null : cell.getMap(keysClass, valuesClass);
+    }
+
+    public <K, V> Map<K, V> getMap(String tableName,
+                                   String cellName,
+                                   Class<K> keysClass,
+                                   Class<V> valuesClass) {
+        Cell cell = getCellByName(tableName, cellName);
+        return cell == null ? null : cell.getMap(keysClass, valuesClass);
+    }
+
+    public <K, V> Map<K, V> getMap(String cellName, Class<K> keysClass, Class<V> valuesClass) {
+        Cell cell = getCellByName(cellName);
+        return cell == null ? null : cell.getMap(keysClass, valuesClass);
+    }
+
+
+    /**
+     * Returns the {@code String} value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @return the {@code String} value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public String getString(String tableName, int idx) {
+        return getValue(tableName, String.class);
+    }
+
+    /**
+     * Returns the {@code String} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object.
+     *
+     * @param idx the index position of the Cell we want to retrieve
+     * @return the {@code String} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object
+     */
+    public String getString(int idx) {
+        return getValue(idx, String.class);
+    }
+
+    /**
+     * Returns the {@code String} value of the {@link Cell} (associated to {@code table}) whose name
+     * iscellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code String} value of the {@link Cell} (associated to {@code table}) whose name
+     * is cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public String getString(String tableName, String cellName) {
+        return getValue(tableName, cellName, String.class);
+    }
+
+    /**
+     * Returns the {@code String} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName.
+     *
+     * @param cellName the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code String} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName
+     */
+    public String getString(String cellName) {
+        return getValue(cellName, String.class);
+    }
+
+
+    /**
+     * Returns the {@code Character} value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @return the {@code Character} value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public Character getCharacter(String tableName, int idx) {
+        return getValue(tableName, Character.class);
+    }
+
+    /**
+     * Returns the {@code Character} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object.
+     *
+     * @param idx the index position of the Cell we want to retrieve
+     * @return the {@code Character} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object
+     */
+    public Character getCharacter(int idx) {
+        return getValue(idx, Character.class);
+    }
+
+    /**
+     * Returns the {@code Character} value of the {@link Cell} (associated to {@code table}) whose name
+     * iscellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Character} value of the {@link Cell} (associated to {@code table}) whose name
+     * is cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public Character getCharacter(String tableName, String cellName) {
+        return getValue(tableName, cellName, Character.class);
+    }
+
+    /**
+     * Returns the {@code Character} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName.
+     *
+     * @param cellName the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Character} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName
+     */
+    public Character getCharacter(String cellName) {
+        return getValue(cellName, Character.class);
+    }
+
+    /**
+     * Returns the {@code Byte} value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @return the {@code Byte} value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public Byte getByte(String tableName, int idx) {
+        return getValue(tableName, Byte.class);
+    }
+
+    /**
+     * Returns the {@code Byte} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object.
+     *
+     * @param idx the index position of the Cell we want to retrieve
+     * @return the {@code Byte} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object
+     */
+    public Byte getByte(int idx) {
+        return getValue(idx, Byte.class);
+    }
+
+    /**
+     * Returns the {@code Byte} value of the {@link Cell} (associated to {@code table}) whose name
+     * iscellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Byte} value of the {@link Cell} (associated to {@code table}) whose name
+     * is cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public Byte getByte(String tableName, String cellName) {
+        return getValue(tableName, cellName, Byte.class);
+    }
+
+    /**
+     * Returns the {@code Byte} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName.
+     *
+     * @param cellName the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Byte} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName
+     */
+    public Byte getByte(String cellName) {
+        return getValue(cellName, Byte.class);
+    }
+
+    /**
+     * Returns the {@code Date} value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @return the {@code Date} value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public Date getDate(String tableName, int idx) {
+        return getValue(tableName, Date.class);
+    }
+
+    /**
+     * Returns the {@code Date} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object.
+     *
+     * @param idx the index position of the Cell we want to retrieve
+     * @return the {@code Date} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object
+     */
+    public Date getDate(int idx) {
+        return getValue(idx, Date.class);
+    }
+
+    /**
+     * Returns the {@code Date} value of the {@link Cell} (associated to {@code table}) whose name
+     * iscellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Date} value of the {@link Cell} (associated to {@code table}) whose name
+     * is cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public Date getDate(String tableName, String cellName) {
+        return getValue(tableName, cellName, Date.class);
+    }
+
+    /**
+     * Returns the {@code Date} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName.
+     *
+     * @param cellName the Date of the Cell we want to retrieve from this Cells object.
+     * @return the {@code String} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName
+     */
+    public Date getDate(String cellName) {
+        return getValue(cellName, Date.class);
+    }
+
+    /**
+     * Returns the {@code Boolean} value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @return the {@code Boolean} value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public Boolean getBoolean(String tableName, int idx) {
+        return getValue(tableName, Boolean.class);
+    }
+
+    /**
+     * Returns the {@code Boolean} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object.
+     *
+     * @param idx the index position of the Cell we want to retrieve
+     * @return the {@code Boolean} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object
+     */
+    public Boolean getBoolean(int idx) {
+        return getValue(idx, Boolean.class);
+    }
+
+    /**
+     * Returns the {@code Boolean} value of the {@link Cell} (associated to {@code table}) whose name
+     * iscellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Boolean} value of the {@link Cell} (associated to {@code table}) whose name
+     * is cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public Boolean getBoolean(String tableName, String cellName) {
+        return getValue(tableName, cellName, Boolean.class);
+    }
+
+    /**
+     * Returns the {@code Boolean} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName.
+     *
+     * @param cellName the Date of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Boolean} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName
+     */
+    public Boolean getBoolean(String cellName) {
+        return getValue(cellName, Boolean.class);
+    }
+
+    /**
+     * Returns the {@code Short} value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @return the {@code Short} value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public Short getShort(String tableName, int idx) {
+        return getValue(tableName, Short.class);
+    }
+
+    /**
+     * Returns the {@code Short} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object.
+     *
+     * @param idx the index position of the Cell we want to retrieve
+     * @return the {@code Short} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object
+     */
+    public Short getShort(int idx) {
+        return getValue(idx, Short.class);
+    }
+
+    /**
+     * Returns the {@code Short} value of the {@link Cell} (associated to {@code table}) whose name
+     * iscellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Short} value of the {@link Cell} (associated to {@code table}) whose name
+     * is cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public Short getShort(String tableName, String cellName) {
+        return getValue(tableName, cellName, Short.class);
+    }
+
+    /**
+     * Returns the {@code Short} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName.
+     *
+     * @param cellName the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Short} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName
+     */
+    public Short getShort(String cellName) {
+        return getValue(cellName, Short.class);
+    }
+
+    /**
+     * Returns the {@code Integer} value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @return the {@code Integer} value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public Integer getInteger(String tableName, int idx) {
+        return getValue(tableName, Integer.class);
+    }
+
+    /**
+     * Returns the {@code Integer} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object.
+     *
+     * @param idx the index position of the Cell we want to retrieve
+     * @return the {@code Integer} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object
+     */
+    public Integer getInteger(int idx) {
+        return getValue(idx, Integer.class);
+    }
+
+    /**
+     * Returns the {@code Integer} value of the {@link Cell} (associated to {@code table}) whose name
+     * iscellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Integer} value of the {@link Cell} (associated to {@code table}) whose name
+     * is cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public Integer getInteger(String tableName, String cellName) {
+        return getValue(tableName, cellName, Integer.class);
+    }
+
+    /**
+     * Returns the {@code Integer} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName.
+     *
+     * @param cellName the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Integer} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName
+     */
+    public Integer getInteger(String cellName) {
+        return getValue(cellName, Integer.class);
+    }
+
+    /**
+     * Returns the {@code Float} value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @return the {@code Float} value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public Float getFloat(String tableName, int idx) {
+        return getValue(tableName, Float.class);
+    }
+
+    /**
+     * Returns the {@code Float} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object.
+     *
+     * @param idx the index position of the Cell we want to retrieve
+     * @return the {@code Float} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object
+     */
+    public Float getFloat(int idx) {
+        return getValue(idx, Float.class);
+    }
+
+    /**
+     * Returns the {@code Float} value of the {@link Cell} (associated to {@code table}) whose name
+     * iscellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Float} value of the {@link Cell} (associated to {@code table}) whose name
+     * is cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public Float getFloat(String tableName, String cellName) {
+        return getValue(tableName, cellName, Float.class);
+    }
+
+    /**
+     * Returns the {@code Float} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName.
+     *
+     * @param cellName the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Float} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName
+     */
+    public Float getFloat(String cellName) {
+        return getValue(cellName, Float.class);
+    }
+
+    /**
+     * Returns the {@code Long} value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @return the {@code Long} value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public Long getLong(String tableName, int idx) {
+        return getValue(tableName, Long.class);
+    }
+
+    /**
+     * Returns the {@code Long} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object.
+     *
+     * @param idx the index position of the Cell we want to retrieve
+     * @return the {@code Long} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object
+     */
+    public Long getLong(int idx) {
+        return getValue(idx, Long.class);
+    }
+
+    /**
+     * Returns the {@code Long} value of the {@link Cell} (associated to {@code table}) whose name
+     * iscellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Long} value of the {@link Cell} (associated to {@code table}) whose name
+     * is cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public Long getLong(String tableName, String cellName) {
+        return getValue(tableName, cellName, Long.class);
+    }
+
+    /**
+     * Returns the {@code Long} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName.
+     *
+     * @param cellName the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Long} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName
+     */
+    public Long getLong(String cellName) {
+        return getValue(cellName, Long.class);
+    }
+
+    /**
+     * Returns the {@code Double} value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @return the {@code Double} value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public Double getDouble(String tableName, int idx) {
+        return getValue(tableName, Double.class);
+    }
+
+    /**
+     * Returns the {@code Double} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object.
+     *
+     * @param idx the index position of the Cell we want to retrieve
+     * @return the {@code Double} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object
+     */
+    public Double getDouble(int idx) {
+        return getValue(idx, Double.class);
+    }
+
+    /**
+     * Returns the {@code Double} value of the {@link Cell} (associated to {@code table}) whose name
+     * iscellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Double} value of the {@link Cell} (associated to {@code table}) whose name
+     * is cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public Double getDouble(String tableName, String cellName) {
+        return getValue(tableName, cellName, Double.class);
+    }
+
+    /**
+     * Returns the {@code Double} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName.
+     *
+     * @param cellName the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Double} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName
+     */
+    public Double getDouble(String cellName) {
+        return getValue(cellName, Double.class);
+    }
+
+    /**
+     * Returns the {@code BigInteger} value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @return the {@code BigInteger} value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public BigInteger getBigInteger(String tableName, int idx) {
+        return getValue(tableName, BigInteger.class);
+    }
+
+    /**
+     * Returns the {@code BigInteger} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object.
+     *
+     * @param idx the index position of the Cell we want to retrieve
+     * @return the {@code BigInteger} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object
+     */
+    public BigInteger getBigInteger(int idx) {
+        return getValue(idx, BigInteger.class);
+    }
+
+    /**
+     * Returns the {@code BigInteger} value of the {@link Cell} (associated to {@code table}) whose name
+     * iscellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code BigInteger} value of the {@link Cell} (associated to {@code table}) whose name
+     * is cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public BigInteger getBigInteger(String tableName, String cellName) {
+        return getValue(tableName, cellName, BigInteger.class);
+    }
+
+    /**
+     * Returns the {@code BigInteger} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName.
+     *
+     * @param cellName the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code BigInteger} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName
+     */
+    public BigInteger getBigInteger(String cellName) {
+        return getValue(cellName, BigInteger.class);
+    }
+
+    /**
+     * Returns the {@code BigDecimal} value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @return the {@code BigDecimal} value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public BigDecimal getBigDecimal(String tableName, int idx) {
+        return getValue(tableName, BigDecimal.class);
+    }
+
+    /**
+     * Returns the {@code BigDecimal} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object.
+     *
+     * @param idx the index position of the Cell we want to retrieve
+     * @return the {@code BigDecimal} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object
+     */
+    public BigDecimal getBigDecimal(int idx) {
+        return getValue(idx, BigDecimal.class);
+    }
+
+    /**
+     * Returns the {@code BigInteger} value of the {@link Cell} (associated to {@code table}) whose name
+     * iscellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code BigInteger} value of the {@link Cell} (associated to {@code table}) whose name
+     * is cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public BigDecimal getBigDecimal(String tableName, String cellName) {
+        return getValue(tableName, cellName, BigDecimal.class);
+    }
+
+    /**
+     * Returns the {@code BigInteger} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName.
+     *
+     * @param cellName the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code BigInteger} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName
+     */
+    public BigDecimal getBigDecimal(String cellName) {
+        return getValue(cellName, BigDecimal.class);
+    }
+
+
+    /**
+     * Returns the {@code ByteBuffer} value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @return the {@code ByteBuffer} value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public ByteBuffer getByteBuffer(String tableName, int idx) {
+        return getValue(tableName, ByteBuffer.class);
+    }
+
+    /**
+     * Returns the {@code ByteBuffer} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object.
+     *
+     * @param idx the index position of the Cell we want to retrieve
+     * @return the {@code ByteBuffer} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object
+     */
+    public ByteBuffer getByteBuffer(int idx) {
+        return getValue(idx, ByteBuffer.class);
+    }
+
+    /**
+     * Returns the {@code ByteBuffer} value of the {@link Cell} (associated to {@code table}) whose name
+     * iscellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code ByteBuffer} value of the {@link Cell} (associated to {@code table}) whose name
+     * is cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public ByteBuffer getByteBuffer(String tableName, String cellName) {
+        return getValue(tableName, cellName, ByteBuffer.class);
+    }
+
+    /**
+     * Returns the {@code ByteBuffer} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName.
+     *
+     * @param cellName the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code ByteBuffer} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName
+     */
+    public ByteBuffer getByteBuffer(String cellName) {
+        return getValue(cellName, ByteBuffer.class);
+    }
+
+
+    /**
+     * Returns the {@code URL} value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @return the {@code URL} value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public URL getURL(String tableName, int idx) {
+        return getValue(tableName, URL.class);
+    }
+
+    /**
+     * Returns the {@code URL} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object.
+     *
+     * @param idx the index position of the Cell we want to retrieve
+     * @return the {@code URL} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object
+     */
+    public URL getURL(int idx) {
+        return getValue(idx, URL.class);
+    }
+
+    /**
+     * Returns the {@code URL} value of the {@link Cell} (associated to {@code table}) whose name
+     * iscellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code URL} value of the {@link Cell} (associated to {@code table}) whose name
+     * is cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public URL getURL(String tableName, String cellName) {
+        return getValue(tableName, cellName, URL.class);
+    }
+
+    /**
+     * Returns the {@code URL} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName.
+     *
+     * @param cellName the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code URL} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName
+     */
+    public URL getURL(String cellName) {
+        return getValue(cellName, URL.class);
+    }
+
+
+    /**
+     * Returns the {@code InetAddress} value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @return the {@code InetAddress} value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public InetAddress getInetAddress(String tableName, int idx) {
+        return getValue(tableName, InetAddress.class);
+    }
+
+    /**
+     * Returns the {@code InetAddress} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object.
+     *
+     * @param idx the index position of the Cell we want to retrieve
+     * @return the {@code InetAddress} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object
+     */
+    public InetAddress getInetAddress(int idx) {
+        return getValue(idx, InetAddress.class);
+    }
+
+    /**
+     * Returns the {@code InetAddress} value of the {@link Cell} (associated to {@code table}) whose name
+     * iscellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code InetAddress} value of the {@link Cell} (associated to {@code table}) whose name
+     * is cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public InetAddress getInetAddress(String tableName, String cellName) {
+        return getValue(tableName, cellName, InetAddress.class);
+    }
+
+    /**
+     * Returns the {@code InetAddress} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName.
+     *
+     * @param cellName the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code InetAddress} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName
+     */
+    public InetAddress getInetAddress(String cellName) {
+        return getValue(cellName, InetAddress.class);
+    }
+
+    /**
+     * Returns the {@code Byte[]} value of the {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}.
+     *
+     * @param tableName the name of the owning table
+     * @param idx       the index position of the Cell we want to retrieve
+     * @return the {@code Byte[]} value of the  {@link Cell} at position {@code idx} in the list of Cell
+     * object associated to {@code table}
+     */
+    public Byte[] getBytes(String tableName, int idx) {
+        return getValue(tableName, Byte[].class);
+    }
+
+    /**
+     * Returns the {@code Byte[]} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object.
+     *
+     * @param idx the index position of the Cell we want to retrieve
+     * @return the {@code Byte[]} value of the  {@link Cell} at position {@code idx} in the list of
+     * Cell object
+     */
+    public Byte[] getBytes(int idx) {
+        return getValue(idx, Byte[].class);
+    }
+
+    /**
+     * Returns the {@code Byte[]} value of the {@link Cell} (associated to {@code table}) whose name
+     * iscellName, or null if this Cells object contains no cell whose name is cellName.
+     *
+     * @param tableName the name of the owning table
+     * @param cellName  the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Byte[]} value of the {@link Cell} (associated to {@code table}) whose name
+     * is cellName, or null if this Cells object contains no cell whose name is cellName
+     */
+    public Byte[] getBytes(String tableName, String cellName) {
+        return getValue(tableName, cellName, Byte[].class);
+    }
+
+    /**
+     * Returns the {@code Byte[]} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName.
+     *
+     * @param cellName the name of the Cell we want to retrieve from this Cells object.
+     * @return the {@code Byte[]} value of the {@link Cell} whose name is cellName, or null if this
+     * Cells object contains no cell whose name is cellName
+     */
+    public Byte[] getBytes(String cellName) {
+        return getValue(cellName, Byte[].class);
+    }
+
 }
