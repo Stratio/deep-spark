@@ -109,6 +109,19 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.stratio.deep</groupId>
+            <artifactId>deep-core</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.stratio.deep</groupId>
+            <artifactId>deep-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
 
         <!-- mongodb embedded -->
         <dependency>
@@ -116,7 +129,6 @@
             <artifactId>de.flapdoodle.embed.mongo</artifactId>
             <version>1.46.0</version>
         </dependency>
-
         <!-- mongodb hadoop connector -->
         <dependency>
             <groupId>org.mongodb</groupId>
@@ -169,6 +181,19 @@
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
             <version>2.12.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.8.7</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>snakeyaml</artifactId>
+                    <groupId>org.yaml</groupId>
+
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

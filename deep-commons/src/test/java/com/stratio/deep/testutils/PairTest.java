@@ -16,8 +16,9 @@
 
 package com.stratio.deep.testutils;
 
-import com.stratio.deep.utils.Pair;
+import com.stratio.deep.commons.utils.Pair;
 import org.testng.annotations.Test;
+
 import static org.testng.Assert.*;
 
 /**
@@ -26,23 +27,23 @@ import static org.testng.Assert.*;
 @Test
 public class PairTest {
 
-	public void testCreation(){
-		Pair p = Pair.create("hello", 4D);
+    public void testCreation() {
+        Pair p = Pair.create("hello", 4D);
 
-		assertNotNull(p);
-		assertEquals(p.left, "hello");
-		assertEquals(p.right, new Double(4));
-	}
+        assertNotNull(p);
+        assertEquals(p.left, "hello");
+        assertEquals(p.right, new Double(4));
+    }
 
-	public void testEquals(){
-		Pair p1 = Pair.create("hello", 1D);
-		Pair p2 = Pair.create("hello2D", 2D);
-		Pair p3 = Pair.create("hello", 3D);
-		Pair p4 = Pair.create("hello", 1D);
+    public void testEquals() {
+        Pair p1 = Pair.create("hello", 1D);
+        Pair p2 = Pair.create("hello2D", 2D);
+        Pair p3 = Pair.create("hello", 3D);
+        Pair p4 = Pair.create("hello", 1D);
 
-		assertFalse(p1.equals(new Integer(1)));
-		assertFalse(p1.equals(p2));
-		assertFalse(p1.equals(p3));
-		assertTrue(p1.equals(p4));
-	}
+        assertFalse(p1.equals(new Integer(1)));
+        assertFalse(p1.equals(p2));
+        assertFalse(p1.equals(p3));
+        assertTrue(p1.equals(p4));
+    }
 }
