@@ -36,6 +36,7 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +92,7 @@ public final class WritingCellToCassandra {
         inputConfig.setExtractorImplClass(CassandraCellExtractor.class);
         //inputConfig.setEntityClass(TweetEntity.class);
 
-        Map<String, String> values = new HashMap<>();
+        Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.KEYSPACE, KEYSPACENAME);
         values.put(ExtractorConstants.TABLE,    TABLENAME);
         values.put(ExtractorConstants.CQLPORT,  CQLPORT);
@@ -136,7 +137,7 @@ public final class WritingCellToCassandra {
         ExtractorConfig<Cells> outputConfig = new ExtractorConfig();
 
         outputConfig.setExtractorImplClass(CassandraCellExtractor.class);
-        Map<String, String> valuesOutput = new HashMap<>();
+        Map<String, Serializable> valuesOutput = new HashMap<>();
         valuesOutput.put(ExtractorConstants.KEYSPACE, KEYSPACENAME);
         valuesOutput.put(ExtractorConstants.TABLE,    outputTableName);
         valuesOutput.put(ExtractorConstants.CQLPORT,  CQLPORT);

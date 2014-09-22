@@ -36,6 +36,7 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -85,7 +86,7 @@ public final class WritingEntityToES {
         // Creating a configuration for the Extractor and initialize it
         ExtractorConfig<BookEntity> config = new ExtractorConfig(BookEntity.class);
 
-        Map<String, String> values = new HashMap<String, String>();
+        Map<String, Serializable> values = new HashMap<>();
 
         values.put(ExtractorConstants.DATABASE,    database);
         values.put(ExtractorConstants.HOST,        host );

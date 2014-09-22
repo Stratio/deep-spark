@@ -42,6 +42,7 @@ import org.elasticsearch.node.Node;
 import scala.Tuple2;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.*;
@@ -126,7 +127,7 @@ public final class GroupingCellWithES {
         // Creating a configuration for the Extractor and initialize it
         ExtractorConfig<Cells> config = new ExtractorConfig();
 
-        Map<String, String> values = new HashMap<>();
+        Map<String, Serializable> values = new HashMap<>();
 
         values.put(ExtractorConstants.DATABASE,    databaseIn);
         values.put(ExtractorConstants.HOST,        host );

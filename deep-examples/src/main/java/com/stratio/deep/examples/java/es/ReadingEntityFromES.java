@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +77,7 @@ public final class ReadingEntityFromES {
         // Creating a configuration for the Extractor and initialize it
         ExtractorConfig<WordCount> config = new ExtractorConfig(WordCount.class);
 
-        Map<String, String> values = new HashMap<String, String>();
+        Map<String, Serializable> values = new HashMap<>();
 
         values.put(ExtractorConstants.DATABASE,    database);
         values.put(ExtractorConstants.HOST,        host );

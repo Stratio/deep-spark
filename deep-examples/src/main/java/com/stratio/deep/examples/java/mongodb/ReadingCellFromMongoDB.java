@@ -27,6 +27,7 @@ import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,7 +80,7 @@ public final class ReadingCellFromMongoDB {
         ExtractorConfig<Cells> config = new ExtractorConfig();
 
         config.setExtractorImplClass(MongoCellExtractor.class);
-        Map<String, String> values = new HashMap<>();
+        Map<String, Serializable> values = new HashMap<>();
         values.put("database", database);
         values.put("collection",    inputCollection);
         values.put("host",  host);

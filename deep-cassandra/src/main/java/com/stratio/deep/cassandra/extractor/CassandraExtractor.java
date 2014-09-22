@@ -114,7 +114,7 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
     @Override
     public Partition[] getPartitions(ExtractorConfig<T> config) {
 
-    int id = Integer.parseInt(config.getValues().get(SPARK_RDD_ID));
+    int id = Integer.parseInt(config.getValues().get(SPARK_RDD_ID).toString());
         ICassandraDeepJobConfig<T> cellDeepJobConfig = initCustomConfig(config);
 
         List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits(cellDeepJobConfig);

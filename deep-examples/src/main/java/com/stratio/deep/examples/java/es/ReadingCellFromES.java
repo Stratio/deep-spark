@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -74,7 +75,7 @@ public final class ReadingCellFromES {
         // Creating a configuration for the Extractor and initialize it
         ExtractorConfig<Cells> config = new ExtractorConfig();
 
-        Map<String, String> values = new HashMap<>();
+        Map<String, Serializable> values = new HashMap<>();
 
         values.put(ExtractorConstants.DATABASE,    database);
         values.put(ExtractorConstants.HOST,        host );

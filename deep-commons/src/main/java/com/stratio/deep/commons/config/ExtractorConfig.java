@@ -18,6 +18,7 @@ package com.stratio.deep.commons.config;
 
 
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.utils.Pair;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -28,7 +29,7 @@ import java.util.Map;
  */
 public class ExtractorConfig<T> implements Serializable {
 
-    private Map<String, String> values = new HashMap<>();
+    private Map<String, Serializable> values = new HashMap<>();
 
     private Class extractorImplClass;
 
@@ -45,11 +46,11 @@ public class ExtractorConfig<T> implements Serializable {
         entityClass = Cells.class;
     }
 
-    public Map<String, String> getValues() {
+    public Map<String, Serializable> getValues() {
         return values;
     }
 
-    public void setValues(Map<String, String> values) {
+    public void setValues(Map<String, Serializable> values) {
         this.values = values;
     }
 
@@ -69,7 +70,7 @@ public class ExtractorConfig<T> implements Serializable {
         this.entityClass = entityClass;
     }
 
-    public ExtractorConfig<T> putValue(String key, String value) {
+    public ExtractorConfig<T> putValue(String key, Serializable value) {
         values.put(key, value);
         return this;
     }
@@ -82,6 +83,46 @@ public class ExtractorConfig<T> implements Serializable {
         this.extractorImplClassName = extractorImplClassName;
     }
 
+    public String getString(String key){
+        return getValue(String.class, key);
+    }
+
+    public Integer getInteger(String key){
+        return getValue(Integer.class, key);
+    }
+
+    public Boolean getBoolean(String key){
+        return getValue(Boolean.class, key);
+    }
+
+    public String[] getStringArray(String key){
+        return getValue(String[].class, key);
+    }
+
+    public Double getDouble(String key){
+        return getValue(Double.class, key);
+    }
+
+    public Float getFloat(String key){
+        return getValue(Float.class, key);
+    }
+
+    public Long getLong(String key){
+        return getValue(Long.class, key);
+    }
+
+    public Short getShort(String key){
+        return getValue(Short.class, key);
+    }
+
+    public Byte[] getByteArray(String key){
+        return getValue(Byte[].class, key);
+    }
+
+    public <K,V> Pair<K,V> getPair(String key, Class<K> keyClass, Class<V> valueClass){
+        return getValue(Pair.class, key);
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("ExtractorConfig{");
@@ -91,6 +132,21 @@ public class ExtractorConfig<T> implements Serializable {
         sb.append(", entityClass=").append(entityClass);
         sb.append('}');
         return sb.toString();
+    }
+
+    /**
+     * Returns the cell value casted to the specified class.
+     *
+     * @param clazz the expected class
+     * @param <T>   the return type
+     * @return the cell value casted to the specified class
+     */
+    public <T> T getValue(Class<T> clazz, String key) {
+        if (values.get(key) == null) {
+            return null;
+        } else {
+            return (T) values.get(key);
+        }
     }
 }
 

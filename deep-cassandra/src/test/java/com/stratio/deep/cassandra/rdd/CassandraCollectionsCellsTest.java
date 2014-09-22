@@ -17,6 +17,7 @@
 package com.stratio.deep.cassandra.rdd;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -67,7 +68,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
 
         assertEquals(entities.length, 500);
 
-	    String keyspace = getReadConfig().getValues().get(ExtractorConstants.KEYSPACE);
+	    String keyspace = getReadConfig().getString(ExtractorConstants.KEYSPACE);
 
         for (Cells e : entities) {
             Integer id = (Integer) e.getCellByName("id").getCellValue();
@@ -155,14 +156,14 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
     protected ExtractorConfig<Cells> initReadConfig() {
 
         ExtractorConfig<Cells> rddConfig = new ExtractorConfig<>();
-        Map<String, String> values = new HashMap<>();
+        Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST);
-        values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
+        values.put(ExtractorConstants.RPCPORT, CassandraServer.CASSANDRA_THRIFT_PORT);
         values.put(ExtractorConstants.KEYSPACE, KEYSPACE_NAME);
         values.put(ExtractorConstants.COLUMN_FAMILY, CQL3_COLLECTION_COLUMN_FAMILY);
-        values.put(ExtractorConstants.PAGE_SIZE, String.valueOf(DEFAULT_PAGE_SIZE));
-        values.put(ExtractorConstants.BISECT_FACTOR, String.valueOf(testBisectFactor));
-        values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.PAGE_SIZE, DEFAULT_PAGE_SIZE);
+        values.put(ExtractorConstants.BISECT_FACTOR, testBisectFactor);
+        values.put(ExtractorConstants.CQLPORT, CassandraServer.CASSANDRA_CQL_PORT);
 
         rddConfig.setValues(values);
         rddConfig.setExtractorImplClass(CassandraCellExtractor.class);
@@ -174,15 +175,15 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
     protected ExtractorConfig<Cells> initWriteConfig() {
 
         ExtractorConfig<Cells> rddConfig = new ExtractorConfig<>();
-        Map<String, String> values = new HashMap<>();
+        Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST);
-        values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
+        values.put(ExtractorConstants.RPCPORT, CassandraServer.CASSANDRA_THRIFT_PORT);
         values.put(ExtractorConstants.KEYSPACE, OUTPUT_KEYSPACE_NAME);
         values.put(ExtractorConstants.COLUMN_FAMILY, OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
-        values.put(ExtractorConstants.PAGE_SIZE, String.valueOf(DEFAULT_PAGE_SIZE));
-        values.put(ExtractorConstants.BISECT_FACTOR, String.valueOf(testBisectFactor));
-        values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
-        values.put(ExtractorConstants.CREATE_ON_WRITE, "true");
+        values.put(ExtractorConstants.PAGE_SIZE, DEFAULT_PAGE_SIZE);
+        values.put(ExtractorConstants.BISECT_FACTOR, testBisectFactor);
+        values.put(ExtractorConstants.CQLPORT, CassandraServer.CASSANDRA_CQL_PORT);
+        values.put(ExtractorConstants.CREATE_ON_WRITE, true);
         rddConfig.setValues(values);
         rddConfig.setExtractorImplClass(CassandraCellExtractor.class);
         return rddConfig;
@@ -205,7 +206,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
         assertTrue(mappedRDD.count() > 0);
 
         ExtractorConfig<Cells> writeConfig = getWriteConfig();
-        writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, "false");
+        writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, false);
 
         try {
             context.saveRDD(mappedRDD, writeConfig);
@@ -213,7 +214,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
             fail();
         } catch (DeepIOException e) {
             // ok
-            writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, "true");
+            writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, true);
         }
 
         context.saveRDD(mappedRDD, writeConfig);
@@ -264,7 +265,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
     @Override
     public void testSimpleSaveToCassandra() {
         ExtractorConfig<Cells> writeConfig = getWriteConfig();
-        writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, "false");
+        writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, false);
 
         try {
             executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
@@ -277,7 +278,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
             fail();
         } catch (Exception e) {
             // ok
-            writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, "true");
+            writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, true);
         }
 
         context.saveRDD(getRDD(), writeConfig);

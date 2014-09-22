@@ -42,6 +42,7 @@ import com.stratio.deep.commons.exception.DeepIndexNotFoundException;
 import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.utils.Constants;
+import com.stratio.deep.commons.utils.Pair;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -480,80 +481,80 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
         return this;
     }
 
-    public ICassandraDeepJobConfig<T> initialize(ExtractorConfig deepJobConfig) {
+    public ICassandraDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
 
 //TODO: Add filters
 
-        Map<String, String> values = deepJobConfig.getValues();
+        Map<String, Serializable> values = extractorConfig.getValues();
 
         if(values.get(USERNAME)!=null){
-            username(values.get(USERNAME));
+            username(extractorConfig.getString(USERNAME));
         }
 
         if(values.get(PASSWORD)!=null){
-            password(values.get(PASSWORD));
+            password(extractorConfig.getString(PASSWORD));
         }
 
         if(values.get(HOST)!=null){
-            host(values.get(HOST));
+            host(extractorConfig.getString(HOST));
         }
 
         if(values.get(BATCHSIZE)!=null){
-            batchSize(getIntegerValue(values.get(BATCHSIZE)));
+            batchSize(extractorConfig.getInteger(BATCHSIZE));
         }
 
 
         if(values.get(CQLPORT)!=null){
-            cqlPort(getIntegerValue(values.get(CQLPORT)));
+            cqlPort(extractorConfig.getInteger(CQLPORT));
         }
         if(values.get(TABLE)!=null){
-            table(values.get(TABLE));
+            table(extractorConfig.getString(TABLE));
         }
         if(values.get(KEYSPACE)!=null){
-            keyspace(values.get(KEYSPACE));
+            keyspace(extractorConfig.getString(KEYSPACE));
         }
         if(values.get(COLUMN_FAMILY)!=null){
-            columnFamily(values.get(COLUMN_FAMILY));
+            columnFamily(extractorConfig.getString(COLUMN_FAMILY));
         }
 
 
         if(values.get(RPCPORT)!=null){
-            rpcPort(getIntegerValue(values.get(RPCPORT)));
+            rpcPort(extractorConfig.getInteger(RPCPORT));
         }
 
 
         if(values.get(CREATE_ON_WRITE)!=null){
-            createTableOnWrite(getBooleanValue(values.get(CREATE_ON_WRITE)));
+            createTableOnWrite(extractorConfig.getBoolean(CREATE_ON_WRITE));
         }
 
 
         if(values.get(PAGE_SIZE)!=null){
-            pageSize(getIntegerValue(values.get(PAGE_SIZE)));
+            pageSize(extractorConfig.getInteger(PAGE_SIZE));
         }
 
 
         if(values.get(READ_CONSISTENCY_LEVEL)!=null){
-            readConsistencyLevel(values.get(READ_CONSISTENCY_LEVEL));
+            readConsistencyLevel(extractorConfig.getString(READ_CONSISTENCY_LEVEL));
         }
 
         if(values.get(WRITE_CONSISTENCY_LEVEL)!=null){
-            writeConsistencyLevel(values.get(WRITE_CONSISTENCY_LEVEL));
+            writeConsistencyLevel(extractorConfig.getString(WRITE_CONSISTENCY_LEVEL));
         }
 
 
         if(values.get(INPUT_COLUMNS)!=null){
-            inputColumns(getStringArray(values.get(INPUT_COLUMNS)));
+            inputColumns(extractorConfig.getStringArray(INPUT_COLUMNS));
         }
 
 
         if(values.get(BISECT_FACTOR)!=null){
-            bisectFactor(getIntegerValue(values.get(BISECT_FACTOR)));
+            bisectFactor(extractorConfig.getInteger(BISECT_FACTOR));
         }
 
 
         if(values.get(ExtractorConstants.FILTER_FIELD)!=null){
-            String[] filterFields=getStringArray(values.get(ExtractorConstants.FILTER_FIELD));
-            filterByField(filterFields[0].trim(), filterFields[1].trim());
+            Pair<String, Serializable> filterFields =  extractorConfig.getPair(ExtractorConstants.FILTER_FIELD, String.class, Serializable.class);
+            filterByField(filterFields.left, filterFields.right);
         }
         this.initialize();
 

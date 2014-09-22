@@ -33,6 +33,7 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +89,7 @@ public final class WritingEntityToCassandra {
         inputConfig.setExtractorImplClass(CassandraEntityExtractor.class);
         //inputConfig.setEntityClass(TweetEntity.class);
 
-        Map<String, String> values = new HashMap<>();
+        Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.KEYSPACE, KEYSPACENAME);
         values.put(ExtractorConstants.TABLE,    TABLENAME);
         values.put(ExtractorConstants.CQLPORT,  CQLPORT);

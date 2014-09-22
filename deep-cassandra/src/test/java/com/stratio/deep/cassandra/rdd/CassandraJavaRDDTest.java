@@ -17,6 +17,7 @@
 package com.stratio.deep.cassandra.rdd;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.charset.CharacterCodingException;
 import java.util.HashMap;
@@ -78,12 +79,12 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
 
         rddConfig = new ExtractorConfig<>(TestEntity.class);
-        Map<String, String> values = new HashMap<>();
+        Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST);
-        values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
+        values.put(ExtractorConstants.RPCPORT, CassandraServer.CASSANDRA_THRIFT_PORT);
         values.put(ExtractorConstants.KEYSPACE, KEYSPACE_NAME);
         values.put(ExtractorConstants.COLUMN_FAMILY, COLUMN_FAMILY);
-        values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.CQLPORT, CassandraServer.CASSANDRA_CQL_PORT);
 //        values.put(ExtractorConstants.P, "org.apache.cassandra.dht.Murmur3Partitioner")
 
         rddConfig.setValues(values);
@@ -234,13 +235,13 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
 
         ExtractorConfig<Cells> writeConfig = new ExtractorConfig<>();
-        Map<String, String> values = new HashMap<>();
+        Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST);
-        values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
+        values.put(ExtractorConstants.RPCPORT, CassandraServer.CASSANDRA_THRIFT_PORT);
         values.put(ExtractorConstants.KEYSPACE, OUTPUT_KEYSPACE_NAME);
         values.put(ExtractorConstants.COLUMN_FAMILY, table);
-        values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
-        values.put(ExtractorConstants.CREATE_ON_WRITE, "true");
+        values.put(ExtractorConstants.CQLPORT, CassandraServer.CASSANDRA_CQL_PORT);
+        values.put(ExtractorConstants.CREATE_ON_WRITE, true);
 
         writeConfig.setValues(values);
         writeConfig.setExtractorImplClass(CassandraCellExtractor.class);
@@ -268,13 +269,13 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
 
         ExtractorConfig<Cells> writeConfig = new ExtractorConfig<>();
-        Map<String, String> values = new HashMap<>();
+        Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST);
-        values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
+        values.put(ExtractorConstants.RPCPORT, CassandraServer.CASSANDRA_THRIFT_PORT);
         values.put(ExtractorConstants.KEYSPACE, OUTPUT_KEYSPACE_NAME);
         values.put(ExtractorConstants.COLUMN_FAMILY, "page");
-        values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
-        values.put(ExtractorConstants.CREATE_ON_WRITE, "true");
+        values.put(ExtractorConstants.CQLPORT, CassandraServer.CASSANDRA_CQL_PORT);
+        values.put(ExtractorConstants.CREATE_ON_WRITE, true);
 
         writeConfig.setValues(values);
         writeConfig.setExtractorImplClass(CassandraCellExtractor.class);

@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -80,7 +81,7 @@ public final class GroupingEntityWithES {
         // Creating a configuration for the Extractor and initialize it
         ExtractorConfig<WordCount> config = new ExtractorConfig(WordCount.class);
 
-        Map<String, String> values = new HashMap<String, String>();
+        Map<String, Serializable> values = new HashMap<>();
 
         values.put(ExtractorConstants.DATABASE,    database);
         values.put(ExtractorConstants.HOST,        host );

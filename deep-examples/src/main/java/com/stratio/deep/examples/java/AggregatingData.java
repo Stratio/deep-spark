@@ -34,6 +34,7 @@ import scala.Tuple2;
 import scala.Tuple3;
 
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,7 +90,7 @@ public final class AggregatingData {
 
         config.setExtractorImplClass(CassandraEntityExtractor.class);
 
-        Map<String, String> values = new HashMap<>();
+        Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.KEYSPACE, keySpace);
         values.put(ExtractorConstants.TABLE,    tableName);
         values.put(ExtractorConstants.CQLPORT,  cqlPort);

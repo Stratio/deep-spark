@@ -13,6 +13,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,7 +64,7 @@ public class RecoverCells {
         config.setExtractorImplClass(CassandraCellExtractor.class);
         config.setEntityClass(Cells.class);
 
-        Map<String, String> values = new HashMap<>();
+        Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.KEYSPACE, KEYSPACENAME);
         values.put(ExtractorConstants.TABLE,    TABLENAME);
         values.put(ExtractorConstants.CQLPORT,  CQLPORT);
