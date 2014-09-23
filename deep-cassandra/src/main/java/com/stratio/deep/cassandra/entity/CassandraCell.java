@@ -249,12 +249,16 @@ public class CassandraCell extends Cell {
 
         boolean isCellEqual = cellEquals(cell);
         boolean isKey = keyEquals(cell);
-        boolean isCellValidatorEqual = cellValidatorEquals(cell);
-
-        return isCellEqual && isKey && isCellValidatorEqual;
+//        boolean isCellValidatorEqual = cellValidatorEquals(cell);
+        boolean iscql3TypeClassNameEquals = cql3TypeClassNameEquals(cell);
+        return isCellEqual && isKey && iscql3TypeClassNameEquals;
     }
 
     private boolean cellEquals(CassandraCell cell) {
+        return cql3TypeClassName != null ? cql3TypeClassName.equals(cell.cql3TypeClassName) : cell.cql3TypeClassName == null;
+    }
+
+    private boolean cql3TypeClassNameEquals(CassandraCell cell) {
         return cellName.equals(cell.cellName) && cellValue != null ? cellValue.equals(cell.cellValue) : cell.cellValue == null;
     }
 
@@ -346,7 +350,10 @@ public class CassandraCell extends Cell {
 
     @Override
     public String toString() {
+
         final StringBuffer sb = new StringBuffer("CassandraCell{");
+        sb.append("cellName='").append(cellName).append('\'');
+        sb.append(", cellValue=").append(cellValue);
         sb.append("isPartitionKey=").append(isPartitionKey);
         sb.append(", isClusterKey=").append(isClusterKey);
         sb.append(", cellValidator=").append(cellValidator);

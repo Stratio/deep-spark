@@ -288,7 +288,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
             context.saveRDD(outRDD.rdd(), writeConfig);
 
             fail();
-        } catch (DeepNoSuchFieldException e) {
+        } catch (Exception e) {
             // OK
             logger.info("Correctly catched DeepNoSuchFieldException");
         }

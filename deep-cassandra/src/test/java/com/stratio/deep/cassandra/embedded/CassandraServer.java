@@ -134,6 +134,8 @@ public class CassandraServer {
 
     private String[] startupCommands;
 
+    private Cluster cluster;
+
     static ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public CassandraServer() {
@@ -152,7 +154,7 @@ public class CassandraServer {
         if (startupCommands == null || startupCommands.length == 0) {
             return;
         }
-        Cluster cluster = Cluster.builder().withPort(CASSANDRA_CQL_PORT)
+        cluster = Cluster.builder().withPort(CASSANDRA_CQL_PORT)
                 .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
 
         try (Session session = cluster.connect()) {
@@ -174,6 +176,7 @@ public class CassandraServer {
     }
 
     public void shutdown() throws IOException {
+        cluster.close();
         executor.shutdown();
         executor.shutdownNow();
     }
