@@ -48,5 +48,6 @@ public class ExtractorConstants {
 
     public static String USE_CHUNKS = "useChunk";
 
+    public static String SPLIT_SIZE = "splitSize";
 
 }

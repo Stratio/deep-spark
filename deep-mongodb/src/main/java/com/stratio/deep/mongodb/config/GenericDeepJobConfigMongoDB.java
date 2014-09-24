@@ -32,6 +32,7 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.IGNORE
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_SHARD;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_SPLITS;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_CHUNKS;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.SPLIT_SIZE;
 import com.mongodb.QueryBuilder;
 import com.mongodb.hadoop.MongoInputFormat;
 import com.mongodb.hadoop.util.MongoConfigUtil;
@@ -143,6 +144,8 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
 
 
     private boolean splitsUseChunks = true;
+
+    private Integer splitSize = 8;
 
 
     private Map<String, Object> customConfiguration;
@@ -460,6 +463,7 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
 
         configHadoop.set(MongoConfigUtil.OUTPUT_URI, connection.toString());
 
+        configHadoop.set(MongoConfigUtil.INPUT_SPLIT_SIZE, String.valueOf(splitSize));
 
         if (inputKey != null) {
             configHadoop.set(MongoConfigUtil.INPUT_KEY, inputKey);
@@ -618,6 +622,9 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
 
         if(values.get(USE_CHUNKS)!=null){
             splitsUseChunks(extractorConfig.getBoolean(USE_CHUNKS));
+        }
+        if(values.get(SPLIT_SIZE)!=null){
+            splitSize = extractorConfig.getInteger(SPLIT_SIZE);
         }
 
 
