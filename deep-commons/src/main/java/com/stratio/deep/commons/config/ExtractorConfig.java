@@ -96,7 +96,12 @@ public class ExtractorConfig<T> implements Serializable {
     }
 
     public String[] getStringArray(String key){
-        return getValue(String[].class, key);
+        try{
+            return getValue(String[].class, key);
+        }catch (ClassCastException e){
+            return new String[] {getString(key)};
+        }
+
     }
 
     public Double getDouble(String key){

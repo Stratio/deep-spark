@@ -29,6 +29,9 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.SORT;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_KEY;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.FILTER_QUERY;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.IGNORE_ID_FIELD;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_SHARD;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_SPLITS;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_CHUNKS;
 import com.mongodb.QueryBuilder;
 import com.mongodb.hadoop.MongoInputFormat;
 import com.mongodb.hadoop.util.MongoConfigUtil;
@@ -40,6 +43,7 @@ import org.apache.hadoop.mapreduce.InputFormat;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
+import java.io.Serializable;
 import java.util.*;
 
 
@@ -548,57 +552,74 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
 
 
     @Override
-    public IMongoDeepJobConfig<T> initialize(ExtractorConfig deepJobConfig) {
-        Map<String, String> values = deepJobConfig.getValues();
+    public IMongoDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
+        Map<String, Serializable> values = extractorConfig.getValues();
 
         if(values.get(USERNAME)!=null){
-            username(values.get(USERNAME));
+            username(extractorConfig.getString(USERNAME));
         }
 
         if(values.get(PASSWORD)!=null){
-            password(values.get(PASSWORD));
+            password(extractorConfig.getString(PASSWORD));
         }
 
         if(values.get(HOST)!=null){
-            host(getStringArray(values.get(HOST)));
+            host((extractorConfig.getStringArray(HOST)));
         }
 
         if(values.get(COLLECTION)!=null){
-            collection(values.get(COLLECTION));
+            collection(extractorConfig.getString(COLLECTION));
         }
 
 
         if(values.get(INPUT_COLUMNS)!=null){
-            inputColumns(getStringArray(values.get(INPUT_COLUMNS)));
+            inputColumns(extractorConfig.getStringArray(INPUT_COLUMNS));
         }
 
         if(values.get(DATABASE)!=null){
-            database(values.get(DATABASE));
+            database(extractorConfig.getString(DATABASE));
         }
 
         if(values.get(REPLICA_SET)!=null){
-            replicaSet(values.get(REPLICA_SET));
+            replicaSet(extractorConfig.getString(REPLICA_SET));
         }
 
         if(values.get(READ_PREFERENCE)!=null){
-            readPreference(values.get(READ_PREFERENCE));
+            readPreference(extractorConfig.getString(READ_PREFERENCE));
         }
 
         if(values.get(SORT)!=null){
-            sort(values.get(SORT));
+            sort(extractorConfig.getString(SORT));
         }
 
         if(values.get(FILTER_QUERY)!=null){
-            filterQuery(values.get(FILTER_QUERY));
+            filterQuery(extractorConfig.getString(FILTER_QUERY));
         }
 
         if(values.get(INPUT_KEY)!=null){
-            inputKey(values.get(INPUT_KEY));
+            inputKey(extractorConfig.getString(INPUT_KEY));
         }
 
-        if(values.get(IGNORE_ID_FIELD)!=null&&getBooleanValue(values.get(IGNORE_ID_FIELD))==true){
+        if(values.get(IGNORE_ID_FIELD)!=null&&extractorConfig.getBoolean(IGNORE_ID_FIELD)==true){
             ignoreIdField();
         }
+
+        if(values.get(INPUT_KEY)!=null){
+            inputKey(extractorConfig.getString(INPUT_KEY));
+        }
+
+        if(values.get(USE_SHARD)!=null){
+            useShards(extractorConfig.getBoolean(USE_SHARD));
+        }
+
+        if(values.get(USE_SPLITS)!=null){
+            createInputSplit(extractorConfig.getBoolean(USE_SPLITS));
+        }
+
+        if(values.get(USE_CHUNKS)!=null){
+            splitsUseChunks(extractorConfig.getBoolean(USE_CHUNKS));
+        }
+
 
         this.initialize();
 

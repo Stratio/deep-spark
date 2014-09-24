@@ -42,5 +42,11 @@ public class ExtractorConstants {
 
     public static String IGNORE_ID_FIELD = "ignoreIdField";
 
+    public static String USE_SHARD = "useShard";
+
+    public static String USE_SPLITS = "useSplit";
+
+    public static String USE_CHUNKS = "useChunk";
+
 
 }
