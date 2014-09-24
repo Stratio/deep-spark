@@ -257,6 +257,20 @@ public abstract class Cell implements Serializable {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Cell cell = (Cell) o;
+
+        return this.cellName.equals(cell.cellName)&&this.cellValue.equals(cell.cellValue);
+    }
+
     /**
      * @return true is the current cell is a key inside the datastore, false
      *         otherwise.

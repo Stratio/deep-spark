@@ -35,4 +35,18 @@ public class MongoCell extends Cell {
     public static Cell create(String cellName, Object cellValue) {
         return new MongoCell(cellName, cellValue);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        MongoCell cell = (MongoCell) o;
+
+        return this.cellName.equals(cell.cellName)&&this.cellValue.equals(cell.cellValue);
+    }
 }
