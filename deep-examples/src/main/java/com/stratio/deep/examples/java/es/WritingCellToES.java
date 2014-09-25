@@ -43,7 +43,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
- * Example class to write a RDD to mongoDB
+ * Example class to write a RDD to ES
  */
 public final class WritingCellToES {
     private static final Logger LOG = Logger.getLogger(WritingCellToES.class);
@@ -67,14 +67,7 @@ public final class WritingCellToES {
         String type     = "test";
         String databaseOutput ="cell/output";
 
-        //Call async the Extractor netty Server
-        ExecutorService es = Executors.newFixedThreadPool(1);
-        final Future future = es.submit(new Callable() {
-            public Object call() throws Exception {
-                ExtractorServer.main(null);
-                return null;
-            }
-        });
+
 
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
@@ -144,7 +137,6 @@ public final class WritingCellToES {
         deepContext.saveRDD(outputRDD.rdd(), outputConfigEntity);
 
 
-        ExtractorServer.close();
         deepContext.stop();
     }
 }

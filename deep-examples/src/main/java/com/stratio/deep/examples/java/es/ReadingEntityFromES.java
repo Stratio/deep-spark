@@ -38,7 +38,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
- * Example class to read an entity from mongoDB
+ * Example class to read an entity from ES
  */
 public final class ReadingEntityFromES {
 
@@ -60,14 +60,8 @@ public final class ReadingEntityFromES {
         String database = "entity/output";
         String index    = "book";
         String type     = "test";
-        //Call async the Extractor netty Server
-        ExecutorService es = Executors.newFixedThreadPool(1);
-        final Future future = es.submit(new Callable() {
-            public Object call() throws Exception {
-                ExtractorServer.main(null);
-                return null;
-            }
-        });
+
+
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -95,7 +89,7 @@ public final class ReadingEntityFromES {
         LOG.info("-------------------------   Num of rows: " + counts +" ------------------------------");
         LOG.info("-------------------------   Num of Columns: " + collection.length+" ------------------------------");
         LOG.info("-------------------------   Element Canto: " + collection[0].getWord()+" ------------------------------");
-        ExtractorServer.close();
+
         deepContext.stop();
 
 

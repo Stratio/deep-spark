@@ -37,8 +37,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.stratio.deep.commons.extractor.server.ExtractorServer.initExtractorServer;
-import static com.stratio.deep.commons.extractor.server.ExtractorServer.stopExtractorServer;
 
 /**
  * Created by rcrespo on 25/06/14.
@@ -71,8 +69,6 @@ public final class GroupingCellWithMongoDB {
                 p.getJars());
 
 
-        initExtractorServer();
-
         ExtractorConfig<Cells> inputConfigEntity = new ExtractorConfig<>();
         inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, inputCollection);
         inputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
@@ -96,7 +92,7 @@ public final class GroupingCellWithMongoDB {
         JavaPairRDD<String, Integer> wordCount = words.mapToPair(new PairFunction<String, String, Integer>() {
             @Override
             public Tuple2<String, Integer> call(String s) throws Exception {
-                return new Tuple2<String, Integer>(s,1);
+                return new Tuple2<>(s,1);
             }
         });
 
@@ -123,7 +119,6 @@ public final class GroupingCellWithMongoDB {
 
         deepContext.saveRDD(outputRDD.rdd(), outputConfigEntity);
 
-        stopExtractorServer();
         deepContext.stop();
 
     }

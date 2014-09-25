@@ -37,8 +37,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.stratio.deep.commons.extractor.server.ExtractorServer.initExtractorServer;
-import static com.stratio.deep.commons.extractor.server.ExtractorServer.stopExtractorServer;
 
 /**
  * Created by rcrespo on 25/06/14.
@@ -64,7 +62,6 @@ public final class GroupingEntityWithMongoDB {
         String inputCollection = "input";
         String outputCollection = "output";
 
-        initExtractorServer();
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -121,7 +118,6 @@ public final class GroupingEntityWithMongoDB {
 
         deepContext.saveRDD(outputRDD.rdd(),outputConfigEntity);
 
-        stopExtractorServer();
 
         deepContext.stop();
     }

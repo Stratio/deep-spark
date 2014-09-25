@@ -45,7 +45,6 @@ public final class GroupingEntityWithES {
 
     private static final Logger LOG = Logger.getLogger(GroupingEntityWithES.class);
 
-    private static Double count;
     private static Long counts;
 
     private GroupingEntityWithES() {
@@ -64,14 +63,7 @@ public final class GroupingEntityWithES {
         String index    = "book";
         String type     = "test";
         String databaseOutput = "entity/output";
-        //Call async the Extractor netty Server
-        ExecutorService es = Executors.newFixedThreadPool(1);
-        final Future future = es.submit(new Callable() {
-            public Object call() throws Exception {
-                ExtractorServer.main(null);
-                return null;
-            }
-        });
+
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -146,7 +138,6 @@ public final class GroupingEntityWithES {
 //
 
 
-        ExtractorServer.close();
         deepContext.stop();
 
 

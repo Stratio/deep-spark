@@ -561,22 +561,6 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
         return this;
     }
 
-    private Integer getIntegerValue(String value){
-        return value!=null?Integer.valueOf(value):null;
-    }
-
-    private Boolean getBooleanValue(String value){
-        return value!=null?Boolean.valueOf(value):false;
-    }
-
-    private String[] getStringArray(String value){
-        return value!=null?value.split(","):new String[0];
-    }
-
-    private String[] getStringFilter(String value){
-        return value!=null?value.split("="):new String[0];
-    }
-
 
     /**
      * {@inheritDoc}

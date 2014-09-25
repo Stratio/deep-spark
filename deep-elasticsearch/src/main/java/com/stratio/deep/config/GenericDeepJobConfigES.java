@@ -174,16 +174,15 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
             configHadoop.set("es.query", query);
         }
 
-        if (fields != null) {
-            //String query = { "query" : { "match_all" : {  } } }
-            configHadoop.set("es.query", fields.toString());
-        }
+//        if (fields != null) {
+//            //String query = { "query" : { "match_all" : {  } } }
+//            configHadoop.set("es.query", fields.toString());
+//        }
 
         configHadoop.set("es.nodes", Utils.splitHosts(hostList));
         configHadoop.set("es.input.json", "yes");
 
 
-        if(false){
 //              index (default)
 //                new data is added while existing data (based on its id) is replaced (reindexed).
 //              create
@@ -196,7 +195,7 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
 //                known as merge or insert if the data does not exist, updates if the data exists (based on its id).
 
 //            configHadoop.set("es.write.operation","");
-        }
+
 
         if (customConfiguration !=null ){
             Set<Map.Entry<String, Object>> set = customConfiguration. entrySet();
@@ -314,75 +313,31 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
 
     @Override
-    public IESDeepJobConfig<T> initialize(ExtractorConfig deepJobConfig) {
+    public IESDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
 
-        //TODO: Add filters
+        //TODO: Add filters & inputColumns
 
-        Map<String, String> values = deepJobConfig.getValues();
+        Map<String, String> values = extractorConfig.getValues();
 
         if(values.get(ExtractorConstants.USERNAME)!=null){
-            username(values.get(ExtractorConstants.USERNAME));
+            username(extractorConfig.getString(ExtractorConstants.USERNAME));
         }
 
         if(values.get(ExtractorConstants.PASSWORD)!=null){
-            password(values.get(ExtractorConstants.PASSWORD));
+            password(extractorConfig.getString(ExtractorConstants.PASSWORD));
         }
 
         if(values.get(ExtractorConstants.HOST)!=null){
-            host(values.get(ExtractorConstants.HOST));
+            host(extractorConfig.getString(ExtractorConstants.HOST));
         }
-        if(values.get(ExtractorConstants.DATABASE)!=null){
-            database(values.get(ExtractorConstants.DATABASE));
+        if(values.get(ExtractorConstants.INDEX)!=null&& (values.get(ExtractorConstants.TYPE)!= null)){
+            database(extractorConfig.getString(ExtractorConstants.INDEX).concat("/").concat(extractorConfig.getString(ExtractorConstants.TYPE)));
        }
-        //       if(values.get(ExtractorConstants.COLLECTION)!=null){
-        //        database(values.get(ExtractorConstants.COLLECTION));
-        //      }
-        //if(values.get(ExtractorConstants.INPUT_COLUMNS)!=null){
-        //        inputColumns(getStringArray(values.get(ExtractorConstants.INPUT_COLUMNS)));
-        //}
 
-//        if(values.get(TABLE)!=null){
-//            table(values.get(TABLE));
-//        }
-//        if(values.get(KEYSPACE)!=null){
-//            keyspace(values.get(KEYSPACE));
-//        }
-//        if(values.get(COLUMN_FAMILY)!=null){
-//            columnFamily(values.get(COLUMN_FAMILY));
-//        }
-//
-//        if(values.get(CREATE_ON_WRITE)!=null){
-//            createTableOnWrite(getBooleanValue(values.get(CREATE_ON_WRITE)));
-//        }
-//
-//        if(values.get(PAGE_SIZE)!=null){
-//            pageSize(getIntegerValue(values.get(PAGE_SIZE)));
-//        }
-//
-//        if(values.get(READ_CONSISTENCY_LEVEL)!=null){
-//            readConsistencyLevel(values.get(READ_CONSISTENCY_LEVEL));
-//        }
-//
-//        if(values.get(WRITE_CONSISTENCY_LEVEL)!=null){
-//            writeConsistencyLevel(values.get(WRITE_CONSISTENCY_LEVEL));
-//        }
-//
-//
-//        if(values.get(INPUT_COLUMNS)!=null){
-//            inputColumns(getStringArray(values.get(INPUT_COLUMNS)));
-//        }
-//
-//
-//        if(values.get(BISECT_FACTOR)!=null){
-//            bisectFactor(getIntegerValue(values.get(BISECT_FACTOR)));
-//        }
         this.initialize();
 
         return this;
     }
 
-    private String[] getStringArray(String value){
-        return value!=null?value.split(","):new String[0];
-    }
 
 }

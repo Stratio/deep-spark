@@ -56,29 +56,17 @@ public final class GroupingCellWithES {
     private static final Logger LOG = Logger.getLogger(GroupingCellWithES.class);
 
     /* used to perform external tests */
-    private static Double avg;
-    private static Double variance;
-    private static Double stddev;
-    private static Double count;
+
     private static Long counts;
-    public static final String MESSAGE_TEST = "new message test";
-    public static final Integer PORT = 9200;
+
     public static final String HOST = "localhost";
     public static final String DATABASE = "twitter/tweet";
-    public static final String DATABASE_OUTPUT = "twitter/tweet2";
-    public static final String COLLECTION_OUTPUT = "output";
-    public static final String COLLECTION_OUTPUT_CELL = "outputcell";
+
     public static final String DATA_SET_NAME = "divineComedy.json";
-    public static final Long WORD_COUNT_SPECTED = 3833L;
     private static Node node = null;
     private static Client client = null;
 
     private GroupingCellWithES() {
-    }
-    public static void init() throws IOException, ExecutionException, InterruptedException {
-        node = nodeBuilder().local(true).clusterName("localhost").node();
-        client = node.client();
-        dataSetImport();
     }
 
     private static void dataSetImport() throws IOException, ExecutionException, InterruptedException {
@@ -106,18 +94,11 @@ public final class GroupingCellWithES {
 
         String job      = "java:groupingCellWithES";
         String host     = "localhost:9200";
-        String databaseIn = "book/word";
         String index    = "book";
-        String type     = "test";
-        String databaseOut = "entity/output";
-        //Call async the Extractor netty Server
-        ExecutorService es = Executors.newFixedThreadPool(1);
-        final Future future = es.submit(new Callable() {
-            public Object call() throws Exception {
-                ExtractorServer.main(null);
-                return null;
-            }
-        });
+        String type     = "word";
+        String typeOut     = "output";
+
+
 
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
@@ -129,8 +110,9 @@ public final class GroupingCellWithES {
 
         Map<String, Serializable> values = new HashMap<>();
 
-        values.put(ExtractorConstants.DATABASE,    databaseIn);
-        values.put(ExtractorConstants.HOST,        host );
+        values.put(ExtractorConstants.INDEX, index);
+        values.put(ExtractorConstants.TYPE, type);
+        values.put(ExtractorConstants.HOST, host );
 
 
         config.setExtractorImplClass(ESCellExtractor.class);
@@ -179,7 +161,8 @@ public final class GroupingCellWithES {
         LOG.info("----------------------------- Num of rows: " + counts);
 
         ExtractorConfig<Cells> outputConfigEntity = new ExtractorConfig<>();
-        outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, databaseOut);
+        outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.INDEX, index)
+                .putValue(ExtractorConstants.TYPE, typeOut);
         outputConfigEntity.setExtractorImplClass(ESCellExtractor.class);
 
 
@@ -188,7 +171,6 @@ public final class GroupingCellWithES {
 
 
 
-        ExtractorServer.close();
         deepContext.stop();
     }
 }

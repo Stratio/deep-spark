@@ -37,7 +37,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
- * Example class to read a collection from mongoDB
+ * Example class to read a collection from ES
  */
 public final class ReadingCellFromES {
     private static final Logger LOG = Logger.getLogger(ReadingCellFromES.class);
@@ -58,14 +58,6 @@ public final class ReadingCellFromES {
         String index    = "book";
         String type     = "test";
 
-        //Call async the Extractor netty Server
-        ExecutorService es = Executors.newFixedThreadPool(1);
-        final Future future = es.submit(new Callable() {
-            public Object call() throws Exception {
-                ExtractorServer.main(null);
-                return null;
-            }
-        });
 
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
@@ -91,6 +83,6 @@ public final class ReadingCellFromES {
 
         LOG.info("--------------------------------- Num of rows: " + counts);
         LOG.info("--------------------------------- Num of rows: " + rdd.first());
-        ExtractorServer.close();
+
         deepContext.stop();
 }}

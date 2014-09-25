@@ -14,6 +14,7 @@
  */
 package com.stratio.deep.commons.extractor.server;
 
+import com.stratio.deep.commons.exception.DeepInstantiationException;
 import com.stratio.deep.commons.extractor.actions.*;
 import com.stratio.deep.commons.extractor.response.*;
 import com.stratio.deep.commons.config.ExtractorConfig;
@@ -21,12 +22,15 @@ import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.rdd.IExtractor;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.apache.log4j.Logger;
 import org.apache.spark.Partition;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Action> {
+
+    private static final Logger LOG = Logger.getLogger(ExtractorServerHandler.class);
 
     private IExtractor<T> extractor;
 
@@ -144,8 +148,8 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
 
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error("Impossible to make an extractor instance, check classpath " +e.getMessage());
+            throw new DeepInstantiationException("Impossible to make an extractor instance, check classpath " +e.getMessage());
         }
     }
 

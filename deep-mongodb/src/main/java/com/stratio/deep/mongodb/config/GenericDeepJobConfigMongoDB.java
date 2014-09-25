@@ -170,7 +170,7 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     /**
      * {@inheritDoc}
      */
-    // TODO
+    // TODO : cheking
     @Override
     public IMongoDeepJobConfig<T> pageSize(int pageSize) {
         return this;
@@ -375,7 +375,7 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     /**
      * {@inheritDoc}
      */
-    // TODO
+    // TODO: cheking
     @Override
     public int getPageSize() {
         return 0;
@@ -632,15 +632,4 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
         return this;
     }
 
-    private Integer getIntegerValue(String value){
-        return value!=null?Integer.valueOf(value):null;
-    }
-
-    private Boolean getBooleanValue(String value){
-        return value!=null?Boolean.valueOf(value):false;
-    }
-
-    private String[] getStringArray(String value){
-        return value!=null?value.trim().split(","):new String[0];
-    }
 }

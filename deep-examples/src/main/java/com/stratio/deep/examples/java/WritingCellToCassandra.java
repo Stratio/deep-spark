@@ -71,8 +71,8 @@ public final class WritingCellToCassandra {
 
         String KEYSPACENAME = "crawler";
         String TABLENAME    = "listdomains";
-        Integer cqlPort      = "9042";
-        Integer rpcPort      = "9160";
+        Integer cqlPort      = 9042;
+        Integer rpcPort      =  9160;
         String HOST         = "127.0.0.1";
 
         final String outputTableName = "newlistdomains";
@@ -95,8 +95,8 @@ public final class WritingCellToCassandra {
         Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.KEYSPACE, KEYSPACENAME);
         values.put(ExtractorConstants.TABLE,    TABLENAME);
-        values.put(ExtractorConstants.CQLPORT,  CQLPORT);
-        values.put(ExtractorConstants.RPCPORT,  RPCPORT);
+        values.put(ExtractorConstants.CQLPORT,  cqlPort);
+        values.put(ExtractorConstants.RPCPORT,  rpcPort);
         values.put(ExtractorConstants.HOST,     HOST );
 
         inputConfig.setValues(values);
@@ -140,8 +140,8 @@ public final class WritingCellToCassandra {
         Map<String, Serializable> valuesOutput = new HashMap<>();
         valuesOutput.put(ExtractorConstants.KEYSPACE, KEYSPACENAME);
         valuesOutput.put(ExtractorConstants.TABLE,    outputTableName);
-        valuesOutput.put(ExtractorConstants.CQLPORT,  CQLPORT);
-        valuesOutput.put(ExtractorConstants.RPCPORT,  RPCPORT);
+        valuesOutput.put(ExtractorConstants.CQLPORT,  cqlPort);
+        valuesOutput.put(ExtractorConstants.RPCPORT,  rpcPort);
         valuesOutput.put(ExtractorConstants.HOST,     HOST );
         valuesOutput.put(ExtractorConstants.CREATE_ON_WRITE,    "true" );
 

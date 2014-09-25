@@ -44,7 +44,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
- * Example class to write an entity to mongoDB from
+ * Example class to write an entity to ES
  */
 public final class WritingEntityToES {
     private static final Logger LOG = Logger.getLogger(WritingEntityToES.class);
@@ -69,14 +69,6 @@ public final class WritingEntityToES {
         String index    = "book";
         String type     = "test";
         String database2 = "entity/output";
-        //Call async the Extractor netty Server
-        ExecutorService es = Executors.newFixedThreadPool(1);
-        final Future future = es.submit(new Callable() {
-            public Object call() throws Exception {
-                ExtractorServer.main(null);
-                return null;
-            }
-        });
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -152,7 +144,6 @@ public final class WritingEntityToES {
 
 
 
-        ExtractorServer.close();
         deepContext.stop();
     }
 
