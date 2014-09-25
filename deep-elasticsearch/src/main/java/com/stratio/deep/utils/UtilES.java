@@ -252,7 +252,6 @@ public final class UtilES {
      * @throws InvocationTargetException
      * @throws NoSuchMethodException
      */
-    //TODO : Generic? reflection?
     private static Object getObjectFromWritable(Writable writable) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Object object = null;
 
@@ -283,7 +282,7 @@ public final class UtilES {
         else if(writable instanceof FloatWritable ) {
             object = ((FloatWritable) writable).get();
         }else {
-            //TODO : exception?
+            //TODO : do nothing
         }
 
         return object;

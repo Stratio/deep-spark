@@ -67,7 +67,6 @@ public class ExtractorClient<T> implements IExtractor<T> {
             // Get the handler instance to initiate the request.
             this.handler = ch.pipeline().get(ExtractorClientHandler.class);
         } catch (SSLException | InterruptedException e) {
-            //TODO
             throw new DeepExtractorinitializationException(e);
 
         }

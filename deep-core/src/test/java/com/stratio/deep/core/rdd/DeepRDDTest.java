@@ -150,16 +150,6 @@ public void testCompute() throws Exception {
     }
 
 
-    /**
-* 
-* Method: getConfig() 
-* 
-*/ 
-@Test
-public void testGetConfig() throws Exception { 
-//TODO: Test goes here... 
-} 
-
 
 /** 
 * 

@@ -71,8 +71,8 @@ public final class WritingCellToCassandra {
 
         String KEYSPACENAME = "crawler";
         String TABLENAME    = "listdomains";
-        String CQLPORT      = "9042";
-        String RPCPORT      = "9160";
+        Integer cqlPort      = "9042";
+        Integer rpcPort      = "9160";
         String HOST         = "127.0.0.1";
 
         final String outputTableName = "newlistdomains";

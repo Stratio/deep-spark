@@ -199,7 +199,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     /**
      * {@inheritDoc}
      */
-    // TODO
     @Override
     public String[] getInputColumns() {
         return fields.keySet().toArray(new String[fields.keySet().size()]);
