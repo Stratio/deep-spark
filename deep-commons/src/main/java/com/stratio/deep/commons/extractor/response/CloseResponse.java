@@ -14,7 +14,6 @@ public class CloseResponse extends Response {
 
     private boolean data;
 
-
     public CloseResponse() {
         super(ActionType.CLOSE);
         this.data = true;

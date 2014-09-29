@@ -1,9 +1,10 @@
 package com.stratio.deep.testentity;
 
+import org.bson.types.ObjectId;
+
 import com.stratio.deep.commons.annotations.DeepEntity;
 import com.stratio.deep.commons.annotations.DeepField;
 import com.stratio.deep.commons.entity.IDeepType;
-import org.bson.types.ObjectId;
 
 /**
  * Created by rcrespo on 18/06/14.

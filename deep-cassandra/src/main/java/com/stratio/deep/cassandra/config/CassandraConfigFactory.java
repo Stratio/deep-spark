@@ -16,11 +16,12 @@
 
 package com.stratio.deep.cassandra.config;
 
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.entity.IDeepType;
+import java.io.Serializable;
+
 import org.apache.log4j.Logger;
 
-import java.io.Serializable;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.entity.IDeepType;
 
 /**
  * Factory class for deep configuration objects.
@@ -76,6 +77,5 @@ public final class CassandraConfigFactory implements Serializable {
     public static <T extends IDeepType> ICassandraDeepJobConfig<T> createWriteConfig(Class<T> entityClass) {
         return new EntityDeepJobConfig<>(entityClass);
     }
-
 
 }

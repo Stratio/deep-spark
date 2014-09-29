@@ -16,6 +16,7 @@
 package com.stratio.deep.core.rdd;
 
 import org.apache.spark.api.java.JavaRDD;
+
 import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
 
@@ -24,11 +25,9 @@ import scala.reflect.ClassTag$;
  */
 public class DeepJavaRDD<T> extends JavaRDD<T> {
 
-
     public DeepJavaRDD(DeepRDD<T> rdd) {
         super(rdd, ClassTag$.MODULE$.<T>apply(rdd.config.value().getEntityClass()));
     }
-
 
     @Override
     public ClassTag<T> classTag() {

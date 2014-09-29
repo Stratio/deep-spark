@@ -16,18 +16,17 @@
 
 package com.stratio.deep.examples.java.es;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
-import com.google.common.io.Resources;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.extractor.server.ExtractorServer;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.entity.ESCell;
-import com.stratio.deep.extractor.ESCellExtractor;
-import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
-
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -39,15 +38,17 @@ import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
+
+import com.google.common.io.Resources;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.entity.ESCell;
+import com.stratio.deep.extractor.ESCellExtractor;
+import com.stratio.deep.utils.ContextProperties;
+
 import scala.Tuple2;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.*;
-
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 /**
  * Created by rcrespo on 25/06/14.
@@ -81,10 +82,11 @@ public final class GroupingCellWithES {
             CountResponse action = client.prepareCount("book").setTypes("test")
                     .execute()
                     .actionGet();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     public static void main(String[] args) {
 
         doMain(args);
@@ -92,18 +94,15 @@ public final class GroupingCellWithES {
 
     public static void doMain(String[] args) {
 
-        String job      = "java:groupingCellWithES";
-        String host     = "localhost:9200";
-        String index    = "book";
-        String type     = "word";
-        String typeOut     = "output";
-
-
+        String job = "java:groupingCellWithES";
+        String host = "localhost:9200";
+        String index = "book";
+        String type = "word";
+        String typeOut = "output";
 
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
-
 
         // Creating a configuration for the Extractor and initialize it
         ExtractorConfig<Cells> config = new ExtractorConfig();
@@ -112,17 +111,15 @@ public final class GroupingCellWithES {
 
         values.put(ExtractorConstants.INDEX, index);
         values.put(ExtractorConstants.TYPE, type);
-        values.put(ExtractorConstants.HOST, host );
-
+        values.put(ExtractorConstants.HOST, host);
 
         config.setExtractorImplClass(ESCellExtractor.class);
         config.setValues(values);
 
         // Creating the RDD
-        RDD<Cells> rdd =  deepContext.createRDD(config);
+        RDD<Cells> rdd = deepContext.createRDD(config);
 
-
-        JavaRDD<String> words =rdd.toJavaRDD().flatMap(new FlatMapFunction<Cells, String>() {
+        JavaRDD<String> words = rdd.toJavaRDD().flatMap(new FlatMapFunction<Cells, String>() {
             @Override
             public Iterable<String> call(Cells cells) throws Exception {
 
@@ -134,26 +131,26 @@ public final class GroupingCellWithES {
             }
         });
 
-
         JavaPairRDD<String, Integer> wordCount = words.mapToPair(new PairFunction<String, String, Integer>() {
             @Override
             public Tuple2<String, Integer> call(String s) throws Exception {
-                return new Tuple2<String, Integer>(s,1);
+                return new Tuple2<String, Integer>(s, 1);
             }
         });
 
+        JavaPairRDD<String, Integer> wordCountReduced = wordCount
+                .reduceByKey(new Function2<Integer, Integer, Integer>() {
+                    @Override
+                    public Integer call(Integer integer, Integer integer2) throws Exception {
+                        return integer + integer2;
+                    }
+                });
 
-        JavaPairRDD<String, Integer>  wordCountReduced = wordCount.reduceByKey(new Function2<Integer, Integer, Integer>() {
-            @Override
-            public Integer call(Integer integer, Integer integer2) throws Exception {
-                return integer + integer2;
-            }
-        });
-
-        JavaRDD<Cells>  outputRDD =  wordCountReduced.map(new Function<Tuple2<String, Integer>, Cells>() {
+        JavaRDD<Cells> outputRDD = wordCountReduced.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
             public Cells call(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
-                return new Cells(ESCell.create("word", stringIntegerTuple2._1()) , ESCell.create("count", stringIntegerTuple2._2()));
+                return new Cells(ESCell.create("word", stringIntegerTuple2._1()),
+                        ESCell.create("count", stringIntegerTuple2._2()));
             }
         });
 
@@ -165,11 +162,7 @@ public final class GroupingCellWithES {
                 .putValue(ExtractorConstants.TYPE, typeOut);
         outputConfigEntity.setExtractorImplClass(ESCellExtractor.class);
 
-
         deepContext.saveRDD(outputRDD.rdd(), outputConfigEntity);
-
-
-
 
         deepContext.stop();
     }

@@ -16,22 +16,6 @@
 
 package com.stratio.deep.commons.extractor.impl;
 
-import static com.stratio.deep.commons.utils.Constants.SPARK_RDD_ID;
-
-import com.stratio.deep.commons.config.IDeepJobConfig;
-import com.stratio.deep.commons.exception.DeepGenericException;
-import com.stratio.deep.commons.functions.AbstractSerializableFunction;
-import com.stratio.deep.commons.utils.Constants;
-import com.stratio.deep.commons.utils.DeepSparkHadoopMapReduceUtil;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.rdd.IExtractor;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapreduce.*;
-import org.apache.log4j.Logger;
-import org.apache.spark.Partition;
-import org.apache.spark.rdd.NewHadoopPartition;
-import scala.Tuple2;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -40,11 +24,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.InputFormat;
+import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.hadoop.mapreduce.JobID;
+import org.apache.hadoop.mapreduce.OutputFormat;
+import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapreduce.RecordWriter;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.TaskAttemptID;
+import org.apache.log4j.Logger;
+import org.apache.spark.Partition;
+import org.apache.spark.rdd.NewHadoopPartition;
+
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.rdd.IExtractor;
+import com.stratio.deep.commons.utils.Constants;
+import com.stratio.deep.commons.utils.DeepSparkHadoopMapReduceUtil;
+
+import scala.Tuple2;
+
 /**
  * Created by rcrespo on 26/08/14.
  */
 public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IExtractor<T> {
-
 
     protected IDeepJobConfig<T, ? extends IDeepJobConfig> deepJobConfig;
 
@@ -52,9 +58,9 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
 
     protected transient RecordWriter<KOut, VOut> writer;
 
-    protected transient InputFormat<K,V> inputFormat;
+    protected transient InputFormat<K, V> inputFormat;
 
-    protected transient OutputFormat<KOut,VOut> outputFormat;
+    protected transient OutputFormat<KOut, VOut> outputFormat;
 
     protected transient String jobTrackerId;
 
@@ -74,16 +80,12 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
 
     }
 
-
-
-
     @Override
     public Partition[] getPartitions(ExtractorConfig<T> config) {
 
-
         addSparkIdToDeepJobConfig(config);
 
-        return getPartitions (deepJobConfig);
+        return getPartitions(deepJobConfig);
     }
 
     @Override
@@ -95,23 +97,21 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
         deepJobConfig = (IDeepJobConfig<T, ? extends IDeepJobConfig>) config.initialize();
         Configuration conf = deepJobConfig.getHadoopConfiguration();
 
-
         JobContext jobContext = DeepSparkHadoopMapReduceUtil.newJobContext(conf, jobId);
 
         try {
             List<InputSplit> splits = inputFormat.getSplits(jobContext);
 
-
             Partition[] partitions = new Partition[(splits.size())];
-            for (int i = 0 ; i < splits.size(); i++) {
+            for (int i = 0; i < splits.size(); i++) {
                 partitions[i] = new NewHadoopPartition(id, i, splits.get(i));
             }
 
             return partitions;
 
         } catch (IOException | InterruptedException | RuntimeException e) {
-            LOG.error("Impossible to calculate partitions " +e.getMessage());
-            throw new DeepGenericException("Impossible to calculate partitions " +e.getMessage());
+            LOG.error("Impossible to calculate partitions " + e.getMessage());
+            throw new DeepGenericException("Impossible to calculate partitions " + e.getMessage());
         }
 
     }
@@ -122,8 +122,8 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
             try {
                 finished = !reader.nextKeyValue();
             } catch (IOException | InterruptedException e) {
-                LOG.error("Impossible to get hasNext " +e.getMessage());
-                throw new DeepGenericException("Impossible to get hasNext " +e.getMessage());
+                LOG.error("Impossible to get hasNext " + e.getMessage());
+                throw new DeepGenericException("Impossible to get hasNext " + e.getMessage());
             }
             havePair = !finished;
 
@@ -140,25 +140,26 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
 
         Tuple2<K, V> tuple = null;
         try {
-            return transformElement(new Tuple2<>((K)reader.getCurrentKey(), (V)reader.getCurrentValue()), deepJobConfig);
+            return transformElement(new Tuple2<>((K) reader.getCurrentKey(), (V) reader.getCurrentValue()),
+                    deepJobConfig);
         } catch (IOException | InterruptedException e) {
-            LOG.error("Impossible to get next value " +e.getMessage());
-            throw new DeepGenericException("Impossible to get next value " +e.getMessage());
+            LOG.error("Impossible to get next value " + e.getMessage());
+            throw new DeepGenericException("Impossible to get next value " + e.getMessage());
         }
     }
 
     @Override
     public void close() {
         try {
-            if(reader!=null){
+            if (reader != null) {
                 reader.close();
             }
-            if(writer!=null){
+            if (writer != null) {
                 writer.close(hadoopAttemptContext);
             }
         } catch (IOException | InterruptedException e) {
-            LOG.error("Impossible to close RecordReader " +e.getMessage());
-            throw new DeepGenericException("Impossible to close RecordReader " +e.getMessage());
+            LOG.error("Impossible to close RecordReader " + e.getMessage());
+            throw new DeepGenericException("Impossible to close RecordReader " + e.getMessage());
         }
     }
 
@@ -170,7 +171,7 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
 
     }
 
-    private void addSparkIdToDeepJobConfig(ExtractorConfig<T> config){
+    private void addSparkIdToDeepJobConfig(ExtractorConfig<T> config) {
         int id = Integer.parseInt(config.getValues().get(Constants.SPARK_RDD_ID).toString());
 
         //the new map
@@ -181,12 +182,10 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
         Map<String, Serializable> serializableMapCustom = deepJobConfig.getCustomConfiguration();
         serializableMapCustom.putAll(serializableMap);
 
-
         deepJobConfig = (IDeepJobConfig<T, ? extends IDeepJobConfig>) deepJobConfig.initialize(config);
         deepJobConfig.customConfiguration(serializableMapCustom);
 
     }
-
 
     public abstract T transformElement(Tuple2<K, V> tuple, IDeepJobConfig<T, ? extends IDeepJobConfig> config);
 
@@ -195,30 +194,30 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
         return this;
     }
 
-
     @Override
-    public  void saveRDD(T t){
+    public void saveRDD(T t) {
         Tuple2<KOut, VOut> tuple = transformElement(t);
         try {
-            writer.write(tuple._1(),tuple._2());
+            writer.write(tuple._1(), tuple._2());
 
         } catch (IOException | InterruptedException e) {
-            LOG.error("Impossible to saveRDD " +e.getMessage());
-            throw new DeepGenericException("Impossible to saveRDD " +e.getMessage());
+            LOG.error("Impossible to saveRDD " + e.getMessage());
+            throw new DeepGenericException("Impossible to saveRDD " + e.getMessage());
         }
         return;
     }
 
     @Override
-    public void initSave(ExtractorConfig<T> config, T first){
+    public void initSave(ExtractorConfig<T> config, T first) {
         int id = Integer.parseInt(config.getValues().get(Constants.SPARK_RDD_ID).toString());
 
         int partitionIndex = Integer.parseInt(config.getValues().get(Constants.SPARK_PARTITION_ID).toString());
 
+        TaskAttemptID attemptId = DeepSparkHadoopMapReduceUtil
+                .newTaskAttemptID(jobTrackerId, id, true, partitionIndex, 0);
 
-        TaskAttemptID attemptId = DeepSparkHadoopMapReduceUtil.newTaskAttemptID(jobTrackerId, id, true, partitionIndex, 0);
-
-        hadoopAttemptContext = DeepSparkHadoopMapReduceUtil.newTaskAttemptContext(deepJobConfig.initialize(config).getHadoopConfiguration(), attemptId);
+        hadoopAttemptContext = DeepSparkHadoopMapReduceUtil
+                .newTaskAttemptContext(deepJobConfig.initialize(config).getHadoopConfiguration(), attemptId);
         try {
             writer = outputFormat.getRecordWriter(hadoopAttemptContext);
         } catch (IOException | InterruptedException e) {
@@ -226,19 +225,18 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
         }
     }
 
-
     @Override
     public void initIterator(Partition dp, IDeepJobConfig<T, ?> deepJobConfig) {
 
         int id = Integer.parseInt(deepJobConfig.getCustomConfiguration().get(Constants.SPARK_RDD_ID).toString());
 
-        NewHadoopPartition split = (NewHadoopPartition)dp;
+        NewHadoopPartition split = (NewHadoopPartition) dp;
 
-        TaskAttemptID attemptId = DeepSparkHadoopMapReduceUtil.newTaskAttemptID(jobTrackerId, id, true, split.index(), 0);
+        TaskAttemptID attemptId = DeepSparkHadoopMapReduceUtil
+                .newTaskAttemptID(jobTrackerId, id, true, split.index(), 0);
 
-
-        TaskAttemptContext hadoopAttemptContext = DeepSparkHadoopMapReduceUtil.newTaskAttemptContext(deepJobConfig.getHadoopConfiguration(), attemptId);
-
+        TaskAttemptContext hadoopAttemptContext = DeepSparkHadoopMapReduceUtil
+                .newTaskAttemptContext(deepJobConfig.getHadoopConfiguration(), attemptId);
 
         try {
             reader = inputFormat.createRecordReader(split.serializableHadoopSplit().value(), hadoopAttemptContext);
@@ -248,5 +246,5 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
         }
     }
 
-    public abstract Tuple2<KOut, VOut>  transformElement(T record);
+    public abstract Tuple2<KOut, VOut> transformElement(T record);
 }

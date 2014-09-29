@@ -33,7 +33,6 @@ public class MetadataEntity implements IDeepType {
     @DeepField
     private String source;
 
-
     public String getAuthor() {
         return author;
     }

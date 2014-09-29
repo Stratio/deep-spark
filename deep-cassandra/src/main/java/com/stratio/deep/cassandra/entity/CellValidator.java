@@ -16,16 +16,9 @@
 
 package com.stratio.deep.cassandra.entity;
 
-import com.datastax.driver.core.DataType;
-import com.google.common.collect.ImmutableMap;
-import com.stratio.deep.cassandra.util.CassandraUtils;
-import com.stratio.deep.commons.annotations.DeepField;
-import com.stratio.deep.commons.exception.DeepGenericException;
-import com.stratio.deep.commons.exception.DeepInstantiationException;
-import com.stratio.deep.commons.utils.AnnotationUtils;
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.db.marshal.*;
-import org.apache.commons.collections.CollectionUtils;
+import static java.lang.Class.forName;
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableCollection;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -33,11 +26,43 @@ import java.math.BigInteger;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
-import static java.lang.Class.forName;
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableCollection;
+import org.apache.cassandra.cql3.CQL3Type;
+import org.apache.cassandra.db.marshal.AbstractType;
+import org.apache.cassandra.db.marshal.BooleanType;
+import org.apache.cassandra.db.marshal.BytesType;
+import org.apache.cassandra.db.marshal.DateType;
+import org.apache.cassandra.db.marshal.DecimalType;
+import org.apache.cassandra.db.marshal.DoubleType;
+import org.apache.cassandra.db.marshal.FloatType;
+import org.apache.cassandra.db.marshal.InetAddressType;
+import org.apache.cassandra.db.marshal.Int32Type;
+import org.apache.cassandra.db.marshal.IntegerType;
+import org.apache.cassandra.db.marshal.ListType;
+import org.apache.cassandra.db.marshal.LongType;
+import org.apache.cassandra.db.marshal.MapType;
+import org.apache.cassandra.db.marshal.SetType;
+import org.apache.cassandra.db.marshal.TimeUUIDType;
+import org.apache.cassandra.db.marshal.TimestampType;
+import org.apache.cassandra.db.marshal.UTF8Type;
+import org.apache.cassandra.db.marshal.UUIDType;
+import org.apache.commons.collections.CollectionUtils;
+
+import com.datastax.driver.core.DataType;
+import com.google.common.collect.ImmutableMap;
+import com.stratio.deep.cassandra.util.CassandraUtils;
+import com.stratio.deep.commons.annotations.DeepField;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.exception.DeepInstantiationException;
+import com.stratio.deep.commons.utils.AnnotationUtils;
 
 /**
  * Defines a serializable CellValidator. <br/>
@@ -51,7 +76,6 @@ import static java.util.Collections.unmodifiableCollection;
  */
 public class CellValidator {
     private static final String DEFAULT_VALIDATOR_CLASSNAME = "org.apache.cassandra.db.marshal.UTF8Type";
-
 
     public static final Map<Class, CQL3Type.Native> MAP_JAVA_TYPE_TO_CQL_TYPE =
             ImmutableMap.<Class, CQL3Type.Native>builder()
@@ -69,23 +93,23 @@ public class CellValidator {
                     .put(BigInteger.class, CQL3Type.Native.VARINT)
                     .put(UUID.class, CQL3Type.Native.UUID)
                     .build();
-//
-//    public static final Map<CQL3Type.Native, Class> CQL_TYPE_TO_MAP_JAVA_TYPE =
-//            ImmutableMap.<CQL3Type.Native, Class>builder()
-//                    .put(CQL3Type.Native.TEXT, String.class)
-//                    .put(CQL3Type.Native.INT, Integer.class)
-//                    .put(CQL3Type.Native.BOOLEAN, Boolean.class)
-//                    .put(CQL3Type.Native.TIMESTAMP, Date.class)
-//                    .put(CQL3Type.Native.DECIMAL, BigDecimal.class)
-//                    .put(CQL3Type.Native.BIGINT, Long.class)
-//                    .put(CQL3Type.Native.DOUBLE, Double.class)
-//                    .put(CQL3Type.Native.FLOAT, Float.class)
-//                    .put(CQL3Type.Native.INET, InetAddress.class)
-//                    .put(CQL3Type.Native.INET, Inet4Address.class)
-//                    .put(CQL3Type.Native.INET, Inet6Address.class)
-//                    .put(CQL3Type.Native.VARINT, BigInteger.class)
-//                    .put(CQL3Type.Native.UUID, UUID.class)
-//                    .build();
+    //
+    //    public static final Map<CQL3Type.Native, Class> CQL_TYPE_TO_MAP_JAVA_TYPE =
+    //            ImmutableMap.<CQL3Type.Native, Class>builder()
+    //                    .put(CQL3Type.Native.TEXT, String.class)
+    //                    .put(CQL3Type.Native.INT, Integer.class)
+    //                    .put(CQL3Type.Native.BOOLEAN, Boolean.class)
+    //                    .put(CQL3Type.Native.TIMESTAMP, Date.class)
+    //                    .put(CQL3Type.Native.DECIMAL, BigDecimal.class)
+    //                    .put(CQL3Type.Native.BIGINT, Long.class)
+    //                    .put(CQL3Type.Native.DOUBLE, Double.class)
+    //                    .put(CQL3Type.Native.FLOAT, Float.class)
+    //                    .put(CQL3Type.Native.INET, InetAddress.class)
+    //                    .put(CQL3Type.Native.INET, Inet4Address.class)
+    //                    .put(CQL3Type.Native.INET, Inet6Address.class)
+    //                    .put(CQL3Type.Native.VARINT, BigInteger.class)
+    //                    .put(CQL3Type.Native.UUID, UUID.class)
+    //                    .build();
 
     private static final Map<String, DataType.Name> MAP_JAVA_TYPE_TO_DATA_TYPE_NAME =
             ImmutableMap.<String, DataType.Name>builder()
@@ -253,7 +277,8 @@ public class CellValidator {
     /**
      * private constructor.
      */
-    private CellValidator(String validatorClassName, Kind validatorKind, Collection<String> validatorTypes, DataType.Name cqlTypeName) {
+    private CellValidator(String validatorClassName, Kind validatorKind, Collection<String> validatorTypes,
+            DataType.Name cqlTypeName) {
         this.validatorClassName = validatorClassName != null ? validatorClassName : DEFAULT_VALIDATOR_CLASSNAME;
         this.validatorKind = validatorKind;
         this.validatorTypes = validatorTypes;
@@ -282,14 +307,14 @@ public class CellValidator {
         cqlTypeName = MAP_JAVA_TYPE_TO_DATA_TYPE_NAME.get(this.validatorClassName);
 
         switch (this.validatorKind) {
-            case SET:
-            case LIST:
-                this.validatorTypes = asList(getCollectionInnerType(types[0]));
-                break;
-            case MAP:
-                this.validatorTypes = asList(getCollectionInnerType(types[0]), getCollectionInnerType(types[1]));
-                break;
-            default:
+        case SET:
+        case LIST:
+            this.validatorTypes = asList(getCollectionInnerType(types[0]));
+            break;
+        case MAP:
+            this.validatorTypes = asList(getCollectionInnerType(types[0]), getCollectionInnerType(types[1]));
+            break;
+        default:
         }
     }
 
@@ -316,26 +341,25 @@ public class CellValidator {
             }
 
             switch (type.getName()) {
-                case SET:
-                    validatorKind = Kind.SET;
-                    validatorClassName = SetType.class.getName();
-                    break;
-                case LIST:
-                    validatorKind = Kind.LIST;
-                    validatorClassName = ListType.class.getName();
-                    break;
-                case MAP:
-                    validatorKind = Kind.MAP;
-                    validatorClassName = MapType.class.getName();
-                    break;
-                default:
-                    throw new DeepGenericException("Cannot determine collection type for " + type.getName());
+            case SET:
+                validatorKind = Kind.SET;
+                validatorClassName = SetType.class.getName();
+                break;
+            case LIST:
+                validatorKind = Kind.LIST;
+                validatorClassName = ListType.class.getName();
+                break;
+            case MAP:
+                validatorKind = Kind.MAP;
+                validatorClassName = MapType.class.getName();
+                break;
+            default:
+                throw new DeepGenericException("Cannot determine collection type for " + type.getName());
             }
 
             validatorTypes = unmodifiableCollection(validatorTypes);
         }
     }
-
 
     /**
      * Generates the cassandra marshaller ({@link org.apache.cassandra.db.marshal.AbstractType}) for this CellValidator.
@@ -357,21 +381,21 @@ public class CellValidator {
                 Iterator<String> types = validatorTypes.iterator();
 
                 switch (validatorKind) {
-                    case SET:
-                        CQL3Type cql3Type = CQL3Type.Native.valueOf(types.next().toUpperCase());
-                        abstractType = SetType.getInstance(cql3Type.getType());
-                        break;
-                    case LIST:
-                        cql3Type = CQL3Type.Native.valueOf(types.next().toUpperCase());
-                        abstractType = ListType.getInstance(cql3Type.getType());
-                        break;
-                    case MAP:
-                        cql3Type = CQL3Type.Native.valueOf(types.next().toUpperCase());
-                        CQL3Type cql3Type2 = CQL3Type.Native.valueOf(types.next().toUpperCase());
-                        abstractType = MapType.getInstance(cql3Type.getType(), cql3Type2.getType());
-                        break;
-                    default:
-                        throw new DeepGenericException("Cannot determine collection kind for " + validatorKind);
+                case SET:
+                    CQL3Type cql3Type = CQL3Type.Native.valueOf(types.next().toUpperCase());
+                    abstractType = SetType.getInstance(cql3Type.getType());
+                    break;
+                case LIST:
+                    cql3Type = CQL3Type.Native.valueOf(types.next().toUpperCase());
+                    abstractType = ListType.getInstance(cql3Type.getType());
+                    break;
+                case MAP:
+                    cql3Type = CQL3Type.Native.valueOf(types.next().toUpperCase());
+                    CQL3Type cql3Type2 = CQL3Type.Native.valueOf(types.next().toUpperCase());
+                    abstractType = MapType.getInstance(cql3Type.getType(), cql3Type2.getType());
+                    break;
+                default:
+                    throw new DeepGenericException("Cannot determine collection kind for " + validatorKind);
 
                 }
             }
@@ -461,7 +485,6 @@ public class CellValidator {
                 ", abstractType=" + abstractType +
                 '}';
     }
-
 
     /**
      * @return the original CQL3 type name (if known, null otherwise)

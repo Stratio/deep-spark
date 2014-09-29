@@ -18,7 +18,7 @@ package com.stratio.deep.commons.utils;
 
 /**
  * Class holding several public Deep constants
- * 
+ *
  * @author Luca Rosellini <luca@stratio.com>
  */
 public final class Constants {

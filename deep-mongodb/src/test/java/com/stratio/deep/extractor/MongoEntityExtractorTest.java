@@ -16,16 +16,15 @@
 
 package com.stratio.deep.extractor;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.core.extractor.ExtractorTest;
-import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
-import com.stratio.deep.core.entity.BookEntity;
-import com.stratio.deep.core.entity.CantoEntity;
-import com.stratio.deep.core.entity.WordCount;
+import static com.stratio.deep.extractor.MongoJavaRDDTest.HOST;
+import static com.stratio.deep.extractor.MongoJavaRDDTest.PORT;
+import static com.stratio.deep.extractor.MongoJavaRDDTest.WORD_COUNT_SPECTED;
+import static org.testng.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -37,21 +36,25 @@ import org.bson.BSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.entity.BookEntity;
+import com.stratio.deep.core.entity.CantoEntity;
+import com.stratio.deep.core.entity.WordCount;
+import com.stratio.deep.core.extractor.ExtractorTest;
+import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
+
 import scala.Tuple2;
-
-import static com.stratio.deep.extractor.MongoJavaRDDTest.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.testng.Assert.*;
 
 /**
  * Created by rcrespo on 18/06/14.
  */
 
-@Test(suiteName = "mongoRddTests", groups = {"MongoEntityExtractorTest"} , dependsOnGroups = "MongoJavaRDDTest")
+@Test(suiteName = "mongoRddTests", groups = { "MongoEntityExtractorTest" }, dependsOnGroups = "MongoJavaRDDTest")
 public class MongoEntityExtractorTest extends ExtractorTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoEntityExtractorTest.class);
@@ -60,7 +63,6 @@ public class MongoEntityExtractorTest extends ExtractorTest {
         super(MongoEntityExtractor.class, "localhost:27890", null, false);
     }
 
-
     @Test
     public void testDataSet() {
 
@@ -68,34 +70,28 @@ public class MongoEntityExtractorTest extends ExtractorTest {
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
-
         ExtractorConfig<BookEntity> inputConfigEntity = new ExtractorConfig(BookEntity.class);
-        inputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book").putValue(ExtractorConstants.COLLECTION,"input");
+        inputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, "book")
+                .putValue(ExtractorConstants.COLLECTION, "input");
         inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
-
 
         RDD<BookEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
 
-
-//Import dataSet was OK and we could read it
+        //Import dataSet was OK and we could read it
         assertEquals(1, inputRDDEntity.count());
 
-
         List<BookEntity> books = inputRDDEntity.toJavaRDD().collect();
-
 
         BookEntity book = books.get(0);
 
         DBObject proObject = new BasicDBObject();
         proObject.put("_id", 0);
 
-
-//      tests subDocuments
+        //      tests subDocuments
         BSONObject result = MongoJavaRDDTest.mongo.getDB("book").getCollection("input").findOne(null, proObject);
         assertEquals(((DBObject) result.get("metadata")).get("author"), book.getMetadataEntity().getAuthor());
 
-
-//      tests List<subDocuments>
+        //      tests List<subDocuments>
         List<BSONObject> listCantos = (List<BSONObject>) result.get("cantos");
 
         for (int i = 0; i < listCantos.size(); i++) {
@@ -118,14 +114,12 @@ public class MongoEntityExtractorTest extends ExtractorTest {
             }
         });
 
-
         JavaPairRDD<String, Long> wordCount = words.mapToPair(new PairFunction<String, String, Long>() {
             @Override
             public Tuple2<String, Long> call(String s) throws Exception {
                 return new Tuple2<String, Long>(s, 1l);
             }
         });
-
 
         JavaPairRDD<String, Long> wordCountReduced = wordCount.reduceByKey(new Function2<Long, Long, Long>() {
             @Override
@@ -141,11 +135,10 @@ public class MongoEntityExtractorTest extends ExtractorTest {
             }
         });
 
-
         ExtractorConfig<WordCount> outputConfigEntity = new ExtractorConfig(WordCount.class);
-        outputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book").putValue(ExtractorConstants.COLLECTION,"output");
+        outputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, "book")
+                .putValue(ExtractorConstants.COLLECTION, "output");
         outputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
-
 
         context.saveRDD(outputRDD.rdd(), outputConfigEntity);
 
@@ -156,7 +149,5 @@ public class MongoEntityExtractorTest extends ExtractorTest {
         context.stop();
 
     }
-
-
 
 }

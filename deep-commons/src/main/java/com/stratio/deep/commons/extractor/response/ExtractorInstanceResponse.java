@@ -15,7 +15,6 @@ public class ExtractorInstanceResponse<T> extends Response {
 
     private IExtractor<T> data;
 
-
     public ExtractorInstanceResponse(IExtractor<T> extractor) {
         super(ActionType.CLOSE);
         this.data = extractor;

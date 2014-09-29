@@ -1,11 +1,12 @@
 package com.stratio.deep.entity;
 
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.mongodb.entity.MongoCell;
-import org.testng.annotations.Test;
-
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+
+import org.testng.annotations.Test;
+
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.mongodb.entity.MongoCell;
 
 /**
  * Created by rcrespo on 16/07/14.
@@ -16,9 +17,7 @@ public class MongoCellTest {
     @Test
     public void createTest() {
 
-
         Cell cell1 = MongoCell.create("cellName1", "testStringObject");
-
 
         assertEquals(cell1.getCellName(), "cellName1");
 
@@ -29,9 +28,7 @@ public class MongoCellTest {
     @Test
     public void isKeyTest() {
 
-
         Cell cell2 = MongoCell.create("_id", "_idObject");
-
 
         assertTrue(cell2.isKey());
 

@@ -16,9 +16,10 @@
 
 package com.stratio.deep.mongodb.config;
 
+import org.apache.log4j.Logger;
+
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
-import org.apache.log4j.Logger;
 
 /**
  * Created by luca on 14/07/14.

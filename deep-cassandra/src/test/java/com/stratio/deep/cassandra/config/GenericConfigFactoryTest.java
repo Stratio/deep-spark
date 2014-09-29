@@ -16,25 +16,26 @@
 
 package com.stratio.deep.cassandra.config;
 
+import static org.testng.Assert.fail;
+
 import java.lang.annotation.AnnotationTypeMismatchException;
 
-import com.stratio.deep.cassandra.context.AbstractDeepSparkContextTest;
-import com.stratio.deep.cassandra.embedded.CassandraServer;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.entity.IDeepType;
-import com.stratio.deep.commons.exception.DeepIllegalAccessException;
-import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
-import com.stratio.deep.cassandra.testentity.TestEntity;
-import com.stratio.deep.cassandra.testentity.WronglyMappedTestEntity;
-import com.stratio.deep.commons.utils.Constants;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.fail;
+import com.stratio.deep.cassandra.context.AbstractDeepSparkContextTest;
+import com.stratio.deep.cassandra.embedded.CassandraServer;
+import com.stratio.deep.cassandra.testentity.TestEntity;
+import com.stratio.deep.cassandra.testentity.WronglyMappedTestEntity;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.exception.DeepIllegalAccessException;
+import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
+import com.stratio.deep.commons.utils.Constants;
 
-@Test(suiteName = "cassandraRddTests", groups = {"GenericDeepJobConfigTest"},
-        dependsOnGroups = {"CassandraJavaRDDTest"})
+@Test(suiteName = "cassandraRddTests", groups = { "GenericDeepJobConfigTest" },
+        dependsOnGroups = { "CassandraJavaRDDTest" })
 public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
     class NotAnnotatedTestEntity implements IDeepType {
         private static final long serialVersionUID = -2603126590709315326L;
@@ -163,7 +164,6 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
 
         }
 
-
         try {
             djc.getEntityClass();
         } catch (DeepIllegalAccessException e) {
@@ -256,7 +256,6 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
             fail(e.getMessage());
         }
 
-
         djc.readConsistencyLevel(ConsistencyLevel.LOCAL_ONE.name());
 
         try {
@@ -300,8 +299,9 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
     @Test
     public void testWronglyMappedField() {
 
-        ICassandraDeepJobConfig<WronglyMappedTestEntity> djc = CassandraConfigFactory.create(WronglyMappedTestEntity.class).host
-                (Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
+        ICassandraDeepJobConfig<WronglyMappedTestEntity> djc = CassandraConfigFactory
+                .create(WronglyMappedTestEntity.class).host
+                        (Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY);
 
         try {
@@ -316,7 +316,8 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
 
     @Test
     public void testValidationNotAnnotadedTestEntity() {
-        ICassandraDeepJobConfig<NotAnnotatedTestEntity> djc = CassandraConfigFactory.create(NotAnnotatedTestEntity.class)
+        ICassandraDeepJobConfig<NotAnnotatedTestEntity> djc = CassandraConfigFactory
+                .create(NotAnnotatedTestEntity.class)
                 .keyspace("a").columnFamily("cf");
         try {
             djc.initialize();

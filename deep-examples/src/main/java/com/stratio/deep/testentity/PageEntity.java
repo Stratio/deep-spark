@@ -16,13 +16,14 @@
 
 package com.stratio.deep.testentity;
 
-import com.stratio.deep.commons.annotations.DeepEntity;
-import com.stratio.deep.commons.annotations.DeepField;
-import com.stratio.deep.commons.entity.IDeepType;
+import java.math.BigInteger;
+
 import org.apache.cassandra.db.marshal.IntegerType;
 import org.apache.cassandra.db.marshal.LongType;
 
-import java.math.BigInteger;
+import com.stratio.deep.commons.annotations.DeepEntity;
+import com.stratio.deep.commons.annotations.DeepField;
+import com.stratio.deep.commons.entity.IDeepType;
 
 /**
  * Author: Luca Rosellini

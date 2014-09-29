@@ -1,33 +1,49 @@
 package com.stratio.deep.extractor;
 
+import static org.testng.Assert.assertEquals;
 
-import com.google.common.io.Resources;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
-import de.flapdoodle.embed.mongo.*;
-import de.flapdoodle.embed.mongo.config.*;
-import de.flapdoodle.embed.mongo.distribution.Version;
-import de.flapdoodle.embed.process.config.IRuntimeConfig;
-import de.flapdoodle.embed.process.io.file.Files;
-import de.flapdoodle.embed.process.runtime.Network;
-import org.bson.BSONObject;
-import org.testng.annotations.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.testng.Assert.assertEquals;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Test;
+
+import com.google.common.io.Resources;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.MongoClient;
+
+import de.flapdoodle.embed.mongo.Command;
+import de.flapdoodle.embed.mongo.MongoImportExecutable;
+import de.flapdoodle.embed.mongo.MongoImportStarter;
+import de.flapdoodle.embed.mongo.MongodExecutable;
+import de.flapdoodle.embed.mongo.MongodProcess;
+import de.flapdoodle.embed.mongo.MongodStarter;
+import de.flapdoodle.embed.mongo.config.ArtifactStoreBuilder;
+import de.flapdoodle.embed.mongo.config.DownloadConfigBuilder;
+import de.flapdoodle.embed.mongo.config.IMongoImportConfig;
+import de.flapdoodle.embed.mongo.config.IMongodConfig;
+import de.flapdoodle.embed.mongo.config.MongoCmdOptionsBuilder;
+import de.flapdoodle.embed.mongo.config.MongoImportConfigBuilder;
+import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
+import de.flapdoodle.embed.mongo.config.Net;
+import de.flapdoodle.embed.mongo.config.RuntimeConfigBuilder;
+import de.flapdoodle.embed.mongo.config.Storage;
+import de.flapdoodle.embed.mongo.distribution.Version;
+import de.flapdoodle.embed.process.config.IRuntimeConfig;
+import de.flapdoodle.embed.process.io.file.Files;
+import de.flapdoodle.embed.process.runtime.Network;
 
 /**
  * Created by rcrespo on 16/07/14.
  */
-@Test(suiteName = "mongoRddTests", groups = {"MongoJavaRDDTest"})
+@Test(suiteName = "mongoRddTests", groups = { "MongoJavaRDDTest" })
 public class MongoJavaRDDTest {
-
 
     public static MongodExecutable mongodExecutable = null;
     public static MongoClient mongo = null;
@@ -57,13 +73,11 @@ public class MongoJavaRDDTest {
 
     public static final String DATA_SET_URL = "http://docs.openstratio.org/resources/datasets/divineComedy.json";
 
-
     private static MongodProcess mongod;
 
     @BeforeSuite
     public static void init() throws IOException {
         Command command = Command.MongoD;
-
 
         new File(DB_FOLDER_NAME).mkdirs();
 
@@ -80,7 +94,6 @@ public class MongoJavaRDDTest {
                         .build())
                 .build();
 
-
         IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder()
                 .defaults(command)
                 .artifactStore(new ArtifactStoreBuilder()
@@ -94,13 +107,11 @@ public class MongoJavaRDDTest {
 
         mongodExecutable = null;
 
-
         mongodExecutable = runtime.prepare(mongodConfig);
 
         mongod = mongodExecutable.start();
 
         Files.forceDelete(new File(DB_FOLDER_NAME));
-
 
         mongo = new MongoClient(HOST, PORT);
         DB db = mongo.getDB(DATABASE);
@@ -110,14 +121,13 @@ public class MongoJavaRDDTest {
         map.put("message", MESSAGE_TEST);
         col.save(new BasicDBObject(map));
 
-
         dataSetImport();
 
     }
 
     @Test
     public void testRDD() {
-        assertEquals(true,true);
+        assertEquals(true, true);
     }
 
     /**
@@ -139,20 +149,19 @@ public class MongoJavaRDDTest {
                 .jsonArray(true)
                 .importFile(url.getFile())
                 .build();
-        MongoImportExecutable mongoImportExecutable = MongoImportStarter.getDefaultInstance().prepare(mongoImportConfig);
+        MongoImportExecutable mongoImportExecutable = MongoImportStarter.getDefaultInstance()
+                .prepare(mongoImportConfig);
         mongoImportExecutable.start();
-
 
     }
 
-
     @AfterSuite
     public static void cleanup() {
-        try{
+        try {
             if (mongodExecutable != null) {
                 mongodExecutable.stop();
             }
-        }finally{
+        } finally {
             Files.forceDelete(new File(DB_FOLDER_NAME));
         }
 

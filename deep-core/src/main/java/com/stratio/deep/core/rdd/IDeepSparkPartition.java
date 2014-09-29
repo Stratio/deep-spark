@@ -15,13 +15,13 @@
  */
 package com.stratio.deep.core.rdd;
 
-import com.stratio.deep.commons.rdd.IDeepPartition;
 import org.apache.spark.Partition;
+
+import com.stratio.deep.commons.rdd.IDeepPartition;
 
 /**
  * Created by rcrespo on 18/08/14.
  */
 public interface IDeepSparkPartition extends IDeepPartition, Partition {
-
 
 }

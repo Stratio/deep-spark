@@ -16,10 +16,11 @@
 
 package com.stratio.deep.config;
 
-import com.stratio.deep.commons.config.IDeepJobConfig;
+import java.util.List;
+
 import org.apache.hadoop.conf.Configuration;
 
-import java.util.List;
+import com.stratio.deep.commons.config.IDeepJobConfig;
 
 /**
  * Defines the public methods that each Stratio Deep ES configuration object should implement.
@@ -43,13 +44,10 @@ public interface IESDeepJobConfig<T> extends IDeepJobConfig<T, IESDeepJobConfig<
      */
     IESDeepJobConfig<T> host(List<String> host);
 
-
     /**
      * @return the hadoop configuration object if the concrete implementation has one, null otherwise.
      */
     Configuration getHadoopConfiguration();
-
-
 
     /**
      * Filter query
@@ -59,7 +57,6 @@ public interface IESDeepJobConfig<T> extends IDeepJobConfig<T, IESDeepJobConfig<
      */
     IESDeepJobConfig<T> filterQuery(String query);
 
-
     /**
      * Sorting
      *
@@ -67,7 +64,6 @@ public interface IESDeepJobConfig<T> extends IDeepJobConfig<T, IESDeepJobConfig<
      * @return this object.
      */
     IESDeepJobConfig<T> sort(String sort);
-
 
     /**
      * @param inputKey
@@ -79,6 +75,5 @@ public interface IESDeepJobConfig<T> extends IDeepJobConfig<T, IESDeepJobConfig<
      * @return Hosts list
      */
     List<String> getHostList();
-
 
 }

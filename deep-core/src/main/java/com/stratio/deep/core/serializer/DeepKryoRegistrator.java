@@ -16,12 +16,14 @@
 
 package com.stratio.deep.core.serializer;
 
+import org.apache.spark.serializer.KryoRegistrator;
+
 import com.esotericsoftware.kryo.Kryo;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
+
 import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
-import org.apache.spark.serializer.KryoRegistrator;
 
 /**
  * Generic kryo registrator we provide to end users.

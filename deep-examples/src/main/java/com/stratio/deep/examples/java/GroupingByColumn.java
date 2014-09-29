@@ -16,26 +16,27 @@
 
 package com.stratio.deep.examples.java;
 
-import com.google.common.collect.Lists;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.commons.extractor.server.ExtractorServer;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
-import com.stratio.deep.testentity.TweetEntity;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
-import scala.Tuple2;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.extractor.server.ExtractorServer;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.testentity.TweetEntity;
+import com.stratio.deep.utils.ContextProperties;
+
+import scala.Tuple2;
 
 // !!Important!!
 
@@ -70,19 +71,17 @@ public final class GroupingByColumn {
         String job = "java:groupingByColumn";
 
         String KEYSPACENAME = "test";
-        String TABLENAME    = "tweets";
-        String CQLPORT      = "9042";
-        String RPCPORT      = "9160";
-        String HOST         = "127.0.0.1";
+        String TABLENAME = "tweets";
+        String CQLPORT = "9042";
+        String RPCPORT = "9160";
+        String HOST = "127.0.0.1";
 
         //Call async the Extractor netty Server
         ExtractorServer.initExtractorServer();
 
-
-
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // Create a configuration for the Extractor and initialize it
         ExtractorConfig<TweetEntity> config = new ExtractorConfig(TweetEntity.class);
@@ -92,10 +91,10 @@ public final class GroupingByColumn {
 
         Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.KEYSPACE, KEYSPACENAME);
-        values.put(ExtractorConstants.TABLE,    TABLENAME);
-        values.put(ExtractorConstants.CQLPORT,  CQLPORT);
-        values.put(ExtractorConstants.RPCPORT,  RPCPORT);
-        values.put(ExtractorConstants.HOST,     HOST );
+        values.put(ExtractorConstants.TABLE, TABLENAME);
+        values.put(ExtractorConstants.CQLPORT, CQLPORT);
+        values.put(ExtractorConstants.RPCPORT, RPCPORT);
+        values.put(ExtractorConstants.HOST, HOST);
 
         config.setValues(values);
 
@@ -103,12 +102,13 @@ public final class GroupingByColumn {
         RDD<TweetEntity> rdd = deepContext.createRDD(config);
 
         // grouping
-        JavaPairRDD<String, Iterable<TweetEntity>> groups = rdd.toJavaRDD().groupBy(new Function<TweetEntity, String>() {
-            @Override
-            public String call(TweetEntity tableEntity) {
-                return tableEntity.getAuthor();
-            }
-        });
+        JavaPairRDD<String, Iterable<TweetEntity>> groups = rdd.toJavaRDD()
+                .groupBy(new Function<TweetEntity, String>() {
+                    @Override
+                    public String call(TweetEntity tableEntity) {
+                        return tableEntity.getAuthor();
+                    }
+                });
 
         // counting elements in groups
         JavaPairRDD<String, Integer> counts = groups.mapToPair(new PairFunction<Tuple2<String,

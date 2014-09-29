@@ -16,14 +16,9 @@
 
 package com.stratio.deep.utils;
 
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.mongodb.entity.MongoCell;
-import com.stratio.deep.mongodb.utils.UtilMongoDB;
-import com.stratio.deep.testentity.*;
-import org.bson.BSONObject;
-import org.bson.BasicBSONObject;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -33,7 +28,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.testng.Assert.*;
+import org.bson.BSONObject;
+import org.bson.BasicBSONObject;
+import org.testng.annotations.Test;
+
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.mongodb.entity.MongoCell;
+import com.stratio.deep.mongodb.utils.UtilMongoDB;
+import com.stratio.deep.testentity.BookEntity;
+import com.stratio.deep.testentity.CantoEntity;
+import com.stratio.deep.testentity.MetadataEntity;
+import com.stratio.deep.testentity.MongoDBTestEntity;
+import com.stratio.deep.testentity.WordCount;
 
 /**
  * Created by rcrespo on 18/06/14.
@@ -41,7 +48,6 @@ import static org.testng.Assert.*;
 
 @Test
 public class UtilMongoDBTest {
-
 
     public static final String ID_EXAMPLE = "ID";
 
@@ -56,8 +62,9 @@ public class UtilMongoDBTest {
     public static final String TEXT_II = "text II";
 
     @Test
-    public void testGetBsonFromObject() throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException {
-
+    public void testGetBsonFromObject()
+            throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+            InstantiationException {
 
         MetadataEntity metadataEntity = new MetadataEntity();
         metadataEntity.setAuthor(AUTHOR);
@@ -78,16 +85,13 @@ public class UtilMongoDBTest {
 
         CantoEntities.add(cantoII);
 
-
         BookEntity bookEntity = new BookEntity();
-
 
         bookEntity.setCantoEntities(CantoEntities);
 
         bookEntity.setMetadataEntity(metadataEntity);
 
         BSONObject bson = UtilMongoDB.getBsonFromObject(bookEntity);
-
 
         BSONObject metadataFromBson = (BSONObject) bson.get("metadata");
 
@@ -96,7 +100,6 @@ public class UtilMongoDBTest {
         assertEquals(metadataFromBson.get("title"), TITLE);
 
         assertEquals(metadataFromBson.get("source"), SOURCE);
-
 
         List<BSONObject> cantoEntityListFromBson = (List<BSONObject>) bson.get("cantos");
 
@@ -108,16 +111,16 @@ public class UtilMongoDBTest {
 
         assertEquals(cantoEntityListFromBson.get(1).get("text"), TEXT_II);
 
-
     }
 
     @Test
-    public void testGetObjectFromBson() throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public void testGetObjectFromBson()
+            throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+            InstantiationException {
 
         BSONObject bson = createBsonTest();
 
         BookEntity bookEntity = UtilMongoDB.getObjectFromBson(BookEntity.class, bson);
-
 
         MetadataEntity metadata = bookEntity.getMetadataEntity();
 
@@ -126,7 +129,6 @@ public class UtilMongoDBTest {
         assertEquals(metadata.getTitle(), TITLE);
 
         assertEquals(metadata.getSource(), SOURCE);
-
 
         List<CantoEntity> cantoEntityList = bookEntity.getCantoEntities();
 
@@ -141,21 +143,20 @@ public class UtilMongoDBTest {
     }
 
     @Test
-    public void testGetId() throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public void testGetId()
+            throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+            InstantiationException {
 
         MongoDBTestEntity commonsBaseTestEntity = new MongoDBTestEntity();
 
         commonsBaseTestEntity.setId(ID_EXAMPLE);
 
-
         assertEquals(UtilMongoDB.getId(commonsBaseTestEntity), ID_EXAMPLE);
-
 
         WordCount wordCount = new WordCount();
 
         assertNull(UtilMongoDB.getId(wordCount));
     }
-
 
     private BSONObject createBsonTest() {
         BSONObject bson = new BasicBSONObject();
@@ -165,7 +166,6 @@ public class UtilMongoDBTest {
         metadata.put("title", TITLE);
         metadata.put("source", SOURCE);
 
-
         BSONObject cantoI = new BasicBSONObject();
 
         cantoI.put("canto", CANTO_I);
@@ -174,7 +174,6 @@ public class UtilMongoDBTest {
         BSONObject cantoII = new BasicBSONObject();
         cantoII.put("canto", CANTO_II);
         cantoII.put("text", TEXT_II);
-
 
         List<BSONObject> cantosList = new ArrayList<>();
         cantosList.add(cantoI);
@@ -187,22 +186,24 @@ public class UtilMongoDBTest {
     }
 
     @Test
-    public void testGetCellFromBson() throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public void testGetCellFromBson()
+            throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+            InstantiationException {
 
         BSONObject bson = createBsonTest();
 
         Cells cells = UtilMongoDB.getCellFromBson(bson);
 
-
         // Check metadata Object
-
 
         Map<String, Object> mapMetadata = (Map<String, Object>) bson.get("metadata");
 
-        assertEquals(mapMetadata.get("author"), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("author").getCellValue());
-        assertEquals(mapMetadata.get("title"), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("title").getCellValue());
-        assertEquals(mapMetadata.get("source"), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("source").getCellValue());
-
+        assertEquals(mapMetadata.get("author"),
+                ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("author").getCellValue());
+        assertEquals(mapMetadata.get("title"),
+                ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("title").getCellValue());
+        assertEquals(mapMetadata.get("source"),
+                ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("source").getCellValue());
 
         // Check list Oject
 
@@ -210,19 +211,18 @@ public class UtilMongoDBTest {
 
         List<Map<String, Object>> mapCantos = (List<Map<String, Object>>) bson.get("cantos");
 
-
         assertEquals(mapCantos.get(0).get("canto"), list.get(0).getCellByName("canto").getCellValue());
         assertEquals(mapCantos.get(0).get("text"), list.get(0).getCellByName("text").getCellValue());
 
         assertEquals(mapCantos.get(1).get("canto"), list.get(1).getCellByName("canto").getCellValue());
         assertEquals(mapCantos.get(1).get("text"), list.get(1).getCellByName("text").getCellValue());
 
-
     }
 
     @Test
-    public void testGetBsonFromCell() throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException {
-
+    public void testGetBsonFromCell()
+            throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+            InstantiationException {
 
         //Create Medataba Object
 
@@ -235,7 +235,6 @@ public class UtilMongoDBTest {
         metadata.add(authorCell);
         metadata.add(titleCell);
         metadata.add(sourceCell);
-
 
         //Create Cantos Object
 
@@ -254,7 +253,6 @@ public class UtilMongoDBTest {
         cantos.add(cantoI);
         cantos.add(cantoII);
 
-
         // Put all together
 
         Cells cells = new Cells();
@@ -262,18 +260,18 @@ public class UtilMongoDBTest {
         cells.add(MongoCell.create("metadata", metadata));
         cells.add(MongoCell.create("cantos", cantos));
 
-
         BSONObject bson = UtilMongoDB.getBsonFromCell(cells);
-
 
         // Check metadata Object
 
         Map<String, Object> mapMetadata = (Map<String, Object>) bson.get("metadata");
 
-        assertEquals(mapMetadata.get("author"), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("author").getCellValue());
-        assertEquals(mapMetadata.get("title"), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("title").getCellValue());
-        assertEquals(mapMetadata.get("source"), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("source").getCellValue());
-
+        assertEquals(mapMetadata.get("author"),
+                ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("author").getCellValue());
+        assertEquals(mapMetadata.get("title"),
+                ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("title").getCellValue());
+        assertEquals(mapMetadata.get("source"),
+                ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("source").getCellValue());
 
         // Check list Oject
 
@@ -281,24 +279,21 @@ public class UtilMongoDBTest {
 
         List<Map<String, Object>> mapCantos = (List<Map<String, Object>>) bson.get("cantos");
 
-
         assertEquals(mapCantos.get(0).get("canto"), list.get(0).getCellByName("canto").getCellValue());
         assertEquals(mapCantos.get(0).get("text"), list.get(0).getCellByName("text").getCellValue());
 
         assertEquals(mapCantos.get(1).get("canto"), list.get(1).getCellByName("canto").getCellValue());
         assertEquals(mapCantos.get(1).get("text"), list.get(1).getCellByName("text").getCellValue());
 
-
     }
 
-
     @Test(expectedExceptions = InvocationTargetException.class)
-    public void testConstructorIsPrivate() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public void testConstructorIsPrivate()
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Constructor<UtilMongoDB> constructor = UtilMongoDB.class.getDeclaredConstructor();
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);
         constructor.newInstance();
     }
-
 
 }

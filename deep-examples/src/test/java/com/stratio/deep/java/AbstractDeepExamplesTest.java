@@ -16,7 +16,30 @@
 
 package com.stratio.deep.java;
 
-import au.com.bytecode.opencsv.CSVReader;
+import static com.stratio.deep.commons.utils.Utils.quote;
+import static org.testng.Assert.assertEquals;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.math.BigInteger;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
+import java.util.zip.GZIPInputStream;
+
+import org.apache.cassandra.exceptions.ConfigurationException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
+
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
@@ -24,24 +47,11 @@ import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.google.common.io.Resources;
-import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.cassandra.embedded.CassandraServer;
 import com.stratio.deep.commons.utils.Constants;
-import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeSuite;
+import com.stratio.deep.core.context.DeepSparkContext;
 
-import java.io.*;
-import java.math.BigInteger;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.zip.GZIPInputStream;
-
-import static com.stratio.deep.commons.utils.Utils.quote;
-import static org.testng.Assert.assertEquals;
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * Base class for all Deep Examples integration tests.
@@ -107,7 +117,7 @@ public class AbstractDeepExamplesTest {
         String useKeyspace = "USE " + KEYSPACE_NAME + ";";
 
         String[] startupCommands =
-                new String[]{createKeyspace, createCrawlerKeyspace, useKeyspace, createTweetCF, createCrawlerCF};
+                new String[] { createKeyspace, createCrawlerKeyspace, useKeyspace, createTweetCF, createCrawlerCF };
 
         cassandraServer = new CassandraServer();
         cassandraServer.setStartupCommands(startupCommands);
@@ -118,7 +128,6 @@ public class AbstractDeepExamplesTest {
 
         session = cluster.connect();
 
-
         try {
 
             session.execute(createKeyspace);
@@ -126,7 +135,8 @@ public class AbstractDeepExamplesTest {
             session.execute(useKeyspace);
             session.execute(createTweetCF);
             session.execute(createCrawlerCF);
-        } catch (Exception ex){}
+        } catch (Exception ex) {
+        }
 
         dataInsertCql();
 
@@ -155,8 +165,8 @@ public class AbstractDeepExamplesTest {
         List<Insert> inserts = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String[] names = new String[]{"tweet_id", "tweet_date", "author", "hashtags", "favorite_count", "content",
-                "truncated"};
+        String[] names = new String[] { "tweet_id", "tweet_date", "author", "hashtags", "favorite_count", "content",
+                "truncated" };
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(
                 new File(tweetsTestData.toURI()))))) {
 
@@ -193,10 +203,10 @@ public class AbstractDeepExamplesTest {
             logger.error("Error", e);
         }
 
-        names = new String[]{
+        names = new String[] {
                 "key", "\"___class\"", "charset", "content", "\"domainName\"",
                 "\"downloadTime\"", "\"enqueuedForTransforming\"", "etag", "\"firstDownloadTime\"",
-                "\"lastModified\"", "\"responseCode\"", "\"responseTime\"", "\"timeTransformed\"", "title", "url"};
+                "\"lastModified\"", "\"responseCode\"", "\"responseTime\"", "\"timeTransformed\"", "title", "url" };
 
         try (CSVReader reader = new CSVReader(new BufferedReader(new InputStreamReader(new GZIPInputStream(new
                 FileInputStream(
@@ -235,7 +245,6 @@ public class AbstractDeepExamplesTest {
                 }
             }
 
-
             Batch batch = QueryBuilder.batch(inserts.toArray(new Insert[0]));
             session.execute(batch);
         } catch (Exception e) {
@@ -256,7 +265,6 @@ public class AbstractDeepExamplesTest {
 
         ResultSet rs = session.execute(command);
         assertEquals(rs.one().getLong(0), 4892);
-
 
         command = "select count(*) from " + CRAWLER_KEYSPACE_NAME + "." + quote(CRAWLER_COLUMN_FAMILY) + ";";
 

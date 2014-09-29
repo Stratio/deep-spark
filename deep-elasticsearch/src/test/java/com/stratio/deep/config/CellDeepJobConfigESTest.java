@@ -16,10 +16,12 @@
 
 package com.stratio.deep.config;
 
-import com.stratio.deep.commons.entity.Cells;
-import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+
+import org.testng.annotations.Test;
+
+import com.stratio.deep.commons.entity.Cells;
 
 /**
  * Created by rcrespo on 29/08/14.

@@ -16,33 +16,45 @@
 
 package com.stratio.deep.testutils;
 
-import com.stratio.deep.commons.entity.IDeepType;
-import com.stratio.deep.commons.exception.DeepGenericException;
-import com.stratio.deep.commons.exception.DeepIOException;
-import com.stratio.deep.testentity.CommonsTestEntity;
-import com.stratio.deep.commons.utils.AnnotationUtils;
-import com.stratio.deep.commons.utils.Pair;
-import com.stratio.deep.commons.utils.Utils;
-import org.testng.annotations.Test;
+import static com.stratio.deep.commons.utils.Utils.additionalFilterGenerator;
+import static com.stratio.deep.commons.utils.Utils.batchQueryGenerator;
+import static com.stratio.deep.commons.utils.Utils.findSetter;
+import static com.stratio.deep.commons.utils.Utils.getAllFields;
+import static com.stratio.deep.commons.utils.Utils.newTypeInstance;
+import static com.stratio.deep.commons.utils.Utils.quote;
+import static com.stratio.deep.commons.utils.Utils.singleQuote;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
 
-import static com.stratio.deep.commons.utils.Utils.*;
-import static org.testng.Assert.*;
+import org.testng.annotations.Test;
+
+import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.utils.AnnotationUtils;
+import com.stratio.deep.commons.utils.Pair;
+import com.stratio.deep.commons.utils.Utils;
+import com.stratio.deep.testentity.CommonsTestEntity;
 
 public class UtilsTest {
     private static final String OUTPUT_KEYSPACE_NAME = "out_test_keyspace";
     private static final String OUTPUT_COLUMN_FAMILY = "out_test_page";
 
-
     class NotInstantiable implements IDeepType {
 
         private static final long serialVersionUID = -3311345712290429412L;
     }
-
 
     @Test
     public void testFilterDeepFields() {
@@ -72,7 +84,6 @@ public class UtilsTest {
     @Test
     public void testAdditionalFilters() {
         assertEquals(additionalFilterGenerator(null), "");
-
 
         Map<String, Serializable> map = new TreeMap<>();
         assertEquals(additionalFilterGenerator(map), "");
@@ -124,7 +135,6 @@ public class UtilsTest {
 
         Utils.newTypeInstance(CommonsTestEntity.class);
     }
-
 
     @Test
     public void testSingleQuote() {

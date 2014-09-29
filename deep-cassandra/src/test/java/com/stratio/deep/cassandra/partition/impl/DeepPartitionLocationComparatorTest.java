@@ -16,23 +16,23 @@
 
 package com.stratio.deep.cassandra.partition.impl;
 
-import com.stratio.deep.commons.exception.DeepInstantiationException;
-import com.stratio.deep.commons.impl.DeepPartitionLocationComparator;
-import org.testng.annotations.Test;
+import static org.junit.Assert.assertArrayEquals;
+import static org.testng.Assert.fail;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.testng.Assert.fail;
+import org.testng.annotations.Test;
+
+import com.stratio.deep.commons.exception.DeepInstantiationException;
+import com.stratio.deep.commons.impl.DeepPartitionLocationComparator;
 
 /**
  * Created by luca on 09/04/14.
  */
 @Test
 public class DeepPartitionLocationComparatorTest {
-
 
     public void testComparator() throws UnknownHostException {
         DeepPartitionLocationComparator comparator = null;
@@ -46,31 +46,31 @@ public class DeepPartitionLocationComparatorTest {
 
         comparator = new DeepPartitionLocationComparator("localhost");
 
-        String[] locations = new String[]{"google.com", "localhost", "edition.cnn.com"};
+        String[] locations = new String[] { "google.com", "localhost", "edition.cnn.com" };
 
         Arrays.sort(locations, comparator);
 
-        assertArrayEquals(new String[]{"localhost", "google.com", "edition.cnn.com"}, locations);
+        assertArrayEquals(new String[] { "localhost", "google.com", "edition.cnn.com" }, locations);
 
         comparator = new DeepPartitionLocationComparator("edition.cnn.com");
 
         Arrays.sort(locations, comparator);
 
-        assertArrayEquals(new String[]{"localhost", "edition.cnn.com", "google.com"}, locations);
+        assertArrayEquals(new String[] { "localhost", "edition.cnn.com", "google.com" }, locations);
 
         comparator = new DeepPartitionLocationComparator("edition.cnn.com");
 
-        locations = new String[]{"google.com", "edition.cnn.com", "localhost"};
+        locations = new String[] { "google.com", "edition.cnn.com", "localhost" };
         Arrays.sort(locations, comparator);
 
-        assertArrayEquals(new String[]{"localhost", "edition.cnn.com", "google.com"}, locations);
+        assertArrayEquals(new String[] { "localhost", "edition.cnn.com", "google.com" }, locations);
 
         comparator = new DeepPartitionLocationComparator();
 
         String hostname = InetAddress.getLocalHost().getHostName();
-        locations = new String[]{"google.com", "edition.cnn.com", hostname};
+        locations = new String[] { "google.com", "edition.cnn.com", hostname };
         Arrays.sort(locations, comparator);
 
-        assertArrayEquals(new String[]{hostname, "google.com", "edition.cnn.com"}, locations);
+        assertArrayEquals(new String[] { hostname, "google.com", "edition.cnn.com" }, locations);
     }
 }

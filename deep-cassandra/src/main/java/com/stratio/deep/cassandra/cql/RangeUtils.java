@@ -16,26 +16,43 @@
 
 package com.stratio.deep.cassandra.cql;
 
-import com.datastax.driver.core.*;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.*;
-import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
-import com.stratio.deep.commons.exception.DeepGenericException;
-import com.stratio.deep.commons.rdd.DeepTokenRange;
-import com.stratio.deep.commons.utils.Pair;
-import com.stratio.deep.commons.utils.Utils;
+import static com.google.common.collect.Iterables.concat;
+import static com.google.common.collect.Iterables.indexOf;
+import static com.google.common.collect.Iterables.transform;
+import static com.stratio.deep.commons.utils.Utils.quote;
+
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Nullable;
+
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.dht.Token;
 import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
 
-import javax.annotation.Nullable;
-import java.net.InetAddress;
-import java.util.*;
-
-import static com.google.common.collect.Iterables.*;
-import static com.stratio.deep.commons.utils.Utils.quote;
+import com.datastax.driver.core.Host;
+import com.datastax.driver.core.Metadata;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
+import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.rdd.DeepTokenRange;
+import com.stratio.deep.commons.utils.Pair;
+import com.stratio.deep.commons.utils.Utils;
 
 /**
  * {@link CqlPagingRecordReader} implementation that returns an instance of a
@@ -61,7 +78,8 @@ public class RangeUtils {
      * @return a map containing, for each cluster machine, the list of tokens. Tokens are not returned in any
      * particular order.
      */
-    static Map<String, Iterable<Comparable>> fetchTokens(String query, final Pair<Session, String> sessionWithHost, IPartitioner partitioner) {
+    static Map<String, Iterable<Comparable>> fetchTokens(String query, final Pair<Session, String> sessionWithHost,
+            IPartitioner partitioner) {
 
         ResultSet rSet = sessionWithHost.left.execute(query);
 
@@ -87,10 +105,9 @@ public class RangeUtils {
      * @return the merged lists of tokens transformed to DeepTokenRange(s). The returned collection is shuffled.
      */
     static List<DeepTokenRange> mergeTokenRanges(Map<String, Iterable<Comparable>> tokens,
-                                                 final Session session,
-                                                 final IPartitioner p) {
+            final Session session,
+            final IPartitioner p) {
         final Iterable<Comparable> allRanges = Ordering.natural().sortedCopy(concat(tokens.values()));
-
 
         final Comparable maxValue = Ordering.natural().max(allRanges);
         final Comparable minValue = (Comparable) p.minValue(maxValue.getClass()).getToken().token;
@@ -143,7 +160,7 @@ public class RangeUtils {
 
         Pair<Session, String> sessionWithHost =
                 CassandraClientProvider.getSession(
-                        config.getHost(),config, false);
+                        config.getHost(), config, false);
 
         String queryLocal = "select tokens from system.local";
         tokens.putAll(fetchTokens(queryLocal, sessionWithHost, p));
@@ -186,7 +203,8 @@ public class RangeUtils {
      * @param accumulator  a token range accumulator (ne
      */
     private static void bisectTokeRange(
-            DeepTokenRange range, final IPartitioner partitioner, final int bisectFactor, final List<DeepTokenRange> accumulator) {
+            DeepTokenRange range, final IPartitioner partitioner, final int bisectFactor,
+            final List<DeepTokenRange> accumulator) {
 
         final AbstractType tkValidator = partitioner.getTokenValidator();
 
@@ -268,10 +286,10 @@ public class RangeUtils {
         private final Iterable<Comparable> allRanges;
 
         public MergeTokenRangesFunction(Comparable maxValue,
-                                        Comparable minValue,
-                                        Session session,
-                                        IPartitioner partitioner,
-                                        Iterable<Comparable> allRanges) {
+                Comparable minValue,
+                Session session,
+                IPartitioner partitioner,
+                Iterable<Comparable> allRanges) {
             this.maxValue = maxValue;
             this.minValue = minValue;
             this.session = session;

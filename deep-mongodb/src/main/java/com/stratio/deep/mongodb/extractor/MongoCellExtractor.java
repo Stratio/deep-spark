@@ -16,17 +16,19 @@
 
 package com.stratio.deep.mongodb.extractor;
 
-import com.stratio.deep.mongodb.config.CellDeepJobConfigMongoDB;
-import com.stratio.deep.commons.config.IDeepJobConfig;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepTransformException;
-import com.stratio.deep.mongodb.utils.UtilMongoDB;
+import java.lang.reflect.InvocationTargetException;
+
 import org.bson.BSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
-import java.lang.reflect.InvocationTargetException;
+import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepTransformException;
+import com.stratio.deep.mongodb.config.CellDeepJobConfigMongoDB;
+import com.stratio.deep.mongodb.utils.UtilMongoDB;
+
+import scala.Tuple2;
 
 /**
  * CellRDD to interact with mongoDB
@@ -36,19 +38,17 @@ public final class MongoCellExtractor extends MongoExtractor<Cells> {
     private static final Logger LOG = LoggerFactory.getLogger(MongoCellExtractor.class);
     private static final long serialVersionUID = -3208994171892747470L;
 
-    public MongoCellExtractor(){
+    public MongoCellExtractor() {
         super();
         this.deepJobConfig = new CellDeepJobConfigMongoDB();
     }
-
-
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Cells transformElement(Tuple2<Object, BSONObject> tuple, IDeepJobConfig<Cells, ? extends IDeepJobConfig> config) {
-
+    public Cells transformElement(Tuple2<Object, BSONObject> tuple,
+            IDeepJobConfig<Cells, ? extends IDeepJobConfig> config) {
 
         try {
             return UtilMongoDB.getCellFromBson(tuple._2());
@@ -60,15 +60,12 @@ public final class MongoCellExtractor extends MongoExtractor<Cells> {
 
     @Override
     public Tuple2<Object, BSONObject> transformElement(Cells record) {
-        try{
+        try {
             return new Tuple2<>(null, UtilMongoDB.getBsonFromCell(record));
-        } catch (IllegalAccessException | InvocationTargetException| InstantiationException e) {
+        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             LOG.error(e.getMessage());
             throw new DeepTransformException(e.getMessage());
         }
     }
-
-
-
 
 }

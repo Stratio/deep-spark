@@ -16,12 +16,34 @@
 
 package com.stratio.deep.cassandra.rdd;
 
-import java.io.*;
+import static com.stratio.deep.commons.utils.Utils.quote;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
-import com.google.common.io.Resources;
+import org.apache.cassandra.exceptions.ConfigurationException;
+import org.apache.log4j.Logger;
+import org.apache.spark.rdd.RDD;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
@@ -30,28 +52,17 @@ import com.datastax.driver.core.Session;
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.stratio.deep.cassandra.config.CassandraConfigFactory;
-import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
+import com.google.common.io.Resources;
 import com.stratio.deep.cassandra.embedded.CassandraServer;
-import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
 import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
+import com.stratio.deep.cassandra.testentity.Cql3CollectionsTestEntity;
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
-import com.stratio.deep.cassandra.testentity.Cql3CollectionsTestEntity;
 import com.stratio.deep.commons.utils.Constants;
-import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.log4j.Logger;
-import org.apache.spark.rdd.RDD;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+
 import scala.Function1;
 import scala.reflect.ClassTag$;
-
-import static com.stratio.deep.commons.utils.Utils.quote;
-import static org.testng.Assert.*;
 
 /**
  * Integration tests for entity RDDs where cells contain Cassandra's collections.
@@ -108,8 +119,8 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
                 uuid2id.put(uuid, id);
 
                 Insert stmt = QueryBuilder.insertInto(CQL3_COLLECTION_COLUMN_FAMILY).values(
-                        new String[]{"id", "first_name", "last_name", "emails", "phones", "uuid2id"},
-                        new Object[]{Integer.parseInt(fields[0]), fields[1], fields[2], emails, phones, uuid2id});
+                        new String[] { "id", "first_name", "last_name", "emails", "phones", "uuid2id" },
+                        new Object[] { Integer.parseInt(fields[0]), fields[1], fields[2], emails, phones, uuid2id });
 
                 batch.add(stmt);
                 ++idx;
@@ -119,7 +130,6 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
         } catch (Exception e) {
             logger.error("Error", e);
         }
-
 
         Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
                 .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
@@ -211,7 +221,6 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
 
     @Override
     protected ExtractorConfig<Cql3CollectionsTestEntity> initReadConfig() {
-
 
         ExtractorConfig<Cql3CollectionsTestEntity> rddConfig = new ExtractorConfig<>(Cql3CollectionsTestEntity.class);
         Map<String, Serializable> values = new HashMap<>();
@@ -348,15 +357,15 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
     @Override
     public void testCql3SaveToCassandra() {
 
-//        try {
-//            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
-//        } catch (Exception e) {
-//        }
-//
-//        ExtractorConfig<Cql3CollectionsTestEntity> writeConfig = getWriteConfig();
-//
-////        RDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
-//        checkSimpleTestData();
+        //        try {
+        //            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
+        //        } catch (Exception e) {
+        //        }
+        //
+        //        ExtractorConfig<Cql3CollectionsTestEntity> writeConfig = getWriteConfig();
+        //
+        ////        RDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
+        //        checkSimpleTestData();
 
         assertEquals(true, true);
     }

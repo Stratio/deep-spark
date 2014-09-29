@@ -6,8 +6,7 @@ import com.stratio.deep.commons.entity.IDeepType;
 /**
  * Created by rcrespo on 5/08/14.
  */
-public class DocumentTest  implements IDeepType {
-
+public class DocumentTest implements IDeepType {
 
     @DeepField(fieldName = "sub1-campo1")
     private String subCampo1;
@@ -29,7 +28,6 @@ public class DocumentTest  implements IDeepType {
     public void setSubCampo2(String subCampo2) {
         this.subCampo2 = subCampo2;
     }
-
 
     @Override
     public String toString() {

@@ -16,44 +16,46 @@
 
 package com.stratio.deep.extractor;
 
-import com.stratio.deep.config.CellDeepJobConfigES;
-import com.stratio.deep.commons.config.IDeepJobConfig;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepTransformException;
-import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
-import com.stratio.deep.utils.UtilES;
+import java.lang.reflect.InvocationTargetException;
+
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
 import org.elasticsearch.hadoop.mr.LinkedMapWritable;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
-import java.lang.reflect.InvocationTargetException;
+import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepTransformException;
+import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
+import com.stratio.deep.config.CellDeepJobConfigES;
+import com.stratio.deep.utils.UtilES;
+
+import scala.Tuple2;
 
 /**
  * CellRDD to interact with ES
  */
-public final class ESCellExtractor extends GenericHadoopExtractor<Cells, Object, LinkedMapWritable, Object, JSONObject> {
+public final class ESCellExtractor
+        extends GenericHadoopExtractor<Cells, Object, LinkedMapWritable, Object, JSONObject> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ESCellExtractor.class);
     private static final long serialVersionUID = -3208994171892747470L;
 
-    public ESCellExtractor(){
+    public ESCellExtractor() {
         super();
         this.deepJobConfig = new CellDeepJobConfigES();
-        this.inputFormat = new EsInputFormat<>() ;
-        this.outputFormat = new EsOutputFormat() ;
+        this.inputFormat = new EsInputFormat<>();
+        this.outputFormat = new EsOutputFormat();
     }
-
-
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Cells transformElement(Tuple2<Object, LinkedMapWritable> tuple, IDeepJobConfig<Cells, ? extends IDeepJobConfig> config) {
+    public Cells transformElement(Tuple2<Object, LinkedMapWritable> tuple,
+            IDeepJobConfig<Cells, ? extends IDeepJobConfig> config) {
 
         try {
             return UtilES.getCellFromJson(tuple._2());
@@ -65,7 +67,7 @@ public final class ESCellExtractor extends GenericHadoopExtractor<Cells, Object,
 
     @Override
     public Tuple2<Object, JSONObject> transformElement(Cells record) {
-        try{
+        try {
             return new Tuple2<>(null, UtilES.getJsonFromCell(record));
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             LOG.error(e.getMessage());
@@ -73,6 +75,5 @@ public final class ESCellExtractor extends GenericHadoopExtractor<Cells, Object,
         }
 
     }
-
 
 }

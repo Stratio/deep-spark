@@ -21,7 +21,6 @@ import java.util.Map;
 
 import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
 import com.stratio.deep.commons.entity.Cells;
-import org.apache.hadoop.conf.Configuration;
 
 /**
  * Cell-based configuration object.
@@ -34,7 +33,7 @@ public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
     private Cells dummyCells;
 
     public CellDeepJobConfig() {
-//        this.isWriteConfig = isWriteConfig;
+        //        this.isWriteConfig = isWriteConfig;
     }
 
     {
@@ -50,7 +49,6 @@ public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
     @Override public ICassandraDeepJobConfig<Cells> customConfiguration(Map<String, Serializable> customConfiguration) {
         return null;
     }
-
 
     @Override
     public Class getExtractorImplClass() {

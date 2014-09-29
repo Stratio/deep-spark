@@ -16,27 +16,28 @@
 
 package com.stratio.deep.examples.java;
 
-import com.google.common.collect.Lists;
-import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.extractor.server.ExtractorServer;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.testentity.TweetEntity;
-import com.stratio.deep.utils.ContextProperties;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
+
+import com.google.common.collect.Lists;
+import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.extractor.server.ExtractorServer;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.testentity.TweetEntity;
+import com.stratio.deep.utils.ContextProperties;
+
 import scala.Tuple2;
 import scala.Tuple3;
-
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -72,13 +73,12 @@ public final class AggregatingData {
         String job = "java:aggregatingData";
 
         String keySpace = "test";
-        String tableName    = "tweets";
-        String cqlPort      = "9042";
-        String rcpPort      = "9160";
-        String host         = "127.0.0.1";
+        String tableName = "tweets";
+        String cqlPort = "9042";
+        String rcpPort = "9160";
+        String host = "127.0.0.1";
 
-
-       //Call async the Extractor netty Server
+        //Call async the Extractor netty Server
         ExtractorServer.initExtractorServer();
 
         // Creating the Deep Context where args are Spark Master and Job Name
@@ -92,13 +92,12 @@ public final class AggregatingData {
 
         Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.KEYSPACE, keySpace);
-        values.put(ExtractorConstants.TABLE,    tableName);
-        values.put(ExtractorConstants.CQLPORT,  cqlPort);
-        values.put(ExtractorConstants.RPCPORT,  rcpPort);
-        values.put(ExtractorConstants.HOST,     host );
+        values.put(ExtractorConstants.TABLE, tableName);
+        values.put(ExtractorConstants.CQLPORT, cqlPort);
+        values.put(ExtractorConstants.RPCPORT, rcpPort);
+        values.put(ExtractorConstants.HOST, host);
 
         config.setValues(values);
-
 
         // Creating the RDD
         JavaRDD<TweetEntity> rdd = deepContext.createJavaRDD(config);

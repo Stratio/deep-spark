@@ -16,16 +16,18 @@
 
 package com.stratio.deep.mongodb.extractor;
 
+import java.lang.reflect.InvocationTargetException;
+
+import org.bson.BSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepTransformException;
 import com.stratio.deep.mongodb.config.EntityDeepJobConfigMongoDB;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
-import org.bson.BSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
-import java.lang.reflect.InvocationTargetException;
+import scala.Tuple2;
 
 /**
  * EntityRDD to interact with mongoDB
@@ -37,9 +39,7 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
     private static final Logger LOG = LoggerFactory.getLogger(MongoEntityExtractor.class);
     private static final long serialVersionUID = -3208994171892747470L;
 
-
-
-    public MongoEntityExtractor(Class<T> t){
+    public MongoEntityExtractor(Class<T> t) {
         super();
         this.deepJobConfig = new EntityDeepJobConfigMongoDB(t);
     }
@@ -48,8 +48,7 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T transformElement(Tuple2<Object, BSONObject> tuple, IDeepJobConfig<T, ? extends IDeepJobConfig> config ) {
-
+    public T transformElement(Tuple2<Object, BSONObject> tuple, IDeepJobConfig<T, ? extends IDeepJobConfig> config) {
 
         try {
             return UtilMongoDB.getObjectFromBson(config.getEntityClass(), tuple._2());

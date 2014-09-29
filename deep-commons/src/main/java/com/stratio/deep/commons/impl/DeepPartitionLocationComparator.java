@@ -16,12 +16,12 @@
 
 package com.stratio.deep.commons.impl;
 
-import com.stratio.deep.commons.exception.DeepIOException;
-import com.stratio.deep.commons.exception.DeepInstantiationException;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Comparator;
+
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.exception.DeepInstantiationException;
 
 /**
  * Given a list of names of machines, this comparator tries as much as he can

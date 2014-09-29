@@ -16,27 +16,28 @@
 
 package com.stratio.deep.examples.java;
 
-import com.google.common.collect.Lists;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.commons.extractor.server.ExtractorServer;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
-import com.stratio.deep.testentity.DomainEntity;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
-import scala.Tuple2;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.extractor.server.ExtractorServer;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.testentity.DomainEntity;
+import com.stratio.deep.utils.ContextProperties;
+
+import scala.Tuple2;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -67,21 +68,19 @@ public final class WritingEntityToCassandra {
         String job = "java:writingEntityToCassandra";
 
         String KEYSPACENAME = "crawler";
-        String TABLENAME    = "listdomains";
-        String CQLPORT      = "9042";
-        String RPCPORT      = "9160";
-        String HOST         = "127.0.0.1";
+        String TABLENAME = "listdomains";
+        String CQLPORT = "9042";
+        String RPCPORT = "9160";
+        String HOST = "127.0.0.1";
 
         final String outputTableName = "newlistdomains";
 
         //        //Call async the Extractor netty Server
         ExtractorServer.initExtractorServer();
 
-
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
-
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // --- INPUT RDD
         ExtractorConfig<DomainEntity> inputConfig = new ExtractorConfig(DomainEntity.class);
@@ -91,22 +90,23 @@ public final class WritingEntityToCassandra {
 
         Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.KEYSPACE, KEYSPACENAME);
-        values.put(ExtractorConstants.TABLE,    TABLENAME);
-        values.put(ExtractorConstants.CQLPORT,  CQLPORT);
-        values.put(ExtractorConstants.RPCPORT,  RPCPORT);
-        values.put(ExtractorConstants.HOST,     HOST );
+        values.put(ExtractorConstants.TABLE, TABLENAME);
+        values.put(ExtractorConstants.CQLPORT, CQLPORT);
+        values.put(ExtractorConstants.RPCPORT, RPCPORT);
+        values.put(ExtractorConstants.HOST, HOST);
 
         inputConfig.setValues(values);
 
         RDD<DomainEntity> inputRDD = deepContext.createRDD(inputConfig);
 
-        JavaPairRDD<String, DomainEntity> pairRDD = inputRDD.toJavaRDD().mapToPair(new PairFunction<DomainEntity, String,
-                DomainEntity>() {
-            @Override
-            public Tuple2<String, DomainEntity> call(DomainEntity e) {
-                return new Tuple2<String, DomainEntity>(e.getDomain(), e);
-            }
-        });
+        JavaPairRDD<String, DomainEntity> pairRDD = inputRDD.toJavaRDD()
+                .mapToPair(new PairFunction<DomainEntity, String,
+                        DomainEntity>() {
+                    @Override
+                    public Tuple2<String, DomainEntity> call(DomainEntity e) {
+                        return new Tuple2<String, DomainEntity>(e.getDomain(), e);
+                    }
+                });
 
         JavaPairRDD<String, Integer> numPerKey = pairRDD.groupByKey()
                 .mapToPair(new PairFunction<Tuple2<String, Iterable<DomainEntity>>, String, Integer>() {

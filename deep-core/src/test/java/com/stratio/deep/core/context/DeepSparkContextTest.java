@@ -16,9 +16,15 @@
 
 package com.stratio.deep.core.context;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.rdd.DeepJavaRDD;
-import com.stratio.deep.core.rdd.DeepRDD;
+import static junit.framework.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
+
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.junit.Test;
@@ -28,30 +34,23 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import static junit.framework.Assert.assertSame;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
-
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.core.rdd.DeepJavaRDD;
+import com.stratio.deep.core.rdd.DeepRDD;
 
 /**
  * Tests DeepSparkContext instantiations.
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(value = {SparkContext.class, DeepJavaRDD.class, DeepSparkContext.class, DeepRDD.class, Method.class, AccessibleObject.class, System.class})
+@PrepareForTest(value = { SparkContext.class, DeepJavaRDD.class, DeepSparkContext.class, DeepRDD.class, Method.class,
+        AccessibleObject.class, System.class })
 public class DeepSparkContextTest {
-
 
     @Test
     public void createRDDTest() throws Exception {
         DeepSparkContext deepSparkContext = createDeepSparkContext();
         ExtractorConfig deepJobConfig = createDeepJobConfig();
         DeepRDD deepRDD = createDeepRDD(deepSparkContext.sc(), deepJobConfig);
-
 
         DeepRDD rddReturn = (DeepRDD) deepSparkContext.createRDD(deepJobConfig);
 
@@ -70,7 +69,6 @@ public class DeepSparkContextTest {
 
         assertSame("The DeepJavaRDD is Same", javaRdd, javaRDdReturn);
     }
-
 
     @Test
     public void saveRDDTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {

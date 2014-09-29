@@ -16,18 +16,20 @@
 
 package com.stratio.deep.cassandra.cql;
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
-import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
-import com.stratio.deep.cassandra.entity.CellValidator;
-import com.stratio.deep.cassandra.entity.CassandraCell;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepGenericException;
-import com.stratio.deep.commons.exception.DeepIOException;
-import com.stratio.deep.commons.exception.DeepInstantiationException;
-import com.stratio.deep.commons.utils.Pair;
-import com.stratio.deep.commons.utils.Utils;
+import static com.stratio.deep.cassandra.util.CassandraUtils.updateQueryGenerator;
+import static com.stratio.deep.commons.utils.Utils.quote;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.db.marshal.LongType;
@@ -41,15 +43,18 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.util.*;
-
-import static com.stratio.deep.cassandra.util.CassandraUtils.updateQueryGenerator;
-import static com.stratio.deep.commons.utils.Utils.quote;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
+import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
+import com.stratio.deep.cassandra.entity.CassandraCell;
+import com.stratio.deep.cassandra.entity.CellValidator;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.exception.DeepInstantiationException;
+import com.stratio.deep.commons.utils.Pair;
+import com.stratio.deep.commons.utils.Utils;
 
 /**
  * Handles the distributed write to cassandra in batch.

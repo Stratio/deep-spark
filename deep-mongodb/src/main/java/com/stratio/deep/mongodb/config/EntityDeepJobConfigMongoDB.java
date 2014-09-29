@@ -16,14 +16,14 @@
 
 package com.stratio.deep.mongodb.config;
 
-import com.stratio.deep.commons.entity.IDeepType;
-import com.stratio.deep.commons.utils.AnnotationUtils;
-import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
-
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.utils.AnnotationUtils;
+import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
 
 /**
  * Class containing the appropriate configuration for a MongoEntityRDD.
@@ -85,6 +85,5 @@ public final class EntityDeepJobConfigMongoDB<T extends IDeepType> extends Gener
     public void setMapDBNameToEntityName(Map<String, String> mapDBNameToEntityName) {
         this.mapDBNameToEntityName = mapDBNameToEntityName;
     }
-
 
 }

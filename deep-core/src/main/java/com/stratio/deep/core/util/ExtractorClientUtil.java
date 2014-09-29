@@ -24,7 +24,7 @@ import com.stratio.deep.core.extractor.client.ExtractorClient;
  */
 public class ExtractorClientUtil {
 
-    public static <T>IExtractor<T> getExtractorClient(){
+    public static <T> IExtractor<T> getExtractorClient() {
         return new ExtractorClient<>().initialize();
     }
 }

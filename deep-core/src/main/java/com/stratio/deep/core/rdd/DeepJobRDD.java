@@ -31,7 +31,6 @@ import org.apache.spark.TaskContext;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.rdd.RDD;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.exception.DeepIOException;
@@ -57,7 +56,7 @@ public class DeepJobRDD<T> extends RDD<T> implements Serializable {
 
     public DeepJobRDD(SparkContext sc, IDeepJobConfig<T, ?> config) {
         super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config
-                .getEntityClass()) );
+                .getEntityClass()));
         Map<String, Serializable> serializableMap = new HashMap<>();
         serializableMap.put(SPARK_RDD_ID, id());
         Map<String, Serializable> serializableMapCustom = config.getCustomConfiguration();
@@ -72,15 +71,13 @@ public class DeepJobRDD<T> extends RDD<T> implements Serializable {
 
     }
 
-
     @Override
     public Iterator<T> compute(Partition split, TaskContext context) {
 
         this.
-        initExtractorClient();
+                initExtractorClient();
 
         context.addOnCompleteCallback(new OnComputedRDDCallback(extractorClient));
-
 
         extractorClient.initIterator(split, config.getValue());
         java.util.Iterator<T> iterator = new java.util.Iterator<T>() {
@@ -112,22 +109,19 @@ public class DeepJobRDD<T> extends RDD<T> implements Serializable {
         return extractorClient.getPartitions(config.getValue());
     }
 
-
     /**
      * It tries to get an Extractor Instance,
      * if there is any problem try to instance an extractorClient
      */
     private void initExtractorClient() {
-        try{
+        try {
             if (extractorClient == null) {
                 extractorClient = getExtractorInstance(config.getValue());
             }
-        }catch (DeepExtractorinitializationException e){
+        } catch (DeepExtractorinitializationException e) {
             extractorClient = getExtractorClient();
         }
 
-
     }
-
 
 }

@@ -16,15 +16,14 @@
 
 package com.stratio.deep.config;
 
-import com.stratio.deep.commons.entity.IDeepType;
-import com.stratio.deep.commons.utils.AnnotationUtils;
-import com.stratio.deep.extractor.ESCellExtractor;
-import com.stratio.deep.extractor.ESEntityExtractor;
-
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.utils.AnnotationUtils;
+import com.stratio.deep.extractor.ESEntityExtractor;
 
 /**
  * Class containing the appropriate configuration for a ESRDD.
@@ -74,9 +73,6 @@ public final class EntityDeepJobConfigES<T extends IDeepType> extends GenericDee
         return this;
     }
 
-
-
-
     public Map<String, String> getMapDBNameToEntityName() {
         return mapDBNameToEntityName;
     }
@@ -84,7 +80,6 @@ public final class EntityDeepJobConfigES<T extends IDeepType> extends GenericDee
     public void setMapDBNameToEntityName(Map<String, String> mapDBNameToEntityName) {
         this.mapDBNameToEntityName = mapDBNameToEntityName;
     }
-
 
     @Override
     public Class getExtractorImplClass() {

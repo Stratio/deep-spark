@@ -16,5 +16,4 @@ public class MessageTestEntity implements IDeepType {
     @DeepField
     private String message;
 
-
 }

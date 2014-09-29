@@ -14,10 +14,14 @@
  */
 package com.stratio.deep.core.extractor.client;
 
+import javax.net.ssl.SSLException;
+
+import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.rdd.IExtractor;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -25,9 +29,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import org.apache.spark.Partition;
-
-import javax.net.ssl.SSLException;
 
 /**
  * Sends a list of continent/city pairs to a {@link } to get the local times of the
@@ -78,7 +79,6 @@ public class ExtractorClient<T> implements IExtractor<T> {
         group.shutdownGracefully();
     }
 
-
     @Override
     public boolean hasNext() {
         return handler.hasNext();
@@ -88,7 +88,6 @@ public class ExtractorClient<T> implements IExtractor<T> {
     public T next() {
         return handler.next();
     }
-
 
     @Override
     public void initIterator(Partition dp, ExtractorConfig<T> config) {
@@ -110,8 +109,6 @@ public class ExtractorClient<T> implements IExtractor<T> {
         handler.initSave(config, first);
     }
 
-
-
     @Override
     public void close() {
         handler.close();
@@ -127,6 +124,5 @@ public class ExtractorClient<T> implements IExtractor<T> {
     public Partition[] getPartitions(ExtractorConfig<T> config) {
         return this.handler.getPartitions(config);
     }
-
 
 }

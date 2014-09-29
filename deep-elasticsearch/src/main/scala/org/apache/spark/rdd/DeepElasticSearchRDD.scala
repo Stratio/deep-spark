@@ -27,8 +27,6 @@ import org.apache.hadoop.mapreduce._
 import org.apache.spark._
 import org.apache.spark.annotation.DeveloperApi
 import org.elasticsearch.hadoop.mr.LinkedMapWritable
-import org.json.simple.JSONObject
-import org.json4s.jackson.Json
 
 import scala.reflect.ClassTag
 

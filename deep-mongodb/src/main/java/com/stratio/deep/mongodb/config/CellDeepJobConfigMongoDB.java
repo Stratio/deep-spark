@@ -16,9 +16,6 @@
 
 package com.stratio.deep.mongodb.config;
 
-import java.io.Serializable;
-import java.util.Map;
-
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
 
@@ -33,8 +30,6 @@ public class CellDeepJobConfigMongoDB extends GenericDeepJobConfigMongoDB<Cells>
     {
         dummyCells = new Cells();
     }
-
-
 
     @SuppressWarnings("unchecked")
     @Override

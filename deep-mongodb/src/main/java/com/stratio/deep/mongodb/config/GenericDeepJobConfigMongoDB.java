@@ -16,45 +16,45 @@
 
 package com.stratio.deep.mongodb.config;
 
-
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.HOST;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNAME;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.DATABASE;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.COLLECTION;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.REPLICA_SET;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.READ_PREFERENCE;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.SORT;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_KEY;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.DATABASE;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.FILTER_QUERY;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.HOST;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.IGNORE_ID_FIELD;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_KEY;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.READ_PREFERENCE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.REPLICA_SET;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.SORT;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.SPLIT_SIZE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNAME;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_CHUNKS;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_SHARD;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_SPLITS;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_CHUNKS;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.SPLIT_SIZE;
-import com.mongodb.QueryBuilder;
-import com.mongodb.hadoop.MongoInputFormat;
-import com.mongodb.hadoop.util.MongoConfigUtil;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapreduce.InputFormat;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
-import java.io.Serializable;
-import java.util.*;
-
+import com.mongodb.QueryBuilder;
+import com.mongodb.hadoop.util.MongoConfigUtil;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cell;
 
 /**
  * @param <T>
  */
 public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     private static final long serialVersionUID = -7179376653643603038L;
-
 
     /**
      * configuration to be broadcasted to every spark node
@@ -65,7 +65,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
      * A list of mongodb host to connect
      */
     private List<String> hostList = new ArrayList<>();
-
 
     /**
      * MongoDB username
@@ -129,23 +128,18 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
      */
     private String sort;
 
-
     /**
      * Shard key
      */
     private String inputKey;
 
-
     private boolean createInputSplit = true;
 
-
     private boolean useShards = false;
-
 
     private boolean splitsUseChunks = true;
 
     private Integer splitSize = 8;
-
 
     private Map<String, Serializable> customConfiguration;
 
@@ -156,7 +150,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
 
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -164,7 +157,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     public Map<String, Cell> columnDefinitions() {
         return null;
     }
-
 
     /**
      * {@inheritDoc}
@@ -305,7 +297,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
         return this;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -332,7 +323,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
         this.sort = sort.toString();
         return this;
     }
-
 
     /**
      * {@inheritDoc}
@@ -370,7 +360,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
         return this;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -379,8 +368,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     public int getPageSize() {
         return 0;
     }
-
-
 
     /**
      * {@inheritDoc}
@@ -440,7 +427,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
         StringBuilder options = new StringBuilder();
         boolean asignado = false;
 
-
         if (readPreference != null) {
             asignado = true;
             options.append("?readPreference=").append(readPreference);
@@ -467,13 +453,11 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
             configHadoop.set(MongoConfigUtil.INPUT_KEY, inputKey);
         }
 
-
         configHadoop.set(MongoConfigUtil.SPLITS_USE_SHARDS, String.valueOf(useShards));
 
         configHadoop.set(MongoConfigUtil.CREATE_INPUT_SPLITS, String.valueOf(createInputSplit));
 
         configHadoop.set(MongoConfigUtil.SPLITS_USE_CHUNKS, String.valueOf(splitsUseChunks));
-
 
         if (query != null) {
             configHadoop.set(MongoConfigUtil.INPUT_QUERY, query);
@@ -483,7 +467,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
             configHadoop.set(MongoConfigUtil.INPUT_FIELDS, fields.toString());
         }
 
-
         if (sort != null) {
             configHadoop.set(MongoConfigUtil.INPUT_SORT, sort);
         }
@@ -492,7 +475,7 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
             configHadoop.set(MongoConfigUtil.AUTH_URI, connection.toString());
         }
 
-        if (customConfiguration !=null ) {
+        if (customConfiguration != null) {
             Set<Map.Entry<String, Serializable>> set = customConfiguration.entrySet();
             Iterator<Map.Entry<String, Serializable>> iterator = set.iterator();
             while (iterator.hasNext()) {
@@ -525,21 +508,20 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     @Override
     public IMongoDeepJobConfig<T> inputColumns(String... columns) {
         BSONObject bsonFields = fields != null ? fields : new BasicBSONObject();
-        boolean isIdPresent=false;
+        boolean isIdPresent = false;
         for (String column : columns) {
-            if(column.trim().equalsIgnoreCase("_id")){
-                isIdPresent=true;
+            if (column.trim().equalsIgnoreCase("_id")) {
+                isIdPresent = true;
             }
 
             bsonFields.put(column.trim(), 1);
         }
-        if(!isIdPresent){
+        if (!isIdPresent) {
             bsonFields.put("_id", 0);
         }
         fields = bsonFields;
         return this;
     }
-
 
     /**
      * {@inheritDoc}
@@ -552,79 +534,76 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
         return configHadoop;
     }
 
-
     @Override
     public IMongoDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
         Map<String, Serializable> values = extractorConfig.getValues();
 
-        if(values.get(USERNAME)!=null){
+        if (values.get(USERNAME) != null) {
             username(extractorConfig.getString(USERNAME));
         }
 
-        if(values.get(PASSWORD)!=null){
+        if (values.get(PASSWORD) != null) {
             password(extractorConfig.getString(PASSWORD));
         }
 
-        if(values.get(HOST)!=null){
+        if (values.get(HOST) != null) {
             host((extractorConfig.getStringArray(HOST)));
         }
 
-        if(values.get(COLLECTION)!=null){
+        if (values.get(COLLECTION) != null) {
             collection(extractorConfig.getString(COLLECTION));
         }
 
-
-        if(values.get(INPUT_COLUMNS)!=null){
+        if (values.get(INPUT_COLUMNS) != null) {
             inputColumns(extractorConfig.getStringArray(INPUT_COLUMNS));
         }
 
-        if(values.get(DATABASE)!=null){
+        if (values.get(DATABASE) != null) {
             database(extractorConfig.getString(DATABASE));
         }
 
-        if(values.get(REPLICA_SET)!=null){
+        if (values.get(REPLICA_SET) != null) {
             replicaSet(extractorConfig.getString(REPLICA_SET));
         }
 
-        if(values.get(READ_PREFERENCE)!=null){
+        if (values.get(READ_PREFERENCE) != null) {
             readPreference(extractorConfig.getString(READ_PREFERENCE));
         }
 
-        if(values.get(SORT)!=null){
+        if (values.get(SORT) != null) {
             sort(extractorConfig.getString(SORT));
         }
 
-        if(values.get(FILTER_QUERY)!=null){
+        if (values.get(FILTER_QUERY) != null) {
             filterQuery(extractorConfig.getString(FILTER_QUERY));
         }
 
-        if(values.get(INPUT_KEY)!=null){
+        if (values.get(INPUT_KEY) != null) {
             inputKey(extractorConfig.getString(INPUT_KEY));
         }
 
-        if(values.get(IGNORE_ID_FIELD)!=null&&extractorConfig.getBoolean(IGNORE_ID_FIELD)==true){
+        if (values.get(IGNORE_ID_FIELD) != null && extractorConfig.getBoolean(IGNORE_ID_FIELD) == true) {
             ignoreIdField();
         }
 
-        if(values.get(INPUT_KEY)!=null){
+        if (values.get(INPUT_KEY) != null) {
             inputKey(extractorConfig.getString(INPUT_KEY));
         }
 
-        if(values.get(USE_SHARD)!=null){
+        if (values.get(USE_SHARD) != null) {
             useShards(extractorConfig.getBoolean(USE_SHARD));
         }
 
-        if(values.get(USE_SPLITS)!=null){
+        if (values.get(USE_SPLITS) != null) {
             createInputSplit(extractorConfig.getBoolean(USE_SPLITS));
         }
 
-        if(values.get(USE_CHUNKS)!=null){
+        if (values.get(USE_CHUNKS) != null) {
             splitsUseChunks(extractorConfig.getBoolean(USE_CHUNKS));
         }
-        if(values.get(SPLIT_SIZE)!=null){
+        if (values.get(SPLIT_SIZE) != null) {
             splitSize = extractorConfig.getInteger(SPLIT_SIZE);
         }
-
 
         this.initialize();
 
@@ -641,6 +620,5 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     public Map<String, Serializable> getCustomConfiguration() {
         return customConfiguration;
     }
-
 
 }

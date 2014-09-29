@@ -16,36 +16,40 @@
 
 package com.stratio.deep.cassandra.rdd;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import org.apache.cassandra.exceptions.ConfigurationException;
+import org.apache.spark.rdd.RDD;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.stratio.deep.cassandra.config.CassandraConfigFactory;
-import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.embedded.CassandraServer;
 import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
-import com.stratio.deep.cassandra.testentity.Cql3CollectionsTestEntity;
 import com.stratio.deep.commons.utils.Constants;
-import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.spark.rdd.RDD;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-import scala.Function1;
-import scala.reflect.ClassTag$;
-
-import static org.testng.Assert.*;
 
 /**
  * Integration tests for generic cell RDDs where cells contain Cassandra's collections.
@@ -68,7 +72,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
 
         assertEquals(entities.length, 500);
 
-	    String keyspace = getReadConfig().getString(ExtractorConstants.KEYSPACE);
+        String keyspace = getReadConfig().getString(ExtractorConstants.KEYSPACE);
 
         for (Cells e : entities) {
             Integer id = (Integer) e.getCellByName("id").getCellValue();
@@ -194,41 +198,41 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
     public void testSaveToCassandra() {
         assertEquals(true, true);
 
-//        Function1<Cells, Cells> mappingFunc =
-//                new TestEntityAbstractSerializableFunction();
-//
-//        RDD<Cells> mappedRDD =
-//                getRDD().map(mappingFunc, ClassTag$.MODULE$.<Cells>apply(Cql3CollectionsTestEntity.class));
-//
-//        try {
-//            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
-//        } catch (Exception e) {
-//        }
-//
-//        assertTrue(mappedRDD.count() > 0);
-//
-//        ExtractorConfig<Cells> writeConfig = getWriteConfig();
-//        writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, false);
-//
-//        try {
-//            context.saveRDD(mappedRDD, writeConfig);
-//
-//            fail();
-//        } catch (Exception e) {
-//            // ok
-//            writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, true);
-//        }
-//
-//        try{
-//
-//            context.saveRDD(mappedRDD, writeConfig);
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
-//
-//
-//
-//        checkOutputTestData();
+        //        Function1<Cells, Cells> mappingFunc =
+        //                new TestEntityAbstractSerializableFunction();
+        //
+        //        RDD<Cells> mappedRDD =
+        //                getRDD().map(mappingFunc, ClassTag$.MODULE$.<Cells>apply(Cql3CollectionsTestEntity.class));
+        //
+        //        try {
+        //            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
+        //        } catch (Exception e) {
+        //        }
+        //
+        //        assertTrue(mappedRDD.count() > 0);
+        //
+        //        ExtractorConfig<Cells> writeConfig = getWriteConfig();
+        //        writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, false);
+        //
+        //        try {
+        //            context.saveRDD(mappedRDD, writeConfig);
+        //
+        //            fail();
+        //        } catch (Exception e) {
+        //            // ok
+        //            writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, true);
+        //        }
+        //
+        //        try{
+        //
+        //            context.saveRDD(mappedRDD, writeConfig);
+        //        }catch(Exception e){
+        //            e.printStackTrace();
+        //        }
+        //
+        //
+        //
+        //        checkOutputTestData();
     }
 
     protected void checkOutputTestData() {
@@ -297,16 +301,16 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
 
     @Override
     public void testCql3SaveToCassandra() {
-assertEquals(true, true);
-//        try {
-//            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
-//        } catch (Exception e) {
-//        }
-//
-//        ExtractorConfig<Cells> writeConfig = getWriteConfig();
+        assertEquals(true, true);
+        //        try {
+        //            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
+        //        } catch (Exception e) {
+        //        }
+        //
+        //        ExtractorConfig<Cells> writeConfig = getWriteConfig();
 
-//        RDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
-//        checkSimpleTestData();
+        //        RDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
+        //        checkSimpleTestData();
     }
 
     private static class TestEntityAbstractSerializableFunction extends

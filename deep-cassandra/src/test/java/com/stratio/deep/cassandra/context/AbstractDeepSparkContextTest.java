@@ -16,28 +16,32 @@
 
 package com.stratio.deep.cassandra.context;
 
-import java.io.*;
+import static com.stratio.deep.commons.utils.Utils.quote;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.io.Resources;
-
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
-import com.stratio.deep.cassandra.embedded.CassandraServer;
-import com.stratio.deep.commons.utils.Constants;
-import com.stratio.deep.core.context.DeepSparkContext;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
-import static com.stratio.deep.commons.utils.Utils.quote;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
+import com.google.common.io.Resources;
+import com.stratio.deep.cassandra.embedded.CassandraServer;
+import com.stratio.deep.commons.utils.Constants;
+import com.stratio.deep.core.context.DeepSparkContext;
 
 /**
  * Base class for all Deep's integration tests.
@@ -62,10 +66,11 @@ public abstract class AbstractDeepSparkContextTest {
     protected static final int entityTestDataSize = 19;
     protected static final int cql3TestDataSize = 20;
 
-    protected String createCF = "CREATE TABLE " + quote(KEYSPACE_NAME) + "." + quote(COLUMN_FAMILY) + " (id text PRIMARY " +
-            "KEY, " + "url text, "
-            + "domain_name text, " + "response_code int, " + "charset text," + "response_time int,"
-            + "download_time bigint," + "first_download_time bigint," + "title text, lucene text ) ;";
+    protected String createCF =
+            "CREATE TABLE " + quote(KEYSPACE_NAME) + "." + quote(COLUMN_FAMILY) + " (id text PRIMARY " +
+                    "KEY, " + "url text, "
+                    + "domain_name text, " + "response_code int, " + "charset text," + "response_time int,"
+                    + "download_time bigint," + "first_download_time bigint," + "title text, lucene text ) ;";
 
     /*
     protected String createLuceneIndex =
@@ -77,15 +82,17 @@ public abstract class AbstractDeepSparkContextTest {
                     "response_code:{type:\"integer\"}, id:{type:\"string\"}, response_time:{type:\"integer\"} } }'};";
     */
 
-    protected String createCFIndex = "create index idx_" + COLUMN_FAMILY + "_resp_time on " + quote(KEYSPACE_NAME) + "." +
-            quote(COLUMN_FAMILY) + " (response_time);";
+    protected String createCFIndex =
+            "create index idx_" + COLUMN_FAMILY + "_resp_time on " + quote(KEYSPACE_NAME) + "." +
+                    quote(COLUMN_FAMILY) + " (response_time);";
 
     protected String createCql3CF = "create table " + quote(KEYSPACE_NAME) + "." + CQL3_COLUMN_FAMILY
             + "(name varchar, password varchar, color varchar, gender varchar, food varchar, "
             + " animal varchar, lucene varchar,age int,PRIMARY KEY ((name, gender), age, animal)); ";
 
-    protected String createCql3CFIndex = "create index idx_" + CQL3_COLUMN_FAMILY + "_food on " + quote(KEYSPACE_NAME) + "."
-            + CQL3_COLUMN_FAMILY + "(food);";
+    protected String createCql3CFIndex =
+            "create index idx_" + CQL3_COLUMN_FAMILY + "_food on " + quote(KEYSPACE_NAME) + "."
+                    + CQL3_COLUMN_FAMILY + "(food);";
 
     protected String createCql3CollectionsCF =
             "CREATE TABLE " + quote(KEYSPACE_NAME) + "." + CQL3_COLLECTION_COLUMN_FAMILY +
@@ -217,7 +224,7 @@ public abstract class AbstractDeepSparkContextTest {
 
     @BeforeSuite
     protected void initContextAndServer() throws ConfigurationException, IOException, InterruptedException {
-        if (context==null && cassandraServer==null) {
+        if (context == null && cassandraServer == null) {
 
             logger.info("instantiating context");
             context = new DeepSparkContext("local", "deepSparkContextTest");
@@ -234,14 +241,14 @@ public abstract class AbstractDeepSparkContextTest {
 
             String initialDataset = buildTestDataInsertBatch();
 
-            String[] startupCommands = new String[]{createKeyspace, createOutputKeyspace, useKeyspace, createCF,
+            String[] startupCommands = new String[] { createKeyspace, createOutputKeyspace, useKeyspace, createCF,
                     createCFIndex, /*createLuceneIndex,*/
-                    createCql3CF, createCql3CFIndex, createCql3CollectionsCF, initialDataset, useOutputKeyspace};
+                    createCql3CF, createCql3CFIndex, createCql3CollectionsCF, initialDataset, useOutputKeyspace };
 
             cassandraServer = new CassandraServer();
             cassandraServer.setStartupCommands(startupCommands);
             cassandraServer.start();
-           checkTestData();
+            checkTestData();
         }
     }
 

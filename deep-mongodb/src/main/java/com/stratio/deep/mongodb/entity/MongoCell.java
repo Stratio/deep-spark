@@ -47,6 +47,6 @@ public class MongoCell extends Cell {
 
         MongoCell cell = (MongoCell) o;
 
-        return this.cellName.equals(cell.cellName)&&this.cellValue.equals(cell.cellValue);
+        return this.cellName.equals(cell.cellName) && this.cellValue.equals(cell.cellValue);
     }
 }

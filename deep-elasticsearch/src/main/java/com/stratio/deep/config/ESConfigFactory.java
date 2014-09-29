@@ -16,9 +16,10 @@
 
 package com.stratio.deep.config;
 
+import org.apache.log4j.Logger;
+
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
-import org.apache.log4j.Logger;
 
 /**
  * Created by rcrespo on 29/07/14.

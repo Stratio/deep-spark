@@ -16,14 +16,19 @@
 
 package com.stratio.deep.testentity;
 
-import com.stratio.deep.commons.annotations.DeepEntity;
-import com.stratio.deep.commons.annotations.DeepField;
-import org.apache.cassandra.db.marshal.*;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import org.apache.cassandra.db.marshal.Int32Type;
+import org.apache.cassandra.db.marshal.ListType;
+import org.apache.cassandra.db.marshal.LongType;
+import org.apache.cassandra.db.marshal.MapType;
+import org.apache.cassandra.db.marshal.SetType;
+
+import com.stratio.deep.commons.annotations.DeepEntity;
+import com.stratio.deep.commons.annotations.DeepField;
 
 @DeepEntity
 public class CommonsTestEntity extends CommonsBaseTestEntity {
@@ -85,7 +90,7 @@ public class CommonsTestEntity extends CommonsBaseTestEntity {
     }
 
     public CommonsTestEntity(String id, String domain, String url, Integer responseTime, Integer responseCode,
-                             String notMappedField) {
+            String notMappedField) {
         super(id, domain);
         this.url = url;
         this.responseTime = responseTime;

@@ -16,19 +16,19 @@
 
 package com.stratio.deep.cassandra.cql;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.Host;
-import com.datastax.driver.core.HostDistance;
-import com.datastax.driver.core.Statement;
-import com.datastax.driver.core.policies.RoundRobinPolicy;
-import com.google.common.collect.AbstractIterator;
-
 import java.net.InetAddress;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Host;
+import com.datastax.driver.core.HostDistance;
+import com.datastax.driver.core.Statement;
+import com.datastax.driver.core.policies.RoundRobinPolicy;
+import com.google.common.collect.AbstractIterator;
 
 /**
  * Load balancing policy that, unlike round robin, sticks to one host.

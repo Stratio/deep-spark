@@ -14,16 +14,25 @@
 
 package com.stratio.deep.commons.entity;
 
-import com.stratio.deep.commons.exception.DeepGenericException;
-import org.apache.commons.lang.StringUtils;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
+
+import com.stratio.deep.commons.exception.DeepGenericException;
 
 /**
  * <p>
@@ -630,7 +639,6 @@ public class Cells implements Iterable<Cell>, Serializable {
         return cell == null ? null : cell.getValue(cellClass);
     }
 
-
     public <T> List<T> getList(String tableName, int idx, Class<T> elementsClass) {
         Cell cell = getCellByIdx(tableName, idx);
         return cell == null ? null : cell.getList(elementsClass);
@@ -650,7 +658,6 @@ public class Cells implements Iterable<Cell>, Serializable {
         Cell cell = getCellByName(cellName);
         return cell == null ? null : cell.getList(elementsClass);
     }
-
 
     public <T> Set<T> getSet(String tableName, int idx, Class<T> elementsClass) {
         Cell cell = getCellByIdx(tableName, idx);
@@ -672,11 +679,10 @@ public class Cells implements Iterable<Cell>, Serializable {
         return cell == null ? null : cell.getSet(elementsClass);
     }
 
-
     public <K, V> Map<K, V> getMap(String tableName,
-                                   int idx,
-                                   Class<K> keysClass,
-                                   Class<V> valuesClass) {
+            int idx,
+            Class<K> keysClass,
+            Class<V> valuesClass) {
         Cell cell = getCellByIdx(tableName, idx);
         return cell == null ? null : cell.getMap(keysClass, valuesClass);
     }
@@ -687,9 +693,9 @@ public class Cells implements Iterable<Cell>, Serializable {
     }
 
     public <K, V> Map<K, V> getMap(String tableName,
-                                   String cellName,
-                                   Class<K> keysClass,
-                                   Class<V> valuesClass) {
+            String cellName,
+            Class<K> keysClass,
+            Class<V> valuesClass) {
         Cell cell = getCellByName(tableName, cellName);
         return cell == null ? null : cell.getMap(keysClass, valuesClass);
     }
@@ -698,7 +704,6 @@ public class Cells implements Iterable<Cell>, Serializable {
         Cell cell = getCellByName(cellName);
         return cell == null ? null : cell.getMap(keysClass, valuesClass);
     }
-
 
     /**
      * Returns the {@code String} value of the {@link Cell} at position {@code idx} in the list of Cell
@@ -749,7 +754,6 @@ public class Cells implements Iterable<Cell>, Serializable {
     public String getString(String cellName) {
         return getValue(cellName, String.class);
     }
-
 
     /**
      * Returns the {@code Character} value of the {@link Cell} at position {@code idx} in the list of Cell
@@ -1301,7 +1305,6 @@ public class Cells implements Iterable<Cell>, Serializable {
         return getValue(cellName, BigDecimal.class);
     }
 
-
     /**
      * Returns the {@code ByteBuffer} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
@@ -1352,7 +1355,6 @@ public class Cells implements Iterable<Cell>, Serializable {
         return getValue(cellName, ByteBuffer.class);
     }
 
-
     /**
      * Returns the {@code URL} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
@@ -1402,7 +1404,6 @@ public class Cells implements Iterable<Cell>, Serializable {
     public URL getURL(String cellName) {
         return getValue(cellName, URL.class);
     }
-
 
     /**
      * Returns the {@code InetAddress} value of the {@link Cell} at position {@code idx} in the list of Cell

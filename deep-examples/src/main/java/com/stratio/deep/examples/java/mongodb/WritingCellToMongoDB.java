@@ -16,18 +16,18 @@
 
 package com.stratio.deep.examples.java.mongodb;
 
+import static com.stratio.deep.commons.extractor.server.ExtractorServer.initExtractorServer;
+import static com.stratio.deep.commons.extractor.server.ExtractorServer.stopExtractorServer;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 
-import static com.stratio.deep.commons.extractor.server.ExtractorServer.initExtractorServer;
-import static com.stratio.deep.commons.extractor.server.ExtractorServer.stopExtractorServer;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
+import com.stratio.deep.utils.ContextProperties;
 
 /**
  * Example class to write a RDD to mongoDB
@@ -38,11 +38,9 @@ public final class WritingCellToMongoDB {
     private WritingCellToMongoDB() {
     }
 
-
     public static void main(String[] args) {
         doMain(args);
     }
-
 
     public static void doMain(String[] args) {
         String job = "java:writingCellToMongoDB";
@@ -58,32 +56,30 @@ public final class WritingCellToMongoDB {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
-
-
         ExtractorConfig<Cells> inputConfigEntity = new ExtractorConfig<>();
-        inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, inputCollection);
+        inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database)
+                .putValue(ExtractorConstants.COLLECTION, inputCollection);
         inputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
 
         RDD<Cells> inputRDDCell = deepContext.createRDD(inputConfigEntity);
 
-
-	    LOG.info("count : " + inputRDDCell.count());
-	    LOG.info("prints first cell : " + inputRDDCell.first());
+        LOG.info("count : " + inputRDDCell.count());
+        LOG.info("prints first cell : " + inputRDDCell.first());
 
         ExtractorConfig<Cells> outputConfigEntity = new ExtractorConfig<>();
-        outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, outputCollection);
+        outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database)
+                .putValue(ExtractorConstants.COLLECTION, outputCollection);
         outputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
 
         deepContext.saveRDD(inputRDDCell, outputConfigEntity);
 
-
         RDD outputRDDCell = deepContext.createRDD(outputConfigEntity);
 
         LOG.info("count output : " + outputRDDCell.count());
-	    LOG.info("prints first output cell: " + outputRDDCell.first());
+        LOG.info("prints first output cell: " + outputRDDCell.first());
 
         stopExtractorServer();
 

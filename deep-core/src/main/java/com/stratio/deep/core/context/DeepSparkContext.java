@@ -16,20 +16,22 @@ package com.stratio.deep.core.context;
 
 import static com.stratio.deep.commons.utils.Constants.SPARK_PARTITION_ID;
 import static com.stratio.deep.commons.utils.Constants.SPARK_RDD_ID;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
-import com.stratio.deep.core.function.PrepareSaveFunction;
-import com.stratio.deep.core.rdd.DeepJavaRDD;
-import com.stratio.deep.core.rdd.DeepJobRDD;
-import com.stratio.deep.core.rdd.DeepRDD;
+
+import java.io.Serializable;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
 
-import java.io.Serializable;
-import java.util.Map;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.core.function.PrepareSaveFunction;
+import com.stratio.deep.core.rdd.DeepJavaRDD;
+import com.stratio.deep.core.rdd.DeepJobRDD;
+import com.stratio.deep.core.rdd.DeepRDD;
 
 /**
  * Entry point to the Cassandra-aware Spark context.
@@ -83,7 +85,6 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         super(master, appName, sparkHome, jars);
     }
 
-
     /**
      * Overridden superclass constructor.
      *
@@ -94,11 +95,10 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * @param environment a map of environment variables.
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String[] jars,
-                            Map<String, String> environment) {
+            Map<String, String> environment) {
 
         super(master, appName, sparkHome, jars, environment);
     }
-
 
     /**
      * @param extractorConfig
@@ -114,10 +114,9 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * @param <T>
      * @return
      */
-    public <T> RDD<T> createRDD(final IDeepJobConfig<T, ? > deepJobConfig) {
+    public <T> RDD<T> createRDD(final IDeepJobConfig<T, ?> deepJobConfig) {
         return new DeepJobRDD<T>(this.sc(), deepJobConfig);
     }
-
 
     /**
      * @param extractorConfig
@@ -134,7 +133,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * @param <T>
      * @return
      */
-    public <T> JavaRDD<T> createJavaRDD(final IDeepJobConfig<T, ? > deepJobConfig) {
+    public <T> JavaRDD<T> createJavaRDD(final IDeepJobConfig<T, ?> deepJobConfig) {
         return new DeepJavaRDD((DeepRDD<T>) createRDD(deepJobConfig));
     }
 
@@ -145,10 +144,10 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
     }
 
-//    public <T> void saveRDD(RDD<T> rdd, IDeepJobConfig<T, ? > deepJobConfig) {
-//        extractorConfig.putValue(SPARK_RDD_ID, String.valueOf(rdd.id()));
-//        extractorConfig.putValue(SPARK_PARTITION_ID, "0");
-//        rdd.foreachPartition(new PrepareSaveFunction<T>(deepJobConfig, rdd.first()));
-//
-//    }
+    //    public <T> void saveRDD(RDD<T> rdd, IDeepJobConfig<T, ? > deepJobConfig) {
+    //        extractorConfig.putValue(SPARK_RDD_ID, String.valueOf(rdd.id()));
+    //        extractorConfig.putValue(SPARK_PARTITION_ID, "0");
+    //        rdd.foreachPartition(new PrepareSaveFunction<T>(deepJobConfig, rdd.first()));
+    //
+    //    }
 }

@@ -16,10 +16,11 @@
 
 package com.stratio.deep.cassandra.testentity;
 
+import org.apache.cassandra.db.marshal.Int32Type;
+
 import com.stratio.deep.commons.annotations.DeepEntity;
 import com.stratio.deep.commons.annotations.DeepField;
 import com.stratio.deep.commons.entity.IDeepType;
-import org.apache.cassandra.db.marshal.Int32Type;
 
 @DeepEntity
 public class StrippedTestEntity implements IDeepType {

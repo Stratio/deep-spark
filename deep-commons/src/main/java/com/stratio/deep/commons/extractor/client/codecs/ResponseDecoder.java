@@ -14,16 +14,17 @@
  */
 package com.stratio.deep.commons.extractor.client.codecs;
 
-import com.stratio.deep.commons.extractor.response.Response;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.util.List;
+
+import com.stratio.deep.commons.extractor.response.Response;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
 
 public class ResponseDecoder extends ByteToMessageDecoder {
 

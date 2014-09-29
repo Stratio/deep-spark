@@ -16,22 +16,22 @@
 
 package com.stratio.deep.entity;
 
-import com.stratio.deep.commons.entity.Cell;
-import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+
+import org.testng.annotations.Test;
+
+import com.stratio.deep.commons.entity.Cell;
+
 /**
  * Created by rcrespo on 29/08/14.
  */
 @Test
 public class ESCellTest {
 
-
-
-        @Test
-        public void createTest() {
-            Cell cell1 = ESCell.create("cellName1", "testStringObject");
-            assertEquals(cell1.getCellName(), "cellName1");
-            assertEquals(cell1.getCellValue().getClass(), String.class);
-        }
+    @Test
+    public void createTest() {
+        Cell cell1 = ESCell.create("cellName1", "testStringObject");
+        assertEquals(cell1.getCellName(), "cellName1");
+        assertEquals(cell1.getCellValue().getClass(), String.class);
+    }
 }

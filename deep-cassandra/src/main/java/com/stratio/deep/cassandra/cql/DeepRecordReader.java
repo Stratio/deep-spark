@@ -16,23 +16,22 @@
 
 package com.stratio.deep.cassandra.cql;
 
-import com.datastax.driver.core.*;
-import com.datastax.driver.core.exceptions.NoHostAvailableException;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.stratio.deep.cassandra.config.GenericDeepJobConfig;
-import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
-import com.stratio.deep.cassandra.entity.CassandraCell;
-import com.stratio.deep.commons.exception.DeepGenericException;
-import com.stratio.deep.commons.exception.DeepIOException;
-import com.stratio.deep.commons.exception.DeepIllegalAccessException;
-import com.stratio.deep.commons.impl.DeepPartitionLocationComparator;
-import com.stratio.deep.commons.rdd.DeepTokenRange;
-import com.stratio.deep.commons.rdd.IDeepRecordReader;
-import com.stratio.deep.commons.utils.Pair;
-import com.stratio.deep.commons.utils.Utils;
+import static com.stratio.deep.cassandra.cql.CassandraClientProvider.trySessionForLocation;
+import static com.stratio.deep.commons.utils.Utils.additionalFilterGenerator;
+
+import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.dht.IPartitioner;
@@ -41,12 +40,29 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
-import java.nio.ByteBuffer;
-import java.util.*;
-
-import static com.stratio.deep.cassandra.cql.CassandraClientProvider.trySessionForLocation;
-import static com.stratio.deep.commons.utils.Utils.additionalFilterGenerator;
+import com.datastax.driver.core.ColumnMetadata;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
+import com.datastax.driver.core.SimpleStatement;
+import com.datastax.driver.core.Statement;
+import com.datastax.driver.core.TableMetadata;
+import com.datastax.driver.core.exceptions.NoHostAvailableException;
+import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.stratio.deep.cassandra.config.GenericDeepJobConfig;
+import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
+import com.stratio.deep.cassandra.entity.CassandraCell;
+import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.exception.DeepIllegalAccessException;
+import com.stratio.deep.commons.impl.DeepPartitionLocationComparator;
+import com.stratio.deep.commons.rdd.DeepTokenRange;
+import com.stratio.deep.commons.rdd.IDeepRecordReader;
+import com.stratio.deep.commons.utils.Pair;
+import com.stratio.deep.commons.utils.Utils;
 
 /**
  * Implements a cassandra record reader with pagination capabilities.
@@ -147,7 +163,6 @@ public class DeepRecordReader implements IDeepRecordReader {
 
         throw new DeepIOException(lastException);
     }
-
 
     /**
      * Closes this input reader object.
@@ -486,33 +501,32 @@ public class DeepRecordReader implements IDeepRecordReader {
         return rowIterator.next();
     }
 
-
-//
-//
-//    @Override
-//    public void initialize(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
-//
-//    }
-//
-//    @Override
-//    public boolean nextKeyValue() throws IOException, InterruptedException {
-//        return false;
-//    }
-//
-//    @Override
-//    public Object getCurrentKey() throws IOException, InterruptedException {
-//        return null;
-//    }
-//
-//    @Override
-//    public Object getCurrentValue() throws IOException, InterruptedException {
-//        return null;
-//    }
-//
-//    @Override
-//    public float getProgress() throws IOException, InterruptedException {
-//        return 0;
-//    }
-//
+    //
+    //
+    //    @Override
+    //    public void initialize(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
+    //
+    //    }
+    //
+    //    @Override
+    //    public boolean nextKeyValue() throws IOException, InterruptedException {
+    //        return false;
+    //    }
+    //
+    //    @Override
+    //    public Object getCurrentKey() throws IOException, InterruptedException {
+    //        return null;
+    //    }
+    //
+    //    @Override
+    //    public Object getCurrentValue() throws IOException, InterruptedException {
+    //        return null;
+    //    }
+    //
+    //    @Override
+    //    public float getProgress() throws IOException, InterruptedException {
+    //        return 0;
+    //    }
+    //
 
 }

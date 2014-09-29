@@ -16,11 +16,12 @@
 
 package com.stratio.deep.commons.config;
 
-import com.stratio.deep.commons.entity.Cell;
-import org.apache.hadoop.conf.Configuration;
-
 import java.io.Serializable;
 import java.util.Map;
+
+import org.apache.hadoop.conf.Configuration;
+
+import com.stratio.deep.commons.entity.Cell;
 
 /**
  * Defines the public methods that each Stratio Deep configuration object should implement.
@@ -129,14 +130,12 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?, ?>> extends Seria
      */
     S username(String username);
 
-
     /**
      * Returns the maximum number of rows that will be retrieved when fetching data pages from Cassandra.
      *
      * @return the page size
      */
     int getPageSize();
-
 
     /**
      * In case you want to add custom configuration, this could override any other configuration,
@@ -147,16 +146,14 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?, ?>> extends Seria
      */
     S customConfiguration(Map<String, Serializable> customConfiguration);
 
-
     Map<String, Serializable> getCustomConfiguration();
-
 
     /**
      * Just in case you want to get the Hadoop Configuration, for any based hadoop-Spark integration
+     *
      * @return
      */
     Configuration getHadoopConfiguration();
-
 
     Class getExtractorImplClass();
 

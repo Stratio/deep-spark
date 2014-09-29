@@ -16,13 +16,12 @@
 
 package com.stratio.deep.commons.config;
 
-
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.utils.Pair;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.utils.Pair;
 
 /**
  * Created by rcrespo on 19/08/14.
@@ -37,12 +36,12 @@ public class ExtractorConfig<T> implements Serializable {
 
     private Class entityClass;
 
-    public ExtractorConfig (Class<T> t){
+    public ExtractorConfig(Class<T> t) {
         super();
         entityClass = t;
     }
 
-    public ExtractorConfig(){
+    public ExtractorConfig() {
         entityClass = Cells.class;
     }
 
@@ -83,48 +82,48 @@ public class ExtractorConfig<T> implements Serializable {
         this.extractorImplClassName = extractorImplClassName;
     }
 
-    public String getString(String key){
+    public String getString(String key) {
         return getValue(String.class, key);
     }
 
-    public Integer getInteger(String key){
+    public Integer getInteger(String key) {
         return getValue(Integer.class, key);
     }
 
-    public Boolean getBoolean(String key){
+    public Boolean getBoolean(String key) {
         return getValue(Boolean.class, key);
     }
 
-    public String[] getStringArray(String key){
-        try{
+    public String[] getStringArray(String key) {
+        try {
             return getValue(String[].class, key);
-        }catch (ClassCastException e){
-            return new String[] {getString(key)};
+        } catch (ClassCastException e) {
+            return new String[] { getString(key) };
         }
 
     }
 
-    public Double getDouble(String key){
+    public Double getDouble(String key) {
         return getValue(Double.class, key);
     }
 
-    public Float getFloat(String key){
+    public Float getFloat(String key) {
         return getValue(Float.class, key);
     }
 
-    public Long getLong(String key){
+    public Long getLong(String key) {
         return getValue(Long.class, key);
     }
 
-    public Short getShort(String key){
+    public Short getShort(String key) {
         return getValue(Short.class, key);
     }
 
-    public Byte[] getByteArray(String key){
+    public Byte[] getByteArray(String key) {
         return getValue(Byte[].class, key);
     }
 
-    public <K,V> Pair<K,V> getPair(String key, Class<K> keyClass, Class<V> valueClass){
+    public <K, V> Pair<K, V> getPair(String key, Class<K> keyClass, Class<V> valueClass) {
         return getValue(Pair.class, key);
     }
 

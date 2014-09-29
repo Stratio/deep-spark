@@ -16,8 +16,15 @@
 
 package com.stratio.deep.extractor;
 
-import com.google.common.io.Resources;
-import com.stratio.deep.commons.extractor.server.ExtractorServer;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
+import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URL;
+import java.util.concurrent.ExecutionException;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.count.CountResponse;
@@ -37,21 +44,13 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URL;
-import java.util.concurrent.*;
-
-import static org.elasticsearch.index.query.QueryBuilders.termQuery;
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
-import static org.testng.AssertJUnit.assertEquals;
-
+import com.google.common.io.Resources;
+import com.stratio.deep.commons.extractor.server.ExtractorServer;
 
 /**
  * Created by rcrespo on 29/08/14.
  */
-@Test(suiteName = "ESRddTests", groups = {"ESJavaRDDTest"})
+@Test(suiteName = "ESRddTests", groups = { "ESJavaRDDTest" })
 public class ESJavaRDDTest {
 
     private static final Logger LOG = Logger.getLogger(ESJavaRDDTest.class);
@@ -64,7 +63,7 @@ public class ESJavaRDDTest {
     public static final String ES_TYPE = "tweet";
     public static final String ES_INDEX_BOOK = "book";
     public static final String ES_INDEX_MESSAGE = "test";
-    public static final String ES_TYPE_MESSAGE  = "test";
+    public static final String ES_TYPE_MESSAGE = "test";
     public static final String ES_SEPARATOR = "/";
     public static final String ES_TYPE_INPUT = "input";
     public static final String ES_TYPE_OUTPUT = "output";
@@ -83,8 +82,8 @@ public class ESJavaRDDTest {
     public static void init() throws IOException, ExecutionException, InterruptedException, ParseException {
 
         Settings settings = ImmutableSettings.settingsBuilder()
-                .put("path.logs","")
-                .put("path.data",DB_FOLDER_NAME)
+                .put("path.logs", "")
+                .put("path.data", DB_FOLDER_NAME)
                 .build();
 
         node = nodeBuilder().settings(settings).data(true).local(true).clusterName(HOST).node();
@@ -93,17 +92,17 @@ public class ESJavaRDDTest {
         LOG.info("Started local node at " + DB_FOLDER_NAME + " settings " + node.settings().getAsMap());
 
         ExtractorServer.initExtractorServer();
-         dataSetImport();
-
-
+        dataSetImport();
 
     }
+
     /**
      * Imports dataset
      *
      * @throws java.io.IOException
      */
-    private static void dataSetImport() throws IOException, ExecutionException,IOException, InterruptedException, ParseException {
+    private static void dataSetImport()
+            throws IOException, ExecutionException, IOException, InterruptedException, ParseException {
 
         JSONParser parser = new JSONParser();
         URL url = Resources.getResource(DATA_SET_NAME);
@@ -111,22 +110,20 @@ public class ESJavaRDDTest {
 
         JSONObject jsonObject = (JSONObject) obj;
 
-        IndexResponse responseBook = client.prepareIndex(ES_INDEX_BOOK, ES_TYPE_INPUT,"1")
+        IndexResponse responseBook = client.prepareIndex(ES_INDEX_BOOK, ES_TYPE_INPUT, "1")
                 .setSource(jsonObject.toJSONString())
                 .execute()
                 .actionGet();
 
         String json2 = "{" +
 
-                "\"message\":\""+MESSAGE_TEST+"\"" +
+                "\"message\":\"" + MESSAGE_TEST + "\"" +
                 "}";
-
 
         IndexResponse response2 = client.prepareIndex(ES_INDEX_MESSAGE, ES_TYPE_MESSAGE).setCreate(true)
                 .setSource(json2).setReplicationType(ReplicationType.ASYNC)
                 .execute()
                 .actionGet();
-
 
         String json = "{" +
                 "\"user\":\"kimchy\"," +
@@ -153,13 +150,13 @@ public class ESJavaRDDTest {
 
             //searchResponse.getHits().hits();
             //assertEquals(searchResponse.getCount(), 1);
-        }catch (AssertionError | Exception e){
+        } catch (AssertionError | Exception e) {
             cleanup();
             e.printStackTrace();
         }
     }
 
-    private static void deleteDataSet()  {
+    private static void deleteDataSet() {
 
         try {
             DeleteByQueryResponse delete = client.prepareDeleteByQuery(ES_INDEX)
@@ -169,15 +166,15 @@ public class ESJavaRDDTest {
             delete.status();
 
             //assertEquals(delete.getCount(), 1);
-        }catch (Exception e){
+        } catch (Exception e) {
 
             e.printStackTrace();
         }
     }
 
     @Test
-    public void testRDD() throws IOException, ExecutionException, InterruptedException{
-       // dataSetImport();
+    public void testRDD() throws IOException, ExecutionException, InterruptedException {
+        // dataSetImport();
 
         Assert.assertEquals(true, true);
 

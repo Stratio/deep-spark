@@ -16,6 +16,7 @@ package com.stratio.deep.commons.extractor.server;
 
 import com.stratio.deep.commons.extractor.client.codecs.ActionDecoder;
 import com.stratio.deep.commons.extractor.client.codecs.ResponseEncoder;
+
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;

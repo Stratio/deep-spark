@@ -14,18 +14,30 @@
  */
 package com.stratio.deep.core.extractor.client;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.extractor.actions.*;
-import com.stratio.deep.commons.extractor.response.*;
+import com.stratio.deep.commons.extractor.actions.CloseAction;
+import com.stratio.deep.commons.extractor.actions.ExtractorInstanceAction;
+import com.stratio.deep.commons.extractor.actions.GetPartitionsAction;
+import com.stratio.deep.commons.extractor.actions.HasNextAction;
+import com.stratio.deep.commons.extractor.actions.InitIteratorAction;
+import com.stratio.deep.commons.extractor.actions.InitSaveAction;
+import com.stratio.deep.commons.extractor.actions.NextAction;
+import com.stratio.deep.commons.extractor.actions.SaveAction;
+import com.stratio.deep.commons.extractor.response.ExtractorInstanceResponse;
+import com.stratio.deep.commons.extractor.response.GetPartitionsResponse;
+import com.stratio.deep.commons.extractor.response.HasNextResponse;
+import com.stratio.deep.commons.extractor.response.NextResponse;
+import com.stratio.deep.commons.extractor.response.Response;
 import com.stratio.deep.commons.rdd.IExtractor;
+
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.apache.spark.Partition;
-
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Response> implements
         IExtractor<T> {
@@ -116,7 +128,6 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return;
     }
 
-
     @Override
     public boolean hasNext() {
         HasNextAction hasNextAction = new HasNextAction<>();
@@ -164,7 +175,6 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         return ((NextResponse<T>) response).getData();
     }
-
 
     @Override
     public void initIterator(Partition dp, ExtractorConfig<T> config) {
@@ -234,7 +244,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
             Thread.currentThread().interrupt();
         }
 
-        return ;
+        return;
     }
 
     @Override
@@ -260,8 +270,5 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         return;
     }
-
-
-
 
 }

@@ -1,6 +1,5 @@
 package com.stratio.deep.commons.rdd;
 
-
 import org.apache.spark.Partition;
 
 /**

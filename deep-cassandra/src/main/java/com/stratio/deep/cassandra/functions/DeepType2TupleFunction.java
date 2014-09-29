@@ -16,12 +16,13 @@
 
 package com.stratio.deep.cassandra.functions;
 
+import static com.stratio.deep.cassandra.util.CassandraUtils.deepType2tuple;
+
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
-import scala.Tuple2;
 
-import static com.stratio.deep.cassandra.util.CassandraUtils.deepType2tuple;
+import scala.Tuple2;
 
 /**
  * Function that converts an IDeepType to tuple of two Cells.<br/>

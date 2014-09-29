@@ -16,11 +16,11 @@
 
 package com.stratio.deep.cassandra.config;
 
-import com.datastax.driver.core.Session;
-import com.stratio.deep.commons.config.IDeepJobConfig;
-
 import java.io.Serializable;
 import java.util.Map;
+
+import com.datastax.driver.core.Session;
+import com.stratio.deep.commons.config.IDeepJobConfig;
 
 /**
  * Defines the public methods that each Stratio Deep Cassandra configuration object should implement.
@@ -38,9 +38,9 @@ public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T, ICassandra
      *                         depends on the actual index implementation.
      * @return this configuration object.
      * @throws com.stratio.deep.commons.exception.DeepIndexNotFoundException if the specified field has not been indexed in
-     *                                                               Cassandra.
+     *                                                                       Cassandra.
      * @throws com.stratio.deep.commons.exception.DeepNoSuchFieldException   if the specified field is not a valid column in
-     *                                                               Cassandra.
+     *                                                                       Cassandra.
      */
     public ICassandraDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue);
 
@@ -50,7 +50,6 @@ public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T, ICassandra
      * @return the map of configured additional filters.
      */
     public abstract Map<String, Serializable> getAdditionalFilters();
-
 
     /**
      * Returns the partitioner class name.
@@ -234,7 +233,6 @@ public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T, ICassandra
      * @return this configuration object.
      */
     public abstract ICassandraDeepJobConfig<T> createTableOnWrite(Boolean createTableOnWrite);
-
 
     /**
      * Returns the name of the configured column family.

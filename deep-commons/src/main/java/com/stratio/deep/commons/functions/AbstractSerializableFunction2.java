@@ -16,9 +16,9 @@
 
 package com.stratio.deep.commons.functions;
 
-import scala.runtime.AbstractFunction2;
-
 import java.io.Serializable;
+
+import scala.runtime.AbstractFunction2;
 
 /**
  * Created by luca on 14/04/14.

@@ -16,24 +16,29 @@
 
 package com.stratio.deep.cassandra.config;
 
-import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
+import java.lang.annotation.AnnotationTypeMismatchException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.conf.Configuration;
+
+import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
 import com.stratio.deep.commons.annotations.DeepEntity;
-import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Utils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.conf.Configuration;
-
-import java.io.Serializable;
-import java.lang.annotation.AnnotationTypeMismatchException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.*;
 
 /**
  * Class containing the appropiate configuration for a CassandraEntityRDD.
@@ -74,22 +79,20 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         return this;
     }
 
-
     public Configuration getHadoopConfiguration() {
         return null;
     }
 
-
     /**
      * Public constructor. Constructs a job object with the specified entity class.
      *
-     * @param entityClass   IDeepType entity Class object
-//     * @param isWriteConfig boolean specifing if the constructed object is suitable for writes.
+     * @param entityClass IDeepType entity Class object
+     *                    //     * @param isWriteConfig boolean specifing if the constructed object is suitable for writes.
      */
     public EntityDeepJobConfig(Class<T> entityClass) {
         super();
         this.entityClass = entityClass;
-//        this.isWriteConfig = isWriteConfig;
+        //        this.isWriteConfig = isWriteConfig;
     }
 
     /* (non-Javadoc)
@@ -176,14 +179,14 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
     @SuppressWarnings("unchecked")
     private Object packageCollectionValue(CassandraCell metadataCell, Object value) {
         switch (metadataCell.getCellValidator().validatorKind()) {
-            case SET:
-                return new LinkedHashSet((Collection) value);
-            case LIST:
-                return new LinkedList((Collection) value);
-            case MAP:
-                return new LinkedHashMap((Map) value);
-            default:
-                return value;
+        case SET:
+            return new LinkedHashSet((Collection) value);
+        case LIST:
+            return new LinkedList((Collection) value);
+        case MAP:
+            return new LinkedHashMap((Map) value);
+        default:
+            return value;
         }
     }
 
@@ -191,6 +194,5 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
     public Class getExtractorImplClass() {
         return CassandraEntityExtractor.class;
     }
-
 
 }

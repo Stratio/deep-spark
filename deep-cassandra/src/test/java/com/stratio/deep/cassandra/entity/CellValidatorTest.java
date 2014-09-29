@@ -16,22 +16,64 @@
 
 package com.stratio.deep.cassandra.entity;
 
+import static com.stratio.deep.cassandra.entity.CellValidator.Kind;
+import static com.stratio.deep.cassandra.entity.CellValidator.cellValidator;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
 import java.lang.reflect.Field;
 import java.math.BigInteger;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Properties;
+import java.util.Stack;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.Vector;
+import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
-import com.datastax.driver.core.DataType;
-import com.stratio.deep.testentity.CommonsTestEntity;
 import javax.management.relation.RoleList;
 import javax.management.relation.RoleUnresolvedList;
 import javax.print.attribute.standard.PrinterStateReasons;
-import org.apache.cassandra.db.marshal.*;
+
+import org.apache.cassandra.db.marshal.BooleanType;
+import org.apache.cassandra.db.marshal.BytesType;
+import org.apache.cassandra.db.marshal.DecimalType;
+import org.apache.cassandra.db.marshal.DoubleType;
+import org.apache.cassandra.db.marshal.FloatType;
+import org.apache.cassandra.db.marshal.InetAddressType;
+import org.apache.cassandra.db.marshal.Int32Type;
+import org.apache.cassandra.db.marshal.IntegerType;
+import org.apache.cassandra.db.marshal.ListType;
+import org.apache.cassandra.db.marshal.LongType;
+import org.apache.cassandra.db.marshal.MapType;
+import org.apache.cassandra.db.marshal.SetType;
+import org.apache.cassandra.db.marshal.TimeUUIDType;
+import org.apache.cassandra.db.marshal.TimestampType;
+import org.apache.cassandra.db.marshal.UTF8Type;
+import org.apache.cassandra.db.marshal.UUIDType;
 import org.testng.annotations.Test;
 
-import static com.stratio.deep.cassandra.entity.CellValidator.Kind;
-import static com.stratio.deep.cassandra.entity.CellValidator.cellValidator;
-import static org.testng.Assert.*;
+import com.datastax.driver.core.DataType;
+import com.stratio.deep.testentity.CommonsTestEntity;
 
 /**
  * Created by luca on 25/03/14.
@@ -119,7 +161,7 @@ public class CellValidatorTest {
         assertEquals(cv.getAbstractType(), ListType.getInstance(TimeUUIDType.instance));
     }
 
-    public void testBlobDataType(){
+    public void testBlobDataType() {
         CellValidator cv = cellValidator(DataType.blob());
         assertNotNull(cv);
         assertEquals(cv.getValidatorClassName(), BytesType.class.getName());
@@ -176,7 +218,6 @@ public class CellValidatorTest {
         assertEquals(cv.getAbstractType(), UUIDType.instance);
         assertNull(cv.getValidatorTypes());
         assertEquals(cv.validatorKind(), Kind.NOT_A_COLLECTION);
-
 
         UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
         cv = cellValidator(testTimeUUID);
@@ -282,7 +323,6 @@ public class CellValidatorTest {
         assertEquals(Kind.objectToKind(new TreeMap<>()), Kind.MAP);
         assertEquals(Kind.objectToKind(new WeakHashMap<>()), Kind.MAP);
     }
-
 
 }
 

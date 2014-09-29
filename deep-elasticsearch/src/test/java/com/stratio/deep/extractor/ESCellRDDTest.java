@@ -16,32 +16,25 @@
 
 package com.stratio.deep.extractor;
 
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.core.entity.BookEntity;
-import com.stratio.deep.core.entity.MessageTestEntity;
-import com.stratio.deep.core.extractor.ExtractorTest;
-
+import static org.testng.AssertJUnit.assertEquals;
 
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
 
-
-import static org.elasticsearch.index.query.QueryBuilders.termQuery;
-import static org.testng.AssertJUnit.assertEquals;
+import com.stratio.deep.core.extractor.ExtractorTest;
 
 /**
  * Created by rcrespo on 29/08/14.
  */
-@Test(suiteName = "ESRddTests", groups = {"ESCellRDDTest"}, dependsOnGroups = "ESJavaRDDTest")
+@Test(suiteName = "ESRddTests", groups = { "ESCellRDDTest" }, dependsOnGroups = "ESJavaRDDTest")
 public class ESCellRDDTest extends ExtractorTest {
     private Logger LOG = Logger.getLogger(getClass());
 
     public ESCellRDDTest() {
-        super(ESCellExtractor.class,"localhost:9200",null,ESJavaRDDTest.ES_INDEX_MESSAGE+ESJavaRDDTest.ES_SEPARATOR+ESJavaRDDTest.ES_TYPE_MESSAGE,
+        super(ESCellExtractor.class, "localhost:9200", null,
+                ESJavaRDDTest.ES_INDEX_MESSAGE + ESJavaRDDTest.ES_SEPARATOR + ESJavaRDDTest.ES_TYPE_MESSAGE,
                 true);
     }
-
-
 
     @Override
     @Test
