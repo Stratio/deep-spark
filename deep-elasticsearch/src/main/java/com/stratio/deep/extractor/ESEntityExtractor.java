@@ -21,6 +21,8 @@ import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepTransformException;
 import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
 import com.stratio.deep.utils.UtilES;
+
+import org.apache.spark.Partition;
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
 import org.elasticsearch.hadoop.mr.LinkedMapWritable;

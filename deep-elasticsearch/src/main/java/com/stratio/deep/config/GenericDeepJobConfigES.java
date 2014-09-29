@@ -28,6 +28,7 @@ import org.elasticsearch.hadoop.mr.EsOutputFormat;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.io.Serializable;
 import java.util.*;
 
 
@@ -95,7 +96,7 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
     private String query;
 
 
-    private Map<String, Object> customConfiguration;
+    private Map<String, Serializable> customConfiguration;
 
     /**
      * Default constructor
@@ -105,7 +106,7 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
     }
 
 
-    public IESDeepJobConfig<T> customConfiguration (Map<String, Object> customConfiguration){
+    public IESDeepJobConfig<T> customConfiguration (Map<String, Serializable> customConfiguration){
         this.customConfiguration=customConfiguration;
         return this;
     }
@@ -198,10 +199,10 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
 
         if (customConfiguration !=null ){
-            Set<Map.Entry<String, Object>> set = customConfiguration. entrySet();
-            Iterator<Map.Entry<String, Object>>  iterator = set.iterator();
+            Set<Map.Entry<String, Serializable>> set = customConfiguration. entrySet();
+            Iterator<Map.Entry<String, Serializable>>  iterator = set.iterator();
             while(iterator.hasNext()){
-                Map.Entry<String, Object> entry = iterator.next();
+                Map.Entry<String, Serializable> entry = iterator.next();
                 configHadoop.set(entry.getKey(),entry.getValue().toString());
             }
 
@@ -339,5 +340,9 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
         return this;
     }
 
+    @Override
+    public Map<String, Serializable> getCustomConfiguration() {
+        return customConfiguration;
+    }
 
 }

@@ -1,6 +1,8 @@
 package com.stratio.deep.commons.rdd;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
+
 import org.apache.spark.Partition;
 
 import java.io.Serializable;
@@ -10,8 +12,13 @@ import java.io.Serializable;
  */
 public interface IExtractor<T> extends Serializable {
 
+    void initIterator(Partition dp,
+            IDeepJobConfig<T, ?> deepJobConfig);
 
     Partition[] getPartitions(ExtractorConfig<T> config);
+
+    Partition[] getPartitions(IDeepJobConfig<T, ?> deepJobConfig);
+
 
     boolean hasNext();
 

@@ -16,6 +16,8 @@
 
 package com.stratio.deep.cassandra.config;
 
+import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
+import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
 import com.stratio.deep.commons.annotations.DeepEntity;
 import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.commons.entity.Cell;
@@ -27,6 +29,7 @@ import com.stratio.deep.commons.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 
+import java.io.Serializable;
 import java.lang.annotation.AnnotationTypeMismatchException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -182,6 +185,11 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
             default:
                 return value;
         }
+    }
+
+    @Override
+    public Class getExtractorImplClass() {
+        return CassandraEntityExtractor.class;
     }
 
 

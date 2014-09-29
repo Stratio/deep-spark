@@ -46,6 +46,7 @@ import com.stratio.deep.commons.utils.Pair;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.conf.*;
 import org.apache.log4j.Logger;
 import scala.Tuple2;
 
@@ -146,6 +147,8 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
     protected Boolean isWriteConfig = Boolean.FALSE;
 
     private int bisectFactor = Constants.DEFAULT_BISECT_FACTOR;
+
+    private Map<String, Serializable> customConfiguration = new HashMap<>();
 
     /**
      * {@inheritDoc}
@@ -865,7 +868,21 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
         return bisectFactor;
     }
 
+    public org.apache.hadoop.conf.Configuration getHadoopConfiguration() {
+        return null;
+    }
 
 
+    @Override
+    public Map<String, Serializable> getCustomConfiguration() {
+        return customConfiguration;
+    }
+
+
+    @Override
+    public ICassandraDeepJobConfig<T> customConfiguration(Map<String, Serializable> customConfiguration) {
+        this.customConfiguration = customConfiguration;
+        return this;
+    }
 
 }

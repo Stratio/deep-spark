@@ -18,6 +18,8 @@ package com.stratio.deep.config;
 
 import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.utils.AnnotationUtils;
+import com.stratio.deep.extractor.ESCellExtractor;
+import com.stratio.deep.extractor.ESEntityExtractor;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
@@ -81,5 +83,11 @@ public final class EntityDeepJobConfigES<T extends IDeepType> extends GenericDee
 
     public void setMapDBNameToEntityName(Map<String, String> mapDBNameToEntityName) {
         this.mapDBNameToEntityName = mapDBNameToEntityName;
+    }
+
+
+    @Override
+    public Class getExtractorImplClass() {
+        return ESEntityExtractor.class;
     }
 }

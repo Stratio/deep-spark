@@ -16,6 +16,8 @@
 
 package com.stratio.deep.commons.extractor.impl;
 
+import static com.stratio.deep.commons.utils.Constants.SPARK_RDD_ID;
+
 import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
@@ -31,9 +33,12 @@ import org.apache.spark.rdd.NewHadoopPartition;
 import scala.Tuple2;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by rcrespo on 26/08/14.
@@ -75,10 +80,19 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
     @Override
     public Partition[] getPartitions(ExtractorConfig<T> config) {
 
-        int id = Integer.parseInt(config.getValues().get(Constants.SPARK_RDD_ID).toString());
+
+        addSparkIdToDeepJobConfig(config);
+
+        return getPartitions (deepJobConfig);
+    }
+
+    @Override
+    public Partition[] getPartitions(IDeepJobConfig<T, ?> config) {
+
+        int id = Integer.parseInt(config.getCustomConfiguration().get(Constants.SPARK_RDD_ID).toString());
         jobId = new JobID(jobTrackerId, id);
 
-        deepJobConfig = (IDeepJobConfig<T, ? extends IDeepJobConfig>) deepJobConfig.initialize(config);
+        deepJobConfig = (IDeepJobConfig<T, ? extends IDeepJobConfig>) config.initialize();
         Configuration conf = deepJobConfig.getHadoopConfiguration();
 
 
@@ -151,25 +165,28 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
     @Override
     public void initIterator(Partition dp, ExtractorConfig<T> config) {
 
-        deepJobConfig.initialize(config);
-
-        int id = Integer.parseInt(config.getValues().get(Constants.SPARK_RDD_ID).toString());
-        NewHadoopPartition split = (NewHadoopPartition)dp;
-
-        TaskAttemptID attemptId = DeepSparkHadoopMapReduceUtil.newTaskAttemptID(jobTrackerId, id, true, split.index(), 0);
-
-
-        TaskAttemptContext hadoopAttemptContext = DeepSparkHadoopMapReduceUtil.newTaskAttemptContext(deepJobConfig.getHadoopConfiguration(), attemptId);
-
-
-        try {
-            reader = inputFormat.createRecordReader(split.serializableHadoopSplit().value(), hadoopAttemptContext);
-            reader.initialize(split.serializableHadoopSplit().value(), hadoopAttemptContext);
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        addSparkIdToDeepJobConfig(config);
+        initIterator(dp, deepJobConfig);
 
     }
+
+    private void addSparkIdToDeepJobConfig(ExtractorConfig<T> config){
+        int id = Integer.parseInt(config.getValues().get(Constants.SPARK_RDD_ID).toString());
+
+        //the new map
+        Map<String, Serializable> serializableMap = new HashMap<>();
+        serializableMap.put(Constants.SPARK_RDD_ID, id);
+
+        //customConfiguration
+        Map<String, Serializable> serializableMapCustom = deepJobConfig.getCustomConfiguration();
+        serializableMapCustom.putAll(serializableMap);
+
+
+        deepJobConfig = (IDeepJobConfig<T, ? extends IDeepJobConfig>) deepJobConfig.initialize(config);
+        deepJobConfig.customConfiguration(serializableMapCustom);
+
+    }
+
 
     public abstract T transformElement(Tuple2<K, V> tuple, IDeepJobConfig<T, ? extends IDeepJobConfig> config);
 
@@ -204,6 +221,28 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
         hadoopAttemptContext = DeepSparkHadoopMapReduceUtil.newTaskAttemptContext(deepJobConfig.initialize(config).getHadoopConfiguration(), attemptId);
         try {
             writer = outputFormat.getRecordWriter(hadoopAttemptContext);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    public void initIterator(Partition dp, IDeepJobConfig<T, ?> deepJobConfig) {
+
+        int id = Integer.parseInt(deepJobConfig.getCustomConfiguration().get(Constants.SPARK_RDD_ID).toString());
+
+        NewHadoopPartition split = (NewHadoopPartition)dp;
+
+        TaskAttemptID attemptId = DeepSparkHadoopMapReduceUtil.newTaskAttemptID(jobTrackerId, id, true, split.index(), 0);
+
+
+        TaskAttemptContext hadoopAttemptContext = DeepSparkHadoopMapReduceUtil.newTaskAttemptContext(deepJobConfig.getHadoopConfiguration(), attemptId);
+
+
+        try {
+            reader = inputFormat.createRecordReader(split.serializableHadoopSplit().value(), hadoopAttemptContext);
+            reader.initialize(split.serializableHadoopSplit().value(), hadoopAttemptContext);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }

@@ -38,6 +38,7 @@ import com.mongodb.hadoop.MongoInputFormat;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
@@ -129,8 +130,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     private String sort;
 
 
-    private Class<? extends InputFormat<?,?>> inputFormat = MongoInputFormat.class;
-
     /**
      * Shard key
      */
@@ -148,7 +147,7 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     private Integer splitSize = 8;
 
 
-    private Map<String, Object> customConfiguration;
+    private Map<String, Serializable> customConfiguration;
 
     /**
      * Default constructor
@@ -494,10 +493,10 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
         }
 
         if (customConfiguration !=null ) {
-            Set<Map.Entry<String, Object>> set = customConfiguration.entrySet();
-            Iterator<Map.Entry<String, Object>> iterator = set.iterator();
+            Set<Map.Entry<String, Serializable>> set = customConfiguration.entrySet();
+            Iterator<Map.Entry<String, Serializable>> iterator = set.iterator();
             while (iterator.hasNext()) {
-                Map.Entry<String, Object> entry = iterator.next();
+                Map.Entry<String, Serializable> entry = iterator.next();
                 configHadoop.set(entry.getKey(), entry.getValue().toString());
             }
         }
@@ -631,5 +630,17 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
 
         return this;
     }
+
+    @Override
+    public IMongoDeepJobConfig<T> customConfiguration(Map<String, Serializable> customConfiguration) {
+        this.customConfiguration = customConfiguration;
+        return this;
+    }
+
+    @Override
+    public Map<String, Serializable> getCustomConfiguration() {
+        return customConfiguration;
+    }
+
 
 }

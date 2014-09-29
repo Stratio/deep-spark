@@ -18,7 +18,9 @@ import static com.stratio.deep.commons.utils.Constants.SPARK_RDD_ID;
 
 import static scala.collection.JavaConversions.asScalaBuffer;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -91,6 +93,13 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
     recordReader = initRecordReader((DeepPartition) dp, cassandraJobConfig);
     }
 
+    @Override
+    public void initIterator(final Partition dp,
+            IDeepJobConfig<T, ?> deepJobConfig) {
+        this.cassandraJobConfig = (ICassandraDeepJobConfig<T>) deepJobConfig.initialize();
+        recordReader = initRecordReader((DeepPartition) dp, cassandraJobConfig);
+    }
+
 
 
     private ICassandraDeepJobConfig<T> initCustomConfig(ExtractorConfig<T> config){
@@ -114,24 +123,43 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
     @Override
     public Partition[] getPartitions(ExtractorConfig<T> config) {
 
-    int id = Integer.parseInt(config.getValues().get(SPARK_RDD_ID).toString());
-        ICassandraDeepJobConfig<T> cellDeepJobConfig = initCustomConfig(config);
-
-        List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits(cellDeepJobConfig);
-
-    Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
-
-    int i = 0;
-
-    for (DeepTokenRange split : underlyingInputSplits) {
-      partitions[i] = new DeepPartition(id, i, split);
-
-      // log().debug("Detected partition: " + partitions[i]);
-      ++i;
+        int id = Integer.parseInt(config.getValues().get(SPARK_RDD_ID).toString());
+        ICassandraDeepJobConfig<T> deepJobConfig = initCustomConfig(config);
+        Map<String, Serializable> serializableMap = new HashMap<>();
+        serializableMap.put(SPARK_RDD_ID, id);
+        deepJobConfig.customConfiguration(serializableMap);
+        return getPartitions(deepJobConfig);
     }
 
-    return partitions;
+    /**
+     * Returns the partitions on which this RDD depends on.
+     * <p/>
+     * Uses the underlying CqlPagingInputFormat in order to retrieve the splits.
+     * <p/>
+     * The number of splits, and hence the number of partitions equals to the number of tokens
+     * configured in cassandra.yaml + 1.
+     */
+    @Override
+    public Partition[] getPartitions(IDeepJobConfig<T, ?> deepJobConfig) {
+
+        int id = Integer.parseInt(deepJobConfig.getCustomConfiguration().get(SPARK_RDD_ID).toString());
+
+        List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits((ICassandraDeepJobConfig) deepJobConfig);
+
+        Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
+
+        int i = 0;
+
+        for (DeepTokenRange split : underlyingInputSplits) {
+            partitions[i] = new DeepPartition(id, i, split);
+
+            // log().debug("Detected partition: " + partitions[i]);
+            ++i;
+        }
+
+        return partitions;
     }
+
 
     /**
      * Returns a list of hosts on which the given split resides.

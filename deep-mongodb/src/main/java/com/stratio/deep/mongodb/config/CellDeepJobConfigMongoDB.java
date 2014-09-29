@@ -16,8 +16,11 @@
 
 package com.stratio.deep.mongodb.config;
 
-import com.stratio.deep.commons.entity.Cells;
+import java.io.Serializable;
+import java.util.Map;
 
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
 
 public class CellDeepJobConfigMongoDB extends GenericDeepJobConfigMongoDB<Cells> {
 
@@ -39,7 +42,9 @@ public class CellDeepJobConfigMongoDB extends GenericDeepJobConfigMongoDB<Cells>
         return (Class<Cells>) dummyCells.getClass();
     }
 
-
-
+    @Override
+    public Class getExtractorImplClass() {
+        return MongoCellExtractor.class;
+    }
 
 }

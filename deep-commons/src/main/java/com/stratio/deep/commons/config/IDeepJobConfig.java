@@ -138,23 +138,26 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?, ?>> extends Seria
     int getPageSize();
 
 
-//    /**
-//     * In case you want to add custom configuration to hadoop-connector, this override any other configuration,
-//     * these configurations are not validated, so be careful
-//     *
-//     * @param customConfiguration
-//     * @return
-//     */
-//    S customConfiguration(Map<String, Object> customConfiguration);
+    /**
+     * In case you want to add custom configuration, this could override any other configuration,
+     * these configurations are not validated, so be careful
+     *
+     * @param customConfiguration
+     * @return
+     */
+    S customConfiguration(Map<String, Serializable> customConfiguration);
 
 
+    Map<String, Serializable> getCustomConfiguration();
 
 
-    //    /**
-//     * Just in case you have a hadoopInputFormat
-//     * @return
-//     */
+    /**
+     * Just in case you want to get the Hadoop Configuration, for any based hadoop-Spark integration
+     * @return
+     */
     Configuration getHadoopConfiguration();
 
+
+    Class getExtractorImplClass();
 
 }

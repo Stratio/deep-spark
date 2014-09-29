@@ -18,6 +18,7 @@ package com.stratio.deep.mongodb.config;
 
 import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.utils.AnnotationUtils;
+import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
@@ -72,8 +73,10 @@ public final class EntityDeepJobConfigMongoDB<T extends IDeepType> extends Gener
         return this;
     }
 
-
-
+    @Override
+    public Class getExtractorImplClass() {
+        return MongoEntityExtractor.class;
+    }
 
     public Map<String, String> getMapDBNameToEntityName() {
         return mapDBNameToEntityName;

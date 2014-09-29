@@ -16,7 +16,11 @@
 
 package com.stratio.deep.config;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.extractor.ESCellExtractor;
 
 /**
  * Created by rcrespo on 29/07/14.
@@ -40,5 +44,10 @@ public class CellDeepJobConfigES extends GenericDeepJobConfigES<Cells> {
     }
 
 
+
+    @Override
+    public Class getExtractorImplClass() {
+        return ESCellExtractor.class;
+    }
 
 }

@@ -99,9 +99,7 @@ public class MongoJavaRDDTest {
 
         mongod = mongodExecutable.start();
 
-//TODO : Uncomment when drone.io is ready
-//        Files.forceDelete(new File(System.getProperty("user.home") +
-//                File.separator + ".embedmongo"));
+        Files.forceDelete(new File(DB_FOLDER_NAME));
 
 
         mongo = new MongoClient(HOST, PORT);

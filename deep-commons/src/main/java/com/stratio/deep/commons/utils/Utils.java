@@ -17,6 +17,7 @@
 package com.stratio.deep.commons.utils;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
@@ -38,6 +39,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -339,6 +341,24 @@ public final class Utils {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
            throw new DeepExtractorinitializationException(e.getMessage());
+        }
+    }
+
+    public static <T>IExtractor<T> getExtractorInstance(IDeepJobConfig<T,?> config){
+
+        try {
+            Class<T> rdd = (Class<T>) config.getExtractorImplClass();
+            Constructor<T> c;
+            if (config.getEntityClass().isAssignableFrom(Cells.class)){
+                c = rdd.getConstructor();
+                return (IExtractor<T>) c.newInstance();
+            }else{
+                c = rdd.getConstructor(Class.class);
+                return (IExtractor<T>) c.newInstance(config.getEntityClass());
+            }
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+            throw new DeepExtractorinitializationException(e.getMessage());
         }
     }
 
