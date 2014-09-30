@@ -317,7 +317,7 @@ public class CassandraCell extends Cell {
         return isPartitionKey;
     }
 
-    @Override
+
     public Boolean isKey() {
         return isClusterKey || isPartitionKey;
     }
