@@ -18,9 +18,9 @@ package com.stratio.deep.examples.java.es;
 
 
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.entity.ESCell;
 import com.stratio.deep.extractor.ESCellExtractor;
 import com.stratio.deep.commons.extractor.server.ExtractorServer;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
@@ -37,10 +37,7 @@ import scala.Tuple2;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+
 
 /**
  * Example class to write a RDD to ES
@@ -62,10 +59,9 @@ public final class WritingCellToES {
         String job = "java:writingCellToES";
 
         String host     = "localhost:9200";
-        String database = "cell/input";
         String index    = "book";
         String type     = "test";
-        String databaseOutput ="cell/output";
+        String typeOut     = "out";
 
 
 
@@ -79,7 +75,8 @@ public final class WritingCellToES {
 
         Map<String, Serializable> values = new HashMap<>();
 
-        values.put(ExtractorConstants.DATABASE,    database);
+        values.put(ExtractorConstants.INDEX,    index);
+        values.put(ExtractorConstants.TYPE,    type);
         values.put(ExtractorConstants.HOST,        host );
 
 
@@ -124,13 +121,15 @@ public final class WritingCellToES {
         JavaRDD<Cells>  outputRDD =  wordCountReduced.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
             public Cells call(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
-                return new Cells(ESCell.create("word", stringIntegerTuple2._1()) , ESCell.create("count", stringIntegerTuple2._2()));
+                return new Cells(Cell.create("word", stringIntegerTuple2._1()) , Cell.create("count", stringIntegerTuple2._2()));
             }
         });
 
 
         ExtractorConfig<Cells> outputConfigEntity = new ExtractorConfig<>();
-        outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, databaseOutput).putValue(ExtractorConstants.CREATE_ON_WRITE,"true");
+        outputConfigEntity.putValue(ExtractorConstants.HOST, host)
+                .putValue(ExtractorConstants.INDEX, index)
+                .putValue(ExtractorConstants.TYPE, typeOut);
         outputConfigEntity.setExtractorImplClass(ESCellExtractor.class);
 
 

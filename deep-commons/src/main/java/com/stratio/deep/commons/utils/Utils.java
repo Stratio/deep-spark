@@ -342,7 +342,34 @@ public final class Utils {
         }
     }
 
+    /**
+     *
+     * @param object
+     * @param clazz
+     * @return
+     */
+   public static Object castNumberType(Object object, Object clazz) {
+        if (object instanceof Number) {
 
+            if (clazz instanceof Double) {
+                return ((Number) object).doubleValue();
+            } else if (clazz instanceof Long) {
+                return ((Number) object).longValue();
 
+            } else if (clazz instanceof Float) {
+                return ((Number) object).floatValue();
+
+            } else if (clazz instanceof Integer) {
+                return ((Number) object).intValue();
+
+            } else if (clazz instanceof Short) {
+                return ((Number) object).shortValue();
+
+            } else if (clazz instanceof Byte) {
+                return ((Number) object).byteValue();
+            }
+        }
+        throw new ClassCastException("it is not a Number Type");
+    }
 
 }

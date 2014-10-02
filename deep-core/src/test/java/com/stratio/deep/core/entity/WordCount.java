@@ -40,6 +40,9 @@ public class WordCount implements IDeepType {
         this.count = count;
     }
 
+    public WordCount(Long count) {
+        this.count = count;
+    }
     public String getWord() {
         return word;
     }

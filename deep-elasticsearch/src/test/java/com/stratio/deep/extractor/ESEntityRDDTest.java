@@ -58,8 +58,7 @@ public class ESEntityRDDTest extends ExtractorTest implements Serializable{
 
     public ESEntityRDDTest() {
 
-        super(ESEntityExtractor.class,"localhost:9200",null,ESJavaRDDTest.ES_INDEX_MESSAGE+ESJavaRDDTest.ES_SEPARATOR+ESJavaRDDTest.ES_TYPE_MESSAGE,
-                MessageTestEntity.class,MessageTestEntity.class,BookEntity.class);
+        super(ESEntityExtractor.class,"localhost:9200",null,false);
     }
 
 
@@ -79,7 +78,7 @@ public class ESEntityRDDTest extends ExtractorTest implements Serializable{
         context = new DeepSparkContext("local", "deepSparkContextTest");
 
         ExtractorConfig<BookEntity> inputConfigEntity = new ExtractorConfig(BookEntity.class);
-        inputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.DATABASE, "book/input");
+        inputConfigEntity.putValue(ExtractorConstants.HOST,hostConcat).putValue(ExtractorConstants.INDEX,"book").putValue(ExtractorConstants.TYPE, "input");
         inputConfigEntity.setExtractorImplClass(ESEntityExtractor.class);
 
 
@@ -101,7 +100,7 @@ public class ESEntityRDDTest extends ExtractorTest implements Serializable{
         //tests subDocuments
         SearchResponse searchResponse = ESJavaRDDTest.client.prepareSearch("book").setQuery(termQuery("_type","input")).execute().actionGet();
         SearchHit[] sh = searchResponse.getHits().getHits() ;
-        List<JSONObject> listCantos =  new ArrayList<JSONObject>();
+        List<JSONObject> listCantos =  new ArrayList<>();
         for(SearchHit hit :sh){
 
             listCantos.add((JSONObject)JSONValue.parse(hit.sourceAsString()));
@@ -156,7 +155,8 @@ public class ESEntityRDDTest extends ExtractorTest implements Serializable{
 
 
         ExtractorConfig<WordCount> outputConfigEntity = new ExtractorConfig(WordCount.class);
-        outputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, "book/words");
+        outputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, "book")
+                .putValue(ExtractorConstants.TYPE, "words");;
         outputConfigEntity.setExtractorImplClass(ESEntityExtractor.class);
 
 
@@ -164,7 +164,7 @@ public class ESEntityRDDTest extends ExtractorTest implements Serializable{
 
         RDD<WordCount> outputRDDEntity = context.createRDD(outputConfigEntity);
 
-        //Assert.assertEquals(((Long) outputRDDEntity.cache().count()).longValue(), ESJavaRDDTest.WORD_COUNT_SPECTED.longValue());
+        Assert.assertEquals(((Long) outputRDDEntity.cache().count()).longValue(), ESJavaRDDTest.WORD_COUNT_SPECTED.longValue());
 
         context.stop();
 

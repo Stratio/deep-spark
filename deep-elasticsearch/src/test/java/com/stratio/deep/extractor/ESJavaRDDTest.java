@@ -41,6 +41,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.*;
 
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
@@ -64,7 +66,7 @@ public class ESJavaRDDTest {
     public static final String ES_TYPE = "tweet";
     public static final String ES_INDEX_BOOK = "book";
     public static final String ES_INDEX_MESSAGE = "test";
-    public static final String ES_TYPE_MESSAGE  = "test";
+    public static final String ES_TYPE_MESSAGE  = "input";
     public static final String ES_SEPARATOR = "/";
     public static final String ES_TYPE_INPUT = "input";
     public static final String ES_TYPE_OUTPUT = "output";
@@ -82,6 +84,9 @@ public class ESJavaRDDTest {
     @BeforeSuite
     public static void init() throws IOException, ExecutionException, InterruptedException, ParseException {
 
+        File file = new File(DB_FOLDER_NAME);
+        FileUtils.deleteDirectory(file);
+
         Settings settings = ImmutableSettings.settingsBuilder()
                 .put("path.logs","")
                 .put("path.data",DB_FOLDER_NAME)
@@ -92,7 +97,9 @@ public class ESJavaRDDTest {
 
         LOG.info("Started local node at " + DB_FOLDER_NAME + " settings " + node.settings().getAsMap());
 
-        ExtractorServer.initExtractorServer();
+
+
+
          dataSetImport();
 
 
@@ -194,7 +201,6 @@ public class ESJavaRDDTest {
             node.stop();
             client.close();
         }
-        ExtractorServer.close();
 
         File file = new File(DB_FOLDER_NAME);
         FileUtils.deleteDirectory(file);

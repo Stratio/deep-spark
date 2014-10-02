@@ -22,6 +22,8 @@ import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Utils;
 import com.stratio.deep.mongodb.entity.MongoCell;
+
+import org.apache.hadoop.io.Writable;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 import org.slf4j.Logger;
@@ -65,12 +67,13 @@ public final class UtilMongoDB {
 
             Field[] fields = AnnotationUtils.filterDeepFields(classEntity);
 
-            Object insert;
+            Object insert = null;
 
             for (Field field : fields) {
                 Object currentBson = null;
+                Method method = null;
                 try {
-                    Method method = Utils.findSetter(field.getName(), classEntity, field.getType());
+                    method = Utils.findSetter(field.getName(), classEntity, field.getType());
 
                     Class<?> classField = field.getType();
 
@@ -95,6 +98,8 @@ public final class UtilMongoDB {
                 }
                 catch ( IllegalAccessException | InstantiationException | InvocationTargetException | IllegalArgumentException e){
                     LOG.error("impossible to create a java object from Bson field:"+field.getName()+" and type:"+field.getType()+" and value:"+t + "; bsonReceived:"+currentBson+", bsonClassReceived:"+currentBson.getClass());
+
+                    method.invoke(t, Utils.castNumberType(insert, t));
                 }
 
         }

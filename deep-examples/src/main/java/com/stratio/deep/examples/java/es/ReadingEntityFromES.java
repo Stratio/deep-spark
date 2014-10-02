@@ -19,10 +19,9 @@ package com.stratio.deep.examples.java.es;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.entity.WordCount;
 import com.stratio.deep.extractor.ESEntityExtractor;
-import com.stratio.deep.commons.extractor.server.ExtractorServer;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.testentity.WordCount;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
@@ -57,7 +56,6 @@ public final class ReadingEntityFromES {
     public static void doMain(String[] args) {
         String job      = "java:readingEntityWithES";
         String host     = "localhost:9200";
-        String database = "entity/output";
         String index    = "book";
         String type     = "test";
 
@@ -73,7 +71,8 @@ public final class ReadingEntityFromES {
 
         Map<String, Serializable> values = new HashMap<>();
 
-        values.put(ExtractorConstants.DATABASE,    database);
+        values.put(ExtractorConstants.INDEX,    index);
+        values.put(ExtractorConstants.TYPE,    type);
         values.put(ExtractorConstants.HOST,        host );
 
         config.setExtractorImplClass(ESEntityExtractor.class);

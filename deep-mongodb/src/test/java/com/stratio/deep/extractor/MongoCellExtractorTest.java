@@ -49,7 +49,7 @@ import static org.testng.Assert.assertEquals;
  * Created by rcrespo on 18/06/14.
  */
 
-@Test(suiteName = "mongoRddTests", groups = {"MongoCellExtractorTest"} , dependsOnGroups = "MongoJavaRDDTest")
+@Test(suiteName = "mongoRddTests", groups = {"MongoCellExtractorTest"} , dependsOnGroups = "MongoEntityExtractorTest")
 public class MongoCellExtractorTest extends ExtractorTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoCellExtractorTest.class);

@@ -19,12 +19,12 @@ package com.stratio.deep.examples.java.es;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.entity.BookEntity;
+import com.stratio.deep.core.entity.CantoEntity;
+import com.stratio.deep.core.entity.WordCount;
 import com.stratio.deep.extractor.ESEntityExtractor;
-import com.stratio.deep.commons.extractor.server.ExtractorServer;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.testentity.BookEntity;
-import com.stratio.deep.testentity.CantoEntity;
-import com.stratio.deep.testentity.WordCount;
+
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -65,10 +65,9 @@ public final class WritingEntityToES {
     public static void doMain(String[] args) {
         String job = "java:writingEntityToES";
         String host     = "localhost:9200";
-        String database = "book/word";
         String index    = "book";
         String type     = "test";
-        String database2 = "entity/output";
+        String typeOut     = "out";
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -80,8 +79,8 @@ public final class WritingEntityToES {
 
         Map<String, Serializable> values = new HashMap<>();
 
-        values.put(ExtractorConstants.DATABASE,    database);
-        values.put(ExtractorConstants.HOST,        host );
+        values.put(ExtractorConstants.INDEX,    index);
+        values.put(ExtractorConstants.TYPE,        type );
 
         config.setExtractorImplClass(ESEntityExtractor.class);
         config.setEntityClass(BookEntity.class);
@@ -137,7 +136,9 @@ public final class WritingEntityToES {
 
 
         ExtractorConfig<WordCount> outputConfigEntity = new ExtractorConfig(WordCount.class);
-        outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database2);
+        outputConfigEntity.putValue(ExtractorConstants.HOST, host)
+                .putValue(ExtractorConstants.INDEX, index)
+                .putValue(ExtractorConstants.TYPE, typeOut);
         outputConfigEntity.setExtractorImplClass(ESEntityExtractor.class);
 
         deepContext.saveRDD(outputRDD.rdd(),outputConfigEntity);

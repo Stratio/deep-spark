@@ -164,8 +164,8 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
         configHadoop.setInputFormat(EsInputFormat.class);
         configHadoop.setOutputFormat(EsOutputFormat.class);
         configHadoop.set("es.resource", database);
-        configHadoop.set("es.field.read.empty.as.null", "true");
-        configHadoop.set("index.mapper.dynamic","false");
+        configHadoop.set("es.field.read.empty.as.null", "false");
+        configHadoop.set("index.mapper.dynamic","true");
 
         if(query!=null){
 //            "?q=message:first"
@@ -217,7 +217,7 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
             throw new IllegalArgumentException("host cannot be null");
         }
         if (database == null) {
-            throw new IllegalArgumentException("database cannot be null");
+            throw new IllegalArgumentException("type cannot be null");
         }
 
     }

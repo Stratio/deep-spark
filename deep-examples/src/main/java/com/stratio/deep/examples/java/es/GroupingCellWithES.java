@@ -19,11 +19,10 @@ package com.stratio.deep.examples.java.es;
 
 import com.google.common.io.Resources;
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.extractor.server.ExtractorServer;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.entity.ESCell;
 import com.stratio.deep.extractor.ESCellExtractor;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
@@ -153,7 +152,8 @@ public final class GroupingCellWithES {
         JavaRDD<Cells>  outputRDD =  wordCountReduced.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
             public Cells call(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
-                return new Cells(ESCell.create("word", stringIntegerTuple2._1()) , ESCell.create("count", stringIntegerTuple2._2()));
+                return new Cells(Cell.create("word", stringIntegerTuple2._1()) , Cell.create("count",
+                        stringIntegerTuple2._2()));
             }
         });
 

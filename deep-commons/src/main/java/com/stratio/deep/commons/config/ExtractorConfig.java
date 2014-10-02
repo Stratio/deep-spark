@@ -19,6 +19,7 @@ package com.stratio.deep.commons.config;
 
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.utils.Pair;
+import com.stratio.deep.commons.utils.Utils;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -150,7 +151,24 @@ public class ExtractorConfig<T> implements Serializable {
         if (values.get(key) == null) {
             return null;
         } else {
-            return (T) values.get(key);
+            try{
+                return (T) values.get(key);
+            }catch(ClassCastException e){
+                if(Number.class.isAssignableFrom(clazz)){
+                    try {
+                        return (T) Utils.castNumberType(values.get(key), clazz.newInstance());
+                    } catch (InstantiationException e1) {
+                        return null;
+                    } catch (IllegalAccessException e1) {
+                        return null;
+                    }
+                }else{
+                    throw e;
+                }
+
+            }
+
+
         }
     }
 }

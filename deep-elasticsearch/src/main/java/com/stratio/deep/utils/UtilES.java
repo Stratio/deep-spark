@@ -24,11 +24,12 @@ import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Utils;
-import com.stratio.deep.entity.ESCell;
 import com.stratio.deep.commons.entity.IDeepType;
 import org.apache.hadoop.io.*;
 import org.elasticsearch.hadoop.mr.LinkedMapWritable;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -38,6 +39,7 @@ import java.util.*;
  */
 public final class UtilES {
 
+    private static final Logger LOG = LoggerFactory.getLogger(UtilES.class);
 
     /**
      * Private default constructor.
@@ -60,7 +62,6 @@ public final class UtilES {
      */
     public static <T> T getObjectFromJson(Class<T> classEntity, LinkedMapWritable jsonObject) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
         T t = classEntity.newInstance();
-
 
         Field[] fields = AnnotationUtils.filterDeepFields(classEntity);
 
@@ -85,7 +86,14 @@ public final class UtilES {
                     method.invoke(t, (insert));
                 } else {
                     insert = currentJson;
-                    method.invoke(t, getObjectFromWritable((Writable) insert));
+                    try{
+                        method.invoke(t, getObjectFromWritable((Writable) insert));
+                    }
+                    catch(Exception e){
+                        LOG.error("impossible to convert field " +t + " :"+ field + " error: "+ e.getMessage());
+                        method.invoke(t, Utils.castNumberType(getObjectFromWritable((Writable) insert), t));
+                    }
+
                 }
 
 
@@ -94,6 +102,10 @@ public final class UtilES {
 
         return t;
     }
+
+
+
+
 
 
     private static <T> Object subDocumentListCase(Type type, ArrayWritable arrayWritable) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
@@ -226,17 +238,17 @@ public final class UtilES {
 
             if (LinkedMapWritable.class.isAssignableFrom(entry.getValue().getClass())) {
                 Cells innerCells = getCellFromJson((LinkedMapWritable) entry.getValue());
-                cells.add(ESCell.create(entry.getKey().toString(), innerCells));
+                cells.add(Cell.create(entry.getKey().toString(), innerCells));
             } else if (ArrayWritable.class.isAssignableFrom(entry.getValue().getClass())) {
                 Writable[] writetable = ((ArrayWritable) entry.getValue()).get();
                 List<Cells> innerCell = new ArrayList<>();
                 for (int i = 0 ; i < writetable.length ; i++){
                     innerCell.add(getCellFromJson((LinkedMapWritable) writetable[i]));
                 }
-                cells.add(ESCell.create(entry.getKey().toString(), innerCell));
+                cells.add(Cell.create(entry.getKey().toString(), innerCell));
             } else {
 
-                cells.add(ESCell.create(entry.getKey().toString(), getObjectFromWritable(entry.getValue())));
+                cells.add(Cell.create(entry.getKey().toString(), getObjectFromWritable(entry.getValue())));
             }
 
         }

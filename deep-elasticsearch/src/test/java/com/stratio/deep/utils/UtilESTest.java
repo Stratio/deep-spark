@@ -18,7 +18,9 @@ package com.stratio.deep.utils;
 
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.entity.ESCell;
+import com.stratio.deep.core.entity.BookEntity;
+import com.stratio.deep.core.entity.CantoEntity;
+import com.stratio.deep.core.entity.MetadataEntity;
 import com.stratio.deep.testentity.*;
 
 import org.apache.hadoop.io.ArrayWritable;
@@ -231,9 +233,9 @@ public class UtilESTest {
 
         //Create Medataba Object
 
-        Cell authorCell = ESCell.create("author", "ANTE ALIGHIERI");
-        Cell titleCell = ESCell.create("title", "THE DIVINE COMEDY");
-        Cell sourceCell = ESCell.create("source", "http://www.gutenberg.org/ebooks/8800");
+        Cell authorCell = Cell.create("author", "ANTE ALIGHIERI");
+        Cell titleCell = Cell.create("title", "THE DIVINE COMEDY");
+        Cell sourceCell = Cell.create("source", "http://www.gutenberg.org/ebooks/8800");
 
         Cells metadata = new Cells();
 
@@ -248,13 +250,13 @@ public class UtilESTest {
 
         Cells cantoI = new Cells();
 
-        cantoI.add(ESCell.create("canto", "Canto I"));
-        cantoI.add(ESCell.create("text", "text I"));
+        cantoI.add(Cell.create("canto", "Canto I"));
+        cantoI.add(Cell.create("text", "text I"));
 
         Cells cantoII = new Cells();
 
-        cantoII.add(ESCell.create("canto", "Canto II"));
-        cantoII.add(ESCell.create("text", "text II"));
+        cantoII.add(Cell.create("canto", "Canto II"));
+        cantoII.add(Cell.create("text", "text II"));
 
         cantos.add(cantoI);
         cantos.add(cantoII);
@@ -264,8 +266,8 @@ public class UtilESTest {
 
         Cells cells = new Cells();
 
-        cells.add(ESCell.create("metadata", metadata));
-        cells.add(ESCell.create("cantos", cantos));
+        cells.add(Cell.create("metadata", metadata));
+        cells.add(Cell.create("cantos", cantos));
 
 
         JSONObject bson = UtilES.getJsonFromCell(cells);
