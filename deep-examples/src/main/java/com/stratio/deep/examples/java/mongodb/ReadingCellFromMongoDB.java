@@ -18,6 +18,7 @@ package com.stratio.deep.examples.java.mongodb;
 
 import com.mongodb.QueryBuilder;
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
@@ -81,9 +82,9 @@ public final class ReadingCellFromMongoDB {
 
         config.setExtractorImplClass(MongoCellExtractor.class);
         Map<String, Serializable> values = new HashMap<>();
-        values.put("database", database);
-        values.put("collection",    inputCollection);
-        values.put("host",  host);
+        values.put(ExtractorConstants.DATABASE, database);
+        values.put(ExtractorConstants.COLLECTION,    inputCollection);
+        values.put(ExtractorConstants.HOST,  host);
 
         config.setValues(values);
 
