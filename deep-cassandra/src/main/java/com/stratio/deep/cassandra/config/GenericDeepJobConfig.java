@@ -41,6 +41,7 @@ import com.stratio.deep.commons.exception.DeepIllegalAccessException;
 import com.stratio.deep.commons.exception.DeepIndexNotFoundException;
 import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.utils.Constants;
 import com.stratio.deep.commons.utils.Pair;
 import org.apache.cassandra.db.ConsistencyLevel;
@@ -555,6 +556,15 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
         if(values.get(ExtractorConstants.FILTER_FIELD)!=null){
             Pair<String, Serializable> filterFields =  extractorConfig.getPair(ExtractorConstants.FILTER_FIELD, String.class, Serializable.class);
             filterByField(filterFields.left, filterFields.right);
+        }
+
+        //TODO: add operations
+        if(values.get(ExtractorConstants.FILTER_QUERY)!=null){
+            Filter[] filters =  extractorConfig.getFilterArray(ExtractorConstants.FILTER_QUERY);
+            for(int i = 0 ; i< filters.length ; i++){
+                filterByField(filters[i].getField(), filters[i].getValue());
+            }
+
         }
         this.initialize();
 
