@@ -18,7 +18,7 @@ package com.stratio.deep.mongodb.extractor;
 
 import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepTransformException;
-import com.stratio.deep.mongodb.config.EntityDeepJobConfigMongoDB;
+import com.stratio.deep.mongodb.config.DeepJobConfigMongoDB;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
 import org.bson.BSONObject;
 import org.slf4j.Logger;
@@ -41,7 +41,7 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
 
     public MongoEntityExtractor(Class<T> t){
         super();
-        this.deepJobConfig = new EntityDeepJobConfigMongoDB(t);
+        this.deepJobConfig = new DeepJobConfigMongoDB(t);
     }
 
     /**

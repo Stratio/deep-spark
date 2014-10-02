@@ -16,11 +16,11 @@
 
 package com.stratio.deep.extractor;
 
-import com.stratio.deep.config.CellDeepJobConfigES;
 import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepTransformException;
 import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
+import com.stratio.deep.config.DeepJobConfigES;
 import com.stratio.deep.utils.UtilES;
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
@@ -42,7 +42,7 @@ public final class ESCellExtractor extends GenericHadoopExtractor<Cells, Object,
 
     public ESCellExtractor(){
         super();
-        this.deepJobConfig = new CellDeepJobConfigES();
+        this.deepJobConfig = new DeepJobConfigES(Cells.class);
         this.inputFormat = new EsInputFormat<>() ;
         this.outputFormat = new EsOutputFormat() ;
     }

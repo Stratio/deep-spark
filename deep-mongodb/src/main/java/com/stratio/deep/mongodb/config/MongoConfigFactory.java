@@ -36,7 +36,7 @@ public class MongoConfigFactory {
      * @return a new cell-based MongoDB job configuration object.
      */
     public static IMongoDeepJobConfig<Cells> createMongoDB() {
-        return new CellDeepJobConfigMongoDB();
+        return new DeepJobConfigMongoDB(Cells.class);
     }
 
     /**
@@ -47,6 +47,6 @@ public class MongoConfigFactory {
      * @return a new entity-based MongoDB job configuration object.
      */
     public static <T extends IDeepType> IMongoDeepJobConfig<T> createMongoDB(Class<T> entityClass) {
-        return new EntityDeepJobConfigMongoDB<>(entityClass);
+        return new DeepJobConfigMongoDB<>(entityClass);
     }
 }

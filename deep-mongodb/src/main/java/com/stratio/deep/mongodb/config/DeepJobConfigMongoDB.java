@@ -38,7 +38,7 @@ import com.mongodb.hadoop.MongoInputFormat;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.bson.BSONObject;
@@ -51,7 +51,7 @@ import java.util.*;
 /**
  * @param <T>
  */
-public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
+public class DeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     private static final long serialVersionUID = -7179376653643603038L;
 
 
@@ -128,9 +128,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
      */
     private String sort;
 
-
-    private Class<? extends InputFormat<?,?>> inputFormat = MongoInputFormat.class;
-
     /**
      * Shard key
      */
@@ -150,14 +147,12 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
 
     private Map<String, Object> customConfiguration;
 
-    /**
-     * Default constructor
-     */
-    public GenericDeepJobConfigMongoDB() {
+
+
+    public DeepJobConfigMongoDB(Class<T> entityClass) {
+        this.entityClass=entityClass;
 
     }
-
-
     /**
      * {@inheritDoc}
      */
@@ -416,7 +411,7 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
      * {@inheritDoc}
      */
     @Override
-    public GenericDeepJobConfigMongoDB<T> initialize() {
+    public DeepJobConfigMongoDB<T> initialize() {
         validate();
         configHadoop = new Configuration();
         StringBuilder connection = new StringBuilder();

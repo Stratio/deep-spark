@@ -16,7 +16,7 @@
 
 package com.stratio.deep.extractor;
 
-import com.stratio.deep.config.EntityDeepJobConfigES;
+import com.stratio.deep.config.DeepJobConfigES;
 import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepTransformException;
 import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
@@ -45,7 +45,7 @@ public final class ESEntityExtractor<T> extends GenericHadoopExtractor<T,  Objec
 
     public ESEntityExtractor(Class<T> t){
         super();
-        this.deepJobConfig = new EntityDeepJobConfigES(t);
+        this.deepJobConfig = new DeepJobConfigES(t);
         this.inputFormat = new EsInputFormat<>() ;
         this.outputFormat = new EsOutputFormat() ;
 
