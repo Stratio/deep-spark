@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.cassandra.rdd;
+package com.stratio.deep.cassandra.extractor;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.CharacterCodingException;
 
-import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import org.apache.cassandra.exceptions.ConfigurationException;
@@ -134,6 +133,5 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
         executeCustomCQL("TRUNCATE  " + quote(keyspace) + "." + cf);
     }
 
-    @Test(dependsOnMethods = "testSaveToCassandra")
-    public abstract void testCql3SaveToCassandra();
+
 }

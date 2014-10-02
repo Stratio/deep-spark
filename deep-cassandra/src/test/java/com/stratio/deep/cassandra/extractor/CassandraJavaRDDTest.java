@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.cassandra.rdd;
+package com.stratio.deep.cassandra.extractor;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -30,17 +30,12 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.stratio.deep.cassandra.config.CassandraConfigFactory;
-import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.cassandra.embedded.CassandraServer;
 import com.stratio.deep.cassandra.entity.CassandraCell;
-import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
-import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
 import com.stratio.deep.cassandra.testentity.StrippedTestEntity;
 import com.stratio.deep.cassandra.testentity.TestEntity;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;

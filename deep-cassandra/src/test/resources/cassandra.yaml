@@ -41,7 +41,7 @@ hinted_handoff_enabled: true
 # this defines the maximum amount of time a dead host will have hints
 # generated.  After it has been dead this long, new hints for it will not be
 # created until it has been seen alive and gone down again.
-max_hint_window_in_ms: 10800000 # 3 hours
+max_hint_window_in_ms: 1080000 # 3 hours
 # throttle in KBs per second, per delivery thread
 hinted_handoff_throttle_in_kb: 1024
 # Number of threads with which to deliver hints;
@@ -443,7 +443,7 @@ auto_snapshot: false
 # scan more tombstones anyway.  These thresholds may also be adjusted at runtime
 # using the StorageService mbean.
 tombstone_warn_threshold: 1000
-tombstone_failure_threshold: 100000
+tombstone_failure_threshold: 10000
 
 # Add column indexes to a row after its contents reach this size.
 # Increase if your column values are large, or if you have a very large
@@ -512,9 +512,9 @@ write_request_timeout_in_ms: 2000
 # How long the coordinator should wait for truncates to complete
 # (This can be much longer, because unless auto_snapshot is disabled
 # we need to flush first so we can snapshot before removing the data.)
-truncate_request_timeout_in_ms: 60000
+truncate_request_timeout_in_ms: 6000
 # The default timeout for other, miscellaneous operations
-request_timeout_in_ms: 10000
+request_timeout_in_ms: 1000
 
 # Enable operation timeout information exchange between nodes to accurately
 # measure request timeouts, If disabled cassandra will assuming the request
@@ -591,7 +591,7 @@ endpoint_snitch: SimpleSnitch
 dynamic_snitch_update_interval_in_ms: 100 
 # controls how often to reset all host scores, allowing a bad host to
 # possibly recover
-dynamic_snitch_reset_interval_in_ms: 600000
+dynamic_snitch_reset_interval_in_ms: 60000
 # if set greater than zero and read_repair_chance is < 1.0, this will allow
 # 'pinning' of replicas to hosts in order to increase cache capacity.
 # The badness threshold will control how much worse the pinned host has to be

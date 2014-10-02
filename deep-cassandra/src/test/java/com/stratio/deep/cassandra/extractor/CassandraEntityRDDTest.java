@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.cassandra.rdd;
+package com.stratio.deep.cassandra.extractor;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,15 +27,8 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.stratio.deep.cassandra.config.CassandraConfigFactory;
-import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.embedded.CassandraServer;
-import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
-import com.stratio.deep.cassandra.testentity.Cql3CollectionsTestEntity;
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.exception.DeepIOException;
-import com.stratio.deep.commons.exception.DeepIndexNotFoundException;
-import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
 import com.stratio.deep.cassandra.testentity.TestEntity;
@@ -351,20 +344,6 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         checkSimpleTestData();
     }
 
-    @Override
-    public void testCql3SaveToCassandra() {
-        assertEquals(true,true);
-//
-//        try {
-//	        executeCustomCQL("DROP TABLE " + quote(OUTPUT_KEYSPACE_NAME) + "." + quote(OUTPUT_COLUMN_FAMILY));
-//        } catch (Exception e) {
-//        }
-//
-//        ExtractorConfig<TestEntity> writeConfig = getWriteConfig();
-//
-////        RDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
-//        checkSimpleTestData();
-    }
 
 
     @Test

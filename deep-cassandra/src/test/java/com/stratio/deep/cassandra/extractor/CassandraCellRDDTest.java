@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.cassandra.rdd;
+package com.stratio.deep.cassandra.extractor;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -26,13 +26,10 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 
-import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.embedded.CassandraServer;
 import com.stratio.deep.cassandra.entity.CassandraCell;
-import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
 import com.stratio.deep.commons.utils.Constants;
@@ -278,19 +275,5 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
 
     }
 
-    @Override
-    public void testCql3SaveToCassandra() {
-        assertEquals(true, true);
-//        try {
-//            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + CQL3_OUTPUT_COLUMN_FAMILY);
-//        } catch (Exception e) {
-//        }
-//
-//        ICassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
-//
-//        RDD.cql3SaveRDDToCassandra(
-//                getRDD(), writeConfig);
-//        checkSimpleTestData();
-    }
 
 }

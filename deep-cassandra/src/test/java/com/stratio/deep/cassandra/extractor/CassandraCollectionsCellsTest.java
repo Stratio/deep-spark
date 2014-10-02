@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.cassandra.rdd;
+package com.stratio.deep.cassandra.extractor;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -25,25 +25,18 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.stratio.deep.cassandra.config.CassandraConfigFactory;
-import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.embedded.CassandraServer;
 import com.stratio.deep.cassandra.entity.CassandraCell;
-import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
-import com.stratio.deep.cassandra.testentity.Cql3CollectionsTestEntity;
 import com.stratio.deep.commons.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.spark.rdd.RDD;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import scala.Function1;
-import scala.reflect.ClassTag$;
 
 import static org.testng.Assert.*;
 
@@ -295,19 +288,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
         checkSimpleTestData();
     }
 
-    @Override
-    public void testCql3SaveToCassandra() {
-assertEquals(true, true);
-//        try {
-//            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
-//        } catch (Exception e) {
-//        }
-//
-//        ExtractorConfig<Cells> writeConfig = getWriteConfig();
 
-//        RDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
-//        checkSimpleTestData();
-    }
 
     private static class TestEntityAbstractSerializableFunction extends
             AbstractSerializableFunction<Cells, Cells> {

@@ -242,7 +242,7 @@ public abstract class ExtractorTest<T> implements Serializable {
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
-        ExtractorConfig<W> inputConfigEntity = getInputColumnConfig("_id, metadata");
+        ExtractorConfig<W> inputConfigEntity = getInputColumnConfig(new String[] {"_id", "metadata"});
 
         RDD<W> inputRDDEntity = context.createRDD(inputConfigEntity);
 
@@ -290,7 +290,7 @@ public abstract class ExtractorTest<T> implements Serializable {
 
 
 
-        ExtractorConfig<W> inputConfigEntity3 = getInputColumnConfig("cantos, metadata");
+        ExtractorConfig<W> inputConfigEntity3 = getInputColumnConfig("cantos", "metadata");
 
 
 
@@ -351,7 +351,7 @@ public abstract class ExtractorTest<T> implements Serializable {
         return extractorConfig;
     }
 
-    public <W>ExtractorConfig<W> getInputColumnConfig(String inputColumns) {
+    public <W>ExtractorConfig<W> getInputColumnConfig(String... inputColumns) {
 
         ExtractorConfig<W> extractorConfig = getExtractorConfig(configEntity);
         extractorConfig.putValue(ExtractorConstants.HOST, host)
