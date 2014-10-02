@@ -48,6 +48,8 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
      */
     private List<String> hostList = new ArrayList<>();
 
+    private int port;
+
 
     /**
      * username
@@ -180,6 +182,7 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
 //        }
 
         configHadoop.set("es.nodes", Utils.splitHosts(hostList));
+        configHadoop.set("es.port", String.valueOf(port));
         configHadoop.set("es.input.json", "yes");
 
 
@@ -330,12 +333,23 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
         if(values.get(ExtractorConstants.HOST)!=null){
             host(extractorConfig.getString(ExtractorConstants.HOST));
         }
+
+        if(values.get(ExtractorConstants.PORT)!=null){
+            port(extractorConfig.getInteger(ExtractorConstants.PORT));
+        }
+
         if(values.get(ExtractorConstants.INDEX)!=null&& (values.get(ExtractorConstants.TYPE)!= null)){
             database(extractorConfig.getString(ExtractorConstants.INDEX).concat("/").concat(extractorConfig.getString(ExtractorConstants.TYPE)));
        }
 
         this.initialize();
 
+        return this;
+    }
+
+
+    public IESDeepJobConfig<T> port(int port){
+        this.port = port;
         return this;
     }
 
