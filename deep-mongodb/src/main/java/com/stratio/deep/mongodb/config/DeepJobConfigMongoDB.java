@@ -19,6 +19,7 @@ package com.stratio.deep.mongodb.config;
 
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.HOST;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PORT;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNAME;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.DATABASE;
@@ -407,6 +408,16 @@ public class DeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         return this;
     }
 
+    public IMongoDeepJobConfig<T> port(int port){
+        for(int i = 0; i< hostList.size() ; i++){
+            if (hostList.get(i).indexOf(":")==-1) {
+                hostList.set(i, hostList.get(i).concat(":").concat(String.valueOf(port))) ;
+            }
+
+        }
+        return this;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -563,6 +574,10 @@ public class DeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
 
         if(values.get(HOST)!=null){
             host((extractorConfig.getStringArray(HOST)));
+        }
+
+        if(values.get(PORT)!=null){
+            port((extractorConfig.getInteger(PORT)));
         }
 
         if(values.get(COLLECTION)!=null){
