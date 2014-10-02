@@ -29,11 +29,12 @@ public class Filter implements Serializable {
 
     private Serializable value;
 
-    public Filter(String filed){
+
+    public Filter(String field){
         this.field = field;
     }
 
-    public Filter(String filed, String operation, Serializable value){
+    public Filter(String field, String operation, Serializable value){
         this.field = field;
         this.operation = operation;
         this.value = value;
@@ -77,4 +78,26 @@ public class Filter implements Serializable {
     }
 
 
+
+    public String getField() {
+        return field;
+    }
+
+    public String getOperation() {
+        return operation;
+    }
+
+    public Serializable getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Filter{");
+        sb.append("field='").append(field).append('\'');
+        sb.append(", operation='").append(operation).append('\'');
+        sb.append(", value=").append(value);
+        sb.append('}');
+        return sb.toString();
+    }
 }

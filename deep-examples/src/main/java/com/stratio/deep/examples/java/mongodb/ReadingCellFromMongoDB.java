@@ -19,6 +19,7 @@ package com.stratio.deep.examples.java.mongodb;
 import com.mongodb.QueryBuilder;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
@@ -34,6 +35,7 @@ import java.util.Map;
 
 import static com.stratio.deep.commons.extractor.server.ExtractorServer.initExtractorServer;
 import static com.stratio.deep.commons.extractor.server.ExtractorServer.stopExtractorServer;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.FILTER_QUERY;
 
 /**
  * Example class to read a collection from mongoDB
@@ -77,11 +79,18 @@ public final class ReadingCellFromMongoDB {
         bsonFields.put("_id",0);
         //TODO review
 
+        Filter filter = new Filter("number");
+        filter.greaterThan(1);
+        Filter filter2 = new Filter("number");
+        filter2.lessThanEquals(10);
+        Filter[] filters = new Filter[]{filter, filter2};
+
         ExtractorConfig<Cells> config = new ExtractorConfig();
 
         config.setExtractorImplClass(MongoCellExtractor.class);
         Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.DATABASE, database);
+        values.put(ExtractorConstants.FILTER_QUERY, filters);
         values.put(ExtractorConstants.COLLECTION,    inputCollection);
         values.put(ExtractorConstants.HOST,  host);
 

@@ -34,11 +34,16 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_SH
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_SPLITS;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_CHUNKS;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.SPLIT_SIZE;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import com.mongodb.hadoop.MongoInputFormat;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.filter.Filter;
+import com.stratio.deep.commons.filter.FilterOperator;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
@@ -606,7 +611,7 @@ public class DeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         }
 
         if(values.get(FILTER_QUERY)!=null){
-            filterQuery(extractorConfig.getString(FILTER_QUERY));
+            filterQuery(extractorConfig.getFilterArray(FILTER_QUERY));
         }
 
         if(values.get(INPUT_KEY)!=null){
@@ -640,6 +645,31 @@ public class DeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         this.initialize();
 
         return this;
+    }
+
+    public IMongoDeepJobConfig<T> filterQuery (Filter[] filters){
+        List<BasicDBObject> list = new ArrayList<>();
+
+        QueryBuilder queryBuilder = QueryBuilder.start();
+        for (int i = 0 ; i < filters.length ; i++){
+            BasicDBObject bsonObject = new BasicDBObject();
+
+            Filter filter = filters[i];
+                if(filter.getOperation().equals(FilterOperator.IS)){
+                    bsonObject.put(filter.getField(), filter.getValue());
+                }else{
+                    bsonObject.put(filter.getField(),
+                            new BasicDBObject("$".concat(filter.getOperation()), filter.getValue()));
+                }
+
+            list.add(bsonObject);
+        }
+        queryBuilder.and(list.toArray(new BasicDBObject[list.size()]));
+
+        filterQuery(queryBuilder);
+        return this;
+
+
     }
 
 }

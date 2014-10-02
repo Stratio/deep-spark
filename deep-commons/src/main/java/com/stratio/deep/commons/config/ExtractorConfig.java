@@ -18,6 +18,7 @@ package com.stratio.deep.commons.config;
 
 
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.utils.Pair;
 import com.stratio.deep.commons.utils.Utils;
 
@@ -123,6 +124,10 @@ public class ExtractorConfig<T> implements Serializable {
 
     public Byte[] getByteArray(String key){
         return getValue(Byte[].class, key);
+    }
+
+    public Filter[] getFilterArray(String key){
+        return getValue(Filter[].class, key);
     }
 
     public <K,V> Pair<K,V> getPair(String key, Class<K> keyClass, Class<V> valueClass){
