@@ -134,8 +134,11 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
     @SuppressWarnings("unchecked")
     private void initExtractor(ExtractorConfig<T> config) {
 
-        Class<T> rdd = (Class<T>) config.getExtractorImplClass();
         try {
+            Class<T> rdd = (Class<T>) config.getExtractorImplClass();
+            if(rdd==null){
+                rdd = (Class<T>) Class.forName(config.getExtractorImplClassName());
+            }
             Constructor<T> c = null;
             if (config.getEntityClass().isAssignableFrom(Cells.class)){
                 c = rdd.getConstructor();
@@ -146,7 +149,7 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
             }
 
 
-        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             LOG.error("Impossible to make an extractor instance, check classpath " +e.getMessage());
             throw new DeepInstantiationException("Impossible to make an extractor instance, check classpath " +e.getMessage());
