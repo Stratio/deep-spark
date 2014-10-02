@@ -73,8 +73,7 @@ public final class MapReduceJob {
         String RPCPORT      = "9160";
         String HOST         = "127.0.0.1";
 
-        //Call async the Extractor netty Server
-        ExtractorServer.initExtractorServer();
+
 
 
         // Creating the Deep Context where args are Spark Master and Job Name
@@ -121,7 +120,6 @@ public final class MapReduceJob {
             LOG.info(t._1() + ": " + t._2().toString());
         }
 
-        ExtractorServer.close();
         deepContext.stop();
     }
 }

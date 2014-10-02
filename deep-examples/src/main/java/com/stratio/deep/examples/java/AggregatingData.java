@@ -78,8 +78,6 @@ public final class AggregatingData {
         String host         = "127.0.0.1";
 
 
-       //Call async the Extractor netty Server
-        ExtractorServer.initExtractorServer();
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);

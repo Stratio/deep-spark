@@ -69,8 +69,6 @@ public final class CreatingCellRDD {
         String RPCPORT      = "9160";
         String HOST         = "127.0.0.1";
 
-//        //Call async the Extractor netty Server
-        ExtractorServer.initExtractorServer();
 
 
         // Creating the Deep Context
@@ -110,7 +108,6 @@ public final class CreatingCellRDD {
         counts = rdd.count();
 
         LOG.info("Num of rows: " + counts);
-        ExtractorServer.close();
 
         deepContext.stop();
     }

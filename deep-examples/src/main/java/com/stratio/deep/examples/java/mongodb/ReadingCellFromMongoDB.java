@@ -59,7 +59,6 @@ public final class ReadingCellFromMongoDB {
         String inputCollection = "input";
 
 
-        initExtractorServer();
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -98,7 +97,6 @@ public final class ReadingCellFromMongoDB {
 
 
 
-        stopExtractorServer();
 
         deepContext.stop();
     }

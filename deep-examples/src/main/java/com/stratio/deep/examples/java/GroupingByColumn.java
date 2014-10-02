@@ -75,8 +75,6 @@ public final class GroupingByColumn {
         String RPCPORT      = "9160";
         String HOST         = "127.0.0.1";
 
-        //Call async the Extractor netty Server
-        ExtractorServer.initExtractorServer();
 
 
 
@@ -128,7 +126,6 @@ public final class GroupingByColumn {
             LOG.info(t._1() + ": " + t._2().toString());
         }
 
-        ExtractorServer.close();
 
         deepContext.stop();
     }

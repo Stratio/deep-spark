@@ -77,8 +77,7 @@ public final class WritingCellToCassandra {
 
         final String outputTableName = "newlistdomains";
 
-//        //Call async the Extractor netty Server
-        ExtractorServer.initExtractorServer();
+
 
 
         // Creating the Deep Context where args are Spark Master and Job Name
@@ -149,7 +148,6 @@ public final class WritingCellToCassandra {
 
 
         deepContext.saveRDD(outputRDD.rdd(), outputConfig);
-        ExtractorServer.close();
 
         deepContext.stop();
     }

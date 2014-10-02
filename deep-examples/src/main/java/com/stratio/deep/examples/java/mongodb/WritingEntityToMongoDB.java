@@ -62,7 +62,6 @@ public final class WritingEntityToMongoDB {
 
         String readPreference = "nearest";
 
-        initExtractorServer();
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -85,7 +84,6 @@ public final class WritingEntityToMongoDB {
 
         deepContext.saveRDD(inputRDDEntity, outputConfigEntity);
 
-        stopExtractorServer();
 
         deepContext.stop();
     }

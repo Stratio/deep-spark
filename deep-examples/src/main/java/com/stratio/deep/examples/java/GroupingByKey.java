@@ -72,8 +72,6 @@ public final class GroupingByKey {
         String RPCPORT      = "9160";
         String HOST         = "127.0.0.1";
 
-        //Call async the Extractor netty Server
-        ExtractorServer.initExtractorServer();
 
 
         // Creating the Deep Context where args are Spark Master and Job Name
@@ -133,7 +131,6 @@ public final class GroupingByKey {
 
         LOG.info("Autores: " + authors + " total: " + total);
 
-        ExtractorServer.close();
         deepContext.stop();
     }
 
