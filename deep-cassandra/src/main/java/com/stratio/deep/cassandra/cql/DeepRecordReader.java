@@ -46,7 +46,7 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 import static com.stratio.deep.cassandra.cql.CassandraClientProvider.trySessionForLocation;
-import static com.stratio.deep.commons.utils.Utils.additionalFilterGenerator;
+import static com.stratio.deep.cassandra.util.CassandraUtils.additionalFilterGenerator;
 
 /**
  * Implements a cassandra record reader with pagination capabilities.
@@ -254,7 +254,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
             return String.format("SELECT %s FROM %s%s%s ALLOW FILTERING",
                     generatedColumns, quote(cfName), clause,
-                    additionalFilterGenerator(config.getAdditionalFilters()));
+                    additionalFilterGenerator(config.getAdditionalFilters(), config.getFilters()));
         }
 
         /**

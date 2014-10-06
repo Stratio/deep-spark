@@ -18,6 +18,7 @@ package com.stratio.deep.cassandra.config;
 
 import com.datastax.driver.core.Session;
 import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.filter.Filter;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -97,6 +98,10 @@ public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T, ICassandra
      * @return the cql port.
      */
     public abstract Integer getCqlPort();
+
+    ICassandraDeepJobConfig<T> filters(Filter... filters);
+
+    Filter[] getFilters();
 
     /**
      * Sets Cassandra Keyspace.

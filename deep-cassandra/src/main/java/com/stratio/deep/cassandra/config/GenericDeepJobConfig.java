@@ -16,6 +16,7 @@
 
 package com.stratio.deep.cassandra.config;
 
+import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.HOST;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
@@ -32,6 +33,8 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.BATCHS
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.READ_CONSISTENCY_LEVEL;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.WRITE_CONSISTENCY_LEVEL;
 import com.datastax.driver.core.*;
+import com.datastax.driver.core.querybuilder.Clause;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.commons.entity.Cell;
@@ -42,6 +45,7 @@ import com.stratio.deep.commons.exception.DeepIndexNotFoundException;
 import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.Filter;
+import com.stratio.deep.commons.filter.FilterOperator;
 import com.stratio.deep.commons.utils.Constants;
 import com.stratio.deep.commons.utils.Pair;
 import org.apache.cassandra.db.ConsistencyLevel;
@@ -106,6 +110,9 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * default "where" filter to use to access ColumnFamily's data.
      */
     private Map<String, Serializable> additionalFilters = new TreeMap<>();
+
+
+    private Filter[] filters ;
 
     /**
      * Defines a projection over the CF columns.
@@ -558,12 +565,9 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
             filterByField(filterFields.left, filterFields.right);
         }
 
-        //TODO: add operations
         if(values.get(ExtractorConstants.FILTER_QUERY)!=null){
-            Filter[] filters =  extractorConfig.getFilterArray(ExtractorConstants.FILTER_QUERY);
-            for(int i = 0 ; i< filters.length ; i++){
-                filterByField(filters[i].getField(), filters[i].getValue());
-            }
+            filters(extractorConfig.getFilterArray(ExtractorConstants.FILTER_QUERY));
+
 
         }
         this.initialize();
@@ -572,9 +576,21 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public ICassandraDeepJobConfig<T> filters(Filter... filters) {
+        this.filters = filters;
+
+        return this;
+    }
+
+    @Override
+    public Filter[] getFilters() {
+        return filters;
+    }
+
+        /**
+         * {@inheritDoc}
+         */
 
     public ICassandraDeepJobConfig<T> inputColumns(String... columns) {
         this.inputColumns = columns;

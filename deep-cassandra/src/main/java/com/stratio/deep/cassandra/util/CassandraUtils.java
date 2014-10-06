@@ -21,12 +21,14 @@ import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.stratio.deep.cassandra.config.GenericDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
+import com.stratio.deep.cassandra.config.OperatorCassandra;
 import com.stratio.deep.cassandra.cql.DeepCqlRecordWriter;
 import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction2;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Pair;
@@ -34,6 +36,7 @@ import com.stratio.deep.commons.utils.Utils;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.TimeUUIDType;
 import org.apache.cassandra.db.marshal.UUIDType;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.spark.TaskContext;
 import org.apache.spark.rdd.RDD;
@@ -43,12 +46,14 @@ import scala.collection.Iterator;
 import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.*;
 
 import static com.stratio.deep.commons.utils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
 import static com.stratio.deep.commons.utils.Utils.quote;
+import static com.stratio.deep.commons.utils.Utils.singleQuote;
 
 /**
  * Created by luca on 16/04/14.
@@ -341,5 +346,81 @@ public class CassandraUtils {
         }
 
         return new Tuple2<>(keys, values);
+    }
+
+
+    /**
+     * Generates the part of the query where clause that will hit the Cassandra's secondary indexes.
+     *
+     * @param additionalFilters the map of filters names and values.
+     * @return the query subpart corresponding to the provided additional filters.
+     */
+    public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters, Filter[] filters) {
+        if (MapUtils.isEmpty(additionalFilters)) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder("");
+
+        for (Map.Entry<String, Serializable> entry : additionalFilters.entrySet()) {
+            if (entry.getValue() == null) {
+                continue;
+            }
+
+            String value = entry.getValue().toString();
+
+            if (entry.getValue() instanceof String) {
+                value = singleQuote(value.trim());
+            }
+
+
+
+            sb.append(" AND ").append(quote(entry.getKey())).append(" = ").append(value);
+        }
+
+        if(filters!=null ){
+            for(int i = 0; i < filters.length; i++){
+
+                sb.append(" AND ").append(quote(filters[i].getField())).append(OperatorCassandra.getOperatorCassandra(filters[i].getOperation
+                        ()).getOperator()).append
+                        (filters[i].getValue());
+            }
+        }
+
+
+        return sb.toString();
+    }
+
+
+    /**
+     * Generates the part of the query where clause that will hit the Cassandra's secondary indexes.
+     *
+     * @param additionalFilters the map of filters names and values.
+     * @return the query subpart corresponding to the provided additional filters.
+     */
+    public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters) {
+        if (MapUtils.isEmpty(additionalFilters)) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder("");
+
+        for (Map.Entry<String, Serializable> entry : additionalFilters.entrySet()) {
+            if (entry.getValue() == null) {
+                continue;
+            }
+
+            String value = entry.getValue().toString();
+
+            if (entry.getValue() instanceof String) {
+                value = singleQuote(value.trim());
+            }
+
+
+
+            sb.append(" AND ").append(quote(entry.getKey())).append(" = ").append(value);
+        }
+
+        return sb.toString();
     }
 }
