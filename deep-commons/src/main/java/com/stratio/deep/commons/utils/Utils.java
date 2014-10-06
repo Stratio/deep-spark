@@ -23,13 +23,9 @@ import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepIOException;
-import com.stratio.deep.commons.exception.DeepInstantiationException;
 import com.stratio.deep.commons.rdd.IExtractor;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import scala.Tuple2;
-
-import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -39,7 +35,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+
 
 /**
  * Utility class providing useful methods to manipulate the conversion
@@ -123,35 +119,7 @@ public final class Utils {
         return res;
     }
 
-    /**
-     * Generates the part of the query where clause that will hit the Cassandra's secondary indexes.
-     *
-     * @param additionalFilters the map of filters names and values.
-     * @return the query subpart corresponding to the provided additional filters.
-     */
-    public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters) {
-        if (MapUtils.isEmpty(additionalFilters)) {
-            return "";
-        }
 
-        StringBuilder sb = new StringBuilder("");
-
-        for (Map.Entry<String, Serializable> entry : additionalFilters.entrySet()) {
-            if (entry.getValue() == null) {
-                continue;
-            }
-
-            String value = entry.getValue().toString();
-
-            if (entry.getValue() instanceof String) {
-                value = singleQuote(value.trim());
-            }
-
-            sb.append(" AND ").append(quote(entry.getKey())).append(" = ").append(value);
-        }
-
-        return sb.toString();
-    }
 
 
     /**
