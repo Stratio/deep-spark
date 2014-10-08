@@ -198,7 +198,7 @@ public class UtilESTest {
 
         LinkedMapWritable bson = createJsonTest();
 
-        Cells cells = UtilES.getCellFromJson(bson);
+        Cells cells = UtilES.getCellFromJson(bson, "book");
 
 
 

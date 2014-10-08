@@ -196,7 +196,7 @@ public class UtilMongoDBTest {
 
         BSONObject bson = createBsonTest();
 
-        Cells cells = UtilMongoDB.getCellFromBson(bson);
+        Cells cells = UtilMongoDB.getCellFromBson(bson, "book");
 
 
         // Check metadata Object
