@@ -22,7 +22,7 @@ import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.CantoEntity;
 import com.stratio.deep.core.entity.MetadataEntity;
 import com.stratio.deep.core.entity.WordCount;
-import com.stratio.deep.mongodb.entity.MongoCell;
+import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
 import com.stratio.deep.testentity.MongoDBTestEntity;
 
@@ -231,9 +231,9 @@ public class UtilMongoDBTest {
 
         //Create Medataba Object
 
-        Cell authorCell = MongoCell.create("author", "ANTE ALIGHIERI");
-        Cell titleCell = MongoCell.create("title", "THE DIVINE COMEDY");
-        Cell sourceCell = MongoCell.create("source", "http://www.gutenberg.org/ebooks/8800");
+        Cell authorCell = Cell.create("author", "ANTE ALIGHIERI");
+        Cell titleCell = Cell.create("title", "THE DIVINE COMEDY");
+        Cell sourceCell = Cell.create("source", "http://www.gutenberg.org/ebooks/8800");
 
         Cells metadata = new Cells();
 
@@ -248,13 +248,13 @@ public class UtilMongoDBTest {
 
         Cells cantoI = new Cells();
 
-        cantoI.add(MongoCell.create("canto", "Canto I"));
-        cantoI.add(MongoCell.create("text", "text I"));
+        cantoI.add(Cell.create("canto", "Canto I"));
+        cantoI.add(Cell.create("text", "text I"));
 
         Cells cantoII = new Cells();
 
-        cantoII.add(MongoCell.create("canto", "Canto II"));
-        cantoII.add(MongoCell.create("text", "text II"));
+        cantoII.add(Cell.create("canto", "Canto II"));
+        cantoII.add(Cell.create("text", "text II"));
 
         cantos.add(cantoI);
         cantos.add(cantoII);
@@ -264,8 +264,8 @@ public class UtilMongoDBTest {
 
         Cells cells = new Cells();
 
-        cells.add(MongoCell.create("metadata", metadata));
-        cells.add(MongoCell.create("cantos", cantos));
+        cells.add(Cell.create("metadata", metadata));
+        cells.add(Cell.create("cantos", cantos));
 
 
         BSONObject bson = UtilMongoDB.getBsonFromCell(cells);

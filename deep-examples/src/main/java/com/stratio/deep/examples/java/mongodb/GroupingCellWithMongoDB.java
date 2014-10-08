@@ -20,7 +20,7 @@ package com.stratio.deep.examples.java.mongodb;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.mongodb.entity.MongoCell;
+import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.utils.ContextProperties;
@@ -107,7 +107,7 @@ public final class GroupingCellWithMongoDB {
         JavaRDD<Cells>  outputRDD =  wordCountReduced.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
             public Cells call(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
-                return new Cells(MongoCell.create("word", stringIntegerTuple2._1()) , MongoCell.create("count", stringIntegerTuple2._2()));
+                return new Cells(Cell.create("word", stringIntegerTuple2._1()) , Cell.create("count", stringIntegerTuple2._2()));
             }
         });
 

@@ -159,13 +159,6 @@ public class DeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         this.entityClass=entityClass;
 
     }
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map<String, Cell> columnDefinitions() {
-        return null;
-    }
 
 
     /**
@@ -174,6 +167,7 @@ public class DeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     // TODO : cheking
     @Override
     public IMongoDeepJobConfig<T> pageSize(int pageSize) {
+        this.splitSize = pageSize;
         return this;
     }
 
@@ -296,6 +290,11 @@ public class DeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     public IMongoDeepJobConfig<T> collection(String collection) {
         this.collection = collection;
         return this;
+    }
+
+    @Override
+    public String getCollection() {
+        return collection;
     }
 
     /**
@@ -638,7 +637,7 @@ public class DeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
             splitsUseChunks(extractorConfig.getBoolean(USE_CHUNKS));
         }
         if(values.get(SPLIT_SIZE)!=null){
-            splitSize = extractorConfig.getInteger(SPLIT_SIZE);
+            pageSize(extractorConfig.getInteger(SPLIT_SIZE));
         }
 
 

@@ -18,6 +18,7 @@ package com.stratio.deep.cassandra.config;
 
 import com.datastax.driver.core.Session;
 import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.filter.Filter;
 
 import java.io.Serializable;
@@ -44,6 +45,14 @@ public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T, ICassandra
      *                                                               Cassandra.
      */
     public ICassandraDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue);
+
+    /**
+     * Fetches table metadata from the underlying datastore and generates a Map<K, V> where the key is the column name, and the value
+     * is the {@link com.stratio.deep.commons.entity.Cell} containing column's metadata.
+     *
+     * @return the map of column names and the corresponding Cell object containing its metadata.
+     */
+    Map<String, Cell> columnDefinitions();
 
     /**
      * Returns the map of additional filters specified by the user.

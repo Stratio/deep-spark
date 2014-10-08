@@ -23,8 +23,13 @@ import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.utils.Utils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
+import org.elasticsearch.hadoop.rest.QueryBuilder;
+import org.elasticsearch.index.query.BaseQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -69,22 +74,17 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
      */
     private String collection;
 
-    /**
-     * Database to connect
-     */
-    private String database;
 
+    private String index;
 
+    private String type;
 
     /**
      * Entity class to map JSONObject
      */
     protected Class<T> entityClass;
 
-    /**
-     * VIP, this MUST be transient!
-     */
-    private transient Map<String, Cell> columnDefinitionMap;
+
 
     private String[] inputColumns;
 
@@ -117,10 +117,6 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
         return password;
     }
 
-    @Override
-    public Map<String, Cell> columnDefinitions() {
-        return columnDefinitionMap;
-    }
 
     @Override
     public IESDeepJobConfig<T> pageSize(int pageSize) {
@@ -165,7 +161,7 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
         configHadoop = new JobConf();
         configHadoop.setInputFormat(EsInputFormat.class);
         configHadoop.setOutputFormat(EsOutputFormat.class);
-        configHadoop.set("es.resource", database);
+        configHadoop.set("es.resource", index.concat("/").concat(type));
         configHadoop.set("es.field.read.empty.as.null", "false");
         configHadoop.set("index.mapper.dynamic","true");
 
@@ -219,8 +215,8 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
         if (hostList.isEmpty()) {
             throw new IllegalArgumentException("host cannot be null");
         }
-        if (database == null) {
-            throw new IllegalArgumentException("type cannot be null");
+        if (index == null) {
+            throw new IllegalArgumentException("index cannot be null");
         }
 
     }
@@ -269,7 +265,7 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
     @Override
     public IESDeepJobConfig<T> database(String database) {
-        this.database = database;
+        this.index = database;
         return this;
     }
 
@@ -313,7 +309,10 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
         return hostList;
     }
 
-
+    @Override
+    public String getType() {
+        return type;
+    }
 
     @Override
     public IESDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
@@ -339,7 +338,8 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
         }
 
         if(values.get(ExtractorConstants.INDEX)!=null&& (values.get(ExtractorConstants.TYPE)!= null)){
-            database(extractorConfig.getString(ExtractorConstants.INDEX).concat("/").concat(extractorConfig.getString(ExtractorConstants.TYPE)));
+            index = extractorConfig.getString(ExtractorConstants.INDEX);
+            type = extractorConfig.getString(ExtractorConstants.TYPE);
        }
 
         this.initialize();

@@ -21,7 +21,7 @@ import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Utils;
-import com.stratio.deep.mongodb.entity.MongoCell;
+import com.stratio.deep.commons.entity.Cell;
 
 import org.apache.hadoop.io.Writable;
 import org.bson.BSONObject;
@@ -195,9 +195,10 @@ public final class UtilMongoDB {
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
-    public static Cells getCellFromBson(BSONObject bsonObject) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    public static Cells getCellFromBson(BSONObject bsonObject, String tableName) throws IllegalAccessException,
+            InstantiationException, InvocationTargetException {
 
-        Cells cells = new Cells();
+        Cells cells = tableName!= null ?new Cells(tableName): new Cells();
 
 
         Map<String, Object> map = bsonObject.toMap();
@@ -211,14 +212,14 @@ public final class UtilMongoDB {
                 if (List.class.isAssignableFrom(entry.getValue().getClass())) {
                     List<Cells> innerCell = new ArrayList<>();
                     for (BSONObject innerBson : (List<BSONObject>) entry.getValue()) {
-                        innerCell.add(getCellFromBson(innerBson));
+                        innerCell.add(getCellFromBson(innerBson, tableName));
                     }
-                    cells.add(MongoCell.create(entry.getKey(), innerCell));
+                    cells.add(Cell.create(entry.getKey(), innerCell));
                 } else if (BSONObject.class.isAssignableFrom(entry.getValue().getClass())) {
-                    Cells innerCells = getCellFromBson((BSONObject) entry.getValue());
-                    cells.add(MongoCell.create(entry.getKey(), innerCells));
+                    Cells innerCells = getCellFromBson((BSONObject) entry.getValue(), tableName);
+                    cells.add(Cell.create(entry.getKey(), innerCells));
                 } else {
-                    cells.add(MongoCell.create(entry.getKey(), entry.getValue()));
+                    cells.add(Cell.create(entry.getKey(), entry.getValue()));
                 }
             }
             catch ( IllegalAccessException | InstantiationException | InvocationTargetException | IllegalArgumentException e){

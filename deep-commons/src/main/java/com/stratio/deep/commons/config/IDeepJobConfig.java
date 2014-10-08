@@ -37,13 +37,6 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?, ?>> extends Seria
      */
     String getPassword();
 
-    /**
-     * Fetches table metadata from the underlying datastore and generates a Map<K, V> where the key is the column name, and the value
-     * is the {@link com.stratio.deep.commons.entity.Cell} containing column's metadata.
-     *
-     * @return the map of column names and the corresponding Cell object containing its metadata.
-     */
-    Map<String, Cell> columnDefinitions();
 
     /**
      * Sets the number of rows to retrieve for each page of data fetched from Cassandra.<br/>

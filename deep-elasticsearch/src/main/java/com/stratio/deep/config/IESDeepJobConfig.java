@@ -80,5 +80,7 @@ public interface IESDeepJobConfig<T> extends IDeepJobConfig<T, IESDeepJobConfig<
      */
     List<String> getHostList();
 
+    String getType();
+
 
 }

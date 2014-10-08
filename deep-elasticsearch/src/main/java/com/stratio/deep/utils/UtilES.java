@@ -227,8 +227,10 @@ public final class UtilES {
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
-    public static Cells getCellFromJson(LinkedMapWritable jsonObject) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
-        Cells cells = new Cells();
+    public static Cells getCellFromJson(LinkedMapWritable jsonObject, String tableName) throws IllegalAccessException,
+            InstantiationException, InvocationTargetException, NoSuchMethodException {
+
+        Cells cells = tableName!= null ?new Cells(tableName): new Cells();
 
 
         Set<Map.Entry<Writable, Writable>> entryJson = jsonObject.entrySet();
@@ -237,13 +239,13 @@ public final class UtilES {
 
 
             if (LinkedMapWritable.class.isAssignableFrom(entry.getValue().getClass())) {
-                Cells innerCells = getCellFromJson((LinkedMapWritable) entry.getValue());
+                Cells innerCells = getCellFromJson((LinkedMapWritable) entry.getValue(), tableName);
                 cells.add(Cell.create(entry.getKey().toString(), innerCells));
             } else if (ArrayWritable.class.isAssignableFrom(entry.getValue().getClass())) {
                 Writable[] writetable = ((ArrayWritable) entry.getValue()).get();
                 List<Cells> innerCell = new ArrayList<>();
                 for (int i = 0 ; i < writetable.length ; i++){
-                    innerCell.add(getCellFromJson((LinkedMapWritable) writetable[i]));
+                    innerCell.add(getCellFromJson((LinkedMapWritable) writetable[i], tableName));
                 }
                 cells.add(Cell.create(entry.getKey().toString(), innerCell));
             } else {

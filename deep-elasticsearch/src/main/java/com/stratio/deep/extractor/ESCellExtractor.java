@@ -21,6 +21,7 @@ import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepTransformException;
 import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
 import com.stratio.deep.config.DeepJobConfigES;
+import com.stratio.deep.config.IESDeepJobConfig;
 import com.stratio.deep.utils.UtilES;
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
@@ -56,7 +57,7 @@ public final class ESCellExtractor extends GenericHadoopExtractor<Cells, Object,
     public Cells transformElement(Tuple2<Object, LinkedMapWritable> tuple, IDeepJobConfig<Cells, ? extends IDeepJobConfig> config) {
 
         try {
-            return UtilES.getCellFromJson(tuple._2());
+            return UtilES.getCellFromJson(tuple._2(), ((IESDeepJobConfig)deepJobConfig).getType());
         } catch (Exception e) {
             LOG.error("Cannot convert JSON: ", e);
             throw new DeepTransformException("Could not transform from Json to Cell " + e.getMessage());
