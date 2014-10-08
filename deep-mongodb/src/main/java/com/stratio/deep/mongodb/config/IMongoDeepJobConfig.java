@@ -32,6 +32,8 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      */
     IMongoDeepJobConfig<T> collection(String collection);
 
+    String getCollection();
+
     /**
      * The MongoDB's database name
      */
