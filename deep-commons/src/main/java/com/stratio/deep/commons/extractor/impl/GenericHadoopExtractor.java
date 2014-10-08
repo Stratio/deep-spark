@@ -173,11 +173,6 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
 
     public abstract T transformElement(Tuple2<K, V> tuple, IDeepJobConfig<T, ? extends IDeepJobConfig> config);
 
-    @Override
-    public IExtractor getExtractorInstance(ExtractorConfig<T> config) {
-        return this;
-    }
-
 
     @Override
     public  void saveRDD(T t){

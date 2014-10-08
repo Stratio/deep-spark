@@ -15,6 +15,7 @@
 package com.stratio.deep.cassandra.extractor;
 
 import com.stratio.deep.cassandra.config.EntityDeepJobConfig;
+import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.IDeepJobConfig;
@@ -56,7 +57,7 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
     @Override
     public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
                               IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
-        Map<String, Cell> columnDefinitions = config.columnDefinitions();
+        Map<String, Cell> columnDefinitions = ((ICassandraDeepJobConfig)config).columnDefinitions();
 
         Class<T> entityClass = config.getEntityClass();
 
@@ -91,11 +92,6 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
     @Override
     public Class getConfigClass() {
         return EntityDeepJobConfig.class;
-    }
-
-    @Override
-    public IExtractor<T> getExtractorInstance(ExtractorConfig<T> config) {
-        return null;
     }
 
 

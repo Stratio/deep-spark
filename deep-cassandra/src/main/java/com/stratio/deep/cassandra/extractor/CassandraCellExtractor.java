@@ -53,7 +53,7 @@ public class CassandraCellExtractor extends CassandraExtractor<Cells> {
                                   IDeepJobConfig<Cells, ? extends IDeepJobConfig<?, ?>> config) {
 
         Cells cells = new Cells(((ICassandraDeepJobConfig) config).getTable());
-        Map<String, Cell> columnDefinitions = config.columnDefinitions();
+        Map<String, Cell> columnDefinitions = ((ICassandraDeepJobConfig) config).columnDefinitions();
 
 
         for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
@@ -78,11 +78,6 @@ public class CassandraCellExtractor extends CassandraExtractor<Cells> {
         return CellDeepJobConfig.class;
     }
 
-
-    @Override
-    public IExtractor<Cells> getExtractorInstance(ExtractorConfig<Cells> config) {
-        return null;
-    }
 
 
 }

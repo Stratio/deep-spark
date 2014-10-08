@@ -189,29 +189,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return;
     }
 
-    @Override
-    public IExtractor<T> getExtractorInstance(ExtractorConfig<T> config) {
-        ExtractorInstanceAction<T> instanceAction = new ExtractorInstanceAction<>(config);
 
-        channel.writeAndFlush(instanceAction);
-
-        Response response;
-        boolean interrupted = false;
-        for (; ; ) {
-            try {
-                response = answer.take();
-                break;
-            } catch (InterruptedException ignore) {
-                interrupted = true;
-            }
-        }
-
-        if (interrupted) {
-            Thread.currentThread().interrupt();
-        }
-
-        return ((ExtractorInstanceResponse<T>) response).getData();
-    }
 
     @Override
     public void saveRDD(T t) {

@@ -16,7 +16,10 @@
 
 package com.stratio.deep.cassandra.utils;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import com.stratio.deep.cassandra.entity.CassandraCell;
@@ -26,7 +29,7 @@ import com.stratio.deep.testentity.CommonsTestEntity;
 import org.testng.annotations.Test;
 import scala.Tuple2;
 
-
+import static com.stratio.deep.cassandra.util.CassandraUtils.additionalFilterGenerator;
 import static com.stratio.deep.cassandra.util.CassandraUtils.createTableQueryGenerator;
 import static com.stratio.deep.cassandra.util.CassandraUtils.deepType2tuple;
 import static com.stratio.deep.cassandra.util.CassandraUtils.updateQueryGenerator;
@@ -187,4 +190,47 @@ public class CassandraRDDUtilsTest {
 		assertEquals(vals[6], 200);
 		assertEquals(vals[7], testDate);
 	}
+
+
+    @Test
+    public void testAdditionalFilters() {
+        assertEquals(additionalFilterGenerator(null), "");
+
+
+        Map<String, Serializable> map = new TreeMap<>();
+        assertEquals(additionalFilterGenerator(map), "");
+
+        map.put("integer", 0L);
+        assertEquals(additionalFilterGenerator(map), " AND \"integer\" = 0");
+        map.remove("integer");
+
+        map.put("lucene", null);
+
+        assertEquals(additionalFilterGenerator(map), "");
+
+        String filter = "address:* AND NOT address:*uropa*";
+
+        map.put("lucene", filter);
+
+        assertEquals(additionalFilterGenerator(map), " AND \"lucene\" = \'address:* AND NOT address:*uropa*\'");
+
+        filter = "'address:* AND NOT address:*uropa*";
+
+        map.put("lucene", filter);
+
+        assertEquals(additionalFilterGenerator(map), " AND \"lucene\" = \'address:* AND NOT address:*uropa*\'");
+
+        filter = "address:* AND NOT address:*uropa*'";
+
+        map.put("lucene", filter);
+
+        assertEquals(additionalFilterGenerator(map), " AND \"lucene\" = \'address:* AND NOT address:*uropa*\'");
+
+        filter = "'address:* AND NOT address:*uropa*'";
+
+        map.put("lucene", filter);
+
+        assertEquals(additionalFilterGenerator(map), " AND \"lucene\" = \'address:* AND NOT address:*uropa*\'");
+    }
+
 }

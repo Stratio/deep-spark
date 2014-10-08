@@ -95,10 +95,6 @@ public class ExtractorClient<T> implements IExtractor<T> {
         handler.initIterator(dp, config);
     }
 
-    @Override
-    public IExtractor<T> getExtractorInstance(ExtractorConfig<T> config) {
-        return handler.getExtractorInstance(config);
-    }
 
     @Override
     public void saveRDD(T t) {
