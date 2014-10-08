@@ -60,7 +60,7 @@ public class PrepareSaveFunction<T> extends AbstractFunction1<Iterator<T>, Boxed
         while(v1.hasNext()){
             extractor.saveRDD(v1.next());
         }
-        extractorConfig.putValue(SPARK_PARTITION_ID, String.valueOf(Integer.parseInt(extractorConfig.getValues().get(SPARK_PARTITION_ID).toString())+1)) ;
+        extractorConfig.putValue(SPARK_PARTITION_ID, extractorConfig.getInteger(SPARK_PARTITION_ID)+1) ;
         extractor.close();
         return null;
     }
