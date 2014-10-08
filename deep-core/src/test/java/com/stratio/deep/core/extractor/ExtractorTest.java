@@ -76,43 +76,7 @@ public abstract class ExtractorTest<T> implements Serializable {
 
     protected Class<IExtractor<T>> extractor;
 
-    /**
-     * Constructor
-     * @param extractor
-     * @param host
-     * @param port
-     * @param inputEntity
-     * @param outputEntity
-     */
-    public ExtractorTest (Class<IExtractor<T>> extractor, String host, Integer port, Class inputEntity, Class outputEntity, Class configEntity){
-        super();
-        this.inputEntity=inputEntity;
-        this.outputEntity=outputEntity;
-        this.configEntity=configEntity;
-        this.host=host;
-        this.port=port;
-        this.extractor=extractor;
-    }
 
-    /**
-     * Constructor
-     * @param extractor
-     * @param host
-     * @param port
-     * @param database
-     * @param inputEntity
-     * @param outputEntity
-     */
-    public ExtractorTest (Class<IExtractor<T>> extractor, String host, Integer port,String database, Class inputEntity, Class outputEntity, Class configEntity){
-        super();
-        this.inputEntity=inputEntity;
-        this.outputEntity=outputEntity;
-        this.configEntity=configEntity;
-        this.host=host;
-        this.port=port;
-        this.extractor=extractor;
-        this.database=database;
-    }
 
     /**
      *
@@ -137,38 +101,6 @@ public abstract class ExtractorTest<T> implements Serializable {
         this.extractor=extractor;
     }
 
-    /**
-     *
-     * @param extractor
-     * @param host
-     * @param port
-     * @param database
-     */
-    public ExtractorTest (Class<IExtractor<T>> extractor, String host, Integer port, String database, boolean isCells){
-        super();
-        if(isCells){
-            this.inputEntity=Cells.class;
-            this.outputEntity=Cells.class;
-            this.configEntity=Cells.class;
-        }else{
-            this.inputEntity=MessageTestEntity.class;
-            this.outputEntity=MessageTestEntity.class;
-            this.configEntity=BookEntity.class;
-        }
-
-        this.host=host;
-        this.port=port;
-        this.extractor=extractor;
-        this.database=database;
-    }
-
-    /**
-     * It initializes spark's context
-     */
-    @BeforeClass
-    public void init(){
-//        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
-    }
 
     /**
      * It tests if the extractor can read from the data store
@@ -333,9 +265,9 @@ public abstract class ExtractorTest<T> implements Serializable {
         ExtractorConfig<W> extractorConfig = getExtractorConfig(outputEntity);
         extractorConfig.putValue(ExtractorConstants.HOST,host)
                 .putValue(ExtractorConstants.DATABASE, database)
-                .putValue(ExtractorConstants.PORT, String.valueOf(port))
+                .putValue(ExtractorConstants.PORT, port)
                 .putValue(ExtractorConstants.COLLECTION, output)
-                .putValue(ExtractorConstants.CREATE_ON_WRITE, "true");
+                .putValue(ExtractorConstants.CREATE_ON_WRITE, true);
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;
     }
@@ -345,7 +277,7 @@ public abstract class ExtractorTest<T> implements Serializable {
         ExtractorConfig<W> extractorConfig = getExtractorConfig(inputEntity);
         extractorConfig.putValue(ExtractorConstants.HOST, host)
                 .putValue(ExtractorConstants.DATABASE, database)
-                .putValue(ExtractorConstants.PORT, String.valueOf(port))
+                .putValue(ExtractorConstants.PORT, port)
                 .putValue(ExtractorConstants.COLLECTION, tableRead);
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;
@@ -356,7 +288,7 @@ public abstract class ExtractorTest<T> implements Serializable {
         ExtractorConfig<W> extractorConfig = getExtractorConfig(configEntity);
         extractorConfig.putValue(ExtractorConstants.HOST, host)
                 .putValue(ExtractorConstants.DATABASE, databaseInputColumns)
-                .putValue(ExtractorConstants.PORT, String.valueOf(port))
+                .putValue(ExtractorConstants.PORT, port)
                 .putValue(ExtractorConstants.COLLECTION, tableRead)
                 .putValue(ExtractorConstants.INPUT_COLUMNS, inputColumns);
         extractorConfig.setExtractorImplClass(extractor);
@@ -370,7 +302,7 @@ public abstract class ExtractorTest<T> implements Serializable {
         extractorConfig.putValue(ExtractorConstants.HOST,host)
                 .putValue(ExtractorConstants.DATABASE, database)
                 .putValue(ExtractorConstants.COLLECTION,tableRead)
-                .putValue(ExtractorConstants.PORT, String.valueOf(port))
+                .putValue(ExtractorConstants.PORT, port)
                 .putValue(ExtractorConstants.FILTER_QUERY, filter);
 
 

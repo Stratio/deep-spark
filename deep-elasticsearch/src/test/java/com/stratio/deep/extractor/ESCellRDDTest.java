@@ -37,15 +37,15 @@ public class ESCellRDDTest extends ExtractorTest {
     private Logger LOG = Logger.getLogger(getClass());
 
     public ESCellRDDTest() {
-        super(ESCellExtractor.class,"localhost:9200",null, true);
+        super(ESCellExtractor.class,"localhost",9200, true);
     }
 
 
 
-    @Override
-    @Test
-    public void testInputColumns() {
-        assertEquals(true, true);
-    }
+//    @Override
+//    @Test
+//    public void testInputColumns() {
+//        assertEquals(true, true);
+//    }
 
 }

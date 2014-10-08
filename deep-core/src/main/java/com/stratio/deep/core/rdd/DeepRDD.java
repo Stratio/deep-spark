@@ -57,24 +57,20 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
     public DeepRDD(SparkContext sc, ExtractorConfig<T> config) {
         super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config
                 .getEntityClass()));
-        config.putValue(SPARK_RDD_ID, String.valueOf(id()));
+        config.putValue(SPARK_RDD_ID, id());
         this.config =
                 sc.broadcast(config, ClassTag$.MODULE$
                         .<ExtractorConfig<T>>apply(config.getClass()));
 
 
-        initExtractorClient();
 
     }
 
-    public DeepRDD(SparkContext sc, Class entityClass) {
-        super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(entityClass));
-    }
+
 
     @Override
     public Iterator<T> compute(Partition split, TaskContext context) {
 
-        this.
         initExtractorClient();
 
         context.addOnCompleteCallback(new OnComputedRDDCallback(extractorClient));

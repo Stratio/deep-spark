@@ -58,16 +58,16 @@ public class ESEntityRDDTest extends ExtractorTest implements Serializable{
 
     public ESEntityRDDTest() {
 
-        super(ESEntityExtractor.class,"localhost:9200",null,false);
+        super(ESEntityExtractor.class,"localhost",9200,false);
     }
 
 
 
-    @Override
-    @Test
-    public void testInputColumns() {
-        assertEquals(true, true);
-    }
+//    @Override
+//    @Test
+//    public void testInputColumns() {
+//        assertEquals(true, true);
+//    }
 
     public void testDataSet() {
 
