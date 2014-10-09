@@ -18,6 +18,8 @@ package com.stratio.deep.utils;
 
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.filter.Filter;
+import com.stratio.deep.commons.filter.FilterOperator;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.CantoEntity;
 import com.stratio.deep.core.entity.MetadataEntity;
@@ -27,6 +29,7 @@ import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.elasticsearch.hadoop.mr.LinkedMapWritable;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.json.simple.JSONObject;
 import org.testng.annotations.Test;
 
@@ -38,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.stratio.deep.utils.UtilES.generateQuery;
 import static org.testng.Assert.*;
 
 /**
@@ -307,5 +311,18 @@ public class UtilESTest {
         constructor.newInstance();
     }
 
+
+    @Test
+    public void testgenerateQuery() {
+
+        Filter filter = new Filter("field1" , FilterOperator.IS, "value1");
+        Filter filter2 = new Filter("field2" , FilterOperator.NE, "value2");
+
+        BoolQueryBuilder boolQueryBuilder = (BoolQueryBuilder) generateQuery(filter, filter2);
+
+//        assertEquals(boolQueryBuilder.toString(), "");
+
+        assertTrue(true, "true");
+    }
 
 }

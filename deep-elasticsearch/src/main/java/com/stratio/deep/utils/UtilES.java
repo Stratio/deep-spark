@@ -22,11 +22,17 @@ package com.stratio.deep.utils;
 
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.filter.Filter;
+import com.stratio.deep.commons.filter.FilterOperator;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Utils;
 import com.stratio.deep.commons.entity.IDeepType;
 import org.apache.hadoop.io.*;
 import org.elasticsearch.hadoop.mr.LinkedMapWritable;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -371,6 +377,67 @@ public final class UtilES {
 
         return json;
     }
+
+
+    public static QueryBuilder generateQuery (Filter... filterArray){
+        List<Filter> range = new ArrayList<>();
+        List<Filter> ne = new ArrayList<>();
+        List<Filter> is = new ArrayList<>();
+        BoolQueryBuilder qb = QueryBuilders.boolQuery();
+
+
+        for (Filter filter : filterArray){
+            if (! filter.getOperation().equals(FilterOperator.IS) && !filter.getOperation().equals(FilterOperator.NE)){
+                range.add(filter);
+            }else if (filter.getOperation().equals(FilterOperator.IS)) {
+                is.add(filter);
+            }else{
+                ne.add(filter);
+            }
+        }
+
+
+        //        List<RangeQueryBuilder> rangeQueryBuilders = new ArrayList<>();
+        for (Filter filter : range){
+
+            RangeQueryBuilder rangeQueryBuilder = QueryBuilders
+                    .rangeQuery(filter.getField());
+            switch (filter.getOperation()){
+            case FilterOperator.LT:
+                rangeQueryBuilder.lt(filter.getValue());
+                break;
+            case FilterOperator.LTE:
+                rangeQueryBuilder.lte(filter.getValue());
+                break;
+            case FilterOperator.GT:
+                rangeQueryBuilder.gt(filter.getValue());
+                break;
+            case FilterOperator.GTE:
+                rangeQueryBuilder.gte(filter.getValue());
+                break;
+            default:
+                break;
+            }
+            qb.must(rangeQueryBuilder);
+            //            rangeQueryBuilders.add(rangeQueryBuilder);
+        }
+
+        //        for(RangeQueryBuilder rangeQueryBuilder : rangeQueryBuilders){
+        //            qb.must(rangeQueryBuilder);
+        //        }
+
+        for(Filter filter : is){
+            qb.must(QueryBuilders.matchQuery(filter.getField(), filter.getValue()));
+        }
+
+        for(Filter filter : ne){
+            qb.mustNot(QueryBuilders.matchQuery(filter.getField(), filter.getValue()));
+        }
+//        System.out.println("imprimo el query builder resultante :) " +qb.toString());
+        return qb;
+    }
+
+
 
 
 }

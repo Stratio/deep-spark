@@ -1,6 +1,5 @@
 package com.stratio.deep.commons.rdd;
 
-import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import org.apache.spark.Partition;
 

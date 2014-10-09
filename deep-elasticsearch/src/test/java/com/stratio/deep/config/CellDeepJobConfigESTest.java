@@ -33,4 +33,7 @@ public class CellDeepJobConfigESTest {
         assertNotNull(cellDeepJobConfigES);
         assertEquals(cellDeepJobConfigES.getEntityClass(), Cells.class);
     }
+
+
+
 }

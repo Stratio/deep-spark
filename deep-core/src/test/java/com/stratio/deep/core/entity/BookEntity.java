@@ -28,7 +28,7 @@ import java.util.List;
 @DeepEntity
 public class BookEntity implements IDeepType {
 
-    @DeepField(fieldName = "_id")
+    @DeepField(fieldName = "id")
     private String id;
 
     @DeepField(fieldName = "cantos")

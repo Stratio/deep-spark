@@ -276,14 +276,14 @@ public final class Utils {
      * @param hosts
      * @return
      */
-    public static String splitHosts(List<String> hosts) {
+    public static String splitListByComma(List<String> hosts) {
         boolean firstHost = true;
         StringBuilder hostConnection = new StringBuilder();
         for (String host : hosts) {
             if (!firstHost) {
                 hostConnection.append(",");
             }
-            hostConnection.append(host);
+            hostConnection.append(host.trim());
             firstHost = false;
         }
         return hostConnection.toString();

@@ -18,31 +18,20 @@ package com.stratio.deep.config;
 
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.FILTER_QUERY;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
-
+import static com.stratio.deep.utils.UtilES.generateQuery;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
-import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.hadoop.cfg.ConfigurationOptions;
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.index.query.BoolFilterBuilder;
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.Filter;
-import com.stratio.deep.commons.filter.FilterOperator;
 import com.stratio.deep.commons.utils.Utils;
 
 /**
@@ -91,15 +80,17 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
 
 
-    private String[] inputColumns;
+    private List<String> inputColumns = new ArrayList<>();
 
-    private JSONObject fields;
     /**
      * OPTIONAL filter query
      */
     private String query;
 
     private Map<String, Object> customConfiguration;
+
+
+    private int pageSize;
 
     /**
      * Default constructor
@@ -136,10 +127,11 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
         }
         return hostList.get(0);
     }
-
+//TODO
     @Override
     public String[] getInputColumns() {
-        return (String[]) fields.keySet().toArray(new String[fields.keySet().size()]);
+        return null;
+//        return (String[]) fields.keySet().toArray(new String[fields.keySet().size()]);
     }
 
     @Override
@@ -162,25 +154,20 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
         configHadoop = new JobConf();
         configHadoop.setInputFormat(EsInputFormat.class);
         configHadoop.setOutputFormat(EsOutputFormat.class);
-        configHadoop.set("es.resource", index.concat("/").concat(type));
-        configHadoop.set("es.field.read.empty.as.null", "false");
-        configHadoop.set("index.mapper.dynamic", "true");
+        configHadoop.set(ConfigurationOptions.ES_RESOURCE, index.concat("/").concat(type));
+        configHadoop.set(ConfigurationOptions.ES_FIELD_READ_EMPTY_AS_NULL, "false");
 
         if (query != null) {
-            // "?q=message:first"
-            // es.query = { "query" : { "term" : { "user" : "costinl" } } }
-            // "query": { "match_all": {} }
-            configHadoop.set("es.query", query);
+            configHadoop.set(ConfigurationOptions.ES_QUERY, query);
         }
 
-        // if (fields != null) {
-        // //String query = { "query" : { "match_all" : { } } }
-        // configHadoop.set("es.query", fields.toString());
-        // }
+        if(!inputColumns.isEmpty()){
+            configHadoop.set(ConfigurationOptions.ES_SCROLL_FIELDS, Utils.splitListByComma(inputColumns));
+        }
 
-        configHadoop.set("es.nodes", Utils.splitHosts(hostList));
-        configHadoop.set("es.port", String.valueOf(port));
-        configHadoop.set("es.input.json", "yes");
+        configHadoop.set(ConfigurationOptions.ES_NODES, Utils.splitListByComma(hostList));
+        configHadoop.set(ConfigurationOptions.ES_PORT, String.valueOf(port));
+        configHadoop.set(ConfigurationOptions.ES_INPUT_JSON, "yes");
 
         // index (default)
         // new data is added while existing data (based on its id) is replaced (reindexed).
@@ -225,16 +212,13 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
      */
     @Override
     public IESDeepJobConfig<T> inputColumns(String... columns) {
-        JSONObject jsonFields = fields != null ? fields : new JSONObject();
-        // jsonFields.put("query", "match_all");
-        JSONArray jsonArray = new JSONArray();
-        for (String column : columns) {
-            jsonArray.add(column);
+        List<String> fields = new ArrayList<>();
+        for (String field : columns){
+            fields.add(field.trim());
         }
-        jsonFields.put("fields", jsonArray);
 
-        fields = jsonFields;
-        System.out.printf(" -- " + fields.toJSONString());
+        inputColumns.addAll(fields);
+
         return this;
     }
 
@@ -252,7 +236,7 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
     @Override
     public int getPageSize() {
-        return 0;
+        return pageSize;
     }
 
     @Override
@@ -314,7 +298,6 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
     @Override
     public IESDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
 
-        // TODO: Add filters & inputColumns
 
         Map<String, String> values = extractorConfig.getValues();
 
@@ -356,66 +339,10 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
      * @param filterArray
      */
     private IESDeepJobConfig<T> filterQuery(Filter[] filterArray) {
-
-        TransportClient elasticClient = new TransportClient();
-        SearchRequestBuilder requestBuilder = elasticClient.prepareSearch();
-
-        if (filterArray.length > 0) {
-
-            // full-text queries are not supported => match all
-            QueryBuilder queryBuilder = QueryBuilders.matchAllQuery();
-
-            BoolFilterBuilder boolFilterBuilder = FilterBuilders.boolFilter();
-            for (Filter filter : filterArray) {
-                boolFilterBuilder.must(handleCompareFilter(filter));
-            }
-
-            requestBuilder.setQuery(QueryBuilders.filteredQuery(queryBuilder, boolFilterBuilder));
-
-        }
-        // Select
-        // TODO
-        if (inputColumns != null && inputColumns.length >= 1) {
-            requestBuilder.addFields(inputColumns);
-        }// TODO else exception?
-
-        elasticClient.close();
+        query = "{ \"query\" :".concat((generateQuery(filterArray)).toString()).concat("}");
         return this;
     }
 
-    /**
-     * @param filter
-     * @return
-     */
-    private FilterBuilder handleCompareFilter(Filter filter) {
-        FilterBuilder localFilterBuilder = null;
-
-        String leftTerm = filter.getField();
-        Object rightTerm = filter.getValue();
-        switch (filter.getOperation()) {
-        case FilterOperator.IS:
-            localFilterBuilder = FilterBuilders.termFilter(leftTerm, rightTerm);
-            break;
-        case FilterOperator.NE:
-            localFilterBuilder = FilterBuilders.notFilter(FilterBuilders.termFilter(leftTerm, rightTerm));
-            break;
-        case FilterOperator.LT:
-            localFilterBuilder = FilterBuilders.rangeFilter(leftTerm).lt(rightTerm);
-            break;
-        case FilterOperator.LTE:
-            localFilterBuilder = FilterBuilders.rangeFilter(leftTerm).lte(rightTerm);
-            break;
-        case FilterOperator.GT:
-            localFilterBuilder = FilterBuilders.rangeFilter(leftTerm).gt(rightTerm);
-            break;
-        case FilterOperator.GTE:
-            localFilterBuilder = FilterBuilders.rangeFilter(leftTerm).gte(rightTerm);
-            break;
-
-        }
-
-        return localFilterBuilder;
-    }
 
     public IESDeepJobConfig<T> port(int port) {
         this.port = port;

@@ -17,7 +17,6 @@
 package com.stratio.deep.extractor;
 
 import com.google.common.io.Resources;
-import com.stratio.deep.commons.extractor.server.ExtractorServer;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.count.CountResponse;
@@ -41,13 +40,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
 
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
-import static org.testng.AssertJUnit.assertEquals;
 
 
 /**
@@ -118,7 +115,7 @@ public class ESJavaRDDTest {
 
         JSONObject jsonObject = (JSONObject) obj;
 
-        IndexResponse responseBook = client.prepareIndex(ES_INDEX_BOOK, ES_TYPE_INPUT,"1")
+        IndexResponse responseBook = client.prepareIndex(ES_INDEX_BOOK, ES_TYPE_INPUT,"id")
                 .setSource(jsonObject.toJSONString())
                 .execute()
                 .actionGet();
