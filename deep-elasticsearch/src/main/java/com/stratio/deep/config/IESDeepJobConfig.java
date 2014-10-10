@@ -25,10 +25,7 @@ import java.util.List;
  * Defines the public methods that each Stratio Deep ES configuration object should implement.
  */
 public interface IESDeepJobConfig<T> extends IDeepJobConfig<T, IESDeepJobConfig<T>> {
-    /**
-     * The ES's collection name
-     */
-    IESDeepJobConfig<T> collection(String collection);
+
 
     /**
      * The ES's database name
@@ -81,6 +78,11 @@ public interface IESDeepJobConfig<T> extends IDeepJobConfig<T, IESDeepJobConfig<
     List<String> getHostList();
 
     String getType();
+
+    String getIndex();
+
+    String getNameSpace();
+
 
 
 }

@@ -102,6 +102,9 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      */
     private String username;
 
+
+    private String nameSpace;
+
     /**
      * Cassandra password. Leave empty if you do not need authentication.
      */
@@ -943,6 +946,13 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
         return this.isBisectModeSet;
     }
 
+    @Override
+    public String getNameSpace(){
+        if (nameSpace==null){
+            nameSpace = new StringBuilder().append(keyspace).append(".").append(columnFamily).toString();
+        }
+        return nameSpace;
 
+    }
 
 }

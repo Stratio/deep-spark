@@ -162,4 +162,9 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      * @return this object.
      */
     IMongoDeepJobConfig<T> ignoreIdField();
+
+    String getDatabase();
+
+    String getNameSpace();
+
 }

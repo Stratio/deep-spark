@@ -52,7 +52,7 @@ public class CassandraCellExtractor extends CassandraExtractor<Cells> {
     public Cells transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
                                   IDeepJobConfig<Cells, ? extends IDeepJobConfig<?, ?>> config) {
 
-        Cells cells = new Cells(((ICassandraDeepJobConfig) config).getTable());
+        Cells cells = new Cells(((ICassandraDeepJobConfig) config).getNameSpace());
         Map<String, Cell> columnDefinitions = ((ICassandraDeepJobConfig) config).columnDefinitions();
 
 

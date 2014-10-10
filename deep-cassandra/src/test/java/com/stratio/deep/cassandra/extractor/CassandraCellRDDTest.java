@@ -55,7 +55,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
 
         @Override
         public Cells apply(Cells e) {
-            return new Cells(e.getDefaultTableName(),
+            return new Cells(e.getnameSpace(),
 				            e.getCellByName("name"), e.getCellByName("gender"), CassandraCell.create("age", 15, false, true),
                     e.getCellByName("animal"), e.getCellByName("password"), e.getCellByName("color"),
                     e.getCellByName("lucene"), e.getCellByName("food"));

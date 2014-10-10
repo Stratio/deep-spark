@@ -271,4 +271,6 @@ public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T, ICassandra
     boolean isSplitModeSet();
 
     boolean isBisectModeSet();
+
+    String getNameSpace();
 }

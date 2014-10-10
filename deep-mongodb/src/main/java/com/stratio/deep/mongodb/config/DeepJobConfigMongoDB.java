@@ -46,6 +46,7 @@ import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.filter.FilterOperator;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
@@ -77,6 +78,8 @@ public class DeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
      */
     private String username;
 
+
+    private String nameSpace;
     /**
      * MongoDB password
      */
@@ -109,12 +112,6 @@ public class DeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
      */
     protected Class<T> entityClass;
 
-    /**
-     * VIP, this MUST be transient!
-     */
-    private transient Map<String, Cell> columnDefinitionMap;
-
-    private String[] inputColumns;
 
     /**
      * OPTIONAL
@@ -412,6 +409,21 @@ public class DeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         return this;
     }
 
+    @Override
+    public String getDatabase() {
+        return database;
+    }
+
+    @Override
+    public String getNameSpace() {
+        if(nameSpace == null){
+            nameSpace = new StringBuilder().append(getDatabase())
+                    .append(".")
+                    .append(getCollection()).toString();
+        }
+        return nameSpace;
+    }
+
     public IMongoDeepJobConfig<T> port(int port){
         for(int i = 0; i< hostList.size() ; i++){
             if (hostList.get(i).indexOf(":")==-1) {
@@ -428,6 +440,8 @@ public class DeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
     @Override
     public DeepJobConfigMongoDB<T> initialize() {
         validate();
+
+        configHadoop = new JobConf();
         configHadoop = new Configuration();
         StringBuilder connection = new StringBuilder();
 

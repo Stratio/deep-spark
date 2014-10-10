@@ -57,16 +57,15 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
      */
     private String username;
 
+    private String nameSpace;
+
+
     /**
      * password
      */
 
     private String password;
 
-    /**
-     * Collection to get or insert data
-     */
-    private String collection;
 
 
     private String index;
@@ -151,6 +150,7 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
     @Override
     public DeepJobConfigES<T> initialize() {
         validate();
+
         configHadoop = new JobConf();
         configHadoop.setInputFormat(EsInputFormat.class);
         configHadoop.setOutputFormat(EsOutputFormat.class);
@@ -239,11 +239,6 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
         return pageSize;
     }
 
-    @Override
-    public IESDeepJobConfig<T> collection(String collection) {
-        this.collection = collection;
-        return this;
-    }
 
     @Override
     public IESDeepJobConfig<T> database(String database) {
@@ -294,6 +289,20 @@ public class DeepJobConfigES<T> implements IESDeepJobConfig<T> {
         return type;
     }
 
+    @Override
+    public String getIndex() {
+        return index;
+    }
+
+    @Override
+    public String getNameSpace() {
+        if(nameSpace == null){
+            nameSpace = new StringBuilder().append(getIndex())
+                    .append(".")
+                    .append(getType()).toString();
+        }
+        return nameSpace;
+    }
 
     @Override
     public IESDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
