@@ -16,27 +16,48 @@
 
 package com.stratio.deep.cassandra.config;
 
-import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
+import static com.stratio.deep.cassandra.util.CassandraUtils.createTableQueryGenerator;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.BATCHSIZE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.BISECT_FACTOR;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.COLUMN_FAMILY;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.CQLPORT;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.CREATE_ON_WRITE;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.HOST;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNAME;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PAGE_SIZE;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.KEYSPACE;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.TABLE;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.RPCPORT;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.CQLPORT;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.COLUMN_FAMILY;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.BISECT_FACTOR;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.CREATE_ON_WRITE;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.BATCHSIZE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PAGE_SIZE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.READ_CONSISTENCY_LEVEL;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.RPCPORT;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.TABLE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNAME;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.WRITE_CONSISTENCY_LEVEL;
-import com.datastax.driver.core.*;
-import com.datastax.driver.core.querybuilder.Clause;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.stratio.deep.commons.config.ExtractorConfig;
+import static com.stratio.deep.commons.utils.Utils.quote;
+
+import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.apache.cassandra.db.ConsistencyLevel;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+
+import scala.Tuple2;
+
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ColumnMetadata;
+import com.datastax.driver.core.KeyspaceMetadata;
+import com.datastax.driver.core.Metadata;
+import com.datastax.driver.core.Session;
+import com.datastax.driver.core.TableMetadata;
 import com.stratio.deep.cassandra.entity.CassandraCell;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepIOException;
@@ -45,28 +66,14 @@ import com.stratio.deep.commons.exception.DeepIndexNotFoundException;
 import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.Filter;
-import com.stratio.deep.commons.filter.FilterOperator;
 import com.stratio.deep.commons.utils.Constants;
 import com.stratio.deep.commons.utils.Pair;
-import org.apache.cassandra.db.ConsistencyLevel;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import scala.Tuple2;
-
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.*;
-
-import static com.stratio.deep.cassandra.util.CassandraUtils.createTableQueryGenerator;
-import static com.stratio.deep.commons.utils.Utils.quote;
 
 /**
- * Base class for all config implementations providing default implementations for methods
- * defined in {@link ICassandraDeepJobConfig}.
+ * Base class for all config implementations providing default implementations for methods defined in
+ * {@link ICassandraDeepJobConfig}.
  */
-public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassandraDeepJobConfig<T> {
+public abstract class GenericDeepJobConfig<T> implements AutoCloseable, ICassandraDeepJobConfig<T> {
     private static final Logger LOG = Logger.getLogger("com.stratio.deep.config.GenericICassandraDeepJobConfig");
     private static final long serialVersionUID = -7179376653643603038L;
     private String partitionerClassName = "org.apache.cassandra.dht.Murmur3Partitioner";
@@ -109,10 +116,9 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
     /**
      * default "where" filter to use to access ColumnFamily's data.
      */
-    private Map<String, Serializable> additionalFilters = new TreeMap<>();
+    private final Map<String, Serializable> additionalFilters = new TreeMap<>();
 
-
-    private Filter[] filters ;
+    private Filter[] filters;
 
     /**
      * Defines a projection over the CF columns.
@@ -140,8 +146,8 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
     private String writeConsistencyLevel = ConsistencyLevel.QUORUM.name();
 
     /**
-     * Enables/Disables auto-creation of column family when writing to Cassandra.
-     * By Default we do not create the output column family.
+     * Enables/Disables auto-creation of column family when writing to Cassandra. By Default we do not create the output
+     * column family.
      */
     private Boolean createTableOnWrite = Boolean.FALSE;
 
@@ -159,6 +165,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public ICassandraDeepJobConfig<T> session(Session session) {
         this.session = session;
         return this;
@@ -168,6 +175,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public synchronized Session getSession() {
         if (session == null) {
             Cluster cluster = Cluster.builder()
@@ -195,16 +203,14 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
 
     /**
      * {@inheritDoc}
-
-     @Override protected void finalize() {
-     LOG.debug("finalizing " + getClass().getCanonicalName());
-     close();
-     }
+     * 
+     * @Override protected void finalize() { LOG.debug("finalizing " + getClass().getCanonicalName()); close(); }
      */
     /**
      * Checks if this configuration object has been initialized or not.
-     *
-     * @throws com.stratio.deep.commons.exception.DeepIllegalAccessException if not initialized
+     * 
+     * @throws com.stratio.deep.commons.exception.DeepIllegalAccessException
+     *             if not initialized
      */
     protected void checkInitialized() {
         if (!isInitialized) {
@@ -214,7 +220,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
 
     /**
      * Fetches table metadata from the underlying datastore, using DataStax java driver.
-     *
+     * 
      * @return the table metadata as returned by the driver.
      */
     public TableMetadata fetchTableMetadata() {
@@ -234,11 +240,11 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * We first check if the column family exists. <br/>
      * If not, we get the first element from <i>tupleRDD</i> and we use it as a template to get columns metadata.
      * <p>
-     * This is a very heavy operation since to obtain the schema
-     * we need to get at least one element of the output RDD.
+     * This is a very heavy operation since to obtain the schema we need to get at least one element of the output RDD.
      * </p>
-     *
-     * @param first the pair RDD.
+     * 
+     * @param first
+     *            the pair RDD.
      */
     public void createOutputTableIfNeeded(Tuple2<Cells, Cells> first) {
 
@@ -257,11 +263,11 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
             return;
         }
 
-
         if (first._1() == null || first._1().isEmpty()) {
             throw new DeepNoSuchFieldException("no key structure found on row metadata");
         }
-        String createTableQuery = createTableQueryGenerator(first._1(), first._2(), this.keyspace, quote(this.columnFamily));
+        String createTableQuery = createTableQueryGenerator(first._1(), first._2(), this.keyspace,
+                quote(this.columnFamily));
         getSession().execute(createTableQuery);
         waitForNewTableMetadata();
     }
@@ -284,7 +290,8 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
                 continue;
             }
 
-            LOG.warn(String.format("Metadata for new table %s.%s NOT FOUND, waiting %d millis", this.keyspace, this.columnFamily, waitTime));
+            LOG.warn(String.format("Metadata for new table %s.%s NOT FOUND, waiting %d millis", this.keyspace,
+                    this.columnFamily, waitTime));
             try {
                 Thread.sleep(waitTime);
             } catch (InterruptedException e) {
@@ -303,6 +310,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public synchronized Map<String, Cell> columnDefinitions() {
         if (columnDefinitionMap != null) {
             return columnDefinitionMap;
@@ -350,85 +358,108 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
         columnDefinitionMap = Collections.unmodifiableMap(columnDefinitionMap);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.stratio.deep.config.IICassandraDeepJobConfig#columnFamily(java.lang.String)
      */
 
+    @Override
     public ICassandraDeepJobConfig<T> columnFamily(String columnFamily) {
         this.columnFamily = columnFamily;
 
         return this;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.stratio.deep.config.IICassandraDeepJobConfig#columnFamily(java.lang.String)
      */
 
+    @Override
     public ICassandraDeepJobConfig<T> table(String table) {
         return columnFamily(table);
     }
 
-    /* (non-Javadoc)
-    * @see com.stratio.deep.config.IICassandraDeepJobConfig#getColumnFamily()
-    */
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.stratio.deep.config.IICassandraDeepJobConfig#getColumnFamily()
+     */
 
-
+    @Override
     public String getColumnFamily() {
         checkInitialized();
         return columnFamily;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.stratio.deep.config.IICassandraDeepJobConfig#getColumnFamily()
      */
 
+    @Override
     public String getTable() {
         return getColumnFamily();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.stratio.deep.config.IICassandraDeepJobConfig#getHost()
      */
 
+    @Override
     public String getHost() {
         checkInitialized();
         return host;
     }
 
-
+    @Override
     public String[] getInputColumns() {
         checkInitialized();
         return inputColumns == null ? new String[0] : inputColumns.clone();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.stratio.deep.config.IICassandraDeepJobConfig#getKeyspace()
      */
 
+    @Override
     public String getKeyspace() {
         checkInitialized();
         return keyspace;
     }
 
-
+    @Override
     public String getPartitionerClassName() {
         checkInitialized();
         return partitionerClassName;
     }
 
-    /* (non-Javadoc)
-    * @see com.stratio.deep.config.IICassandraDeepJobConfig#getPassword()
-    */
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.stratio.deep.config.IICassandraDeepJobConfig#getPassword()
+     */
 
+    @Override
     public String getPassword() {
         checkInitialized();
         return password;
     }
 
-    /* (non-Javadoc)
-    * @see com.stratio.deep.config.IICassandraDeepJobConfig#getRpcPort()
-    */
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.stratio.deep.config.IICassandraDeepJobConfig#getRpcPort()
+     */
 
+    @Override
     public Integer getRpcPort() {
         checkInitialized();
         return rpcPort;
@@ -438,6 +469,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public Integer getCqlPort() {
         checkInitialized();
         return cqlPort;
@@ -447,6 +479,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public String getUsername() {
         checkInitialized();
         return username;
@@ -456,6 +489,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public ICassandraDeepJobConfig<T> host(String hostname) {
         this.host = hostname;
 
@@ -466,6 +500,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public ICassandraDeepJobConfig<T> initialize() {
         if (isInitialized) {
             return this;
@@ -480,7 +515,6 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
             }
         }
 
-
         validate();
 
         columnDefinitions();
@@ -489,92 +523,84 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
         return this;
     }
 
+    @Override
     public ICassandraDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
 
-//TODO: Add filters
+        // TODO: Add filters
 
         Map<String, Serializable> values = extractorConfig.getValues();
 
-        if(values.get(USERNAME)!=null){
+        if (values.get(USERNAME) != null) {
             username(extractorConfig.getString(USERNAME));
         }
 
-        if(values.get(PASSWORD)!=null){
+        if (values.get(PASSWORD) != null) {
             password(extractorConfig.getString(PASSWORD));
         }
 
-        if(values.get(HOST)!=null){
+        if (values.get(HOST) != null) {
             host(extractorConfig.getString(HOST));
         }
 
-        if(values.get(BATCHSIZE)!=null){
+        if (values.get(BATCHSIZE) != null) {
             batchSize(extractorConfig.getInteger(BATCHSIZE));
         }
 
-
-        if(values.get(CQLPORT)!=null){
-            cqlPort(extractorConfig.getInteger(CQLPORT));
+        if (values.get(CQLPORT) != null) {
+            cqlPort(Integer.parseInt(extractorConfig.getString(CQLPORT)));
         }
-        if(values.get(TABLE)!=null){
+        if (values.get(TABLE) != null) {
             table(extractorConfig.getString(TABLE));
         }
-        if(values.get(KEYSPACE)!=null){
+        if (values.get(KEYSPACE) != null) {
             keyspace(extractorConfig.getString(KEYSPACE));
         }
-        if(values.get(COLUMN_FAMILY)!=null){
+        if (values.get(COLUMN_FAMILY) != null) {
             columnFamily(extractorConfig.getString(COLUMN_FAMILY));
         }
 
-
-        if(values.get(RPCPORT)!=null){
-            rpcPort(extractorConfig.getInteger(RPCPORT));
+        if (values.get(RPCPORT) != null) {
+            rpcPort(Integer.parseInt(extractorConfig.getString(RPCPORT)));
         }
 
-
-        if(values.get(CREATE_ON_WRITE)!=null){
+        if (values.get(CREATE_ON_WRITE) != null) {
             createTableOnWrite(extractorConfig.getBoolean(CREATE_ON_WRITE));
         }
 
-
-        if(values.get(PAGE_SIZE)!=null){
+        if (values.get(PAGE_SIZE) != null) {
             pageSize(extractorConfig.getInteger(PAGE_SIZE));
         }
 
-
-        if(values.get(READ_CONSISTENCY_LEVEL)!=null){
+        if (values.get(READ_CONSISTENCY_LEVEL) != null) {
             readConsistencyLevel(extractorConfig.getString(READ_CONSISTENCY_LEVEL));
         }
 
-        if(values.get(WRITE_CONSISTENCY_LEVEL)!=null){
+        if (values.get(WRITE_CONSISTENCY_LEVEL) != null) {
             writeConsistencyLevel(extractorConfig.getString(WRITE_CONSISTENCY_LEVEL));
         }
 
-
-        if(values.get(INPUT_COLUMNS)!=null){
+        if (values.get(INPUT_COLUMNS) != null) {
             inputColumns(extractorConfig.getStringArray(INPUT_COLUMNS));
         }
 
-
-        if(values.get(BISECT_FACTOR)!=null){
+        if (values.get(BISECT_FACTOR) != null) {
             bisectFactor(extractorConfig.getInteger(BISECT_FACTOR));
         }
 
-
-        if(values.get(ExtractorConstants.FILTER_FIELD)!=null){
-            Pair<String, Serializable> filterFields =  extractorConfig.getPair(ExtractorConstants.FILTER_FIELD, String.class, Serializable.class);
+        if (values.get(ExtractorConstants.FILTER_FIELD) != null) {
+            Pair<String, Serializable> filterFields = extractorConfig.getPair(ExtractorConstants.FILTER_FIELD,
+                    String.class, Serializable.class);
             filterByField(filterFields.left, filterFields.right);
         }
 
-        if(values.get(ExtractorConstants.FILTER_QUERY)!=null){
+        if (values.get(ExtractorConstants.FILTER_QUERY) != null) {
             filters(extractorConfig.getFilterArray(ExtractorConstants.FILTER_QUERY));
-
 
         }
         this.initialize();
 
         return this;
     }
-
 
     @Override
     public ICassandraDeepJobConfig<T> filters(Filter... filters) {
@@ -588,10 +614,11 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
         return filters;
     }
 
-        /**
-         * {@inheritDoc}
-         */
+    /**
+     * {@inheritDoc}
+     */
 
+    @Override
     public ICassandraDeepJobConfig<T> inputColumns(String... columns) {
         this.inputColumns = columns;
 
@@ -602,12 +629,13 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public ICassandraDeepJobConfig<T> keyspace(String keyspace) {
         this.keyspace = keyspace;
         return this;
     }
 
-
+    @Override
     public ICassandraDeepJobConfig<T> bisectFactor(int bisectFactor) {
         this.bisectFactor = bisectFactor;
         return this;
@@ -617,6 +645,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public ICassandraDeepJobConfig<T> partitioner(String partitionerClassName) {
         this.partitionerClassName = partitionerClassName;
         return this;
@@ -626,7 +655,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
-
+    @Override
     public ICassandraDeepJobConfig<T> password(String password) {
         this.password = password;
 
@@ -637,6 +666,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public ICassandraDeepJobConfig<T> rpcPort(Integer port) {
         this.rpcPort = port;
 
@@ -647,6 +677,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public ICassandraDeepJobConfig<T> cqlPort(Integer port) {
         this.cqlPort = port;
 
@@ -657,6 +688,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public ICassandraDeepJobConfig<T> username(String username) {
         this.username = username;
 
@@ -664,9 +696,8 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
     }
 
     /**
-     * Validates if any of the mandatory fields have been configured or not.
-     * Throws an {@link IllegalArgumentException} if any of the mandatory
-     * properties have not been configured.
+     * Validates if any of the mandatory fields have been configured or not. Throws an {@link IllegalArgumentException}
+     * if any of the mandatory properties have not been configured.
      */
     void validate() {
         validateCassandraParams();
@@ -782,6 +813,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public ICassandraDeepJobConfig<T> batchSize(int batchSize) {
         this.batchSize = batchSize;
         return this;
@@ -791,6 +823,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public Boolean isCreateTableOnWrite() {
         return createTableOnWrite;
     }
@@ -799,6 +832,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public ICassandraDeepJobConfig<T> createTableOnWrite(Boolean createTableOnWrite) {
         this.createTableOnWrite = createTableOnWrite;
         this.isWriteConfig = createTableOnWrite;
@@ -809,11 +843,12 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
     /**
      * {@inheritDoc}
      */
+    @Override
     public Map<String, Serializable> getAdditionalFilters() {
         return Collections.unmodifiableMap(additionalFilters);
     }
 
-
+    @Override
     public int getPageSize() {
         checkInitialized();
         return this.pageSize;
@@ -823,13 +858,14 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public ICassandraDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue) {
         /* check if there's an index specified on the provided column */
         additionalFilters.put(filterColumnName, filterValue);
         return this;
     }
 
-
+    @Override
     public ICassandraDeepJobConfig<T> pageSize(int pageSize) {
         this.pageSize = pageSize;
         return this;
@@ -839,6 +875,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public String getReadConsistencyLevel() {
         return readConsistencyLevel;
     }
@@ -847,6 +884,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public String getWriteConsistencyLevel() {
         return writeConsistencyLevel;
     }
@@ -855,6 +893,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public ICassandraDeepJobConfig<T> readConsistencyLevel(String level) {
         this.readConsistencyLevel = level;
 
@@ -865,6 +904,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public ICassandraDeepJobConfig<T> writeConsistencyLevel(String level) {
         this.writeConsistencyLevel = level;
         return this;
@@ -874,6 +914,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public int getBatchSize() {
         return batchSize;
     }
@@ -882,6 +923,7 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
      * {@inheritDoc}
      */
 
+    @Override
     public Boolean getIsWriteConfig() {
         return isWriteConfig;
     }
@@ -890,8 +932,5 @@ public abstract class GenericDeepJobConfig<T>  implements AutoCloseable, ICassan
     public int getBisectFactor() {
         return bisectFactor;
     }
-
-
-
 
 }
