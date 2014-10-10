@@ -36,6 +36,8 @@ public final class Constants {
 
     public static final int DEFAULT_BISECT_FACTOR = 1;
 
+    public static final int DEFAULT_SPLIT_SIZE = 100000;
+
     public static final String SPARK_PARTITION_ID = "spark.partition.id";
 
     public static final String SPARK_RDD_ID = "spark.rdd.id";

@@ -263,4 +263,12 @@ public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T, ICassandra
      * @param session the session to use.
      */
     public abstract ICassandraDeepJobConfig<T> session(Session session);
+
+    ICassandraDeepJobConfig<T> splitSize(int splitSize);
+
+    Integer getSplitSize();
+
+    boolean isSplitModeSet();
+
+    boolean isBisectModeSet();
 }
