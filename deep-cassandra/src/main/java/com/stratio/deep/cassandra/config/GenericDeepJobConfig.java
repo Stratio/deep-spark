@@ -29,6 +29,7 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PAGE_S
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.READ_CONSISTENCY_LEVEL;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.RPCPORT;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.SPLIT_SIZE;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.TABLE;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNAME;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.WRITE_CONSISTENCY_LEVEL;
@@ -108,6 +109,8 @@ public abstract class GenericDeepJobConfig<T> implements AutoCloseable, ICassand
      */
     private String username;
 
+    private String nameSpace;
+
     /**
      * Cassandra password. Leave empty if you do not need authentication.
      */
@@ -160,6 +163,12 @@ public abstract class GenericDeepJobConfig<T> implements AutoCloseable, ICassand
     protected Boolean isWriteConfig = Boolean.FALSE;
 
     private int bisectFactor = Constants.DEFAULT_BISECT_FACTOR;
+
+    private int splitSize = Constants.DEFAULT_SPLIT_SIZE;
+
+    private boolean isSplitModeSet = false;
+
+    private boolean isBisectModeSet = false;
 
     /**
      * {@inheritDoc}
@@ -587,6 +596,10 @@ public abstract class GenericDeepJobConfig<T> implements AutoCloseable, ICassand
             bisectFactor(extractorConfig.getInteger(BISECT_FACTOR));
         }
 
+        if (values.get(SPLIT_SIZE) != null) {
+            splitSize(extractorConfig.getInteger(SPLIT_SIZE));
+        }
+
         if (values.get(ExtractorConstants.FILTER_FIELD) != null) {
             Pair<String, Serializable> filterFields = extractorConfig.getPair(ExtractorConstants.FILTER_FIELD,
                     String.class, Serializable.class);
@@ -637,6 +650,7 @@ public abstract class GenericDeepJobConfig<T> implements AutoCloseable, ICassand
 
     @Override
     public ICassandraDeepJobConfig<T> bisectFactor(int bisectFactor) {
+        this.isBisectModeSet = true;
         this.bisectFactor = bisectFactor;
         return this;
     }
@@ -717,8 +731,25 @@ public abstract class GenericDeepJobConfig<T> implements AutoCloseable, ICassand
         validateTableMetadata(tableMetadata);
         validateAdditionalFilters(tableMetadata);
 
-        if (bisectFactor != Constants.DEFAULT_BISECT_FACTOR && !checkIsPowerOfTwo(bisectFactor)) {
-            throw new IllegalArgumentException("Bisect factor should be greater than zero and a power of 2");
+        if (!(this.isBisectModeSet && this.isSplitModeSet)) {
+            if (this.isBisectModeSet) {
+                if (this.bisectFactor != Constants.DEFAULT_BISECT_FACTOR
+                        && !this.checkIsPowerOfTwo(this.bisectFactor)) {
+                    throw new IllegalArgumentException(
+                            "Bisect factor should be greater than zero and a power of 2");
+                }
+            } else if (this.isSplitModeSet) {
+                if (this.splitSize <= 0) {
+                    throw new IllegalArgumentException(
+                            "The split size must be a positve integer");
+                }
+            } else {
+                throw new IllegalArgumentException(
+                        "One split mode must be defined, please choose between Split or Bisect");
+            }
+        } else {
+            throw new IllegalArgumentException(
+                    "Only one split mode can be defined, please choose between Split or Bisect");
         }
     }
 
@@ -933,4 +964,34 @@ public abstract class GenericDeepJobConfig<T> implements AutoCloseable, ICassand
         return bisectFactor;
     }
 
+    @Override
+    public ICassandraDeepJobConfig<T> splitSize(int splitSize) {
+        this.isSplitModeSet = true;
+        this.splitSize = splitSize;
+        return this;
+    }
+
+    @Override
+    public Integer getSplitSize() {
+        return this.splitSize;
+    }
+
+    @Override
+    public boolean isSplitModeSet() {
+        return this.isSplitModeSet;
+    }
+
+    @Override
+    public boolean isBisectModeSet() {
+        return this.isBisectModeSet;
+    }
+
+    @Override
+    public String getNameSpace() {
+        if (nameSpace == null) {
+            nameSpace = new StringBuilder().append(keyspace).append(".").append(columnFamily).toString();
+        }
+        return nameSpace;
+
+    }
 }

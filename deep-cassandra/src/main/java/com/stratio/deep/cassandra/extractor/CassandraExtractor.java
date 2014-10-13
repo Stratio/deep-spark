@@ -117,8 +117,12 @@ public abstract class CassandraExtractor<T> implements IExtractor<T> {
     int id = Integer.parseInt(config.getValues().get(SPARK_RDD_ID).toString());
         ICassandraDeepJobConfig<T> cellDeepJobConfig = initCustomConfig(config);
 
-        List<DeepTokenRange> underlyingInputSplits = RangeUtils.getSplits(cellDeepJobConfig);
-
+        List<DeepTokenRange> underlyingInputSplits = null;
+        if (cellDeepJobConfig.isBisectModeSet()) {
+            underlyingInputSplits = RangeUtils.getSplits(cellDeepJobConfig);
+        } else {
+            underlyingInputSplits = RangeUtils.getSplitsBySize(cellDeepJobConfig);
+        }
     Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
 
     int i = 0;

@@ -24,8 +24,8 @@ public class ExtractorConstants {
     public static  String PAGE_SIZE = "page";
     public static  String SESSION  = "session";
     public static  String PORT2  = "port2";
-    public static  String CQLPORT  = PORT;
-    public static  String RPCPORT  = PORT2;
+    public static  String CQLPORT  = PORT2;
+    public static  String RPCPORT  = PORT;
     public static  String COLUMN_FAMILY  = "columnFamily";
     public static  String BISECT_FACTOR  = "bisecFactor";
     public static  String CREATE_ON_WRITE  = "createOnWrite";

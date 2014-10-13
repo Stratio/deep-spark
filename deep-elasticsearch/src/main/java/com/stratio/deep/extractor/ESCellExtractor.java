@@ -57,7 +57,7 @@ public final class ESCellExtractor extends GenericHadoopExtractor<Cells, Object,
     public Cells transformElement(Tuple2<Object, LinkedMapWritable> tuple, IDeepJobConfig<Cells, ? extends IDeepJobConfig> config) {
 
         try {
-            return UtilES.getCellFromJson(tuple._2(), ((IESDeepJobConfig)deepJobConfig).getType());
+            return UtilES.getCellFromJson(tuple._2(), ((IESDeepJobConfig)deepJobConfig).getNameSpace());
         } catch (Exception e) {
             LOG.error("Cannot convert JSON: ", e);
             throw new DeepTransformException("Could not transform from Json to Cell " + e.getMessage());

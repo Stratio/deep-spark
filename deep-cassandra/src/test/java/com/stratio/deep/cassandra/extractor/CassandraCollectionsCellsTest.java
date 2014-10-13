@@ -326,7 +326,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
             }
             Cell newuu = CassandraCell.create(uu, uuid2id);
 
-            return new Cells(e.getDefaultTableName(), newid, newfn, newln, newem, newph, newuu);
+            return new Cells(e.getnameSpace(), newid, newfn, newln, newem, newph, newuu);
         }
     }
 

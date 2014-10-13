@@ -47,7 +47,7 @@ public class Cells implements Iterable<Cell>, Serializable {
     /**
      * Internal default table name used when no table name is specified.
      */
-    private String defaultTableName;
+    private String nameSpace;
 
     private final static String DEFAULT_TABLE_NAME = "3fa2fbc6d8abbc77cdab9e3216d957dffd64a64b";
 
@@ -59,11 +59,11 @@ public class Cells implements Iterable<Cell>, Serializable {
     /**
      * Given the table name, returns the List of Cell object associated to that table.
      *
-     * @param tableName the table name.
+     * @param nameSpace the table name.
      * @return the List of Cell object associated to that table.
      */
-    private List<Cell> getCellsByTable(String tableName) {
-        String tName = StringUtils.isEmpty(tableName) ? defaultTableName : tableName;
+    private List<Cell> getCellsByTable(String nameSpace) {
+        String tName = StringUtils.isEmpty(nameSpace) ? this.nameSpace : nameSpace;
 
         List<Cell> res = cells.get(tName);
 
@@ -79,14 +79,14 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Constructs a new Cells object without a default table name.
      */
     public Cells() {
-        this.defaultTableName = DEFAULT_TABLE_NAME;
+        this.nameSpace = DEFAULT_TABLE_NAME;
     }
 
     /**
      * Builds a new Cells object using the provided table name as the default table name.
      */
-    public Cells(String defaultTableName) {
-        this.defaultTableName = defaultTableName;
+    public Cells(String nameSpace) {
+        this.nameSpace = nameSpace;
     }
 
     /**
@@ -104,12 +104,12 @@ public class Cells implements Iterable<Cell>, Serializable {
      *
      * @param cells the array of Cells we want to use to create the Cells object.
      */
-    public Cells(String defaultTableName, Cell... cells) {
-        this.defaultTableName = defaultTableName;
-        if (StringUtils.isEmpty(defaultTableName)) {
+    public Cells(String nameSpace, Cell... cells) {
+        this.nameSpace = nameSpace;
+        if (StringUtils.isEmpty(nameSpace)) {
             throw new IllegalArgumentException("table name cannot be null");
         }
-        Collections.addAll(getCellsByTable(defaultTableName), cells);
+        Collections.addAll(getCellsByTable(nameSpace), cells);
     }
 
     /**
@@ -124,7 +124,7 @@ public class Cells implements Iterable<Cell>, Serializable {
             throw new DeepGenericException(new IllegalArgumentException("cell parameter cannot be null"));
         }
 
-        return getCellsByTable(defaultTableName).add(c);
+        return getCellsByTable(nameSpace).add(c);
     }
 
     /**
@@ -202,7 +202,7 @@ public class Cells implements Iterable<Cell>, Serializable {
      * @return either true/false if the Cell has been successfully replace or not.
      */
     public boolean replaceByName(Cell c) {
-        return replaceByName(defaultTableName, c);
+        return replaceByName(nameSpace, c);
     }
 
     /**
@@ -236,7 +236,7 @@ public class Cells implements Iterable<Cell>, Serializable {
      * @return either true/false if the Cell has been successfully removed or not.
      */
     public boolean remove(String cellName) {
-        return remove(defaultTableName, cellName);
+        return remove(nameSpace, cellName);
     }
 
     /**
@@ -277,7 +277,7 @@ public class Cells implements Iterable<Cell>, Serializable {
      * @return Returns the cell at position idx.
      */
     public Cell getCellByIdx(int idx) {
-        return getCellsByTable(defaultTableName).get(idx);
+        return getCellsByTable(nameSpace).get(idx);
     }
 
     /**
@@ -299,7 +299,7 @@ public class Cells implements Iterable<Cell>, Serializable {
      * cellName is present.
      */
     public Cell getCellByName(String cellName) {
-        return getCellByName(defaultTableName, cellName);
+        return getCellByName(nameSpace, cellName);
     }
 
     /**
@@ -341,11 +341,11 @@ public class Cells implements Iterable<Cell>, Serializable {
     /**
      * Returns an immutable list of Cell object (associated to <i>table</i>) contained in this Cells.
      *
-     * @param tableName the name of the owning table.
+     * @param nameSpace the name of the owning table.
      * @return the requested list of Cell objects.
      */
-    public Collection<Cell> getCells(String tableName) {
-        return Collections.unmodifiableList(getCellsByTable(tableName));
+    public Collection<Cell> getCells(String nameSpace) {
+        return Collections.unmodifiableList(getCellsByTable(nameSpace));
     }
 
     /**
@@ -364,7 +364,7 @@ public class Cells implements Iterable<Cell>, Serializable {
      * marshaller.
      */
     public Collection<ByteBuffer> getDecomposedCellValues() {
-        return getDecomposedCellValues(defaultTableName);
+        return getDecomposedCellValues(nameSpace);
     }
 
     /**
@@ -411,7 +411,7 @@ public class Cells implements Iterable<Cell>, Serializable {
      * @return a collection of Cell(s) values.
      */
     public Collection<Object> getCellValues() {
-        return getCellValues(defaultTableName);
+        return getCellValues(nameSpace);
     }
 
     /**
@@ -441,7 +441,7 @@ public class Cells implements Iterable<Cell>, Serializable {
      * the key.
      */
     public Cells getIndexCells() {
-        Cells res = new Cells(this.defaultTableName);
+        Cells res = new Cells(this.nameSpace);
 
         for (Map.Entry<String, List<Cell>> entry : cells.entrySet()) {
             Cells keys = getIndexCells(entry.getKey());
@@ -480,7 +480,7 @@ public class Cells implements Iterable<Cell>, Serializable {
      * are NOT part of the key.
      */
     public Cells getValueCells() {
-        Cells res = new Cells(this.defaultTableName);
+        Cells res = new Cells(this.nameSpace);
 
         for (Map.Entry<String, List<Cell>> entry : cells.entrySet()) {
             Cells keys = getValueCells(entry.getKey());
@@ -565,23 +565,23 @@ public class Cells implements Iterable<Cell>, Serializable {
      *
      * @return the default table name.
      */
-    public String getDefaultTableName() {
-        return defaultTableName;
+    public String getnameSpace() {
+        return nameSpace;
     }
 
     /**
      * Returns the casted value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @param cellClass the class of the cell's value
      * @param <T>       the type of the cell's value
      * @return the casted value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public <T> T getValue(String tableName, int idx, Class<T> cellClass) {
-        Cell cell = getCellByIdx(tableName, idx);
+    public <T> T getValue(String nameSpace, int idx, Class<T> cellClass) {
+        Cell cell = getCellByIdx(nameSpace, idx);
         return cell == null ? null : cell.getValue(cellClass);
     }
 
@@ -603,15 +603,15 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the casted value of the {@link Cell} (associated to {@code table}) whose name is
      * cellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @param cellClass the class of the cell's value
      * @param <T>       the type of the cell's value
      * @return the casted value of the {@link Cell} (associated to {@code table}) whose name is
      * cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public <T> T getValue(String tableName, String cellName, Class<T> cellClass) {
-        Cell cell = getCellByName(tableName, cellName);
+    public <T> T getValue(String nameSpace, String cellName, Class<T> cellClass) {
+        Cell cell = getCellByName(nameSpace, cellName);
         return cell == null ? null : cell.getValue(cellClass);
     }
 
@@ -631,8 +631,8 @@ public class Cells implements Iterable<Cell>, Serializable {
     }
 
 
-    public <T> List<T> getList(String tableName, int idx, Class<T> elementsClass) {
-        Cell cell = getCellByIdx(tableName, idx);
+    public <T> List<T> getList(String nameSpace, int idx, Class<T> elementsClass) {
+        Cell cell = getCellByIdx(nameSpace, idx);
         return cell == null ? null : cell.getList(elementsClass);
     }
 
@@ -641,8 +641,8 @@ public class Cells implements Iterable<Cell>, Serializable {
         return cell == null ? null : cell.getList(elementsClass);
     }
 
-    public <T> List<T> getList(String tableName, String cellName, Class<T> elementsClass) {
-        Cell cell = getCellByName(tableName, cellName);
+    public <T> List<T> getList(String nameSpace, String cellName, Class<T> elementsClass) {
+        Cell cell = getCellByName(nameSpace, cellName);
         return cell == null ? null : cell.getList(elementsClass);
     }
 
@@ -652,8 +652,8 @@ public class Cells implements Iterable<Cell>, Serializable {
     }
 
 
-    public <T> Set<T> getSet(String tableName, int idx, Class<T> elementsClass) {
-        Cell cell = getCellByIdx(tableName, idx);
+    public <T> Set<T> getSet(String nameSpace, int idx, Class<T> elementsClass) {
+        Cell cell = getCellByIdx(nameSpace, idx);
         return cell == null ? null : cell.getSet(elementsClass);
     }
 
@@ -662,8 +662,8 @@ public class Cells implements Iterable<Cell>, Serializable {
         return cell == null ? null : cell.getSet(elementsClass);
     }
 
-    public <T> Set<T> getSet(String tableName, String cellName, Class<T> elementsClass) {
-        Cell cell = getCellByName(tableName, cellName);
+    public <T> Set<T> getSet(String nameSpace, String cellName, Class<T> elementsClass) {
+        Cell cell = getCellByName(nameSpace, cellName);
         return cell == null ? null : cell.getSet(elementsClass);
     }
 
@@ -673,11 +673,11 @@ public class Cells implements Iterable<Cell>, Serializable {
     }
 
 
-    public <K, V> Map<K, V> getMap(String tableName,
+    public <K, V> Map<K, V> getMap(String nameSpace,
                                    int idx,
                                    Class<K> keysClass,
                                    Class<V> valuesClass) {
-        Cell cell = getCellByIdx(tableName, idx);
+        Cell cell = getCellByIdx(nameSpace, idx);
         return cell == null ? null : cell.getMap(keysClass, valuesClass);
     }
 
@@ -686,11 +686,11 @@ public class Cells implements Iterable<Cell>, Serializable {
         return cell == null ? null : cell.getMap(keysClass, valuesClass);
     }
 
-    public <K, V> Map<K, V> getMap(String tableName,
+    public <K, V> Map<K, V> getMap(String nameSpace,
                                    String cellName,
                                    Class<K> keysClass,
                                    Class<V> valuesClass) {
-        Cell cell = getCellByName(tableName, cellName);
+        Cell cell = getCellByName(nameSpace, cellName);
         return cell == null ? null : cell.getMap(keysClass, valuesClass);
     }
 
@@ -704,13 +704,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code String} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @return the {@code String} value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public String getString(String tableName, int idx) {
-        return getValue(tableName, String.class);
+    public String getString(String nameSpace, int idx) {
+        return getValue(nameSpace, String.class);
     }
 
     /**
@@ -729,13 +729,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code String} value of the {@link Cell} (associated to {@code table}) whose name
      * iscellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @return the {@code String} value of the {@link Cell} (associated to {@code table}) whose name
      * is cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public String getString(String tableName, String cellName) {
-        return getValue(tableName, cellName, String.class);
+    public String getString(String nameSpace, String cellName) {
+        return getValue(nameSpace, cellName, String.class);
     }
 
     /**
@@ -755,13 +755,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Character} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @return the {@code Character} value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public Character getCharacter(String tableName, int idx) {
-        return getValue(tableName, Character.class);
+    public Character getCharacter(String nameSpace, int idx) {
+        return getValue(nameSpace, Character.class);
     }
 
     /**
@@ -780,13 +780,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Character} value of the {@link Cell} (associated to {@code table}) whose name
      * iscellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @return the {@code Character} value of the {@link Cell} (associated to {@code table}) whose name
      * is cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public Character getCharacter(String tableName, String cellName) {
-        return getValue(tableName, cellName, Character.class);
+    public Character getCharacter(String nameSpace, String cellName) {
+        return getValue(nameSpace, cellName, Character.class);
     }
 
     /**
@@ -805,13 +805,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Byte} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @return the {@code Byte} value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public Byte getByte(String tableName, int idx) {
-        return getValue(tableName, Byte.class);
+    public Byte getByte(String nameSpace, int idx) {
+        return getValue(nameSpace, Byte.class);
     }
 
     /**
@@ -830,13 +830,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Byte} value of the {@link Cell} (associated to {@code table}) whose name
      * iscellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @return the {@code Byte} value of the {@link Cell} (associated to {@code table}) whose name
      * is cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public Byte getByte(String tableName, String cellName) {
-        return getValue(tableName, cellName, Byte.class);
+    public Byte getByte(String nameSpace, String cellName) {
+        return getValue(nameSpace, cellName, Byte.class);
     }
 
     /**
@@ -855,13 +855,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Date} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @return the {@code Date} value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public Date getDate(String tableName, int idx) {
-        return getValue(tableName, Date.class);
+    public Date getDate(String nameSpace, int idx) {
+        return getValue(nameSpace, Date.class);
     }
 
     /**
@@ -880,13 +880,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Date} value of the {@link Cell} (associated to {@code table}) whose name
      * iscellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @return the {@code Date} value of the {@link Cell} (associated to {@code table}) whose name
      * is cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public Date getDate(String tableName, String cellName) {
-        return getValue(tableName, cellName, Date.class);
+    public Date getDate(String nameSpace, String cellName) {
+        return getValue(nameSpace, cellName, Date.class);
     }
 
     /**
@@ -905,13 +905,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Boolean} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @return the {@code Boolean} value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public Boolean getBoolean(String tableName, int idx) {
-        return getValue(tableName, Boolean.class);
+    public Boolean getBoolean(String nameSpace, int idx) {
+        return getValue(nameSpace, Boolean.class);
     }
 
     /**
@@ -930,13 +930,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Boolean} value of the {@link Cell} (associated to {@code table}) whose name
      * iscellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @return the {@code Boolean} value of the {@link Cell} (associated to {@code table}) whose name
      * is cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public Boolean getBoolean(String tableName, String cellName) {
-        return getValue(tableName, cellName, Boolean.class);
+    public Boolean getBoolean(String nameSpace, String cellName) {
+        return getValue(nameSpace, cellName, Boolean.class);
     }
 
     /**
@@ -955,13 +955,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Short} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @return the {@code Short} value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public Short getShort(String tableName, int idx) {
-        return getValue(tableName, Short.class);
+    public Short getShort(String nameSpace, int idx) {
+        return getValue(nameSpace, Short.class);
     }
 
     /**
@@ -980,13 +980,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Short} value of the {@link Cell} (associated to {@code table}) whose name
      * iscellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @return the {@code Short} value of the {@link Cell} (associated to {@code table}) whose name
      * is cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public Short getShort(String tableName, String cellName) {
-        return getValue(tableName, cellName, Short.class);
+    public Short getShort(String nameSpace, String cellName) {
+        return getValue(nameSpace, cellName, Short.class);
     }
 
     /**
@@ -1005,13 +1005,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Integer} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @return the {@code Integer} value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public Integer getInteger(String tableName, int idx) {
-        return getValue(tableName, Integer.class);
+    public Integer getInteger(String nameSpace, int idx) {
+        return getValue(nameSpace, Integer.class);
     }
 
     /**
@@ -1030,13 +1030,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Integer} value of the {@link Cell} (associated to {@code table}) whose name
      * iscellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @return the {@code Integer} value of the {@link Cell} (associated to {@code table}) whose name
      * is cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public Integer getInteger(String tableName, String cellName) {
-        return getValue(tableName, cellName, Integer.class);
+    public Integer getInteger(String nameSpace, String cellName) {
+        return getValue(nameSpace, cellName, Integer.class);
     }
 
     /**
@@ -1055,13 +1055,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Float} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @return the {@code Float} value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public Float getFloat(String tableName, int idx) {
-        return getValue(tableName, Float.class);
+    public Float getFloat(String nameSpace, int idx) {
+        return getValue(nameSpace, Float.class);
     }
 
     /**
@@ -1080,13 +1080,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Float} value of the {@link Cell} (associated to {@code table}) whose name
      * iscellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @return the {@code Float} value of the {@link Cell} (associated to {@code table}) whose name
      * is cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public Float getFloat(String tableName, String cellName) {
-        return getValue(tableName, cellName, Float.class);
+    public Float getFloat(String nameSpace, String cellName) {
+        return getValue(nameSpace, cellName, Float.class);
     }
 
     /**
@@ -1105,13 +1105,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Long} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @return the {@code Long} value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public Long getLong(String tableName, int idx) {
-        return getValue(tableName, Long.class);
+    public Long getLong(String nameSpace, int idx) {
+        return getValue(nameSpace, Long.class);
     }
 
     /**
@@ -1130,13 +1130,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Long} value of the {@link Cell} (associated to {@code table}) whose name
      * iscellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @return the {@code Long} value of the {@link Cell} (associated to {@code table}) whose name
      * is cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public Long getLong(String tableName, String cellName) {
-        return getValue(tableName, cellName, Long.class);
+    public Long getLong(String nameSpace, String cellName) {
+        return getValue(nameSpace, cellName, Long.class);
     }
 
     /**
@@ -1155,13 +1155,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Double} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @return the {@code Double} value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public Double getDouble(String tableName, int idx) {
-        return getValue(tableName, Double.class);
+    public Double getDouble(String nameSpace, int idx) {
+        return getValue(nameSpace, Double.class);
     }
 
     /**
@@ -1180,13 +1180,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Double} value of the {@link Cell} (associated to {@code table}) whose name
      * iscellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @return the {@code Double} value of the {@link Cell} (associated to {@code table}) whose name
      * is cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public Double getDouble(String tableName, String cellName) {
-        return getValue(tableName, cellName, Double.class);
+    public Double getDouble(String nameSpace, String cellName) {
+        return getValue(nameSpace, cellName, Double.class);
     }
 
     /**
@@ -1205,13 +1205,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code BigInteger} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @return the {@code BigInteger} value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public BigInteger getBigInteger(String tableName, int idx) {
-        return getValue(tableName, BigInteger.class);
+    public BigInteger getBigInteger(String nameSpace, int idx) {
+        return getValue(nameSpace, BigInteger.class);
     }
 
     /**
@@ -1230,13 +1230,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code BigInteger} value of the {@link Cell} (associated to {@code table}) whose name
      * iscellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @return the {@code BigInteger} value of the {@link Cell} (associated to {@code table}) whose name
      * is cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public BigInteger getBigInteger(String tableName, String cellName) {
-        return getValue(tableName, cellName, BigInteger.class);
+    public BigInteger getBigInteger(String nameSpace, String cellName) {
+        return getValue(nameSpace, cellName, BigInteger.class);
     }
 
     /**
@@ -1255,13 +1255,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code BigDecimal} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @return the {@code BigDecimal} value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public BigDecimal getBigDecimal(String tableName, int idx) {
-        return getValue(tableName, BigDecimal.class);
+    public BigDecimal getBigDecimal(String nameSpace, int idx) {
+        return getValue(nameSpace, BigDecimal.class);
     }
 
     /**
@@ -1280,13 +1280,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code BigInteger} value of the {@link Cell} (associated to {@code table}) whose name
      * iscellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @return the {@code BigInteger} value of the {@link Cell} (associated to {@code table}) whose name
      * is cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public BigDecimal getBigDecimal(String tableName, String cellName) {
-        return getValue(tableName, cellName, BigDecimal.class);
+    public BigDecimal getBigDecimal(String nameSpace, String cellName) {
+        return getValue(nameSpace, cellName, BigDecimal.class);
     }
 
     /**
@@ -1306,13 +1306,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code ByteBuffer} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @return the {@code ByteBuffer} value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public ByteBuffer getByteBuffer(String tableName, int idx) {
-        return getValue(tableName, ByteBuffer.class);
+    public ByteBuffer getByteBuffer(String nameSpace, int idx) {
+        return getValue(nameSpace, ByteBuffer.class);
     }
 
     /**
@@ -1331,13 +1331,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code ByteBuffer} value of the {@link Cell} (associated to {@code table}) whose name
      * iscellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @return the {@code ByteBuffer} value of the {@link Cell} (associated to {@code table}) whose name
      * is cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public ByteBuffer getByteBuffer(String tableName, String cellName) {
-        return getValue(tableName, cellName, ByteBuffer.class);
+    public ByteBuffer getByteBuffer(String nameSpace, String cellName) {
+        return getValue(nameSpace, cellName, ByteBuffer.class);
     }
 
     /**
@@ -1357,13 +1357,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code URL} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @return the {@code URL} value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public URL getURL(String tableName, int idx) {
-        return getValue(tableName, URL.class);
+    public URL getURL(String nameSpace, int idx) {
+        return getValue(nameSpace, URL.class);
     }
 
     /**
@@ -1382,13 +1382,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code URL} value of the {@link Cell} (associated to {@code table}) whose name
      * iscellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @return the {@code URL} value of the {@link Cell} (associated to {@code table}) whose name
      * is cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public URL getURL(String tableName, String cellName) {
-        return getValue(tableName, cellName, URL.class);
+    public URL getURL(String nameSpace, String cellName) {
+        return getValue(nameSpace, cellName, URL.class);
     }
 
     /**
@@ -1408,13 +1408,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code InetAddress} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @return the {@code InetAddress} value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public InetAddress getInetAddress(String tableName, int idx) {
-        return getValue(tableName, InetAddress.class);
+    public InetAddress getInetAddress(String nameSpace, int idx) {
+        return getValue(nameSpace, InetAddress.class);
     }
 
     /**
@@ -1433,13 +1433,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code InetAddress} value of the {@link Cell} (associated to {@code table}) whose name
      * iscellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @return the {@code InetAddress} value of the {@link Cell} (associated to {@code table}) whose name
      * is cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public InetAddress getInetAddress(String tableName, String cellName) {
-        return getValue(tableName, cellName, InetAddress.class);
+    public InetAddress getInetAddress(String nameSpace, String cellName) {
+        return getValue(nameSpace, cellName, InetAddress.class);
     }
 
     /**
@@ -1458,13 +1458,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Byte[]} value of the {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param idx       the index position of the Cell we want to retrieve
      * @return the {@code Byte[]} value of the  {@link Cell} at position {@code idx} in the list of Cell
      * object associated to {@code table}
      */
-    public Byte[] getBytes(String tableName, int idx) {
-        return getValue(tableName, Byte[].class);
+    public Byte[] getBytes(String nameSpace, int idx) {
+        return getValue(nameSpace, Byte[].class);
     }
 
     /**
@@ -1483,13 +1483,13 @@ public class Cells implements Iterable<Cell>, Serializable {
      * Returns the {@code Byte[]} value of the {@link Cell} (associated to {@code table}) whose name
      * iscellName, or null if this Cells object contains no cell whose name is cellName.
      *
-     * @param tableName the name of the owning table
+     * @param nameSpace the name of the owning table
      * @param cellName  the name of the Cell we want to retrieve from this Cells object.
      * @return the {@code Byte[]} value of the {@link Cell} (associated to {@code table}) whose name
      * is cellName, or null if this Cells object contains no cell whose name is cellName
      */
-    public Byte[] getBytes(String tableName, String cellName) {
-        return getValue(tableName, cellName, Byte[].class);
+    public Byte[] getBytes(String nameSpace, String cellName) {
+        return getValue(nameSpace, cellName, Byte[].class);
     }
 
     /**
