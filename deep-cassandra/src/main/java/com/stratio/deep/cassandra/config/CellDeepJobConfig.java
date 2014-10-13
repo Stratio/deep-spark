@@ -16,10 +16,6 @@
 
 package com.stratio.deep.cassandra.config;
 
-import java.io.Serializable;
-import java.util.Map;
-
-import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
 import com.stratio.deep.commons.entity.Cells;
 
 /**
@@ -27,32 +23,17 @@ import com.stratio.deep.commons.entity.Cells;
  *
  * @author Luca Rosellini <luca@stratio.com>
  */
-public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
+public final class CellDeepJobConfig extends CassandraDeepJobConfig<Cells> {
 
     private static final long serialVersionUID = -598862509865396541L;
-    private Cells dummyCells;
 
     public CellDeepJobConfig() {
-        //        this.isWriteConfig = isWriteConfig;
+       super(Cells.class);
     }
 
-    {
-        dummyCells = new Cells("dummyCellsTable");
-    }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public Class<Cells> getEntityClass() {
-        return (Class<Cells>) dummyCells.getClass();
-    }
 
-    @Override public ICassandraDeepJobConfig<Cells> customConfiguration(Map<String, Serializable> customConfiguration) {
-        return null;
-    }
 
-    @Override
-    public Class getExtractorImplClass() {
-        return CassandraCellExtractor.class;
-    }
+
 
 }

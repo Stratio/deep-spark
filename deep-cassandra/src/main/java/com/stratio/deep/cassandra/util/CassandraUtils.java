@@ -37,24 +37,32 @@ import org.apache.spark.rdd.RDD;
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.stratio.deep.cassandra.config.GenericDeepJobConfig;
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
+import com.stratio.deep.cassandra.config.OperatorCassandra;
 import com.stratio.deep.cassandra.cql.DeepCqlRecordWriter;
 import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction2;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Pair;
 import com.stratio.deep.commons.utils.Utils;
+
+import org.apache.commons.collections.MapUtils;
 
 import scala.Function1;
 import scala.Tuple2;
 import scala.collection.Iterator;
 import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
+
+import java.io.Serializable;
+
+import static com.stratio.deep.commons.utils.Utils.singleQuote;
 
 /**
  * Created by luca on 16/04/14.
@@ -77,7 +85,7 @@ public class CassandraUtils {
         RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
                 ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
 
-        ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD.first());
+        ((CassandraDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD.first());
 
         final int pageSize = writeConfig.getBatchSize();
         int offset = 0;
@@ -122,7 +130,7 @@ public class CassandraUtils {
         final RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
                 ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
 
-        ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD.first());
+        ((CassandraDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD.first());
 
         ClassTag<Integer> uClassTag = ClassTag$.MODULE$.apply(Integer.class);
 
@@ -347,5 +355,81 @@ public class CassandraUtils {
         }
 
         return new Tuple2<>(keys, values);
+    }
+
+
+    /**
+     * Generates the part of the query where clause that will hit the Cassandra's secondary indexes.
+     *
+     * @param additionalFilters the map of filters names and values.
+     * @return the query subpart corresponding to the provided additional filters.
+     */
+    public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters, Filter[] filters) {
+        if (MapUtils.isEmpty(additionalFilters)) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder("");
+
+        for (Map.Entry<String, Serializable> entry : additionalFilters.entrySet()) {
+            if (entry.getValue() == null) {
+                continue;
+            }
+
+            String value = entry.getValue().toString();
+
+            if (entry.getValue() instanceof String) {
+                value = singleQuote(value.trim());
+            }
+
+
+
+            sb.append(" AND ").append(quote(entry.getKey())).append(" = ").append(value);
+        }
+
+        if(filters!=null ){
+            for(int i = 0; i < filters.length; i++){
+
+                sb.append(" AND ").append(quote(filters[i].getField())).append(OperatorCassandra.getOperatorCassandra(filters[i].getOperation
+                        ()).getOperator()).append
+                        (filters[i].getValue());
+            }
+        }
+
+
+        return sb.toString();
+    }
+
+
+    /**
+     * Generates the part of the query where clause that will hit the Cassandra's secondary indexes.
+     *
+     * @param additionalFilters the map of filters names and values.
+     * @return the query subpart corresponding to the provided additional filters.
+     */
+    public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters) {
+        if (MapUtils.isEmpty(additionalFilters)) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder("");
+
+        for (Map.Entry<String, Serializable> entry : additionalFilters.entrySet()) {
+            if (entry.getValue() == null) {
+                continue;
+            }
+
+            String value = entry.getValue().toString();
+
+            if (entry.getValue() instanceof String) {
+                value = singleQuote(value.trim());
+            }
+
+
+
+            sb.append(" AND ").append(quote(entry.getKey())).append(" = ").append(value);
+        }
+
+        return sb.toString();
     }
 }

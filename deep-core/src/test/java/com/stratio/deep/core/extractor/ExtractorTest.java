@@ -16,12 +16,22 @@
 
 package com.stratio.deep.core.extractor;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
+import static junit.framework.TestCase.assertNotNull;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNull;
 
 import java.io.Serializable;
 
+import com.stratio.deep.commons.config.BaseConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.filter.Filter;
+import com.stratio.deep.commons.filter.FilterOperator;
+import com.stratio.deep.commons.rdd.IExtractor;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.entity.BookEntity;
+import com.stratio.deep.core.entity.MessageTestEntity;
 import org.apache.spark.rdd.RDD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,13 +39,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.commons.rdd.IExtractor;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.core.entity.BookEntity;
-import com.stratio.deep.core.entity.MessageTestEntity;
+
 
 /**
  * Created by rcrespo on 9/09/14.
@@ -46,7 +50,7 @@ import com.stratio.deep.core.entity.MessageTestEntity;
  *
  * @param <T>
  */
-public abstract class ExtractorTest<T> implements Serializable {
+public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(ExtractorTest.class);
 
     Class inputEntity;
@@ -67,62 +71,20 @@ public abstract class ExtractorTest<T> implements Serializable {
 
     protected final String tableRead = "input";
 
-    protected final String filter = "filter";
-
     private static final long READ_COUNT_EXPECTED = 1l;
 
     private static final String READ_FIELD_EXPECTED = "new message test";
 
-    protected Class<IExtractor<T>> extractor;
+    protected Class<IExtractor<T, S>> extractor;
 
-    /**
-     * Constructor
-     *
-     * @param extractor
-     * @param host
-     * @param port
-     * @param inputEntity
-     * @param outputEntity
-     */
-    public ExtractorTest(Class<IExtractor<T>> extractor, String host, Integer port, Class inputEntity,
-            Class outputEntity, Class configEntity) {
-        super();
-        this.inputEntity = inputEntity;
-        this.outputEntity = outputEntity;
-        this.configEntity = configEntity;
-        this.host = host;
-        this.port = port;
-        this.extractor = extractor;
-    }
 
-    /**
-     * Constructor
-     *
-     * @param extractor
-     * @param host
-     * @param port
-     * @param database
-     * @param inputEntity
-     * @param outputEntity
-     */
-    public ExtractorTest(Class<IExtractor<T>> extractor, String host, Integer port, String database, Class inputEntity,
-            Class outputEntity, Class configEntity) {
-        super();
-        this.inputEntity = inputEntity;
-        this.outputEntity = outputEntity;
-        this.configEntity = configEntity;
-        this.host = host;
-        this.port = port;
-        this.extractor = extractor;
-        this.database = database;
-    }
 
     /**
      * @param extractor
      * @param host
      * @param port
      */
-    public ExtractorTest(Class<IExtractor<T>> extractor, String host, Integer port, boolean isCells) {
+    public ExtractorTest(Class<IExtractor<T, S>> extractor, String host, Integer port, boolean isCells) {
         super();
         if (isCells) {
             this.inputEntity = Cells.class;
@@ -139,37 +101,6 @@ public abstract class ExtractorTest<T> implements Serializable {
         this.extractor = extractor;
     }
 
-    /**
-     * @param extractor
-     * @param host
-     * @param port
-     * @param database
-     */
-    public ExtractorTest(Class<IExtractor<T>> extractor, String host, Integer port, String database, boolean isCells) {
-        super();
-        if (isCells) {
-            this.inputEntity = Cells.class;
-            this.outputEntity = Cells.class;
-            this.configEntity = Cells.class;
-        } else {
-            this.inputEntity = MessageTestEntity.class;
-            this.outputEntity = MessageTestEntity.class;
-            this.configEntity = BookEntity.class;
-        }
-
-        this.host = host;
-        this.port = port;
-        this.extractor = extractor;
-        this.database = database;
-    }
-
-    /**
-     * It initializes spark's context
-     */
-    @BeforeClass
-    public void init() {
-        //        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
-    }
 
     /**
      * It tests if the extractor can read from the data store
@@ -179,20 +110,27 @@ public abstract class ExtractorTest<T> implements Serializable {
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
-        ExtractorConfig<W> inputConfigEntity = getReadExtractorConfig();
+        try {
 
-        RDD<W> inputRDDEntity = context.createRDD(inputConfigEntity);
+            ExtractorConfig<W> inputConfigEntity = getReadExtractorConfig();
 
-        Assert.assertEquals(READ_COUNT_EXPECTED, inputRDDEntity.count());
+            RDD<W> inputRDDEntity = context.createRDD(inputConfigEntity);
 
-        if (inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)) {
-            Assert.assertEquals(READ_FIELD_EXPECTED,
-                    ((Cells) inputRDDEntity.first()).getCellByName("message").getCellValue());
-        } else {
+            Assert.assertEquals(READ_COUNT_EXPECTED, inputRDDEntity.count());
 
-            Assert.assertEquals(READ_FIELD_EXPECTED, ((MessageTestEntity) inputRDDEntity.first()).getMessage());
+            if (inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)) {
+                Assert.assertEquals(READ_FIELD_EXPECTED,
+                        ((Cells) inputRDDEntity.first()).getCellByName("message").getCellValue());
+            } else {
+
+                Assert.assertEquals(READ_FIELD_EXPECTED, ((MessageTestEntity) inputRDDEntity.first()).getMessage());
+            }
+
+        }finally {
+            context.stop();
         }
-        context.stop();
+
+
 
     }
 
@@ -204,30 +142,35 @@ public abstract class ExtractorTest<T> implements Serializable {
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
-        ExtractorConfig<W> inputConfigEntity = getReadExtractorConfig();
+        try {
 
-        RDD<W> inputRDDEntity = context.createRDD(inputConfigEntity);
+            ExtractorConfig<W> inputConfigEntity = getReadExtractorConfig();
 
-        ExtractorConfig<W> outputConfigEntity;
-        if (inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)) {
-            outputConfigEntity = getWriteExtractorConfig("outputCells");
-        } else {
-            outputConfigEntity = getWriteExtractorConfig("outputEntity");
+            RDD<W> inputRDDEntity = context.createRDD(inputConfigEntity);
+
+            ExtractorConfig<W> outputConfigEntity;
+            if (inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)) {
+                outputConfigEntity = getWriteExtractorConfig("outputCells");
+            } else {
+                outputConfigEntity = getWriteExtractorConfig("outputEntity");
+            }
+
+            //Save RDD in DataSource
+            context.saveRDD(inputRDDEntity, outputConfigEntity);
+
+            RDD<W> outputRDDEntity = context.createRDD(outputConfigEntity);
+
+            if (inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)) {
+                Assert.assertEquals(READ_FIELD_EXPECTED,
+                        ((Cells) outputRDDEntity.first()).getCellByName("message").getCellValue());
+            } else {
+
+                Assert.assertEquals(READ_FIELD_EXPECTED, ((MessageTestEntity) outputRDDEntity.first()).getMessage());
+            }
+        }finally {
+            context.stop();
         }
 
-        //Save RDD in DataSource
-        context.saveRDD(inputRDDEntity, outputConfigEntity);
-
-        RDD<W> outputRDDEntity = context.createRDD(outputConfigEntity);
-
-        if (inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)) {
-            Assert.assertEquals(READ_FIELD_EXPECTED,
-                    ((Cells) outputRDDEntity.first()).getCellByName("message").getCellValue());
-        } else {
-
-            Assert.assertEquals(READ_FIELD_EXPECTED, ((MessageTestEntity) outputRDDEntity.first()).getMessage());
-        }
-        context.stop();
 
     }
 
@@ -235,81 +178,110 @@ public abstract class ExtractorTest<T> implements Serializable {
     public <W> void testInputColumns() {
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
+        try {
 
-        ExtractorConfig<W> inputConfigEntity = getInputColumnConfig("_id, metadata");
+            ExtractorConfig<W> inputConfigEntity = getInputColumnConfig(new String[] { "id", "metadata" });
 
-        RDD<W> inputRDDEntity = context.createRDD(inputConfigEntity);
+            RDD<W> inputRDDEntity = context.createRDD(inputConfigEntity);
 
-        if (isEntityClassCells(inputConfigEntity)) {
-            Cells bookCells = (Cells) inputRDDEntity.first();
+            if (isEntityClassCells(inputConfigEntity)) {
+                Cells bookCells = (Cells) inputRDDEntity.first();
 
-            assertNotNull(bookCells.getCellByName("_id").getCellValue());
-            assertNotNull(bookCells.getCellByName("metadata").getCellValue());
-            assertNull(bookCells.getCellByName("cantos"));
-        } else {
-            BookEntity bookEntity = (BookEntity) inputRDDEntity.first();
+                assertNotNull(bookCells.getCellByName("id").getCellValue());
+                assertNotNull(bookCells.getCellByName("metadata").getCellValue());
+                assertNull(bookCells.getCellByName("cantos"));
+            } else {
+                BookEntity bookEntity = (BookEntity) inputRDDEntity.first();
 
-            assertNotNull(bookEntity.getId());
-            assertNotNull(bookEntity.getMetadataEntity());
-            assertNull(bookEntity.getCantoEntities());
+                assertNotNull(bookEntity.getId());
+                assertNotNull(bookEntity.getMetadataEntity());
+                assertNull(bookEntity.getCantoEntities());
+            }
+
+            ExtractorConfig<W> inputConfigEntity2 = getInputColumnConfig("cantos");
+
+            RDD<W> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
+
+            if (isEntityClassCells(inputConfigEntity2)) {
+                Cells bookCells = (Cells) inputRDDEntity2.first();
+
+                assertNull(bookCells.getCellByName("id"));
+                assertNull(bookCells.getCellByName("metadata"));
+                assertNotNull(bookCells.getCellByName("cantos").getCellValue());
+            } else {
+                BookEntity bookEntity2 = (BookEntity) inputRDDEntity2.first();
+
+                assertNull(bookEntity2.getId());
+                assertNull(bookEntity2.getMetadataEntity());
+                assertNotNull(bookEntity2.getCantoEntities());
+            }
+
+            ExtractorConfig<W> inputConfigEntity3 = getInputColumnConfig("cantos", "metadata");
+
+            RDD<W> inputRDDEntity3 = context.createRDD(inputConfigEntity3);
+
+            if (isEntityClassCells(inputConfigEntity3)) {
+                Cells bookCells = (Cells) inputRDDEntity3.first();
+
+                assertNull(bookCells.getCellByName("id"));
+                assertNotNull(bookCells.getCellByName("metadata").getCellValue());
+                assertNotNull(bookCells.getCellByName("cantos").getCellValue());
+            } else {
+                BookEntity bookEntity = (BookEntity) inputRDDEntity3.first();
+
+                assertNull(bookEntity.getId());
+                assertNotNull(bookEntity.getMetadataEntity());
+                assertNotNull(bookEntity.getCantoEntities());
+            }
+
+        }finally {
+            context.stop();
         }
 
-        ExtractorConfig<W> inputConfigEntity2 = getInputColumnConfig("cantos");
 
-        RDD<W> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
-
-        if (isEntityClassCells(inputConfigEntity2)) {
-            Cells bookCells = (Cells) inputRDDEntity2.first();
-
-            assertNull(bookCells.getCellByName("_id"));
-            assertNull(bookCells.getCellByName("metadata"));
-            assertNotNull(bookCells.getCellByName("cantos").getCellValue());
-        } else {
-            BookEntity bookEntity2 = (BookEntity) inputRDDEntity2.first();
-
-            assertNull(bookEntity2.getId());
-            assertNull(bookEntity2.getMetadataEntity());
-            assertNotNull(bookEntity2.getCantoEntities());
-        }
-
-        ExtractorConfig<W> inputConfigEntity3 = getInputColumnConfig("cantos, metadata");
-
-        RDD<W> inputRDDEntity3 = context.createRDD(inputConfigEntity3);
-
-        if (isEntityClassCells(inputConfigEntity3)) {
-            Cells bookCells = (Cells) inputRDDEntity3.first();
-
-            assertNull(bookCells.getCellByName("_id"));
-            assertNotNull(bookCells.getCellByName("metadata").getCellValue());
-            assertNotNull(bookCells.getCellByName("cantos").getCellValue());
-        } else {
-            BookEntity bookEntity = (BookEntity) inputRDDEntity3.first();
-
-            assertNull(bookEntity.getId());
-            assertNotNull(bookEntity.getMetadataEntity());
-            assertNotNull(bookEntity.getCantoEntities());
-        }
-
-        context.stop();
 
     }
 
-    private <W> ExtractorConfig<W> getExtractorConfig(Class<W> clazz) {
+
+    private <W> ExtractorConfig<W> getExtractorConfig(Class<W> clazz){
         return new ExtractorConfig<>(clazz);
     }
 
     @Test
-    protected void testFilter() {
-        assertEquals(true, true);
+    protected <W> void testFilter(){
+        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
+        try {
+
+            Filter[] filters = null;
+            Filter filter = new Filter("id", FilterOperator.NE, "TestDataSet");
+            filters = new Filter[] { filter };
+            ExtractorConfig<W> inputConfigEntity = getFilterConfig(filters);
+
+            RDD<W> inputRDDEntity = context.createRDD(inputConfigEntity);
+
+            assertEquals(inputRDDEntity.count(), 0);
+
+            //
+
+            Filter filter2 = new Filter("id", FilterOperator.IS, "TestDataSet");
+            filters = new Filter[] { filter2 };
+            ExtractorConfig<W> inputConfigEntity2 = getFilterConfig(filters);
+
+            RDD<W> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
+            assertEquals(inputRDDEntity2.count(), 1);
+        }finally {
+            context.stop();
+        }
+
     }
 
     public <W> ExtractorConfig<W> getWriteExtractorConfig(String output) {
         ExtractorConfig<W> extractorConfig = getExtractorConfig(outputEntity);
         extractorConfig.putValue(ExtractorConstants.HOST, host)
                 .putValue(ExtractorConstants.DATABASE, database)
-                .putValue(ExtractorConstants.PORT, String.valueOf(port))
+                .putValue(ExtractorConstants.PORT, port)
                 .putValue(ExtractorConstants.COLLECTION, output)
-                .putValue(ExtractorConstants.CREATE_ON_WRITE, "true");
+                .putValue(ExtractorConstants.CREATE_ON_WRITE, true);
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;
     }
@@ -319,33 +291,32 @@ public abstract class ExtractorTest<T> implements Serializable {
         ExtractorConfig<W> extractorConfig = getExtractorConfig(inputEntity);
         extractorConfig.putValue(ExtractorConstants.HOST, host)
                 .putValue(ExtractorConstants.DATABASE, database)
-                .putValue(ExtractorConstants.PORT, String.valueOf(port))
+                .putValue(ExtractorConstants.PORT, port)
                 .putValue(ExtractorConstants.COLLECTION, tableRead);
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;
     }
 
-    public <W> ExtractorConfig<W> getInputColumnConfig(String inputColumns) {
+    public <W>ExtractorConfig<W> getInputColumnConfig(String... inputColumns) {
 
         ExtractorConfig<W> extractorConfig = getExtractorConfig(configEntity);
         extractorConfig.putValue(ExtractorConstants.HOST, host)
                 .putValue(ExtractorConstants.DATABASE, databaseInputColumns)
-                .putValue(ExtractorConstants.PORT, String.valueOf(port))
+                .putValue(ExtractorConstants.PORT, port)
                 .putValue(ExtractorConstants.COLLECTION, tableRead)
                 .putValue(ExtractorConstants.INPUT_COLUMNS, inputColumns);
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;
     }
 
-    public <W> ExtractorConfig<W> getFilterConfig() {
+    public <W>ExtractorConfig<W> getFilterConfig(Filter[] filters) {
 
-        ExtractorConfig<W> extractorConfig = getExtractorConfig(inputEntity);
-        extractorConfig.setEntityClass(inputEntity);
-        extractorConfig.putValue(ExtractorConstants.HOST, host)
-                .putValue(ExtractorConstants.DATABASE, database)
-                .putValue(ExtractorConstants.COLLECTION, tableRead)
-                .putValue(ExtractorConstants.PORT, String.valueOf(port))
-                .putValue(ExtractorConstants.FILTER_QUERY, filter);
+        ExtractorConfig<W> extractorConfig = getExtractorConfig(configEntity);
+        extractorConfig.putValue(ExtractorConstants.HOST,host)
+                .putValue(ExtractorConstants.DATABASE, databaseInputColumns)
+                .putValue(ExtractorConstants.COLLECTION,tableRead)
+                .putValue(ExtractorConstants.PORT, port)
+                .putValue(ExtractorConstants.FILTER_QUERY, filters);
 
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;

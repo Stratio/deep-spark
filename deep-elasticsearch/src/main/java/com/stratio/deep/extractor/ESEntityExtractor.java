@@ -18,6 +18,12 @@ package com.stratio.deep.extractor;
 
 import java.lang.reflect.InvocationTargetException;
 
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.config.ESDeepJobConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.exception.DeepTransformException;
+import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
+import com.stratio.deep.utils.UtilES;
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
 import org.elasticsearch.hadoop.mr.LinkedMapWritable;
@@ -25,11 +31,6 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.stratio.deep.commons.config.IDeepJobConfig;
-import com.stratio.deep.commons.exception.DeepTransformException;
-import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
-import com.stratio.deep.config.EntityDeepJobConfigES;
-import com.stratio.deep.utils.UtilES;
 
 import scala.Tuple2;
 
@@ -39,16 +40,16 @@ import scala.Tuple2;
  * @param <T>
  */
 public final class ESEntityExtractor<T>
-        extends GenericHadoopExtractor<T, Object, LinkedMapWritable, Object, JSONObject> {
+        extends GenericHadoopExtractor<T, ESDeepJobConfig<T>, Object, LinkedMapWritable, Object, JSONObject> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ESEntityExtractor.class);
     private static final long serialVersionUID = -3208994171892747470L;
 
     public ESEntityExtractor(Class<T> t) {
         super();
-        this.deepJobConfig = new EntityDeepJobConfigES(t);
-        this.inputFormat = new EsInputFormat<>();
-        this.outputFormat = new EsOutputFormat();
+        this.deepJobConfig = new ESDeepJobConfig(t);
+        this.inputFormat = new EsInputFormat<>() ;
+        this.outputFormat = new EsOutputFormat() ;
 
     }
 
@@ -57,10 +58,10 @@ public final class ESEntityExtractor<T>
      */
     @Override
     public T transformElement(Tuple2<Object, LinkedMapWritable> tuple,
-            IDeepJobConfig<T, ? extends IDeepJobConfig> config) {
+            DeepJobConfig<T> config) {
 
         try {
-            return UtilES.getObjectFromJson(config.getEntityClass(), tuple._2());
+            return (T) UtilES.getObjectFromJson(config.getEntityClass(), tuple._2());
         } catch (Exception e) {
             LOG.error("Cannot convert JSON: ", e);
             throw new DeepTransformException("Could not transform from Json to Entity " + e.getMessage());

@@ -69,84 +69,88 @@ public class MongoEntityExtractorTest extends ExtractorTest {
         String hostConcat = HOST.concat(":").concat(PORT.toString());
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
+        try {
 
-        ExtractorConfig<BookEntity> inputConfigEntity = new ExtractorConfig(BookEntity.class);
-        inputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, "book")
-                .putValue(ExtractorConstants.COLLECTION, "input");
-        inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
+            ExtractorConfig<BookEntity> inputConfigEntity = new ExtractorConfig(BookEntity.class);
+            inputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat)
+                    .putValue(ExtractorConstants.DATABASE, "book").putValue(ExtractorConstants.COLLECTION, "input");
+            inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
-        RDD<BookEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
+            RDD<BookEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
 
-        //Import dataSet was OK and we could read it
-        assertEquals(1, inputRDDEntity.count());
+            //Import dataSet was OK and we could read it
+            assertEquals(1, inputRDDEntity.count());
 
-        List<BookEntity> books = inputRDDEntity.toJavaRDD().collect();
+            List<BookEntity> books = inputRDDEntity.toJavaRDD().collect();
 
-        BookEntity book = books.get(0);
+            BookEntity book = books.get(0);
 
-        DBObject proObject = new BasicDBObject();
-        proObject.put("_id", 0);
+            DBObject proObject = new BasicDBObject();
+            proObject.put("_id", 0);
 
-        //      tests subDocuments
-        BSONObject result = MongoJavaRDDTest.mongo.getDB("book").getCollection("input").findOne(null, proObject);
-        assertEquals(((DBObject) result.get("metadata")).get("author"), book.getMetadataEntity().getAuthor());
+            //      tests subDocuments
+            BSONObject result = MongoJavaRDDTest.mongo.getDB("book").getCollection("input").findOne(null, proObject);
+            assertEquals(((DBObject) result.get("metadata")).get("author"), book.getMetadataEntity().getAuthor());
 
-        //      tests List<subDocuments>
-        List<BSONObject> listCantos = (List<BSONObject>) result.get("cantos");
+            //      tests List<subDocuments>
+            List<BSONObject> listCantos = (List<BSONObject>) result.get("cantos");
 
-        for (int i = 0; i < listCantos.size(); i++) {
-            BSONObject bsonObject = listCantos.get(i);
-            assertEquals(bsonObject.get("canto"), book.getCantoEntities().get(i).getNumber());
-            assertEquals(bsonObject.get("text"), book.getCantoEntities().get(i).getText());
+            for (int i = 0; i < listCantos.size(); i++) {
+                BSONObject bsonObject = listCantos.get(i);
+                assertEquals(bsonObject.get("canto"), book.getCantoEntities().get(i).getNumber());
+                assertEquals(bsonObject.get("text"), book.getCantoEntities().get(i).getText());
+            }
+
+            RDD<BookEntity> inputRDDEntity2 = context.createRDD(inputConfigEntity);
+
+            JavaRDD<String> words = inputRDDEntity2.toJavaRDD().flatMap(new FlatMapFunction<BookEntity, String>() {
+                @Override
+                public Iterable<String> call(BookEntity bookEntity) throws Exception {
+
+                    List<String> words = new ArrayList<>();
+                    for (CantoEntity canto : bookEntity.getCantoEntities()) {
+                        words.addAll(Arrays.asList(canto.getText().split(" ")));
+                    }
+                    return words;
+                }
+            });
+
+            JavaPairRDD<String, Long> wordCount = words.mapToPair(new PairFunction<String, String, Long>() {
+                @Override
+                public Tuple2<String, Long> call(String s) throws Exception {
+                    return new Tuple2<String, Long>(s, 1l);
+                }
+            });
+
+            JavaPairRDD<String, Long> wordCountReduced = wordCount.reduceByKey(new Function2<Long, Long, Long>() {
+                @Override
+                public Long call(Long integer, Long integer2) throws Exception {
+                    return integer + integer2;
+                }
+            });
+
+            JavaRDD<WordCount> outputRDD = wordCountReduced.map(new Function<Tuple2<String, Long>, WordCount>() {
+                @Override
+                public WordCount call(Tuple2<String, Long> stringIntegerTuple2) throws Exception {
+                    return new WordCount(stringIntegerTuple2._1(), stringIntegerTuple2._2());
+                }
+            });
+
+            ExtractorConfig<WordCount> outputConfigEntity = new ExtractorConfig(WordCount.class);
+            outputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat)
+                    .putValue(ExtractorConstants.DATABASE, "book").putValue(ExtractorConstants.COLLECTION, "output");
+            outputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
+
+            context.saveRDD(outputRDD.rdd(), outputConfigEntity);
+
+            RDD<WordCount> outputRDDEntity = context.createRDD(outputConfigEntity);
+
+            assertEquals(((Long) outputRDDEntity.cache().count()).longValue(), WORD_COUNT_SPECTED.longValue());
+
+        }finally {
+            context.stop();
         }
 
-        RDD<BookEntity> inputRDDEntity2 = context.createRDD(inputConfigEntity);
-
-        JavaRDD<String> words = inputRDDEntity2.toJavaRDD().flatMap(new FlatMapFunction<BookEntity, String>() {
-            @Override
-            public Iterable<String> call(BookEntity bookEntity) throws Exception {
-
-                List<String> words = new ArrayList<>();
-                for (CantoEntity canto : bookEntity.getCantoEntities()) {
-                    words.addAll(Arrays.asList(canto.getText().split(" ")));
-                }
-                return words;
-            }
-        });
-
-        JavaPairRDD<String, Long> wordCount = words.mapToPair(new PairFunction<String, String, Long>() {
-            @Override
-            public Tuple2<String, Long> call(String s) throws Exception {
-                return new Tuple2<String, Long>(s, 1l);
-            }
-        });
-
-        JavaPairRDD<String, Long> wordCountReduced = wordCount.reduceByKey(new Function2<Long, Long, Long>() {
-            @Override
-            public Long call(Long integer, Long integer2) throws Exception {
-                return integer + integer2;
-            }
-        });
-
-        JavaRDD<WordCount> outputRDD = wordCountReduced.map(new Function<Tuple2<String, Long>, WordCount>() {
-            @Override
-            public WordCount call(Tuple2<String, Long> stringIntegerTuple2) throws Exception {
-                return new WordCount(stringIntegerTuple2._1(), stringIntegerTuple2._2());
-            }
-        });
-
-        ExtractorConfig<WordCount> outputConfigEntity = new ExtractorConfig(WordCount.class);
-        outputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, "book")
-                .putValue(ExtractorConstants.COLLECTION, "output");
-        outputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
-
-        context.saveRDD(outputRDD.rdd(), outputConfigEntity);
-
-        RDD<WordCount> outputRDDEntity = context.createRDD(outputConfigEntity);
-
-        assertEquals(((Long) outputRDDEntity.cache().count()).longValue(), WORD_COUNT_SPECTED.longValue());
-
-        context.stop();
 
     }
 

@@ -22,9 +22,10 @@ import org.bson.BSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepTransformException;
-import com.stratio.deep.mongodb.config.EntityDeepJobConfigMongoDB;
+import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
 
 import scala.Tuple2;
@@ -41,17 +42,17 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
 
     public MongoEntityExtractor(Class<T> t) {
         super();
-        this.deepJobConfig = new EntityDeepJobConfigMongoDB(t);
+        this.deepJobConfig = new MongoDeepJobConfig(t);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public T transformElement(Tuple2<Object, BSONObject> tuple, IDeepJobConfig<T, ? extends IDeepJobConfig> config) {
+    public T transformElement(Tuple2<Object, BSONObject> tuple, DeepJobConfig<T> config) {
 
         try {
-            return UtilMongoDB.getObjectFromBson(config.getEntityClass(), tuple._2());
+            return (T) UtilMongoDB.getObjectFromBson(config.getEntityClass(), tuple._2());
         } catch (Exception e) {
             LOG.error("Cannot convert BSON: ", e);
             throw new DeepTransformException("Could not transform from Bson to Entity " + e.getMessage());

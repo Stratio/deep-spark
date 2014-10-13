@@ -16,6 +16,12 @@
 
 package com.stratio.deep.commons.config;
 
+
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.filter.Filter;
+import com.stratio.deep.commons.utils.Pair;
+import com.stratio.deep.commons.utils.Utils;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,23 +32,16 @@ import com.stratio.deep.commons.utils.Pair;
 /**
  * Created by rcrespo on 19/08/14.
  */
-public class ExtractorConfig<T> implements Serializable {
+public class ExtractorConfig<T> extends BaseConfig<T> implements Serializable {
 
     private Map<String, Serializable> values = new HashMap<>();
 
-    private Class extractorImplClass;
-
-    private String extractorImplClassName;
-
-    private Class entityClass;
-
     public ExtractorConfig(Class<T> t) {
-        super();
-        entityClass = t;
+        super(t);
     }
 
     public ExtractorConfig() {
-        entityClass = Cells.class;
+        super();
     }
 
     public Map<String, Serializable> getValues() {
@@ -53,33 +52,11 @@ public class ExtractorConfig<T> implements Serializable {
         this.values = values;
     }
 
-    public Class getExtractorImplClass() {
-        return extractorImplClass;
-    }
 
-    public void setExtractorImplClass(Class extractorImplClass) {
-        this.extractorImplClass = extractorImplClass;
-    }
-
-    public Class getEntityClass() {
-        return entityClass;
-    }
-
-    public void setEntityClass(Class entityClass) {
-        this.entityClass = entityClass;
-    }
 
     public ExtractorConfig<T> putValue(String key, Serializable value) {
         values.put(key, value);
         return this;
-    }
-
-    public String getExtractorImplClassName() {
-        return extractorImplClassName;
-    }
-
-    public void setExtractorImplClassName(String extractorImplClassName) {
-        this.extractorImplClassName = extractorImplClassName;
     }
 
     public String getString(String key) {
@@ -123,7 +100,11 @@ public class ExtractorConfig<T> implements Serializable {
         return getValue(Byte[].class, key);
     }
 
-    public <K, V> Pair<K, V> getPair(String key, Class<K> keyClass, Class<V> valueClass) {
+    public Filter[] getFilterArray(String key){
+        return getValue(Filter[].class, key);
+    }
+
+    public <K,V> Pair<K,V> getPair(String key, Class<K> keyClass, Class<V> valueClass){
         return getValue(Pair.class, key);
     }
 
@@ -149,7 +130,24 @@ public class ExtractorConfig<T> implements Serializable {
         if (values.get(key) == null) {
             return null;
         } else {
-            return (T) values.get(key);
+            try{
+                return (T) values.get(key);
+            }catch(ClassCastException e){
+                if(Number.class.isAssignableFrom(clazz)){
+                    try {
+                        return (T) Utils.castNumberType(values.get(key), clazz.newInstance());
+                    } catch (InstantiationException e1) {
+                        return null;
+                    } catch (IllegalAccessException e1) {
+                        return null;
+                    }
+                }else{
+                    throw e;
+                }
+
+            }
+
+
         }
     }
 }

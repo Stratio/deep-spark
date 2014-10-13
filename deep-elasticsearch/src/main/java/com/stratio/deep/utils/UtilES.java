@@ -48,15 +48,30 @@ import org.json.simple.JSONObject;
 
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.filter.Filter;
+import com.stratio.deep.commons.filter.FilterOperator;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Utils;
-import com.stratio.deep.entity.ESCell;
+import com.stratio.deep.commons.entity.IDeepType;
+import org.apache.hadoop.io.*;
+import org.elasticsearch.hadoop.mr.LinkedMapWritable;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.*;
+import java.util.*;
 
 /**
  * Created by rcrespo on 29/07/14.
  */
 public final class UtilES {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UtilES.class);
 
     /**
      * Private default constructor.
@@ -103,7 +118,14 @@ public final class UtilES {
                     method.invoke(t, (insert));
                 } else {
                     insert = currentJson;
-                    method.invoke(t, getObjectFromWritable((Writable) insert));
+                    try{
+                        method.invoke(t, getObjectFromWritable((Writable) insert));
+                    }
+                    catch(Exception e){
+                        LOG.error("impossible to convert field " +t + " :"+ field + " error: "+ e.getMessage());
+                        method.invoke(t, Utils.castNumberType(getObjectFromWritable((Writable) insert), t));
+                    }
+
                 }
 
             }
@@ -112,8 +134,12 @@ public final class UtilES {
         return t;
     }
 
-    private static <T> Object subDocumentListCase(Type type, ArrayWritable arrayWritable)
-            throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+
+
+
+
+
+    private static <T> Object subDocumentListCase(Type type, ArrayWritable arrayWritable) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
         ParameterizedType listType = (ParameterizedType) type;
 
         Class<?> listClass = (Class<?>) listType.getActualTypeArguments()[0];
@@ -236,27 +262,28 @@ public final class UtilES {
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
-    public static Cells getCellFromJson(LinkedMapWritable jsonObject)
-            throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
-        Cells cells = new Cells();
+    public static Cells getCellFromJson(LinkedMapWritable jsonObject, String tableName) throws IllegalAccessException,
+            InstantiationException, InvocationTargetException, NoSuchMethodException {
+
+        Cells cells = tableName!= null ?new Cells(tableName): new Cells();
 
         Set<Map.Entry<Writable, Writable>> entryJson = jsonObject.entrySet();
 
         for (Map.Entry<Writable, Writable> entry : entryJson) {
 
             if (LinkedMapWritable.class.isAssignableFrom(entry.getValue().getClass())) {
-                Cells innerCells = getCellFromJson((LinkedMapWritable) entry.getValue());
-                cells.add(ESCell.create(entry.getKey().toString(), innerCells));
+                Cells innerCells = getCellFromJson((LinkedMapWritable) entry.getValue(), tableName);
+                cells.add(Cell.create(entry.getKey().toString(), innerCells));
             } else if (ArrayWritable.class.isAssignableFrom(entry.getValue().getClass())) {
                 Writable[] writetable = ((ArrayWritable) entry.getValue()).get();
                 List<Cells> innerCell = new ArrayList<>();
-                for (int i = 0; i < writetable.length; i++) {
-                    innerCell.add(getCellFromJson((LinkedMapWritable) writetable[i]));
+                for (int i = 0 ; i < writetable.length ; i++){
+                    innerCell.add(getCellFromJson((LinkedMapWritable) writetable[i], tableName));
                 }
-                cells.add(ESCell.create(entry.getKey().toString(), innerCell));
+                cells.add(Cell.create(entry.getKey().toString(), innerCell));
             } else {
 
-                cells.add(ESCell.create(entry.getKey().toString(), getObjectFromWritable(entry.getValue())));
+                cells.add(Cell.create(entry.getKey().toString(), getObjectFromWritable(entry.getValue())));
             }
 
         }
@@ -367,5 +394,67 @@ public final class UtilES {
 
         return json;
     }
+
+
+    public static QueryBuilder generateQuery (Filter... filterArray){
+        List<Filter> range = new ArrayList<>();
+        List<Filter> ne = new ArrayList<>();
+        List<Filter> is = new ArrayList<>();
+        BoolQueryBuilder qb = QueryBuilders.boolQuery();
+
+
+        for (Filter filter : filterArray){
+            if (! filter.getOperation().equals(FilterOperator.IS) && !filter.getOperation().equals(FilterOperator.NE)){
+                range.add(filter);
+            }else if (filter.getOperation().equals(FilterOperator.IS)) {
+                is.add(filter);
+            }else{
+                ne.add(filter);
+            }
+        }
+
+
+        //        List<RangeQueryBuilder> rangeQueryBuilders = new ArrayList<>();
+        for (Filter filter : range){
+
+            RangeQueryBuilder rangeQueryBuilder = QueryBuilders
+                    .rangeQuery(filter.getField());
+            switch (filter.getOperation()){
+            case FilterOperator.LT:
+                rangeQueryBuilder.lt(filter.getValue());
+                break;
+            case FilterOperator.LTE:
+                rangeQueryBuilder.lte(filter.getValue());
+                break;
+            case FilterOperator.GT:
+                rangeQueryBuilder.gt(filter.getValue());
+                break;
+            case FilterOperator.GTE:
+                rangeQueryBuilder.gte(filter.getValue());
+                break;
+            default:
+                break;
+            }
+            qb.must(rangeQueryBuilder);
+            //            rangeQueryBuilders.add(rangeQueryBuilder);
+        }
+
+        //        for(RangeQueryBuilder rangeQueryBuilder : rangeQueryBuilders){
+        //            qb.must(rangeQueryBuilder);
+        //        }
+
+        for(Filter filter : is){
+            qb.must(QueryBuilders.matchQuery(filter.getField(), filter.getValue()));
+        }
+
+        for(Filter filter : ne){
+            qb.mustNot(QueryBuilders.matchQuery(filter.getField(), filter.getValue()));
+        }
+//        System.out.println("imprimo el query builder resultante :) " +qb.toString());
+        return qb;
+    }
+
+
+
 
 }

@@ -16,12 +16,12 @@
 
 package com.stratio.deep.core.function;
 
-import static com.stratio.deep.commons.utils.Constants.SPARK_PARTITION_ID;
 import static com.stratio.deep.commons.utils.Utils.getExtractorInstance;
 import static com.stratio.deep.core.util.ExtractorClientUtil.getExtractorClient;
 
 import java.io.Serializable;
 
+import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.rdd.IExtractor;
@@ -33,32 +33,32 @@ import scala.runtime.BoxedUnit;
 /**
  * Created by rcrespo on 28/08/14.
  */
-public class PrepareSaveFunction<T> extends AbstractFunction1<Iterator<T>, BoxedUnit> implements Serializable {
+public class PrepareSaveFunction<T, S extends BaseConfig<T>> extends AbstractFunction1<Iterator<T>,
+        BoxedUnit> implements Serializable {
 
-    private ExtractorConfig<T> extractorConfig;
+    private S config;
 
     private T first;
 
-    public PrepareSaveFunction(ExtractorConfig<T> extractorConfig, T first) {
+    public PrepareSaveFunction(S config, T first) {
         this.first = first;
-        this.extractorConfig = extractorConfig;
+        this.config = config;
     }
 
     @Override
     public BoxedUnit apply(Iterator<T> v1) {
-        IExtractor<T> extractor;
+        IExtractor<T, S> extractor;
         try {
-            extractor = getExtractorInstance(extractorConfig);
+            extractor = getExtractorInstance(config);
         } catch (DeepExtractorinitializationException e) {
             extractor = getExtractorClient();
         }
 
-        extractor.initSave(extractorConfig, first);
+        extractor.initSave(config, first);
         while (v1.hasNext()) {
             extractor.saveRDD(v1.next());
         }
-        extractorConfig.putValue(SPARK_PARTITION_ID,
-                String.valueOf(Integer.parseInt(extractorConfig.getValues().get(SPARK_PARTITION_ID).toString()) + 1));
+        config.setPartitionId(config.getPartitionId()+1);
         extractor.close();
         return null;
     }

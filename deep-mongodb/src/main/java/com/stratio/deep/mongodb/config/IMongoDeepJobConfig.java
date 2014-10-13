@@ -27,11 +27,13 @@ import com.stratio.deep.commons.config.IDeepJobConfig;
 /**
  * Defines the public methods that each Stratio Deep MongoDB configuration object should implement.
  */
-public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobConfig<T>> {
+public interface IMongoDeepJobConfig<T>  {
     /**
      * The MongoDB's collection name
      */
     IMongoDeepJobConfig<T> collection(String collection);
+
+    String getCollection();
 
     /**
      * The MongoDB's database name
@@ -159,4 +161,9 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      * @return this object.
      */
     IMongoDeepJobConfig<T> ignoreIdField();
+
+    String getDatabase();
+
+    String getNameSpace();
+
 }

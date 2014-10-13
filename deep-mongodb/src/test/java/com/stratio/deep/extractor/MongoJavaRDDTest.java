@@ -38,6 +38,14 @@ import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.io.file.Files;
 import de.flapdoodle.embed.process.runtime.Network;
+import org.testng.annotations.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * Created by rcrespo on 16/07/14.
@@ -79,6 +87,12 @@ public class MongoJavaRDDTest {
     public static void init() throws IOException {
         Command command = Command.MongoD;
 
+        try{
+            Files.forceDelete(new File(DB_FOLDER_NAME));
+        }catch (Exception e){
+
+        }
+
         new File(DB_FOLDER_NAME).mkdirs();
 
         IMongodConfig mongodConfig = new MongodConfigBuilder()
@@ -111,7 +125,7 @@ public class MongoJavaRDDTest {
 
         mongod = mongodExecutable.start();
 
-        Files.forceDelete(new File(DB_FOLDER_NAME));
+
 
         mongo = new MongoClient(HOST, PORT);
         DB db = mongo.getDB(DATABASE);

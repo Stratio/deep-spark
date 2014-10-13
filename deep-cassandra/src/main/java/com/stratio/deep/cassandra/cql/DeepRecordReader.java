@@ -17,8 +17,6 @@
 package com.stratio.deep.cassandra.cql;
 
 import static com.stratio.deep.cassandra.cql.CassandraClientProvider.trySessionForLocation;
-import static com.stratio.deep.commons.utils.Utils.additionalFilterGenerator;
-
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -51,9 +49,10 @@ import com.datastax.driver.core.exceptions.NoHostAvailableException;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.stratio.deep.cassandra.config.GenericDeepJobConfig;
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.entity.CassandraCell;
+import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepIOException;
@@ -63,6 +62,7 @@ import com.stratio.deep.commons.rdd.DeepTokenRange;
 import com.stratio.deep.commons.rdd.IDeepRecordReader;
 import com.stratio.deep.commons.utils.Pair;
 import com.stratio.deep.commons.utils.Utils;
+import static com.stratio.deep.cassandra.util.CassandraUtils.additionalFilterGenerator;
 
 /**
  * Implements a cassandra record reader with pagination capabilities.
@@ -96,7 +96,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
     private AbstractType<?> keyValidator;
 
-    private final ICassandraDeepJobConfig config;
+    private final CassandraDeepJobConfig config;
 
     private Session session;
 
@@ -106,8 +106,8 @@ public class DeepRecordReader implements IDeepRecordReader {
      * @param config the deep configuration object.
      * @param split  the token range on which the new reader will be based.
      */
-    public DeepRecordReader(IDeepJobConfig config, DeepTokenRange split) {
-        this.config = (ICassandraDeepJobConfig) config;
+    public DeepRecordReader(DeepJobConfig config, DeepTokenRange split) {
+        this.config = (CassandraDeepJobConfig) config;
         this.split = split;
         this.pageSize = config.getPageSize();
         initialize();
@@ -219,7 +219,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
         private void initColumns(Map<String, ByteBuffer> valueColumns, Map<String, ByteBuffer> keyColumns) {
             Row row = rows.next();
-            TableMetadata tableMetadata = ((GenericDeepJobConfig) config).fetchTableMetadata();
+            TableMetadata tableMetadata = ((CassandraDeepJobConfig) config).fetchTableMetadata();
 
             List<ColumnMetadata> partitionKeys = tableMetadata.getPartitionKey();
             List<ColumnMetadata> clusteringKeys = tableMetadata.getClusteringColumns();
@@ -269,7 +269,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
             return String.format("SELECT %s FROM %s%s%s ALLOW FILTERING",
                     generatedColumns, quote(cfName), clause,
-                    additionalFilterGenerator(config.getAdditionalFilters()));
+                    additionalFilterGenerator(config.getAdditionalFilters(), config.getFilters()));
         }
 
         /**
@@ -414,7 +414,7 @@ public class DeepRecordReader implements IDeepRecordReader {
      * retrieve the partition keys and cluster keys from system.schema_columnfamilies table
      */
     private void retrieveKeys() {
-        TableMetadata tableMetadata = ((GenericDeepJobConfig) config).fetchTableMetadata();
+        TableMetadata tableMetadata = ((CassandraDeepJobConfig) config).fetchTableMetadata();
 
         List<ColumnMetadata> partitionKeys = tableMetadata.getPartitionKey();
         List<ColumnMetadata> clusteringKeys = tableMetadata.getClusteringColumns();

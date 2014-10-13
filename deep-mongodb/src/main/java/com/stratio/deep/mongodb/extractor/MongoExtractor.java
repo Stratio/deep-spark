@@ -23,11 +23,13 @@ import org.bson.BSONObject;
 import com.mongodb.hadoop.MongoInputFormat;
 import com.mongodb.hadoop.MongoOutputFormat;
 import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
+import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
 
 /**
  * Created by rcrespo on 27/08/14.
  */
-public abstract class MongoExtractor<T> extends GenericHadoopExtractor<T, Object, BSONObject, Object, BSONObject>
+public abstract class MongoExtractor<T> extends GenericHadoopExtractor<T, MongoDeepJobConfig<T>, Object,
+        BSONObject, Object, BSONObject>
         implements Serializable {
 
     private static final long serialVersionUID = 298122755783328212L;

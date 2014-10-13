@@ -26,6 +26,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
 
+import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.core.function.PrepareSaveFunction;
@@ -106,7 +107,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * @return
      */
     public <T> RDD<T> createRDD(final ExtractorConfig<T> extractorConfig) {
-        return new DeepRDD<T>(this.sc(), extractorConfig);
+        return new DeepRDD<T, ExtractorConfig<T>>(this.sc(), extractorConfig);
     }
 
     /**
@@ -115,7 +116,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * @return
      */
     public <T> RDD<T> createRDD(final IDeepJobConfig<T, ?> deepJobConfig) {
-        return new DeepJobRDD<T>(this.sc(), deepJobConfig);
+        return new DeepRDD<T, DeepJobConfig<T>>(this.sc(), (DeepJobConfig) deepJobConfig);
     }
 
     /**
@@ -125,7 +126,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      */
     public <T> JavaRDD<T> createJavaRDD(
             ExtractorConfig<T> extractorConfig) {
-        return new DeepJavaRDD((DeepRDD<T>) createRDD(extractorConfig));
+        return new DeepJavaRDD((DeepRDD<T, ExtractorConfig<T>>) createRDD(extractorConfig));
     }
 
     /**
@@ -134,20 +135,20 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * @return
      */
     public <T> JavaRDD<T> createJavaRDD(final IDeepJobConfig<T, ?> deepJobConfig) {
-        return new DeepJavaRDD((DeepRDD<T>) createRDD(deepJobConfig));
+        return new DeepJavaRDD((DeepRDD<T, DeepJobConfig<T>>) createRDD(deepJobConfig));
     }
 
     public <T> void saveRDD(RDD<T> rdd, ExtractorConfig<T> extractorConfig) {
-        extractorConfig.putValue(SPARK_RDD_ID, String.valueOf(rdd.id()));
-        extractorConfig.putValue(SPARK_PARTITION_ID, "0");
-        rdd.foreachPartition(new PrepareSaveFunction<T>(extractorConfig, rdd.first()));
+        extractorConfig.setRddId(rdd.id());
+        extractorConfig.setPartitionId(0);
+        rdd.foreachPartition(new PrepareSaveFunction<>(extractorConfig, rdd.first()));
 
     }
 
-    //    public <T> void saveRDD(RDD<T> rdd, IDeepJobConfig<T, ? > deepJobConfig) {
-    //        extractorConfig.putValue(SPARK_RDD_ID, String.valueOf(rdd.id()));
-    //        extractorConfig.putValue(SPARK_PARTITION_ID, "0");
-    //        rdd.foreachPartition(new PrepareSaveFunction<T>(deepJobConfig, rdd.first()));
-    //
-    //    }
+//        public <T> void saveRDD(RDD<T> rdd, IDeepJobConfig<T, ? > deepJobConfig) {
+//            deepJobConfig.setRddId(rdd.id());
+//            deepJobConfig.setPartitionId(0);;
+//            rdd.foreachPartition(new PrepareSaveFunction<T>(deepJobConfig, rdd.first()));
+
+//        }
 }

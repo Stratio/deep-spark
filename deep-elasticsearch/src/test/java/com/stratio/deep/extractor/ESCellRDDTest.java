@@ -16,12 +16,15 @@
 
 package com.stratio.deep.extractor;
 
-import static org.testng.AssertJUnit.assertEquals;
+
+import com.stratio.deep.core.extractor.ExtractorTest;
+
 
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
 
-import com.stratio.deep.core.extractor.ExtractorTest;
+
+
 
 /**
  * Created by rcrespo on 29/08/14.
@@ -31,15 +34,11 @@ public class ESCellRDDTest extends ExtractorTest {
     private Logger LOG = Logger.getLogger(getClass());
 
     public ESCellRDDTest() {
-        super(ESCellExtractor.class, "localhost:9200", null,
-                ESJavaRDDTest.ES_INDEX_MESSAGE + ESJavaRDDTest.ES_SEPARATOR + ESJavaRDDTest.ES_TYPE_MESSAGE,
-                true);
+        super(ESCellExtractor.class,"localhost",9200, true);
     }
 
-    @Override
-    @Test
-    public void testInputColumns() {
-        assertEquals(true, true);
-    }
+
+
+
 
 }

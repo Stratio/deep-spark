@@ -30,6 +30,7 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.LoadBalancingPolicy;
 import com.datastax.driver.core.policies.Policies;
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.utils.Pair;
@@ -64,7 +65,7 @@ class CassandraClientProvider {
     CassandraClientProvider() {
     }
 
-    static Pair<Session, String> trySessionForLocation(String location, ICassandraDeepJobConfig conf,
+    static Pair<Session, String> trySessionForLocation(String location, CassandraDeepJobConfig conf,
             Boolean balanced) {
         try {
             return getSession(location, conf, balanced);
@@ -77,7 +78,7 @@ class CassandraClientProvider {
         }
     }
 
-    static Pair<Session, String> getSession(String location, ICassandraDeepJobConfig conf, Boolean balanced) {
+    static Pair<Session, String> getSession(String location, CassandraDeepJobConfig conf, Boolean balanced) {
         assert balanced != null;
 
         synchronized (CLIENTS_CACHE) {

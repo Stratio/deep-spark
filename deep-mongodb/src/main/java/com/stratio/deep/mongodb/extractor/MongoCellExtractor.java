@@ -22,10 +22,12 @@ import org.bson.BSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepTransformException;
-import com.stratio.deep.mongodb.config.CellDeepJobConfigMongoDB;
+import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
+import com.stratio.deep.mongodb.config.IMongoDeepJobConfig;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
 
 import scala.Tuple2;
@@ -40,7 +42,12 @@ public final class MongoCellExtractor extends MongoExtractor<Cells> {
 
     public MongoCellExtractor() {
         super();
-        this.deepJobConfig = new CellDeepJobConfigMongoDB();
+        this.deepJobConfig = new MongoDeepJobConfig(Cells.class);
+    }
+
+    public MongoCellExtractor(Class entityClass) {
+        super();
+        this.deepJobConfig = new MongoDeepJobConfig(entityClass);
     }
 
     /**
@@ -48,10 +55,10 @@ public final class MongoCellExtractor extends MongoExtractor<Cells> {
      */
     @Override
     public Cells transformElement(Tuple2<Object, BSONObject> tuple,
-            IDeepJobConfig<Cells, ? extends IDeepJobConfig> config) {
+                                  DeepJobConfig<Cells> config) {
 
         try {
-            return UtilMongoDB.getCellFromBson(tuple._2());
+            return UtilMongoDB.getCellFromBson(tuple._2(), deepJobConfig.getNameSpace()) ;
         } catch (Exception e) {
             LOG.error("Cannot convert BSON: ", e);
             throw new DeepTransformException("Could not transform from Bson to Cell " + e.getMessage());

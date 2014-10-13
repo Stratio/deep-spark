@@ -48,6 +48,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.rdd.DeepTokenRange;
@@ -154,7 +155,7 @@ public class RangeUtils {
      * @param config the Deep configuration object.
      * @return the list of computed token ranges.
      */
-    public static List<DeepTokenRange> getSplits(ICassandraDeepJobConfig config) {
+    public static List<DeepTokenRange> getSplits(CassandraDeepJobConfig config) {
         Map<String, Iterable<Comparable>> tokens = new HashMap<>();
         IPartitioner p = getPartitioner(config);
 
@@ -334,5 +335,45 @@ public class RangeUtils {
 
             return result;
         }
+    }
+
+
+    /**
+     * Returns the token ranges that will be mapped to Spark partitions.
+     *
+     * @param config
+     *            the Deep configuration object.
+     * @return the list of computed token ranges.
+     */
+    public static List<DeepTokenRange> getSplitsBySize(
+            CassandraDeepJobConfig config) {
+
+        IPartitioner p = getPartitioner(config);
+        AbstractType tokenValidator = p.getTokenValidator();
+
+        Pair<Session, String> sessionWithHost = CassandraClientProvider
+                .getSession(config.getHost(), config, false);
+
+        String query = new StringBuilder("CALCULATE SPLITS FROM ")
+                .append(config.getKeyspace()).append(".")
+                .append(config.getTable()).append(" ESTIMATING ")
+                .append(config.getSplitSize()).toString();
+        ResultSet rSet = sessionWithHost.left.execute(query);
+
+        List<DeepTokenRange> tokens = new ArrayList<>();
+
+        for (Row row : rSet.all()) {
+            Comparable startToken = (Comparable) tokenValidator.compose(row
+                    .getBytesUnsafe("start_token"));
+            Comparable endToken = (Comparable) tokenValidator.compose(row
+                    .getBytesUnsafe("end_token"));
+            List<String> replicas = new ArrayList<>();
+            for (InetAddress addres : row.getList("preferred_locations",
+                    InetAddress.class)) {
+                replicas.add(addres.getHostName());
+            }
+            tokens.add(new DeepTokenRange(startToken, endToken, replicas));
+        }
+        return tokens;
     }
 }

@@ -31,8 +31,11 @@ public class CellDeepJobConfigESTest {
 
     @Test
     public void createTest() {
-        GenericDeepJobConfigES<Cells> cellDeepJobConfigES = new CellDeepJobConfigES();
+        ESDeepJobConfig<Cells> cellDeepJobConfigES = new ESDeepJobConfig(Cells.class);
         assertNotNull(cellDeepJobConfigES);
         assertEquals(cellDeepJobConfigES.getEntityClass(), Cells.class);
     }
+
+
+
 }

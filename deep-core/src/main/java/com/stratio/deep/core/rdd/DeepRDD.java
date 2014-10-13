@@ -29,6 +29,7 @@ import org.apache.spark.TaskContext;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.rdd.RDD;
 
+import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.exception.DeepIOException;
@@ -40,35 +41,36 @@ import scala.reflect.ClassTag$;
 /**
  * Created by rcrespo on 11/08/14.
  */
-public class DeepRDD<T> extends RDD<T> implements Serializable {
+public class DeepRDD<T, S extends BaseConfig<T>> extends RDD<T> implements Serializable {
 
     private static final long serialVersionUID = -5360986039609466526L;
 
-    private transient IExtractor<T> extractorClient;
+    private transient IExtractor<T, S> extractorClient;
 
-    protected Broadcast<ExtractorConfig<T>> config;
+    protected Broadcast<S> config;
 
-    public Broadcast<ExtractorConfig<T>> getConfig() {
+    public Broadcast<S> getConfig() {
         return config;
     }
 
-    public DeepRDD(SparkContext sc, ExtractorConfig<T> config) {
+    public DeepRDD(SparkContext sc, S config) {
         super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config
                 .getEntityClass()));
-        config.putValue(SPARK_RDD_ID, String.valueOf(id()));
+        config.setRddId(id());
         this.config =
                 sc.broadcast(config, ClassTag$.MODULE$
-                        .<ExtractorConfig<T>>apply(config.getClass()));
+                        .<S>apply(config.getClass()));
 
-        initExtractorClient();
+
 
     }
+
+
 
     @Override
     public Iterator<T> compute(Partition split, TaskContext context) {
 
-        this.
-                initExtractorClient();
+        initExtractorClient();
 
         context.addOnCompleteCallback(new OnComputedRDDCallback(extractorClient));
 

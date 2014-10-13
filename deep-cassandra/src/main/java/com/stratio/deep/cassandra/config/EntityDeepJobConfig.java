@@ -31,7 +31,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 
 import com.stratio.deep.cassandra.entity.CassandraCell;
-import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
 import com.stratio.deep.commons.annotations.DeepEntity;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.IDeepType;
@@ -48,11 +47,9 @@ import com.stratio.deep.commons.utils.Utils;
  *
  * @author Luca Rosellini <luca@strat.io>
  */
-public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJobConfig<T> {
+public final class EntityDeepJobConfig<T extends IDeepType> extends CassandraDeepJobConfig<T> {
 
     private static final long serialVersionUID = 4490719746563473495L;
-
-    private Class<T> entityClass;
 
     private Map<String, String> mapDBNameToEntityName;
 
@@ -60,7 +57,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
      * {@inheritDoc}
      */
     @Override
-    public ICassandraDeepJobConfig<T> initialize() {
+    public CassandraDeepJobConfig<T> initialize() {
         super.initialize();
 
         Map<String, String> tmpMap = new HashMap<>();
@@ -79,6 +76,9 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         return this;
     }
 
+
+
+
     public Configuration getHadoopConfiguration() {
         return null;
     }
@@ -90,19 +90,10 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
      *                    //     * @param isWriteConfig boolean specifing if the constructed object is suitable for writes.
      */
     public EntityDeepJobConfig(Class<T> entityClass) {
-        super();
-        this.entityClass = entityClass;
+        super(entityClass);
         //        this.isWriteConfig = isWriteConfig;
     }
 
-    /* (non-Javadoc)
-     * @see IDeepJobConfig#getEntityClass()
-     */
-    @Override
-    public Class<T> getEntityClass() {
-        checkInitialized();
-        return entityClass;
-    }
 
     /* (non-Javadoc)
        * @see IDeepJobConfig#validate()
@@ -190,9 +181,5 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         }
     }
 
-    @Override
-    public Class getExtractorImplClass() {
-        return CassandraEntityExtractor.class;
-    }
 
 }

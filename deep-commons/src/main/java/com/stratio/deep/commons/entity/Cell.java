@@ -31,7 +31,7 @@ import java.util.UUID;
 /**
  * Created by rcrespo on 2/07/14.
  */
-public abstract class Cell implements Serializable {
+public  class Cell implements Serializable {
 
     private static final long serialVersionUID = 2298549804049316156L;
 
@@ -53,6 +53,11 @@ public abstract class Cell implements Serializable {
         super();
         this.cellName = cellName;
         this.cellValue = cellValue;
+    }
+
+    public static Cell create(String cellName, Object cellValue) {
+
+        return new Cell(cellName, cellValue);
     }
 
     public String getCellName() {
@@ -277,7 +282,9 @@ public abstract class Cell implements Serializable {
      * @return true is the current cell is a key inside the datastore, false
      * otherwise.
      */
-    public abstract Boolean isKey();
+    public Boolean isKey(){
+        return false;
+    }
 
     @Override
     public String toString() {

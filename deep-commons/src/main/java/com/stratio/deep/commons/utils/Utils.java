@@ -16,7 +16,17 @@
 
 package com.stratio.deep.commons.utils;
 
-import java.io.Serializable;
+import com.stratio.deep.commons.config.BaseConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.rdd.IExtractor;
+import org.apache.commons.lang.StringUtils;
+import scala.Tuple2;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -26,7 +36,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
@@ -125,35 +135,7 @@ public final class Utils {
         return res;
     }
 
-    /**
-     * Generates the part of the query where clause that will hit the Cassandra's secondary indexes.
-     *
-     * @param additionalFilters the map of filters names and values.
-     * @return the query subpart corresponding to the provided additional filters.
-     */
-    public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters) {
-        if (MapUtils.isEmpty(additionalFilters)) {
-            return "";
-        }
 
-        StringBuilder sb = new StringBuilder("");
-
-        for (Map.Entry<String, Serializable> entry : additionalFilters.entrySet()) {
-            if (entry.getValue() == null) {
-                continue;
-            }
-
-            String value = entry.getValue().toString();
-
-            if (entry.getValue() instanceof String) {
-                value = singleQuote(value.trim());
-            }
-
-            sb.append(" AND ").append(quote(entry.getKey())).append(" = ").append(value);
-        }
-
-        return sb.toString();
-    }
 
     /**
      * Returns a CQL batch query wrapping the given statements.
@@ -307,20 +289,20 @@ public final class Utils {
      * @param hosts
      * @return
      */
-    public static String splitHosts(List<String> hosts) {
+    public static String splitListByComma(List<String> hosts) {
         boolean firstHost = true;
         StringBuilder hostConnection = new StringBuilder();
         for (String host : hosts) {
             if (!firstHost) {
                 hostConnection.append(",");
             }
-            hostConnection.append(host);
+            hostConnection.append(host.trim());
             firstHost = false;
         }
         return hostConnection.toString();
     }
 
-    public static <T> IExtractor<T> getExtractorInstance(ExtractorConfig<T> config) {
+    public static <T, S extends BaseConfig<T>> IExtractor<T, S> getExtractorInstance(S config) {
 
         try {
             Class<T> rdd = (Class<T>) config.getExtractorImplClass();
@@ -330,10 +312,10 @@ public final class Utils {
             Constructor<T> c;
             if (config.getEntityClass().isAssignableFrom(Cells.class)) {
                 c = rdd.getConstructor();
-                return (IExtractor<T>) c.newInstance();
+                return (IExtractor<T, S>) c.newInstance();
             } else {
                 c = rdd.getConstructor(Class.class);
-                return (IExtractor<T>) c.newInstance(config.getEntityClass());
+                return (IExtractor<T, S>) c.newInstance(config.getEntityClass());
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
@@ -341,22 +323,34 @@ public final class Utils {
         }
     }
 
-    public static <T> IExtractor<T> getExtractorInstance(IDeepJobConfig<T, ?> config) {
+    /**
+     *
+     * @param object
+     * @param clazz
+     * @return
+     */
+   public static Object castNumberType(Object object, Object clazz) {
+        if (object instanceof Number) {
 
-        try {
-            Class<T> rdd = (Class<T>) config.getExtractorImplClass();
-            Constructor<T> c;
-            if (config.getEntityClass().isAssignableFrom(Cells.class)) {
-                c = rdd.getConstructor();
-                return (IExtractor<T>) c.newInstance();
-            } else {
-                c = rdd.getConstructor(Class.class);
-                return (IExtractor<T>) c.newInstance(config.getEntityClass());
+            if (clazz instanceof Double) {
+                return ((Number) object).doubleValue();
+            } else if (clazz instanceof Long) {
+                return ((Number) object).longValue();
+
+            } else if (clazz instanceof Float) {
+                return ((Number) object).floatValue();
+
+            } else if (clazz instanceof Integer) {
+                return ((Number) object).intValue();
+
+            } else if (clazz instanceof Short) {
+                return ((Number) object).shortValue();
+
+            } else if (clazz instanceof Byte) {
+                return ((Number) object).byteValue();
             }
-        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            throw new DeepExtractorinitializationException(e.getMessage());
         }
+        throw new ClassCastException("it is not a Number Type");
     }
 
 }

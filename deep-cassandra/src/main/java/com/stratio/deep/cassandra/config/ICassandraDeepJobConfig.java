@@ -16,6 +16,11 @@
 
 package com.stratio.deep.cassandra.config;
 
+import com.datastax.driver.core.Session;
+import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.filter.Filter;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -25,7 +30,9 @@ import com.stratio.deep.commons.config.IDeepJobConfig;
 /**
  * Defines the public methods that each Stratio Deep Cassandra configuration object should implement.
  */
-public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T, ICassandraDeepJobConfig<T>> {
+public interface ICassandraDeepJobConfig<T> {
+
+    ICassandraDeepJobConfig<T> initialize();
 
     /**
      * Adds a new filter for the Cassandra underlying datastore.<br/>
@@ -43,6 +50,14 @@ public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T, ICassandra
      *                                                                       Cassandra.
      */
     public ICassandraDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue);
+
+    /**
+     * Fetches table metadata from the underlying datastore and generates a Map<K, V> where the key is the column name, and the value
+     * is the {@link com.stratio.deep.commons.entity.Cell} containing column's metadata.
+     *
+     * @return the map of column names and the corresponding Cell object containing its metadata.
+     */
+    Map<String, Cell> columnDefinitions();
 
     /**
      * Returns the map of additional filters specified by the user.
@@ -96,6 +111,10 @@ public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T, ICassandra
      * @return the cql port.
      */
     public abstract Integer getCqlPort();
+
+    ICassandraDeepJobConfig<T> filters(Filter... filters);
+
+    Filter[] getFilters();
 
     /**
      * Sets Cassandra Keyspace.
@@ -247,4 +266,14 @@ public interface ICassandraDeepJobConfig<T> extends IDeepJobConfig<T, ICassandra
      * @param session the session to use.
      */
     public abstract ICassandraDeepJobConfig<T> session(Session session);
+
+    ICassandraDeepJobConfig<T> splitSize(int splitSize);
+
+    Integer getSplitSize();
+
+    boolean isSplitModeSet();
+
+    boolean isBisectModeSet();
+
+    String getNameSpace();
 }

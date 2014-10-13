@@ -47,7 +47,7 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
 
     private static final Logger LOG = Logger.getLogger(ExtractorServerHandler.class);
 
-    private IExtractor<T> extractor;
+    private IExtractor<T, ExtractorConfig<T>> extractor;
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Action action) throws Exception {
@@ -147,18 +147,22 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
     @SuppressWarnings("unchecked")
     private void initExtractor(ExtractorConfig<T> config) {
 
-        Class<T> rdd = (Class<T>) config.getExtractorImplClass();
         try {
+            Class<T> rdd = (Class<T>) config.getExtractorImplClass();
+            if(rdd==null){
+                rdd = (Class<T>) Class.forName(config.getExtractorImplClassName());
+            }
             Constructor<T> c = null;
             if (config.getEntityClass().isAssignableFrom(Cells.class)) {
                 c = rdd.getConstructor();
-                this.extractor = (IExtractor<T>) c.newInstance();
+                this.extractor = (IExtractor<T, ExtractorConfig<T>>) c.newInstance();
             } else {
                 c = rdd.getConstructor(Class.class);
-                this.extractor = (IExtractor<T>) c.newInstance(config.getEntityClass());
+                this.extractor = (IExtractor<T, ExtractorConfig<T>>) c.newInstance(config.getEntityClass());
             }
 
-        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             LOG.error("Impossible to make an extractor instance, check classpath " + e.getMessage());
             throw new DeepInstantiationException(

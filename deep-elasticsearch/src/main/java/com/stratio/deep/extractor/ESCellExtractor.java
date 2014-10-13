@@ -18,6 +18,14 @@ package com.stratio.deep.extractor;
 
 import java.lang.reflect.InvocationTargetException;
 
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepTransformException;
+import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
+import com.stratio.deep.config.ESDeepJobConfig;
+import com.stratio.deep.config.IESDeepJobConfig;
+import com.stratio.deep.utils.UtilES;
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
 import org.elasticsearch.hadoop.mr.LinkedMapWritable;
@@ -25,29 +33,22 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.stratio.deep.commons.config.IDeepJobConfig;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepTransformException;
-import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
-import com.stratio.deep.config.CellDeepJobConfigES;
-import com.stratio.deep.utils.UtilES;
-
 import scala.Tuple2;
 
 /**
  * CellRDD to interact with ES
  */
 public final class ESCellExtractor
-        extends GenericHadoopExtractor<Cells, Object, LinkedMapWritable, Object, JSONObject> {
+        extends GenericHadoopExtractor<Cells, ESDeepJobConfig<Cells>, Object, LinkedMapWritable, Object, JSONObject> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ESCellExtractor.class);
     private static final long serialVersionUID = -3208994171892747470L;
 
     public ESCellExtractor() {
         super();
-        this.deepJobConfig = new CellDeepJobConfigES();
-        this.inputFormat = new EsInputFormat<>();
-        this.outputFormat = new EsOutputFormat();
+        this.deepJobConfig = new ESDeepJobConfig(Cells.class);
+        this.inputFormat = new EsInputFormat<>() ;
+        this.outputFormat = new EsOutputFormat() ;
     }
 
     /**
@@ -55,10 +56,10 @@ public final class ESCellExtractor
      */
     @Override
     public Cells transformElement(Tuple2<Object, LinkedMapWritable> tuple,
-            IDeepJobConfig<Cells, ? extends IDeepJobConfig> config) {
+            DeepJobConfig<Cells> config) {
 
         try {
-            return UtilES.getCellFromJson(tuple._2());
+            return UtilES.getCellFromJson(tuple._2(), ((IESDeepJobConfig)deepJobConfig).getNameSpace());
         } catch (Exception e) {
             LOG.error("Cannot convert JSON: ", e);
             throw new DeepTransformException("Could not transform from Json to Cell " + e.getMessage());

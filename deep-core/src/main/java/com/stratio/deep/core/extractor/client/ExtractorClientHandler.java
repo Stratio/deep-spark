@@ -20,6 +20,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.extractor.actions.CloseAction;
 import com.stratio.deep.commons.extractor.actions.ExtractorInstanceAction;
 import com.stratio.deep.commons.extractor.actions.GetPartitionsAction;
@@ -38,9 +39,10 @@ import com.stratio.deep.commons.rdd.IExtractor;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Response> implements
-        IExtractor<T> {
+        IExtractor<T, ExtractorConfig<T>> {
 
     // Stateful properties
     private volatile Channel channel;
@@ -103,6 +105,8 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         return ((GetPartitionsResponse) response).getPartitions();
     }
+
+
 
     @Override
     public void close() {
@@ -199,29 +203,6 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return;
     }
 
-    @Override
-    public IExtractor<T> getExtractorInstance(ExtractorConfig<T> config) {
-        ExtractorInstanceAction<T> instanceAction = new ExtractorInstanceAction<>(config);
-
-        channel.writeAndFlush(instanceAction);
-
-        Response response;
-        boolean interrupted = false;
-        for (; ; ) {
-            try {
-                response = answer.take();
-                break;
-            } catch (InterruptedException ignore) {
-                interrupted = true;
-            }
-        }
-
-        if (interrupted) {
-            Thread.currentThread().interrupt();
-        }
-
-        return ((ExtractorInstanceResponse<T>) response).getData();
-    }
 
     @Override
     public void saveRDD(T t) {

@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.cassandra.entity.CellValidator;
@@ -164,7 +165,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
      */
     protected void retrievePartitionKeyValidator() throws ConfigurationException {
         Pair<Session, String> sessionWithHost =
-                CassandraClientProvider.trySessionForLocation(localhost.getHostAddress(), writeConfig, false);
+                CassandraClientProvider.trySessionForLocation(localhost.getHostAddress(), (CassandraDeepJobConfig)writeConfig, false);
 
         String keyspace = writeConfig.getKeyspace();
         String cfName = writeConfig.getColumnFamily();
@@ -323,7 +324,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         public void run() {
             LOG.debug("[" + this + "] Initializing cassandra client");
             Pair<Session, String> sessionWithHost = CassandraClientProvider.trySessionForLocation(localhost
-                    .getHostAddress(), writeConfig, false);
+                    .getHostAddress(), (CassandraDeepJobConfig)writeConfig, false);
             sessionWithHost.left.execute(cql, bindVariables.toArray(new Object[bindVariables.size()]));
         }
     }

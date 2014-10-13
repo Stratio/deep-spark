@@ -16,7 +16,6 @@
 
 package com.stratio.deep.testutils;
 
-import static com.stratio.deep.commons.utils.Utils.additionalFilterGenerator;
 import static com.stratio.deep.commons.utils.Utils.batchQueryGenerator;
 import static com.stratio.deep.commons.utils.Utils.findSetter;
 import static com.stratio.deep.commons.utils.Utils.getAllFields;
@@ -28,13 +27,10 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
-import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.UUID;
 
 import org.testng.annotations.Test;
@@ -79,46 +75,6 @@ public class UtilsTest {
         assertTrue(keyFields.right.length == 8);
 
         assertTrue(keyFields.left[0].getName().equals("id"));
-    }
-
-    @Test
-    public void testAdditionalFilters() {
-        assertEquals(additionalFilterGenerator(null), "");
-
-        Map<String, Serializable> map = new TreeMap<>();
-        assertEquals(additionalFilterGenerator(map), "");
-
-        map.put("integer", 0L);
-        assertEquals(additionalFilterGenerator(map), " AND \"integer\" = 0");
-        map.remove("integer");
-
-        map.put("lucene", null);
-
-        assertEquals(additionalFilterGenerator(map), "");
-
-        String filter = "address:* AND NOT address:*uropa*";
-
-        map.put("lucene", filter);
-
-        assertEquals(additionalFilterGenerator(map), " AND \"lucene\" = \'address:* AND NOT address:*uropa*\'");
-
-        filter = "'address:* AND NOT address:*uropa*";
-
-        map.put("lucene", filter);
-
-        assertEquals(additionalFilterGenerator(map), " AND \"lucene\" = \'address:* AND NOT address:*uropa*\'");
-
-        filter = "address:* AND NOT address:*uropa*'";
-
-        map.put("lucene", filter);
-
-        assertEquals(additionalFilterGenerator(map), " AND \"lucene\" = \'address:* AND NOT address:*uropa*\'");
-
-        filter = "'address:* AND NOT address:*uropa*'";
-
-        map.put("lucene", filter);
-
-        assertEquals(additionalFilterGenerator(map), " AND \"lucene\" = \'address:* AND NOT address:*uropa*\'");
     }
 
     @Test

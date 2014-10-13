@@ -19,6 +19,7 @@ import javax.net.ssl.SSLException;
 import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.rdd.IExtractor;
 
@@ -34,7 +35,7 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
  * Sends a list of continent/city pairs to a {@link } to get the local times of the
  * specified cities.
  */
-public class ExtractorClient<T> implements IExtractor<T> {
+public class ExtractorClient<T> implements IExtractor<T, ExtractorConfig<T>> {
 
     static final boolean SSL = System.getProperty("ssl") != null;
 
@@ -94,10 +95,6 @@ public class ExtractorClient<T> implements IExtractor<T> {
         handler.initIterator(dp, config);
     }
 
-    @Override
-    public IExtractor<T> getExtractorInstance(ExtractorConfig<T> config) {
-        return handler.getExtractorInstance(config);
-    }
 
     @Override
     public void saveRDD(T t) {
@@ -124,5 +121,7 @@ public class ExtractorClient<T> implements IExtractor<T> {
     public Partition[] getPartitions(ExtractorConfig<T> config) {
         return this.handler.getPartitions(config);
     }
+
+
 
 }
