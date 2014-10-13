@@ -16,20 +16,21 @@
 
 package com.stratio.deep.commons.config;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.utils.Pair;
 import com.stratio.deep.commons.utils.Utils;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created by rcrespo on 19/08/14.
  */
-public class ExtractorConfig<T> implements Serializable {
+public class ExtractorConfig<T> implements Serializable, Cloneable {
+
+    private static final long serialVersionUID = -7342575785285363891L;
 
     private Map<String, Serializable> values = new HashMap<>();
 
@@ -39,12 +40,12 @@ public class ExtractorConfig<T> implements Serializable {
 
     private Class entityClass;
 
-    public ExtractorConfig (Class<T> t){
+    public ExtractorConfig(Class<T> t) {
         super();
         entityClass = t;
     }
 
-    public ExtractorConfig(){
+    public ExtractorConfig() {
         entityClass = Cells.class;
     }
 
@@ -85,52 +86,52 @@ public class ExtractorConfig<T> implements Serializable {
         this.extractorImplClassName = extractorImplClassName;
     }
 
-    public String getString(String key){
+    public String getString(String key) {
         return getValue(String.class, key);
     }
 
-    public Integer getInteger(String key){
+    public Integer getInteger(String key) {
         return getValue(Integer.class, key);
     }
 
-    public Boolean getBoolean(String key){
+    public Boolean getBoolean(String key) {
         return getValue(Boolean.class, key);
     }
 
-    public String[] getStringArray(String key){
-        try{
+    public String[] getStringArray(String key) {
+        try {
             return getValue(String[].class, key);
-        }catch (ClassCastException e){
-            return new String[] {getString(key)};
+        } catch (ClassCastException e) {
+            return new String[] { getString(key) };
         }
 
     }
 
-    public Double getDouble(String key){
+    public Double getDouble(String key) {
         return getValue(Double.class, key);
     }
 
-    public Float getFloat(String key){
+    public Float getFloat(String key) {
         return getValue(Float.class, key);
     }
 
-    public Long getLong(String key){
+    public Long getLong(String key) {
         return getValue(Long.class, key);
     }
 
-    public Short getShort(String key){
+    public Short getShort(String key) {
         return getValue(Short.class, key);
     }
 
-    public Byte[] getByteArray(String key){
+    public Byte[] getByteArray(String key) {
         return getValue(Byte[].class, key);
     }
 
-    public Filter[] getFilterArray(String key){
+    public Filter[] getFilterArray(String key) {
         return getValue(Filter[].class, key);
     }
 
-    public <K,V> Pair<K,V> getPair(String key, Class<K> keyClass, Class<V> valueClass){
+    public <K, V> Pair<K, V> getPair(String key, Class<K> keyClass, Class<V> valueClass) {
         return getValue(Pair.class, key);
     }
 
@@ -147,19 +148,21 @@ public class ExtractorConfig<T> implements Serializable {
 
     /**
      * Returns the cell value casted to the specified class.
-     *
-     * @param clazz the expected class
-     * @param <T>   the return type
+     * 
+     * @param clazz
+     *            the expected class
+     * @param <T>
+     *            the return type
      * @return the cell value casted to the specified class
      */
     public <T> T getValue(Class<T> clazz, String key) {
         if (values.get(key) == null) {
             return null;
         } else {
-            try{
+            try {
                 return (T) values.get(key);
-            }catch(ClassCastException e){
-                if(Number.class.isAssignableFrom(clazz)){
+            } catch (ClassCastException e) {
+                if (Number.class.isAssignableFrom(clazz)) {
                     try {
                         return (T) Utils.castNumberType(values.get(key), clazz.newInstance());
                     } catch (InstantiationException e1) {
@@ -167,14 +170,24 @@ public class ExtractorConfig<T> implements Serializable {
                     } catch (IllegalAccessException e1) {
                         return null;
                     }
-                }else{
+                } else {
                     throw e;
                 }
 
             }
 
-
         }
     }
-}
 
+    @Override
+    public ExtractorConfig<T> clone() {
+
+        ExtractorConfig<T> clonedObject = new ExtractorConfig<>();
+        clonedObject.getValues().putAll(this.getValues());
+        clonedObject.setExtractorImplClass(this.getExtractorImplClass());
+        clonedObject.setExtractorImplClassName(this.getExtractorImplClassName());
+        clonedObject.setEntityClass(this.getEntityClass());
+        return clonedObject;
+
+    }
+}

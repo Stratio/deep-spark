@@ -168,7 +168,7 @@ public abstract class GenericDeepJobConfig<T> implements AutoCloseable, ICassand
 
     private boolean isSplitModeSet = false;
 
-    private boolean isBisectModeSet = false;
+    private boolean isBisectModeSet = true;
 
     /**
      * {@inheritDoc}
