@@ -365,9 +365,9 @@ public class CassandraUtils {
      * @return the query subpart corresponding to the provided additional filters.
      */
     public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters, Filter[] filters) {
-        if (MapUtils.isEmpty(additionalFilters)) {
-            return "";
-        }
+//        if (MapUtils.isEmpty(additionalFilters)) {
+//            return "";
+//        }
 
         StringBuilder sb = new StringBuilder("");
 
@@ -391,8 +391,12 @@ public class CassandraUtils {
             for(int i = 0; i < filters.length; i++){
 
                 sb.append(" AND ").append(quote(filters[i].getField())).append(OperatorCassandra.getOperatorCassandra(filters[i].getOperation
-                        ()).getOperator()).append
-                        (filters[i].getValue());
+                        ()).getOperator());
+                Object value = filters[i].getValue();
+                if (filters[i].getValue() instanceof String) {
+                    value = singleQuote( ((String)filters[i].getValue()).trim());
+                }
+                sb.append(value);
             }
         }
 
