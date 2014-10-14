@@ -1,4 +1,4 @@
-package com.stratio.deep.config;
+package com.stratio.deep.mongodb.config;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;

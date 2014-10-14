@@ -16,12 +16,14 @@
 
 package com.stratio.deep.commons.config;
 
+import java.io.Serializable;
+
 import org.apache.hadoop.conf.Configuration;
 
 /**
  * Created by rcrespo on 13/10/14.
  */
-public class HadoopConfig<T> extends DeepJobConfig<T> {
+public class HadoopConfig<T> extends DeepJobConfig<T> implements Serializable {
 
     protected transient Configuration configHadoop;
 

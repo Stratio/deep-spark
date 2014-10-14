@@ -16,6 +16,8 @@
 
 package com.stratio.deep.commons.config;
 
+import java.io.Serializable;
+
 import org.apache.hadoop.conf.Configuration;
 
 import com.stratio.deep.commons.entity.Cells;
@@ -23,7 +25,7 @@ import com.stratio.deep.commons.entity.Cells;
 /**
  * Created by rcrespo on 13/10/14.
  */
-public class DeepJobConfig<T> extends BaseConfig<T> implements IDeepJobConfig<T, DeepJobConfig<T>> {
+public class DeepJobConfig<T> extends BaseConfig<T> implements IDeepJobConfig<T, DeepJobConfig<T>>, Serializable {
 
     protected String username;
 
@@ -59,7 +61,7 @@ public class DeepJobConfig<T> extends BaseConfig<T> implements IDeepJobConfig<T,
 
 //    @Override
     public DeepJobConfig host(String hostname) {
-        return null;
+        return this;
     }
 
     public void setUsername(String username) {

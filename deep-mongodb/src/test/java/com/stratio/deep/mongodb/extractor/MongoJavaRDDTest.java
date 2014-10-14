@@ -1,4 +1,4 @@
-package com.stratio.deep.extractor;
+package com.stratio.deep.mongodb.extractor;
 
 import static org.testng.Assert.assertEquals;
 

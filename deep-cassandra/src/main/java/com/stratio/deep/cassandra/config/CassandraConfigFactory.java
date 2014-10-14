@@ -45,7 +45,7 @@ public final class CassandraConfigFactory implements Serializable {
      *
      * @return a new cell-based job configuration object.
      */
-    public static ICassandraDeepJobConfig<Cells> create() {
+    public static CassandraDeepJobConfig<Cells> create() {
         return new CellDeepJobConfig();
     }
 
@@ -54,7 +54,7 @@ public final class CassandraConfigFactory implements Serializable {
      *
      * @return a new cell-based write suitable job configuration object.
      */
-    public static ICassandraDeepJobConfig<Cells> createWriteConfig() {
+    public static CassandraDeepJobConfig<Cells> createWriteConfig() {
         return new CellDeepJobConfig();
     }
 

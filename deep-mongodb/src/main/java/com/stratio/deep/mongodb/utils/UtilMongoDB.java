@@ -92,7 +92,6 @@ public final class UtilMongoDB {
                         } else {
                             insert = currentBson;
                         }
-
                         method.invoke(t, insert);
                     }
                 }

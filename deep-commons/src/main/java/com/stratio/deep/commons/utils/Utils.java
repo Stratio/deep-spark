@@ -199,7 +199,6 @@ public final class Utils {
     @SuppressWarnings("unchecked")
     public static Method findSetter(String propertyName, Class entityClass, Class valueType) {
         Method setter;
-
         String setterName = "set" + propertyName.substring(0, 1).toUpperCase() +
                 propertyName.substring(1);
 
@@ -330,6 +329,9 @@ public final class Utils {
      * @return
      */
    public static Object castNumberType(Object object, Object clazz) {
+
+       System.out.println("imprimo clase que viene " + clazz);
+       System.out.println("imprimo clase que viene " + object);
         if (object instanceof Number) {
 
             if (clazz instanceof Double) {

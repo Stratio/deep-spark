@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.stratio.deep.extractor;
+package com.stratio.deep.mongodb.extractor;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -24,7 +24,7 @@ import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.extractor.ExtractorTest;
 import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
+
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -35,6 +35,7 @@ import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import scala.Tuple2;
 
@@ -42,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.stratio.deep.extractor.MongoJavaRDDTest.*;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -63,7 +63,7 @@ public class MongoCellExtractorTest extends ExtractorTest {
     @Test
     public void testDataSet() {
 
-        String hostConcat = HOST.concat(":").concat(PORT.toString());
+        String hostConcat = MongoJavaRDDTest.HOST.concat(":").concat(MongoJavaRDDTest.PORT.toString());
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
@@ -149,7 +149,8 @@ public class MongoCellExtractorTest extends ExtractorTest {
 
             RDD<Cells> outputRDDEntity = context.createRDD(outputConfigEntity);
 
-            assertEquals(((Long) outputRDDEntity.cache().count()).longValue(), WORD_COUNT_SPECTED.longValue());
+            Assert.assertEquals(((Long) outputRDDEntity.cache().count()).longValue(),
+                    MongoJavaRDDTest.WORD_COUNT_SPECTED.longValue());
         }finally {
             context.stop();
         }

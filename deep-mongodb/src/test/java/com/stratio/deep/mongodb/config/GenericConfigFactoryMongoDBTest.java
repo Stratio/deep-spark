@@ -1,19 +1,12 @@
-package com.stratio.deep.config;
+package com.stratio.deep.mongodb.config;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
 
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.mongodb.config.IMongoDeepJobConfig;
-import com.stratio.deep.mongodb.config.MongoConfigFactory;
-import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
-import com.stratio.deep.testentity.MessageTestEntity;
+import com.stratio.deep.mongodb.testentity.MessageTestEntity;
 
 /**
  * Created by rcrespo on 18/06/14.

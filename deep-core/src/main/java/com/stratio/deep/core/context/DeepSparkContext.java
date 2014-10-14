@@ -26,6 +26,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
 
+import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.IDeepJobConfig;
@@ -107,7 +108,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * @return
      */
     public <T> RDD<T> createRDD(final ExtractorConfig<T> extractorConfig) {
-        return new DeepRDD<T, ExtractorConfig<T>>(this.sc(), extractorConfig);
+        return new DeepRDD<>(this.sc(), extractorConfig);
     }
 
     /**
@@ -138,10 +139,10 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         return new DeepJavaRDD((DeepRDD<T, DeepJobConfig<T>>) createRDD(deepJobConfig));
     }
 
-    public <T> void saveRDD(RDD<T> rdd, ExtractorConfig<T> extractorConfig) {
-        extractorConfig.setRddId(rdd.id());
-        extractorConfig.setPartitionId(0);
-        rdd.foreachPartition(new PrepareSaveFunction<>(extractorConfig, rdd.first()));
+    public <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, S config) {
+        config.setRddId(rdd.id());
+        config.setPartitionId(0);
+        rdd.foreachPartition(new PrepareSaveFunction<>(config, rdd.first()));
 
     }
 

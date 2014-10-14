@@ -1,4 +1,4 @@
-package com.stratio.deep.testentity;
+package com.stratio.deep.mongodb.testentity;
 
 import org.bson.types.ObjectId;
 

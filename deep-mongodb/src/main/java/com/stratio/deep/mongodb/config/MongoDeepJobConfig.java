@@ -46,8 +46,11 @@ import com.mongodb.QueryBuilder;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.HadoopConfig;
+import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.filter.FilterOperator;
+import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
+import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
@@ -57,7 +60,7 @@ import org.bson.BasicBSONObject;
 /**
  * @param <T>
  */
-public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeepJobConfig<T> {
+public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeepJobConfig<T>, Serializable {
     private static final long serialVersionUID = -7179376653643603038L;
 
     /**
@@ -82,12 +85,6 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * primaryPreferred is the recommended read preference. If the primary node go down, can still read from secundaries
      */
     private String readPreference;
-
-    /**
-     * Entity class to map BSONObject
-     */
-    protected Class<T> entityClass;
-
 
     /**
      * OPTIONAL
@@ -126,6 +123,12 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
 
     public MongoDeepJobConfig(Class<T> entityClass) {
         super(entityClass);
+        if(Cells.class.isAssignableFrom(entityClass)){
+            extractorImplClass = MongoCellExtractor.class;
+        }else{
+            extractorImplClass = MongoEntityExtractor.class;
+        }
+
 
     }
 
@@ -189,12 +192,12 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> host(List<String> host) {
+    public MongoDeepJobConfig<T> host(List<String> host) {
         this.hostList.addAll(host);
         return this;
     }
 
-    public IMongoDeepJobConfig<T> host(String[] hosts) {
+    public MongoDeepJobConfig<T> host(String[] hosts) {
         this.hostList.addAll(Arrays.asList(hosts));
         return this;
     }
@@ -203,7 +206,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> filterQuery(String query) {
+    public MongoDeepJobConfig<T> filterQuery(String query) {
         this.query = query;
         return this;
     }
@@ -212,7 +215,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> filterQuery(BSONObject query) {
+    public MongoDeepJobConfig<T> filterQuery(BSONObject query) {
         this.query = query.toString();
         return this;
     }
@@ -221,7 +224,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> filterQuery(QueryBuilder query) {
+    public MongoDeepJobConfig<T> filterQuery(QueryBuilder query) {
         this.query = query.get().toString();
         return this;
     }
@@ -230,7 +233,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> replicaSet(String replicaSet) {
+    public MongoDeepJobConfig<T> replicaSet(String replicaSet) {
         this.replicaSet = replicaSet;
         return this;
     }
@@ -239,7 +242,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> database(String database) {
+    public MongoDeepJobConfig<T> database(String database) {
         this.catalog = database;
         return this;
     }
@@ -248,7 +251,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> collection(String collection) {
+    public MongoDeepJobConfig<T> collection(String collection) {
         this.table = collection;
         return this;
     }
@@ -271,7 +274,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> fields(BSONObject fields) {
+    public MongoDeepJobConfig<T> fields(BSONObject fields) {
         this.fields = fields;
         return this;
     }
@@ -280,7 +283,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> sort(String sort) {
+    public MongoDeepJobConfig<T> sort(String sort) {
         this.sort = sort;
         return this;
     }
@@ -289,7 +292,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> sort(BSONObject sort) {
+    public MongoDeepJobConfig<T> sort(BSONObject sort) {
         this.sort = sort.toString();
         return this;
     }
@@ -298,7 +301,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> createInputSplit(boolean createInputSplit) {
+    public MongoDeepJobConfig<T> createInputSplit(boolean createInputSplit) {
         this.createInputSplit = createInputSplit;
         return this;
     }
@@ -307,7 +310,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> useShards(boolean useShards) {
+    public MongoDeepJobConfig<T> useShards(boolean useShards) {
         this.useShards = useShards;
         return this;
     }
@@ -316,7 +319,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> splitsUseChunks(boolean splitsUseChunks) {
+    public MongoDeepJobConfig<T> splitsUseChunks(boolean splitsUseChunks) {
         this.splitsUseChunks = splitsUseChunks;
         return this;
     }
@@ -325,7 +328,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> inputKey(String inputKey) {
+    public MongoDeepJobConfig<T> inputKey(String inputKey) {
         this.inputKey = inputKey;
         return this;
     }
@@ -352,7 +355,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> readPreference(String readPreference) {
+    public MongoDeepJobConfig<T> readPreference(String readPreference) {
         this.readPreference = readPreference;
         return this;
     }
@@ -361,7 +364,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> ignoreIdField() {
+    public MongoDeepJobConfig<T> ignoreIdField() {
         BSONObject bsonFields = fields != null ? fields : new BasicBSONObject();
         bsonFields.put("_id", 0);
         fields = bsonFields;
@@ -383,7 +386,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
         return nameSpace;
     }
 
-    public IMongoDeepJobConfig<T> port(int port){
+    public MongoDeepJobConfig<T> port(int port){
         for(int i = 0; i< hostList.size() ; i++){
             if (hostList.get(i).indexOf(":")==-1) {
                 hostList.set(i, hostList.get(i).concat(":").concat(String.valueOf(port))) ;
@@ -611,7 +614,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
         return this;
     }
 
-    public IMongoDeepJobConfig<T> filterQuery (Filter[] filters){
+    public MongoDeepJobConfig<T> filterQuery (Filter[] filters){
         List<BasicDBObject> list = new ArrayList<>();
 
         QueryBuilder queryBuilder = QueryBuilder.start();

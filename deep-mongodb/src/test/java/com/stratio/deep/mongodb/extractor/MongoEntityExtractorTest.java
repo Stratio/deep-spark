@@ -14,11 +14,8 @@
  *  limitations under the License.
  */
 
-package com.stratio.deep.extractor;
+package com.stratio.deep.mongodb.extractor;
 
-import static com.stratio.deep.extractor.MongoJavaRDDTest.HOST;
-import static com.stratio.deep.extractor.MongoJavaRDDTest.PORT;
-import static com.stratio.deep.extractor.MongoJavaRDDTest.WORD_COUNT_SPECTED;
 import static org.testng.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -35,6 +32,7 @@ import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.mongodb.BasicDBObject;
@@ -46,7 +44,6 @@ import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.CantoEntity;
 import com.stratio.deep.core.entity.WordCount;
 import com.stratio.deep.core.extractor.ExtractorTest;
-import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
 
 import scala.Tuple2;
 
@@ -66,7 +63,7 @@ public class MongoEntityExtractorTest extends ExtractorTest {
     @Test
     public void testDataSet() {
 
-        String hostConcat = HOST.concat(":").concat(PORT.toString());
+        String hostConcat = MongoJavaRDDTest.HOST.concat(":").concat(MongoJavaRDDTest.PORT.toString());
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
         try {
@@ -145,7 +142,8 @@ public class MongoEntityExtractorTest extends ExtractorTest {
 
             RDD<WordCount> outputRDDEntity = context.createRDD(outputConfigEntity);
 
-            assertEquals(((Long) outputRDDEntity.cache().count()).longValue(), WORD_COUNT_SPECTED.longValue());
+            Assert.assertEquals(((Long) outputRDDEntity.cache().count()).longValue(),
+                    MongoJavaRDDTest.WORD_COUNT_SPECTED.longValue());
 
         }finally {
             context.stop();

@@ -413,8 +413,6 @@ public final class UtilES {
             }
         }
 
-
-        //        List<RangeQueryBuilder> rangeQueryBuilders = new ArrayList<>();
         for (Filter filter : range){
 
             RangeQueryBuilder rangeQueryBuilder = QueryBuilders
@@ -436,12 +434,7 @@ public final class UtilES {
                 break;
             }
             qb.must(rangeQueryBuilder);
-            //            rangeQueryBuilders.add(rangeQueryBuilder);
         }
-
-        //        for(RangeQueryBuilder rangeQueryBuilder : rangeQueryBuilders){
-        //            qb.must(rangeQueryBuilder);
-        //        }
 
         for(Filter filter : is){
             qb.must(QueryBuilders.matchQuery(filter.getField(), filter.getValue()));
@@ -450,7 +443,6 @@ public final class UtilES {
         for(Filter filter : ne){
             qb.mustNot(QueryBuilders.matchQuery(filter.getField(), filter.getValue()));
         }
-//        System.out.println("imprimo el query builder resultante :) " +qb.toString());
         return qb;
     }
 

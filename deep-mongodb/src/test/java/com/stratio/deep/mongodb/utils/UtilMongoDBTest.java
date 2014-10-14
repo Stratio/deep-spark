@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.utils;
+package com.stratio.deep.mongodb.utils;
 
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
@@ -22,9 +22,7 @@ import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.CantoEntity;
 import com.stratio.deep.core.entity.MetadataEntity;
 import com.stratio.deep.core.entity.WordCount;
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.mongodb.utils.UtilMongoDB;
-import com.stratio.deep.testentity.MongoDBTestEntity;
+import com.stratio.deep.mongodb.testentity.MongoDBTestEntity;
 
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
