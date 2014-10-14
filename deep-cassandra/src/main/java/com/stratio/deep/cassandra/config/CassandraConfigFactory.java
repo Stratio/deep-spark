@@ -65,7 +65,7 @@ public final class CassandraConfigFactory implements Serializable {
      * @param <T>         the generic type of the entity object implementing IDeepType.
      * @return a new an entity-based configuration object.
      */
-    public static <T extends IDeepType> ICassandraDeepJobConfig<T> create(Class<T> entityClass) {
+    public static <T extends IDeepType> CassandraDeepJobConfig<T> create(Class<T> entityClass) {
         return new EntityDeepJobConfig<>(entityClass);
     }
 
@@ -74,7 +74,7 @@ public final class CassandraConfigFactory implements Serializable {
      *
      * @return an entity-based write configuration object.
      */
-    public static <T extends IDeepType> ICassandraDeepJobConfig<T> createWriteConfig(Class<T> entityClass) {
+    public static <T extends IDeepType> CassandraDeepJobConfig<T> createWriteConfig(Class<T> entityClass) {
         return new EntityDeepJobConfig<>(entityClass);
     }
 

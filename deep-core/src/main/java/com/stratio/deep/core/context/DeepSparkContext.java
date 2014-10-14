@@ -139,17 +139,11 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         return new DeepJavaRDD((DeepRDD<T, DeepJobConfig<T>>) createRDD(deepJobConfig));
     }
 
-    public <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, S config) {
+    public static <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, S config) {
         config.setRddId(rdd.id());
         config.setPartitionId(0);
         rdd.foreachPartition(new PrepareSaveFunction<>(config, rdd.first()));
 
     }
 
-//        public <T> void saveRDD(RDD<T> rdd, IDeepJobConfig<T, ? > deepJobConfig) {
-//            deepJobConfig.setRddId(rdd.id());
-//            deepJobConfig.setPartitionId(0);;
-//            rdd.foreachPartition(new PrepareSaveFunction<T>(deepJobConfig, rdd.first()));
-
-//        }
 }
