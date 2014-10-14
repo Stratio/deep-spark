@@ -16,10 +16,11 @@
 
 package com.stratio.deep.testentity;
 
+import org.apache.cassandra.db.marshal.Int32Type;
+
 import com.stratio.deep.commons.annotations.DeepEntity;
 import com.stratio.deep.commons.annotations.DeepField;
 import com.stratio.deep.commons.entity.IDeepType;
-import org.apache.cassandra.db.marshal.Int32Type;
 
 /**
  * Author: Luca Rosellini
@@ -38,15 +39,14 @@ public class DomainEntity implements IDeepType {
 
     public String getDomain() {
 
-
         return domain;
     }
 
-    public DomainEntity(){
+    public DomainEntity() {
 
     }
 
-    public DomainEntity(String domain, Integer numPages){
+    public DomainEntity(String domain, Integer numPages) {
         this.domain = domain;
         this.numPages = numPages;
     }

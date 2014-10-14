@@ -30,7 +30,6 @@ public class InitSaveResponse extends Response {
 
     private boolean data;
 
-
     public InitSaveResponse() {
         super(ActionType.CLOSE);
         this.data = true;

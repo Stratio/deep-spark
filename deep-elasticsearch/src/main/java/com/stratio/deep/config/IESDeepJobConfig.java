@@ -16,15 +16,18 @@
 
 package com.stratio.deep.config;
 
-import com.stratio.deep.commons.config.IDeepJobConfig;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.hadoop.conf.Configuration;
 
-import java.util.List;
+import com.stratio.deep.commons.config.IDeepJobConfig;
 
 /**
  * Defines the public methods that each Stratio Deep ES configuration object should implement.
  */
-public interface IESDeepJobConfig<T> extends IDeepJobConfig<T, IESDeepJobConfig<T>> {
+public interface IESDeepJobConfig<T> {
 
 
     /**
@@ -40,13 +43,10 @@ public interface IESDeepJobConfig<T> extends IDeepJobConfig<T, IESDeepJobConfig<
      */
     IESDeepJobConfig<T> host(List<String> host);
 
-
     /**
      * @return the hadoop configuration object if the concrete implementation has one, null otherwise.
      */
     Configuration getHadoopConfiguration();
-
-
 
     /**
      * Filter query
@@ -56,7 +56,6 @@ public interface IESDeepJobConfig<T> extends IDeepJobConfig<T, IESDeepJobConfig<
      */
     IESDeepJobConfig<T> filterQuery(String query);
 
-
     /**
      * Sorting
      *
@@ -64,7 +63,6 @@ public interface IESDeepJobConfig<T> extends IDeepJobConfig<T, IESDeepJobConfig<
      * @return this object.
      */
     IESDeepJobConfig<T> sort(String sort);
-
 
     /**
      * @param inputKey
@@ -83,6 +81,17 @@ public interface IESDeepJobConfig<T> extends IDeepJobConfig<T, IESDeepJobConfig<
 
     String getNameSpace();
 
+
+    /**
+     * In case you want to add custom configuration, this could override any other configuration,
+     * these configurations are not validated, so be careful
+     *
+     * @param customConfiguration
+     * @return
+     */
+    IESDeepJobConfig<T> customConfiguration(Map<String, Serializable> customConfiguration);
+
+    Map<String, Serializable> getCustomConfiguration();
 
 
 }

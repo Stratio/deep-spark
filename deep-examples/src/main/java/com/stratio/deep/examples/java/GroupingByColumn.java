@@ -16,26 +16,20 @@
 
 package com.stratio.deep.examples.java;
 
-import com.google.common.collect.Lists;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.commons.extractor.server.ExtractorServer;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
-import com.stratio.deep.testentity.TweetEntity;
+import java.util.List;
 
+import com.google.common.collect.Lists;
+import com.stratio.deep.cassandra.config.CassandraConfigFactory;
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 // !!Important!!
 
@@ -69,46 +63,32 @@ public final class GroupingByColumn {
     public static void doMain(String[] args) {
         String job = "java:groupingByColumn";
 
-        String KEYSPACENAME = "test";
-        String TABLENAME    = "tweets";
-        String CQLPORT      = "9042";
-        String RPCPORT      = "9160";
-        String HOST         = "127.0.0.1";
-
-
+        String keyspaceName = "test";
+        String tableName = "tweets";
 
 
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
 	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
-        // Create a configuration for the Extractor and initialize it
-        ExtractorConfig<TweetEntity> config = new ExtractorConfig(TweetEntity.class);
+// Create a configuration for the RDD and initialize it
+        CassandraDeepJobConfig<TweetEntity> config = CassandraConfigFactory.create(TweetEntity.class)
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
+                .keyspace(keyspaceName).table(tableName)
+                .initialize();
 
-        config.setExtractorImplClass(CassandraEntityExtractor.class);
-        config.setEntityClass(TweetEntity.class);
-
-        Map<String, Serializable> values = new HashMap<>();
-        values.put(ExtractorConstants.KEYSPACE, KEYSPACENAME);
-        values.put(ExtractorConstants.TABLE,    TABLENAME);
-        values.put(ExtractorConstants.CQLPORT,  CQLPORT);
-        values.put(ExtractorConstants.RPCPORT,  RPCPORT);
-        values.put(ExtractorConstants.HOST,     HOST );
-
-        config.setValues(values);
-
-        // Creating the RDD
-        RDD<TweetEntity> rdd = deepContext.createRDD(config);
+// Creating the RDD
+        JavaRDD<TweetEntity> rdd = deepContext.createJavaRDD(config);
 
         // grouping
-        JavaPairRDD<String, Iterable<TweetEntity>> groups = rdd.toJavaRDD().groupBy(new Function<TweetEntity, String>() {
+        JavaPairRDD<String, Iterable<TweetEntity>> groups = rdd.groupBy(new Function<TweetEntity, String>() {
             @Override
             public String call(TweetEntity tableEntity) {
                 return tableEntity.getAuthor();
             }
         });
 
-        // counting elements in groups
+// counting elements in groups
         JavaPairRDD<String, Integer> counts = groups.mapToPair(new PairFunction<Tuple2<String,
                 Iterable<TweetEntity>>, String,
                 Integer>() {
@@ -118,14 +98,13 @@ public final class GroupingByColumn {
             }
         });
 
-        // fetching the results
+// fetching the results
         results = counts.collect();
 
         LOG.info("Este es el resultado con groupBy: ");
         for (Tuple2 t : results) {
             LOG.info(t._1() + ": " + t._2().toString());
         }
-
 
         deepContext.stop();
     }

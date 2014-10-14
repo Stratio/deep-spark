@@ -28,25 +28,16 @@ import com.stratio.deep.commons.utils.Utils;
 /**
  * Created by rcrespo on 19/08/14.
  */
-public class ExtractorConfig<T> implements Serializable, Cloneable {
-
-    private static final long serialVersionUID = -7342575785285363891L;
+public class ExtractorConfig<T> extends BaseConfig<T> implements Serializable, Cloneable {
 
     private Map<String, Serializable> values = new HashMap<>();
 
-    private Class extractorImplClass;
-
-    private String extractorImplClassName;
-
-    private Class entityClass;
-
     public ExtractorConfig(Class<T> t) {
-        super();
-        entityClass = t;
+        super(t);
     }
 
     public ExtractorConfig() {
-        entityClass = Cells.class;
+        super();
     }
 
     public Map<String, Serializable> getValues() {
@@ -57,21 +48,7 @@ public class ExtractorConfig<T> implements Serializable, Cloneable {
         this.values = values;
     }
 
-    public Class getExtractorImplClass() {
-        return extractorImplClass;
-    }
 
-    public void setExtractorImplClass(Class extractorImplClass) {
-        this.extractorImplClass = extractorImplClass;
-    }
-
-    public Class getEntityClass() {
-        return entityClass;
-    }
-
-    public void setEntityClass(Class entityClass) {
-        this.entityClass = entityClass;
-    }
 
     public ExtractorConfig<T> putValue(String key, Serializable value) {
         values.put(key, value);

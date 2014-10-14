@@ -16,10 +16,12 @@
 
 package com.stratio.deep.config;
 
-import com.stratio.deep.commons.entity.Cells;
-import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+
+import org.testng.annotations.Test;
+
+import com.stratio.deep.commons.entity.Cells;
 
 /**
  * Created by rcrespo on 29/08/14.
@@ -29,7 +31,7 @@ public class CellDeepJobConfigESTest {
 
     @Test
     public void createTest() {
-        DeepJobConfigES<Cells> cellDeepJobConfigES = new DeepJobConfigES(Cells.class);
+        ESDeepJobConfig<Cells> cellDeepJobConfigES = new ESDeepJobConfig(Cells.class);
         assertNotNull(cellDeepJobConfigES);
         assertEquals(cellDeepJobConfigES.getEntityClass(), Cells.class);
     }

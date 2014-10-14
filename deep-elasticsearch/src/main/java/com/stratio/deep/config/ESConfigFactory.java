@@ -16,9 +16,10 @@
 
 package com.stratio.deep.config;
 
+import org.apache.log4j.Logger;
+
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
-import org.apache.log4j.Logger;
 
 /**
  * Created by rcrespo on 29/07/14.
@@ -36,7 +37,7 @@ public class ESConfigFactory {
      * @return a new cell-based ElasticSearch job configuration object.
      */
     public static IESDeepJobConfig<Cells> createES() {
-        return new DeepJobConfigES(Cells.class);
+        return new ESDeepJobConfig(Cells.class);
     }
 
     /**
@@ -47,6 +48,6 @@ public class ESConfigFactory {
      * @return a new entity-based ElasticSearch job configuration object.
      */
     public static <T extends IDeepType> IESDeepJobConfig<T> createES(Class<T> entityClass) {
-        return new DeepJobConfigES<>(entityClass);
+        return new ESDeepJobConfig<>(entityClass);
     }
 }

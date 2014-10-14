@@ -16,18 +16,19 @@
 
 package com.stratio.deep.cassandra.testentity;
 
-import com.stratio.deep.commons.annotations.DeepEntity;
-import com.stratio.deep.commons.annotations.DeepField;
-import com.stratio.deep.commons.entity.IDeepType;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import org.apache.cassandra.db.marshal.Int32Type;
 import org.apache.cassandra.db.marshal.ListType;
 import org.apache.cassandra.db.marshal.MapType;
 import org.apache.cassandra.db.marshal.SetType;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import com.stratio.deep.commons.annotations.DeepEntity;
+import com.stratio.deep.commons.annotations.DeepField;
+import com.stratio.deep.commons.entity.IDeepType;
 
 /**
  * Created by luca on 24/03/14.

@@ -15,7 +15,10 @@
  */
 package com.stratio.deep.core.rdd;
 
+import com.stratio.deep.commons.config.BaseConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.rdd.IExtractor;
+
 import scala.runtime.AbstractFunction0;
 
 /**
@@ -26,10 +29,10 @@ import scala.runtime.AbstractFunction0;
  * @param <T>
  * @author Luca Rosellini <luca@strat.io>
  */
-public class OnComputedRDDCallback<T> extends AbstractFunction0<T> {
-    private final IExtractor<T> extractorClient;
+public class OnComputedRDDCallback<T, S extends BaseConfig<T>> extends AbstractFunction0<T> {
+    private final IExtractor<T, S> extractorClient;
 
-    public OnComputedRDDCallback(IExtractor<T> extractorClient) {
+    public OnComputedRDDCallback(IExtractor<T, S> extractorClient) {
         super();
         this.extractorClient = extractorClient;
     }

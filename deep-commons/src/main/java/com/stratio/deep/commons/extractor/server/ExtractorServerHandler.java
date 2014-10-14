@@ -14,25 +14,40 @@
  */
 package com.stratio.deep.commons.extractor.server;
 
-import com.stratio.deep.commons.exception.DeepInstantiationException;
-import com.stratio.deep.commons.extractor.actions.*;
-import com.stratio.deep.commons.extractor.response.*;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.rdd.IExtractor;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import org.apache.log4j.Logger;
 import org.apache.spark.Partition;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepInstantiationException;
+import com.stratio.deep.commons.extractor.actions.Action;
+import com.stratio.deep.commons.extractor.actions.GetPartitionsAction;
+import com.stratio.deep.commons.extractor.actions.HasNextAction;
+import com.stratio.deep.commons.extractor.actions.InitIteratorAction;
+import com.stratio.deep.commons.extractor.actions.InitSaveAction;
+import com.stratio.deep.commons.extractor.actions.NextAction;
+import com.stratio.deep.commons.extractor.actions.SaveAction;
+import com.stratio.deep.commons.extractor.response.CloseResponse;
+import com.stratio.deep.commons.extractor.response.GetPartitionsResponse;
+import com.stratio.deep.commons.extractor.response.HasNextResponse;
+import com.stratio.deep.commons.extractor.response.InitIteratorResponse;
+import com.stratio.deep.commons.extractor.response.InitSaveResponse;
+import com.stratio.deep.commons.extractor.response.NextResponse;
+import com.stratio.deep.commons.extractor.response.Response;
+import com.stratio.deep.commons.extractor.response.SaveResponse;
+import com.stratio.deep.commons.rdd.IExtractor;
+
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 
 public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Action> {
 
     private static final Logger LOG = Logger.getLogger(ExtractorServerHandler.class);
 
-    private IExtractor<T> extractor;
+    private IExtractor<T, ExtractorConfig<T>> extractor;
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Action action) throws Exception {
@@ -40,39 +55,39 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
         Response response = null;
 
         switch (action.getType()) {
-            case GET_PARTITIONS:
-                GetPartitionsAction<T> partitionsAction = (GetPartitionsAction<T>) action;
-                response = new GetPartitionsResponse(this.getPartitions(partitionsAction));
-                break;
-            case CLOSE:
-                this.close();
-                response = new CloseResponse();
-                break;
-            case HAS_NEXT:
-                HasNextAction<T> hasNextAction = (HasNextAction<T>) action;
-                response = new HasNextResponse(this.hastNext(hasNextAction));
-                break;
-            case NEXT:
-                NextAction<T> nextAction = (NextAction<T>) action;
-                response = new NextResponse<T>(this.next(nextAction));
-                break;
-            case INIT_ITERATOR:
-                InitIteratorAction<T> initIteratorAction = (InitIteratorAction<T>) action;
-                this.initIterator(initIteratorAction);
-                response = new InitIteratorResponse();
-                break;
-            case SAVE:
-                SaveAction<T> SaveAction = (SaveAction<T>) action;
-                this.save(SaveAction);
-                response = new SaveResponse();
-                break;
-            case INIT_SAVE:
-                InitSaveAction<T> initSave = (InitSaveAction<T>) action;
-                this.initSave(initSave);
-                response = new InitSaveResponse();
-                break;
-            default:
-                break;
+        case GET_PARTITIONS:
+            GetPartitionsAction<T> partitionsAction = (GetPartitionsAction<T>) action;
+            response = new GetPartitionsResponse(this.getPartitions(partitionsAction));
+            break;
+        case CLOSE:
+            this.close();
+            response = new CloseResponse();
+            break;
+        case HAS_NEXT:
+            HasNextAction<T> hasNextAction = (HasNextAction<T>) action;
+            response = new HasNextResponse(this.hastNext(hasNextAction));
+            break;
+        case NEXT:
+            NextAction<T> nextAction = (NextAction<T>) action;
+            response = new NextResponse<T>(this.next(nextAction));
+            break;
+        case INIT_ITERATOR:
+            InitIteratorAction<T> initIteratorAction = (InitIteratorAction<T>) action;
+            this.initIterator(initIteratorAction);
+            response = new InitIteratorResponse();
+            break;
+        case SAVE:
+            SaveAction<T> SaveAction = (SaveAction<T>) action;
+            this.save(SaveAction);
+            response = new SaveResponse();
+            break;
+        case INIT_SAVE:
+            InitSaveAction<T> initSave = (InitSaveAction<T>) action;
+            this.initSave(initSave);
+            response = new InitSaveResponse();
+            break;
+        default:
+            break;
         }
 
         ctx.write(response);
@@ -88,7 +103,6 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
         cause.printStackTrace();
         ctx.close();
     }
-
 
     protected boolean hastNext(HasNextAction hasNextAction) {
 
@@ -127,7 +141,6 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
         return extractor.getPartitions(getPartitionsAction.getConfig());
     }
 
-
     /**
      * @param config
      */
@@ -140,19 +153,20 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
                 rdd = (Class<T>) Class.forName(config.getExtractorImplClassName());
             }
             Constructor<T> c = null;
-            if (config.getEntityClass().isAssignableFrom(Cells.class)){
+            if (config.getEntityClass().isAssignableFrom(Cells.class)) {
                 c = rdd.getConstructor();
-            this.extractor = (IExtractor<T>) c.newInstance();
-            }else{
+                this.extractor = (IExtractor<T, ExtractorConfig<T>>) c.newInstance();
+            } else {
                 c = rdd.getConstructor(Class.class);
-                this.extractor = (IExtractor<T>) c.newInstance(config.getEntityClass());
+                this.extractor = (IExtractor<T, ExtractorConfig<T>>) c.newInstance(config.getEntityClass());
             }
 
 
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            LOG.error("Impossible to make an extractor instance, check classpath " +e.getMessage());
-            throw new DeepInstantiationException("Impossible to make an extractor instance, check classpath " +e.getMessage());
+            LOG.error("Impossible to make an extractor instance, check classpath " + e.getMessage());
+            throw new DeepInstantiationException(
+                    "Impossible to make an extractor instance, check classpath " + e.getMessage());
         }
     }
 

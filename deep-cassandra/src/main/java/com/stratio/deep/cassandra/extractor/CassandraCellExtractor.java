@@ -14,35 +14,31 @@
 
 package com.stratio.deep.cassandra.extractor;
 
+import java.nio.ByteBuffer;
+import java.util.Map;
+
 import com.stratio.deep.cassandra.config.CellDeepJobConfig;
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.cassandra.functions.CellList2TupleFunction;
-import com.stratio.deep.commons.rdd.IExtractor;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.utils.Pair;
-
-import java.nio.ByteBuffer;
-import java.util.Map;
 
 /**
  * Concrete implementation of a CassandraRDD representing an RDD of
  * {@link com.stratio.deep.commons.entity.Cells} element.<br/>
  */
-public class CassandraCellExtractor extends CassandraExtractor<Cells> {
+public class CassandraCellExtractor extends CassandraExtractor<Cells, CellDeepJobConfig> {
 
     private static final long serialVersionUID = -738528971629963221L;
 
-
-    public CassandraCellExtractor(){
+    public CassandraCellExtractor() {
         super();
         this.cassandraJobConfig = new CellDeepJobConfig();
         this.transformer = new CellList2TupleFunction();
     }
-
 
     /**
      * {@inheritDoc}
@@ -50,11 +46,10 @@ public class CassandraCellExtractor extends CassandraExtractor<Cells> {
     @SuppressWarnings("unchecked")
     @Override
     public Cells transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
-                                  IDeepJobConfig<Cells, ? extends IDeepJobConfig<?, ?>> config) {
+                                  CassandraDeepJobConfig<Cells> config) {
 
         Cells cells = new Cells(((ICassandraDeepJobConfig) config).getNameSpace());
         Map<String, Cell> columnDefinitions = ((ICassandraDeepJobConfig) config).columnDefinitions();
-
 
         for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
             Cell cd = columnDefinitions.get(entry.getKey());
@@ -77,7 +72,5 @@ public class CassandraCellExtractor extends CassandraExtractor<Cells> {
     public Class getConfigClass() {
         return CellDeepJobConfig.class;
     }
-
-
 
 }

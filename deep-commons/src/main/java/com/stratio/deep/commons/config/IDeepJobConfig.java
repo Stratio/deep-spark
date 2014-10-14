@@ -16,11 +16,10 @@
 
 package com.stratio.deep.commons.config;
 
-import com.stratio.deep.commons.entity.Cell;
+import java.io.Serializable;
+
 import org.apache.hadoop.conf.Configuration;
 
-import java.io.Serializable;
-import java.util.Map;
 
 /**
  * Defines the public methods that each Stratio Deep configuration object should implement.
@@ -37,26 +36,26 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?, ?>> extends Seria
      */
     String getPassword();
 
-
-    /**
-     * Sets the number of rows to retrieve for each page of data fetched from Cassandra.<br/>
-     * Defaults to 1000 rows.
-     *
-     * @param pageSize the number of rows per page
-     * @return this configuration object.
-     */
-    S pageSize(int pageSize);
-
-
-    /* Getters */
-
-    /**
-     * Returns the underlying testentity class used to map the Cassandra
-     * Column family.
-     *
-     * @return the entity class object associated to this configuration object.
-     */
-    Class<T> getEntityClass();
+//
+//    /**
+//     * Sets the number of rows to retrieve for each page of data fetched from Cassandra.<br/>
+//     * Defaults to 1000 rows.
+//     *
+//     * @param pageSize the number of rows per page
+//     * @return this configuration object.
+//     */
+//    S pageSize(int pageSize);
+//
+//
+//    /* Getters */
+//
+//    /**
+//     * Returns the underlying testentity class used to map the Cassandra
+//     * Column family.
+//     *
+//     * @return the entity class object associated to this configuration object.
+//     */
+//    Class<T> getEntityClass();
 
     /**
      * Returns the hostname of the cassandra server.
@@ -81,47 +80,46 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?, ?>> extends Seria
      */
     String getUsername();
 
-    /**
-     * Sets the datastore hostname
-     *
-     * @param hostname the cassandra server endpoint.
-     * @return this object.
-     */
-    S host(String hostname);
-
-    /**
-     * Initialized the current configuration object.
-     *
-     * @return this object.
-     */
-    S initialize();
-
-    S initialize(ExtractorConfig deepJobConfig);
-
-    /**
-     * Defines a projection over the CF columns. <br/>
-     * Key columns will always be returned, even if not specified in the columns input array.
-     *
-     * @param columns list of columns we want to retrieve from the datastore.
-     * @return this object.
-     */
-    S inputColumns(String... columns);
-
-    /**
-     * Sets the password to use to login to Cassandra. Leave empty if you do not need authentication.
-     *
-     * @return this object.
-     */
-    S password(String password);
-
-    /**
-     * /**
-     * Sets the username to use to login to Cassandra. Leave empty if you do not need authentication.
-     *
-     * @return this object.
-     */
-    S username(String username);
-
+//    /**
+//     * Sets the datastore hostname
+//     *
+//     * @param hostname the cassandra server endpoint.
+//     * @return this object.
+//     */
+//    S host(String hostname);
+//
+//    /**
+//     * Initialized the current configuration object.
+//     *
+//     * @return this object.
+//     */
+//    S initialize();
+//
+//    S initialize(ExtractorConfig extractorConfig);
+//
+//    /**
+//     * Defines a projection over the CF columns. <br/>
+//     * Key columns will always be returned, even if not specified in the columns input array.
+//     *
+//     * @param columns list of columns we want to retrieve from the datastore.
+//     * @return this object.
+//     */
+//    S inputColumns(String... columns);
+//
+//    /**
+//     * Sets the password to use to login to Cassandra. Leave empty if you do not need authentication.
+//     *
+//     * @return this object.
+//     */
+//    S password(String password);
+//
+//    /**
+//     * /**
+//     * Sets the username to use to login to Cassandra. Leave empty if you do not need authentication.
+//     *
+//     * @return this object.
+//     */
+//    S username(String username);
 
     /**
      * Returns the maximum number of rows that will be retrieved when fetching data pages from Cassandra.
@@ -131,23 +129,12 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?, ?>> extends Seria
     int getPageSize();
 
 
-//    /**
-//     * In case you want to add custom configuration to hadoop-connector, this override any other configuration,
-//     * these configurations are not validated, so be careful
-//     *
-//     * @param customConfiguration
-//     * @return
-//     */
-//    S customConfiguration(Map<String, Object> customConfiguration);
+    void setRddId(int rddId);
 
+    void setPartitionId(int rddId);
 
+    int getRddId();
 
-
-    //    /**
-//     * Just in case you have a hadoopInputFormat
-//     * @return
-//     */
-    Configuration getHadoopConfiguration();
-
+    int getPartitionId();
 
 }

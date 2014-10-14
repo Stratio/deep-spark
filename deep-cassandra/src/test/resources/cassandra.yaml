@@ -21,7 +21,7 @@ cluster_name: 'EmbeddedTestCluster'
 #
 # If you already have a cluster with 1 token per node, and wish to migrate to 
 # multiple tokens per node, see http://wiki.apache.org/cassandra/Operations
-num_tokens: 2
+num_tokens: 8
 
 # If you haven't specified num_tokens, or have set it to the default of 1 then
 # you should always specify InitialToken when setting up a production
@@ -41,7 +41,7 @@ hinted_handoff_enabled: true
 # this defines the maximum amount of time a dead host will have hints
 # generated.  After it has been dead this long, new hints for it will not be
 # created until it has been seen alive and gone down again.
-max_hint_window_in_ms: 1080000 # 3 hours
+max_hint_window_in_ms: 10800000 # 3 hours
 # throttle in KBs per second, per delivery thread
 hinted_handoff_throttle_in_kb: 1024
 # Number of threads with which to deliver hints;
@@ -143,7 +143,7 @@ key_cache_size_in_mb:
 # has limited use.
 #
 # Default is 14400 or 4 hours.
-key_cache_save_period: 1440
+key_cache_save_period: 14400
 
 # Number of keys from the key cache to save
 # Disabled by default, meaning all keys are going to be saved
@@ -265,8 +265,8 @@ seed_provider:
 # On the other hand, since writes are almost never IO bound, the ideal
 # number of "concurrent_writes" is dependent on the number of cores in
 # your system; (8 * number_of_cores) is a good rule of thumb.
-concurrent_reads: 8
-concurrent_writes: 8
+concurrent_reads: 32
+concurrent_writes: 32
 
 # Total memory to use for memtables.  Cassandra will flush the largest
 # memtable when this much memory is used.
@@ -431,7 +431,7 @@ snapshot_before_compaction: false
 # or dropping of column families. The STRONGLY advised default of true 
 # should be used to provide data safety. If you set this flag to false, you will
 # lose data on truncation or drop.
-auto_snapshot: false
+auto_snapshot: true
 
 # When executing a scan, within or across a partition, we need to keep the
 # tombstones seen in memory so we can return them to the coordinator, which
@@ -443,7 +443,7 @@ auto_snapshot: false
 # scan more tombstones anyway.  These thresholds may also be adjusted at runtime
 # using the StorageService mbean.
 tombstone_warn_threshold: 1000
-tombstone_failure_threshold: 10000
+tombstone_failure_threshold: 100000
 
 # Add column indexes to a row after its contents reach this size.
 # Increase if your column values are large, or if you have a very large
@@ -501,20 +501,20 @@ compaction_preheat_key_cache: true
 # stream_throughput_outbound_megabits_per_sec: 200
 
 # How long the coordinator should wait for read operations to complete
-read_request_timeout_in_ms: 5000
+read_request_timeout_in_ms: 50000
 # How long the coordinator should wait for seq or index scans to complete
-range_request_timeout_in_ms: 10000
+range_request_timeout_in_ms: 100000
 # How long the coordinator should wait for writes to complete
 # How long a coordinator should continue to retry a CAS operation
 # that contends with other proposals for the same row
-cas_contention_timeout_in_ms: 1000
-write_request_timeout_in_ms: 2000
+cas_contention_timeout_in_ms: 10000
+write_request_timeout_in_ms: 20000
 # How long the coordinator should wait for truncates to complete
 # (This can be much longer, because unless auto_snapshot is disabled
 # we need to flush first so we can snapshot before removing the data.)
-truncate_request_timeout_in_ms: 6000
+truncate_request_timeout_in_ms: 600000
 # The default timeout for other, miscellaneous operations
-request_timeout_in_ms: 1000
+request_timeout_in_ms: 100000
 
 # Enable operation timeout information exchange between nodes to accurately
 # measure request timeouts, If disabled cassandra will assuming the request
@@ -591,7 +591,7 @@ endpoint_snitch: SimpleSnitch
 dynamic_snitch_update_interval_in_ms: 100 
 # controls how often to reset all host scores, allowing a bad host to
 # possibly recover
-dynamic_snitch_reset_interval_in_ms: 60000
+dynamic_snitch_reset_interval_in_ms: 600000
 # if set greater than zero and read_repair_chance is < 1.0, this will allow
 # 'pinning' of replicas to hosts in order to increase cache capacity.
 # The badness threshold will control how much worse the pinned host has to be

@@ -14,22 +14,21 @@
 
 package com.stratio.deep.cassandra.extractor;
 
+import java.nio.ByteBuffer;
+import java.util.Map;
+
+import org.apache.cassandra.db.marshal.AbstractType;
+
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.EntityDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
-import com.stratio.deep.commons.rdd.IExtractor;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.cassandra.entity.CassandraCell;
+import com.stratio.deep.cassandra.functions.DeepType2TupleFunction;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
-import com.stratio.deep.cassandra.functions.DeepType2TupleFunction;
 import com.stratio.deep.commons.utils.Pair;
 import com.stratio.deep.commons.utils.Utils;
-import org.apache.cassandra.db.marshal.AbstractType;
-
-import java.nio.ByteBuffer;
-import java.util.Map;
 
 /**
  * Stratio's implementation of an RDD reading and writing data from and to Apache Cassandra. This
@@ -40,12 +39,11 @@ import java.util.Map;
  *
  * @author Luca Rosellini <luca@strat.io>
  */
-public final class CassandraEntityExtractor<T extends IDeepType> extends CassandraExtractor<T> {
+public final class CassandraEntityExtractor<T extends IDeepType> extends CassandraExtractor<T, EntityDeepJobConfig<T>> {
 
     private static final long serialVersionUID = -3208994171892747470L;
 
-
-    public CassandraEntityExtractor(Class<T> t){
+    public CassandraEntityExtractor(Class<T> t) {
         super();
         this.cassandraJobConfig = new EntityDeepJobConfig(t);
         this.transformer = new DeepType2TupleFunction<T>();
@@ -56,7 +54,7 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
      */
     @Override
     public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
-                              IDeepJobConfig<T, ? extends IDeepJobConfig<?, ?>> config) {
+                              CassandraDeepJobConfig<T> config) {
         Map<String, Cell> columnDefinitions = ((ICassandraDeepJobConfig)config).columnDefinitions();
 
         Class<T> entityClass = config.getEntityClass();

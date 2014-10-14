@@ -16,18 +16,21 @@
 
 package com.stratio.deep.mongodb.extractor;
 
-import com.stratio.deep.commons.config.IDeepJobConfig;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepTransformException;
-import com.stratio.deep.mongodb.config.DeepJobConfigMongoDB;
-import com.stratio.deep.mongodb.config.IMongoDeepJobConfig;
-import com.stratio.deep.mongodb.utils.UtilMongoDB;
+import java.lang.reflect.InvocationTargetException;
+
 import org.bson.BSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
-import java.lang.reflect.InvocationTargetException;
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepTransformException;
+import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
+import com.stratio.deep.mongodb.config.IMongoDeepJobConfig;
+import com.stratio.deep.mongodb.utils.UtilMongoDB;
+
+import scala.Tuple2;
 
 /**
  * CellRDD to interact with mongoDB
@@ -37,22 +40,25 @@ public final class MongoCellExtractor extends MongoExtractor<Cells> {
     private static final Logger LOG = LoggerFactory.getLogger(MongoCellExtractor.class);
     private static final long serialVersionUID = -3208994171892747470L;
 
-    public MongoCellExtractor(){
+    public MongoCellExtractor() {
         super();
-        this.deepJobConfig = new DeepJobConfigMongoDB(Cells.class);
+        this.deepJobConfig = new MongoDeepJobConfig(Cells.class);
     }
 
-
+    public MongoCellExtractor(Class entityClass) {
+        super();
+        this.deepJobConfig = new MongoDeepJobConfig(entityClass);
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Cells transformElement(Tuple2<Object, BSONObject> tuple, IDeepJobConfig<Cells, ? extends IDeepJobConfig> config) {
-
+    public Cells transformElement(Tuple2<Object, BSONObject> tuple,
+                                  DeepJobConfig<Cells> config) {
 
         try {
-            return UtilMongoDB.getCellFromBson(tuple._2(), ((IMongoDeepJobConfig)deepJobConfig).getNameSpace()) ;
+            return UtilMongoDB.getCellFromBson(tuple._2(), deepJobConfig.getNameSpace()) ;
         } catch (Exception e) {
             LOG.error("Cannot convert BSON: ", e);
             throw new DeepTransformException("Could not transform from Bson to Cell " + e.getMessage());
@@ -61,15 +67,12 @@ public final class MongoCellExtractor extends MongoExtractor<Cells> {
 
     @Override
     public Tuple2<Object, BSONObject> transformElement(Cells record) {
-        try{
+        try {
             return new Tuple2<>(null, UtilMongoDB.getBsonFromCell(record));
-        } catch (IllegalAccessException | InvocationTargetException| InstantiationException e) {
+        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             LOG.error(e.getMessage());
             throw new DeepTransformException(e.getMessage());
         }
     }
-
-
-
 
 }

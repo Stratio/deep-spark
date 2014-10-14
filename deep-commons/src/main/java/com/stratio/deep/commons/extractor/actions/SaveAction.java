@@ -30,7 +30,7 @@ public class SaveAction<T> extends Action {
 
     public SaveAction(T record) {
         super(ActionType.SAVE);
-        this.record=record;
+        this.record = record;
     }
 
     public T getRecord() {

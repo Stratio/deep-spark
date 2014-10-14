@@ -21,7 +21,6 @@ package com.stratio.deep.commons.exception;
  */
 public class DeepInstantiationException extends RuntimeException {
 
-
     private static final long serialVersionUID = -8281399377853619766L;
 
     /**
@@ -49,7 +48,7 @@ public class DeepInstantiationException extends RuntimeException {
      * Public constructor.
      */
     public DeepInstantiationException(String message, Throwable cause, boolean enableSuppression,
-                                      boolean writableStackTrace) {
+            boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 

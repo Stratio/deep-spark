@@ -51,7 +51,6 @@ import static org.testng.Assert.*;
 @Test
 public class UtilESTest {
 
-
     public static final String ID_EXAMPLE = "ID";
 
     public static final String AUTHOR = "ANTE ALIGHIERI";
@@ -65,8 +64,9 @@ public class UtilESTest {
     public static final String TEXT_II = "text II";
 
     @Test
-    public void testGetBsonFromObject() throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException {
-
+    public void testGetBsonFromObject()
+            throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+            InstantiationException {
 
         MetadataEntity metadataEntity = new MetadataEntity();
         metadataEntity.setAuthor(AUTHOR);
@@ -87,16 +87,13 @@ public class UtilESTest {
 
         CantoEntities.add(cantoII);
 
-
         BookEntity bookEntity = new BookEntity();
-
 
         bookEntity.setCantoEntities(CantoEntities);
 
         bookEntity.setMetadataEntity(metadataEntity);
 
         JSONObject bson = UtilES.getJsonFromObject(bookEntity);
-
 
         JSONObject metadataFromBson = (JSONObject) bson.get("metadata");
 
@@ -105,7 +102,6 @@ public class UtilESTest {
         assertEquals(metadataFromBson.get("title"), TITLE);
 
         assertEquals(metadataFromBson.get("source"), SOURCE);
-
 
         List<JSONObject> cantoEntityListFromBson = (List<JSONObject>) bson.get("cantos");
 
@@ -117,16 +113,16 @@ public class UtilESTest {
 
         assertEquals(cantoEntityListFromBson.get(1).get("text"), TEXT_II);
 
-
     }
 
     @Test
-    public void testGetObjectFromBson() throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+    public void testGetObjectFromBson()
+            throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+            InstantiationException, NoSuchMethodException {
 
         LinkedMapWritable json = createJsonTest();
 
         BookEntity bookEntity = UtilES.getObjectFromJson(BookEntity.class, json);
-
 
         MetadataEntity metadata = bookEntity.getMetadataEntity();
 
@@ -135,7 +131,6 @@ public class UtilESTest {
         assertEquals(metadata.getTitle(), TITLE);
 
         assertEquals(metadata.getSource(), SOURCE);
-
 
         List<CantoEntity> cantoEntityList = bookEntity.getCantoEntities();
 
@@ -150,21 +145,22 @@ public class UtilESTest {
     }
 
     @Test
-    public void testGetId() throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public void testGetId()
+            throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+            InstantiationException {
 
-//        ESTestEntity commonsBaseTestEntity = new ESTestEntity();
-//
-//        commonsBaseTestEntity.setId(ID_EXAMPLE);
-//
-//
-//        assertEquals(UtilES.getId(commonsBaseTestEntity), ID_EXAMPLE);
-//
-//
-//        WordCount wordCount = new WordCount();
+        //        ESTestEntity commonsBaseTestEntity = new ESTestEntity();
+        //
+        //        commonsBaseTestEntity.setId(ID_EXAMPLE);
+        //
+        //
+        //        assertEquals(UtilES.getId(commonsBaseTestEntity), ID_EXAMPLE);
+        //
+        //
+        //        WordCount wordCount = new WordCount();
 
-//        assertNull(UtilES.getId(wordCount));
+        //        assertNull(UtilES.getId(wordCount));
     }
-
 
     private LinkedMapWritable createJsonTest() {
         LinkedMapWritable json = new LinkedMapWritable();
@@ -173,7 +169,6 @@ public class UtilESTest {
         metadata.put(new Text("author"), new Text(AUTHOR));
         metadata.put(new Text("title"), new Text(TITLE));
         metadata.put(new Text("source"), new Text(SOURCE));
-
 
         LinkedMapWritable cantoI = new LinkedMapWritable();
 
@@ -184,12 +179,9 @@ public class UtilESTest {
         cantoII.put(new Text("canto"), new Text(CANTO_II));
         cantoII.put(new Text("text"), new Text(TEXT_II));
 
-
-
-        LinkedMapWritable[] writableArrary = new LinkedMapWritable[]{cantoI, cantoII};
+        LinkedMapWritable[] writableArrary = new LinkedMapWritable[] { cantoI, cantoII };
 
         ArrayWritable cantosList = new ArrayWritable(LinkedMapWritable.class, writableArrary);
-
 
         json.put(new Text("metadata"), metadata);
         json.put(new Text("cantos"), cantosList);
@@ -198,29 +190,28 @@ public class UtilESTest {
     }
 
     @Test
-    public void testGetCellFromJson() throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+    public void testGetCellFromJson()
+            throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+            InstantiationException, NoSuchMethodException {
 
         LinkedMapWritable bson = createJsonTest();
 
         Cells cells = UtilES.getCellFromJson(bson, "book");
 
-
-
-
         Map<Writable, Writable> mapMetadata = (Map<Writable, Writable>) bson.get(new Text("metadata"));
 
-
-        assertEquals(mapMetadata.get(new Text("author")).toString(), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("author").getCellValue());
-        assertEquals(mapMetadata.get(new Text("title")).toString(), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("title").getCellValue());
-        assertEquals(mapMetadata.get(new Text("source")).toString(), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("source").getCellValue());
-
+        assertEquals(mapMetadata.get(new Text("author")).toString(),
+                ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("author").getCellValue());
+        assertEquals(mapMetadata.get(new Text("title")).toString(),
+                ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("title").getCellValue());
+        assertEquals(mapMetadata.get(new Text("source")).toString(),
+                ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("source").getCellValue());
 
         // Check list Oject
 
         List<Cells> list = (List<Cells>) cells.getCellByName("cantos").getCellValue();
 
-        LinkedMapWritable[] mapCantos = (LinkedMapWritable[])((ArrayWritable) bson.get(new Text("cantos"))).get();
-
+        LinkedMapWritable[] mapCantos = (LinkedMapWritable[]) ((ArrayWritable) bson.get(new Text("cantos"))).get();
 
         assertEquals(mapCantos[0].get(new Text("canto")).toString(), list.get(0).getCellByName("canto").getCellValue());
         assertEquals(mapCantos[0].get(new Text("text")).toString(), list.get(0).getCellByName("text").getCellValue());
@@ -228,12 +219,12 @@ public class UtilESTest {
         assertEquals(mapCantos[1].get(new Text("canto")).toString(), list.get(1).getCellByName("canto").getCellValue());
         assertEquals(mapCantos[1].get(new Text("text")).toString(), list.get(1).getCellByName("text").getCellValue());
 
-
     }
 
     @Test
-    public void testGetBsonFromCell() throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException {
-
+    public void testGetBsonFromCell()
+            throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+            InstantiationException {
 
         //Create Medataba Object
 
@@ -246,7 +237,6 @@ public class UtilESTest {
         metadata.add(authorCell);
         metadata.add(titleCell);
         metadata.add(sourceCell);
-
 
         //Create Cantos Object
 
@@ -265,7 +255,6 @@ public class UtilESTest {
         cantos.add(cantoI);
         cantos.add(cantoII);
 
-
         // Put all together
 
         Cells cells = new Cells();
@@ -273,18 +262,18 @@ public class UtilESTest {
         cells.add(Cell.create("metadata", metadata));
         cells.add(Cell.create("cantos", cantos));
 
-
         JSONObject bson = UtilES.getJsonFromCell(cells);
-
 
         // Check metadata Object
 
         Map<String, Object> mapMetadata = (Map<String, Object>) bson.get("metadata");
 
-        assertEquals(mapMetadata.get("author"), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("author").getCellValue());
-        assertEquals(mapMetadata.get("title"), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("title").getCellValue());
-        assertEquals(mapMetadata.get("source"), ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("source").getCellValue());
-
+        assertEquals(mapMetadata.get("author"),
+                ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("author").getCellValue());
+        assertEquals(mapMetadata.get("title"),
+                ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("title").getCellValue());
+        assertEquals(mapMetadata.get("source"),
+                ((Cells) cells.getCellByName("metadata").getCellValue()).getCellByName("source").getCellValue());
 
         // Check list Oject
 
@@ -292,19 +281,17 @@ public class UtilESTest {
 
         List<Map<String, Object>> mapCantos = (List<Map<String, Object>>) bson.get("cantos");
 
-
         assertEquals(mapCantos.get(0).get("canto"), list.get(0).getCellByName("canto").getCellValue());
         assertEquals(mapCantos.get(0).get("text"), list.get(0).getCellByName("text").getCellValue());
 
         assertEquals(mapCantos.get(1).get("canto"), list.get(1).getCellByName("canto").getCellValue());
         assertEquals(mapCantos.get(1).get("text"), list.get(1).getCellByName("text").getCellValue());
 
-
     }
 
-
     @Test(expectedExceptions = InvocationTargetException.class)
-    public void testConstructorIsPrivate() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public void testConstructorIsPrivate()
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Constructor<UtilES> constructor = UtilES.class.getDeclaredConstructor();
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);

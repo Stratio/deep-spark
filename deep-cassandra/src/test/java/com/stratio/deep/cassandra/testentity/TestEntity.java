@@ -16,10 +16,11 @@
 
 package com.stratio.deep.cassandra.testentity;
 
-import com.stratio.deep.commons.annotations.DeepEntity;
-import com.stratio.deep.commons.annotations.DeepField;
 import org.apache.cassandra.db.marshal.Int32Type;
 import org.apache.cassandra.db.marshal.LongType;
+
+import com.stratio.deep.commons.annotations.DeepEntity;
+import com.stratio.deep.commons.annotations.DeepField;
 
 /**
  * Entity test class, inherits field from {@link BaseTestEntity}
@@ -47,7 +48,7 @@ public class TestEntity extends BaseTestEntity {
     }
 
     public TestEntity(String id, String domain, String url, Integer responseTime, Integer responseCode,
-                      String notMappedField) {
+            String notMappedField) {
         super(domain);
         setId(id);
         this.url = url;
@@ -60,7 +61,6 @@ public class TestEntity extends BaseTestEntity {
     public Long getDownloadTime() {
         return downloadTime;
     }
-
 
     public String getNotMappedField() {
         return notMappedField;

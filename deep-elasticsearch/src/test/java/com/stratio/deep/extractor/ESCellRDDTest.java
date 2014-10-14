@@ -29,7 +29,7 @@ import org.testng.annotations.Test;
 /**
  * Created by rcrespo on 29/08/14.
  */
-@Test(suiteName = "ESRddTests", groups = {"ESCellRDDTest"}, dependsOnGroups = "ESJavaRDDTest")
+@Test(suiteName = "ESRddTests", groups = { "ESCellRDDTest" }, dependsOnGroups = "ESJavaRDDTest")
 public class ESCellRDDTest extends ExtractorTest {
     private Logger LOG = Logger.getLogger(getClass());
 

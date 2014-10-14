@@ -16,23 +16,50 @@
 
 package com.stratio.deep.cassandra.entity;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import org.apache.cassandra.db.marshal.BooleanType;
+import org.apache.cassandra.db.marshal.DecimalType;
+import org.apache.cassandra.db.marshal.DoubleType;
+import org.apache.cassandra.db.marshal.FloatType;
+import org.apache.cassandra.db.marshal.InetAddressType;
+import org.apache.cassandra.db.marshal.Int32Type;
+import org.apache.cassandra.db.marshal.IntegerType;
+import org.apache.cassandra.db.marshal.ListType;
+import org.apache.cassandra.db.marshal.LongType;
+import org.apache.cassandra.db.marshal.MapType;
+import org.apache.cassandra.db.marshal.SetType;
+import org.apache.cassandra.db.marshal.TimeUUIDType;
+import org.apache.cassandra.db.marshal.TimestampType;
+import org.apache.cassandra.db.marshal.UTF8Type;
+import org.apache.cassandra.db.marshal.UUIDType;
+import org.apache.log4j.Logger;
+import org.testng.annotations.Test;
 
 import com.datastax.driver.core.DataType;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepInstantiationException;
 import com.stratio.deep.testentity.CommonsTestEntity;
-import org.apache.cassandra.db.marshal.*;
-import org.apache.log4j.Logger;
-import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
 
 /**
  * Created by luca on 04/02/14.
@@ -45,7 +72,8 @@ public class CellTest {
     public void testCellInstantiationForCollections() throws UnknownHostException, NoSuchFieldException {
         CommonsTestEntity te = new CommonsTestEntity();
 
-        Set<String> emails = new HashSet<>(Arrays.asList("DelfinaMarino@superrito.com", "GabyCasasVeliz@superrito.com"));
+        Set<String> emails = new HashSet<>(
+                Arrays.asList("DelfinaMarino@superrito.com", "GabyCasasVeliz@superrito.com"));
         List<String> phones = Arrays.asList("401-477-8301", "209-845-8841");
 
         te.setEmails(emails);
@@ -72,7 +100,8 @@ public class CellTest {
         assertTrue(c2.marshallerClassName().equals(ListType.class.getCanonicalName()));
         assertEquals(c2.getValueType(), List.class);
 
-        CassandraCell c3 = (CassandraCell) CassandraCell.create(te, CommonsTestEntity.class.getDeclaredField("uuid2id"));
+        CassandraCell c3 = (CassandraCell) CassandraCell
+                .create(te, CommonsTestEntity.class.getDeclaredField("uuid2id"));
 
         assertNotNull(c3);
         assertEquals(c3.getCellName(), "uuid2id");

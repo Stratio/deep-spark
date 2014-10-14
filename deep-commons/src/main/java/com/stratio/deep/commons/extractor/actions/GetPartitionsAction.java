@@ -24,5 +24,4 @@ public class GetPartitionsAction<T> extends Action {
         return config;
     }
 
-
 }

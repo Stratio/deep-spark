@@ -14,21 +14,35 @@
  */
 package com.stratio.deep.core.extractor.client;
 
-
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.extractor.actions.*;
-import com.stratio.deep.commons.extractor.response.*;
-import com.stratio.deep.commons.rdd.IExtractor;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import org.apache.spark.Partition;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.spark.Partition;
+
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.extractor.actions.CloseAction;
+import com.stratio.deep.commons.extractor.actions.ExtractorInstanceAction;
+import com.stratio.deep.commons.extractor.actions.GetPartitionsAction;
+import com.stratio.deep.commons.extractor.actions.HasNextAction;
+import com.stratio.deep.commons.extractor.actions.InitIteratorAction;
+import com.stratio.deep.commons.extractor.actions.InitSaveAction;
+import com.stratio.deep.commons.extractor.actions.NextAction;
+import com.stratio.deep.commons.extractor.actions.SaveAction;
+import com.stratio.deep.commons.extractor.response.ExtractorInstanceResponse;
+import com.stratio.deep.commons.extractor.response.GetPartitionsResponse;
+import com.stratio.deep.commons.extractor.response.HasNextResponse;
+import com.stratio.deep.commons.extractor.response.NextResponse;
+import com.stratio.deep.commons.extractor.response.Response;
+import com.stratio.deep.commons.rdd.IExtractor;
+
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Response> implements
-        IExtractor<T> {
+        IExtractor<T, ExtractorConfig<T>> {
 
     // Stateful properties
     private volatile Channel channel;
@@ -92,6 +106,8 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return ((GetPartitionsResponse) response).getPartitions();
     }
 
+
+
     @Override
     public void close() {
         CloseAction closeAction = new CloseAction();
@@ -115,7 +131,6 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         return;
     }
-
 
     @Override
     public boolean hasNext() {
@@ -165,7 +180,6 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return ((NextResponse<T>) response).getData();
     }
 
-
     @Override
     public void initIterator(Partition dp, ExtractorConfig<T> config) {
         InitIteratorAction<T> initIteratorAction = new InitIteratorAction<>(dp, config);
@@ -190,7 +204,6 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
     }
 
 
-
     @Override
     public void saveRDD(T t) {
         SaveAction<T> saveAction = new SaveAction<>(t);
@@ -212,7 +225,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
             Thread.currentThread().interrupt();
         }
 
-        return ;
+        return;
     }
 
     @Override
@@ -238,8 +251,5 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         return;
     }
-
-
-
 
 }

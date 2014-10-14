@@ -16,22 +16,24 @@
 
 package com.stratio.deep.cassandra.cql;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.core.policies.LoadBalancingPolicy;
-import com.datastax.driver.core.policies.Policies;
-import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
-import com.stratio.deep.commons.exception.DeepIOException;
-import com.stratio.deep.commons.utils.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.stratio.deep.commons.utils.Utils.quote;
 
 import java.net.InetAddress;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.stratio.deep.commons.utils.Utils.quote;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Session;
+import com.datastax.driver.core.policies.LoadBalancingPolicy;
+import com.datastax.driver.core.policies.Policies;
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
+import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.utils.Pair;
 
 /**
  * Created by luca on 09/04/14.
@@ -63,7 +65,8 @@ class CassandraClientProvider {
     CassandraClientProvider() {
     }
 
-    static Pair<Session, String> trySessionForLocation(String location, ICassandraDeepJobConfig conf, Boolean balanced) {
+    static Pair<Session, String> trySessionForLocation(String location, CassandraDeepJobConfig conf,
+            Boolean balanced) {
         try {
             return getSession(location, conf, balanced);
         } catch (Exception e) {
@@ -75,7 +78,7 @@ class CassandraClientProvider {
         }
     }
 
-    static Pair<Session, String> getSession(String location, ICassandraDeepJobConfig conf, Boolean balanced) {
+    static Pair<Session, String> getSession(String location, CassandraDeepJobConfig conf, Boolean balanced) {
         assert balanced != null;
 
         synchronized (CLIENTS_CACHE) {

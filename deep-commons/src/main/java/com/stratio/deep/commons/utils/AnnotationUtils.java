@@ -16,14 +16,6 @@
 
 package com.stratio.deep.commons.utils;
 
-import com.google.common.collect.ImmutableMap;
-import com.stratio.deep.commons.annotations.DeepField;
-import com.stratio.deep.commons.entity.IDeepType;
-import com.stratio.deep.commons.exception.DeepIOException;
-import org.apache.cassandra.db.marshal.*;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
-
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -35,7 +27,38 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import org.apache.cassandra.db.marshal.AbstractType;
+import org.apache.cassandra.db.marshal.BooleanType;
+import org.apache.cassandra.db.marshal.BytesType;
+import org.apache.cassandra.db.marshal.DateType;
+import org.apache.cassandra.db.marshal.DecimalType;
+import org.apache.cassandra.db.marshal.DoubleType;
+import org.apache.cassandra.db.marshal.FloatType;
+import org.apache.cassandra.db.marshal.InetAddressType;
+import org.apache.cassandra.db.marshal.Int32Type;
+import org.apache.cassandra.db.marshal.IntegerType;
+import org.apache.cassandra.db.marshal.ListType;
+import org.apache.cassandra.db.marshal.LongType;
+import org.apache.cassandra.db.marshal.MapType;
+import org.apache.cassandra.db.marshal.SetType;
+import org.apache.cassandra.db.marshal.TimeUUIDType;
+import org.apache.cassandra.db.marshal.TimestampType;
+import org.apache.cassandra.db.marshal.UTF8Type;
+import org.apache.cassandra.db.marshal.UUIDType;
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
+
+import com.google.common.collect.ImmutableMap;
+import com.stratio.deep.commons.annotations.DeepField;
+import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.exception.DeepIOException;
 
 /**
  * Common utility methods to manipulate beans and fields annotated with @DeepEntity and @DeepField.
@@ -216,7 +239,7 @@ public final class AnnotationUtils {
             return res;
 
         } catch (ClassCastException e) {
-            return new Class<?>[]{(Class<?>) field.getGenericType()};
+            return new Class<?>[] { (Class<?>) field.getGenericType() };
         }
     }
 

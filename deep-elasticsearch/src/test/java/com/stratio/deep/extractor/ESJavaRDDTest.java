@@ -50,7 +50,7 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 /**
  * Created by rcrespo on 29/08/14.
  */
-@Test(suiteName = "ESRddTests", groups = {"ESJavaRDDTest"})
+@Test(suiteName = "ESRddTests", groups = { "ESJavaRDDTest" })
 public class ESJavaRDDTest {
 
     private static final Logger LOG = Logger.getLogger(ESJavaRDDTest.class);
@@ -85,8 +85,8 @@ public class ESJavaRDDTest {
         FileUtils.deleteDirectory(file);
 
         Settings settings = ImmutableSettings.settingsBuilder()
-                .put("path.logs","")
-                .put("path.data",DB_FOLDER_NAME)
+                .put("path.logs", "")
+                .put("path.data", DB_FOLDER_NAME)
                 .build();
 
         node = nodeBuilder().settings(settings).data(true).local(true).clusterName(HOST).node();
@@ -102,12 +102,14 @@ public class ESJavaRDDTest {
 
 
     }
+
     /**
      * Imports dataset
      *
      * @throws java.io.IOException
      */
-    private static void dataSetImport() throws IOException, ExecutionException,IOException, InterruptedException, ParseException {
+    private static void dataSetImport()
+            throws IOException, ExecutionException, IOException, InterruptedException, ParseException {
 
         JSONParser parser = new JSONParser();
         URL url = Resources.getResource(DATA_SET_NAME);
@@ -122,15 +124,13 @@ public class ESJavaRDDTest {
 
         String json2 = "{" +
 
-                "\"message\":\""+MESSAGE_TEST+"\"" +
+                "\"message\":\"" + MESSAGE_TEST + "\"" +
                 "}";
-
 
         IndexResponse response2 = client.prepareIndex(ES_INDEX_MESSAGE, ES_TYPE_MESSAGE).setCreate(true)
                 .setSource(json2).setReplicationType(ReplicationType.ASYNC)
                 .execute()
                 .actionGet();
-
 
         String json = "{" +
                 "\"user\":\"kimchy\"," +
@@ -157,13 +157,13 @@ public class ESJavaRDDTest {
 
             //searchResponse.getHits().hits();
             //assertEquals(searchResponse.getCount(), 1);
-        }catch (AssertionError | Exception e){
+        } catch (AssertionError | Exception e) {
             cleanup();
             e.printStackTrace();
         }
     }
 
-    private static void deleteDataSet()  {
+    private static void deleteDataSet() {
 
         try {
             DeleteByQueryResponse delete = client.prepareDeleteByQuery(ES_INDEX)
@@ -173,15 +173,15 @@ public class ESJavaRDDTest {
             delete.status();
 
             //assertEquals(delete.getCount(), 1);
-        }catch (Exception e){
+        } catch (Exception e) {
 
             e.printStackTrace();
         }
     }
 
     @Test
-    public void testRDD() throws IOException, ExecutionException, InterruptedException{
-       // dataSetImport();
+    public void testRDD() throws IOException, ExecutionException, InterruptedException {
+        // dataSetImport();
 
         Assert.assertEquals(true, true);
 

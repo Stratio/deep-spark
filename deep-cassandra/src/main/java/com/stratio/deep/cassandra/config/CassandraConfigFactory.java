@@ -16,11 +16,12 @@
 
 package com.stratio.deep.cassandra.config;
 
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.entity.IDeepType;
+import java.io.Serializable;
+
 import org.apache.log4j.Logger;
 
-import java.io.Serializable;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.entity.IDeepType;
 
 /**
  * Factory class for deep configuration objects.
@@ -44,7 +45,7 @@ public final class CassandraConfigFactory implements Serializable {
      *
      * @return a new cell-based job configuration object.
      */
-    public static ICassandraDeepJobConfig<Cells> create() {
+    public static CassandraDeepJobConfig<Cells> create() {
         return new CellDeepJobConfig();
     }
 
@@ -53,8 +54,8 @@ public final class CassandraConfigFactory implements Serializable {
      *
      * @return a new cell-based write suitable job configuration object.
      */
-    public static ICassandraDeepJobConfig<Cells> createWriteConfig() {
-        return new CellDeepJobConfig();
+    public static CassandraDeepJobConfig<Cells> createWriteConfig() {
+        return new CellDeepJobConfig(true);
     }
 
     /**
@@ -64,7 +65,7 @@ public final class CassandraConfigFactory implements Serializable {
      * @param <T>         the generic type of the entity object implementing IDeepType.
      * @return a new an entity-based configuration object.
      */
-    public static <T extends IDeepType> ICassandraDeepJobConfig<T> create(Class<T> entityClass) {
+    public static <T extends IDeepType> CassandraDeepJobConfig<T> create(Class<T> entityClass) {
         return new EntityDeepJobConfig<>(entityClass);
     }
 
@@ -73,9 +74,8 @@ public final class CassandraConfigFactory implements Serializable {
      *
      * @return an entity-based write configuration object.
      */
-    public static <T extends IDeepType> ICassandraDeepJobConfig<T> createWriteConfig(Class<T> entityClass) {
-        return new EntityDeepJobConfig<>(entityClass);
+    public static <T extends IDeepType> CassandraDeepJobConfig<T> createWriteConfig(Class<T> entityClass) {
+        return new EntityDeepJobConfig<>(entityClass, true);
     }
-
 
 }

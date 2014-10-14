@@ -3,8 +3,9 @@
  */
 package com.stratio.deep.commons.extractor.response;
 
-import com.stratio.deep.commons.extractor.actions.ActionType;
 import org.apache.spark.Partition;
+
+import com.stratio.deep.commons.extractor.actions.ActionType;
 
 /**
  * @author Óscar Puertas

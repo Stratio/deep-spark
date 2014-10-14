@@ -16,15 +16,17 @@
 
 package com.stratio.deep.commons.entity;
 
-import com.datastax.driver.core.ResultSet;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created by rcrespo on 2/07/14.
@@ -273,12 +275,12 @@ public  class Cell implements Serializable {
 
         Cell cell = (Cell) o;
 
-        return this.cellName.equals(cell.cellName)&&this.cellValue.equals(cell.cellValue);
+        return this.cellName.equals(cell.cellName) && this.cellValue.equals(cell.cellValue);
     }
 
     /**
      * @return true is the current cell is a key inside the datastore, false
-     *         otherwise.
+     * otherwise.
      */
     public Boolean isKey(){
         return false;

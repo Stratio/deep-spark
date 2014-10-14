@@ -16,6 +16,7 @@
 
 package com.stratio.deep.commons.utils;
 
+import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
@@ -36,6 +37,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
+
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.rdd.IExtractor;
+
+import scala.Tuple2;
 
 /**
  * Utility class providing useful methods to manipulate the conversion
@@ -121,7 +137,6 @@ public final class Utils {
 
 
 
-
     /**
      * Returns a CQL batch query wrapping the given statements.
      *
@@ -184,7 +199,6 @@ public final class Utils {
     @SuppressWarnings("unchecked")
     public static Method findSetter(String propertyName, Class entityClass, Class valueType) {
         Method setter;
-
         String setterName = "set" + propertyName.substring(0, 1).toUpperCase() +
                 propertyName.substring(1);
 
@@ -201,7 +215,6 @@ public final class Utils {
 
         return setter;
     }
-
 
     /**
      * Resolves the getter name for the property whose name is 'propertyName' whose type is 'valueType'
@@ -232,7 +245,6 @@ public final class Utils {
 
         return getter;
     }
-
 
     /**
      * Returns the inet address for the specified location.
@@ -289,24 +301,24 @@ public final class Utils {
         return hostConnection.toString();
     }
 
-    public static <T>IExtractor<T> getExtractorInstance(ExtractorConfig<T> config){
+    public static <T, S extends BaseConfig<T>> IExtractor<T, S> getExtractorInstance(S config) {
 
         try {
             Class<T> rdd = (Class<T>) config.getExtractorImplClass();
-            if(rdd==null){
+            if (rdd == null) {
                 rdd = (Class<T>) Class.forName(config.getExtractorImplClassName());
             }
             Constructor<T> c;
-            if (config.getEntityClass().isAssignableFrom(Cells.class)){
+            if (config.getEntityClass().isAssignableFrom(Cells.class)) {
                 c = rdd.getConstructor();
-                return (IExtractor<T>) c.newInstance();
-            }else{
+                return (IExtractor<T, S>) c.newInstance();
+            } else {
                 c = rdd.getConstructor(Class.class);
-                return (IExtractor<T>) c.newInstance(config.getEntityClass());
+                return (IExtractor<T, S>) c.newInstance(config.getEntityClass());
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-           throw new DeepExtractorinitializationException(e.getMessage());
+            throw new DeepExtractorinitializationException(e.getMessage());
         }
     }
 
@@ -317,6 +329,7 @@ public final class Utils {
      * @return
      */
    public static Object castNumberType(Object object, Object clazz) {
+
         if (object instanceof Number) {
 
             if (clazz instanceof Double) {

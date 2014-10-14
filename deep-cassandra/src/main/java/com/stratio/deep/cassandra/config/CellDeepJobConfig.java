@@ -16,38 +16,31 @@
 
 package com.stratio.deep.cassandra.config;
 
+import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
 import com.stratio.deep.commons.entity.Cells;
-import org.apache.hadoop.conf.Configuration;
 
 /**
  * Cell-based configuration object.
  *
  * @author Luca Rosellini <luca@stratio.com>
  */
-public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
+public final class CellDeepJobConfig extends CassandraDeepJobConfig<Cells> {
 
     private static final long serialVersionUID = -598862509865396541L;
-    private Cells dummyCells;
 
     public CellDeepJobConfig() {
-//        this.isWriteConfig = isWriteConfig;
+       super(Cells.class);
+        this.setExtractorImplClass(CassandraCellExtractor.class);
     }
 
-    {
-        dummyCells = new Cells("dummyCellsTable");
-    }
+    public CellDeepJobConfig(boolean isWriteConfig) {
+        this();
+        this.isWriteConfig = isWriteConfig;
+        this.createTableOnWrite = isWriteConfig;
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public Class<Cells> getEntityClass() {
-        return (Class<Cells>) dummyCells.getClass();
     }
 
 
-
-    public Configuration getHadoopConfiguration() {
-        return null;
-    }
 
 
 

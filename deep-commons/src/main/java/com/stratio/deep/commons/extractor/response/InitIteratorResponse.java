@@ -14,9 +14,9 @@ public class InitIteratorResponse<T> extends Response {
 
     private boolean data;
 
-//  public InitIteratorResponse() {
-//    super();
-//  }
+    //  public InitIteratorResponse() {
+    //    super();
+    //  }
 
     public InitIteratorResponse() {
         super(ActionType.INIT_ITERATOR);

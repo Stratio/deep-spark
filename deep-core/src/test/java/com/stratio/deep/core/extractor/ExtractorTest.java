@@ -16,9 +16,15 @@
 
 package com.stratio.deep.core.extractor;
 
+import static junit.framework.TestCase.assertNotNull;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNull;
+
+import java.io.Serializable;
+
+import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.filter.FilterOperator;
@@ -33,11 +39,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.Serializable;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
 
 
 /**
@@ -46,9 +47,10 @@ import static org.testng.Assert.assertNull;
 
 /**
  * This is the common test that validate each extractor.
+ *
  * @param <T>
  */
-public abstract class ExtractorTest<T> implements Serializable {
+public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(ExtractorTest.class);
 
     Class inputEntity;
@@ -57,7 +59,7 @@ public abstract class ExtractorTest<T> implements Serializable {
 
     Class configEntity;
 
-//    protected DeepSparkContext context;
+    //    protected DeepSparkContext context;
 
     private String host;
 
@@ -73,32 +75,30 @@ public abstract class ExtractorTest<T> implements Serializable {
 
     private static final String READ_FIELD_EXPECTED = "new message test";
 
-
-    protected Class<IExtractor<T>> extractor;
+    protected Class<IExtractor<T, S>> extractor;
 
 
 
     /**
-     *
      * @param extractor
      * @param host
      * @param port
      */
-    public ExtractorTest (Class<IExtractor<T>> extractor, String host, Integer port, boolean isCells){
+    public ExtractorTest(Class<IExtractor<T, S>> extractor, String host, Integer port, boolean isCells) {
         super();
-        if(isCells){
-            this.inputEntity=Cells.class;
-            this.outputEntity=Cells.class;
-            this.configEntity=Cells.class;
-        }else{
+        if (isCells) {
+            this.inputEntity = Cells.class;
+            this.outputEntity = Cells.class;
+            this.configEntity = Cells.class;
+        } else {
             this.inputEntity = MessageTestEntity.class;
-            this.outputEntity= MessageTestEntity.class;
-            this.configEntity= BookEntity.class;
+            this.outputEntity = MessageTestEntity.class;
+            this.configEntity = BookEntity.class;
         }
 
-        this.host=host;
-        this.port=port;
-        this.extractor=extractor;
+        this.host = host;
+        this.port = port;
+        this.extractor = extractor;
     }
 
 
@@ -106,7 +106,7 @@ public abstract class ExtractorTest<T> implements Serializable {
      * It tests if the extractor can read from the data store
      */
     @Test
-    public <W>void testRead(){
+    public <W> void testRead() {
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
@@ -132,16 +132,13 @@ public abstract class ExtractorTest<T> implements Serializable {
 
 
 
-
-
     }
-
 
     /**
      * It tests if the extractor can write to the data store
      */
     @Test
-    public <W>void testWrite(){
+    public <W> void testWrite() {
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
@@ -178,7 +175,7 @@ public abstract class ExtractorTest<T> implements Serializable {
     }
 
     @Test
-    public <W> void testInputColumns(){
+    public <W> void testInputColumns() {
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
         try {
@@ -278,9 +275,9 @@ public abstract class ExtractorTest<T> implements Serializable {
 
     }
 
-    public <W>ExtractorConfig<W> getWriteExtractorConfig(String output) {
+    public <W> ExtractorConfig<W> getWriteExtractorConfig(String output) {
         ExtractorConfig<W> extractorConfig = getExtractorConfig(outputEntity);
-        extractorConfig.putValue(ExtractorConstants.HOST,host)
+        extractorConfig.putValue(ExtractorConstants.HOST, host)
                 .putValue(ExtractorConstants.DATABASE, database)
                 .putValue(ExtractorConstants.PORT, port)
                 .putValue(ExtractorConstants.COLLECTION, output)
@@ -289,7 +286,7 @@ public abstract class ExtractorTest<T> implements Serializable {
         return extractorConfig;
     }
 
-    public <W>ExtractorConfig<W> getReadExtractorConfig() {
+    public <W> ExtractorConfig<W> getReadExtractorConfig() {
 
         ExtractorConfig<W> extractorConfig = getExtractorConfig(inputEntity);
         extractorConfig.putValue(ExtractorConstants.HOST, host)
@@ -321,7 +318,6 @@ public abstract class ExtractorTest<T> implements Serializable {
                 .putValue(ExtractorConstants.PORT, port)
                 .putValue(ExtractorConstants.FILTER_QUERY, filters);
 
-
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;
     }
@@ -330,12 +326,11 @@ public abstract class ExtractorTest<T> implements Serializable {
      * It closes spark's context
      */
 
-    private boolean isEntityClassCells(ExtractorConfig extractorConfig){
-        if(extractorConfig.getEntityClass().isAssignableFrom(Cells.class)) {
+    private boolean isEntityClassCells(ExtractorConfig extractorConfig) {
+        if (extractorConfig.getEntityClass().isAssignableFrom(Cells.class)) {
             return true;
         }
         return false;
     }
-
 
 }

@@ -16,10 +16,16 @@
 
 package com.stratio.deep.testentity;
 
+import org.apache.cassandra.db.marshal.BooleanType;
+import org.apache.cassandra.db.marshal.Int32Type;
+import org.apache.cassandra.db.marshal.SetType;
+import org.apache.cassandra.db.marshal.TimestampType;
+import org.apache.cassandra.db.marshal.UTF8Type;
+import org.apache.cassandra.db.marshal.UUIDType;
+
 import com.stratio.deep.commons.annotations.DeepEntity;
 import com.stratio.deep.commons.annotations.DeepField;
 import com.stratio.deep.commons.entity.IDeepType;
-import org.apache.cassandra.db.marshal.*;
 
 /**
  * Author: Emmanuelle Raffenne

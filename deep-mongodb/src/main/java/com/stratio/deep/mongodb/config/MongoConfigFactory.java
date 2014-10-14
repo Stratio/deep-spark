@@ -16,9 +16,10 @@
 
 package com.stratio.deep.mongodb.config;
 
+import org.apache.log4j.Logger;
+
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
-import org.apache.log4j.Logger;
 
 /**
  * Created by luca on 14/07/14.
@@ -35,8 +36,8 @@ public class MongoConfigFactory {
      *
      * @return a new cell-based MongoDB job configuration object.
      */
-    public static IMongoDeepJobConfig<Cells> createMongoDB() {
-        return new DeepJobConfigMongoDB(Cells.class);
+    public static MongoDeepJobConfig<Cells> createMongoDB() {
+        return new MongoDeepJobConfig(Cells.class);
     }
 
     /**
@@ -46,7 +47,7 @@ public class MongoConfigFactory {
      * @param <T>         the generic type of the entity object implementing IDeepType.
      * @return a new entity-based MongoDB job configuration object.
      */
-    public static <T extends IDeepType> IMongoDeepJobConfig<T> createMongoDB(Class<T> entityClass) {
-        return new DeepJobConfigMongoDB<>(entityClass);
+    public static <T extends IDeepType> MongoDeepJobConfig<T> createMongoDB(Class<T> entityClass) {
+        return new MongoDeepJobConfig<>(entityClass);
     }
 }

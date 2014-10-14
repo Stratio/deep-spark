@@ -16,17 +16,18 @@
 
 package com.stratio.deep.mongodb.config;
 
-import com.mongodb.QueryBuilder;
-import com.stratio.deep.commons.config.IDeepJobConfig;
+import java.util.List;
+
 import org.apache.hadoop.conf.Configuration;
 import org.bson.BSONObject;
 
-import java.util.List;
+import com.mongodb.QueryBuilder;
+import com.stratio.deep.commons.config.IDeepJobConfig;
 
 /**
  * Defines the public methods that each Stratio Deep MongoDB configuration object should implement.
  */
-public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobConfig<T>> {
+public interface IMongoDeepJobConfig<T>  {
     /**
      * The MongoDB's collection name
      */
@@ -89,7 +90,6 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      */
     IMongoDeepJobConfig<T> filterQuery(QueryBuilder query);
 
-
     /**
      * Fiels to be returned, you can also use inputFields() and ignoreIdField()
      *
@@ -132,7 +132,6 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      * @return this object.
      */
     IMongoDeepJobConfig<T> useShards(boolean useShards);
-
 
     /**
      * If {@code true} have one split = one shard chunk.  If {SPLITS_USE_SHARDS} is not true splits will still

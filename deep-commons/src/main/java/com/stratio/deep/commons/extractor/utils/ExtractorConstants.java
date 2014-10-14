@@ -1,7 +1,5 @@
 package com.stratio.deep.commons.extractor.utils;
 
-import org.apache.cassandra.db.ConsistencyLevel;
-
 /**
  * Created by dgomez on 25/08/14.
  */
@@ -40,7 +38,6 @@ public class ExtractorConstants {
     public static String SORT = "sort";
 
     public static String FILTER_FIELD = "filterField";
-
 
     public static String FILTER_QUERY = "filterQuery";
 

@@ -16,10 +16,9 @@
 
 package com.stratio.deep.commons.utils;
 
-import com.google.common.base.Objects;
-
 import java.io.Serializable;
 
+import com.google.common.base.Objects;
 
 /**
  * Common utility class wrapping a pair of objects.

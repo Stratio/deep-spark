@@ -15,52 +15,51 @@
  */
 package com.stratio.deep.core.rdd;
 
-
 import static com.stratio.deep.commons.utils.Constants.SPARK_RDD_ID;
+import static com.stratio.deep.commons.utils.Utils.getExtractorInstance;
+import static com.stratio.deep.core.util.ExtractorClientUtil.getExtractorClient;
+import static scala.collection.JavaConversions.asScalaIterator;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.extractor.client.ExtractorClient;
-import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
-import com.stratio.deep.commons.exception.DeepIOException;
-import com.stratio.deep.commons.rdd.IExtractor;
+import java.io.Serializable;
+
 import org.apache.spark.InterruptibleIterator;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.rdd.RDD;
+
+import com.stratio.deep.commons.config.BaseConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.rdd.IExtractor;
+
 import scala.collection.Iterator;
 import scala.reflect.ClassTag$;
-
-import java.io.Serializable;
-
-import static com.stratio.deep.commons.utils.Utils.getExtractorInstance;
-import static com.stratio.deep.core.util.ExtractorClientUtil.getExtractorClient;
-import static scala.collection.JavaConversions.asScalaIterator;
-
 
 /**
  * Created by rcrespo on 11/08/14.
  */
-public class DeepRDD<T> extends RDD<T> implements Serializable {
+public class DeepRDD<T, S extends BaseConfig<T>> extends RDD<T> implements Serializable {
 
     private static final long serialVersionUID = -5360986039609466526L;
 
-    private transient IExtractor<T> extractorClient;
+    private transient IExtractor<T, S> extractorClient;
 
-    protected Broadcast<ExtractorConfig<T>> config;
+    protected Broadcast<S> config;
 
-    public Broadcast<ExtractorConfig<T>> getConfig() {
+    public Broadcast<S> getConfig() {
         return config;
     }
 
-    public DeepRDD(SparkContext sc, ExtractorConfig<T> config) {
+    public DeepRDD(SparkContext sc, S config) {
         super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config
                 .getEntityClass()));
-        config.putValue(SPARK_RDD_ID, id());
+        config.setRddId(id());
         this.config =
                 sc.broadcast(config, ClassTag$.MODULE$
-                        .<ExtractorConfig<T>>apply(config.getClass()));
+                        .<S>apply(config.getClass()));
 
 
 
@@ -74,7 +73,6 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         initExtractorClient();
 
         context.addOnCompleteCallback(new OnComputedRDDCallback(extractorClient));
-
 
         extractorClient.initIterator(split, config.getValue());
         java.util.Iterator<T> iterator = new java.util.Iterator<T>() {
@@ -106,22 +104,19 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         return extractorClient.getPartitions(config.getValue());
     }
 
-
     /**
      * It tries to get an Extractor Instance,
      * if there is any problem try to instance an extractorClient
      */
     private void initExtractorClient() {
-        try{
+        try {
             if (extractorClient == null) {
                 extractorClient = getExtractorInstance(config.getValue());
             }
-        }catch (DeepExtractorinitializationException e){
+        } catch (DeepExtractorinitializationException e) {
             extractorClient = getExtractorClient();
         }
 
-
     }
-
 
 }

@@ -15,6 +15,14 @@
  */
 package com.stratio.deep.commons.extractor.server;
 
+import java.security.cert.CertificateException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import javax.net.ssl.SSLException;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -23,13 +31,6 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
-
-import javax.net.ssl.SSLException;
-import java.security.cert.CertificateException;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * Receives a list of continent/city pairs from a {@link } to
@@ -75,12 +76,12 @@ public final class ExtractorServer {
         b.bind(PORT).sync().channel().closeFuture().sync();
     }
 
-    public static void close(){
+    public static void close() {
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
     }
 
-    public static void initExtractorServer (){
+    public static void initExtractorServer() {
         ExecutorService es = Executors.newFixedThreadPool(1);
         final Future future = es.submit(new Callable() {
             public Object call() throws Exception {
@@ -90,7 +91,7 @@ public final class ExtractorServer {
         });
     }
 
-    public static void stopExtractorServer (){
+    public static void stopExtractorServer() {
         close();
     }
 }

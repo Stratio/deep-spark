@@ -16,11 +16,13 @@
 
 package com.stratio.deep.extractor;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.core.entity.*;
-import com.stratio.deep.core.extractor.ExtractorTest;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
+import static org.testng.AssertJUnit.assertEquals;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -30,7 +32,6 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
-
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.SearchHit;
 import org.json.simple.JSONArray;
@@ -38,21 +39,23 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.entity.BookEntity;
+import com.stratio.deep.core.entity.CantoEntity;
+import com.stratio.deep.core.entity.MessageTestEntity;
+import com.stratio.deep.core.entity.WordCount;
+import com.stratio.deep.core.extractor.ExtractorTest;
+
 import scala.Tuple2;
-
-import java.io.Serializable;
-import java.util.*;
-
-import static org.elasticsearch.index.query.QueryBuilders.termQuery;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
-import static org.testng.AssertJUnit.assertEquals;
 
 /**
  * Created by rcrespo on 29/08/14.
  */
-@Test(suiteName = "ESRddTests", groups = {"ESEntityRDDTest"}, dependsOnGroups = "ESJavaRDDTest")
-public class ESEntityRDDTest extends ExtractorTest implements Serializable{
+@Test(suiteName = "ESRddTests", groups = { "ESEntityRDDTest" }, dependsOnGroups = "ESJavaRDDTest")
+public class ESEntityRDDTest extends ExtractorTest implements Serializable {
 
     private static final Logger LOG = Logger.getLogger(ESEntityRDDTest.class);
 
@@ -173,8 +176,5 @@ public class ESEntityRDDTest extends ExtractorTest implements Serializable{
 
 
     }
-
-
-
 
 }

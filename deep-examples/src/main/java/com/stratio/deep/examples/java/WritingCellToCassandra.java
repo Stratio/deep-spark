@@ -16,30 +16,23 @@
 
 package com.stratio.deep.examples.java;
 
+import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.cassandra.config.CassandraConfigFactory;
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
-
-import com.stratio.deep.commons.extractor.server.ExtractorServer;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
+import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.utils.ContextProperties;
+
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -69,16 +62,9 @@ public final class WritingCellToCassandra {
     public static void doMain(String[] args) {
         String job = "java:writingCellToCassandra";
 
-        String KEYSPACENAME = "crawler";
-        String TABLENAME    = "listdomains";
-        Integer cqlPort      = 9042;
-        Integer rpcPort      =  9160;
-        String HOST         = "127.0.0.1";
-
+        String keyspaceName = "crawler";
+        String inputTableName = "Page";
         final String outputTableName = "newlistdomains";
-
-
-
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -86,30 +72,17 @@ public final class WritingCellToCassandra {
 
 
         // --- INPUT RDD
-        ExtractorConfig<Cells> inputConfig = new ExtractorConfig();
+        CassandraDeepJobConfig<Cells> inputConfig = CassandraConfigFactory.create()
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
+                .keyspace(keyspaceName).table(inputTableName)
+                .initialize();
 
-        inputConfig.setExtractorImplClass(CassandraCellExtractor.class);
-        //inputConfig.setEntityClass(TweetEntity.class);
+        JavaRDD<Cells> inputRDD = deepContext.createJavaRDD(inputConfig);
 
-        Map<String, Serializable> values = new HashMap<>();
-        values.put(ExtractorConstants.KEYSPACE, KEYSPACENAME);
-        values.put(ExtractorConstants.TABLE,    TABLENAME);
-        values.put(ExtractorConstants.CQLPORT,  cqlPort);
-        values.put(ExtractorConstants.RPCPORT,  rpcPort);
-        values.put(ExtractorConstants.HOST,     HOST );
-
-        inputConfig.setValues(values);
-
-
-        RDD<Cells> inputRDD = deepContext.createRDD(inputConfig);
-
-        LOG.info("Count :"+ inputRDD.count());
-        LOG.info("First :"+ inputRDD.first());
-
-        JavaPairRDD<String, Cells> pairRDD = inputRDD.toJavaRDD().mapToPair(new PairFunction<Cells, String, Cells>() {
+        JavaPairRDD<String, Cells> pairRDD = inputRDD.mapToPair(new PairFunction<Cells, String, Cells>() {
             @Override
             public Tuple2<String, Cells> call(Cells c) {
-                return new Tuple2<String, Cells>((String) c.getCellByName("domain")
+                return new Tuple2<String, Cells>((String) c.getCellByName("domainName")
                         .getCellValue(), c);
             }
         });
@@ -122,6 +95,21 @@ public final class WritingCellToCassandra {
                     }
                 });
 
+        results = numPerKey.collect();
+
+        for (Tuple2<String, Integer> result : results) {
+            LOG.info(result);
+        }
+
+
+        // --- OUTPUT RDD
+        CassandraDeepJobConfig<Cells> outputConfig = CassandraConfigFactory.createWriteConfig()
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
+                .keyspace(keyspaceName).table(outputTableName)
+                .createTableOnWrite(true);
+
+        outputConfig.initialize();
+
         JavaRDD<Cells> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
             public Cells call(Tuple2<String, Integer> t) {
@@ -130,22 +118,6 @@ public final class WritingCellToCassandra {
                 return new Cells(outputTableName,c1, c2);
             }
         });
-        LOG.info("Count  insert:"+outputRDD.count());
-        LOG.info("First insert:"+ outputRDD.first());
-        // --- OUTPUT RDD
-        ExtractorConfig<Cells> outputConfig = new ExtractorConfig();
-
-        outputConfig.setExtractorImplClass(CassandraCellExtractor.class);
-        Map<String, Serializable> valuesOutput = new HashMap<>();
-        valuesOutput.put(ExtractorConstants.KEYSPACE, KEYSPACENAME);
-        valuesOutput.put(ExtractorConstants.TABLE,    outputTableName);
-        valuesOutput.put(ExtractorConstants.CQLPORT,  cqlPort);
-        valuesOutput.put(ExtractorConstants.RPCPORT,  rpcPort);
-        valuesOutput.put(ExtractorConstants.HOST,     HOST );
-        valuesOutput.put(ExtractorConstants.CREATE_ON_WRITE,    "true" );
-
-        outputConfig.setValues(valuesOutput);
-
 
         deepContext.saveRDD(outputRDD.rdd(), outputConfig);
 

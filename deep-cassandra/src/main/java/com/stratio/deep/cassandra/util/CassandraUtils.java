@@ -16,10 +16,28 @@
 
 package com.stratio.deep.cassandra.util;
 
+import static com.stratio.deep.commons.utils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
+import static com.stratio.deep.commons.utils.Utils.quote;
+
+import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.apache.cassandra.db.marshal.AbstractType;
+import org.apache.cassandra.db.marshal.TimeUUIDType;
+import org.apache.cassandra.db.marshal.UUIDType;
+import org.apache.commons.lang.StringUtils;
+import org.apache.spark.TaskContext;
+import org.apache.spark.rdd.RDD;
+
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.stratio.deep.cassandra.config.GenericDeepJobConfig;
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.OperatorCassandra;
 import com.stratio.deep.cassandra.cql.DeepCqlRecordWriter;
@@ -33,13 +51,9 @@ import com.stratio.deep.commons.functions.AbstractSerializableFunction2;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Pair;
 import com.stratio.deep.commons.utils.Utils;
-import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.db.marshal.TimeUUIDType;
-import org.apache.cassandra.db.marshal.UUIDType;
+
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.spark.TaskContext;
-import org.apache.spark.rdd.RDD;
+
 import scala.Function1;
 import scala.Tuple2;
 import scala.collection.Iterator;
@@ -47,12 +61,7 @@ import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.nio.ByteBuffer;
-import java.util.*;
 
-import static com.stratio.deep.commons.utils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
-import static com.stratio.deep.commons.utils.Utils.quote;
 import static com.stratio.deep.commons.utils.Utils.singleQuote;
 
 /**
@@ -67,7 +76,7 @@ public class CassandraUtils {
     }
 
     public static <W> void doCql3SaveToCassandra(RDD<W> rdd, ICassandraDeepJobConfig<W> writeConfig,
-                                                 Function1<W, Tuple2<Cells, Cells>> transformer) {
+            Function1<W, Tuple2<Cells, Cells>> transformer) {
         if (!writeConfig.getIsWriteConfig()) {
             throw new IllegalArgumentException("Provided configuration object is not suitable for writing");
         }
@@ -76,7 +85,7 @@ public class CassandraUtils {
         RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
                 ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
 
-        ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD.first());
+        ((CassandraDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD.first());
 
         final int pageSize = writeConfig.getBatchSize();
         int offset = 0;
@@ -110,7 +119,7 @@ public class CassandraUtils {
      * @param transformer
      */
     public static <W> void doSaveToCassandra(RDD<W> rdd, final ICassandraDeepJobConfig<W> writeConfig,
-                                             Function1<W, Tuple2<Cells, Cells>> transformer) {
+            Function1<W, Tuple2<Cells, Cells>> transformer) {
 
         if (!writeConfig.getIsWriteConfig()) {
             throw new IllegalArgumentException("Provided configuration object is not suitable for writing");
@@ -121,7 +130,7 @@ public class CassandraUtils {
         final RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
                 ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
 
-        ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD.first());
+        ((CassandraDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD.first());
 
         ClassTag<Integer> uClassTag = ClassTag$.MODULE$.apply(Integer.class);
 
@@ -188,7 +197,7 @@ public class CassandraUtils {
      * @return the update query statement.
      */
     public static String updateQueryGenerator(Cells keys, Cells values, String outputKeyspace,
-                                              String outputColumnFamily) {
+            String outputColumnFamily) {
 
         StringBuilder sb = new StringBuilder("UPDATE ").append(outputKeyspace).append(".").append(outputColumnFamily)
                 .append(" SET ");
@@ -234,7 +243,7 @@ public class CassandraUtils {
      * @return the create table statement.
      */
     public static String createTableQueryGenerator(Cells keys, Cells values, String outputKeyspace,
-                                                   String outputColumnFamily) {
+            String outputColumnFamily) {
 
         if (keys == null || StringUtils.isEmpty(outputKeyspace)
                 || StringUtils.isEmpty(outputColumnFamily)) {
@@ -256,8 +265,8 @@ public class CassandraUtils {
                 sb.append(", ");
             }
 
-//            CellValidator cellValidator = CellValidator.cellValidator(key.getCellValue());
-            sb.append(cellName).append(" ").append(((CassandraCell)key).getCql3TypeClassName());
+            //            CellValidator cellValidator = CellValidator.cellValidator(key.getCellValue());
+            sb.append(cellName).append(" ").append(((CassandraCell) key).getCql3TypeClassName());
 
             if (((CassandraCell) key).isPartitionKey()) {
                 partitionKey.add(cellName);
@@ -271,7 +280,7 @@ public class CassandraUtils {
         if (values != null) {
             for (Cell key : values) {
                 sb.append(", ");
-                sb.append(quote(key.getCellName())).append(" ").append(((CassandraCell)key).getCql3TypeClassName());
+                sb.append(quote(key.getCellName())).append(" ").append(((CassandraCell) key).getCql3TypeClassName());
             }
         }
 

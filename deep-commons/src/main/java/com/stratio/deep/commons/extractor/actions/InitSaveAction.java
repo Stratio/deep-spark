@@ -39,9 +39,8 @@ public class InitSaveAction<T> extends Action {
     public InitSaveAction(ExtractorConfig<T> config, T first) {
         super(ActionType.INIT_SAVE);
         this.config = config;
-        this.first=first;
+        this.first = first;
     }
-
 
     public ExtractorConfig<T> getConfig() {
         return config;
