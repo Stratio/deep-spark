@@ -17,6 +17,7 @@
 package com.stratio.deep.mongodb.config;
 
 
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.CQLPORT;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.HOST;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PORT;
@@ -595,7 +596,7 @@ public class DeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
         }
 
         if(values.get(PORT)!=null){
-            port((extractorConfig.getInteger(PORT)));
+            port(extractorConfig.getInteger(PORT));
         }
 
         if(values.get(COLLECTION)!=null){

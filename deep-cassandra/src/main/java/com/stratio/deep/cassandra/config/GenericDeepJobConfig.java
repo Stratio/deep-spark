@@ -556,7 +556,7 @@ public abstract class GenericDeepJobConfig<T> implements AutoCloseable, ICassand
         }
 
         if (values.get(CQLPORT) != null) {
-            cqlPort(Integer.parseInt(extractorConfig.getString(CQLPORT)));
+            cqlPort(extractorConfig.getInteger(CQLPORT));
         }
         if (values.get(TABLE) != null) {
             table(extractorConfig.getString(TABLE));
@@ -569,7 +569,7 @@ public abstract class GenericDeepJobConfig<T> implements AutoCloseable, ICassand
         }
 
         if (values.get(RPCPORT) != null) {
-            rpcPort(Integer.parseInt(extractorConfig.getString(RPCPORT)));
+            rpcPort(extractorConfig.getInteger(RPCPORT));
         }
 
         if (values.get(CREATE_ON_WRITE) != null) {
