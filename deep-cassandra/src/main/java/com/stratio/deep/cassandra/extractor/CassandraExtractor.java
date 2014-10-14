@@ -86,8 +86,10 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
             S config) {
         if(config instanceof ExtractorConfig){
             initWithExtractorConfig((ExtractorConfig) config);
+        }else{
+            cassandraJobConfig = (CassandraDeepJobConfig<T>) ((DeepJobConfig)config).initialize();
         }
-        this.cassandraJobConfig = (CassandraDeepJobConfig<T>) ((DeepJobConfig)config).initialize();
+
         recordReader = initRecordReader((DeepPartition) dp, cassandraJobConfig);
     }
 
@@ -117,23 +119,25 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
 
         if(config instanceof ExtractorConfig){
             initWithExtractorConfig((ExtractorConfig) config);
+        }else{
+            cassandraJobConfig = (CassandraDeepJobConfig) config;
         }
 
-        CassandraDeepJobConfig deepJobConfig = (CassandraDeepJobConfig) config;
+
 
 
         List<DeepTokenRange> underlyingInputSplits = null;
-        if (deepJobConfig.isBisectModeSet()) {
-            underlyingInputSplits = RangeUtils.getSplits(deepJobConfig);
+        if (cassandraJobConfig.isBisectModeSet()) {
+            underlyingInputSplits = RangeUtils.getSplits(cassandraJobConfig);
         } else {
-            underlyingInputSplits = RangeUtils.getSplitsBySize(deepJobConfig);
+            underlyingInputSplits = RangeUtils.getSplitsBySize(cassandraJobConfig);
         }
         Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
 
         int i = 0;
 
         for (DeepTokenRange split : underlyingInputSplits) {
-            partitions[i] = new DeepPartition( deepJobConfig.getRddId(), i, split);
+            partitions[i] = new DeepPartition( cassandraJobConfig.getRddId(), i, split);
 
             // log().debug("Detected partition: " + partitions[i]);
             ++i;

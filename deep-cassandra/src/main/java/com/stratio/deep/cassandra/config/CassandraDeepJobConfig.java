@@ -150,7 +150,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
 
     private boolean isSplitModeSet = false;
 
-    private boolean isBisectModeSet = false;
+    private boolean isBisectModeSet = true;
 
 
     /**
