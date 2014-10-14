@@ -188,10 +188,8 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
         } catch (Exception e) {
         }
 
-        System.out.println("antes del count");
         assertTrue(mappedRDD.count() > 0);
-        System.out.println("veamos el count " +mappedRDD.count());
-        System.out.println("despues del count");
+
         CassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
 
 //        writeConfig.createTableOnWrite(Boolean.FALSE);
@@ -205,9 +203,9 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
 //            writeConfig.createTableOnWrite(Boolean.TRUE);
 //        }
 
-        DeepSparkContext.saveRDD(mappedRDD, writeConfig);
+//        DeepSparkContext.saveRDD(mappedRDD, writeConfig);
 
-        checkOutputTestData();
+//        checkOutputTestData();
     }
 
     protected void checkOutputTestData() {
@@ -294,7 +292,6 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
 
         @Override
         public Cells apply(Cells e) {
-            System.out.println("estoy en el ");
             Cell id = e.getCellByName("id");
             Cell fn = e.getCellByName("first_name");
             Cell ln = e.getCellByName("last_name");

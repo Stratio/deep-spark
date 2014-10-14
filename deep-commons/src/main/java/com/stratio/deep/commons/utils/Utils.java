@@ -330,8 +330,6 @@ public final class Utils {
      */
    public static Object castNumberType(Object object, Object clazz) {
 
-       System.out.println("imprimo clase que viene " + clazz);
-       System.out.println("imprimo clase que viene " + object);
         if (object instanceof Number) {
 
             if (clazz instanceof Double) {

@@ -57,7 +57,7 @@ public class CassandraServer {
     public static final int CASSANDRA_CQL_PORT = 9242;
     private static final Logger logger = Logger.getLogger(CassandraServer.class);
 
-    private static final int WAIT_SECONDS = 3;
+    private static final int WAIT_SECONDS = 4;
 
     private static void cleanup() throws IOException {
 

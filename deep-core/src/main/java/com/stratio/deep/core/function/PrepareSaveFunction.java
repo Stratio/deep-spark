@@ -47,7 +47,6 @@ public class PrepareSaveFunction<T, S extends BaseConfig<T>> extends AbstractFun
 
     @Override
     public BoxedUnit apply(Iterator<T> v1) {
-        System.out.println("voy a recorrer cada particion");
         IExtractor<T, S> extractor;
         try {
             extractor = getExtractorInstance(config);

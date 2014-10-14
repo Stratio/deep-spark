@@ -141,11 +141,8 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
     }
 
     public static <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, S config) throws DeepIOException {
-        System.out.println("invoco al save");
         config.setRddId(rdd.id());
         config.setPartitionId(0);
-        System.out.println("antes de hacer el first");
-        System.out.println("imprimo el first" + rdd.first());
         rdd.foreachPartition(new PrepareSaveFunction<>(config, rdd.first()));
 
     }

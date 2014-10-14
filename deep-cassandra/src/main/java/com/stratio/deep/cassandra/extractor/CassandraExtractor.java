@@ -186,12 +186,10 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
         cassandraJobConfig
                 .createOutputTableIfNeeded((Tuple2<Cells, Cells>) transformer.apply(first));
         writer = new DeepCqlRecordWriter(cassandraJobConfig);
-        System.out.println("termina de hacer el init");
     }
 
     @Override
     public void saveRDD(T t) {
-        System.out.println("antes del transformer");
         Tuple2<Cells, Cells> tuple = (Tuple2<Cells, Cells>) transformer.apply(t);
         writer.write(tuple._1(), tuple._2());
     }
