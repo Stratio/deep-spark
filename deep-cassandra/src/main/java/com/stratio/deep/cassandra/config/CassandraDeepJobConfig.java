@@ -134,7 +134,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * Enables/Disables auto-creation of column family when writing to Cassandra.
      * By Default we do not create the output column family.
      */
-    private Boolean createTableOnWrite = Boolean.FALSE;
+    protected Boolean createTableOnWrite = Boolean.FALSE;
 
     private transient Session session;
 

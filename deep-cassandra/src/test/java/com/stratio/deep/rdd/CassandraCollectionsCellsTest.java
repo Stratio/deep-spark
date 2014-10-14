@@ -17,6 +17,7 @@
 package com.stratio.deep.rdd;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -24,16 +25,18 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.stratio.deep.config.CassandraConfigFactory;
-import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.entity.CassandraCell;
-import com.stratio.deep.entity.Cell;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.functions.AbstractSerializableFunction;
-import com.stratio.deep.testentity.Cql3CollectionsTestEntity;
-import com.stratio.deep.utils.Constants;
+import com.stratio.deep.cassandra.config.CassandraConfigFactory;
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
+import com.stratio.deep.cassandra.embedded.CassandraServer;
+import com.stratio.deep.cassandra.entity.CassandraCell;
+import com.stratio.deep.cassandra.testentity.Cql3CollectionsTestEntity;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.functions.AbstractSerializableFunction;
+import com.stratio.deep.commons.utils.Constants;
+import com.stratio.deep.core.context.DeepSparkContext;
+
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.spark.rdd.RDD;
 import org.testng.annotations.BeforeClass;
@@ -46,7 +49,8 @@ import static org.testng.Assert.*;
 /**
  * Integration tests for generic cell RDDs where cells contain Cassandra's collections.
  */
-@Test(suiteName = "cassandraRddTests", dependsOnGroups = "CassandraCollectionsEntityTest",
+//, dependsOnGroups = "CassandraCollectionsEntityTest"
+@Test(suiteName = "cassandraRddTests",
         groups = "CassandraCollectionsCellsTest")
 public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
     @BeforeClass
@@ -144,13 +148,13 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
     }
 
     @Override
-    protected CassandraRDD<Cells> initRDD() {
-        return context.cassandraRDD(getReadConfig());
+    protected RDD<Cells> initRDD() {
+        return context.createRDD(getReadConfig());
     }
 
     @Override
-    protected ICassandraDeepJobConfig<Cells> initReadConfig() {
-        ICassandraDeepJobConfig<Cells> config = CassandraConfigFactory.create()
+    protected CassandraDeepJobConfig<Cells> initReadConfig() {
+        CassandraDeepJobConfig<Cells> config = CassandraConfigFactory.create()
                 .host(Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).bisectFactor(testBisectFactor)
 				        .pageSize(DEFAULT_PAGE_SIZE).cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily
                         (CQL3_COLLECTION_COLUMN_FAMILY);
@@ -159,8 +163,8 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
     }
 
     @Override
-    protected ICassandraDeepJobConfig<Cells> initWriteConfig() {
-        ICassandraDeepJobConfig<Cells> writeConfig = CassandraConfigFactory.createWriteConfig()
+    protected CassandraDeepJobConfig<Cells> initWriteConfig() {
+        CassandraDeepJobConfig<Cells> writeConfig = CassandraConfigFactory.createWriteConfig()
                 .host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
@@ -184,21 +188,24 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
         } catch (Exception e) {
         }
 
+        System.out.println("antes del count");
         assertTrue(mappedRDD.count() > 0);
+        System.out.println("veamos el count " +mappedRDD.count());
+        System.out.println("despues del count");
+        CassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
 
-        ICassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
-        writeConfig.createTableOnWrite(Boolean.FALSE);
+//        writeConfig.createTableOnWrite(Boolean.FALSE);
+//
+//        try {
+//            DeepSparkContext.saveRDD(mappedRDD, writeConfig);
+//
+//            fail();
+//        } catch (Exception e) {
+//            // ok
+//            writeConfig.createTableOnWrite(Boolean.TRUE);
+//        }
 
-        try {
-            CassandraRDD.saveRDDToCassandra(mappedRDD, writeConfig);
-
-            fail();
-        } catch (DeepIOException e) {
-            // ok
-            writeConfig.createTableOnWrite(Boolean.TRUE);
-        }
-
-        CassandraRDD.saveRDDToCassandra(mappedRDD, writeConfig);
+        DeepSparkContext.saveRDD(mappedRDD, writeConfig);
 
         checkOutputTestData();
     }
@@ -245,24 +252,24 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
 
     @Override
     public void testSimpleSaveToCassandra() {
-        ICassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
-        writeConfig.createTableOnWrite(Boolean.FALSE);
+        CassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
+//        writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
             executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
         } catch (Exception e) {
         }
 
-        try {
-            CassandraRDD.saveRDDToCassandra(getRDD(), writeConfig);
+//        try {
+//            DeepSparkContext.saveRDD(getRDD(), writeConfig);
+//
+//            fail();
+//        } catch (Exception e) {
+//            // ok
+//            writeConfig.createTableOnWrite(Boolean.TRUE);
+//        }
 
-            fail();
-        } catch (Exception e) {
-            // ok
-            writeConfig.createTableOnWrite(Boolean.TRUE);
-        }
-
-        CassandraRDD.saveRDDToCassandra(getRDD(), writeConfig);
+        DeepSparkContext.saveRDD(getRDD(), writeConfig);
 
         checkSimpleTestData();
     }
@@ -274,19 +281,20 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
         } catch (Exception e) {
         }
 
-        ICassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
+        CassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
 
-        CassandraRDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
-        checkSimpleTestData();
+//        RDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
+//        checkSimpleTestData();
     }
 
     private static class TestEntityAbstractSerializableFunction extends
-            AbstractSerializableFunction<Cells, Cells> {
+            AbstractSerializableFunction<Cells, Cells> implements Serializable {
 
         private static final long serialVersionUID = -1555102599662015841L;
 
         @Override
         public Cells apply(Cells e) {
+            System.out.println("estoy en el ");
             Cell id = e.getCellByName("id");
             Cell fn = e.getCellByName("first_name");
             Cell ln = e.getCellByName("last_name");
@@ -316,7 +324,7 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
             }
             Cell newuu = CassandraCell.create(uu, uuid2id);
 
-            return new Cells(e.getDefaultTableName(), newid, newfn, newln, newem, newph, newuu);
+            return new Cells(e.getnameSpace(), newid, newfn, newln, newem, newph, newuu);
         }
     }
 

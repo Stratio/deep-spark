@@ -22,14 +22,16 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.stratio.deep.config.CassandraConfigFactory;
-import com.stratio.deep.config.ICassandraDeepJobConfig;
-import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.entity.CassandraCell;
-import com.stratio.deep.entity.Cells;
-import com.stratio.deep.exception.DeepIOException;
-import com.stratio.deep.functions.AbstractSerializableFunction;
-import com.stratio.deep.utils.Constants;
+import com.stratio.deep.cassandra.config.CassandraConfigFactory;
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
+import com.stratio.deep.cassandra.embedded.CassandraServer;
+import com.stratio.deep.cassandra.entity.CassandraCell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.functions.AbstractSerializableFunction;
+import com.stratio.deep.commons.utils.Constants;
+import com.stratio.deep.core.context.DeepSparkContext;
+
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import org.testng.annotations.Test;
@@ -50,8 +52,9 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
 
         @Override
         public Cells apply(Cells e) {
-            return new Cells(e.getDefaultTableName(),
-				            e.getCellByName("name"), e.getCellByName("gender"), CassandraCell.create("age", 15, false, true),
+            return new Cells(e.getnameSpace(),
+				            e.getCellByName("name"), e.getCellByName("gender"), CassandraCell
+                    .create("age", 15, false, true),
                     e.getCellByName("animal"), e.getCellByName("password"), e.getCellByName("color"),
                     e.getCellByName("lucene"), e.getCellByName("food"));
         }
@@ -69,7 +72,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
             Cells valueCells = cells.getValueCells();
 
             if (indexCells.equals(
-				            new Cells(cells.getDefaultTableName(), CassandraCell.create("name", "pepito_3", true, false), CassandraCell.create("gender", "male",
+				            new Cells(cells.getnameSpace(), CassandraCell.create("name", "pepito_3", true, false), CassandraCell.create("gender", "male",
                     true, false), CassandraCell.create("age", -2, false, true), CassandraCell.create("animal", "monkey", false, true)))) {
                 assertEquals(valueCells.getCellByName("password").getCellValue(), "abc");
                 assertNull(valueCells.getCellByName("color").getCellValue());
@@ -135,14 +138,14 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
     }
 
     @Override
-    protected CassandraRDD<Cells> initRDD() {
+    protected RDD<Cells> initRDD() {
         assertNotNull(context);
-        return context.cassandraRDD(getReadConfig());
+        return context.createRDD(getReadConfig());
     }
 
     @Override
-    protected ICassandraDeepJobConfig<Cells> initReadConfig() {
-        ICassandraDeepJobConfig<Cells> rddConfig = CassandraConfigFactory.create().host(Constants.DEFAULT_CASSANDRA_HOST)
+    protected CassandraDeepJobConfig<Cells> initReadConfig() {
+        CassandraDeepJobConfig<Cells> rddConfig = CassandraConfigFactory.create().host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(KEYSPACE_NAME).columnFamily(CQL3_COLUMN_FAMILY)
 				        .pageSize(DEFAULT_PAGE_SIZE)
 				        .bisectFactor(testBisectFactor).cqlPort(CassandraServer.CASSANDRA_CQL_PORT).initialize();
@@ -154,7 +157,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
     public void testCountWithInputColumns() {
         logger.info("testCountWithInputColumns()");
 
-        ICassandraDeepJobConfig<Cells> tmpConfig = CassandraConfigFactory.create().host(Constants.DEFAULT_CASSANDRA_HOST)
+        CassandraDeepJobConfig<Cells> tmpConfig = CassandraConfigFactory.create().host(Constants.DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .keyspace(KEYSPACE_NAME)
                 .columnFamily(CQL3_COLUMN_FAMILY)
@@ -162,7 +165,7 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
                 .inputColumns("password")
                 .initialize();
 
-        CassandraRDD<Cells> tmpRdd = context.cassandraRDD(tmpConfig);
+        RDD<Cells> tmpRdd = context.createRDD(tmpConfig);
 
         Cells[] cells = (Cells[]) tmpRdd.collect();
 
@@ -174,8 +177,8 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
     }
 
     @Override
-    protected ICassandraDeepJobConfig<Cells> initWriteConfig() {
-        ICassandraDeepJobConfig<Cells> writeConfig = CassandraConfigFactory.createWriteConfig().host(Constants
+    protected CassandraDeepJobConfig<Cells> initWriteConfig() {
+        CassandraDeepJobConfig<Cells> writeConfig = CassandraConfigFactory.createWriteConfig().host(Constants
                 .DEFAULT_CASSANDRA_HOST)
                 .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).keyspace(OUTPUT_KEYSPACE_NAME)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).columnFamily(CQL3_OUTPUT_COLUMN_FAMILY)
@@ -196,18 +199,18 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
 
         assertTrue(mappedRDD.count() > 0);
 
-        ICassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
-        writeConfig.createTableOnWrite(Boolean.FALSE);
+        CassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
+//        writeConfig.createTableOnWrite(Boolean.FALSE);
+//
+//        try {
+//            DeepSparkContext.saveRDD(mappedRDD, writeConfig);
+//            fail();
+//        } catch (Exception e) {
+//            // ok
+//            writeConfig.createTableOnWrite(Boolean.TRUE);
+//        }
 
-        try {
-            CassandraRDD.saveRDDToCassandra(mappedRDD, writeConfig);
-            fail();
-        } catch (DeepIOException e) {
-            // ok
-            writeConfig.createTableOnWrite(Boolean.TRUE);
-        }
-
-        CassandraRDD.saveRDDToCassandra(mappedRDD, writeConfig);
+        DeepSparkContext.saveRDD(mappedRDD, writeConfig);
         checkOutputTestData();
     }
 
@@ -218,18 +221,18 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
         } catch (Exception e) {
         }
 
-        ICassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
-        writeConfig.createTableOnWrite(Boolean.FALSE);
+        CassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
+//        writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
-            CassandraRDD.saveRDDToCassandra(getRDD(), writeConfig);
-            fail();
-        } catch (DeepIOException e) {
+//            DeepSparkContext.saveRDD(getRDD(), writeConfig);
+//            fail();
+        } catch (Exception e) {
             // ok
             writeConfig.createTableOnWrite(Boolean.TRUE);
         }
 
-        CassandraRDD.saveRDDToCassandra(getRDD(), writeConfig);
+        DeepSparkContext.saveRDD(getRDD(), writeConfig);
         checkSimpleTestData();
 
     }
@@ -241,11 +244,11 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
         } catch (Exception e) {
         }
 
-        ICassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
+        CassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
 
-        CassandraRDD.cql3SaveRDDToCassandra(
-                getRDD(), writeConfig);
-        checkSimpleTestData();
+//        RDD.cql3SaveRDDToCassandra(
+//                getRDD(), writeConfig);
+//        checkSimpleTestData();
     }
 
 }

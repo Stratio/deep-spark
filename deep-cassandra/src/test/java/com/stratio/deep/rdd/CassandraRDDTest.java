@@ -20,16 +20,17 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.CharacterCodingException;
 
-import com.stratio.deep.config.ICassandraDeepJobConfig;
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.spark.Partition;
+import org.apache.spark.rdd.RDD;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import scala.collection.Seq;
 
-import static com.stratio.deep.utils.Utils.quote;
+import static com.stratio.deep.commons.utils.Utils.quote;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
@@ -41,9 +42,9 @@ import static org.testng.Assert.assertNotNull;
 public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     private Logger logger = Logger.getLogger(getClass());
 
-    protected CassandraRDD<W> rdd;
-    private ICassandraDeepJobConfig<W> rddConfig;
-    private ICassandraDeepJobConfig<W> writeConfig;
+    protected RDD<W> rdd;
+    private CassandraDeepJobConfig<W> rddConfig;
+    private CassandraDeepJobConfig<W> writeConfig;
 
     protected int testBisectFactor = 8;
 
@@ -53,23 +54,23 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
 
     protected abstract void checkSimpleTestData();
 
-    protected CassandraRDD<W> getRDD() {
+    protected RDD<W> getRDD() {
         return this.rdd;
     }
 
-    protected ICassandraDeepJobConfig<W> getReadConfig() {
+    protected CassandraDeepJobConfig<W> getReadConfig() {
         return rddConfig;
     }
 
-    protected ICassandraDeepJobConfig<W> getWriteConfig() {
+    protected CassandraDeepJobConfig<W> getWriteConfig() {
         return writeConfig;
     }
 
-    protected abstract CassandraRDD<W> initRDD();
+    protected abstract RDD<W> initRDD();
 
-    protected abstract ICassandraDeepJobConfig<W> initReadConfig();
+    protected abstract CassandraDeepJobConfig<W> initReadConfig();
 
-    protected abstract ICassandraDeepJobConfig<W> initWriteConfig();
+    protected abstract CassandraDeepJobConfig<W> initWriteConfig();
 
     @BeforeClass
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,

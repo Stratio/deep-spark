@@ -27,14 +27,15 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.stratio.deep.embedded.CassandraServer;
-import com.stratio.deep.utils.Constants;
+import com.stratio.deep.cassandra.embedded.CassandraServer;
+import com.stratio.deep.commons.utils.Constants;
+import com.stratio.deep.core.context.DeepSparkContext;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
-import static com.stratio.deep.utils.Utils.quote;
+import static com.stratio.deep.commons.utils.Utils.quote;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
@@ -44,7 +45,7 @@ import static org.testng.Assert.assertNotNull;
 public abstract class AbstractDeepSparkContextTest {
 
     private Logger logger = Logger.getLogger(getClass());
-    protected static CassandraDeepSparkContext context;
+    protected static DeepSparkContext context;
 
     private static CassandraServer cassandraServer;
     public static final String KEYSPACE_NAME = "Test_Keyspace";
@@ -217,7 +218,7 @@ public abstract class AbstractDeepSparkContextTest {
     @BeforeSuite
     protected void initContextAndServer() throws ConfigurationException, IOException, InterruptedException {
         logger.info("instantiating context");
-        context = new CassandraDeepSparkContext("local", "deepSparkContextTest");
+        context = new DeepSparkContext("local", "deepSparkContextTest");
 
         String createKeyspace = "CREATE KEYSPACE " + quote(KEYSPACE_NAME)
                 + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 };";
@@ -242,7 +243,7 @@ public abstract class AbstractDeepSparkContextTest {
         checkTestData();
     }
 
-    protected CassandraDeepSparkContext getContext() {
+    protected DeepSparkContext getContext() {
         return context;
     }
 

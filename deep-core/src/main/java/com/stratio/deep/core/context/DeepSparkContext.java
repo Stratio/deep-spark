@@ -30,6 +30,7 @@ import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.core.function.PrepareSaveFunction;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepJobRDD;
@@ -139,9 +140,12 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         return new DeepJavaRDD((DeepRDD<T, DeepJobConfig<T>>) createRDD(deepJobConfig));
     }
 
-    public static <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, S config) {
+    public static <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, S config) throws DeepIOException {
+        System.out.println("invoco al save");
         config.setRddId(rdd.id());
         config.setPartitionId(0);
+        System.out.println("antes de hacer el first");
+        System.out.println("imprimo el first" + rdd.first());
         rdd.foreachPartition(new PrepareSaveFunction<>(config, rdd.first()));
 
     }

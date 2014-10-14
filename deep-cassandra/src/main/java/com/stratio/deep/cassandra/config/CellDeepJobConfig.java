@@ -16,6 +16,7 @@
 
 package com.stratio.deep.cassandra.config;
 
+import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
 import com.stratio.deep.commons.entity.Cells;
 
 /**
@@ -29,7 +30,16 @@ public final class CellDeepJobConfig extends CassandraDeepJobConfig<Cells> {
 
     public CellDeepJobConfig() {
        super(Cells.class);
+        this.setExtractorImplClass(CassandraCellExtractor.class);
     }
+
+    public CellDeepJobConfig(boolean isWriteConfig) {
+        this();
+        this.isWriteConfig = isWriteConfig;
+        this.createTableOnWrite = isWriteConfig;
+
+    }
+
 
 
 

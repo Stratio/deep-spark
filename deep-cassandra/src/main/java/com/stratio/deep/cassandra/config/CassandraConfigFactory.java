@@ -55,7 +55,7 @@ public final class CassandraConfigFactory implements Serializable {
      * @return a new cell-based write suitable job configuration object.
      */
     public static CassandraDeepJobConfig<Cells> createWriteConfig() {
-        return new CellDeepJobConfig();
+        return new CellDeepJobConfig(true);
     }
 
     /**
@@ -75,7 +75,7 @@ public final class CassandraConfigFactory implements Serializable {
      * @return an entity-based write configuration object.
      */
     public static <T extends IDeepType> CassandraDeepJobConfig<T> createWriteConfig(Class<T> entityClass) {
-        return new EntityDeepJobConfig<>(entityClass);
+        return new EntityDeepJobConfig<>(entityClass, true);
     }
 
 }

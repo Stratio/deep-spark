@@ -31,6 +31,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 
 import com.stratio.deep.cassandra.entity.CassandraCell;
+import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
 import com.stratio.deep.commons.annotations.DeepEntity;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.IDeepType;
@@ -91,7 +92,14 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends CassandraDee
      */
     public EntityDeepJobConfig(Class<T> entityClass) {
         super(entityClass);
-        //        this.isWriteConfig = isWriteConfig;
+        this.setExtractorImplClass(CassandraEntityExtractor.class);
+
+    }
+
+    public EntityDeepJobConfig(Class<T> entityClass, boolean isWriteConfig) {
+        this(entityClass);
+        this.isWriteConfig = isWriteConfig;
+        this.createTableOnWrite = isWriteConfig;
     }
 
 
