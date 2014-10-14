@@ -603,6 +603,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
     }
 
     public CassandraDeepJobConfig<T> bisectFactor(int bisectFactor) {
+        this.isSplitModeSet = false;
         this.isBisectModeSet = true;
         this.bisectFactor = bisectFactor;
         return this;
@@ -903,6 +904,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
     @Override
     public CassandraDeepJobConfig<T> splitSize(int splitSize) {
         this.isSplitModeSet = true;
+        this.isBisectModeSet = false;
         this.splitSize = splitSize;
         return this;
     }
