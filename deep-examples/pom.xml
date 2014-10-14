@@ -21,12 +21,18 @@
         <artifactId>deep-parent</artifactId>
         <groupId>com.stratio.deep</groupId>
         <version>0.5.0</version>
-        <relativePath>../deep-parent/pom.xml</relativePath>
+        <relativePath>../deep-parent</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>deep-examples</artifactId>
     <name>deep examples</name>
+    <licenses>
+        <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
 
     <dependencies>
         <dependency>
