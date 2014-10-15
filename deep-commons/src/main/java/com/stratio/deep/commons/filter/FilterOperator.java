@@ -31,4 +31,6 @@ public class FilterOperator {
     public static final String LTE = "lte";
 
     public static final String NE = "ne";
+
+    public static final String MATCH = "match";
 }

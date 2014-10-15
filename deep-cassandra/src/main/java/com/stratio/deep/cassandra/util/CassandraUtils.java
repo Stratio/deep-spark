@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.TimeUUIDType;
@@ -36,6 +37,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.spark.TaskContext;
 import org.apache.spark.rdd.RDD;
+import org.json4s.DefaultWriters.W;
 
 import scala.Function1;
 import scala.Tuple2;
@@ -375,7 +377,8 @@ public class CassandraUtils {
      *            the map of filters names and values.
      * @return the query subpart corresponding to the provided additional filters.
      */
-    public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters, Filter[] filters) {
+    public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters, Filter[] filters,
+            String luceneIndex) {
 
         StringBuilder sb = new StringBuilder("");
 
@@ -398,10 +401,24 @@ public class CassandraUtils {
         if (filters != null) {
             for (int i = 0; i < filters.length; i++) {
 
-                sb.append(" AND ").append(quote(filters[i].getField()))
-                        .append(OperatorCassandra.getOperatorCassandra(filters[i].getOperation
-                                ()).getOperator()).append
-                        (filters[i].getValue());
+                String operation = filters[i].getOperation();
+
+                switch (operation) {
+                case "in":
+                case "between":
+                    break;
+                case "match":
+                    sb.append(" AND ").append(luceneIndex).append(" = '");
+                    sb.append(getLuceneWhereClause(filters[i]));
+                    sb.append("'");
+                    break;
+                default:
+                    sb.append(" AND ").append(quote(filters[i].getField()))
+                            .append(OperatorCassandra.getOperatorCassandra(filters[i].getOperation
+                                    ()).getOperator()).append
+                            (filters[i].getValue());
+                    break;
+                }
             }
         }
 
@@ -438,4 +455,81 @@ public class CassandraUtils {
 
         return sb.toString();
     }
+
+    private static String getLuceneWhereClause(Filter filter) {
+        String result;
+
+        StringBuilder sb = new StringBuilder("{filter:{type:\"boolean\",must:[");
+
+        String column = filter.getField();
+        String value = (String) filter.getValue();
+
+        // Generate query for column
+        String[] processedQuery = processLuceneQueryType(value);
+        sb.append("{type:\"");
+        sb.append(processedQuery[0]);
+        sb.append("\",field:\"");
+        sb.append(column);
+        sb.append("\",value:\"");
+        sb.append(processedQuery[1]);
+        sb.append("\"},");
+
+        sb.replace(sb.length() - 1, sb.length(), "");
+        sb.append("]}}");
+
+        result = sb.toString();
+
+        return result;
+
+    }
+
+    /**
+     * Process a query pattern to determine the type of Lucene query. The supported types of queries are: <li>
+     * <ul>
+     * Wildcard: The query contains * or ?.
+     * </ul>
+     * <ul>
+     * Fuzzy: The query ends with ~ and a number.
+     * </ul>
+     * <ul>
+     * Regex: The query contains [ or ].
+     * </ul>
+     * <ul>
+     * Match: Default query, supporting escaped symbols: *, ?, [, ], etc.
+     * </ul>
+     * </li>
+     * 
+     * @param query
+     *            The user query.
+     * @return An array with the type of query and the processed query.
+     */
+    private static String[] processLuceneQueryType(String query) {
+        String[] result = { "", "" };
+        Pattern escaped = Pattern.compile(".*\\\\\\*.*|.*\\\\\\?.*|.*\\\\\\[.*|.*\\\\\\].*");
+        Pattern wildcard = Pattern.compile(".*\\*.*|.*\\?.*");
+        Pattern regex = Pattern.compile(".*\\].*|.*\\[.*");
+        Pattern fuzzy = Pattern.compile(".*~\\d+");
+        if (escaped.matcher(query).matches()) {
+            result[0] = "match";
+            result[1] =
+                    query.replace("\\*", "*").replace("\\?", "?").replace("\\]", "]")
+                            .replace("\\[", "[");
+        } else if (regex.matcher(query).matches()) {
+            result[0] = "regex";
+            result[1] = query;
+        } else if (fuzzy.matcher(query).matches()) {
+            result[0] = "fuzzy";
+            result[1] = query;
+        } else if (wildcard.matcher(query).matches()) {
+            result[0] = "wildcard";
+            result[1] = query;
+        } else {
+            result[0] = "match";
+            result[1] = query;
+        }
+        // C* Query builder doubles the ' character.
+        result[1] = result[1].replaceAll("^'", "").replaceAll("'$", "");
+        return result;
+    }
+
 }
