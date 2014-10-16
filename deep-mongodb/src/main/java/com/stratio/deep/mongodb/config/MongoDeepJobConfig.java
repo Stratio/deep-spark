@@ -615,25 +615,28 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
     }
 
     public MongoDeepJobConfig<T> filterQuery (Filter[] filters){
-        List<BasicDBObject> list = new ArrayList<>();
 
-        QueryBuilder queryBuilder = QueryBuilder.start();
-        for (int i = 0 ; i < filters.length ; i++){
-            BasicDBObject bsonObject = new BasicDBObject();
+        if(filters.length>0) {
+            List<BasicDBObject> list = new ArrayList<>();
 
-            Filter filter = filters[i];
-                if(filter.getOperation().equals(FilterOperator.IS)){
+            QueryBuilder queryBuilder = QueryBuilder.start();
+            for (int i = 0; i < filters.length; i++) {
+                BasicDBObject bsonObject = new BasicDBObject();
+
+                Filter filter = filters[i];
+                if (filter.getOperation().equals(FilterOperator.IS)) {
                     bsonObject.put(filter.getField(), filter.getValue());
-                }else{
+                } else {
                     bsonObject.put(filter.getField(),
                             new BasicDBObject("$".concat(filter.getOperation()), filter.getValue()));
                 }
 
-            list.add(bsonObject);
-        }
-        queryBuilder.and(list.toArray(new BasicDBObject[list.size()]));
+                list.add(bsonObject);
+            }
+            queryBuilder.and(list.toArray(new BasicDBObject[list.size()]));
 
-        filterQuery(queryBuilder);
+            filterQuery(queryBuilder);
+        }
         return this;
 
 
