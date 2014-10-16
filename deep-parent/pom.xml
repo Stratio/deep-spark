@@ -28,8 +28,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Cassandra -->
-        <cassandra.version>2.0.8</cassandra.version>
-        <datastax.driver.version>2.0.3</datastax.driver.version>
+        <cassandra.version>2.1.01</cassandra.version>
+        <datastax.driver.version>2.1.0</datastax.driver.version>
 
         <!-- Spark version -->
         <spark.version>1.1.0</spark.version>
@@ -123,13 +123,13 @@
     <dependencies>
         <!-- cassandra -->
         <dependency>
-            <groupId>org.apache.cassandra</groupId>
+            <groupId>com.stratio.cassandra</groupId>
             <artifactId>cassandra-all</artifactId>
             <version>${cassandra.version}</version>
 
         </dependency>
         <dependency>
-            <groupId>com.stratio.cassandra</groupId>
+            <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
             <version>${datastax.driver.version}</version>
             <exclusions>

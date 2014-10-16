@@ -22,6 +22,7 @@ import static com.google.common.collect.Iterables.transform;
 import static com.stratio.deep.commons.utils.Utils.quote;
 
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,7 +35,6 @@ import javax.annotation.Nullable;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.dht.Token;
-import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
 
 import com.datastax.driver.core.Host;
 import com.datastax.driver.core.Metadata;
@@ -56,9 +56,8 @@ import com.stratio.deep.commons.utils.Pair;
 import com.stratio.deep.commons.utils.Utils;
 
 /**
- * {@link CqlPagingRecordReader} implementation that returns an instance of a
- * {@link DeepRecordReader}.
- *
+ * {@link CqlPagingRecordReader} implementation that returns an instance of a {@link DeepRecordReader}.
+ * 
  * @author Luca Rosellini <luca@strat.io>
  */
 public class RangeUtils {
@@ -71,13 +70,15 @@ public class RangeUtils {
     /**
      * Gets the list of token for each cluster machine.<br/>
      * The concrete class of the token depends on the partitioner used.<br/>
-     *
-     * @param query           the query to execute against the given session to obtain the list of tokens.
-     * @param sessionWithHost the pair object containing both the session and the name of the machine to which we're
-     *                        connected to.
-     * @param partitioner     the partitioner used in the cluster.
-     * @return a map containing, for each cluster machine, the list of tokens. Tokens are not returned in any
-     * particular order.
+     * 
+     * @param query
+     *            the query to execute against the given session to obtain the list of tokens.
+     * @param sessionWithHost
+     *            the pair object containing both the session and the name of the machine to which we're connected to.
+     * @param partitioner
+     *            the partitioner used in the cluster.
+     * @return a map containing, for each cluster machine, the list of tokens. Tokens are not returned in any particular
+     *         order.
      */
     static Map<String, Iterable<Comparable>> fetchTokens(String query, final Pair<Session, String> sessionWithHost,
             IPartitioner partitioner) {
@@ -99,10 +100,13 @@ public class RangeUtils {
 
     /**
      * Merges the list of tokens for each cluster machine to a single list of token ranges.
-     *
-     * @param tokens  the map of tokens for each cluster machine.
-     * @param session the connection to the cluster.
-     * @param p       the partitioner used in the cluster.
+     * 
+     * @param tokens
+     *            the map of tokens for each cluster machine.
+     * @param session
+     *            the connection to the cluster.
+     * @param p
+     *            the partitioner used in the cluster.
      * @return the merged lists of tokens transformed to DeepTokenRange(s). The returned collection is shuffled.
      */
     static List<DeepTokenRange> mergeTokenRanges(Map<String, Iterable<Comparable>> tokens,
@@ -125,10 +129,13 @@ public class RangeUtils {
 
     /**
      * Given a token, fetches the list of replica machines holding that token.
-     *
-     * @param token       the token whose replicas we want to fetch.
-     * @param session     the connection to the cluster.
-     * @param partitioner the partitioner used in the cluster.
+     * 
+     * @param token
+     *            the token whose replicas we want to fetch.
+     * @param session
+     *            the connection to the cluster.
+     * @param partitioner
+     *            the partitioner used in the cluster.
      * @return the list of replica machines holding that token.
      */
     private static List<String> initReplicas(
@@ -137,7 +144,8 @@ public class RangeUtils {
         final Metadata metadata = session.getCluster().getMetadata();
 
         @SuppressWarnings("unchecked")
-        Set<Host> replicas = metadata.getTokenReplicas(quote(session.getLoggedKeyspace()), token.toString());
+        Set<Host> replicas = metadata.getReplicas(quote(session.getLoggedKeyspace()),
+                ByteBuffer.wrap(token.toString().getBytes()));
 
         return Lists.newArrayList(Iterables.transform(replicas, new Function<Host, String>() {
             @Nullable
@@ -151,8 +159,9 @@ public class RangeUtils {
 
     /**
      * Returns the token ranges that will be mapped to Spark partitions.
-     *
-     * @param config the Deep configuration object.
+     * 
+     * @param config
+     *            the Deep configuration object.
      * @return the list of computed token ranges.
      */
     public static List<DeepTokenRange> getSplits(CassandraDeepJobConfig config) {
@@ -197,11 +206,15 @@ public class RangeUtils {
 
     /**
      * Recursive function that splits a given token range to a given number of token ranges.
-     *
-     * @param range        the token range to be splitted.
-     * @param partitioner  the cassandra partitioner.
-     * @param bisectFactor the actual number of pieces the original token range will be splitted to.
-     * @param accumulator  a token range accumulator (ne
+     * 
+     * @param range
+     *            the token range to be splitted.
+     * @param partitioner
+     *            the cassandra partitioner.
+     * @param bisectFactor
+     *            the actual number of pieces the original token range will be splitted to.
+     * @param accumulator
+     *            a token range accumulator (ne
      */
     private static void bisectTokeRange(
             DeepTokenRange range, final IPartitioner partitioner, final int bisectFactor,
@@ -229,8 +242,9 @@ public class RangeUtils {
 
     /**
      * Creates a new instance of the cassandra partitioner configured in the configuration object.
-     *
-     * @param config the Deep configuration object.
+     * 
+     * @param config
+     *            the Deep configuration object.
      * @return an instance of the cassandra partitioner configured in the configuration object.
      */
     public static IPartitioner getPartitioner(ICassandraDeepJobConfig config) {
@@ -263,12 +277,12 @@ public class RangeUtils {
 
             Iterable<Comparable> sortedTokens =
                     transform(row.getSet("tokens", String.class), new Function<String, Comparable>() {
-                                @Nullable
-                                @Override
-                                public Comparable apply(final @Nullable String token) {
-                                    return (Comparable) tkValidator.compose(tkValidator.fromString(token));
-                                }
-                            }
+                        @Nullable
+                        @Override
+                        public Comparable apply(final @Nullable String token) {
+                            return (Comparable) tkValidator.compose(tkValidator.fromString(token));
+                        }
+                    }
                     );
 
             return Pair.create(host.getHostName(), sortedTokens);
@@ -276,8 +290,7 @@ public class RangeUtils {
     }
 
     /**
-     * Function that converts a partitioner hash to a token range. Takes into account
-     * the ring wrap-around range.
+     * Function that converts a partitioner hash to a token range. Takes into account the ring wrap-around range.
      */
     private static class MergeTokenRangesFunction implements Function<Comparable, Set<DeepTokenRange>> {
         private final Comparable maxValue;
@@ -298,6 +311,7 @@ public class RangeUtils {
             this.allRanges = allRanges;
         }
 
+        @Override
         public Set<DeepTokenRange> apply(final Comparable elem) {
             Comparable nextValue;
             Comparable currValue = elem;
@@ -337,10 +351,9 @@ public class RangeUtils {
         }
     }
 
-
     /**
      * Returns the token ranges that will be mapped to Spark partitions.
-     *
+     * 
      * @param config
      *            the Deep configuration object.
      * @return the list of computed token ranges.
