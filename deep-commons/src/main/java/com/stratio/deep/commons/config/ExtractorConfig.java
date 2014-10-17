@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.utils.Pair;
 import com.stratio.deep.commons.utils.Utils;
@@ -48,17 +47,17 @@ public class ExtractorConfig<T> extends BaseConfig<T> implements Serializable, C
         this.values = values;
     }
 
-
-
     public ExtractorConfig<T> putValue(String key, Serializable value) {
         values.put(key, value);
         return this;
     }
 
+    @Override
     public String getExtractorImplClassName() {
         return extractorImplClassName;
     }
 
+    @Override
     public void setExtractorImplClassName(String extractorImplClassName) {
         this.extractorImplClassName = extractorImplClassName;
     }
@@ -68,7 +67,11 @@ public class ExtractorConfig<T> extends BaseConfig<T> implements Serializable, C
     }
 
     public Integer getInteger(String key) {
-        return getValue(Integer.class, key);
+        try {
+            return getValue(Integer.class, key);
+        } catch (ClassCastException e) {
+            return Integer.parseInt(getString(key));
+        }
     }
 
     public Boolean getBoolean(String key) {

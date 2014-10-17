@@ -17,6 +17,7 @@
 package com.stratio.deep.cassandra.cql;
 
 import static com.stratio.deep.cassandra.cql.CassandraClientProvider.trySessionForLocation;
+
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -50,10 +51,9 @@ import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
-import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.entity.CassandraCell;
+import com.stratio.deep.cassandra.util.CassandraUtils;
 import com.stratio.deep.commons.config.DeepJobConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.exception.DeepIllegalAccessException;
@@ -62,29 +62,28 @@ import com.stratio.deep.commons.rdd.DeepTokenRange;
 import com.stratio.deep.commons.rdd.IDeepRecordReader;
 import com.stratio.deep.commons.utils.Pair;
 import com.stratio.deep.commons.utils.Utils;
-import static com.stratio.deep.cassandra.util.CassandraUtils.additionalFilterGenerator;
 
 /**
- * Implements a cassandra record reader with pagination capabilities.
- * Does not rely on Cassandra's Hadoop CqlPagingRecordReader.
+ * Implements a cassandra record reader with pagination capabilities. Does not rely on Cassandra's Hadoop
+ * CqlPagingRecordReader.
  * <p/>
  * Pagination is outsourced to Datastax Java Driver.
- *
+ * 
  * @author Luca Rosellini <luca@strat.io>
  */
 public class DeepRecordReader implements IDeepRecordReader {
     private static final Logger LOG = LoggerFactory.getLogger(DeepRecordReader.class);
 
-    private DeepTokenRange split;
+    private final DeepTokenRange split;
     private RowIterator rowIterator;
 
     private String cfName;
 
     // partition keys -- key aliases
-    private List<BoundColumn> partitionBoundColumns = new ArrayList<>();
+    private final List<BoundColumn> partitionBoundColumns = new ArrayList<>();
 
     // cluster keys -- column aliases
-    private List<BoundColumn> clusterColumns = new ArrayList<>();
+    private final List<BoundColumn> clusterColumns = new ArrayList<>();
 
     // cql query select columns
     private String columns;
@@ -102,9 +101,11 @@ public class DeepRecordReader implements IDeepRecordReader {
 
     /**
      * public constructor. Takes a list of filters to pass to the underlying data stores.
-     *
-     * @param config the deep configuration object.
-     * @param split  the token range on which the new reader will be based.
+     * 
+     * @param config
+     *            the deep configuration object.
+     * @param split
+     *            the token range on which the new reader will be based.
      */
     public DeepRecordReader(DeepJobConfig config, DeepTokenRange split) {
         this.config = (CassandraDeepJobConfig) config;
@@ -115,7 +116,9 @@ public class DeepRecordReader implements IDeepRecordReader {
 
     /**
      * Initialized this object.
-     * <p>Creates a new client and row iterator.</p>
+     * <p>
+     * Creates a new client and row iterator.
+     * </p>
      */
     private void initialize() {
         cfName = config.getTable();
@@ -139,7 +142,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
     /**
      * Creates a new connection. Reuses a cached connection if possible.
-     *
+     * 
      * @return the new session
      */
     private Session createConnection() {
@@ -167,13 +170,14 @@ public class DeepRecordReader implements IDeepRecordReader {
     /**
      * Closes this input reader object.
      */
+    @Override
     public void close() {
         /* dummy close method, no need to close any resource here */
     }
 
     /**
      * Creates a new empty LinkedHashMap.
-     *
+     * 
      * @return the map of associations between row column names and their values.
      */
     public Map<String, ByteBuffer> createEmptyMap() {
@@ -185,8 +189,8 @@ public class DeepRecordReader implements IDeepRecordReader {
      */
     class RowIterator extends AbstractIterator<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> {
         private Iterator<Row> rows;
-        private String partitionKeyString;       // keys in <key1>, <key2>, <key3> string format
-        private String partitionKeyMarkers;      // question marks in ? , ? , ? format which matches the number of keys
+        private String partitionKeyString; // keys in <key1>, <key2>, <key3> string format
+        private String partitionKeyMarkers; // question marks in ? , ? , ? format which matches the number of keys
 
         /**
          * Default constructor.
@@ -204,6 +208,7 @@ public class DeepRecordReader implements IDeepRecordReader {
         /**
          * {@inheritDoc}
          */
+        @Override
         protected Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> computeNext() {
             if (rows == null || !rows.hasNext()) {
                 return endOfData();
@@ -219,7 +224,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
         private void initColumns(Map<String, ByteBuffer> valueColumns, Map<String, ByteBuffer> keyColumns) {
             Row row = rows.next();
-            TableMetadata tableMetadata = ((CassandraDeepJobConfig) config).fetchTableMetadata();
+            TableMetadata tableMetadata = config.fetchTableMetadata();
 
             List<ColumnMetadata> partitionKeys = tableMetadata.getPartitionKey();
             List<ColumnMetadata> clusteringKeys = tableMetadata.getClusteringColumns();
@@ -269,7 +274,28 @@ public class DeepRecordReader implements IDeepRecordReader {
 
             return String.format("SELECT %s FROM %s%s%s ALLOW FILTERING",
                     generatedColumns, quote(cfName), clause,
-                    additionalFilterGenerator(config.getAdditionalFilters(), config.getFilters()));
+                    CassandraUtils.additionalFilterGenerator(config.getAdditionalFilters(), config.getFilters(),
+                            getLuceneIndex()));
+        }
+
+        /**
+         * Retrieve the column name for the lucene indexes. Null if there is no lucene index.
+         * 
+         * @return Lucene index; null, if doesn't exist.
+         */
+        private String getLuceneIndex() {
+            String indexName = "";
+            List<ColumnMetadata> columns =
+                    session.getCluster().getMetadata().getKeyspace(config.getCatalog()).getTable(config.getTable())
+                            .getColumns();
+            for (ColumnMetadata column : columns) {
+                if (column.getIndex() != null) {
+                    if (column.getIndex().isCustomIndex()) {
+                        indexName = column.getIndex().getName();
+                    }
+                }
+            }
+            return indexName;
         }
 
         /**
@@ -414,7 +440,7 @@ public class DeepRecordReader implements IDeepRecordReader {
      * retrieve the partition keys and cluster keys from system.schema_columnfamilies table
      */
     private void retrieveKeys() {
-        TableMetadata tableMetadata = ((CassandraDeepJobConfig) config).fetchTableMetadata();
+        TableMetadata tableMetadata = config.fetchTableMetadata();
 
         List<ColumnMetadata> partitionKeys = tableMetadata.getPartitionKey();
         List<ColumnMetadata> clusteringKeys = tableMetadata.getClusteringColumns();
@@ -480,20 +506,22 @@ public class DeepRecordReader implements IDeepRecordReader {
     }
 
     /**
-     * Returns a boolean indicating if the underlying rowIterator has a new element or not.
-     * DOES NOT advance the iterator to the next element.
-     *
+     * Returns a boolean indicating if the underlying rowIterator has a new element or not. DOES NOT advance the
+     * iterator to the next element.
+     * 
      * @return a boolean indicating if the underlying rowIterator has a new element or not.
      */
+    @Override
     public boolean hasNext() {
         return rowIterator.hasNext();
     }
 
     /**
      * Returns the next element in the underlying rowIterator.
-     *
+     * 
      * @return the next element in the underlying rowIterator.
      */
+    @Override
     public Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> next() {
         if (!this.hasNext()) {
             throw new DeepIllegalAccessException("DeepRecordReader exhausted");
@@ -503,30 +531,31 @@ public class DeepRecordReader implements IDeepRecordReader {
 
     //
     //
-    //    @Override
-    //    public void initialize(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
+    // @Override
+    // public void initialize(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException,
+    // InterruptedException {
     //
-    //    }
+    // }
     //
-    //    @Override
-    //    public boolean nextKeyValue() throws IOException, InterruptedException {
-    //        return false;
-    //    }
+    // @Override
+    // public boolean nextKeyValue() throws IOException, InterruptedException {
+    // return false;
+    // }
     //
-    //    @Override
-    //    public Object getCurrentKey() throws IOException, InterruptedException {
-    //        return null;
-    //    }
+    // @Override
+    // public Object getCurrentKey() throws IOException, InterruptedException {
+    // return null;
+    // }
     //
-    //    @Override
-    //    public Object getCurrentValue() throws IOException, InterruptedException {
-    //        return null;
-    //    }
+    // @Override
+    // public Object getCurrentValue() throws IOException, InterruptedException {
+    // return null;
+    // }
     //
-    //    @Override
-    //    public float getProgress() throws IOException, InterruptedException {
-    //        return 0;
-    //    }
+    // @Override
+    // public float getProgress() throws IOException, InterruptedException {
+    // return 0;
+    // }
     //
 
 }
