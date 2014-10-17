@@ -40,7 +40,7 @@
 
         <!-- Artifacts include -->
         <distribution.include>
-            org.apache.cassandra,org.apache.thrift,com.github.stephenc.high-scale-lib,com.googlecode.concurrentlinkedhashmap,com.github.stephenc,org.apache.commons,net.jpountz.lz4,com.yammer.metrics,org.yaml,org.antlr,com.datastax.cassandra,de.javakaffee,commons-cli,org.mongodb,org.elasticsearch
+            org.apache.cassandra,org.apache.thrift,com.github.stephenc.high-scale-lib,com.googlecode.concurrentlinkedhashmap,com.github.stephenc,org.apache.commons,net.jpountz.lz4,com.yammer.metrics,org.yaml,org.antlr,com.datastax.cassandra,de.javakaffee,commons-cli,org.mongodb,org.elasticsearch,com.github.jbellis
         </distribution.include>
     </properties>
 
@@ -125,9 +125,9 @@
     <dependencies>
         <!-- cassandra -->
         <dependency>
-            <groupId>com.stratio.cassandra</groupId>
+            <groupId>org.apache.cassandra</groupId>
             <artifactId>cassandra-all</artifactId>
-            <version>${cassandra.version}</version>
+            <version>${datastax.driver.version}</version>
         </dependency>
         <dependency>
             <groupId>com.datastax.cassandra</groupId>
@@ -144,7 +144,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
+        <dependency>
+            <groupId>com.github.jbellis</groupId>
+            <artifactId>jamm</artifactId>
+            <version>0.2.6</version>
+        </dependency>
         <!-- spark artifact -->
         <dependency>
             <groupId>org.apache.spark</groupId>
