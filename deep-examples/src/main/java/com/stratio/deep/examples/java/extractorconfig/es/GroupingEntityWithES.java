@@ -25,7 +25,7 @@ import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.CantoEntity;
 import com.stratio.deep.core.entity.WordCount;
-import com.stratio.deep.extractor.ESEntityExtractor;
+import com.stratio.deep.es.extractor.ESEntityExtractor;
 import com.stratio.deep.utils.ContextProperties;
 
 import org.apache.spark.api.java.JavaPairRDD;

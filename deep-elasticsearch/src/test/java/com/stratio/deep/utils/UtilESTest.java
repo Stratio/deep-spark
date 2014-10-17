@@ -23,7 +23,7 @@ import com.stratio.deep.commons.filter.FilterOperator;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.CantoEntity;
 import com.stratio.deep.core.entity.MetadataEntity;
-import com.stratio.deep.testentity.*;
+import com.stratio.deep.es.utils.UtilES;
 
 import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.Text;
@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.stratio.deep.utils.UtilES.generateQuery;
+import static com.stratio.deep.es.utils.UtilES.generateQuery;
 import static org.testng.Assert.*;
 
 /**

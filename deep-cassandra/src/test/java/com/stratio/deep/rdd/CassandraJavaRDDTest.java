@@ -37,7 +37,6 @@ import com.stratio.deep.cassandra.testentity.TestEntity;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
 import com.stratio.deep.commons.utils.Constants;
 import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.core.context.DeepSparkContext;

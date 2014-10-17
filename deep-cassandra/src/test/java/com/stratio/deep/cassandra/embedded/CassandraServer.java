@@ -189,7 +189,7 @@ public class CassandraServer {
 
         File dir = Files.createTempDir();
         String dirPath = dir.getAbsolutePath();
-        System.out.println("Storing Cassandra files in " + dirPath);
+        logger.info("Storing Cassandra files in " + dirPath);
 
         URL url = Resources.getResource("cassandra.yaml");
         String yaml = Resources.toString(url, Charsets.UTF_8);

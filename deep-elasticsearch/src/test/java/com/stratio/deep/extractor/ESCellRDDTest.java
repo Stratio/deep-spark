@@ -18,7 +18,7 @@ package com.stratio.deep.extractor;
 
 
 import com.stratio.deep.core.extractor.ExtractorTest;
-
+import com.stratio.deep.es.extractor.ESCellExtractor;
 
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;

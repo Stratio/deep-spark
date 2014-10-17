@@ -34,7 +34,6 @@ import com.stratio.deep.cassandra.config.CassandraConfigFactory;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.embedded.CassandraServer;
 import com.stratio.deep.cassandra.testentity.Cql3CollectionsTestEntity;
-import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
 import com.stratio.deep.commons.utils.Constants;
 import com.stratio.deep.core.context.DeepSparkContext;
@@ -44,8 +43,6 @@ import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import scala.Function1;
-import scala.reflect.ClassTag$;
 
 import static com.stratio.deep.commons.utils.Utils.quote;
 import static org.testng.Assert.*;

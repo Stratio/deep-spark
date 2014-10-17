@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.config;
+package com.stratio.deep.es.config;
 
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.FILTER_QUERY;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
-import static com.stratio.deep.utils.UtilES.generateQuery;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -36,6 +35,7 @@ import com.stratio.deep.commons.config.HadoopConfig;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.utils.Utils;
+import com.stratio.deep.es.utils.UtilES;
 
 /**
  * @param <T>
@@ -325,7 +325,7 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T> implements IESDeepJobCon
      * @param filterArray
      */
     private IESDeepJobConfig<T> filterQuery(Filter[] filterArray) {
-        query = "{ \"query\" :".concat((generateQuery(filterArray)).toString()).concat("}");
+        query = "{ \"query\" :".concat((UtilES.generateQuery(filterArray)).toString()).concat("}");
         return this;
     }
 

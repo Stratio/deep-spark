@@ -32,7 +32,6 @@ import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.cassandra.testentity.Cql3CollectionsTestEntity;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
 import com.stratio.deep.commons.utils.Constants;
 import com.stratio.deep.core.context.DeepSparkContext;
