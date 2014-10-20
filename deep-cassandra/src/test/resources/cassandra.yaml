@@ -293,7 +293,7 @@ concurrent_writes: 32
 # the number of full memtables to allow pending flush, that is,
 # waiting for a writer thread.  At a minimum, this should be set to
 # the maximum number of secondary indexes created on a single CF.
-memtable_flush_queue_size: 4
+# memtable_flush_queue_size: 4
 
 # Whether to, when doing sequential writing, fsync() at intervals in
 # order to force the operating system to flush the dirty
@@ -356,6 +356,13 @@ rpc_address: 0.0.0.0
 
 # port for Thrift to listen for clients on
 rpc_port: 9360
+
+# RPC address to broadcast to drivers and other Cassandra nodes. This cannot
+# be set to 0.0.0.0. If left blank, this will be set to the value of
+# rpc_address. If rpc_address is set to 0.0.0.0, broadcast_rpc_address must
+# be set.
+# broadcast_rpc_address: 1.2.3.4
+broadcast_rpc_address: localhost
 
 # enable or disable keepalive on rpc connections
 rpc_keepalive: true
@@ -457,7 +464,7 @@ column_index_size_in_kb: 64
 # Size limit for rows being compacted in memory.  Larger rows will spill
 # over to disk and use a slower two-pass compaction process.  A message
 # will be logged specifying the row key.
-in_memory_compaction_limit_in_mb: 64
+#in_memory_compaction_limit_in_mb: 64
 
 # Number of simultaneous compactions to allow, NOT including
 # validation "compactions" for anti-entropy repair.  Simultaneous
@@ -491,7 +498,7 @@ compaction_throughput_mb_per_sec: 16
 # Track cached row keys during compaction, and re-cache their new
 # positions in the compacted sstable.  Disable if you use really large
 # key caches.
-compaction_preheat_key_cache: true
+#compaction_preheat_key_cache: true
 
 # Throttles all outbound streaming file transfers on this node to the
 # given total throughput in Mbps. This is necessary because Cassandra does
