@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.extractor;
+package com.stratio.deep.es.extractor;
 
 import java.lang.reflect.InvocationTargetException;
 
 import com.stratio.deep.commons.config.DeepJobConfig;
-import com.stratio.deep.config.ESDeepJobConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.es.config.ESDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepTransformException;
 import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
-import com.stratio.deep.utils.UtilES;
+import com.stratio.deep.es.utils.UtilES;
+
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
 import org.elasticsearch.hadoop.mr.LinkedMapWritable;

@@ -147,7 +147,7 @@ chmod +x bin/stratio-deep-shell
 
 echo " >>> Executing make distribution script"
 ##  --skip-java-test has been added to Spark 1.0.0, avoids prompting the user about not having JDK 6 installed
-./make-distribution.sh --skip-java-test --hadoop 2.4.0 --with-yarn || { echo "Cannot make Spark distribution"; exit 1; }
+./make-distribution.sh --skip-java-test -Dhadoop.version=2.4.0 -Pyarn -Phive || { echo "Cannot make Spark distribution"; exit 1; }
 
 DISTDIR=spark-deep-distribution-${RELEASE_VER}
 DISTFILENAME=${DISTDIR}.tgz

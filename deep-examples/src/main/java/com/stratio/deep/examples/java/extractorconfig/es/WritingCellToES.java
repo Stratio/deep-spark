@@ -27,7 +27,7 @@ import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.extractor.ESCellExtractor;
+import com.stratio.deep.es.extractor.ESCellExtractor;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;

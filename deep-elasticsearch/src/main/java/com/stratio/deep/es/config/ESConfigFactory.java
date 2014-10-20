@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.config;
+package com.stratio.deep.es.config;
 
 import org.apache.log4j.Logger;
 

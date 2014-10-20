@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.utils;
+package com.stratio.deep.es.utils;
 
 /**
  * Several utilities to work used in the Spark <=> ElasticSearch integration.
@@ -53,18 +53,13 @@ import com.stratio.deep.commons.filter.FilterOperator;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Utils;
 import com.stratio.deep.commons.entity.IDeepType;
-import org.apache.hadoop.io.*;
-import org.elasticsearch.hadoop.mr.LinkedMapWritable;
+
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.*;
-import java.util.*;
 
 /**
  * Created by rcrespo on 29/07/14.

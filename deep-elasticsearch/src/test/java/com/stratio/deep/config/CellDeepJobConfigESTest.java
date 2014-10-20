@@ -22,6 +22,7 @@ import static org.testng.Assert.assertNotNull;
 import org.testng.annotations.Test;
 
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.es.config.ESDeepJobConfig;
 
 /**
  * Created by rcrespo on 29/08/14.

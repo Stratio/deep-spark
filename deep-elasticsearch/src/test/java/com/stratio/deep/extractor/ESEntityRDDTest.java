@@ -45,9 +45,9 @@ import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.CantoEntity;
-import com.stratio.deep.core.entity.MessageTestEntity;
 import com.stratio.deep.core.entity.WordCount;
 import com.stratio.deep.core.extractor.ExtractorTest;
+import com.stratio.deep.es.extractor.ESEntityExtractor;
 
 import scala.Tuple2;
 

@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.config;
+package com.stratio.deep.es.config;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
-
-import com.stratio.deep.commons.config.IDeepJobConfig;
 
 /**
  * Defines the public methods that each Stratio Deep ES configuration object should implement.

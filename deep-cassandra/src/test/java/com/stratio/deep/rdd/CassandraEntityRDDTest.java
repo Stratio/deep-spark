@@ -28,7 +28,6 @@ import com.stratio.deep.cassandra.config.CassandraConfigFactory;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.embedded.CassandraServer;
 import com.stratio.deep.cassandra.testentity.TestEntity;
-import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.exception.DeepIndexNotFoundException;
 import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
