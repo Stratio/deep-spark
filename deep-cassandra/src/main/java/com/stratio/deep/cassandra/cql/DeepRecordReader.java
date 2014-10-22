@@ -291,7 +291,7 @@ public class DeepRecordReader implements IDeepRecordReader {
             for (ColumnMetadata column : columns) {
                 if (column.getIndex() != null) {
                     if (column.getIndex().isCustomIndex()) {
-                        indexName = column.getIndex().getName();
+                        indexName = column.getName();
                     }
                 }
             }
