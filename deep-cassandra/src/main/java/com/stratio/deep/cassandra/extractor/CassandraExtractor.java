@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.spark.Partition;
-
+import com.stratio.deep.cassandra.thrift.ThriftRangeUtils;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.cql.DeepCqlRecordWriter;
@@ -30,7 +30,6 @@ import com.stratio.deep.cassandra.cql.RangeUtils;
 import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
 import com.stratio.deep.commons.impl.DeepPartition;
@@ -130,7 +129,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
         if (cassandraJobConfig.isBisectModeSet()) {
             underlyingInputSplits = RangeUtils.getSplits(cassandraJobConfig);
         } else {
-            underlyingInputSplits = RangeUtils.getSplitsBySize(cassandraJobConfig);
+            underlyingInputSplits = ThriftRangeUtils.build(cassandraJobConfig).getSplits();
         }
         Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
 
