@@ -36,7 +36,7 @@ public class ESConfigFactory {
      *
      * @return a new cell-based ElasticSearch job configuration object.
      */
-    public static IESDeepJobConfig<Cells> createES() {
+    public static ESDeepJobConfig<Cells> createES() {
         return new ESDeepJobConfig(Cells.class);
     }
 
@@ -47,7 +47,7 @@ public class ESConfigFactory {
      * @param <T>         the generic type of the entity object implementing IDeepType.
      * @return a new entity-based ElasticSearch job configuration object.
      */
-    public static <T extends IDeepType> IESDeepJobConfig<T> createES(Class<T> entityClass) {
+    public static <T extends IDeepType> ESDeepJobConfig<T> createES(Class<T> entityClass) {
         return new ESDeepJobConfig<>(entityClass);
     }
 }

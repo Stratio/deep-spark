@@ -32,9 +32,12 @@ import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.HadoopConfig;
+import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.utils.Utils;
+import com.stratio.deep.es.extractor.ESCellExtractor;
+import com.stratio.deep.es.extractor.ESEntityExtractor;
 import com.stratio.deep.es.utils.UtilES;
 
 /**
@@ -73,6 +76,11 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T> implements IESDeepJobCon
      */
     public ESDeepJobConfig(Class<T> entityClass) {
         super(entityClass);
+        if(Cells.class.isAssignableFrom(entityClass)){
+            extractorImplClass = ESCellExtractor.class;
+        }else{
+            extractorImplClass = ESEntityExtractor.class;
+        }
     }
 
 
@@ -112,6 +120,10 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T> implements IESDeepJobCon
         return this;
     }
 
+
+    public String getResource(){
+        return type!=null?index.concat("/").concat(type):index;
+    }
     /**
      * {@inheritDoc}
      */
@@ -122,7 +134,8 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T> implements IESDeepJobCon
         configHadoop = new JobConf();
         ((JobConf)configHadoop).setInputFormat(EsInputFormat.class);
         ((JobConf)configHadoop).setOutputFormat(EsOutputFormat.class);
-        configHadoop.set(ConfigurationOptions.ES_RESOURCE, index.concat("/").concat(type));
+
+        configHadoop.set(ConfigurationOptions.ES_RESOURCE, getResource());
         configHadoop.set(ConfigurationOptions.ES_FIELD_READ_EMPTY_AS_NULL, "false");
 
         if (query != null) {
@@ -172,7 +185,9 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T> implements IESDeepJobCon
         if (index == null) {
             throw new IllegalArgumentException("index cannot be null");
         }
-
+        if (type == null) {
+            throw new IllegalArgumentException("type cannot be null");
+        }
     }
 
     /**
@@ -208,13 +223,13 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T> implements IESDeepJobCon
     }
 
     @Override
-    public IESDeepJobConfig<T> database(String database) {
+    public ESDeepJobConfig<T> database(String database) {
         this.index = database;
         return this;
     }
 
     @Override
-    public IESDeepJobConfig<T> host(List<String> host) {
+    public ESDeepJobConfig<T> host(List<String> host) {
         hostList.addAll(host);
         return this;
     }
@@ -231,24 +246,46 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T> implements IESDeepJobCon
     }
 
     @Override
-    public IESDeepJobConfig<T> filterQuery(String query) {
+    public ESDeepJobConfig<T> filterQuery(String query) {
         this.query = query;
         return this;
     }
 
     @Override
-    public IESDeepJobConfig<T> sort(String sort) {
+    public ESDeepJobConfig<T> sort(String sort) {
         return null;
     }
 
     @Override
-    public IESDeepJobConfig<T> inputKey(String inputKey) {
+    public ESDeepJobConfig<T> inputKey(String inputKey) {
         return null;
     }
 
     @Override
     public List<String> getHostList() {
         return hostList;
+    }
+
+    @Override
+    public ESDeepJobConfig<T> type(String type) {
+        this.type=type;
+        return this;
+    }
+
+    /**
+     * Same as type
+     * @param type
+     * @return
+     */
+    public ESDeepJobConfig<T> tipe(String type) {
+        this.type=type;
+        return this;
+    }
+
+    @Override
+    public ESDeepJobConfig<T> index(String index) {
+        this.index=index;
+        return this;
     }
 
     @Override
@@ -272,7 +309,7 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T> implements IESDeepJobCon
     }
 
     @Override
-    public IESDeepJobConfig<T> customConfiguration(Map<String, Serializable> customConfiguration) {
+    public ESDeepJobConfig<T> customConfiguration(Map<String, Serializable> customConfiguration) {
         return null;
     }
 
@@ -303,10 +340,14 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T> implements IESDeepJobCon
             port(extractorConfig.getInteger(ExtractorConstants.PORT));
         }
 
-        if(values.get(ExtractorConstants.INDEX)!=null&& (values.get(ExtractorConstants.TYPE)!= null)){
+        if(values.get(ExtractorConstants.INDEX)!=null){
             index = extractorConfig.getString(ExtractorConstants.INDEX);
+
+        }
+
+        if(values.get(ExtractorConstants.TYPE)!= null){
             type = extractorConfig.getString(ExtractorConstants.TYPE);
-       }
+        }
 
         if (values.get(INPUT_COLUMNS) != null) {
             inputColumns(extractorConfig.getStringArray(INPUT_COLUMNS));
@@ -324,13 +365,13 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T> implements IESDeepJobCon
     /**
      * @param filterArray
      */
-    private IESDeepJobConfig<T> filterQuery(Filter[] filterArray) {
+    private ESDeepJobConfig<T> filterQuery(Filter[] filterArray) {
         query = "{ \"query\" :".concat((UtilES.generateQuery(filterArray)).toString()).concat("}");
         return this;
     }
 
 
-    public IESDeepJobConfig<T> port(int port) {
+    public ESDeepJobConfig<T> port(int port) {
         this.port = port;
         return this;
     }

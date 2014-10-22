@@ -73,6 +73,10 @@ public interface IESDeepJobConfig<T> {
      */
     List<String> getHostList();
 
+    ESDeepJobConfig<T> type(String type);
+
+    ESDeepJobConfig<T> index(String index);
+
     String getType();
 
     String getIndex();
