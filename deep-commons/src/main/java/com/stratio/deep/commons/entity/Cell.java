@@ -31,7 +31,7 @@ import java.util.UUID;
 /**
  * Created by rcrespo on 2/07/14.
  */
-public  class Cell implements Serializable {
+public class Cell implements Serializable {
 
     private static final long serialVersionUID = 2298549804049316156L;
 
@@ -70,7 +70,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell name.
-     *
+     * 
      * @return the cell name.
      */
     public String getName() {
@@ -83,9 +83,11 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted to the specified class.
-     *
-     * @param clazz the expected class
-     * @param <T>   the return type
+     * 
+     * @param clazz
+     *            the expected class
+     * @param <T>
+     *            the return type
      * @return the cell value casted to the specified class
      */
     public <T> T getValue(Class<T> clazz) {
@@ -98,7 +100,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted as a {@code String}.
-     *
+     * 
      * @return the cell value casted as a {@code String}.
      */
     public String getString() {
@@ -107,7 +109,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted as a {@code Boolean}.
-     *
+     * 
      * @return the cell value casted as a {@code Boolean}.
      */
     public Boolean getBoolean() {
@@ -116,7 +118,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted as a {@code Date}.
-     *
+     * 
      * @return the cell value casted as a {@code Date}.
      */
     public Date getDate() {
@@ -125,7 +127,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted as a {@code UUID}.
-     *
+     * 
      * @return the cell value casted as a {@code UUID}.
      */
     public UUID getUUID() {
@@ -134,7 +136,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted as a {@code Short}.
-     *
+     * 
      * @return the cell value casted as a {@code Short}.
      */
     public Short getShort() {
@@ -143,7 +145,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted as a {@code Byte}.
-     *
+     * 
      * @return the cell value casted as a {@code Byte}.
      */
     public Byte getByte() {
@@ -152,7 +154,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted as a {@code Byte[]}.
-     *
+     * 
      * @return the cell value casted as a {@code Byte[]}.
      */
     public Byte[] getBytes() {
@@ -161,7 +163,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted as a {@code Character}.
-     *
+     * 
      * @return the cell value casted as a {@code Character}.
      */
     public Character getCharacter() {
@@ -170,7 +172,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted as a {@code Integer}.
-     *
+     * 
      * @return the cell value casted as a {@code Integer}.
      */
     public Integer getInteger() {
@@ -179,7 +181,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted as a {@code Long}.
-     *
+     * 
      * @return the cell value casted as a {@code Long}.
      */
     public Long getLong() {
@@ -188,7 +190,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted as a {@code BigInteger}.
-     *
+     * 
      * @return the cell value casted as a {@code BigInteger}.
      */
     public BigInteger getBigInteger() {
@@ -197,7 +199,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted as a {@code Float}.
-     *
+     * 
      * @return the cell value casted as a {@code Float}.
      */
     public Float getFloat() {
@@ -206,7 +208,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted as a {@code Double}.
-     *
+     * 
      * @return the cell value casted as a {@code Double}.
      */
     public Double getDouble() {
@@ -215,7 +217,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted as a {@code BigDecimal}.
-     *
+     * 
      * @return the cell value casted as a {@code BigDecimal}.
      */
     public BigDecimal getBigDecimal() {
@@ -224,7 +226,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted as a {@code URL}.
-     *
+     * 
      * @return the cell value casted as a {@code URL}.
      */
     public URL getURL() {
@@ -233,7 +235,7 @@ public  class Cell implements Serializable {
 
     /**
      * Returns the cell value casted as a {@code InetAddress}.
-     *
+     * 
      * @return the cell value casted as a {@code InetAddress}.
      */
     public InetAddress getInetAddress() {
@@ -278,11 +280,19 @@ public  class Cell implements Serializable {
         return this.cellName.equals(cell.cellName) && this.cellValue.equals(cell.cellValue);
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((cellName == null) ? 0 : cellName.hashCode());
+        result = prime * result + ((cellValue == null) ? 0 : cellValue.hashCode());
+        return result;
+    }
+
     /**
-     * @return true is the current cell is a key inside the datastore, false
-     * otherwise.
+     * @return true is the current cell is a key inside the datastore, false otherwise.
      */
-    public Boolean isKey(){
+    public Boolean isKey() {
         return false;
     }
 

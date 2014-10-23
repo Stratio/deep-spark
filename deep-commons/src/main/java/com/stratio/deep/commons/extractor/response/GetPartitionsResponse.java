@@ -22,7 +22,7 @@ public class GetPartitionsResponse extends Response {
 
     public GetPartitionsResponse(Partition[] partitions) {
         super(ActionType.GET_PARTITIONS);
-        this.partitions = partitions;
+        this.partitions = partitions.clone();
     }
 
     public Partition[] getPartitions() {
