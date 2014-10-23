@@ -288,17 +288,6 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         assertTrue(mappedRDD.count() > 0);
 
         CassandraDeepJobConfig<TestEntity> writeConfig = getWriteConfig();
-//        writeConfig.createTableOnWrite(Boolean.FALSE);
-//        try {
-//
-//            DeepSparkContext.saveRDD(mappedRDD, writeConfig);
-//
-//            fail();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            // ok
-//            writeConfig.createTableOnWrite(Boolean.TRUE);
-//        }
 
         DeepSparkContext.saveRDD(mappedRDD, writeConfig);
 

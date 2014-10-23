@@ -48,9 +48,8 @@ import static org.testng.Assert.*;
 /**
  * Integration tests for generic cell RDDs where cells contain Cassandra's collections.
  */
-//, dependsOnGroups = "CassandraCollectionsEntityTest"
 @Test(suiteName = "cassandraRddTests",
-        groups = "CassandraCollectionsCellsTest")
+        groups = "CassandraCollectionsCellsTest", dependsOnGroups = "CassandraCollectionsEntityTest")
 public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
     @BeforeClass
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
@@ -191,19 +190,9 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
 
         CassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
 
-//        writeConfig.createTableOnWrite(Boolean.FALSE);
-//
-//        try {
-//            DeepSparkContext.saveRDD(mappedRDD, writeConfig);
-//
-//            fail();
-//        } catch (Exception e) {
-//            // ok
-//            writeConfig.createTableOnWrite(Boolean.TRUE);
-//        }
 
 //        DeepSparkContext.saveRDD(mappedRDD, writeConfig);
-
+//
 //        checkOutputTestData();
     }
 
@@ -250,21 +239,13 @@ public class CassandraCollectionsCellsTest extends CassandraRDDTest<Cells> {
     @Override
     public void testSimpleSaveToCassandra() {
         CassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
-//        writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
             executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
         } catch (Exception e) {
         }
 
-//        try {
-//            DeepSparkContext.saveRDD(getRDD(), writeConfig);
-//
-//            fail();
-//        } catch (Exception e) {
-//            // ok
-//            writeConfig.createTableOnWrite(Boolean.TRUE);
-//        }
+
 
         DeepSparkContext.saveRDD(getRDD(), writeConfig);
 

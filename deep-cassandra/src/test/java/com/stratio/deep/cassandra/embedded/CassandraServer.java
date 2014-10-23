@@ -141,7 +141,7 @@ public class CassandraServer {
     }
 
     public CassandraServer(String yamlFile) {
-        this.yamlFilePath = "/cassandra.yaml";
+        this.yamlFilePath = yamlFile;
     }
 
     public String[] getStartupCommands() {

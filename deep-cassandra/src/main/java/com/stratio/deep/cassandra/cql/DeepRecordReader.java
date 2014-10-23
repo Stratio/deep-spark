@@ -40,6 +40,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.ColumnMetadata;
+import com.datastax.driver.core.KeyspaceMetadata;
+import com.datastax.driver.core.Metadata;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
@@ -285,9 +287,9 @@ public class DeepRecordReader implements IDeepRecordReader {
          */
         private String getLuceneIndex() {
             String indexName = "";
-            List<ColumnMetadata> columns =
-                    session.getCluster().getMetadata().getKeyspace(config.getCatalog()).getTable(config.getTable())
-                            .getColumns();
+
+            TableMetadata tableMetadata = config.fetchTableMetadata();
+            List<ColumnMetadata> columns = tableMetadata.getColumns();
             for (ColumnMetadata column : columns) {
                 if (column.getIndex() != null) {
                     if (column.getIndex().isCustomIndex()) {

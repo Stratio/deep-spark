@@ -304,22 +304,13 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
     @Override
     public void testSimpleSaveToCassandra() {
         CassandraDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = getWriteConfig();
-//        writeConfig.createTableOnWrite(Boolean.FALSE);
 
         try {
             executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
         } catch (Exception e) {
         }
 
-//        try {
-//            DeepSparkContext.saveRDD(getRDD(), writeConfig);
-//
-//            fail();
-//        } catch (Exception e) {
-//            // ok
-//            logger.info("Correctly catched Exception: " + e.getMessage());
-//            writeConfig.createTableOnWrite(Boolean.TRUE);
-//        }
+
 
         DeepSparkContext.saveRDD(getRDD(), writeConfig);
 

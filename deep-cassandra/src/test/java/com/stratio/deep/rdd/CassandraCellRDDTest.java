@@ -200,15 +200,6 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
         assertTrue(mappedRDD.count() > 0);
 
         CassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
-//        writeConfig.createTableOnWrite(Boolean.FALSE);
-//
-//        try {
-//            DeepSparkContext.saveRDD(mappedRDD, writeConfig);
-//            fail();
-//        } catch (Exception e) {
-//            // ok
-//            writeConfig.createTableOnWrite(Boolean.TRUE);
-//        }
 
         DeepSparkContext.saveRDD(mappedRDD, writeConfig);
         checkOutputTestData();
@@ -222,15 +213,6 @@ public class CassandraCellRDDTest extends CassandraRDDTest<Cells> {
         }
 
         CassandraDeepJobConfig<Cells> writeConfig = getWriteConfig();
-//        writeConfig.createTableOnWrite(Boolean.FALSE);
-
-        try {
-//            DeepSparkContext.saveRDD(getRDD(), writeConfig);
-//            fail();
-        } catch (Exception e) {
-            // ok
-            writeConfig.createTableOnWrite(Boolean.TRUE);
-        }
 
         DeepSparkContext.saveRDD(getRDD(), writeConfig);
         checkSimpleTestData();
