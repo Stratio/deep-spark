@@ -36,11 +36,11 @@
 
         <java.version>1.7</java.version>
 
-        <hadoop.version>2.4.0</hadoop.version>
+        <hadoop.version>2.5.1</hadoop.version>
 
         <!-- Artifacts include -->
         <distribution.include>
-            org.apache.cassandra,org.apache.thrift,com.github.stephenc.high-scale-lib,com.googlecode.concurrentlinkedhashmap,com.github.stephenc,org.apache.commons,net.jpountz.lz4,com.yammer.metrics,org.yaml,org.antlr,com.datastax.cassandra,de.javakaffee,commons-cli,org.mongodb,org.elasticsearch,com.github.jbellis
+            org.apache.cassandra,org.apache.thrift,com.github.stephenc.high-scale-lib,com.googlecode.concurrentlinkedhashmap,com.github.stephenc,org.apache.commons,net.jpountz.lz4,com.yammer.metrics,org.yaml,org.antlr,com.datastax.cassandra,de.javakaffee,commons-cli,org.mongodb,org.elasticsearch,com.github.jbellis,com.google.guava
         </distribution.include>
     </properties>
 
@@ -185,6 +185,10 @@
                     <artifactId>chill-java</artifactId>
                     <groupId>com.twitter</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -208,13 +212,29 @@
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
             <version>${hadoop.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-mapreduce-client-app</artifactId>
             <version>${hadoop.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
+        <dependency>
+            <artifactId>guava</artifactId>
+            <groupId>com.google.guava</groupId>
+            <version>16.0</version>
+        </dependency>
 
         <!-- test -->
 

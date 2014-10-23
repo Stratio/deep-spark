@@ -80,11 +80,6 @@
 
     <dependencies>
         <dependency>
-            <artifactId>guava</artifactId>
-            <groupId>com.google.guava</groupId>
-            <version>16.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.stratio.deep</groupId>
             <artifactId>deep-commons</artifactId>
             <version>${project.version}</version>
