@@ -130,7 +130,7 @@
             <version>${cassandra.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>netty</artifactId>
+                    <artifactId>netty-all</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
@@ -186,6 +186,17 @@
                     <groupId>com.twitter</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.9.1</version>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.7.1</version>
         </dependency>
 
         <dependency>

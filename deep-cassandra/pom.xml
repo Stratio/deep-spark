@@ -80,9 +80,10 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.cassandra</groupId>
-            <artifactId>cassandra-all</artifactId>
-            <version>${cassandra.version}</version>
+            <artifactId>guava</artifactId>
+            <groupId>com.google.guava</groupId>
+            <version>16.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.stratio.deep</groupId>
