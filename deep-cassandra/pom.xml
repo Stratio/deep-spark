@@ -83,7 +83,6 @@
             <artifactId>guava</artifactId>
             <groupId>com.google.guava</groupId>
             <version>16.0</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.stratio.deep</groupId>
