@@ -550,9 +550,9 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
             bisectFactor(extractorConfig.getInteger(BISECT_FACTOR));
         }
 
-        if(values.get(SPLIT_SIZE)!=null){
-            splitSize(extractorConfig.getInteger(SPLIT_SIZE));
-        }
+//        if(values.get(SPLIT_SIZE)!=null){
+//            splitSize(extractorConfig.getInteger(SPLIT_SIZE));
+//        }
 
 
         if(values.get(ExtractorConstants.FILTER_FIELD)!=null){
@@ -901,11 +901,12 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
         return bisectFactor;
     }
 
+//TODO: It will be added in a future release
     @Override
     public CassandraDeepJobConfig<T> splitSize(int splitSize) {
-        this.isSplitModeSet = true;
-        this.isBisectModeSet = false;
-        this.splitSize = splitSize;
+//        this.isSplitModeSet = true;
+//        this.isBisectModeSet = false;
+//        this.splitSize = splitSize;
         return this;
     }
 
