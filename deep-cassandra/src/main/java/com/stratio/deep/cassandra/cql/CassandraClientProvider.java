@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ProtocolVersion;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.LoadBalancingPolicy;
 import com.datastax.driver.core.policies.Policies;
@@ -107,6 +108,7 @@ class CassandraClientProvider {
                         .withPort(port)
                         .addContactPoint(location)
                         .withLoadBalancingPolicy(loadBalancingPolicy)
+                        .withProtocolVersion(ProtocolVersion.V2)
                         .withCredentials(conf.getUsername(), conf.getPassword())
                         .build();
 
