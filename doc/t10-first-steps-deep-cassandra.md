@@ -375,13 +375,13 @@ properties of the configuration object: Define a configuration object for the RD
 string for Cassandra, namely the keyspace and the table name:
 
 ```shell-session
-scala> val config : ICassandraDeepJobConfig[Cells] = Cfg.create().host("localhost").rpcPort(9160).keyspace("crawler").table("Page").initialize
+scala> val config : CassandraDeepJobConfig[Cells] = CassandraConfigFactory.create().host("localhost").rpcPort(9160).keyspace("crawler").table("Page").initialize
 ```
 
 Create an RDD in the Deep context using the configuration object:
 
 ```shell-session
-scala> val rdd: CassandraRDD[Cells] = deepContext.cassandraGenericRDD(config)
+scala> val rdd: RDD[Cells] = deepContext.createRDD(config)
 ```
 
 Step 2: Filtering data
@@ -449,23 +449,24 @@ cells for populating the “listdomains” table are obtained by applying a tran
 tuples of the CassandraRDD object “numPagePerDomainPairs” to construct the cells:
 
 ```shell-session
-scala> val outRDD = numPagePerDomainPairs map { t: (String, Int) => 
-    val domainNameCell = Cell.create("domain", t._1, true, false);
-    val numPagesCell = Cell.create("num_pages", t._2);
-    new Cells(domainNameCell, numPagesCell) 
-}
+scala> val outputRDD: RDD[Cells] = numPagePerDomainPairs map {
+      t: (String, Int) =>
+        val c1 = CassandraCell.create("domain", t._1, true, false);
+        val c2 = CassandraCell.create("num_pages", t._2);
+        new Cells("crawler", c1, c2)
+    }
 ```
 
 Now that we have a RDD of cells to be written, we create the new configuration for the listdomains table:
 
 ```shell-session
-scala> val outConfig = Cfg.createWriteConfig().host("localhost").rpcPort(9160).keyspace("crawler").table("listdomains").initialize
+scala> val outputConfig = CassandraConfigFactory.createWriteConfig().host("localhost").rpcPort(9160).keyspace("crawler").table("listdomains").createTableOnWrite(true).initialize
 ```
 
 Then write the outRDD to Cassandra:
 
 ```shell-session
-scala> com.stratio.deep.rdd.CassandraRDD.saveRDDToCassandra(outRDD, outConfig)
+scala> DeepSparkContext.saveRDD(outputRDD, outputConfig)
 ```
 
 To check that the data has been correctly written to Cassandra, exit the Deep shell, open a CQL shell and 
