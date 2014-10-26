@@ -101,15 +101,13 @@ port properties of the configuration object: Define a configuration object for t
 connection string for MongoDB, namely the database and the collection name:
 
 ```shell-session
-scala> import org.apache.spark.rdd._
-scala> import scala.collection.JavaConversions._
-scala> val inputConfigEntity: IMongoDeepJobConfig[BookEntity] = Cfg.createMongoDB(classOf[BookEntity]).host("localhost:27017").database("book").collection("input").initialize
+val inputConfigEntity: MongoDeepJobConfig[BookEntity] = MongoConfigFactory.createMongoDB(classOf[BookEntity]).host("localhost:27017").database("book").collection("input").readPreference("nearest").initialize
 ```
 
 Create a RDD in the Deep context using the configuration object:
 
 ```shell-session
-scala> val inputRDDEntity: MongoEntityRDD[BookEntity] = deepContext.mongoEntityRDD(inputConfigEntity)
+scala> val inputRDDEntity: RDD[BookEntity] = deepContext.createJavaRDD(inputConfigEntity)
 ```
 
 Step 2: Word Count
@@ -126,7 +124,7 @@ scala> val words: RDD[String] = inputRDDEntity flatMap {
 Now we make a JavaPairRDD&lt;String, Integer>, counting one unit for each word
 
 ```shell-session
-scala> val wordCount : RDD[(String, Integer)] = words map { s:String => (s,1) }
+scala> val wordCount : RDD[(String, Long)] = words map { s:String => (s,1) }
 ```
 
 We group by word
@@ -138,7 +136,7 @@ scala> val wordCountReduced  = wordCount reduceByKey { (a,b) => a + b }
 Create a new WordCount Object from
 
 ```shell-session
-scala> val outputRDD = wordCountReduced map { e:(String, Integer) => new WordCount(e._1, e._2) }
+scala> val outputRDD = wordCountReduced map { e:(String, Long) => new WordCount(e._1, e._2) }
 ```
 
 Step 3: Writing the results to MongoDB
@@ -150,13 +148,13 @@ a configuration that binds the RDD to the given collection and then writes its c
 using that configuration:
 
 ```shell-session
-scala> val outputConfigEntity: IMongoDeepJobConfig[WordCount] = Cfg.createMongoDB(classOf[WordCount]).host("localhost:27017").database("book").collection("output").initialize
+scala> val outputConfigEntity: MongoDeepJobConfig[WordCount] = MongoConfigFactory.createMongoDB(classOf[WordCount]).host("localhost:27017").database("book").collection("output").readPreference("nearest").initialize
 ```
 
 Then write the outRDD to MongoDB:
 
 ```shell-session
-scala> MongoEntityRDD.saveEntity(outputRDD, outputConfigEntity)
+scala>DeepSparkContext.saveRDD(outputRDD, outputConfigEntity)
 ```
 
 To check that the data has been correctly written to MongoDB, open a Mongo shell and look at the contents 
