@@ -422,11 +422,11 @@ scala> import com.example.TweetEntity
 TweetEntity can now be used to create a RDD out of the Cassandra table “tweets”:
 
 ```shell-session
-scala> val config = Cfg.create(classOf[TweetEntity]).host("localhost").rpcPort(9160).keyspace("test").table("tweets").initialize
+scala> val config = CassandraConfigFactory.create(classOf[TweetEntity]).host("localhost").rpcPort(9160).keyspace("test").table("tweets").initialize
 ```
 
 ```shell-session
-scala> val rdd = deepContext.cassandraEntityRDD(config)
+scala> val rdd: RDD[TweetEntity] = deepContext.createRDD(config)
 ```
 
 Check the number of tweet objects in the RDD:
