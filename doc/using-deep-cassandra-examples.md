@@ -91,13 +91,13 @@ columns are bound to generic cells that include metadata along with the values.
 val deepContext: DeepSparkContext = new DeepSparkContext(cluster, job)
 
 // Configuration and initialization
-val config: ICassandraDeepJobConfig[Cells] = DeepJobConfigFactory.create()
-    .host(cassandraHost).rpcPort(cassandraPort)
-    .keyspace(keyspaceName).table(tableName)
-    .initialize
+val config: CassandraDeepJobConfig[Cells] = CassandraConfigFactory.create()
+      .host(cassandraHost).rpcPort(cassandraPort)
+      .keyspace(keyspaceName).table(tableName)
+      .initialize
 
 // Creating the RDD
-val rdd: CassandraRDD[Cells] = deepContext.cassandraGenericRDD(config)
+val rdd: RDD[Cells] = deepContext.createRDD(config)
 ```
 {% endtab %}
 {% tab Java %}
@@ -129,13 +129,13 @@ When working with entity objects, an entity RDD must be used.
 val deepContext: DeepSparkContext = new DeepSparkContext(cluster, job)
 
 // Configure and initialize the RDD
-val config = DeepJobConfigFactory.create(classOf[TableEntity])
-                .host(cassandraHost).rpcPort(cassandraPort)
-                .keyspace(keyspaceName).table(tableName)
-                .initialize
+val config = CassandraConfigFactory.create(classOf[TableEntity])
+      .host(cassandraHost).rpcPort(cassandraPort)
+      .keyspace(keyspaceName).table(tableName)
+      .initialize
 
 // Create the RDD
-val rdd: CassandraRDD[TableEntity] = deepContext.cassandraEntityRDD(config)
+val rdd: RDD[TableEntity] = deepContext.createRDD(config)
 ```
 {% endtab %}
 {% tab Java %}
@@ -307,12 +307,11 @@ Writing a Cell RDD
 {% tab Scala %}
 ```scala
 // --- INPUT RDD
-val inputConfig = DeepJobConfigFactory.create()
-    .host(cassandraHost).rpcPort(cassandraPort)
-    .keyspace(inputKeyspaceName).table(inputTableName)
-    .initialize
-
-val inputRDD: CassandraRDD[Cells] = deepContext.cassandraGenericRDD(inputConfig)
+val inputConfig = CassandraConfigFactory.create()
+      .host(cCassandraHost).rpcPort(cassandraPort)
+      .keyspace(inputKeyspaceName).table(inputTableName)
+      .initialize
+val inputRDD: RDD[Cells] = deepContext.createRDD(inputConfig)
 
 val pairRDD: RDD[(String, Cells)] = inputRDD map {
     c:Cells => (c.getCellByName("columnName").getCellValue.asInstanceOf[String], c)
@@ -322,20 +321,21 @@ val numPerKey: RDD[(String, Integer)] = pairRDD.groupByKey
     .map { t:(String, Iterable[Cells]) => (t._1, t._2.size)}
 
 // --- OUTPUT RDD
-val outputConfig = DeepJobConfigFactory.createWriteConfig()
-        .host(cassandraHost).rpcPort(cassandraPort)
-        .keyspace(outputKeyspaceName).table(outputTableName)
-        .createTableOnWrite(true)
-        .initialize
-
-val outputRDD: RDD[Cells] = numPerKey map { t: (String, Int) =>
-    val c1 = Cell.create("primaryKeyColumnName", t._1, true, false);
-    val c2 = Cell.create("otherColumnName", t._2);
-    new Cells(c1, c2)
-}
+ val outputConfig = CassandraConfigFactory.createWriteConfig()
+      .host(cassandraHost)rpcPort(cassandraPort)
+      .keyspace(outputKeyspaceName).table(outputTableName)
+      .createTableOnWrite(true)
+      .initialize
+      
+val outputRDD: RDD[Cells] = numPerKey map {
+      t: (String, Integer) =>
+        val c1 = CassandraCell.create("primaryKeyColumnName", t._1, true, false);
+        val c2 = CassandraCell.create("otherColumnName", t._2);
+        new Cells(outputKeyspaceName, c1, c2)
+    }
 
 // Write to Cassandra
-CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig)
+DeepSparkContext.saveRDD(outputRDD, outputConfig)
 ```
 {% endtab %}
 {% tab Java %}
@@ -394,12 +394,11 @@ Writing an Entity RDD
 {% tab Scala %}
 ```scala
 // --- INPUT RDD
-val inputConfig = DeepJobConfigFactory.create(classOf[InputTableEntity])
-    .host(cassandraHost).rpcPort(cassandraPort)
-    .keyspace(inputKeyspaceName).table(inputTableName)
-    .initialize
-
-val inputRDD: CassandraRDD[InputTableEntity] = deepContext.cassandraEntityRDD(inputConfig)
+val inputConfig = CassandraConfigFactory.create(classOf[PageEntity])
+      .host(cassandraHost).rpcPort(cassandraPort)
+      .keyspace(inputKeyspaceName).table(inputTableName)
+      .initialize
+val inputRDD: RDD[InputTableEntity] = deepContext.createRDD(inputConfig)
 
 val pairRDD: RDD[(String, InputTableEntity)] = inputRDD map {e:IntputTableEntity => (e.getKey, e)}
 
@@ -407,17 +406,18 @@ val numPerKey: RDD[(String, Int)] = pairRDD.groupByKey
     .map { t:(String, Iterable[InputTableEntity]) => (t._1, t._2.size)}
 
 // --- OUTPUT RDD
-val outputConfig = DeepJobConfigFactory.createWriteConfig(classOf[OutputTableEntity])
-    .host(cassandraHost).rpcPort(cassandraPort)
-    .keyspace(outputKeyspaceName).table(outputTableName)
-    .initialize
+val outputConfig = CassandraConfigFactory.createWriteConfig(classOf[OutputTableEntity])
+      .host(cassandraHost).rpcPort(cassandraPort)
+      .keyspace(outputKeyspaceName).table(outputTableName)
+      .createTableOnWrite(true)
+      .initialize
 
 val outputRDD: RDD[OutputTableEntity] = numPerKey map { t: (String, Int) => 
     new OutputTableEntity(t._1, t._2);
 }
 
 // Write to Cassandra
-CassandraRDD.saveRDDToCassandra(outputRDD, outputConfig)
+DeepSparkContext.saveRDD(outputRDD, outputConfig)
 ```
 {% endtab %}
 {% tab Java %}
