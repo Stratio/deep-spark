@@ -59,4 +59,14 @@ public interface IAerospikeDeepJobConfig<T> {
      */
     IAerospikeDeepJobConfig<T> host(List<String> host);
 
+    /**
+     * Sets the operation to perform in Aerospike.
+     *
+     * @param operation the operation to perform in aerospike.
+     * @return
+     */
+    IAerospikeDeepJobConfig<T> operation(String operation);
+
+    String getOperation();
+
 }
