@@ -30,6 +30,13 @@ public interface IAerospikeDeepJobConfig<T> {
      */
     IAerospikeDeepJobConfig<T> set(String set);
 
+    /**
+     * Aerospike's namespace
+     */
+    IAerospikeDeepJobConfig<T> namespace(String namespace);
+
+    String getNamespace();
+
     String getSet();
 
     /**

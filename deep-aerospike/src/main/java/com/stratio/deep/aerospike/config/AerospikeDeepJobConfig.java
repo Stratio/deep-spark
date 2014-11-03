@@ -41,6 +41,11 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
     private List<String> hostList = new ArrayList<>();
 
     /**
+     * Aerospike namespace
+     */
+    private String namespace;
+
+    /**
      * Aerospike's set name
      */
     private String set;
@@ -89,6 +94,15 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AerospikeDeepJobConfig<T> namespace(String nameSpace) {
+        this.nameSpace = nameSpace;
+        return this;
+    }
+
     public AerospikeDeepJobConfig<T> host(String[] hosts) {
         this.hostList.addAll(Arrays.asList(hosts));
         return this;
@@ -98,6 +112,11 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
     public IAerospikeDeepJobConfig<T> set(String set) {
         this.set = set;
         return this;
+    }
+
+    @Override
+    public String getNamespace() {
+        return this.nameSpace;
     }
 
     @Override

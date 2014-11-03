@@ -15,6 +15,7 @@
  */
 package com.stratio.deep.aerospike.utils;
 
+import com.aerospike.client.Record;
 import com.aerospike.hadoop.mapreduce.AerospikeRecord;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
@@ -102,12 +103,23 @@ public class UtilAerospike {
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
-    public static Cells getCellFromRecord(AerospikeRecord aerospikeRecord, String setName) throws IllegalAccessException,
+    public static Cells getCellFromRecord(AerospikeRecord aerospikeRecord, String namespace, String setName) throws IllegalAccessException,
             InstantiationException, InvocationTargetException {
 
         Cells cells = setName!= null ?new Cells(setName): new Cells();
 
-        // TODO: Record -> Cell conversion logic
+        Map<String, Object> map = aerospikeRecord.bins;
+
+        Set<Map.Entry<String, Object>> entriesAerospike = map.entrySet();
+
+        for(Map.Entry<String, Object> entry: entriesAerospike) {
+            try {
+                Cell cell = Cell.create(entry.getKey(), entry.getValue());
+                cells.add(cell);
+            } catch (IllegalArgumentException e) {
+                LOG.error("impossible to create a java cell from AerospikeRecord field:"+entry.getKey()+", type:"+entry.getValue().getClass()+", value:"+entry.getValue());
+            }
+        }
 
         return cells;
     }
@@ -121,11 +133,16 @@ public class UtilAerospike {
      * @throws InvocationTargetException
      */
     public static AerospikeRecord getRecordFromCell(Cells cells) throws IllegalAccessException, InstantiationException, InvocationTargetException {
-AerospikeRecord record = new AerospikeRecord();
+        AerospikeRecord result = new AerospikeRecord();
 
-        // TODO: Cell -> Record conversion logic
+        if(cells.size() > 0) {
+            Cell cell = cells.getCellByIdx(0);
+            Map<String, Object> bins = cell.getMap(String.class, Object.class);
+            Record record = new Record(bins, null, 0, 999999);
+            result = new AerospikeRecord(record);
+        }
 
-        return record;
+        return result;
     }
 
 
