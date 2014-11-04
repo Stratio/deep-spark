@@ -16,20 +16,17 @@
 package com.stratio.deep.aerospike.utils;
 
 import com.aerospike.client.Record;
+import com.aerospike.hadoop.mapreduce.AerospikeKey;
 import com.aerospike.hadoop.mapreduce.AerospikeRecord;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.utils.AnnotationUtils;
-import com.stratio.deep.commons.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Map;
 
 /**
  * Several utilities to work used in the Spark <=> Aerospike integration.
@@ -103,24 +100,15 @@ public class UtilAerospike {
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
-    public static Cells getCellFromRecord(AerospikeRecord aerospikeRecord, String namespace, String setName) throws IllegalAccessException,
+    public static Cells getCellFromRecord(AerospikeKey key, AerospikeRecord aerospikeRecord, String namespace, String setName) throws IllegalAccessException,
             InstantiationException, InvocationTargetException {
 
         Cells cells = setName!= null ?new Cells(setName): new Cells();
 
         Map<String, Object> map = aerospikeRecord.bins;
 
-        Set<Map.Entry<String, Object>> entriesAerospike = map.entrySet();
-
-        for(Map.Entry<String, Object> entry: entriesAerospike) {
-            try {
-                Cell cell = Cell.create(entry.getKey(), entry.getValue());
-                cells.add(cell);
-            } catch (IllegalArgumentException e) {
-                LOG.error("impossible to create a java cell from AerospikeRecord field:"+entry.getKey()+", type:"+entry.getValue().getClass()+", value:"+entry.getValue());
-            }
-        }
-
+        Cell cell = Cell.create(key.toKey().toString(), map);
+        cells.add(cell);
         return cells;
     }
 
@@ -138,7 +126,7 @@ public class UtilAerospike {
         if(cells.size() > 0) {
             Cell cell = cells.getCellByIdx(0);
             Map<String, Object> bins = cell.getMap(String.class, Object.class);
-            Record record = new Record(bins, null, 0, 999999);
+            Record record = new Record(bins, null, 0, 999999); // TODO -> How should I setup generation and expiration time?
             result = new AerospikeRecord(record);
         }
 

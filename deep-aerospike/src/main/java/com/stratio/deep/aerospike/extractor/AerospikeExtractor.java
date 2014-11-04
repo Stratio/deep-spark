@@ -19,6 +19,7 @@ import com.aerospike.hadoop.mapreduce.AerospikeInputFormat;
 import com.aerospike.hadoop.mapreduce.AerospikeKey;
 import com.aerospike.hadoop.mapreduce.AerospikeRecord;
 import com.stratio.deep.aerospike.config.AerospikeDeepJobConfig;
+import com.stratio.deep.aerospike.config.AerospikeDeepOutputFormat;
 import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
 
 import java.io.Serializable;
@@ -31,7 +32,7 @@ public abstract class AerospikeExtractor<T> extends GenericHadoopExtractor<T, Ae
     public AerospikeExtractor(){
         super();
         this.inputFormat = new AerospikeInputFormat();
-        // this.outputFormat = new AerospikeOutputFormat(); TODO: AerospikeOutputFormat is an abstract class (for now)
+        this.outputFormat = new AerospikeDeepOutputFormat();
     }
 
 }

@@ -49,11 +49,6 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
     private List<String> hostList = new ArrayList<>();
 
     /**
-     * Aerospike namespace
-     */
-    private String namespace;
-
-    /**
      * Aerospike's set name
      */
     private String set;
@@ -122,14 +117,14 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
     }
 
     @Override
-    public IAerospikeDeepJobConfig<T> set(String set) {
+    public AerospikeDeepJobConfig<T> set(String set) {
         this.set = set;
         return this;
     }
 
     @Override
     public String getNamespace() {
-        return this.namespace;
+        return this.nameSpace;
     }
 
     @Override
@@ -138,7 +133,7 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
     }
 
     @Override
-    public IAerospikeDeepJobConfig<T> bin(String bin) {
+    public AerospikeDeepJobConfig<T> bin(String bin) {
         this.bin = bin;
         return this;
     }
@@ -152,7 +147,7 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
      * {@inheritDoc}
      */
     @Override
-    public IAerospikeDeepJobConfig<T> operation(String operation) {
+    public AerospikeDeepJobConfig<T> operation(String operation) {
         this.operation = operation;
         return this;
     }
@@ -163,12 +158,7 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
     }
 
     public AerospikeDeepJobConfig<T> port(int port){
-        for(int i = 0; i< hostList.size() ; i++){
-            if (hostList.get(i).indexOf(":")==-1) {
-                hostList.set(i, hostList.get(i).concat(":").concat(String.valueOf(port))) ;
-            }
-
-        }
+        this.port = port;
         return this;
     }
 
@@ -182,19 +172,19 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         configHadoop = new JobConf();
         configHadoop = new Configuration();
 
-        configHadoop.set(AerospikeConfigUtil.INPUT_HOST, host);
+        configHadoop.set(AerospikeConfigUtil.INPUT_HOST, getHost());
 
-        configHadoop.set(AerospikeConfigUtil.INPUT_PORT, Integer.toString(port));
+        configHadoop.set(AerospikeConfigUtil.INPUT_PORT, Integer.toString(getPort()));
 
-        configHadoop.set(AerospikeConfigUtil.INPUT_NAMESPACE, namespace);
+        configHadoop.set(AerospikeConfigUtil.INPUT_NAMESPACE, nameSpace);
 
         configHadoop.set(AerospikeConfigUtil.INPUT_SETNAME, set);
 
-        configHadoop.set(AerospikeConfigUtil.OUTPUT_HOST, host);
+        configHadoop.set(AerospikeConfigUtil.OUTPUT_HOST, getHost());
 
         configHadoop.set(AerospikeConfigUtil.OUTPUT_PORT, Integer.toString(port));
 
-        configHadoop.set(AerospikeConfigUtil.OUTPUT_NAMESPACE, namespace);
+        configHadoop.set(AerospikeConfigUtil.OUTPUT_NAMESPACE, nameSpace);
 
         configHadoop.set(AerospikeConfigUtil.OUTPUT_SETNAME, set);
 
@@ -212,11 +202,11 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         if (hostList.isEmpty()) {
             throw new IllegalArgumentException("host cannot be null");
         }
-        if (catalog == null) {
-            throw new IllegalArgumentException("database cannot be null");
+        if (nameSpace == null) {
+            throw new IllegalArgumentException("namespace cannot be null");
         }
-        if (table == null) {
-            throw new IllegalArgumentException("collection cannot be null");
+        if (set == null) {
+            throw new IllegalArgumentException("set cannot be null");
         }
     }
 
