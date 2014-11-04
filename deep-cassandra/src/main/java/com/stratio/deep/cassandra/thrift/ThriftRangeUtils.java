@@ -159,8 +159,8 @@ public class ThriftRangeUtils {
      */
     public List<DeepTokenRange> getSplits(DeepTokenRange deepTokenRange) {
 
-        String start = tokenAsString(deepTokenRange.getStartToken());
-        String end = tokenAsString(deepTokenRange.getEndToken());
+        String start = tokenAsString((Comparable) deepTokenRange.getStartToken());
+        String end = tokenAsString((Comparable) deepTokenRange.getEndToken());
         List<String> endpoints = deepTokenRange.getReplicas();
 
         for (String endpoint : endpoints) {

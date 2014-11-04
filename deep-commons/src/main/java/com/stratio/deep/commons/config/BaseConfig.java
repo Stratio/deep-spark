@@ -25,6 +25,8 @@ import com.stratio.deep.commons.entity.Cells;
  */
 public class BaseConfig<T> implements Serializable {
 
+    private static final long serialVersionUID = -6575509538810299996L;
+
     protected Class entityClass;
 
     protected Class extractorImplClass;
