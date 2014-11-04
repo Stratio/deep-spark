@@ -54,30 +54,31 @@ import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.exception.DeepInstantiationException;
+import com.stratio.deep.commons.handler.DeepRecordWriter;
 import com.stratio.deep.commons.utils.Pair;
 import com.stratio.deep.commons.utils.Utils;
 
 /**
  * Handles the distributed write to cassandra in batch.
  */
-public class DeepCqlRecordWriter implements AutoCloseable {
+public class DeepCqlRecordWriter extends DeepRecordWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(DeepCqlRecordWriter.class);
 
     // handles for clients for each range exhausted in the threadpool
-    private final Map<Token, RangeClient> clients;
-    private final Map<Token, RangeClient> removedClients;
+    protected final Map<Token, RangeClient> clients;
+    protected final Map<Token, RangeClient> removedClients;
 
-    private AbstractType<?> keyValidator;
-    private String[] partitionKeyColumns;
+    protected AbstractType<?> keyValidator;
+    protected String[] partitionKeyColumns;
 
-    private final ICassandraDeepJobConfig writeConfig;
-    private final IPartitioner partitioner;
-    private final InetAddress localhost;
+    protected final ICassandraDeepJobConfig writeConfig;
+    protected final IPartitioner partitioner;
+    protected final InetAddress localhost;
 
     /**
      * Con
-     *
+     * 
      * @param writeConfig
      */
     public DeepCqlRecordWriter(ICassandraDeepJobConfig writeConfig) {
@@ -117,7 +118,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         }
     }
 
-    private ByteBuffer getPartitionKey(Cells cells) {
+    protected ByteBuffer getPartitionKey(Cells cells) {
         ByteBuffer partitionKey;
         if (keyValidator instanceof CompositeType) {
             ByteBuffer[] keys = new ByteBuffer[partitionKeyColumns.length];
@@ -165,7 +166,8 @@ public class DeepCqlRecordWriter implements AutoCloseable {
      */
     protected void retrievePartitionKeyValidator() throws ConfigurationException {
         Pair<Session, String> sessionWithHost =
-                CassandraClientProvider.trySessionForLocation(localhost.getHostAddress(), (CassandraDeepJobConfig)writeConfig, false);
+                CassandraClientProvider.trySessionForLocation(localhost.getHostAddress(),
+                        (CassandraDeepJobConfig) writeConfig, false);
 
         String keyspace = writeConfig.getKeyspace();
         String cfName = writeConfig.getColumnFamily();
@@ -197,10 +199,13 @@ public class DeepCqlRecordWriter implements AutoCloseable {
 
     /**
      * Fetches row metadata for the given column family.
-     *
-     * @param sessionWithHost the connection to the DB.
-     * @param keyspace        the keyspace name
-     * @param cfName          the column family
+     * 
+     * @param sessionWithHost
+     *            the connection to the DB.
+     * @param keyspace
+     *            the keyspace name
+     * @param cfName
+     *            the column family
      * @return the Row object
      */
     private static Row getRowMetadata(Pair<Session, String> sessionWithHost, String keyspace, String cfName) {
@@ -214,11 +219,13 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     }
 
     /**
-     * Adds the provided row to a batch. If the batch size reaches the threshold configured in IDeepJobConfig.getBatchSize
-     * the batch will be sent to the data store.
-     *
-     * @param keys   the Cells object containing the row keys.
-     * @param values the Cells object containing all the other row  columns.
+     * Adds the provided row to a batch. If the batch size reaches the threshold configured in
+     * IDeepJobConfig.getBatchSize the batch will be sent to the data store.
+     * 
+     * @param keys
+     *            the Cells object containing the row keys.
+     * @param values
+     *            the Cells object containing all the other row columns.
      */
     public void write(Cells keys, Cells values) {
         /* generate SQL */
@@ -246,22 +253,24 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     }
 
     /**
-     * A client that runs in a threadpool and connects to the list of endpoints for a particular
-     * range. Bound variables for keys in that range are sent to this client via a queue.
+     * A client that runs in a threadpool and connects to the list of endpoints for a particular range. Bound variables
+     * for keys in that range are sent to this client via a queue.
      */
-    private class RangeClient extends Thread implements Closeable {
+    protected class RangeClient extends Thread implements Closeable {
 
         private final int batchSize = writeConfig.getBatchSize();
-        private List<String> batchStatements = new ArrayList<>();
-        private List<Object> bindVariables = new ArrayList<>();
-        private UUID identity = UUID.randomUUID();
+        private final List<String> batchStatements = new ArrayList<>();
+        private final List<Object> bindVariables = new ArrayList<>();
+        private final UUID identity = UUID.randomUUID();
         private String cql;
 
         /**
          * Returns true if adding the current element triggers the batch execution.
-         *
-         * @param stmt   the query to add to the batch.
-         * @param values the list of binding values.
+         * 
+         * @param stmt
+         *            the query to add to the batch.
+         * @param values
+         *            the list of binding values.
          * @return a boolean indicating if the batch has been triggered or not.
          */
         public synchronized boolean put(String stmt, List<Object> values) {
@@ -324,7 +333,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
         public void run() {
             LOG.debug("[" + this + "] Initializing cassandra client");
             Pair<Session, String> sessionWithHost = CassandraClientProvider.trySessionForLocation(localhost
-                    .getHostAddress(), (CassandraDeepJobConfig)writeConfig, false);
+                    .getHostAddress(), (CassandraDeepJobConfig) writeConfig, false);
             sessionWithHost.left.execute(cql, bindVariables.toArray(new Object[bindVariables.size()]));
         }
     }

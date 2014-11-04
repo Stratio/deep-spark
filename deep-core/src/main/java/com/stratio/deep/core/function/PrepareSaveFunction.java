@@ -21,14 +21,14 @@ import static com.stratio.deep.core.util.ExtractorClientUtil.getExtractorClient;
 
 import java.io.Serializable;
 
-import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
-import com.stratio.deep.commons.rdd.IExtractor;
-
 import scala.collection.Iterator;
 import scala.runtime.AbstractFunction1;
 import scala.runtime.BoxedUnit;
+
+import com.stratio.deep.commons.config.BaseConfig;
+import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
+import com.stratio.deep.commons.functions.SaveFunction;
+import com.stratio.deep.commons.rdd.IExtractor;
 
 /**
  * Created by rcrespo on 28/08/14.
@@ -36,13 +36,16 @@ import scala.runtime.BoxedUnit;
 public class PrepareSaveFunction<T, S extends BaseConfig<T>> extends AbstractFunction1<Iterator<T>,
         BoxedUnit> implements Serializable {
 
-    private S config;
+    private final S config;
 
-    private T first;
+    private final T first;
 
-    public PrepareSaveFunction(S config, T first) {
+    private final SaveFunction function;
+
+    public PrepareSaveFunction(SaveFunction function, S config, T first) {
         this.first = first;
         this.config = config;
+        this.function = function;
     }
 
     @Override
@@ -54,12 +57,14 @@ public class PrepareSaveFunction<T, S extends BaseConfig<T>> extends AbstractFun
             extractor = getExtractorClient();
         }
 
-
-        extractor.initSave(config, first);
-        while (v1.hasNext()) {
-            extractor.saveRDD(v1.next());
+        if (function == null) {
+            extractor.initSave(config, first);
         }
-        config.setPartitionId(config.getPartitionId()+1);
+
+        while (v1.hasNext()) {
+            extractor.saveRDD(v1.next(), function);
+        }
+        config.setPartitionId(config.getPartitionId() + 1);
         extractor.close();
         return null;
     }

@@ -14,32 +14,29 @@
  */
 package com.stratio.deep.core.extractor.client;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.extractor.actions.CloseAction;
-import com.stratio.deep.commons.extractor.actions.ExtractorInstanceAction;
 import com.stratio.deep.commons.extractor.actions.GetPartitionsAction;
 import com.stratio.deep.commons.extractor.actions.HasNextAction;
 import com.stratio.deep.commons.extractor.actions.InitIteratorAction;
 import com.stratio.deep.commons.extractor.actions.InitSaveAction;
 import com.stratio.deep.commons.extractor.actions.NextAction;
 import com.stratio.deep.commons.extractor.actions.SaveAction;
-import com.stratio.deep.commons.extractor.response.ExtractorInstanceResponse;
 import com.stratio.deep.commons.extractor.response.GetPartitionsResponse;
 import com.stratio.deep.commons.extractor.response.HasNextResponse;
 import com.stratio.deep.commons.extractor.response.NextResponse;
 import com.stratio.deep.commons.extractor.response.Response;
+import com.stratio.deep.commons.functions.SaveFunction;
 import com.stratio.deep.commons.rdd.IExtractor;
-
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Response> implements
         IExtractor<T, ExtractorConfig<T>> {
@@ -66,10 +63,9 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
     /*
      * (non-Javadoc)
-     *
-     * @see
-     * io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext
-     * , java.lang.Object)
+     * 
+     * @see io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext ,
+     * java.lang.Object)
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Response msg) throws Exception {
@@ -78,7 +74,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(org.apache.spark.broadcast.Broadcast, int)
      */
     @Override
@@ -90,7 +86,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (; ; ) {
+        for (;;) {
             try {
                 response = answer.take();
                 break;
@@ -106,8 +102,6 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return ((GetPartitionsResponse) response).getPartitions();
     }
 
-
-
     @Override
     public void close() {
         CloseAction closeAction = new CloseAction();
@@ -116,7 +110,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (; ; ) {
+        for (;;) {
             try {
                 response = answer.take();
                 break;
@@ -140,7 +134,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (; ; ) {
+        for (;;) {
             try {
                 response = answer.take();
                 break;
@@ -164,7 +158,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (; ; ) {
+        for (;;) {
             try {
                 response = answer.take();
                 break;
@@ -188,7 +182,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (; ; ) {
+        for (;;) {
             try {
                 response = answer.take();
                 break;
@@ -203,16 +197,21 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return;
     }
 
-
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.stratio.deep.commons.rdd.IExtractor#saveRDD(java.lang.Object,
+     * com.stratio.deep.commons.functions.SaveFunction)
+     */
     @Override
-    public void saveRDD(T t) {
-        SaveAction<T> saveAction = new SaveAction<>(t);
+    public void saveRDD(T t, SaveFunction saveFunction) {
+        SaveAction<T> saveAction = new SaveAction<>(t, saveFunction);
 
         channel.writeAndFlush(saveAction);
 
         Response response;
         boolean interrupted = false;
-        for (; ; ) {
+        for (;;) {
             try {
                 response = answer.take();
                 break;
@@ -236,7 +235,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (; ; ) {
+        for (;;) {
             try {
                 response = answer.take();
                 break;

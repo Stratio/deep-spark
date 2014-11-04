@@ -1,11 +1,11 @@
 package com.stratio.deep.commons.rdd;
 
-import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
 import java.io.Serializable;
+
 import org.apache.spark.Partition;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
+
+import com.stratio.deep.commons.config.BaseConfig;
+import com.stratio.deep.commons.functions.SaveFunction;
 
 /**
  * Created by rcrespo on 4/08/14.
@@ -22,7 +22,7 @@ public interface IExtractor<T, S extends BaseConfig<T>> extends Serializable {
 
     void initIterator(Partition dp, S config);
 
-    void saveRDD(T t);
+    void saveRDD(T t, SaveFunction function);
 
     void initSave(S config, T first);
 }
