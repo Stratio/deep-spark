@@ -26,6 +26,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Test
 public class UtilAerospikeTest {
 
     public static final String KEY_EXAMPLE = "key";
@@ -52,27 +53,7 @@ public class UtilAerospikeTest {
 
         AerospikeRecord record = UtilAerospike.getRecordFromObject(bookEntity);
 
-        // TODO: Test logic
-
-//        BSONObject metadataFromBson = (BSONObject) bson.get("metadata");
-//
-//        assertEquals(metadataFromBson.get("author"), AUTHOR);
-//
-//        assertEquals(metadataFromBson.get("title"), TITLE);
-//
-//        assertEquals(metadataFromBson.get("source"), SOURCE);
-//
-//
-//        List<BSONObject> cantoEntityListFromBson = (List<BSONObject>) bson.get("cantos");
-//
-//        assertEquals(cantoEntityListFromBson.get(0).get("canto"), CANTO_I);
-//
-//        assertEquals(cantoEntityListFromBson.get(0).get("text"), TEXT_I);
-//
-//        assertEquals(cantoEntityListFromBson.get(1).get("canto"), CANTO_II);
-//
-//        assertEquals(cantoEntityListFromBson.get(1).get("text"), TEXT_II);
-
+        // TODO -> Entity extractor logic not yet implemented.
 
     }
 }
