@@ -33,8 +33,6 @@ import java.util.Map;
  */
 public class UtilAerospike {
 
-    public static final String MONGO_DEFAULT_ID = "_id";
-
     private static final Logger LOG = LoggerFactory.getLogger(UtilAerospike.class);
 
     /**
