@@ -126,7 +126,7 @@ public class UtilAerospike {
         if(cells.size() > 0) {
             Cell cell = cells.getCellByIdx(0);
             Map<String, Object> bins = cell.getMap(String.class, Object.class);
-            Record record = new Record(bins, null, 0, 999999); // TODO -> How should I setup generation and expiration time?
+            Record record = new Record(bins, null, 0, 0); // Expiration time = 0, defaults to namespace configuration ("default-ttl")
             result = new AerospikeRecord(record);
         }
 
