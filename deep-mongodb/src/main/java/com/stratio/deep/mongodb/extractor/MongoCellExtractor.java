@@ -17,6 +17,7 @@
 package com.stratio.deep.mongodb.extractor;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import org.bson.BSONObject;
 import org.slf4j.Logger;
@@ -74,5 +75,20 @@ public final class MongoCellExtractor extends MongoExtractor<Cells> {
             throw new DeepTransformException(e.getMessage());
         }
     }
+
+	@Override
+	public void saveMaxRDD(Cells first, String columnName,
+			List<String> primaryKeys) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void initSaveMax(MongoDeepJobConfig<Cells> config, Cells first) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 
 }

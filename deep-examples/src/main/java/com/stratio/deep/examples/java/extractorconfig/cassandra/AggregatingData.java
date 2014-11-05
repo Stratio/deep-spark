@@ -39,8 +39,7 @@ import scala.Tuple2;
 import scala.Tuple3;
 
 /**
- * Author: Emmanuelle Raffenne
- * Date..: 13-feb-2014
+ * Author: Emmanuelle Raffenne Date..: 13-feb-2014
  */
 public final class AggregatingData {
     private static final Logger LOG = Logger.getLogger(AggregatingData.class);
@@ -57,7 +56,8 @@ public final class AggregatingData {
     /**
      * Application entry point.
      *
-     * @param args the arguments passed to the application.
+     * @param args
+     *            the arguments passed to the application.
      */
     public static void main(String[] args) {
         doMain(args);
@@ -76,7 +76,6 @@ public final class AggregatingData {
         String cqlPort = "9042";
         String rcpPort = "9160";
         String host = "127.0.0.1";
-
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -115,29 +114,29 @@ public final class AggregatingData {
         // aggregating
         Double zero = 0.0;
         Tuple3<Double, Double, Double> initValues = new Tuple3<Double, Double, Double>(zero, zero, zero);
-        Tuple3<Double, Double, Double> results = groups.aggregate(initValues,
-                new Function2<Tuple3<Double, Double, Double>, Tuple2<String, Integer>, Tuple3<Double, Double,
-                        Double>>() {
-                    @Override
-                    public Tuple3<Double, Double, Double> call(Tuple3<Double, Double, Double> n, Tuple2<String,
-                            Integer> t) {
-                        Double sumOfX = n._1() + t._2();
-                        Double numOfX = n._2() + 1;
-                        Double sumOfSquares = n._3() + Math.pow(t._2(), 2);
-                        return new Tuple3<>(sumOfX, numOfX, sumOfSquares);
-                    }
-                }, new Function2<Tuple3<Double, Double, Double>, Tuple3<Double, Double, Double>, Tuple3<Double,
-                        Double, Double>>() {
-                    @Override
-                    public Tuple3<Double, Double, Double> call(Tuple3<Double, Double, Double> a, Tuple3<Double,
-                            Double, Double> b) {
-                        Double sumOfX = a._1() + b._1();
-                        Double numOfX = a._2() + b._2();
-                        Double sumOfSquares = a._3() + b._3();
-                        return new Tuple3<>(sumOfX, numOfX, sumOfSquares);
-                    }
-                }
-        );
+        Tuple3<Double, Double, Double> results = groups
+                        .aggregate(initValues,
+                                        new Function2<Tuple3<Double, Double, Double>, Tuple2<String, Integer>, Tuple3<Double, Double, Double>>() {
+                                            @Override
+                                            public Tuple3<Double, Double, Double> call(
+                                                            Tuple3<Double, Double, Double> n, Tuple2<String, Integer> t) {
+                                                Double sumOfX = n._1() + t._2();
+                                                Double numOfX = n._2() + 1;
+                                                Double sumOfSquares = n._3() + Math.pow(t._2(), 2);
+                                                return new Tuple3<>(sumOfX, numOfX, sumOfSquares);
+                                            }
+                                        },
+                                        new Function2<Tuple3<Double, Double, Double>, Tuple3<Double, Double, Double>, Tuple3<Double, Double, Double>>() {
+                                            @Override
+                                            public Tuple3<Double, Double, Double> call(
+                                                            Tuple3<Double, Double, Double> a,
+                                                            Tuple3<Double, Double, Double> b) {
+                                                Double sumOfX = a._1() + b._1();
+                                                Double numOfX = a._2() + b._2();
+                                                Double sumOfSquares = a._3() + b._3();
+                                                return new Tuple3<>(sumOfX, numOfX, sumOfSquares);
+                                            }
+                                        });
 
         // computing stats
         Double sumOfX = results._1();

@@ -21,12 +21,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.spark.Partition;
-import com.stratio.deep.cassandra.thrift.ThriftRangeUtils;
+
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.cql.DeepCqlRecordWriter;
+import com.stratio.deep.cassandra.cql.DeepCqlSingleQuery;
 import com.stratio.deep.cassandra.cql.DeepRecordReader;
 import com.stratio.deep.cassandra.cql.RangeUtils;
+import com.stratio.deep.cassandra.thrift.ThriftRangeUtils;
 import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
@@ -51,6 +53,8 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     protected transient IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
 
     protected transient DeepCqlRecordWriter writer;
+    
+    protected transient DeepCqlSingleQuery queryExecutor;
 
     protected CassandraDeepJobConfig<T> cassandraJobConfig;
 
@@ -78,15 +82,12 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
 
     }
 
-
-
     @Override
-    public void initIterator(final Partition dp,
-            S config) {
-        if(config instanceof ExtractorConfig){
+    public void initIterator(final Partition dp, S config) {
+        if (config instanceof ExtractorConfig) {
             initWithExtractorConfig((ExtractorConfig) config);
-        }else{
-            cassandraJobConfig = (CassandraDeepJobConfig<T>) ((DeepJobConfig)config).initialize();
+        } else {
+            cassandraJobConfig = (CassandraDeepJobConfig<T>) ((DeepJobConfig) config).initialize();
         }
 
         recordReader = initRecordReader((DeepPartition) dp, cassandraJobConfig);
@@ -95,12 +96,11 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     private ICassandraDeepJobConfig<T> initWithExtractorConfig(ExtractorConfig<T> config) {
         int id = config.getRddId();
         cassandraJobConfig.setRddId(id);
-        return (ICassandraDeepJobConfig<T>) ((DeepJobConfig)cassandraJobConfig).initialize(config);
+        return (ICassandraDeepJobConfig<T>) ((DeepJobConfig) cassandraJobConfig).initialize(config);
     }
 
-    public abstract T transformElement(
-            Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
-            CassandraDeepJobConfig<T> config);
+    public abstract T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
+                    CassandraDeepJobConfig<T> config);
 
     public abstract Class getConfigClass();
 
@@ -109,21 +109,18 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
      * <p/>
      * Uses the underlying CqlPagingInputFormat in order to retrieve the splits.
      * <p/>
-     * The number of splits, and hence the number of partitions equals to the number of tokens
-     * configured in cassandra.yaml + 1.
+     * The number of splits, and hence the number of partitions equals to the number of tokens configured in
+     * cassandra.yaml + 1.
      */
 
     @Override
     public Partition[] getPartitions(S config) {
 
-        if(config instanceof ExtractorConfig){
+        if (config instanceof ExtractorConfig) {
             initWithExtractorConfig((ExtractorConfig) config);
-        }else{
+        } else {
             cassandraJobConfig = (CassandraDeepJobConfig) config;
         }
-
-
-
 
         List<DeepTokenRange> underlyingInputSplits = null;
         if (cassandraJobConfig.isBisectModeSet()) {
@@ -136,7 +133,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
         int i = 0;
 
         for (DeepTokenRange split : underlyingInputSplits) {
-            partitions[i] = new DeepPartition( cassandraJobConfig.getRddId(), i, split);
+            partitions[i] = new DeepPartition(cassandraJobConfig.getRddId(), i, split);
 
             // log().debug("Detected partition: " + partitions[i]);
             ++i;
@@ -144,9 +141,6 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
 
         return partitions;
     }
-
-
-
 
     /**
      * Returns a list of hosts on which the given split resides.
@@ -162,11 +156,11 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     /**
      * Instantiates a new deep record reader object associated to the provided partition.
      *
-     * @param dp a spark deep partition
+     * @param dp
+     *            a spark deep partition
      * @return the deep record reader associated to the provided partition.
      */
-    private IDeepRecordReader initRecordReader(final DeepPartition dp,
-            CassandraDeepJobConfig<T> config) {
+    private IDeepRecordReader initRecordReader(final DeepPartition dp, CassandraDeepJobConfig<T> config) {
 
         IDeepRecordReader recordReader = new DeepRecordReader(config, dp.splitWrapper());
 
@@ -177,13 +171,13 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     @Override
     public void initSave(S config, T first) {
 
-        if (config instanceof ExtractorConfig){
-            cassandraJobConfig = (CassandraDeepJobConfig<T>) ((DeepJobConfig)cassandraJobConfig).initialize((ExtractorConfig)config);
-        }else if (config instanceof CassandraDeepJobConfig){
+        if (config instanceof ExtractorConfig) {
+            cassandraJobConfig = (CassandraDeepJobConfig<T>) ((DeepJobConfig) cassandraJobConfig)
+                            .initialize((ExtractorConfig) config);
+        } else if (config instanceof CassandraDeepJobConfig) {
             cassandraJobConfig = (CassandraDeepJobConfig) config;
         }
-        cassandraJobConfig
-                .createOutputTableIfNeeded((Tuple2<Cells, Cells>) transformer.apply(first));
+        cassandraJobConfig.createOutputTableIfNeeded((Tuple2<Cells, Cells>) transformer.apply(first));
         writer = new DeepCqlRecordWriter(cassandraJobConfig);
     }
 
@@ -191,6 +185,25 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     public void saveRDD(T t) {
         Tuple2<Cells, Cells> tuple = (Tuple2<Cells, Cells>) transformer.apply(t);
         writer.write(tuple._1(), tuple._2());
+    }
+    
+    @Override
+    public void initSaveMax(S config, T first) {
+
+        if (config instanceof ExtractorConfig) {
+            cassandraJobConfig = (CassandraDeepJobConfig<T>) ((DeepJobConfig) cassandraJobConfig)
+                            .initialize((ExtractorConfig) config);
+        } else if (config instanceof CassandraDeepJobConfig) {
+            cassandraJobConfig = (CassandraDeepJobConfig) config;
+        }
+        cassandraJobConfig.createOutputTableIfNeeded((Tuple2<Cells, Cells>) transformer.apply(first));
+        queryExecutor = new DeepCqlSingleQuery(cassandraJobConfig);
+    }
+
+    @Override
+    public void saveMaxRDD(T iterElement, String columnName, List<String> primaryKeys) {
+        Tuple2<Cells, Cells> tuple = (Tuple2<Cells, Cells>) transformer.apply(iterElement);
+        queryExecutor.writeMaxStatement(tuple._1(), tuple._2(), columnName);
     }
 
 }

@@ -14,12 +14,13 @@
  */
 package com.stratio.deep.core.extractor.client;
 
+import java.util.List;
+
 import javax.net.ssl.SSLException;
 
 import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.rdd.IExtractor;
 
@@ -32,8 +33,7 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 
 /**
- * Sends a list of continent/city pairs to a {@link } to get the local times of the
- * specified cities.
+ * Sends a list of continent/city pairs to a {@link } to get the local times of the specified cities.
  */
 public class ExtractorClient<T> implements IExtractor<T, ExtractorConfig<T>> {
 
@@ -95,7 +95,6 @@ public class ExtractorClient<T> implements IExtractor<T, ExtractorConfig<T>> {
         handler.initIterator(dp, config);
     }
 
-
     @Override
     public void saveRDD(T t) {
         handler.saveRDD(t);
@@ -114,7 +113,7 @@ public class ExtractorClient<T> implements IExtractor<T, ExtractorConfig<T>> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(IDeepJobConfig, int)
      */
     @Override
@@ -122,6 +121,16 @@ public class ExtractorClient<T> implements IExtractor<T, ExtractorConfig<T>> {
         return this.handler.getPartitions(config);
     }
 
+	@Override
+	public void saveMaxRDD(T first, String columnName, List<String> primaryKeys) {
+		// TODO Auto-generated method stub
+		
+	}
 
+	@Override
+	public void initSaveMax(ExtractorConfig<T> config, T first) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

@@ -61,9 +61,9 @@ import com.stratio.deep.commons.utils.Utils;
 /**
  * Handles the distributed write to cassandra in batch.
  */
-public class DeepCqlRecordWriter implements AutoCloseable {
+public class DeepCqlSingleQuery implements AutoCloseable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DeepCqlRecordWriter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DeepCqlSingleQuery.class);
 
     // handles for clients for each range exhausted in the threadpool
     private final Map<Token, RangeClient> clients;
@@ -81,7 +81,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
      *
      * @param writeConfig
      */
-    public DeepCqlRecordWriter(ICassandraDeepJobConfig writeConfig) {
+    public DeepCqlSingleQuery(ICassandraDeepJobConfig writeConfig) {
         this.clients = new HashMap<>();
         this.removedClients = new HashMap<>();
         this.writeConfig = writeConfig;
@@ -289,14 +289,15 @@ public class DeepCqlRecordWriter implements AutoCloseable {
 
         localCql = sb.toString();
 
-
         Token range = partitioner.getToken(getPartitionKey(keys));
 
         // add primary key columns to the bind variables
         List<Object> allValues = new ArrayList<>();
-        allValues.add(50);
+        allValues.add(50l);
         allValues.addAll(keys.getCellValues());
 
+        System.out.println("**************"+localCql);
+        
         // get the client for the given range, or create a new one
         RangeClient client = clients.get(range);
         if (client == null) {
@@ -337,11 +338,9 @@ public class DeepCqlRecordWriter implements AutoCloseable {
             batchStatements.add(stmt);
             bindVariables.addAll(values);
 
-            boolean res = batchStatements.size() >= batchSize;
-            if (res) {
-                triggerBatch();
-            }
-            return res;
+            triggerBatch();
+            
+            return true;
         }
 
         /**
@@ -352,7 +351,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
                 return;
             }
 
-            cql = Utils.batchQueryGenerator(batchStatements);
+            cql = batchStatements.get(0);
             this.start();
         }
 
@@ -394,6 +393,8 @@ public class DeepCqlRecordWriter implements AutoCloseable {
             LOG.debug("[" + this + "] Initializing cassandra client");
             Pair<Session, String> sessionWithHost = CassandraClientProvider.trySessionForLocation(
                             localhost.getHostAddress(), (CassandraDeepJobConfig) writeConfig, false);
+            System.out.println("**************execute"+cql);
+            
             sessionWithHost.left.execute(cql, bindVariables.toArray(new Object[bindVariables.size()]));
         }
     }

@@ -17,6 +17,7 @@
 package com.stratio.deep.es.extractor;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.es.config.ESDeepJobConfig;
@@ -30,7 +31,6 @@ import org.elasticsearch.hadoop.mr.LinkedMapWritable;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 import scala.Tuple2;
 
@@ -78,5 +78,19 @@ public final class ESEntityExtractor<T>
             throw new DeepTransformException(e.getMessage());
         }
     }
+
+	@Override
+	public void saveMaxRDD(T first, String columnName, List<String> primaryKeys) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void initSaveMax(ESDeepJobConfig<T> config, T first) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 
 }

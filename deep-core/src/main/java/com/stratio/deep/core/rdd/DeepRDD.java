@@ -15,7 +15,6 @@
  */
 package com.stratio.deep.core.rdd;
 
-import static com.stratio.deep.commons.utils.Constants.SPARK_RDD_ID;
 import static com.stratio.deep.commons.utils.Utils.getExtractorInstance;
 import static com.stratio.deep.core.util.ExtractorClientUtil.getExtractorClient;
 import static scala.collection.JavaConversions.asScalaIterator;
@@ -30,7 +29,6 @@ import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.rdd.RDD;
 
 import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.rdd.IExtractor;
@@ -54,18 +52,11 @@ public class DeepRDD<T, S extends BaseConfig<T>> extends RDD<T> implements Seria
     }
 
     public DeepRDD(SparkContext sc, S config) {
-        super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config
-                .getEntityClass()));
+        super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T> apply(config.getEntityClass()));
         config.setRddId(id());
-        this.config =
-                sc.broadcast(config, ClassTag$.MODULE$
-                        .<S>apply(config.getClass()));
-
-
+        this.config = sc.broadcast(config, ClassTag$.MODULE$.<S> apply(config.getClass()));
 
     }
-
-
 
     @Override
     public Iterator<T> compute(Partition split, TaskContext context) {
@@ -89,8 +80,7 @@ public class DeepRDD<T, S extends BaseConfig<T>> extends RDD<T> implements Seria
 
             @Override
             public void remove() {
-                throw new DeepIOException(
-                        "Method not implemented (and won't be implemented anytime soon!!!)");
+                throw new DeepIOException("Method not implemented (and won't be implemented anytime soon!!!)");
             }
         };
 
@@ -105,8 +95,7 @@ public class DeepRDD<T, S extends BaseConfig<T>> extends RDD<T> implements Seria
     }
 
     /**
-     * It tries to get an Extractor Instance,
-     * if there is any problem try to instance an extractorClient
+     * It tries to get an Extractor Instance, if there is any problem try to instance an extractorClient
      */
     private void initExtractorClient() {
         try {

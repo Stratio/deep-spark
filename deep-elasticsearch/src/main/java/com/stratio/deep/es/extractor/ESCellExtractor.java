@@ -17,6 +17,7 @@
 package com.stratio.deep.es.extractor;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.entity.Cells;
@@ -76,5 +77,20 @@ public final class ESCellExtractor
         }
 
     }
+
+	@Override
+	public void saveMaxRDD(Cells first, String columnName,
+			List<String> primaryKeys) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void initSaveMax(ESDeepJobConfig<Cells> config, Cells first) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 
 }

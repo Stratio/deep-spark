@@ -1,9 +1,10 @@
 package com.stratio.deep.extractor.message
 
-import com.stratio.deep.commons.config.ExtractorConfig
-import com.stratio.deep.commons.rdd.DeepTokenRange
+
 
 import scala.reflect.ClassTag
+import com.stratio.deep.commons.rdd.DeepTokenRange
+import com.stratio.deep.commons.config.ExtractorConfig
 
 // Messages the server can handle
 sealed trait ActionSystemMessage
