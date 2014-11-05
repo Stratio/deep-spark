@@ -49,6 +49,11 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
     private List<String> hostList = new ArrayList<>();
 
     /**
+     * A list of aerospike ports to connect
+     */
+    private List<Integer> portList = new ArrayList<>();
+
+    /**
      * Aerospike's set name
      */
     private String set;
@@ -93,12 +98,27 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         return this;
     }
 
+
+    public AerospikeDeepJobConfig<T> port(int port) {
+        this.portList.add(port);
+        return this;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public AerospikeDeepJobConfig<T> host(List<String> host) {
         this.hostList.addAll(host);
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AerospikeDeepJobConfig<T> port(List<Integer> port) {
+        this.portList.addAll(port);
         return this;
     }
 
@@ -113,6 +133,11 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
 
     public AerospikeDeepJobConfig<T> host(String[] hosts) {
         this.hostList.addAll(Arrays.asList(hosts));
+        return this;
+    }
+
+    public AerospikeDeepJobConfig<T> port(Integer[] ports) {
+        this.portList.addAll(Arrays.asList(ports));
         return this;
     }
 
@@ -155,11 +180,6 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
     @Override
     public String getOperation() {
         return this.operation;
-    }
-
-    public AerospikeDeepJobConfig<T> port(int port){
-        this.port = port;
-        return this;
     }
 
     /**
@@ -208,6 +228,14 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         if (set == null) {
             throw new IllegalArgumentException("set cannot be null");
         }
+        if (portList.isEmpty()) {
+            throw new IllegalArgumentException("port cannot be null");
+        }
+        if (hostList.size() != portList.size()) {
+            throw new IllegalArgumentException("Host and ports cardinality must be the same");
+        }
+
+
     }
 
     /**

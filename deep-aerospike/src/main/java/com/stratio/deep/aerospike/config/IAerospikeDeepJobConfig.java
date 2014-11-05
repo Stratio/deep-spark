@@ -52,12 +52,19 @@ public interface IAerospikeDeepJobConfig<T> {
     Configuration getHadoopConfiguration();
 
     /**
-     * Sets the list of available Mongo hosts.
+     * Sets the list of available Aerospike hosts.
      *
      * @param host the list of available mongo hosts.
      * @return this object.
      */
     IAerospikeDeepJobConfig<T> host(List<String> host);
+
+    /**
+     * Sets the list of available Aerospike ports.
+     * @param port
+     * @return
+     */
+    IAerospikeDeepJobConfig<T> port(List<Integer> port);
 
     /**
      * Sets the operation to perform in Aerospike.
