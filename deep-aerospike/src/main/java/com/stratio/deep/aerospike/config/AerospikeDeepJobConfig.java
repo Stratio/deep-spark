@@ -104,6 +104,10 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         return this;
     }
 
+    public Integer getAerospikePort() {
+        return !portList.isEmpty() ? portList.get(0) : null;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -194,7 +198,7 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
 
         configHadoop.set(AerospikeConfigUtil.INPUT_HOST, getHost());
 
-        configHadoop.set(AerospikeConfigUtil.INPUT_PORT, Integer.toString(getPort()));
+        configHadoop.set(AerospikeConfigUtil.INPUT_PORT, Integer.toString(getAerospikePort()));
 
         configHadoop.set(AerospikeConfigUtil.INPUT_NAMESPACE, nameSpace);
 
@@ -202,7 +206,7 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
 
         configHadoop.set(AerospikeConfigUtil.OUTPUT_HOST, getHost());
 
-        configHadoop.set(AerospikeConfigUtil.OUTPUT_PORT, Integer.toString(port));
+        configHadoop.set(AerospikeConfigUtil.OUTPUT_PORT, Integer.toString(getAerospikePort()));
 
         configHadoop.set(AerospikeConfigUtil.OUTPUT_NAMESPACE, nameSpace);
 
@@ -261,12 +265,12 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
             port((extractorConfig.getInteger(PORT)));
         }
 
-        if(values.get(DATABASE)!=null){
-            namespace(extractorConfig.getString(COLLECTION));
+        if(values.get(NAMESPACE)!=null){
+            namespace(extractorConfig.getString(NAMESPACE));
         }
 
-        if (values.get(TABLE) != null) {
-            set(extractorConfig.getString(TABLE));
+        if (values.get(SET) != null) {
+            set(extractorConfig.getString(SET));
         }
 
         this.initialize();

@@ -41,11 +41,13 @@ public class AerospikeJavaRDDTest {
 
     public static final Integer PORT = 3000;
 
-    public static final String HOST = "localhost";
+    public static final String HOST = "127.0.0.1";
 
-    public static final String NAMESPACE = "test";
+    public static final String NAMESPACE_TEST = "test";
 
-    public static final String SET_NAME = "books";
+    public static final String NAMESPACE_BOOK = "book";
+
+    public static final String SET_NAME = "input";
 
     public static final String DATA_SET_NAME = "aerospikeData.csv";
 
@@ -81,7 +83,7 @@ public class AerospikeJavaRDDTest {
             Bin pages = null;
             while(lineScanner.hasNext()) {
                 if(index == 0) {
-                    key = new Key(NAMESPACE, SET_NAME, lineScanner.nextInt());
+                    key = new Key(NAMESPACE_BOOK, SET_NAME, lineScanner.nextInt());
                 }
                 if(index == 1) {
                     title = new Bin("title", lineScanner.next());
@@ -97,6 +99,10 @@ public class AerospikeJavaRDDTest {
             index = 0;
             aerospike.put(null, key, title, author, pages);
         }
+        Key key = new Key(NAMESPACE_TEST, SET_NAME, 1);
+        Bin bin_number = new Bin("number", 1);
+        Bin bin_text = new Bin("message", "new message test");
+        aerospike.put(null, key, bin_number, bin_text);
         scanner.close();
     }
 
@@ -104,7 +110,13 @@ public class AerospikeJavaRDDTest {
      * Delete previously loaded data for starting with a fresh dataset.
      */
     private static void deleteData() {
-        aerospike.scanAll(new ScanPolicy(), "test", "books", new ScanCallback() {
+        aerospike.scanAll(new ScanPolicy(), NAMESPACE_TEST, SET_NAME, new ScanCallback() {
+            @Override
+            public void scanCallback(Key key, Record record) throws AerospikeException {
+                aerospike.delete(new WritePolicy(), key);
+            }
+        }, new String[] {});
+        aerospike.scanAll(new ScanPolicy(), NAMESPACE_BOOK, SET_NAME, new ScanCallback() {
             @Override
             public void scanCallback(Key key, Record record) throws AerospikeException {
                 aerospike.delete(new WritePolicy(), key);

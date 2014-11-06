@@ -46,26 +46,26 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
     private static final Logger LOG = LoggerFactory.getLogger(AerospikeCellExtractorTest.class);
 
     public AerospikeCellExtractorTest() {
-        super(AerospikeCellExtractor.class, "localhost:3000", null, true);
+        super(AerospikeCellExtractor.class, "127.0.0.1", 3000, true);
     }
 
     @Test
     public void testDataSet() {
-        String hostConcat = AerospikeJavaRDDTest.HOST.concat(":").concat(AerospikeJavaRDDTest.PORT.toString());
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
         try {
 
             ExtractorConfig<Cells> inputConfigEntity = new ExtractorConfig(Cells.class);
-            inputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, "test")
-                    .putValue(ExtractorConstants.COLLECTION, "books");
+            inputConfigEntity.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, "book")
+                    .putValue(ExtractorConstants.SET, "input");
             inputConfigEntity.setExtractorImplClass(AerospikeCellExtractor.class);
 
             RDD<Cells> inputRDDEntity = context.createRDD(inputConfigEntity);
 
             //Import dataSet was OK and we could read it
-            assertEquals(2, inputRDDEntity.count());
+            assertEquals(1, inputRDDEntity.count());
 
 //            List<Cells> books = inputRDDEntity.toJavaRDD().collect();
 //

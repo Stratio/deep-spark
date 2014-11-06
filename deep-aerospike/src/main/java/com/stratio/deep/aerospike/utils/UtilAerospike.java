@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -104,9 +105,12 @@ public class UtilAerospike {
         Cells cells = setName!= null ?new Cells(setName): new Cells();
 
         Map<String, Object> map = aerospikeRecord.bins;
+        for(Map.Entry<String, Object> bin:map.entrySet()) {
+            Cell cell = Cell.create(bin.getKey(), bin.getValue());
+            cells.add(cell);
+        }
 
         Cell cell = Cell.create(key.toKey().toString(), map);
-        cells.add(cell);
         return cells;
     }
 
@@ -120,14 +124,12 @@ public class UtilAerospike {
      */
     public static AerospikeRecord getRecordFromCell(Cells cells) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         AerospikeRecord result = new AerospikeRecord();
-
-        if(cells.size() > 0) {
-            Cell cell = cells.getCellByIdx(0);
-            Map<String, Object> bins = cell.getMap(String.class, Object.class);
-            Record record = new Record(bins, null, 0, 0); // Expiration time = 0, defaults to namespace configuration ("default-ttl")
-            result = new AerospikeRecord(record);
+        Map<String, Object> bins = new HashMap<>();
+        for(Cell cell:cells.getCells()) {
+            bins.put(cell.getCellName(), cell.getValue());
         }
-
+        Record record = new Record(bins, null, 0, 0);  // Expiration time = 0, defaults to namespace configuration ("default-ttl")
+        result = new AerospikeRecord(record);
         return result;
     }
 
