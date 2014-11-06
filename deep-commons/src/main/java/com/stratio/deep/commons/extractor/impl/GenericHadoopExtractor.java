@@ -184,7 +184,8 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, K
     }
 
     @Override
-    public void initSave(S config, T first) {
+    public void initSave(S config, T first, SaveFunction function) {
+        //TODO do something with saveFunction
         int id = config.getRddId();
 
         int partitionIndex = config.getPartitionId();

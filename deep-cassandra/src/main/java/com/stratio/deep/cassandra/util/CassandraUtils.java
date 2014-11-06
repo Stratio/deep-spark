@@ -239,6 +239,65 @@ public class CassandraUtils {
         return sb.toString();
     }
 
+
+
+    /**
+     * Generates the update query for the provided IDeepType. The UPDATE query takes into account all the columns of the
+     * testentity, even those containing the null value. We do not generate the key part of the update query. The
+     * provided query will be concatenated with the key part by CqlRecordWriter.
+     *
+     * @param keys
+     *            the row keys wrapped inside a Cells object.
+     * @param values
+     *            all the other row columns wrapped inside a Cells object.
+     * @param outputKeyspace
+     *            the output keyspace.
+     * @param outputColumnFamily
+     *            the output column family.
+     * @return the update query statement.
+     */
+    public static String counterQueryGenerator(Cells keys, Cells values, String outputKeyspace,
+                                              String outputColumnFamily) {
+
+        StringBuilder sb = new StringBuilder("UPDATE ").append(outputKeyspace).append(".").append(outputColumnFamily)
+                .append(" SET ");
+
+        int k = 0;
+
+
+
+
+        for (Cell cell : values.getCells()) {
+            if (k > 0) {
+                sb.append(", ");
+            }
+
+            sb.append(quote(cell.getCellName())).append(" = ").append(quote(cell.getCellName())).append(" + ").append(((Number)cell.getCellValue()).longValue());
+            ++k;
+        }
+
+        k = 0;
+        StringBuilder keyClause = new StringBuilder(" WHERE ");
+        for (Cell cell : keys.getCells()) {
+            if (((CassandraCell) cell).isPartitionKey() || ((CassandraCell) cell).isClusterKey()) {
+                if (k > 0) {
+                    keyClause.append(" AND ");
+                }
+
+                keyClause.append(String.format("%s = ?", quote(cell.getCellName())));
+
+                ++k;
+            }
+
+        }
+
+        sb.append(keyClause).append(";");
+
+        return sb.toString();
+    }
+
+
+
     /**
      * Generates a create table cql statement from the given Cells description.
      * 

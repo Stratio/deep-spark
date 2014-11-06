@@ -24,5 +24,5 @@ public interface IExtractor<T, S extends BaseConfig<T>> extends Serializable {
 
     void saveRDD(T t, SaveFunction function);
 
-    void initSave(S config, T first);
+    void initSave(S config, T first, SaveFunction function);
 }

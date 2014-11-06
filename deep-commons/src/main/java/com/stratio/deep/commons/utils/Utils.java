@@ -144,7 +144,18 @@ public final class Utils {
      * @return the batch statement.
      */
     public static String batchQueryGenerator(List<String> statements) {
-        StringBuilder sb = new StringBuilder("BEGIN BATCH \n");
+       return batchCounterQueryGenerator(statements,false);
+    }
+
+    /**
+     * Returns a CQL batch query wrapping the given statements.
+     *
+     * @param statements the list of statements to use to generate the batch statement.
+     * @return the batch statement.
+     */
+    public static String batchCounterQueryGenerator(List<String> statements, boolean isCounter) {
+        String counter = isCounter ? "COUNTER" : "";
+        StringBuilder sb = new StringBuilder("BEGIN "+counter+" BATCH \n");
 
         for (String statement : statements) {
             sb.append(statement).append("\n");

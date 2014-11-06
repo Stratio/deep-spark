@@ -58,7 +58,9 @@ public class PrepareSaveFunction<T, S extends BaseConfig<T>> extends AbstractFun
         }
 
         if (function == null) {
-            extractor.initSave(config, first);
+            extractor.initSave(config, first,null);
+        }else{
+            extractor.initSave(config,first, function);
         }
 
         while (v1.hasNext()) {

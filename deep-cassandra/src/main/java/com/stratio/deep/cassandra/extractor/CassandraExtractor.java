@@ -20,6 +20,8 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
+import com.stratio.deep.cassandra.cql.DeepIncrementalCqlRecordWriter;
+import com.stratio.deep.cassandra.functions.IncreaseCounterFunction;
 import org.apache.spark.Partition;
 
 import scala.Tuple2;
@@ -170,7 +172,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     }
 
     @Override
-    public void initSave(S config, T first) {
+    public void initSave(S config, T first, SaveFunction saveFunction) {
 
         if (config instanceof ExtractorConfig) {
             cassandraJobConfig = (CassandraDeepJobConfig<T>) ((DeepJobConfig) cassandraJobConfig)
@@ -180,7 +182,13 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
         }
         cassandraJobConfig
                 .createOutputTableIfNeeded((Tuple2<Cells, Cells>) transformer.apply(first));
-        writer = new DeepCqlRecordWriter(cassandraJobConfig);
+
+        if(saveFunction == null)  writer = new DeepCqlRecordWriter(cassandraJobConfig);
+        //TODO if !customFunction
+        else if(saveFunction instanceof IncreaseCounterFunction){
+            writer = new DeepIncrementalCqlRecordWriter(cassandraJobConfig);
+            ((IncreaseCounterFunction)saveFunction).setWriter(writer);
+        }
     }
 
     @Override
@@ -191,7 +199,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
         if (saveFunction == null) {
             writer.write(tuple._1(), tuple._2());
         } else {
-            saveFunction.call();
+            saveFunction.call((Cells)t);
         }
     }
 

@@ -40,6 +40,7 @@ import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.exceptions.SyntaxException;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.commons.io.IOUtils;
+import org.apache.xpath.operations.Bool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -263,6 +264,7 @@ public class DeepCqlRecordWriter extends DeepRecordWriter {
         private final List<Object> bindVariables = new ArrayList<>();
         private final UUID identity = UUID.randomUUID();
         private String cql;
+        private Boolean isCounterBatch = null;
 
         /**
          * Returns true if adding the current element triggers the batch execution.
@@ -284,6 +286,15 @@ public class DeepCqlRecordWriter extends DeepRecordWriter {
             return res;
         }
 
+        public synchronized boolean setCounterBatch(boolean counterBatch){
+            boolean res = isCounterBatch != null && counterBatch != isCounterBatch;
+            if(res){
+                triggerBatch();
+            }
+            isCounterBatch = counterBatch;
+            return res;
+        }
+
         /**
          * Triggers the execution of the batch
          */
@@ -292,7 +303,8 @@ public class DeepCqlRecordWriter extends DeepRecordWriter {
                 return;
             }
 
-            cql = Utils.batchQueryGenerator(batchStatements);
+            cql = Utils.batchCounterQueryGenerator(batchStatements,isCounterBatch);
+
             this.start();
         }
 

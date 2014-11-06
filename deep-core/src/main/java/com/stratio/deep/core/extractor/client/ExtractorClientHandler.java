@@ -228,7 +228,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
     }
 
     @Override
-    public void initSave(ExtractorConfig<T> config, T first) {
+    public void initSave(ExtractorConfig<T> config, T first, SaveFunction function) {
         InitSaveAction<T> initSaveAction = new InitSaveAction<>(config, first);
 
         channel.writeAndFlush(initSaveAction);

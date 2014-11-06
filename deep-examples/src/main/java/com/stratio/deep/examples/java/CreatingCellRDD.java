@@ -66,11 +66,10 @@ public final class CreatingCellRDD {
                 .setMaster(p.getCluster())
                 .setAppName(job)
                 .setJars(p.getJars())
-                .setSparkHome(p.getSparkHome())
-                .set("spark.serializer","org.apache.spark.serializer.KryoSerializer")
+                .setSparkHome(p.getSparkHome());
+              /*  .set("spark.serializer","org.apache.spark.serializer.KryoSerializer")
                 .set("spark.kryo.registrator","com.stratio.deep.serializer.DeepKryoRegistrator");
-
-        SparkContext sc = new SparkContext(p.getCluster(), job, sparkConf);
+*/        SparkContext sc = new SparkContext(p.getCluster(), job, sparkConf);
 
         LOG.info("spark.serializer: " + System.getProperty("spark.serializer"));
         LOG.info("spark.kryo.registrator: " + System.getProperty("spark.kryo.registrator"));

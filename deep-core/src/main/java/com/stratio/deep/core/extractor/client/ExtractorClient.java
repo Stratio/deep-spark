@@ -100,8 +100,8 @@ public class ExtractorClient<T> implements IExtractor<T, ExtractorConfig<T>> {
     }
 
     @Override
-    public void initSave(ExtractorConfig<T> config, T first) {
-        handler.initSave(config, first);
+    public void initSave(ExtractorConfig<T> config, T first, SaveFunction function) {
+        handler.initSave(config, first, function);
     }
 
     @Override

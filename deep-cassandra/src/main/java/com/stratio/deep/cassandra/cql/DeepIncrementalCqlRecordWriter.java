@@ -22,6 +22,7 @@ import static com.stratio.deep.commons.utils.Utils.quote;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.stratio.deep.cassandra.util.CassandraUtils;
 import org.apache.cassandra.dht.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,13 +58,14 @@ public class DeepIncrementalCqlRecordWriter extends DeepCqlRecordWriter {
     @Override
     public void write(Cells keys, Cells values) {
         /* generate SQL */
-        String localCql = updateQueryGenerator(keys, values, writeConfig.getKeyspace(),
+        String localCql = CassandraUtils.counterQueryGenerator(keys, values, writeConfig.getKeyspace(),
                 quote(writeConfig.getColumnFamily()));
 
         Token range = partitioner.getToken(getPartitionKey(keys));
 
         // add primary key columns to the bind variables
-        List<Object> allValues = new ArrayList<>(values.getCellValues());
+        List<Object> allValues = new ArrayList<>();
+        //allValues.addAll(values.getCellValues());
         allValues.addAll(keys.getCellValues());
 
         // get the client for the given range, or create a new one
@@ -72,6 +74,9 @@ public class DeepIncrementalCqlRecordWriter extends DeepCqlRecordWriter {
             // haven't seen keys for this range: create new client
             client = new RangeClient();
             clients.put(range, client);
+            if (client.setCounterBatch(true)) {
+                removedClients.put(range, clients.remove(range));
+            }
         }
 
         if (client.put(localCql, allValues)) {
