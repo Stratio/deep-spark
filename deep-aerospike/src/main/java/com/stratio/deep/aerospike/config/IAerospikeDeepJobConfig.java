@@ -17,6 +17,8 @@
 package com.stratio.deep.aerospike.config;
 
 import org.apache.hadoop.conf.Configuration;
+import scala.Tuple2;
+import scala.Tuple3;
 
 import java.util.List;
 
@@ -75,5 +77,23 @@ public interface IAerospikeDeepJobConfig<T> {
     IAerospikeDeepJobConfig<T> operation(String operation);
 
     String getOperation();
+
+    /**
+     * Sets an equality filter for querying Aerospike
+     * @param filter Equality filter value
+     * @return
+     */
+    IAerospikeDeepJobConfig<T> equalsFilter(Tuple2<String, Object> filter);
+
+    Tuple2<String, Object> getEqualsFilter();
+
+    /**
+     * Sets a numrange filter for querying Aerospike
+     * @param filter
+     * @return
+     */
+    IAerospikeDeepJobConfig<T> numrangeFilter(Tuple3<String, Long, Long> filter);
+
+    Tuple3<String, Long, Long> getNumrangeFilter();
 
 }

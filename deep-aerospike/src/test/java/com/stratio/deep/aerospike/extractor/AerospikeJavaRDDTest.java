@@ -18,6 +18,7 @@ package com.stratio.deep.aerospike.extractor;
 import com.aerospike.client.*;
 import com.aerospike.client.policy.ScanPolicy;
 import com.aerospike.client.policy.WritePolicy;
+import com.aerospike.client.query.IndexType;
 import com.google.common.io.Resources;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -91,10 +92,11 @@ public class AerospikeJavaRDDTest {
         Bin binCantos = new Bin("cantos", cantos);
         aerospike.put(null, key, binId, binMetadata, binCantos);
 
-        Key key2 = new Key(NAMESPACE_TEST, SET_NAME, 1);
-        Bin bin_number = new Bin("number", 1);
+        Key key2 = new Key(NAMESPACE_TEST, SET_NAME, 3);
+        Bin bin_number = new Bin("number", 3);
         Bin bin_text = new Bin("message", "new message test");
         aerospike.put(null, key2, bin_number, bin_text);
+        aerospike.createIndex(null, NAMESPACE_TEST, SET_NAME, "num_idx", "number", IndexType.NUMERIC);
     }
 
     /**

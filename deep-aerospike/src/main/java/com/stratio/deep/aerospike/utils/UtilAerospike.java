@@ -18,11 +18,13 @@ package com.stratio.deep.aerospike.utils;
 import com.aerospike.client.Record;
 import com.aerospike.hadoop.mapreduce.AerospikeKey;
 import com.aerospike.hadoop.mapreduce.AerospikeRecord;
+import com.stratio.deep.aerospike.config.AerospikeDeepJobConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple2;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -99,30 +101,45 @@ public class UtilAerospike {
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
-    public static Cells getCellFromRecord(AerospikeKey key, AerospikeRecord aerospikeRecord, String namespace, String setName, String[] inputColumns) throws IllegalAccessException,
+    public static Cells getCellFromRecord(AerospikeKey key, AerospikeRecord aerospikeRecord, AerospikeDeepJobConfig aerospikeConfig) throws IllegalAccessException,
             InstantiationException, InvocationTargetException {
+
+        String namespace = aerospikeConfig.getNamespace();
+        String setName = aerospikeConfig.getSet();
+        String [] inputColumns = aerospikeConfig.getInputColumns();
+        Tuple2<String, Object> equalsFilter = aerospikeConfig.getEqualsFilter();
+        String equalsFilterBin = equalsFilter!=null ? equalsFilter._1():null;
+        Object equalsFilterValue = equalsFilter!=null ? equalsFilter._2():null;
 
         Cells cells = setName!= null ?new Cells(setName): new Cells();
 
         Map<String, Object> map = aerospikeRecord.bins;
         if(inputColumns != null) {
-            for(int i=0; i<inputColumns.length; i++) {
-                String binName = inputColumns[i];
-                if(map.containsKey(binName)) {
-                    Cell cell = Cell.create(binName, map.get(binName));
-                    cells.add(cell);
-                } else {
-                    throw new InvocationTargetException(new Exception("There is no [" + binName + "] on aerospike [" + namespace + "." + setName + "] set" ));
+            if(equalsFilter == null || checkEqualityFilter(map, equalsFilterBin, equalsFilterValue)) {
+                for (int i = 0; i < inputColumns.length; i++) {
+                    String binName = inputColumns[i];
+                    if (map.containsKey(binName)) {
+                        Cell cell = Cell.create(binName, map.get(binName));
+                        cells.add(cell);
+                    } else {
+                        throw new InvocationTargetException(new Exception("There is no [" + binName + "] on aerospike [" + namespace + "." + setName + "] set"));
+                    }
                 }
             }
         } else {
-            for(Map.Entry<String, Object> bin:map.entrySet()) {
-                Cell cell = Cell.create(bin.getKey(), bin.getValue());
-                cells.add(cell);
+            if(equalsFilter == null || checkEqualityFilter(map, equalsFilterBin, equalsFilterValue)) {
+                for (Map.Entry<String, Object> bin : map.entrySet()) {
+                    Cell cell = Cell.create(bin.getKey(), bin.getValue());
+                    cells.add(cell);
+                }
             }
         }
 
         return cells;
+    }
+
+    private static boolean checkEqualityFilter(Map<String, Object> bins, String binName, Object binValue) {
+        return bins.containsKey(binName) && bins.get(binName).equals(binValue);
     }
 
     /**

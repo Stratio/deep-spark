@@ -16,27 +16,16 @@
 package com.stratio.deep.aerospike.extractor;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.filter.Filter;
+import com.stratio.deep.commons.filter.FilterOperator;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.extractor.ExtractorTest;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 import org.testng.annotations.Test;
-import scala.Tuple2;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 
@@ -67,78 +56,6 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
             //Import dataSet was OK and we could read it
             assertEquals(1, inputRDDEntity.count());
 
-//            List<Cells> books = inputRDDEntity.toJavaRDD().collect();
-//
-//            Cells book = books.get(0);
-//
-//            DBObject proObject = new BasicDBObject();
-//            proObject.put("_id", 0);
-//
-//            //      tests subDocuments
-//            BSONObject result = MongoJavaRDDTest.mongo.getDB("book").getCollection("input").findOne(null, proObject);
-//            assertEquals(((DBObject) result.get("metadata")).get("author"),
-//                    ((Cells) book.getCellByName("metadata").getCellValue()).getCellByName("author").getCellValue());
-//
-//            //      tests List<subDocuments>
-//            List<BSONObject> listCantos = (List<BSONObject>) result.get("cantos");
-//
-//            for (int i = 0; i < listCantos.size(); i++) {
-//                BSONObject bsonObject = listCantos.get(i);
-//                assertEquals(bsonObject.get("canto"),
-//                        ((List<Cells>) book.getCellByName("cantos").getCellValue()).get(i).getCellByName("canto")
-//                                .getCellValue());
-//                assertEquals(bsonObject.get("text"),
-//                        ((List<Cells>) book.getCellByName("cantos").getCellValue()).get(i).getCellByName("text")
-//                                .getCellValue());
-//            }
-//
-//            RDD<Cells> inputRDDEntity2 = context.createRDD(inputConfigEntity);
-//
-//            JavaRDD<String> words = inputRDDEntity2.toJavaRDD().flatMap(new FlatMapFunction<Cells, String>() {
-//                @Override
-//                public Iterable<String> call(Cells bookEntity) throws Exception {
-//
-//                    List<String> words = new ArrayList<>();
-//                    for (Cells canto : ((List<Cells>) bookEntity.getCellByName("cantos").getCellValue())) {
-//                        words.addAll(Arrays.asList(((String) canto.getCellByName("text").getCellValue()).split(" ")));
-//                    }
-//                    return words;
-//                }
-//            });
-//
-//            JavaPairRDD<String, Integer> wordCount = words.mapToPair(new PairFunction<String, String, Integer>() {
-//                @Override
-//                public Tuple2<String, Integer> call(String s) throws Exception {
-//                    return new Tuple2<>(s, 1);
-//                }
-//            });
-//
-//            JavaPairRDD<String, Integer> wordCountReduced = wordCount.reduceByKey(new Function2<Integer, Integer, Integer>() {
-//                @Override
-//                public Integer call(Integer integer, Integer integer2) throws Exception {
-//                    return integer + integer2;
-//                }
-//            });
-//
-//            JavaRDD<Cells> outputRDD = wordCountReduced.map(new Function<Tuple2<String, Integer>, Cells>() {
-//                @Override
-//                public Cells call(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
-//                    return new Cells(Cell.create("word", stringIntegerTuple2._1()),
-//                            Cell.create("count", stringIntegerTuple2._2()));
-//                }
-//            });
-//
-//            ExtractorConfig<Cells> outputConfigEntity = new ExtractorConfig(Cells.class);
-//            outputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, "book")
-//                    .putValue(ExtractorConstants.COLLECTION, "outputCell");
-//            outputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
-//
-//            context.saveRDD(outputRDD.rdd(), outputConfigEntity);
-//
-//            RDD<Cells> outputRDDEntity = context.createRDD(outputConfigEntity);
-//
-//            Assert.assertEquals(((Long) outputRDDEntity.cache().count()).longValue(),
-//                    MongoJavaRDDTest.WORD_COUNT_SPECTED.longValue());
         }finally {
             context.stop();
         }
@@ -150,6 +67,101 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
     @Override
     @Test
     protected void testFilter() {
-        assertEquals(true, true);
+        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
+        try {
+
+            Filter[] filters = null;
+            Filter equalFilter = new Filter("number", FilterOperator.IS, 3L);
+            Filter ltFilter = new Filter("number", FilterOperator.LT, 4L);
+            Filter gtFilter = new Filter("number", FilterOperator.GT, 5L);
+            Filter lteFilter = new Filter("number", FilterOperator.LTE, 3L);
+            Filter gteFilter = new Filter("number", FilterOperator.GTE, 4L);
+            Filter equalFilter2 = new Filter("number", FilterOperator.IS, 4L);
+
+            try {
+                filters = new Filter[] { equalFilter, ltFilter };
+                ExtractorConfig inputConfigEntity = getFilterConfig(filters);
+            } catch(UnsupportedOperationException e) {
+                LOG.info("Expected exception thrown for more than one filter in aerospike");
+            }
+
+            try {
+                filters = new Filter[] { new Filter("number", FilterOperator.NE, "invalid")};
+                ExtractorConfig inputConfigEntity = getFilterConfig(filters);
+            } catch(UnsupportedOperationException e) {
+                LOG.info("Expected exception thrown for a filter not supported by aerospike");
+            }
+
+            try {
+                Filter invalidFilter = new Filter("number", FilterOperator.LT, "invalid");
+                filters = new Filter[] { invalidFilter };
+                ExtractorConfig inputConfigEntity = getFilterConfig(filters);
+            } catch(UnsupportedOperationException e) {
+                LOG.info("Expected exception thrown for using a range filter without Long mandatory value type");
+            }
+
+            ExtractorConfig<Cells> inputConfigEntity = new ExtractorConfig(Cells.class);
+            inputConfigEntity.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, "test")
+                    .putValue(ExtractorConstants.SET, "input")
+                    .putValue(ExtractorConstants.FILTER_QUERY, new Filter[] {equalFilter});
+            inputConfigEntity.setExtractorImplClass(AerospikeCellExtractor.class);
+
+            RDD<Cells> inputRDDEntity = context.createRDD(inputConfigEntity);
+            assertEquals(1, inputRDDEntity.count());
+
+            ExtractorConfig<Cells> inputConfigEntity2 = new ExtractorConfig(Cells.class);
+            inputConfigEntity2.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, "test")
+                    .putValue(ExtractorConstants.SET, "input")
+                    .putValue(ExtractorConstants.FILTER_QUERY, new Filter[] {ltFilter});
+            inputConfigEntity2.setExtractorImplClass(AerospikeCellExtractor.class);
+
+            RDD<Cells> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
+            assertEquals(1, inputRDDEntity2.count());
+
+            ExtractorConfig<Cells> inputConfigEntity3 = new ExtractorConfig(Cells.class);
+            inputConfigEntity3.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, "test")
+                    .putValue(ExtractorConstants.SET, "input")
+                    .putValue(ExtractorConstants.FILTER_QUERY, new Filter[] {gtFilter});
+            inputConfigEntity3.setExtractorImplClass(AerospikeCellExtractor.class);
+
+            RDD<Cells> inputRDDEntity3 = context.createRDD(inputConfigEntity3);
+            assertEquals(0, inputRDDEntity3.count());
+
+            ExtractorConfig<Cells> inputConfigEntity4 = new ExtractorConfig(Cells.class);
+            inputConfigEntity4.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, "test")
+                    .putValue(ExtractorConstants.SET, "input")
+                    .putValue(ExtractorConstants.FILTER_QUERY, new Filter[] {lteFilter});
+            inputConfigEntity4.setExtractorImplClass(AerospikeCellExtractor.class);
+
+            RDD<Cells> inputRDDEntity4 = context.createRDD(inputConfigEntity4);
+            assertEquals(1, inputRDDEntity4.count());
+
+            ExtractorConfig<Cells> inputConfigEntity5 = new ExtractorConfig(Cells.class);
+            inputConfigEntity5.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, "test")
+                    .putValue(ExtractorConstants.SET, "input")
+                    .putValue(ExtractorConstants.FILTER_QUERY, new Filter[] {gteFilter});
+            inputConfigEntity5.setExtractorImplClass(AerospikeCellExtractor.class);
+
+            RDD<Cells> inputRDDEntity5 = context.createRDD(inputConfigEntity5);
+            assertEquals(0, inputRDDEntity5.count());
+
+            ExtractorConfig<Cells> inputConfigEntity6 = new ExtractorConfig(Cells.class);
+            inputConfigEntity6.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, "test")
+                    .putValue(ExtractorConstants.SET, "input")
+                    .putValue(ExtractorConstants.FILTER_QUERY, new Filter[] {gteFilter});
+            inputConfigEntity6.setExtractorImplClass(AerospikeCellExtractor.class);
+
+            RDD<Cells> inputRDDEntity6 = context.createRDD(inputConfigEntity5);
+            assertEquals(0, inputRDDEntity6.count());
+
+        }finally {
+            context.stop();
+        }
     }
 }
