@@ -22,12 +22,11 @@ import org.apache.hadoop.conf.Configuration;
 import org.bson.BSONObject;
 
 import com.mongodb.QueryBuilder;
-import com.stratio.deep.commons.config.IDeepJobConfig;
 
 /**
  * Defines the public methods that each Stratio Deep MongoDB configuration object should implement.
  */
-public interface IMongoDeepJobConfig<T>  {
+public interface IMongoDeepJobConfig<T> {
     /**
      * The MongoDB's collection name
      */

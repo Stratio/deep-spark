@@ -27,13 +27,20 @@ import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
 
 /**
  * Created by rcrespo on 27/08/14.
+ * @param <T>  the type parameter
  */
 public abstract class MongoExtractor<T> extends GenericHadoopExtractor<T, MongoDeepJobConfig<T>, Object,
         BSONObject, Object, BSONObject>
         implements Serializable {
 
+    /**
+     * The constant serialVersionUID.
+     */
     private static final long serialVersionUID = 298122755783328212L;
 
+    /**
+     * Instantiates a new Mongo extractor.
+     */
     public MongoExtractor() {
         super();
         this.inputFormat = new MongoInputFormat();

@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.spark.Partition;
-import org.bson.BSONObject;
 
+import com.mongodb.Cursor;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -32,53 +32,106 @@ import com.mongodb.MongoClient;
 import com.mongodb.QueryBuilder;
 import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
-import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.impl.DeepPartition;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
 
 /**
  * Created by rcrespo on 30/10/14.
+ *
+ * @param <T> the type parameter
  */
 public class MongoReader<T> {
 
+    /**
+     * The Mongo client.
+     */
     private MongoClient mongoClient = null;
+    /**
+     * The Collection.
+     */
     private DBCollection collection = null;
+    /**
+     * The Db.
+     */
     private DB db = null;
+    /**
+     * The Key.
+     */
     private String key = "_id";
 
+    /**
+     * The Db cursor.
+     */
     DBCursor dbCursor = null;
 
+    /**
+     * The Db cursors.
+     */
+    List<Cursor> dbCursors = null;
 
-    public MongoReader () {
+    /**
+     * Instantiates a new Mongo reader.
+     */
+    public MongoReader() {
 
     }
 
-    public MongoReader (String key) {
-        if(key!=null){
-            this.key=key;
+    /**
+     * The type Connections.
+     */
+    public static class connections {
+
+        //        private
+
+    }
+
+    /**
+     * Instantiates a new Mongo reader.
+     *
+     * @param key the key
+     */
+    public MongoReader(String key) {
+        if (key != null) {
+            this.key = key;
         }
 
     }
 
-    public void close (){
-        if (dbCursor!=null){
+    /**
+     * Close void.
+     */
+    public void close() {
+        if (dbCursor != null) {
             dbCursor.close();
         }
-        if(mongoClient!=null){
+
+        if (dbCursors != null && !dbCursors.isEmpty()) {
+            for (Cursor cursor : dbCursors) {
+                cursor.close();
+            }
+        }
+        if (mongoClient != null) {
             mongoClient.close();
         }
 
     }
 
-
-
-    public boolean hasNext(){
+    /**
+     * Has next.
+     *
+     * @return the boolean
+     */
+    public boolean hasNext() {
         return dbCursor.hasNext();
     }
 
-    public Cells next(){
+    /**
+     * Next cells.
+     *
+     * @return the cells
+     */
+    public Cells next() {
         try {
             return UtilMongoDB.getCellFromBson(dbCursor.next(), collection.getFullName());
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
@@ -87,16 +140,19 @@ public class MongoReader<T> {
         return null;
     }
 
-
-    public void init(Partition partition, String host, String database, String collectionName) {
+    /**
+     * Init void.
+     *
+     * @param partition      the partition
+     * @param database       the database
+     * @param collectionName the collection name
+     */
+    public void init(Partition partition, String database, String collectionName) {
         try {
 
-
-
-            ServerAddress address = new ServerAddress(host);
             List<ServerAddress> addressList = new ArrayList<>();
 
-            for(String s: (List<String>)((DeepPartition)partition).splitWrapper().getReplicas()){
+            for (String s : (List<String>) ((DeepPartition) partition).splitWrapper().getReplicas()) {
                 addressList.add(new ServerAddress(s));
             }
             mongoClient = new MongoClient(addressList);
@@ -104,34 +160,39 @@ public class MongoReader<T> {
             db = mongoClient.getDB(database);
             collection = db.getCollection(collectionName);
 
-            dbCursor = collection.find(createQueryPartition((DeepPartition)partition));
+            dbCursor = collection.find(createQueryPartition((DeepPartition) partition));
 
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
     }
 
-        private DBObject createQueryPartition(DeepPartition partition){
+    /**
+     * Create query partition.
+     *
+     * @param partition the partition
+     * @return the dB object
+     */
+    private DBObject createQueryPartition(DeepPartition partition) {
 
-            QueryBuilder queryBuilderMin = QueryBuilder.start(key);
-            DBObject bsonObjectMin = queryBuilderMin.greaterThanEquals(partition.splitWrapper().getStartToken()).get();
+        QueryBuilder queryBuilderMin = QueryBuilder.start(key);
+        DBObject bsonObjectMin = queryBuilderMin.greaterThanEquals(partition.splitWrapper().getStartToken()).get();
 
-            QueryBuilder queryBuilderMax = QueryBuilder.start(key);
-            DBObject bsonObjectMax = queryBuilderMax.lessThan(partition.splitWrapper().getEndToken()).get();
+        QueryBuilder queryBuilderMax = QueryBuilder.start(key);
+        DBObject bsonObjectMax = queryBuilderMax.lessThan(partition.splitWrapper().getEndToken()).get();
 
-            QueryBuilder queryBuilder = QueryBuilder.start();
-            if(partition.splitWrapper().getStartToken()!=null) {
-                queryBuilder.and(bsonObjectMin);
-            }
-
-            if(partition.splitWrapper().getEndToken()!=null) {
-                queryBuilder.and(bsonObjectMax);
-            }
-
-
-            return queryBuilder.get();
+        QueryBuilder queryBuilder = QueryBuilder.start();
+        if (partition.splitWrapper().getStartToken() != null) {
+            queryBuilder.and(bsonObjectMin);
         }
 
+        if (partition.splitWrapper().getEndToken() != null) {
+            queryBuilder.and(bsonObjectMax);
+        }
+
+        return queryBuilder.get();
     }
+
+}
 
 
