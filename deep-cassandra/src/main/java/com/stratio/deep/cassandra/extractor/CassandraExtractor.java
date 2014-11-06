@@ -185,7 +185,10 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
             writer = new DeepCqlRecordWriter(cassandraJobConfig);
         } else {
             writer = new DeepCqlRecordWriter(cassandraJobConfig, queryBuilder);
+            queryBuilder.setColumnFamily(cassandraJobConfig.getColumnFamily());
+            queryBuilder.setKeyspace(cassandraJobConfig.getKeyspace());
         }
+
     }
 
     @Override

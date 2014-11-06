@@ -15,7 +15,7 @@ import com.stratio.deep.commons.functions.QueryBuilder;
 /**
  *
  */
-public class CassandraDefaultQueryBuilder implements QueryBuilder {
+public class CassandraDefaultQueryBuilder extends QueryBuilder {
 
     private final String keyspace;
 

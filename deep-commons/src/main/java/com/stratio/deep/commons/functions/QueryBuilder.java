@@ -11,7 +11,11 @@ import com.stratio.deep.commons.entity.Cells;
 /**
  *
  */
-public interface QueryBuilder extends Serializable {
+public abstract class QueryBuilder implements Serializable {
+
+    protected String keyspace;
+
+    protected String columnFamily;
 
     /**
      * Generates a query from the given set of keys and set of values.
@@ -23,7 +27,7 @@ public interface QueryBuilder extends Serializable {
      * 
      * @return the query statement.
      */
-    public String prepareQuery(Cells keys, Cells values);
+    public abstract String prepareQuery(Cells keys, Cells values);
 
     /**
      * Returns a CQL batch query wrapping the given statements.
@@ -32,5 +36,15 @@ public interface QueryBuilder extends Serializable {
      *            the list of statements to use to generate the batch statement.
      * @return the batch statement.
      */
-    public String prepareBatchQuery(List<String> statements);
+    public abstract String prepareBatchQuery(List<String> statements);
+
+    public void setKeyspace(String keyspace){
+        this.keyspace = keyspace;
+
+    }
+
+    public void setColumnFamily(String columnFamily){
+        this.columnFamily = columnFamily;
+
+    }
 }
