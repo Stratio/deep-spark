@@ -174,13 +174,13 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
             this.initExtractor(initSaveAction.getConfig());
         }
 
-        extractor.initSave(initSaveAction.getConfig(), initSaveAction.getFirst());
+        extractor.initSave(initSaveAction.getConfig(), initSaveAction.getFirst(), initSaveAction.getQueryBuilder());
         return;
 
     }
 
     protected void save(SaveAction<T> saveAction) {
-        extractor.saveRDD(saveAction.getRecord(), saveAction.getSaveFunction());
+        extractor.saveRDD(saveAction.getRecord());
         return;
 
     }

@@ -27,7 +27,7 @@ import scala.runtime.BoxedUnit;
 
 import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
-import com.stratio.deep.commons.functions.SaveFunction;
+import com.stratio.deep.commons.functions.QueryBuilder;
 import com.stratio.deep.commons.rdd.IExtractor;
 
 /**
@@ -36,16 +36,18 @@ import com.stratio.deep.commons.rdd.IExtractor;
 public class PrepareSaveFunction<T, S extends BaseConfig<T>> extends AbstractFunction1<Iterator<T>,
         BoxedUnit> implements Serializable {
 
+    private static final long serialVersionUID = -7556596901637129564L;
+
     private final S config;
 
     private final T first;
 
-    private final SaveFunction function;
+    private final QueryBuilder queryBuilder;
 
-    public PrepareSaveFunction(SaveFunction function, S config, T first) {
+    public PrepareSaveFunction(QueryBuilder queryBuilder, S config, T first) {
         this.first = first;
         this.config = config;
-        this.function = function;
+        this.queryBuilder = queryBuilder;
     }
 
     @Override
@@ -57,12 +59,10 @@ public class PrepareSaveFunction<T, S extends BaseConfig<T>> extends AbstractFun
             extractor = getExtractorClient();
         }
 
-        if (function == null) {
-            extractor.initSave(config, first);
-        }
+        extractor.initSave(config, first, queryBuilder);
 
         while (v1.hasNext()) {
-            extractor.saveRDD(v1.next(), function);
+            extractor.saveRDD(v1.next());
         }
         config.setPartitionId(config.getPartitionId() + 1);
         extractor.close();

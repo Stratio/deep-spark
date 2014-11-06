@@ -36,7 +36,7 @@ import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
-import com.stratio.deep.commons.functions.SaveFunction;
+import com.stratio.deep.commons.functions.QueryBuilder;
 import com.stratio.deep.commons.impl.DeepPartition;
 import com.stratio.deep.commons.rdd.DeepTokenRange;
 import com.stratio.deep.commons.rdd.IDeepRecordReader;
@@ -170,7 +170,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     }
 
     @Override
-    public void initSave(S config, T first) {
+    public void initSave(S config, T first, QueryBuilder queryBuilder) {
 
         if (config instanceof ExtractorConfig) {
             cassandraJobConfig = (CassandraDeepJobConfig<T>) ((DeepJobConfig) cassandraJobConfig)
@@ -180,19 +180,20 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
         }
         cassandraJobConfig
                 .createOutputTableIfNeeded((Tuple2<Cells, Cells>) transformer.apply(first));
-        writer = new DeepCqlRecordWriter(cassandraJobConfig);
+
+        if (queryBuilder == null) {
+            writer = new DeepCqlRecordWriter(cassandraJobConfig);
+        } else {
+            writer = new DeepCqlRecordWriter(cassandraJobConfig, queryBuilder);
+        }
     }
 
     @Override
-    public void saveRDD(T t, SaveFunction saveFunction) {
+    public void saveRDD(T t) {
 
         Tuple2<Cells, Cells> tuple = (Tuple2<Cells, Cells>) transformer.apply(t);
 
-        if (saveFunction == null) {
-            writer.write(tuple._1(), tuple._2());
-        } else {
-            saveFunction.call();
-        }
+        writer.write(tuple._1(), tuple._2());
     }
 
 }

@@ -19,8 +19,6 @@
  */
 package com.stratio.deep.commons.extractor.actions;
 
-import com.stratio.deep.commons.functions.SaveFunction;
-
 /**
  * Created by rcrespo on 20/08/14.
  */
@@ -30,12 +28,9 @@ public class SaveAction<T> extends Action {
 
     private T record;
 
-    private SaveFunction saveFunction;
-
-    public SaveAction(T record, SaveFunction saveFunction) {
+    public SaveAction(T record) {
         super(ActionType.SAVE);
         this.record = record;
-        this.saveFunction = saveFunction;
     }
 
     public T getRecord() {
@@ -44,13 +39,5 @@ public class SaveAction<T> extends Action {
 
     public void setRecord(T record) {
         this.record = record;
-    }
-
-    public SaveFunction getSaveFunction() {
-        return saveFunction;
-    }
-
-    public void setSaveFunction(SaveFunction saveFunction) {
-        this.saveFunction = saveFunction;
     }
 }

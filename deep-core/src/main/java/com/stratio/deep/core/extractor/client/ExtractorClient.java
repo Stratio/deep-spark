@@ -28,7 +28,7 @@ import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
-import com.stratio.deep.commons.functions.SaveFunction;
+import com.stratio.deep.commons.functions.QueryBuilder;
 import com.stratio.deep.commons.rdd.IExtractor;
 
 /**
@@ -95,13 +95,13 @@ public class ExtractorClient<T> implements IExtractor<T, ExtractorConfig<T>> {
     }
 
     @Override
-    public void saveRDD(T t, SaveFunction function) {
-        handler.saveRDD(t, function);
+    public void saveRDD(T t) {
+        handler.saveRDD(t);
     }
 
     @Override
-    public void initSave(ExtractorConfig<T> config, T first) {
-        handler.initSave(config, first);
+    public void initSave(ExtractorConfig<T> config, T first, QueryBuilder queryBuilder) {
+        handler.initSave(config, first, queryBuilder);
     }
 
     @Override

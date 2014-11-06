@@ -16,9 +16,6 @@
 
 package com.stratio.deep.cassandra.cql;
 
-import static com.stratio.deep.cassandra.util.CassandraUtils.updateQueryGenerator;
-import static com.stratio.deep.commons.utils.Utils.quote;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -50,18 +47,19 @@ import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.cassandra.entity.CellValidator;
+import com.stratio.deep.cassandra.functions.CassandraDefaultQueryBuilder;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.exception.DeepInstantiationException;
+import com.stratio.deep.commons.functions.QueryBuilder;
 import com.stratio.deep.commons.handler.DeepRecordWriter;
 import com.stratio.deep.commons.utils.Pair;
-import com.stratio.deep.commons.utils.Utils;
 
 /**
  * Handles the distributed write to cassandra in batch.
  */
-public class DeepCqlRecordWriter extends DeepRecordWriter {
+public final class DeepCqlRecordWriter extends DeepRecordWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(DeepCqlRecordWriter.class);
 
@@ -76,6 +74,8 @@ public class DeepCqlRecordWriter extends DeepRecordWriter {
     protected final IPartitioner partitioner;
     protected final InetAddress localhost;
 
+    private final QueryBuilder queryBuilder;
+
     /**
      * Con
      * 
@@ -86,6 +86,22 @@ public class DeepCqlRecordWriter extends DeepRecordWriter {
         this.removedClients = new HashMap<>();
         this.writeConfig = writeConfig;
         this.partitioner = RangeUtils.getPartitioner(writeConfig);
+        this.queryBuilder = new CassandraDefaultQueryBuilder(writeConfig.getKeyspace(), writeConfig.getColumnFamily());
+
+        try {
+            this.localhost = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            throw new DeepInstantiationException("Cannot resolve local hostname", e);
+        }
+        init();
+    }
+
+    public DeepCqlRecordWriter(ICassandraDeepJobConfig writeConfig, QueryBuilder queryBuilder) {
+        this.clients = new HashMap<>();
+        this.removedClients = new HashMap<>();
+        this.writeConfig = writeConfig;
+        this.partitioner = RangeUtils.getPartitioner(writeConfig);
+        this.queryBuilder = queryBuilder;
         try {
             this.localhost = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
@@ -229,8 +245,10 @@ public class DeepCqlRecordWriter extends DeepRecordWriter {
      */
     public void write(Cells keys, Cells values) {
         /* generate SQL */
-        String localCql = updateQueryGenerator(keys, values, writeConfig.getKeyspace(),
-                quote(writeConfig.getColumnFamily()));
+        // String localCql = updateQueryGenerator(keys, values, writeConfig.getKeyspace(),
+        // quote(writeConfig.getColumnFamily()));
+
+        String localCql = queryBuilder.prepareQuery(keys, values);
 
         Token range = partitioner.getToken(getPartitionKey(keys));
 
@@ -292,7 +310,7 @@ public class DeepCqlRecordWriter extends DeepRecordWriter {
                 return;
             }
 
-            cql = Utils.batchQueryGenerator(batchStatements);
+            cql = queryBuilder.prepareBatchQuery(batchStatements);
             this.start();
         }
 

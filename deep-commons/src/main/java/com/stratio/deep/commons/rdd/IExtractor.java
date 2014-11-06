@@ -5,7 +5,7 @@ import java.io.Serializable;
 import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.functions.SaveFunction;
+import com.stratio.deep.commons.functions.QueryBuilder;
 
 /**
  * Created by rcrespo on 4/08/14.
@@ -22,7 +22,7 @@ public interface IExtractor<T, S extends BaseConfig<T>> extends Serializable {
 
     void initIterator(Partition dp, S config);
 
-    void saveRDD(T t, SaveFunction function);
+    void saveRDD(T t);
 
-    void initSave(S config, T first);
+    void initSave(S config, T first, QueryBuilder queryBuilder);
 }
