@@ -167,6 +167,23 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] getInputColumns() {
+        return fields;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AerospikeDeepJobConfig<T> inputColumns(String... columns) {
+        fields = columns;
+        return this;
+    }
+
     @Override
     public String getBin() {
         return this.bin;
@@ -271,6 +288,14 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
 
         if (values.get(SET) != null) {
             set(extractorConfig.getString(SET));
+        }
+
+        if (values.get(FILTER_QUERY) != null) {
+            filterQuery(extractorConfig.getFilterArray(FILTER_QUERY));
+        }
+
+        if (values.get(INPUT_COLUMNS) != null) {
+            inputColumns(extractorConfig.getStringArray(INPUT_COLUMNS));
         }
 
         this.initialize();

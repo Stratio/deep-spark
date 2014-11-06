@@ -19,6 +19,9 @@ import com.aerospike.client.*;
 import com.aerospike.client.policy.ScanPolicy;
 import com.aerospike.client.policy.WritePolicy;
 import com.google.common.io.Resources;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterSuite;
@@ -26,8 +29,11 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import static org.testng.Assert.assertEquals;
@@ -49,11 +55,11 @@ public class AerospikeJavaRDDTest {
 
     public static final String SET_NAME = "input";
 
-    public static final String DATA_SET_NAME = "aerospikeData.csv";
+    public static final String DATA_SET_NAME = "divineComedy.json";
 
 
     @BeforeSuite
-    public static void init() throws IOException {
+    public static void init() throws IOException, ParseException {
         aerospike = new AerospikeClient(HOST, PORT);
         deleteData();
         dataSetImport();
@@ -69,41 +75,26 @@ public class AerospikeJavaRDDTest {
      *
      * @throws java.io.IOException
      */
-    private static void dataSetImport() throws IOException {
+    private static void dataSetImport() throws IOException, ParseException {
         URL url = Resources.getResource(DATA_SET_NAME);
-        Scanner scanner = new Scanner(new File(url.getFile()));
-        Scanner lineScanner = null;
-        int index = 0;
-        while(scanner.hasNextLine()){
-            lineScanner = new Scanner(scanner.nextLine());
-            lineScanner.useDelimiter(",");
-            Key key = null;
-            Bin title = null;
-            Bin author = null;
-            Bin pages = null;
-            while(lineScanner.hasNext()) {
-                if(index == 0) {
-                    key = new Key(NAMESPACE_BOOK, SET_NAME, lineScanner.nextInt());
-                }
-                if(index == 1) {
-                    title = new Bin("title", lineScanner.next());
-                }
-                if(index == 2) {
-                    author = new Bin("author", lineScanner.next());
-                }
-                if(index == 3) {
-                    pages = new Bin("pages", lineScanner.nextInt());
-                }
-                index++;
-            }
-            index = 0;
-            aerospike.put(null, key, title, author, pages);
-        }
-        Key key = new Key(NAMESPACE_TEST, SET_NAME, 1);
+        JSONParser parser = new JSONParser();
+        Object obj = parser.parse(new FileReader(url.getFile()));
+        JSONObject jsonObject = (JSONObject) obj;
+
+        String id = (String)jsonObject.get("id");
+        Map<String, String> metadata = (Map<String, String>)jsonObject.get("metadata");
+        List<Map<String, String>> cantos = (List<Map<String, String>>) jsonObject.get("cantos");
+
+        Key key = new Key(NAMESPACE_BOOK, SET_NAME, id);
+        Bin binId = new Bin("id", id);
+        Bin binMetadata = new Bin("metadata", metadata);
+        Bin binCantos = new Bin("cantos", cantos);
+        aerospike.put(null, key, binId, binMetadata, binCantos);
+
+        Key key2 = new Key(NAMESPACE_TEST, SET_NAME, 1);
         Bin bin_number = new Bin("number", 1);
         Bin bin_text = new Bin("message", "new message test");
-        aerospike.put(null, key, bin_number, bin_text);
-        scanner.close();
+        aerospike.put(null, key2, bin_number, bin_text);
     }
 
     /**

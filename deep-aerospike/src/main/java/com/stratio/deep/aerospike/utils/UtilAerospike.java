@@ -99,18 +99,29 @@ public class UtilAerospike {
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
-    public static Cells getCellFromRecord(AerospikeKey key, AerospikeRecord aerospikeRecord, String namespace, String setName) throws IllegalAccessException,
+    public static Cells getCellFromRecord(AerospikeKey key, AerospikeRecord aerospikeRecord, String namespace, String setName, String[] inputColumns) throws IllegalAccessException,
             InstantiationException, InvocationTargetException {
 
         Cells cells = setName!= null ?new Cells(setName): new Cells();
 
         Map<String, Object> map = aerospikeRecord.bins;
-        for(Map.Entry<String, Object> bin:map.entrySet()) {
-            Cell cell = Cell.create(bin.getKey(), bin.getValue());
-            cells.add(cell);
+        if(inputColumns != null) {
+            for(int i=0; i<inputColumns.length; i++) {
+                String binName = inputColumns[i];
+                if(map.containsKey(binName)) {
+                    Cell cell = Cell.create(binName, map.get(binName));
+                    cells.add(cell);
+                } else {
+                    throw new InvocationTargetException(new Exception("There is no [" + binName + "] on aerospike [" + namespace + "." + setName + "] set" ));
+                }
+            }
+        } else {
+            for(Map.Entry<String, Object> bin:map.entrySet()) {
+                Cell cell = Cell.create(bin.getKey(), bin.getValue());
+                cells.add(cell);
+            }
         }
 
-        Cell cell = Cell.create(key.toKey().toString(), map);
         return cells;
     }
 
