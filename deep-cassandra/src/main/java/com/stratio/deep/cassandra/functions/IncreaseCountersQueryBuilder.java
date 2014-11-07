@@ -57,7 +57,6 @@ public class IncreaseCountersQueryBuilder extends QueryBuilder {
 
         StringBuilder keyClause = new StringBuilder(" WHERE ");
         for (Cell cell : keys.getCells(originNamespace)) {
-            if (((CassandraCell) cell).isPartitionKey() || ((CassandraCell) cell).isClusterKey()) {
                 if (k > 0) {
                     keyClause.append(" AND ");
                 }
@@ -65,7 +64,6 @@ public class IncreaseCountersQueryBuilder extends QueryBuilder {
                 keyClause.append(String.format("%s = ?", quote(cell.getCellName())));
 
                 ++k;
-            }
 
         }
         sb.append(keyClause).append(";");
