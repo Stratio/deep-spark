@@ -16,8 +16,35 @@
 
 package com.stratio.deep.mongodb.extractor;
 
+import java.lang.reflect.InvocationTargetException;
+
+import com.mongodb.DBObject;
+import com.stratio.deep.commons.config.BaseConfig;
+import com.stratio.deep.mongodb.utils.UtilMongoDB;
+
 /**
  * Created by rcrespo on 7/11/14.
  */
-public class MongoNativeEntityExtractor {
+public class MongoNativeEntityExtractor<T, S extends BaseConfig<T>> extends MongoNativeExtractor<T, S> {
+    private static final long serialVersionUID = -1073974965338697939L;
+
+    @Override
+    protected T transformElement(DBObject dbObject) {
+        try {
+            return (T) UtilMongoDB.getObjectFromBson(mongoDeepJobConfig.getEntityClass(), dbObject);
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    protected DBObject transformElement(T entity) {
+        try {
+            return (DBObject) UtilMongoDB.getBsonFromObject(entity);
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

@@ -57,15 +57,10 @@ public class MongoWriter {
     /**
      * Save void.
      *
-     * @param cells the cells
+     * @param dbObject the db object
      */
-    public void save(Cells cells) {
-        try {
-            dbCollection.insert((DBObject) UtilMongoDB.getBsonFromCell(cells));
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
+    public void save(DBObject dbObject) {
+        dbCollection.insert(dbObject);
     }
 
     /**

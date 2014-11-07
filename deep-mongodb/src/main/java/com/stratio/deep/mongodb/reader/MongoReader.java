@@ -35,6 +35,7 @@ import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.impl.DeepPartition;
+import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
 import com.stratio.deep.mongodb.partition.MongoPartition;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
 
@@ -60,18 +61,16 @@ public class MongoReader<T> {
     /**
      * The Db cursor.
      */
-    DBCursor dbCursor = null;
+    private DBCursor dbCursor = null;
 
-    /**
-     * The Db cursors.
-     */
-    List<Cursor> dbCursors = null;
+
+    private MongoDeepJobConfig mongoDeepJobConfig;
 
     /**
      * Instantiates a new Mongo reader.
      */
-    public MongoReader() {
-
+    public MongoReader(MongoDeepJobConfig mongoDeepJobConfig) {
+        this.mongoDeepJobConfig = mongoDeepJobConfig;
     }
 
     /**
@@ -92,11 +91,6 @@ public class MongoReader<T> {
             dbCursor.close();
         }
 
-        if (dbCursors != null && !dbCursors.isEmpty()) {
-            for (Cursor cursor : dbCursors) {
-                cursor.close();
-            }
-        }
         if (mongoClient != null) {
             mongoClient.close();
         }
@@ -117,23 +111,16 @@ public class MongoReader<T> {
      *
      * @return the cells
      */
-    public Cells next() {
-        try {
-            return UtilMongoDB.getCellFromBson(dbCursor.next(), collection.getFullName());
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public DBObject next() {
+       return dbCursor.next();
     }
 
     /**
      * Init void.
      *
      * @param partition      the partition
-     * @param database       the database
-     * @param collectionName the collection name
      */
-    public void init(Partition partition, String database, String collectionName) {
+    public void init(Partition partition) {
         try {
 
             List<ServerAddress> addressList = new ArrayList<>();
@@ -143,11 +130,12 @@ public class MongoReader<T> {
             }
             mongoClient = new MongoClient(addressList);
             mongoClient.setReadPreference(ReadPreference.nearest());
-            db = mongoClient.getDB(database);
-            collection = db.getCollection(collectionName);
+            db = mongoClient.getDB(mongoDeepJobConfig.getDatabase());
+            collection = db.getCollection(mongoDeepJobConfig.getCollection());
 
-            DBObject keys = new BasicDBObject("_id",1);
-            dbCursor = collection.find(createQueryPartition((MongoPartition) partition),keys);
+
+
+            dbCursor = collection.find(generateFilterQuery((MongoPartition) partition),mongoDeepJobConfig.getInputFields());
 
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -162,7 +150,6 @@ public class MongoReader<T> {
      */
     private DBObject createQueryPartition(MongoPartition partition) {
 
-//        System.out.println("imprimo la partition " +partition);
         QueryBuilder queryBuilderMin = QueryBuilder.start(partition.getKey());
         DBObject bsonObjectMin = queryBuilderMin.greaterThanEquals(partition.splitWrapper().getStartToken()).get();
 
@@ -179,6 +166,22 @@ public class MongoReader<T> {
         }
 
         return queryBuilder.get();
+    }
+
+
+    private DBObject generateFilterQuery(MongoPartition partition){
+
+        if(mongoDeepJobConfig.getQuery() !=null){
+            QueryBuilder queryBuilder = QueryBuilder.start();
+
+            queryBuilder.and(createQueryPartition(partition),mongoDeepJobConfig.getQuery());
+
+            return queryBuilder.get();
+        }
+
+        return createQueryPartition(partition);
+
+
     }
 
 }

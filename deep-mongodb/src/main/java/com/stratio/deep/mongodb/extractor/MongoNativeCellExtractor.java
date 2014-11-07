@@ -16,6 +16,7 @@
 
 package com.stratio.deep.mongodb.extractor;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,334 +50,44 @@ import com.stratio.deep.commons.utils.Pair;
 import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
 import com.stratio.deep.mongodb.partition.MongoPartition;
 import com.stratio.deep.mongodb.reader.MongoReader;
+import com.stratio.deep.mongodb.utils.UtilMongoDB;
 import com.stratio.deep.mongodb.writer.MongoWriter;
 
 /**
  * Created by rcrespo on 29/10/14.
+ * @param <S>  the type parameter
  */
-public class MongoNativeCellExtractor<S extends BaseConfig<Cells>> implements IExtractor<Cells,S> {
+public class MongoNativeCellExtractor<S extends BaseConfig<Cells>> extends MongoNativeExtractor<Cells,S> {
 
     /**
-     * The constant SHARDED.
+     * The constant serialVersionUID.
      */
-    public static String SHARDED = "sharded";
-    /**
-     * The constant NAME_SPACE.
-     */
-    public static String NAME_SPACE = "ns";
+    private static final long serialVersionUID = 7584233937780968953L;
 
     /**
-     * The constant SPLIT_KEYS.
+     * Instantiates a new Mongo native cell extractor.
      */
-    public static final String SPLIT_KEYS = "splitKeys";
-
-    /**
-     * The Split size.
-     */
-    public int splitSize = 10;
-
-    /**
-     * The constant MONGODB_ID.
-     */
-    public static String MONGODB_ID = "_id";
-    /**
-     * The Reader.
-     */
-    private MongoReader reader;
-
-    private MongoWriter writer;
-
-    private MongoDeepJobConfig<Cells> mongoDeepJobConfig = new MongoDeepJobConfig<>(Cells.class);
+    public MongoNativeCellExtractor(){
+        this.mongoDeepJobConfig = new MongoDeepJobConfig<>(Cells.class);
+    }
 
     @Override
-    public Partition[] getPartitions(S config) {
-        MongoClient mongoClient = null;
-
+    protected Cells transformElement(DBObject dbObject) {
         try {
-
-            initMongoDeepJobConfig(config);
-
-            splitSize = mongoDeepJobConfig.getPageSize()>0 ? mongoDeepJobConfig.getPageSize() : splitSize;
-
-            DBCollection collection;
-            ServerAddress address = new ServerAddress(mongoDeepJobConfig.getHost());
-
-            List<ServerAddress> addressList = new ArrayList<>();
-            addressList.add(address);
-            mongoClient = new MongoClient(addressList);
-
-            mongoClient.setReadPreference(ReadPreference.nearest());
-            DB db = mongoClient.getDB(mongoDeepJobConfig.getDatabase());
-            collection = db.getCollection(mongoDeepJobConfig.getCollection());
-            return isShardedCollection(collection) ? calculateShardChunks(collection) : calculateSplits(collection);
-        } catch (UnknownHostException e) {
-
+            return UtilMongoDB.getCellFromBson(dbObject,  mongoDeepJobConfig.getNameSpace());
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
-        } finally {
-            if (mongoClient != null) {
-                mongoClient.close();
-            }
-
         }
         return null;
-
     }
 
-    /**
-     * Is sharded collection.
-     *
-     * @param collection the collection
-     * @return the boolean
-     */
-    private boolean isShardedCollection(DBCollection collection) {
-
-        DB config = collection.getDB().getMongo().getDB("config");
-        DBCollection configCollections = config.getCollection("collections");
-
-        DBObject dbObject = configCollections.findOne(new BasicDBObject(MONGODB_ID, collection.getFullName()));
-        return dbObject != null;
-    }
-
-    /**
-     * Gets shards.
-     *
-     * @param collection the collection
-     * @return the shards
-     */
-    private Map<String, String[]> getShards(DBCollection collection) {
-        DB config = collection.getDB().getSisterDB("config");
-        DBCollection configShards = config.getCollection("shards");
-
-        DBCursor cursorShards = configShards.find();
-
-        Map<String, String[]> map = new HashMap<>();
-        while (cursorShards.hasNext()) {
-            DBObject currentShard = cursorShards.next();
-            String currentHost = (String) currentShard.get("host");
-            int slashIndex = currentHost.indexOf("/");
-            if (slashIndex > 0) {
-                map.put((String) currentShard.get(MONGODB_ID),
-                        currentHost.substring(slashIndex + 1).split(","));
-            }
-        }
-        return map;
-    }
-
-    /**
-     * Gets chunks.
-     *
-     * @param collection the collection
-     * @return the chunks
-     */
-    private DBCursor getChunks(DBCollection collection) {
-        DB config = collection.getDB().getSisterDB("config");
-        DBCollection configChunks = config.getCollection("chunks");
-        return configChunks.find(new BasicDBObject("ns", collection.getFullName()));
-    }
-
-    /**
-     * Calculate splits.
-     *
-     * @param collection the collection
-     * @return the deep partition [ ]
-     */
-    private DeepPartition[] calculateSplits(DBCollection collection) {
-
-        BasicDBList splitData = getSplitData(collection);
-        List<ServerAddress> serverAddressList = collection.getDB().getMongo().getServerAddressList();
-
-        //Estamos intentado hacer splitVector desde mongos
-        //a una coleccion no fragmentada
-        if (splitData == null) {
-            Pair<BasicDBList, List<ServerAddress>> pair = getSplitDataCollectionShardEnviroment(getShards(collection),
-                    collection.getDB().getName(),
-                    collection.getName());
-            splitData = pair.left;
-            serverAddressList = pair.right;
-        }
-
-        Object lastKey = null; // Lower boundary of the first min split
-
-        List<String> stringHosts = new ArrayList<>();
-
-        for (ServerAddress serverAddress : serverAddressList) {
-            stringHosts.add(serverAddress.toString());
-        }
-        int i = 0;
-
-        MongoPartition[] partitions = new MongoPartition[splitData.size() + 1];
-
-        for (Object aSplitData : splitData) {
-
-            BasicDBObject currentKey = (BasicDBObject) aSplitData;
-
-            Object currentO = currentKey.get(MONGODB_ID);
-
-            partitions[i] = new MongoPartition(mongoDeepJobConfig.getRddId(), i, new DeepTokenRange(lastKey,
-                    currentO, stringHosts), MONGODB_ID);
-
-            lastKey = currentO;
-            i++;
-        }
-        QueryBuilder queryBuilder = QueryBuilder.start(MONGODB_ID);
-        queryBuilder.greaterThanEquals(lastKey);
-        partitions[i] = new MongoPartition(0, i, new DeepTokenRange(lastKey, null, stringHosts), MONGODB_ID);
-        return partitions;
-    }
-
-    /**
-     * Gets split data.
-     *
-     * @param collection the collection
-     * @return the split data
-     */
-    private BasicDBList getSplitData(DBCollection collection) {
-
-        final DBObject cmd = BasicDBObjectBuilder.start("splitVector", collection.getFullName())
-                .add("keyPattern", new BasicDBObject(MONGODB_ID, 1))
-                .add("force", false)
-                .add("maxChunkSize", splitSize)
-                .get();
-
-        CommandResult splitVectorResult = collection.getDB().getSisterDB("admin").command(cmd);
-        return (BasicDBList) splitVectorResult.get(SPLIT_KEYS);
-
-    }
-
-    /**
-     * Gets split data collection shard enviroment.
-     *
-     * @param shards         the shards
-     * @param dbName         the db name
-     * @param collectionName the collection name
-     * @return the split data collection shard enviroment
-     */
-    private Pair<BasicDBList, List<ServerAddress>> getSplitDataCollectionShardEnviroment(Map<String, String[]> shards,
-                                                                                         String dbName,
-                                                                                         String collectionName) {
-        MongoClient mongoClient = null;
+    @Override
+    protected DBObject transformElement(Cells entity) {
         try {
-            Set<String> keys = shards.keySet();
-
-            for (String key : keys) {
-
-                List<ServerAddress> addressList = getServerAddressList(Arrays.asList(shards.get(key)));
-
-                mongoClient = new MongoClient(addressList);
-
-                BasicDBList dbList = getSplitData(mongoClient.getDB(dbName).getCollection(collectionName));
-
-                if (dbList != null) {
-                    return Pair.create(dbList, addressList);
-                }
-            }
-        } catch (UnknownHostException e) {
+            return UtilMongoDB.getDBObjectFromCell(entity);
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
-        } finally {
-            if (mongoClient != null) {
-                mongoClient.close();
-            }
-
         }
-
         return null;
-
     }
-
-    /**
-     * Calculates shard chunks.
-     *
-     * @param collection the collection
-     * @return the deep partition [ ]
-     */
-    private DeepPartition[] calculateShardChunks(DBCollection collection) {
-
-        DBCursor chuncks = getChunks(collection);
-
-        Map<String, String[]> shards = getShards(collection);
-
-        MongoPartition[] deepPartitions = new MongoPartition[chuncks.count()];
-        int i = 0;
-        boolean keyAssigned = false;
-        String key = null;
-        while (chuncks.hasNext()) {
-
-            DBObject dbObject = chuncks.next();
-            if (!keyAssigned) {
-                Set<String> keySet = ((DBObject) dbObject.get("min")).keySet();
-                for (String s : keySet) {
-                    key = s;
-                    keyAssigned = true;
-                }
-            }
-            deepPartitions[i] = new MongoPartition(mongoDeepJobConfig.getRddId(), i, new DeepTokenRange(shards.get(dbObject.get
-                    ("shard")),
-                    ((DBObject) dbObject.get
-                            ("min")).get(key),
-                    ((DBObject) dbObject.get("max")).get(key)), key);
-            i++;
-        }
-        return deepPartitions;
-    }
-
-    /**
-     * Gets server address list.
-     *
-     * @param addressStringList the address string list
-     * @return the server address list
-     * @throws UnknownHostException the unknown host exception
-     */
-    private List<ServerAddress> getServerAddressList(List<String> addressStringList) throws UnknownHostException {
-
-        List<ServerAddress> addressList = new ArrayList<>();
-
-        for (String addressString : addressStringList) {
-            addressList.add(new ServerAddress(addressString));
-        }
-        return addressList;
-    }
-
-    @Override
-    public boolean hasNext() {
-        return reader.hasNext();
-    }
-
-    @Override
-    public Cells next() {
-        return reader.next();
-    }
-
-    @Override
-    public void close() {
-        reader.close();
-    }
-
-    @Override
-    public void initIterator(Partition dp, S config) {
-
-        initMongoDeepJobConfig(config);
-
-        reader = new MongoReader();
-        reader.init(dp, mongoDeepJobConfig.getDatabase(), mongoDeepJobConfig.getCollection());
-    }
-
-    private void initMongoDeepJobConfig(S config){
-
-        if(config instanceof ExtractorConfig){
-            mongoDeepJobConfig.initialize((ExtractorConfig) config);
-        }else{
-            mongoDeepJobConfig = (MongoDeepJobConfig<Cells>) config;
-        }
-    }
-
-    @Override
-    public void saveRDD(Cells cells) {
-        writer.save(cells);
-    }
-
-    @Override
-    public void initSave(S config, Cells first) {
-        writer = new MongoWriter(null, null, null);
-    }
-
 }

@@ -33,6 +33,8 @@ import org.bson.BasicBSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
@@ -281,4 +283,37 @@ public final class UtilMongoDB {
         return bson;
     }
 
+    /**
+     * converts from and entity class with deep's anotations to BsonObject
+     *
+     * @param cells the cells
+     * @return bson from cell
+     * @throws IllegalAccessException the illegal access exception
+     * @throws IllegalAccessException the instantiation exception
+     * @throws IllegalAccessException the invocation target exception
+     */
+    public static DBObject getDBObjectFromCell(Cells cells)
+            throws IllegalAccessException, InstantiationException, InvocationTargetException {
+
+        DBObject bson = new BasicDBObject();
+        for (Cell cell : cells) {
+            if (List.class.isAssignableFrom(cell.getCellValue().getClass())) {
+                Collection c = (Collection) cell.getCellValue();
+                Iterator iterator = c.iterator();
+                List<DBObject> innerBsonList = new ArrayList<>();
+
+                while (iterator.hasNext()) {
+                    innerBsonList.add(getDBObjectFromCell((Cells) iterator.next()));
+                }
+                bson.put(cell.getCellName(), innerBsonList);
+            } else if (Cells.class.isAssignableFrom(cell.getCellValue().getClass())) {
+                bson.put(cell.getCellName(), getBsonFromCell((Cells) cell.getCellValue()));
+            } else {
+                bson.put(cell.getCellName(), cell.getCellValue());
+            }
+
+        }
+
+        return bson;
+    }
 }
