@@ -38,6 +38,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.QueryBuilder;
 import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
+import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
@@ -45,12 +46,15 @@ import com.stratio.deep.commons.impl.DeepPartition;
 import com.stratio.deep.commons.rdd.DeepTokenRange;
 import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.commons.utils.Pair;
+import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
+import com.stratio.deep.mongodb.partition.MongoPartition;
 import com.stratio.deep.mongodb.reader.MongoReader;
+import com.stratio.deep.mongodb.writer.MongoWriter;
 
 /**
  * Created by rcrespo on 29/10/14.
  */
-public class MongoNativeCellExtractor implements IExtractor<Cells, ExtractorConfig<Cells>> {
+public class MongoNativeCellExtractor<S extends BaseConfig<Cells>> implements IExtractor<Cells,S> {
 
     /**
      * The constant SHARDED.
@@ -69,12 +73,7 @@ public class MongoNativeCellExtractor implements IExtractor<Cells, ExtractorConf
     /**
      * The Split size.
      */
-    public int splitSize = 1;
-
-    /**
-     * The Max chunks.
-     */
-    public int maxChunks = 3;
+    public int splitSize = 10;
 
     /**
      * The constant MONGODB_ID.
@@ -85,26 +84,31 @@ public class MongoNativeCellExtractor implements IExtractor<Cells, ExtractorConf
      */
     private MongoReader reader;
 
+    private MongoWriter writer;
+
+    private MongoDeepJobConfig<Cells> mongoDeepJobConfig = new MongoDeepJobConfig<>(Cells.class);
+
     @Override
-    public Partition[] getPartitions(ExtractorConfig<Cells> config) {
+    public Partition[] getPartitions(S config) {
         MongoClient mongoClient = null;
 
         try {
 
-            splitSize = config.getInteger(ExtractorConstants.SPLIT_SIZE) != null ? config.getInteger(ExtractorConstants
-                    .SPLIT_SIZE) : splitSize;
+            initMongoDeepJobConfig(config);
+
+            splitSize = mongoDeepJobConfig.getPageSize()>0 ? mongoDeepJobConfig.getPageSize() : splitSize;
+
             DBCollection collection;
-            ServerAddress address = new ServerAddress(config.getString(ExtractorConstants.HOST));
+            ServerAddress address = new ServerAddress(mongoDeepJobConfig.getHost());
 
             List<ServerAddress> addressList = new ArrayList<>();
             addressList.add(address);
             mongoClient = new MongoClient(addressList);
 
             mongoClient.setReadPreference(ReadPreference.nearest());
-            DB db = mongoClient.getDB(config.getString(ExtractorConstants.CATALOG));
-            collection = db.getCollection(config.getString(ExtractorConstants.TABLE));
-            return isShardedCollection(collection) ? calculateShardChunks(collection,
-                    config) : calculateSplits(collection, config);
+            DB db = mongoClient.getDB(mongoDeepJobConfig.getDatabase());
+            collection = db.getCollection(mongoDeepJobConfig.getCollection());
+            return isShardedCollection(collection) ? calculateShardChunks(collection) : calculateSplits(collection);
         } catch (UnknownHostException e) {
 
             e.printStackTrace();
@@ -174,10 +178,9 @@ public class MongoNativeCellExtractor implements IExtractor<Cells, ExtractorConf
      * Calculate splits.
      *
      * @param collection the collection
-     * @param config     the config
      * @return the deep partition [ ]
      */
-    private DeepPartition[] calculateSplits(DBCollection collection, ExtractorConfig<Cells> config) {
+    private DeepPartition[] calculateSplits(DBCollection collection) {
 
         BasicDBList splitData = getSplitData(collection);
         List<ServerAddress> serverAddressList = collection.getDB().getMongo().getServerAddressList();
@@ -201,7 +204,7 @@ public class MongoNativeCellExtractor implements IExtractor<Cells, ExtractorConf
         }
         int i = 0;
 
-        DeepPartition[] partitions = new DeepPartition[splitData.size() + 1];
+        MongoPartition[] partitions = new MongoPartition[splitData.size() + 1];
 
         for (Object aSplitData : splitData) {
 
@@ -209,14 +212,15 @@ public class MongoNativeCellExtractor implements IExtractor<Cells, ExtractorConf
 
             Object currentO = currentKey.get(MONGODB_ID);
 
-            partitions[i] = new DeepPartition(config.getRddId(), i, new DeepTokenRange(lastKey, currentO, stringHosts));
+            partitions[i] = new MongoPartition(mongoDeepJobConfig.getRddId(), i, new DeepTokenRange(lastKey,
+                    currentO, stringHosts), MONGODB_ID);
 
             lastKey = currentO;
             i++;
         }
         QueryBuilder queryBuilder = QueryBuilder.start(MONGODB_ID);
         queryBuilder.greaterThanEquals(lastKey);
-        partitions[i] = new DeepPartition(0, i, new DeepTokenRange(lastKey, null, stringHosts));
+        partitions[i] = new MongoPartition(0, i, new DeepTokenRange(lastKey, null, stringHosts), MONGODB_ID);
         return partitions;
     }
 
@@ -283,16 +287,15 @@ public class MongoNativeCellExtractor implements IExtractor<Cells, ExtractorConf
      * Calculates shard chunks.
      *
      * @param collection the collection
-     * @param config     the config
      * @return the deep partition [ ]
      */
-    private DeepPartition[] calculateShardChunks(DBCollection collection, ExtractorConfig<Cells> config) {
+    private DeepPartition[] calculateShardChunks(DBCollection collection) {
 
         DBCursor chuncks = getChunks(collection);
 
         Map<String, String[]> shards = getShards(collection);
 
-        DeepPartition[] deepPartitions = new DeepPartition[chuncks.count()];
+        MongoPartition[] deepPartitions = new MongoPartition[chuncks.count()];
         int i = 0;
         boolean keyAssigned = false;
         String key = null;
@@ -302,16 +305,15 @@ public class MongoNativeCellExtractor implements IExtractor<Cells, ExtractorConf
             if (!keyAssigned) {
                 Set<String> keySet = ((DBObject) dbObject.get("min")).keySet();
                 for (String s : keySet) {
-                    config.putValue("stratio_mongodb_key", s);
                     key = s;
                     keyAssigned = true;
                 }
             }
-            deepPartitions[i] = new DeepPartition(config.getRddId(), i, new DeepTokenRange(shards.get(dbObject.get
+            deepPartitions[i] = new MongoPartition(mongoDeepJobConfig.getRddId(), i, new DeepTokenRange(shards.get(dbObject.get
                     ("shard")),
                     ((DBObject) dbObject.get
                             ("min")).get(key),
-                    ((DBObject) dbObject.get("max")).get(key)));
+                    ((DBObject) dbObject.get("max")).get(key)), key);
             i++;
         }
         return deepPartitions;
@@ -350,21 +352,31 @@ public class MongoNativeCellExtractor implements IExtractor<Cells, ExtractorConf
     }
 
     @Override
-    public void initIterator(Partition dp, ExtractorConfig<Cells> config) {
-        String database = config.getString(ExtractorConstants.DATABASE);
-        String collection = config.getString(ExtractorConstants.COLLECTION);
-        reader = new MongoReader(config.getString("stratio_mongodb_key"));
-        reader.init(dp, database, collection);
+    public void initIterator(Partition dp, S config) {
+
+        initMongoDeepJobConfig(config);
+
+        reader = new MongoReader();
+        reader.init(dp, mongoDeepJobConfig.getDatabase(), mongoDeepJobConfig.getCollection());
+    }
+
+    private void initMongoDeepJobConfig(S config){
+
+        if(config instanceof ExtractorConfig){
+            mongoDeepJobConfig.initialize((ExtractorConfig) config);
+        }else{
+            mongoDeepJobConfig = (MongoDeepJobConfig<Cells>) config;
+        }
     }
 
     @Override
     public void saveRDD(Cells cells) {
-
+        writer.save(cells);
     }
 
     @Override
-    public void initSave(ExtractorConfig<Cells> config, Cells first) {
-
+    public void initSave(S config, Cells first) {
+        writer = new MongoWriter(null, null, null);
     }
 
 }

@@ -636,4 +636,43 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
 
     }
 
+    public String getInputKey() {
+        return inputKey;
+    }
+
+    public void setInputKey(String inputKey) {
+        this.inputKey = inputKey;
+    }
+
+    public boolean isCreateInputSplit() {
+        return createInputSplit;
+    }
+
+    public void setCreateInputSplit(boolean createInputSplit) {
+        this.createInputSplit = createInputSplit;
+    }
+
+    public boolean isUseShards() {
+        return useShards;
+    }
+
+    public void setUseShards(boolean useShards) {
+        this.useShards = useShards;
+    }
+
+    public boolean isSplitsUseChunks() {
+        return splitsUseChunks;
+    }
+
+    public void setSplitsUseChunks(boolean splitsUseChunks) {
+        this.splitsUseChunks = splitsUseChunks;
+    }
+
+    public Integer getSplitSize() {
+        return splitSize;
+    }
+
+    public void setSplitSize(Integer splitSize) {
+        this.splitSize = splitSize;
+    }
 }

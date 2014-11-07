@@ -24,6 +24,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.ServerAddress;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
 
@@ -32,21 +33,38 @@ import com.stratio.deep.mongodb.utils.UtilMongoDB;
  */
 public class MongoWriter {
 
+    /**
+     * The Mongo client.
+     */
     private MongoClient mongoClient = null;
+    /**
+     * The Db collection.
+     */
     private DBCollection dbCollection = null;
-    private DB db = null;
-    private String key = "_id";
+
+    /**
+     * Instantiates a new Mongo writer.
+     *
+     * @param serverAddresses the server addresses
+     * @param databaseName the database name
+     * @param collectionName the collection name
+     */
+    public MongoWriter(List<ServerAddress> serverAddresses, String databaseName, String collectionName) {
+        mongoClient = new MongoClient(serverAddresses);
+        dbCollection = mongoClient.getDB(databaseName).getCollection(collectionName);
+    }
 
     /**
      * Save void.
      *
      * @param cells the cells
-     * @throws IllegalAccessException    the illegal access exception
-     * @throws InvocationTargetException the invocation target exception
-     * @throws InstantiationException    the instantiation exception
      */
-    public void save(Cells cells) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-        dbCollection.insert((DBObject) UtilMongoDB.getBsonFromCell(cells));
+    public void save(Cells cells) {
+        try {
+            dbCollection.insert((DBObject) UtilMongoDB.getBsonFromCell(cells));
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -59,18 +77,4 @@ public class MongoWriter {
         }
     }
 
-    /**
-     * Init save.
-     *
-     * @param host       the host
-     * @param port       the port
-     * @param database   the database
-     * @param collection the collection
-     * @throws UnknownHostException the unknown host exception
-     */
-    public void initSave(List<String> host, int port, String database, String collection) throws UnknownHostException {
-        mongoClient = new MongoClient(host.get(0));
-        dbCollection = mongoClient.getDB(database).getCollection(collection);
-
-    }
 }

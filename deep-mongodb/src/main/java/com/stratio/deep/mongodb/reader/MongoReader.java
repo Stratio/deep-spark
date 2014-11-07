@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.spark.Partition;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.Cursor;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -34,6 +35,7 @@ import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.impl.DeepPartition;
+import com.stratio.deep.mongodb.partition.MongoPartition;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
 
 /**
@@ -55,11 +57,6 @@ public class MongoReader<T> {
      * The Db.
      */
     private DB db = null;
-    /**
-     * The Key.
-     */
-    private String key = "_id";
-
     /**
      * The Db cursor.
      */
@@ -86,17 +83,6 @@ public class MongoReader<T> {
 
     }
 
-    /**
-     * Instantiates a new Mongo reader.
-     *
-     * @param key the key
-     */
-    public MongoReader(String key) {
-        if (key != null) {
-            this.key = key;
-        }
-
-    }
 
     /**
      * Close void.
@@ -160,7 +146,8 @@ public class MongoReader<T> {
             db = mongoClient.getDB(database);
             collection = db.getCollection(collectionName);
 
-            dbCursor = collection.find(createQueryPartition((DeepPartition) partition));
+            DBObject keys = new BasicDBObject("_id",1);
+            dbCursor = collection.find(createQueryPartition((MongoPartition) partition),keys);
 
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -173,12 +160,13 @@ public class MongoReader<T> {
      * @param partition the partition
      * @return the dB object
      */
-    private DBObject createQueryPartition(DeepPartition partition) {
+    private DBObject createQueryPartition(MongoPartition partition) {
 
-        QueryBuilder queryBuilderMin = QueryBuilder.start(key);
+//        System.out.println("imprimo la partition " +partition);
+        QueryBuilder queryBuilderMin = QueryBuilder.start(partition.getKey());
         DBObject bsonObjectMin = queryBuilderMin.greaterThanEquals(partition.splitWrapper().getStartToken()).get();
 
-        QueryBuilder queryBuilderMax = QueryBuilder.start(key);
+        QueryBuilder queryBuilderMax = QueryBuilder.start(partition.getKey());
         DBObject bsonObjectMax = queryBuilderMax.lessThan(partition.splitWrapper().getEndToken()).get();
 
         QueryBuilder queryBuilder = QueryBuilder.start();
