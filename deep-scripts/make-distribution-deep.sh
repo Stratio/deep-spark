@@ -14,7 +14,7 @@ export PATH=$SCALA_HOME/bin:$PATH
 SPARK_REPO="$1"
 
 if [ -z "$1" ]; then
-    SPARK_REPO="git@github.com:Stratio/spark.git"
+    SPARK_REPO="https://github.com/Stratio/spark.git"
 fi
 
 SPARK_BRANCH="$2"
