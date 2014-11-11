@@ -273,6 +273,11 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
 
     }
 
+    @Override
+    public List<String> getPreferredLocations(Partition split) {
+        return ((DeepPartition)split).splitWrapper().getReplicas();
+    }
+
     /**
      * Calculates shard chunks.
      *

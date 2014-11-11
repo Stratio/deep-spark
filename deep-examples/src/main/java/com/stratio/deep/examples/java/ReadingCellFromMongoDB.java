@@ -16,6 +16,8 @@
 
 package com.stratio.deep.examples.java;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.examples.java.extractorconfig.mongodb.utils.ContextProperties;
@@ -58,10 +60,10 @@ public final class ReadingCellFromMongoDB {
         QueryBuilder query = QueryBuilder.start();
         query.and("number").greaterThan(27).lessThan(30);
 
-        BSONObject bsonSort = new BasicBSONObject();
+        DBObject bsonSort = new BasicDBObject();
         bsonSort.put("number",1);
 
-        BSONObject bsonFields = new BasicBSONObject();
+        DBObject bsonFields = new BasicDBObject();
         bsonFields.put("number",1);
         bsonFields.put("text",1);
         bsonFields.put("_id",0);

@@ -23,13 +23,17 @@ import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
+import com.stratio.deep.mongodb.extractor.MongoNativeCellExtractor;
 import com.stratio.deep.utils.ContextProperties;
+
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,9 +51,10 @@ public final class ReadingCellFromMongoDB {
     }
 
     public static void doMain(String[] args) {
+        LOG.setLevel(Level.ERROR);
         String job = "java:readingCellFromMongoDB";
 
-        String host = "127.0.0.1:27017";
+        String host = "127.0.0.1:27100";
 
         String database = "test";
         String inputCollection = "input";
@@ -81,7 +86,8 @@ public final class ReadingCellFromMongoDB {
 
         ExtractorConfig<Cells> config = new ExtractorConfig();
 
-        config.setExtractorImplClass(MongoCellExtractor.class);
+
+        config.setExtractorImplClass(MongoNativeCellExtractor.class);
         Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.DATABASE, database);
         values.put(ExtractorConstants.FILTER_QUERY, filters);
@@ -92,8 +98,13 @@ public final class ReadingCellFromMongoDB {
 
         RDD<Cells> inputRDDEntity = deepContext.createRDD(config);
 
-        LOG.info("count : " + inputRDDEntity.count());
+        System.out.println("compienza el calculo");
+        Calendar calendar = Calendar.getInstance();
 
+        LOG.info("count : " + inputRDDEntity.count());
+        Calendar calendar1 = Calendar.getInstance();
+
+        System.out.println(calendar1.getTimeInMillis() - calendar.getTimeInMillis());
         LOG.info("prints first cell  : " + inputRDDEntity.first());
 
 

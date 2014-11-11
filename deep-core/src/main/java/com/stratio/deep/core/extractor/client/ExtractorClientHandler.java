@@ -14,6 +14,7 @@
  */
 package com.stratio.deep.core.extractor.client;
 
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -44,6 +45,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Response> implements
         IExtractor<T, ExtractorConfig<T>> {
 
+    private static final long serialVersionUID = -5313035259708180308L;
     // Stateful properties
     private volatile Channel channel;
 
@@ -250,6 +252,11 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         }
 
         return;
+    }
+
+    @Override
+    public List<String> getPreferredLocations(Partition split) {
+        return null;
     }
 
 }

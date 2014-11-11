@@ -17,6 +17,9 @@
 package com.stratio.deep.mongodb.extractor;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+
+import org.apache.spark.Partition;
 
 import com.mongodb.DBObject;
 import com.stratio.deep.commons.config.BaseConfig;
@@ -47,4 +50,6 @@ public class MongoNativeEntityExtractor<T, S extends BaseConfig<T>> extends Mong
         }
         return null;
     }
+
+
 }
