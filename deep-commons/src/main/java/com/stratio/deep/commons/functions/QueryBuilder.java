@@ -13,6 +13,8 @@ import com.stratio.deep.commons.entity.Cells;
  */
 public abstract class QueryBuilder implements Serializable {
 
+    private static final long serialVersionUID = 4771318432009656904L;
+
     protected String keyspace;
 
     protected String columnFamily;
@@ -38,13 +40,11 @@ public abstract class QueryBuilder implements Serializable {
      */
     public abstract String prepareBatchQuery(List<String> statements);
 
-    public void setKeyspace(String keyspace){
+    public void setKeyspace(String keyspace) {
         this.keyspace = keyspace;
-
     }
 
-    public void setColumnFamily(String columnFamily){
+    public void setColumnFamily(String columnFamily) {
         this.columnFamily = columnFamily;
-
     }
 }

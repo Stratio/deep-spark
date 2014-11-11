@@ -102,6 +102,8 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
         this.writeConfig = writeConfig;
         this.partitioner = RangeUtils.getPartitioner(writeConfig);
         this.queryBuilder = queryBuilder;
+        this.queryBuilder.setKeyspace(writeConfig.getKeyspace());
+        this.queryBuilder.setColumnFamily(writeConfig.getColumnFamily());
         try {
             this.localhost = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
