@@ -21,14 +21,19 @@ import com.aerospike.hadoop.mapreduce.AerospikeRecord;
 import com.stratio.deep.aerospike.config.AerospikeDeepJobConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.utils.AnnotationUtils;
+import com.stratio.deep.commons.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,12 +65,40 @@ public class UtilAerospike {
         T t = classEntity.newInstance();
 
         Field[] fields = AnnotationUtils.filterDeepFields(classEntity);
-
         Object insert = null;
-
-        // TODO: Record -> Object conversion logic
+        Map<String, Object> bins = aerospikeRecord.bins;
 
         for (Field field : fields) {
+            Object currentBin = null;
+            Method method = null;
+            try {
+                method = Utils.findSetter(field.getName(), classEntity, field.getType());
+                Class<?> classField = field.getType();
+
+                currentBin = bins.get(AnnotationUtils.deepFieldName(field));
+
+                if (currentBin != null) {
+                    if (IDeepType.class.isAssignableFrom(classField)) {
+                        Map<String, Object> innerObjectBins = new HashMap<>();
+                        Field[] innerObjectFields = AnnotationUtils.filterDeepFields(classField);
+                        for(Field innerField:innerObjectFields) {
+                            String deepFieldName = AnnotationUtils.deepFieldName(innerField);
+                            innerObjectBins.put(deepFieldName, innerObjectBins.get(deepFieldName));
+                        }
+                        Record innerRecord = new Record(innerObjectBins, null, 0, 0);
+                        AerospikeRecord innerAerospikeRecord = new AerospikeRecord(innerRecord);
+                        insert = getObjectFromRecord(classField, innerAerospikeRecord);
+                    } else {
+                        insert = currentBin;
+                    }
+                    method.invoke(t, insert);
+                }
+            }
+            catch ( IllegalAccessException | InvocationTargetException | IllegalArgumentException e){
+                LOG.error("impossible to create a java object from Bin:"+field.getName()+" and type:"+field.getType()+" and value:"+t + "; recordReceived:"+currentBin+", binClassReceived:"+currentBin.getClass());
+
+                method.invoke(t, Utils.castNumberType(insert, t));
+            }
 
         }
 
@@ -85,11 +118,18 @@ public class UtilAerospike {
     public static <T> AerospikeRecord getRecordFromObject(T t) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Field[] fields = AnnotationUtils.filterDeepFields(t.getClass());
 
-        AerospikeRecord record = new AerospikeRecord();
+        Map<String, Object> bins = new HashMap<>();
 
-        // TODO: Object -> Record conversion logic
-
-        return record;
+        for (Field field : fields) {
+            Method method = Utils.findGetter(field.getName(), t.getClass());
+            Object object = method.invoke(t);
+            if (object != null) {
+                bins.put(field.getName(), object);
+            }
+        }
+        Record record = new Record(bins, null, 0, 0);
+        AerospikeRecord result = new AerospikeRecord(record);
+        return result;
     }
 
     /**
@@ -151,13 +191,12 @@ public class UtilAerospike {
      * @throws InvocationTargetException
      */
     public static AerospikeRecord getRecordFromCell(Cells cells) throws IllegalAccessException, InstantiationException, InvocationTargetException {
-        AerospikeRecord result = new AerospikeRecord();
         Map<String, Object> bins = new HashMap<>();
         for(Cell cell:cells.getCells()) {
             bins.put(cell.getCellName(), cell.getValue());
         }
         Record record = new Record(bins, null, 0, 0);  // Expiration time = 0, defaults to namespace configuration ("default-ttl")
-        result = new AerospikeRecord(record);
+        AerospikeRecord result = new AerospikeRecord(record);
         return result;
     }
 

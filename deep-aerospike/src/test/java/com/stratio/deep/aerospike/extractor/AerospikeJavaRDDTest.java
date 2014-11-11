@@ -58,6 +58,8 @@ public class AerospikeJavaRDDTest {
 
     public static final String DATA_SET_NAME = "divineComedy.json";
 
+    public static final Long WORD_COUNT_SPECTED = 3833L;
+
 
     @BeforeSuite
     public static void init() throws IOException, ParseException {
@@ -91,6 +93,7 @@ public class AerospikeJavaRDDTest {
         Bin binMetadata = new Bin("metadata", metadata);
         Bin binCantos = new Bin("cantos", cantos);
         aerospike.put(null, key, binId, binMetadata, binCantos);
+        aerospike.createIndex(null, NAMESPACE_BOOK, SET_NAME, "id_idx", "id", IndexType.STRING);
 
         Key key2 = new Key(NAMESPACE_TEST, SET_NAME, 3);
         Bin bin_number = new Bin("number", 3);
