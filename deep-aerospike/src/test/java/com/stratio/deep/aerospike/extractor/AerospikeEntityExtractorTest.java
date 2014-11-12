@@ -21,6 +21,7 @@ import com.aerospike.client.query.RecordSet;
 import com.aerospike.client.query.Statement;
 import com.aerospike.hadoop.mapreduce.AerospikeRecord;
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.FilterOperator;
 import com.stratio.deep.core.context.DeepSparkContext;
@@ -35,7 +36,9 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.Map;
 
+import static junit.framework.TestCase.assertNotNull;
 import static org.testng.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertNull;
 
 /**
  * Created by mariomgal on 07/11/14.
@@ -49,6 +52,43 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
         super(AerospikeEntityExtractor.class, "127.0.0.1", 3000, false);
     }
 
+    @Override
+    @Test
+    public void testInputColumns() {
+        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
+        try {
+
+            ExtractorConfig<MessageTestEntity> inputConfigEntity = new ExtractorConfig(MessageTestEntity.class);
+            inputConfigEntity.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, "test")
+                    .putValue(ExtractorConstants.SET, "input").putValue(ExtractorConstants.INPUT_COLUMNS, new String[] { "_id" });
+            inputConfigEntity.setExtractorImplClass(AerospikeEntityExtractor.class);
+
+            RDD<MessageTestEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
+
+            MessageTestEntity messageEntity = inputRDDEntity.first();
+
+            assertNotNull(messageEntity.getId());
+            assertNull(messageEntity.getMessage());
+
+            ExtractorConfig<MessageTestEntity> inputConfigEntity2 = new ExtractorConfig(MessageTestEntity.class);
+            inputConfigEntity2.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, "test")
+                    .putValue(ExtractorConstants.SET, "input").putValue(ExtractorConstants.INPUT_COLUMNS, new String[] { "message" });
+            inputConfigEntity2.setExtractorImplClass(AerospikeEntityExtractor.class);
+
+            RDD<MessageTestEntity> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
+
+            MessageTestEntity messageEntity2 = inputRDDEntity2.first();
+
+            assertNull(messageEntity2.getId());
+            assertNotNull(messageEntity2.getMessage());
+
+        }finally {
+            context.stop();
+        }
+    }
+
     @Test
     public void testDataSet() {
 
@@ -56,10 +96,10 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
         try {
 
             Statement stmnt = new Statement();
-            stmnt.setNamespace("book");
+            stmnt.setNamespace("test");
             stmnt.setSetName("input");
 
-            stmnt.setFilters(Filter.equal("id", "TestDataSet"));
+            stmnt.setFilters(Filter.equal("_id", "3"));
 
             RecordSet recordSet = AerospikeJavaRDDTest.aerospike.query(null, stmnt);
             Record record = null;
@@ -70,24 +110,23 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
 
             Map<String, Object> bins = aerospikeRecord.bins;
 
-            ExtractorConfig<BookEntity> inputConfigEntity = new ExtractorConfig(BookEntity.class);
+            ExtractorConfig<MessageTestEntity> inputConfigEntity = new ExtractorConfig(MessageTestEntity.class);
             inputConfigEntity.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, "book")
+                    .putValue(ExtractorConstants.NAMESPACE, "test")
                     .putValue(ExtractorConstants.SET, "input");
             inputConfigEntity.setExtractorImplClass(AerospikeEntityExtractor.class);
 
-            RDD<BookEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
+            RDD<MessageTestEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
 
             //Import dataSet was OK and we could read it
             assertEquals(1, inputRDDEntity.count());
 
-            List<BookEntity> books = inputRDDEntity.toJavaRDD().collect();
+            List<MessageTestEntity> messages = inputRDDEntity.toJavaRDD().collect();
 
-            BookEntity book = books.get(0);
+            MessageTestEntity message = messages.get(0);
 
-            // TODO: Entity mapping not working for subentities
-            assertEquals(true, true);
-            // assertEquals(((Map<String, String>)bins.get("metadata")).get("author"), book.getMetadataEntity().getAuthor());
+            assertEquals((String)bins.get("_id"), message.getId());
+            assertEquals((String)bins.get("message"), message.getMessage());
 
         }finally {
             context.stop();
@@ -190,7 +229,7 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
             RDD<MessageTestEntity> inputRDDEntity6 = context.createRDD(inputConfigEntity5);
             assertEquals(0, inputRDDEntity6.count());
 
-            // TODO: Equality filter not working properly
+            //TODO: Equality filter not working properly
 //            ExtractorConfig<MessageTestEntity> inputConfigEntity7 = new ExtractorConfig(MessageTestEntity.class);
 //            inputConfigEntity7.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
 //                    .putValue(ExtractorConstants.NAMESPACE, "test")

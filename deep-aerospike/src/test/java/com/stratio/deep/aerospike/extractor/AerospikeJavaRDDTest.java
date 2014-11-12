@@ -97,10 +97,12 @@ public class AerospikeJavaRDDTest {
         aerospike.createIndex(null, NAMESPACE_BOOK, SET_NAME, "id_idx", "id", IndexType.STRING);
 
         Key key2 = new Key(NAMESPACE_TEST, SET_NAME, 3);
+        Bin bin_id = new Bin("_id", "3");
         Bin bin_number = new Bin("number", 3);
         Bin bin_text = new Bin("message", "new message test");
-        aerospike.put(null, key2, bin_number, bin_text);
+        aerospike.put(null, key2, bin_id, bin_number, bin_text);
         aerospike.createIndex(null, NAMESPACE_TEST, SET_NAME, "num_idx", "number", IndexType.NUMERIC);
+        aerospike.createIndex(null, NAMESPACE_TEST, SET_NAME, "_id_idx", "_id", IndexType.STRING);
     }
 
     /**

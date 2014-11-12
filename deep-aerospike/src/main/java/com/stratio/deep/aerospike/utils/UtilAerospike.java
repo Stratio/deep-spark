@@ -22,6 +22,7 @@ import com.stratio.deep.aerospike.config.AerospikeDeepJobConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Utils;
 import org.slf4j.Logger;
@@ -90,18 +91,11 @@ public class UtilAerospike {
                     currentBin = bins.get(AnnotationUtils.deepFieldName(field));
 
                     if (currentBin != null) {
-                        if (IDeepType.class.isAssignableFrom(classField)) {
-                            Map<String, Object> innerObjectBins = new HashMap<>();
-                            Field[] innerObjectFields = AnnotationUtils.filterDeepFields(classField);
-                            for (Field innerField : innerObjectFields) {
-                                String deepFieldName = AnnotationUtils.deepFieldName(innerField);
-                                innerObjectBins.put(deepFieldName, innerObjectBins.get(deepFieldName));
-                            }
-                            Record innerRecord = new Record(innerObjectBins, null, 0, 0);
-                            AerospikeRecord innerAerospikeRecord = new AerospikeRecord(innerRecord);
-                            insert = getObjectFromRecord(classField, innerAerospikeRecord, aerospikeConfig);
-                        } else {
+                        if(currentBin instanceof String || currentBin instanceof Integer || currentBin instanceof Long) {
                             insert = currentBin;
+                        }
+                        else {
+                            throw new DeepGenericException("Data type [" + classField.toString() + "] not supported in Aerospike entity extractor (only Strings and Integers)");
                         }
                         method.invoke(t, insert);
                     }
