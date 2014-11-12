@@ -51,13 +51,11 @@ import com.stratio.deep.core.entity.MessageTestEntity;
 public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(ExtractorTest.class);
 
-    Class inputEntity;
+    private Class inputEntity;
 
-    Class outputEntity;
+    private Class outputEntity;
 
-    Class configEntity;
-
-    // protected DeepSparkContext context;
+    private Class configEntity;
 
     private final String host;
 
@@ -258,7 +256,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
             RDD<W> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
             assertEquals(inputRDDEntity2.count(), 1);
-        } finally {
+        } finally{
             context.stop();
         }
 
@@ -310,10 +308,6 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;
     }
-
-    /**
-     * It closes spark's context
-     */
 
     private boolean isEntityClassCells(ExtractorConfig extractorConfig) {
         if (extractorConfig.getEntityClass().isAssignableFrom(Cells.class)) {

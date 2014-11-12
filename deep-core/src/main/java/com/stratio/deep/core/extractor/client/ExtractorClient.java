@@ -14,6 +14,8 @@
  */
 package com.stratio.deep.core.extractor.client;
 
+import java.util.List;
+
 import javax.net.ssl.SSLException;
 
 import org.apache.spark.Partition;
@@ -41,6 +43,7 @@ public class ExtractorClient<T> implements IExtractor<T, ExtractorConfig<T>> {
 
     static final String HOST = System.getProperty("host", "127.0.0.1");
     static final int PORT = Integer.parseInt(System.getProperty("port", "8463"));
+    private static final long serialVersionUID = -7076154908311072669L;
 
     private transient EventLoopGroup group = new NioEventLoopGroup();
 
@@ -104,6 +107,11 @@ public class ExtractorClient<T> implements IExtractor<T, ExtractorConfig<T>> {
     @Override
     public void initSave(ExtractorConfig<T> config, T first) {
         handler.initSave(config, first);
+    }
+
+    @Override
+    public List<String> getPreferredLocations(Partition split) {
+        return null;
     }
 
     @Override

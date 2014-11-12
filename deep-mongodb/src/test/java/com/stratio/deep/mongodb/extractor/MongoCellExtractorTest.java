@@ -16,14 +16,11 @@
 
 package com.stratio.deep.mongodb.extractor;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.core.extractor.ExtractorTest;
-import com.stratio.deep.commons.entity.Cell;
+import static org.testng.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -37,28 +34,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.extractor.ExtractorTest;
+
 import scala.Tuple2;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.testng.Assert.assertEquals;
 
 /**
  * Created by rcrespo on 18/06/14.
  */
 
-@Test(suiteName = "mongoRddTests", groups = {"MongoCellExtractorTest"} , dependsOnGroups = "MongoJavaRDDTest")
+@Test(suiteName = "mongoRddTests", groups = { "MongoCellExtractorTest" }, dependsOnGroups = "MongoEntityExtractorTest")
 public class MongoCellExtractorTest extends ExtractorTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoCellExtractorTest.class);
 
-
     public MongoCellExtractorTest() {
         super(MongoCellExtractor.class, "localhost:27890", null, true);
     }
-
 
     @Test
     public void testDataSet() {
@@ -70,7 +69,8 @@ public class MongoCellExtractorTest extends ExtractorTest {
         try {
 
             ExtractorConfig<Cells> inputConfigEntity = new ExtractorConfig(Cells.class);
-            inputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, "book")
+            inputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat)
+                    .putValue(ExtractorConstants.DATABASE, "book")
                     .putValue(ExtractorConstants.COLLECTION, "input");
             inputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
 
@@ -125,12 +125,13 @@ public class MongoCellExtractorTest extends ExtractorTest {
                 }
             });
 
-            JavaPairRDD<String, Integer> wordCountReduced = wordCount.reduceByKey(new Function2<Integer, Integer, Integer>() {
-                @Override
-                public Integer call(Integer integer, Integer integer2) throws Exception {
-                    return integer + integer2;
-                }
-            });
+            JavaPairRDD<String, Integer> wordCountReduced = wordCount
+                    .reduceByKey(new Function2<Integer, Integer, Integer>() {
+                        @Override
+                        public Integer call(Integer integer, Integer integer2) throws Exception {
+                            return integer + integer2;
+                        }
+                    });
 
             JavaRDD<Cells> outputRDD = wordCountReduced.map(new Function<Tuple2<String, Integer>, Cells>() {
                 @Override
@@ -141,7 +142,8 @@ public class MongoCellExtractorTest extends ExtractorTest {
             });
 
             ExtractorConfig<Cells> outputConfigEntity = new ExtractorConfig(Cells.class);
-            outputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, "book")
+            outputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat)
+                    .putValue(ExtractorConstants.DATABASE, "book")
                     .putValue(ExtractorConstants.COLLECTION, "outputCell");
             outputConfigEntity.setExtractorImplClass(MongoCellExtractor.class);
 
@@ -151,11 +153,9 @@ public class MongoCellExtractorTest extends ExtractorTest {
 
             Assert.assertEquals(((Long) outputRDDEntity.cache().count()).longValue(),
                     MongoJavaRDDTest.WORD_COUNT_SPECTED.longValue());
-        }finally {
+        } finally {
             context.stop();
         }
-
-
 
     }
 
