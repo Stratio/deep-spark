@@ -61,7 +61,7 @@ public class AerospikeEntityExtractor<T> extends AerospikeExtractor<T> {
     @Override
     public T transformElement(Tuple2<AerospikeKey, AerospikeRecord> tuple, DeepJobConfig<T> config) {
         try {
-            return (T) UtilAerospike.getObjectFromRecord(config.getEntityClass(), tuple._2());
+            return (T) UtilAerospike.getObjectFromRecord(config.getEntityClass(), tuple._2(), (AerospikeDeepJobConfig)this.deepJobConfig);
         } catch (Exception e) {
             LOG.error("Cannot convert AerospikeRecord: ", e);
             throw new DeepTransformException("Could not transform from AerospikeRecord to Entity " + e.getMessage());

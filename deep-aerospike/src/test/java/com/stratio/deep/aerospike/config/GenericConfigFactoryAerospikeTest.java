@@ -109,14 +109,18 @@ public class GenericConfigFactoryAerospikeTest {
         assertEquals(djc.getHostList().get(2), HOST_TEST_3);
 
         List<String> hostList = new ArrayList<>();
-
         hostList.add(HOST_TEST);
         hostList.add(HOST_TEST_2);
         hostList.add(HOST_TEST_3);
 
+        List<Integer> portList = new ArrayList<>();
+        portList.add(PORT_TEST);
+        portList.add(PORT_TEST_2);
+        portList.add(PORT_TEST_3);
+
         AerospikeDeepJobConfig<MessageTestEntity> djc2 = AerospikeConfigFactory.createAerospike(MessageTestEntity.class);
 
-        djc2.namespace(NAMESPACE_TEST).set(SET_TEST).host(hostList).initialize();
+        djc2.namespace(NAMESPACE_TEST).set(SET_TEST).host(hostList).port(portList).initialize();
 
         assertEquals(djc2.getHostList().get(0), HOST_TEST);
         assertEquals(djc2.getHostList().get(1), HOST_TEST_2);

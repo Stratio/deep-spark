@@ -92,8 +92,8 @@ public interface IAerospikeDeepJobConfig<T> {
      * @param filter
      * @return
      */
-    IAerospikeDeepJobConfig<T> numrangeFilter(Tuple3<String, Long, Long> filter);
+    IAerospikeDeepJobConfig<T> numrangeFilter(Tuple3<String, Object, Object> filter);
 
-    Tuple3<String, Long, Long> getNumrangeFilter();
+    Tuple3<String, Object, Object> getNumrangeFilter();
 
 }

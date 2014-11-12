@@ -18,7 +18,7 @@ package com.stratio.deep.examples.java;
 import com.stratio.deep.aerospike.config.AerospikeConfigFactory;
 import com.stratio.deep.aerospike.config.AerospikeDeepJobConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.examples.java.extractorconfig.mongodb.utils.ContextProperties;
+import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 
@@ -44,8 +44,8 @@ public class ReadingCellFromAerospike {
         String host = "127.0.0.1";
         int port = 3000;
 
-        String namespace = "test";
-        String set = "books";
+        String namespace = "book";
+        String set = "input";
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);

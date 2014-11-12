@@ -20,6 +20,7 @@ import com.aerospike.client.policy.ScanPolicy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.client.query.IndexType;
 import com.google.common.io.Resources;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -85,8 +86,8 @@ public class AerospikeJavaRDDTest {
         JSONObject jsonObject = (JSONObject) obj;
 
         String id = (String)jsonObject.get("id");
-        Map<String, String> metadata = (Map<String, String>)jsonObject.get("metadata");
-        List<Map<String, String>> cantos = (List<Map<String, String>>) jsonObject.get("cantos");
+        JSONObject metadata = (JSONObject)jsonObject.get("metadata");
+        JSONArray cantos = (JSONArray) jsonObject.get("cantos");
 
         Key key = new Key(NAMESPACE_BOOK, SET_NAME, id);
         Bin binId = new Bin("id", id);

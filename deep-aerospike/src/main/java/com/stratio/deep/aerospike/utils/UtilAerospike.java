@@ -32,9 +32,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Several utilities to work used in the Spark <=> Aerospike integration.
@@ -61,47 +59,59 @@ public class UtilAerospike {
      * @throws InstantiationException
      * @throws java.lang.reflect.InvocationTargetException
      */
-    public static <T> T getObjectFromRecord(Class<T> classEntity, AerospikeRecord aerospikeRecord) throws IllegalAccessException, InstantiationException, InvocationTargetException {
-        T t = classEntity.newInstance();
-
-        Field[] fields = AnnotationUtils.filterDeepFields(classEntity);
-        Object insert = null;
+    public static <T> T getObjectFromRecord(Class<T> classEntity, AerospikeRecord aerospikeRecord, AerospikeDeepJobConfig aerospikeConfig) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        Tuple2<String, Object> equalsFilter = aerospikeConfig.getEqualsFilter();
+        String equalsFilterBin = equalsFilter != null ? equalsFilter._1() : null;
+        Object equalsFilterValue = equalsFilter != null ? equalsFilter._2() : null;
         Map<String, Object> bins = aerospikeRecord.bins;
+        T t = null;
+        if(equalsFilter == null || checkEqualityFilter(bins, equalsFilterBin, equalsFilterValue)) {
+            t = classEntity.newInstance();
 
-        for (Field field : fields) {
-            Object currentBin = null;
-            Method method = null;
-            try {
-                method = Utils.findSetter(field.getName(), classEntity, field.getType());
-                Class<?> classField = field.getType();
+            Field[] fields = AnnotationUtils.filterDeepFields(classEntity);
+            Object insert = null;
+            List<String> inputColumns = null;
 
-                currentBin = bins.get(AnnotationUtils.deepFieldName(field));
+            if (aerospikeConfig.getInputColumns() != null) {
+                inputColumns = Arrays.asList(aerospikeConfig.getInputColumns());
+            }
 
-                if (currentBin != null) {
-                    if (IDeepType.class.isAssignableFrom(classField)) {
-                        Map<String, Object> innerObjectBins = new HashMap<>();
-                        Field[] innerObjectFields = AnnotationUtils.filterDeepFields(classField);
-                        for(Field innerField:innerObjectFields) {
-                            String deepFieldName = AnnotationUtils.deepFieldName(innerField);
-                            innerObjectBins.put(deepFieldName, innerObjectBins.get(deepFieldName));
+            for (Field field : fields) {
+
+                if (inputColumns != null && !inputColumns.contains(AnnotationUtils.deepFieldName(field))) {
+                    continue;
+                }
+                Object currentBin = null;
+                Method method = null;
+                try {
+                    method = Utils.findSetter(field.getName(), classEntity, field.getType());
+                    Class<?> classField = field.getType();
+
+                    currentBin = bins.get(AnnotationUtils.deepFieldName(field));
+
+                    if (currentBin != null) {
+                        if (IDeepType.class.isAssignableFrom(classField)) {
+                            Map<String, Object> innerObjectBins = new HashMap<>();
+                            Field[] innerObjectFields = AnnotationUtils.filterDeepFields(classField);
+                            for (Field innerField : innerObjectFields) {
+                                String deepFieldName = AnnotationUtils.deepFieldName(innerField);
+                                innerObjectBins.put(deepFieldName, innerObjectBins.get(deepFieldName));
+                            }
+                            Record innerRecord = new Record(innerObjectBins, null, 0, 0);
+                            AerospikeRecord innerAerospikeRecord = new AerospikeRecord(innerRecord);
+                            insert = getObjectFromRecord(classField, innerAerospikeRecord, aerospikeConfig);
+                        } else {
+                            insert = currentBin;
                         }
-                        Record innerRecord = new Record(innerObjectBins, null, 0, 0);
-                        AerospikeRecord innerAerospikeRecord = new AerospikeRecord(innerRecord);
-                        insert = getObjectFromRecord(classField, innerAerospikeRecord);
-                    } else {
-                        insert = currentBin;
+                        method.invoke(t, insert);
                     }
-                    method.invoke(t, insert);
+                } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+                    LOG.error("impossible to create a java object from Bin:" + field.getName() + " and type:" + field.getType() + " and value:" + t + "; recordReceived:" + currentBin + ", binClassReceived:" + currentBin.getClass());
+
+                    method.invoke(t, Utils.castNumberType(insert, t));
                 }
             }
-            catch ( IllegalAccessException | InvocationTargetException | IllegalArgumentException e){
-                LOG.error("impossible to create a java object from Bin:"+field.getName()+" and type:"+field.getType()+" and value:"+t + "; recordReceived:"+currentBin+", binClassReceived:"+currentBin.getClass());
-
-                method.invoke(t, Utils.castNumberType(insert, t));
-            }
-
         }
-
         return t;
     }
 
