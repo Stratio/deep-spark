@@ -21,7 +21,8 @@ import com.aerospike.client.query.RecordSet;
 import com.aerospike.client.query.Statement;
 import com.aerospike.hadoop.mapreduce.AerospikeRecord;
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.exception.DeepTransformException;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.FilterOperator;
 import com.stratio.deep.core.context.DeepSparkContext;
@@ -36,6 +37,7 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.Map;
 
+import static junit.framework.Assert.fail;
 import static junit.framework.TestCase.assertNotNull;
 import static org.testng.Assert.assertEquals;
 import static org.testng.AssertJUnit.assertNull;
@@ -241,6 +243,29 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
 //            assertEquals(0, inputRDDEntity7.count());
 
         }finally {
+            context.stop();
+        }
+    }
+
+    @Test
+    public void testInvalidDataType() {
+        DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
+        try {
+            ExtractorConfig<BookEntity> inputConfigEntity = new ExtractorConfig(BookEntity.class);
+            inputConfigEntity.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, "book")
+                    .putValue(ExtractorConstants.SET, "input");
+            inputConfigEntity.setExtractorImplClass(AerospikeEntityExtractor.class);
+
+            RDD<BookEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
+
+            BookEntity bookEntity = inputRDDEntity.first();
+
+            fail();
+        } catch(Exception e) {
+            System.out.println("a");
+
+        } finally {
             context.stop();
         }
     }
