@@ -52,13 +52,11 @@ import org.testng.annotations.Test;
 public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(ExtractorTest.class);
 
-    Class inputEntity;
+    private Class inputEntity;
 
-    Class outputEntity;
+    private Class outputEntity;
 
-    Class configEntity;
-
-    //    protected DeepSparkContext context;
+    private Class configEntity;
 
     private String host;
 
@@ -268,7 +266,10 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
             RDD<W> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
             assertEquals(inputRDDEntity2.count(), 1);
-        }finally {
+        }catch(Exception e){
+            e.printStackTrace();
+
+        } finally{
             context.stop();
         }
 

@@ -27,7 +27,7 @@ import com.stratio.deep.mongodb.utils.UtilMongoDB;
  *
  * @param <T> the type parameter
  */
-public class MongoNativeEntityExtractor<T> extends MongoNativeExtractor<T, MongoDeepJobConfig<T>> {
+public final class MongoNativeEntityExtractor<T> extends MongoNativeExtractor<T, MongoDeepJobConfig<T>> {
     /**
      * The constant serialVersionUID.
      */
