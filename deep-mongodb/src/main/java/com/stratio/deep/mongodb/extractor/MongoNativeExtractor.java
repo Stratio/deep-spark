@@ -16,9 +16,12 @@
 
 package com.stratio.deep.mongodb.extractor;
 
+import static com.stratio.deep.commons.utils.Utils.removeAddressPort;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +43,7 @@ import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
 import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.impl.DeepPartition;
 import com.stratio.deep.commons.rdd.DeepTokenRange;
 import com.stratio.deep.commons.rdd.IExtractor;
@@ -52,13 +55,21 @@ import com.stratio.deep.mongodb.writer.MongoWriter;
 
 /**
  * Created by rcrespo on 7/11/14.
+ *
+ * @param <T> the type parameter
+ * @param <S> the type parameter
  */
-public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implements IExtractor<T,S> {
+public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implements IExtractor<T, S> {
 
     /**
      * The constant SPLIT_KEYS.
      */
     public static final String SPLIT_KEYS = "splitKeys";
+
+    /**
+     * The constant serialVersionUID.
+     */
+    private static final long serialVersionUID = -4020891863696443624L;
 
     /**
      * The Split size.
@@ -74,8 +85,14 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
      */
     private MongoReader reader;
 
+    /**
+     * The Writer.
+     */
     private MongoWriter writer;
 
+    /**
+     * The Mongo deep job config.
+     */
     protected MongoDeepJobConfig<T> mongoDeepJobConfig;
 
     @Override
@@ -86,7 +103,7 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
 
             initMongoDeepJobConfig(config);
 
-            splitSize = mongoDeepJobConfig.getPageSize()>0 ? mongoDeepJobConfig.getPageSize() : splitSize;
+            splitSize = mongoDeepJobConfig.getPageSize() > 0 ? mongoDeepJobConfig.getPageSize() : splitSize;
 
             DBCollection collection;
             ServerAddress address = new ServerAddress(mongoDeepJobConfig.getHost());
@@ -101,14 +118,22 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
             return isShardedCollection(collection) ? calculateShardChunks(collection) : calculateSplits(collection);
         } catch (UnknownHostException e) {
 
-            e.printStackTrace();
+            throw new DeepGenericException(e);
         } finally {
             if (mongoClient != null) {
                 mongoClient.close();
             }
 
         }
-        return null;
+    }
+
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
+    public static void main(String... args) {
+        MongoNativeExtractor mongoNativeExtractor = new MongoNativeCellExtractor();
 
     }
 
@@ -175,8 +200,6 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
         BasicDBList splitData = getSplitData(collection);
         List<ServerAddress> serverAddressList = collection.getDB().getMongo().getServerAddressList();
 
-        //Estamos intentado hacer splitVector desde mongos
-        //a una coleccion no fragmentada
         if (splitData == null) {
             Pair<BasicDBList, List<ServerAddress>> pair = getSplitDataCollectionShardEnviroment(getShards(collection),
                     collection.getDB().getName(),
@@ -275,7 +298,7 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
 
     @Override
     public List<String> getPreferredLocations(Partition split) {
-        return ((DeepPartition)split).splitWrapper().getReplicas();
+        return removeAddressPort(((DeepPartition) split).splitWrapper().getReplicas());
     }
 
     /**
@@ -304,14 +327,18 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
                     keyAssigned = true;
                 }
             }
-            deepPartitions[i] = new MongoPartition(mongoDeepJobConfig.getRddId(), i, new DeepTokenRange(shards.get(dbObject.get
-                    ("shard")),
-                    ((DBObject) dbObject.get
-                            ("min")).get(key),
-                    ((DBObject) dbObject.get("max")).get(key)), key);
+            deepPartitions[i] = new MongoPartition(mongoDeepJobConfig.getRddId(), i,
+                    new DeepTokenRange(shards.get(dbObject.get
+                            ("shard")),
+                            ((DBObject) dbObject.get
+                                    ("min")).get(key),
+                            ((DBObject) dbObject.get("max")).get(key)), key);
             i++;
         }
-        return deepPartitions;
+        List<MongoPartition> mongoPartitions = Arrays.asList(deepPartitions);
+
+        Collections.shuffle(mongoPartitions);
+        return mongoPartitions.toArray(new MongoPartition[mongoPartitions.size()]);
     }
 
     /**
@@ -343,11 +370,11 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
 
     @Override
     public void close() {
-        if(reader!=null){
+        if (reader != null) {
             reader.close();
         }
 
-        if(writer!=null){
+        if (writer != null) {
             writer.close();
         }
 
@@ -362,11 +389,16 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
         reader.init(dp);
     }
 
-    private void initMongoDeepJobConfig(S config){
+    /**
+     * Init mongo deep job config.
+     *
+     * @param config the config
+     */
+    private void initMongoDeepJobConfig(S config) {
 
-        if(config instanceof ExtractorConfig){
+        if (config instanceof ExtractorConfig) {
             mongoDeepJobConfig.initialize((ExtractorConfig) config);
-        }else{
+        } else {
             mongoDeepJobConfig = (MongoDeepJobConfig) config;
         }
     }
@@ -381,15 +413,28 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
         initMongoDeepJobConfig(config);
 
         try {
-            writer = new MongoWriter(getServerAddressList(mongoDeepJobConfig.getHostList()), mongoDeepJobConfig.getDatabase(),
+            writer = new MongoWriter(getServerAddressList(mongoDeepJobConfig.getHostList()),
+                    mongoDeepJobConfig.getDatabase(),
                     mongoDeepJobConfig.getCollection());
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Transform element.
+     *
+     * @param dbObject the db object
+     * @return the t
+     */
     protected abstract T transformElement(DBObject dbObject);
 
+    /**
+     * Transform element.
+     *
+     * @param entity the entity
+     * @return the dB object
+     */
     protected abstract DBObject transformElement(T entity);
 
 }

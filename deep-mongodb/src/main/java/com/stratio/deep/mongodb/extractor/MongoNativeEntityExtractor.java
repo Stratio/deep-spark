@@ -17,18 +17,20 @@
 package com.stratio.deep.mongodb.extractor;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-
-import org.apache.spark.Partition;
 
 import com.mongodb.DBObject;
-import com.stratio.deep.commons.config.BaseConfig;
+import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
 
 /**
  * Created by rcrespo on 7/11/14.
+ *
+ * @param <T> the type parameter
  */
-public class MongoNativeEntityExtractor<T, S extends BaseConfig<T>> extends MongoNativeExtractor<T, S> {
+public class MongoNativeEntityExtractor<T> extends MongoNativeExtractor<T, MongoDeepJobConfig<T>> {
+    /**
+     * The constant serialVersionUID.
+     */
     private static final long serialVersionUID = -1073974965338697939L;
 
     @Override
@@ -50,6 +52,5 @@ public class MongoNativeEntityExtractor<T, S extends BaseConfig<T>> extends Mong
         }
         return null;
     }
-
 
 }

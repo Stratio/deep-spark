@@ -17,47 +17,16 @@
 package com.stratio.deep.mongodb.extractor;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.apache.spark.Partition;
-
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.CommandResult;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
-import com.mongodb.QueryBuilder;
-import com.mongodb.ReadPreference;
-import com.mongodb.ServerAddress;
-import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.commons.impl.DeepPartition;
-import com.stratio.deep.commons.rdd.DeepTokenRange;
-import com.stratio.deep.commons.rdd.IExtractor;
-import com.stratio.deep.commons.utils.Pair;
 import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
-import com.stratio.deep.mongodb.partition.MongoPartition;
-import com.stratio.deep.mongodb.reader.MongoReader;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
-import com.stratio.deep.mongodb.writer.MongoWriter;
 
 /**
  * Created by rcrespo on 29/10/14.
- * @param <S>  the type parameter
  */
-public class MongoNativeCellExtractor<S extends BaseConfig<Cells>> extends MongoNativeExtractor<Cells,S> {
+public class MongoNativeCellExtractor extends MongoNativeExtractor<Cells, MongoDeepJobConfig<Cells>> {
 
     /**
      * The constant serialVersionUID.
@@ -67,14 +36,14 @@ public class MongoNativeCellExtractor<S extends BaseConfig<Cells>> extends Mongo
     /**
      * Instantiates a new Mongo native cell extractor.
      */
-    public MongoNativeCellExtractor(){
+    public MongoNativeCellExtractor() {
         this.mongoDeepJobConfig = new MongoDeepJobConfig<>(Cells.class);
     }
 
     @Override
     protected Cells transformElement(DBObject dbObject) {
         try {
-            return UtilMongoDB.getCellFromBson(dbObject,  mongoDeepJobConfig.getNameSpace());
+            return UtilMongoDB.getCellFromBson(dbObject, mongoDeepJobConfig.getNameSpace());
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
         }

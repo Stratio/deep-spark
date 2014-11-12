@@ -16,17 +16,12 @@
 
 package com.stratio.deep.mongodb.writer;
 
-import java.lang.reflect.InvocationTargetException;
-import java.net.UnknownHostException;
 import java.util.List;
 
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.mongodb.utils.UtilMongoDB;
 
 /**
  * Created by rcrespo on 5/11/14.
@@ -46,8 +41,8 @@ public class MongoWriter {
      * Instantiates a new Mongo writer.
      *
      * @param serverAddresses the server addresses
-     * @param databaseName the database name
-     * @param collectionName the collection name
+     * @param databaseName    the database name
+     * @param collectionName  the collection name
      */
     public MongoWriter(List<ServerAddress> serverAddresses, String databaseName, String collectionName) {
         mongoClient = new MongoClient(serverAddresses);

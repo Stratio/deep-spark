@@ -32,7 +32,7 @@ import scala.Tuple2;
 /**
  * EntityRDD to interact with mongoDB
  *
- * @param <T>  the type parameter
+ * @param <T> the type parameter
  */
 public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
 

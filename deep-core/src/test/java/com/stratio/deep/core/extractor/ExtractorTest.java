@@ -321,10 +321,6 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
         return extractorConfig;
     }
 
-    /**
-     * It closes spark's context
-     */
-
     private boolean isEntityClassCells(ExtractorConfig extractorConfig) {
         if (extractorConfig.getEntityClass().isAssignableFrom(Cells.class)) {
             return true;

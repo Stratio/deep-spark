@@ -47,10 +47,10 @@ import com.stratio.deep.core.extractor.ExtractorTest;
 import scala.Tuple2;
 
 /**
- * Created by rcrespo on 18/06/14.
+ * Created by rcrespo on 11/11/14.
  */
 
-@Test(suiteName = "mongoRddTests", groups = { "MongoCellExtractorTest" }, dependsOnGroups = "MongoJavaRDDTest")
+@Test(suiteName = "mongoRddTests", groups = { "MongoNativeCellExtractorTest" }, dependsOnGroups = "MongoJavaRDDTest")
 public class MongoNativeCellExtractorTest extends ExtractorTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoNativeCellExtractorTest.class);

@@ -16,28 +16,25 @@
 
 package com.stratio.deep.mongodb.reader;
 
-import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.spark.Partition;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.Cursor;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
 import com.mongodb.QueryBuilder;
 import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
-import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.impl.DeepPartition;
 import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
 import com.stratio.deep.mongodb.partition.MongoPartition;
-import com.stratio.deep.mongodb.utils.UtilMongoDB;
 
 /**
  * Created by rcrespo on 30/10/14.
@@ -63,25 +60,19 @@ public class MongoReader<T> {
      */
     private DBCursor dbCursor = null;
 
-
+    /**
+     * The Mongo deep job config.
+     */
     private MongoDeepJobConfig mongoDeepJobConfig;
 
     /**
      * Instantiates a new Mongo reader.
+     *
+     * @param mongoDeepJobConfig the mongo deep job config
      */
     public MongoReader(MongoDeepJobConfig mongoDeepJobConfig) {
         this.mongoDeepJobConfig = mongoDeepJobConfig;
     }
-
-    /**
-     * The type Connections.
-     */
-    public static class connections {
-
-        //        private
-
-    }
-
 
     /**
      * Close void.
@@ -112,13 +103,13 @@ public class MongoReader<T> {
      * @return the cells
      */
     public DBObject next() {
-       return dbCursor.next();
+        return dbCursor.next();
     }
 
     /**
      * Init void.
      *
-     * @param partition      the partition
+     * @param partition the partition
      */
     public void init(Partition partition) {
         try {
@@ -128,17 +119,28 @@ public class MongoReader<T> {
             for (String s : (List<String>) ((DeepPartition) partition).splitWrapper().getReplicas()) {
                 addressList.add(new ServerAddress(s));
             }
-            mongoClient = new MongoClient(addressList);
+
+            //Credentials
+            List<MongoCredential> mongoCredentials = new ArrayList<>();
+
+            if (mongoDeepJobConfig.getUsername() != null && mongoDeepJobConfig.getPassword() != null) {
+                MongoCredential credential = MongoCredential.createMongoCRCredential(mongoDeepJobConfig.getUsername(),
+                        mongoDeepJobConfig.getDatabase(),
+                        mongoDeepJobConfig.getPassword().toCharArray());
+                mongoCredentials.add(credential);
+
+            }
+
+            mongoClient = new MongoClient(addressList, mongoCredentials);
             mongoClient.setReadPreference(ReadPreference.nearest());
             db = mongoClient.getDB(mongoDeepJobConfig.getDatabase());
             collection = db.getCollection(mongoDeepJobConfig.getCollection());
 
-
-
-            dbCursor = collection.find(generateFilterQuery((MongoPartition) partition),mongoDeepJobConfig.getInputFields());
+            dbCursor = collection.find(generateFilterQuery((MongoPartition) partition),
+                    mongoDeepJobConfig.getInputFields());
 
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            throw new DeepExtractorinitializationException(e.getMessage());
         }
     }
 
@@ -168,19 +170,23 @@ public class MongoReader<T> {
         return queryBuilder.get();
     }
 
+    /**
+     * Generate filter query.
+     *
+     * @param partition the partition
+     * @return the dB object
+     */
+    private DBObject generateFilterQuery(MongoPartition partition) {
 
-    private DBObject generateFilterQuery(MongoPartition partition){
-
-        if(mongoDeepJobConfig.getQuery() !=null){
+        if (mongoDeepJobConfig.getQuery() != null) {
             QueryBuilder queryBuilder = QueryBuilder.start();
 
-            queryBuilder.and(createQueryPartition(partition),mongoDeepJobConfig.getQuery());
+            queryBuilder.and(createQueryPartition(partition), mongoDeepJobConfig.getQuery());
 
             return queryBuilder.get();
         }
 
         return createQueryPartition(partition);
-
 
     }
 

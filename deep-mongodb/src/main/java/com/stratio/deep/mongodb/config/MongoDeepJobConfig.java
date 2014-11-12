@@ -45,7 +45,6 @@ import java.util.Set;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
 import org.bson.BSONObject;
-import org.bson.BasicBSONObject;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -60,9 +59,14 @@ import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
 import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
 
 /**
- * @param <T>
+ * The type Mongo deep job config.
+ *
+ * @param <T> the type parameter
  */
 public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeepJobConfig<T>, Serializable {
+    /**
+     * The constant serialVersionUID.
+     */
     private static final long serialVersionUID = -7179376653643603038L;
 
     /**
@@ -109,16 +113,36 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      */
     private String inputKey;
 
+    /**
+     * The Create input split.
+     */
     private boolean createInputSplit = true;
 
+    /**
+     * The Use shards.
+     */
     private boolean useShards = false;
 
+    /**
+     * The Splits use chunks.
+     */
     private boolean splitsUseChunks = true;
 
+    /**
+     * The Split size.
+     */
     private Integer splitSize = 8;
 
+    /**
+     * The Custom configuration.
+     */
     private Map<String, Serializable> customConfiguration;
 
+    /**
+     * Instantiates a new Mongo deep job config.
+     *
+     * @param entityClass the entity class
+     */
     public MongoDeepJobConfig(Class<T> entityClass) {
         super(entityClass);
         if (Cells.class.isAssignableFrom(entityClass)) {
@@ -193,19 +217,16 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
         return this;
     }
 
+    /**
+     * Host mongo deep job config.
+     *
+     * @param hosts the hosts
+     * @return the mongo deep job config
+     */
     public MongoDeepJobConfig<T> host(String[] hosts) {
         this.hostList.addAll(Arrays.asList(hosts));
         return this;
     }
-
-//    /**
-//     * {@inheritDoc}
-//     */
-//    @Override
-//    public MongoDeepJobConfig<T> filterQuery(String query) {
-//        this.query = query;
-//        return this;
-//    }
 
     /**
      * {@inheritDoc}
@@ -382,6 +403,12 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
         return nameSpace;
     }
 
+    /**
+     * Port mongo deep job config.
+     *
+     * @param port the port
+     * @return the mongo deep job config
+     */
     public MongoDeepJobConfig<T> port(int port) {
         for (int i = 0; i < hostList.size(); i++) {
             if (hostList.get(i).indexOf(":") == -1) {
@@ -610,6 +637,12 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
         return this;
     }
 
+    /**
+     * Filter query.
+     *
+     * @param filters the filters
+     * @return the mongo deep job config
+     */
     public MongoDeepJobConfig<T> filterQuery(Filter[] filters) {
 
         if (filters.length > 0) {
@@ -637,51 +670,110 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
 
     }
 
+    /**
+     * Gets input key.
+     *
+     * @return the input key
+     */
     public String getInputKey() {
         return inputKey;
     }
 
+    /**
+     * Sets input key.
+     *
+     * @param inputKey the input key
+     */
     public void setInputKey(String inputKey) {
         this.inputKey = inputKey;
     }
 
+    /**
+     * Is create input split.
+     *
+     * @return the boolean
+     */
     public boolean isCreateInputSplit() {
         return createInputSplit;
     }
 
+    /**
+     * Sets create input split.
+     *
+     * @param createInputSplit the create input split
+     */
     public void setCreateInputSplit(boolean createInputSplit) {
         this.createInputSplit = createInputSplit;
     }
 
+    /**
+     * Is use shards.
+     *
+     * @return the boolean
+     */
     public boolean isUseShards() {
         return useShards;
     }
 
+    /**
+     * Sets use shards.
+     *
+     * @param useShards the use shards
+     */
     public void setUseShards(boolean useShards) {
         this.useShards = useShards;
     }
 
+    /**
+     * Is splits use chunks.
+     *
+     * @return the boolean
+     */
     public boolean isSplitsUseChunks() {
         return splitsUseChunks;
     }
 
+    /**
+     * Sets splits use chunks.
+     *
+     * @param splitsUseChunks the splits use chunks
+     */
     public void setSplitsUseChunks(boolean splitsUseChunks) {
         this.splitsUseChunks = splitsUseChunks;
     }
 
+    /**
+     * Gets split size.
+     *
+     * @return the split size
+     */
     public Integer getSplitSize() {
         return splitSize;
     }
 
+    /**
+     * Sets split size.
+     *
+     * @param splitSize the split size
+     */
     public void setSplitSize(Integer splitSize) {
         this.splitSize = splitSize;
     }
 
-
+    /**
+     * Gets input fields.
+     *
+     * @return the input fields
+     */
     public DBObject getInputFields() {
         return fields;
     }
 
+    /**
+     * Gets query.
+     *
+     * @return the query
+     */
     public DBObject getQuery() {
         return query;
     }

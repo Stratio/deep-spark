@@ -38,9 +38,9 @@ public class MongoPartition extends DeepPartition {
      * Instantiates a new Mongo partition.
      *
      * @param rddId the rdd id
-     * @param idx the idx
+     * @param idx   the idx
      * @param range the range
-     * @param key the key
+     * @param key   the key
      */
     public MongoPartition(int rddId, int idx, DeepTokenRange range, String key) {
         super(rddId, idx, range);
@@ -67,7 +67,7 @@ public class MongoPartition extends DeepPartition {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer(super.toString()+"MongoPartition{");
+        final StringBuffer sb = new StringBuffer(super.toString() + "MongoPartition{");
         sb.append("key='").append(key).append('\'');
         sb.append('}');
         return sb.toString();

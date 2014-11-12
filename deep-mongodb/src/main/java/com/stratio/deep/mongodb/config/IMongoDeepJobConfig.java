@@ -72,7 +72,7 @@ public interface IMongoDeepJobConfig<T> {
      * @param query
      * @return this object.
      */
-//    IMongoDeepJobConfig<T> filterQuery(String query);
+    //    IMongoDeepJobConfig<T> filterQuery(String query);
 
     /**
      * Filter query
