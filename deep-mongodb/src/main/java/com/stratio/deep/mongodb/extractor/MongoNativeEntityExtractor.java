@@ -19,19 +19,31 @@ package com.stratio.deep.mongodb.extractor;
 import java.lang.reflect.InvocationTargetException;
 
 import com.mongodb.DBObject;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
 
 /**
  * Created by rcrespo on 7/11/14.
  *
- * @param <T> the type parameter
+ * @param <T>  the type parameter
  */
 public final class MongoNativeEntityExtractor<T> extends MongoNativeExtractor<T, MongoDeepJobConfig<T>> {
     /**
      * The constant serialVersionUID.
      */
     private static final long serialVersionUID = -1073974965338697939L;
+
+    /**
+     * Instantiates a new Mongo native entity extractor.
+     *
+     * @param t the t
+     */
+    public MongoNativeEntityExtractor(Class<T> t){
+        this.mongoDeepJobConfig = new MongoDeepJobConfig<>(t);
+    }
+
 
     @Override
     protected T transformElement(DBObject dbObject) {
