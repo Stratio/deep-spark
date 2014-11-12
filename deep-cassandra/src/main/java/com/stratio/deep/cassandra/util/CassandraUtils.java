@@ -405,11 +405,21 @@ public class CassandraUtils {
 
                 switch (filterType) {
                 case IN:
+                    List<String> inValues = (List<String>) filters[i].getValue();
+
                     sb.append(" AND ")
                             .append(quote(filters[i].getField()))
-                            .append(" IN ").append("('")
-                            .append(StringUtils.join(((List<String>) filters[i].getValue()), "','"))
-                            .append("')");
+                            .append(" IN ").append("(");
+
+                    if (!inValues.isEmpty()) {
+                        if (inValues.get(0) instanceof String) {
+                            sb.append("'").append(StringUtils.join(((List<String>) filters[i].getValue()), "','"))
+                                    .append("'");
+                        } else {
+                            sb.append(StringUtils.join(((List<String>) filters[i].getValue()), ","));
+                        }
+                    }
+                    sb.append(")");
                     break;
                 case BETWEEN:
                     break;
@@ -419,9 +429,15 @@ public class CassandraUtils {
                     sb.append("'");
                     break;
                 default:
-                    sb.append(" AND ").append(quote(filters[i].getField()))
+                    String value = filters[i].getValue().toString();
+
+                    if (filters[i].getValue() instanceof String) {
+                        value = singleQuote(value.trim());
+                    }
+
+                    sb.append(" AND ").append(quote(filters[i].getField())).append(" ")
                             .append(OperatorCassandra.getOperatorCassandra(filters[i].getFilterType()).getOperator())
-                            .append(filters[i].getValue());
+                            .append(" ").append(value);
                     break;
                 }
             }

@@ -15,6 +15,8 @@ public class ExtractorConstants {
     public static  String TABLE    = "table";
     public static  String COLLECTION = TABLE;
     public static  String TYPE = TABLE;
+    public static  String NAMESPACE = CATALOG;
+    public static  String SET = TABLE;
     public static  String HOST     = "host";
     public static  String PORT     = "port";
     public static  String INPUT_COLUMNS = "inputColumns";
