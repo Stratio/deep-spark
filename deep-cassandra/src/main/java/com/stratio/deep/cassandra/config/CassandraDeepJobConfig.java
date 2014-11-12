@@ -16,9 +16,12 @@
 
 package com.stratio.deep.cassandra.config;
 
-import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.stratio.deep.cassandra.util.CassandraUtils.createTableQueryGenerator;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.BATCHSIZE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.BISECT_FACTOR;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.COLUMN_FAMILY;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.CQLPORT;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.CREATE_ON_WRITE;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.HOST;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.KEYSPACE;
@@ -29,13 +32,7 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.RPCPOR
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.TABLE;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNAME;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.WRITE_CONSISTENCY_LEVEL;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.SPLIT_SIZE;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.BATCHSIZE;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.COLUMN_FAMILY;
 import static com.stratio.deep.commons.utils.Utils.quote;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.CQLPORT;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.CREATE_ON_WRITE;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.BISECT_FACTOR;
 
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -48,15 +45,20 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.conf.*;
 import org.apache.log4j.Logger;
 
-import com.datastax.driver.core.*;
-import com.datastax.driver.core.querybuilder.Clause;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.stratio.deep.commons.config.DeepJobConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
+import scala.Tuple2;
+
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ColumnMetadata;
+import com.datastax.driver.core.ConsistencyLevel;
+import com.datastax.driver.core.KeyspaceMetadata;
+import com.datastax.driver.core.Metadata;
+import com.datastax.driver.core.ProtocolVersion;
+import com.datastax.driver.core.Session;
+import com.datastax.driver.core.TableMetadata;
 import com.stratio.deep.cassandra.entity.CassandraCell;
+import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
@@ -66,15 +68,12 @@ import com.stratio.deep.commons.exception.DeepIndexNotFoundException;
 import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.Filter;
-import com.stratio.deep.commons.filter.FilterOperator;
 import com.stratio.deep.commons.utils.Constants;
 import com.stratio.deep.commons.utils.Pair;
 
-import scala.Tuple2;
-
 /**
- * Base class for all config implementations providing default implementations for methods
- * defined in {@link ICassandraDeepJobConfig}.
+ * Base class for all config implementations providing default implementations for methods defined in
+ * {@link ICassandraDeepJobConfig}.
  */
 public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> implements AutoCloseable,
         ICassandraDeepJobConfig<T> {
@@ -84,7 +83,6 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
     private static final long serialVersionUID = -7179376653643603038L;
 
     private String partitionerClassName = "org.apache.cassandra.dht.Murmur3Partitioner";
-
 
     /**
      * Cassandra server RPC port.
@@ -96,14 +94,12 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      */
     private Integer cqlPort = Constants.DEFAULT_CASSANDRA_CQL_PORT;
 
-
     /**
      * default "where" filter to use to access ColumnFamily's data.
      */
-    private Map<String, Serializable> additionalFilters = new TreeMap<>();
+    private final Map<String, Serializable> additionalFilters = new TreeMap<>();
 
-
-    private Filter[] filters ;
+    private Filter[] filters;
 
     /**
      * Defines a projection over the CF columns.
@@ -131,8 +127,8 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
     private String writeConsistencyLevel = ConsistencyLevel.QUORUM.name();
 
     /**
-     * Enables/Disables auto-creation of column family when writing to Cassandra.
-     * By Default we do not create the output column family.
+     * Enables/Disables auto-creation of column family when writing to Cassandra. By Default we do not create the output
+     * column family.
      */
     protected Boolean createTableOnWrite = Boolean.FALSE;
 
@@ -146,17 +142,17 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
 
     private int bisectFactor = Constants.DEFAULT_BISECT_FACTOR;
 
-    private int splitSize = Constants.DEFAULT_SPLIT_SIZE;
+    private final int splitSize = Constants.DEFAULT_SPLIT_SIZE;
 
     private boolean isSplitModeSet = false;
 
     private boolean isBisectModeSet = true;
 
-
     /**
      * {@inheritDoc}
      */
 
+    @Override
     public CassandraDeepJobConfig<T> session(Session session) {
         this.session = session;
         return this;
@@ -166,6 +162,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public synchronized Session getSession() {
         if (session == null) {
             Cluster cluster = Cluster.builder()
@@ -192,22 +189,20 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
         }
     }
 
-    public CassandraDeepJobConfig(Class<T> entityClass){
+    public CassandraDeepJobConfig(Class<T> entityClass) {
         super(entityClass);
     }
 
     /**
      * {@inheritDoc}
-
-     @Override protected void finalize() {
-     LOG.debug("finalizing " + getClass().getCanonicalName());
-     close();
-     }
+     * 
+     * @Override protected void finalize() { LOG.debug("finalizing " + getClass().getCanonicalName()); close(); }
      */
     /**
      * Checks if this configuration object has been initialized or not.
-     *
-     * @throws com.stratio.deep.commons.exception.DeepIllegalAccessException if not initialized
+     * 
+     * @throws com.stratio.deep.commons.exception.DeepIllegalAccessException
+     *             if not initialized
      */
     protected void checkInitialized() {
         if (!isInitialized) {
@@ -217,7 +212,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
 
     /**
      * Fetches table metadata from the underlying datastore, using DataStax java driver.
-     *
+     * 
      * @return the table metadata as returned by the driver.
      */
     public TableMetadata fetchTableMetadata() {
@@ -237,11 +232,11 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * We first check if the column family exists. <br/>
      * If not, we get the first element from <i>tupleRDD</i> and we use it as a template to get columns metadata.
      * <p>
-     * This is a very heavy operation since to obtain the schema
-     * we need to get at least one element of the output RDD.
+     * This is a very heavy operation since to obtain the schema we need to get at least one element of the output RDD.
      * </p>
-     *
-     * @param first the pair RDD.
+     * 
+     * @param first
+     *            the pair RDD.
      */
     public void createOutputTableIfNeeded(Tuple2<Cells, Cells> first) {
 
@@ -307,6 +302,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public synchronized Map<String, Cell> columnDefinitions() {
         if (columnDefinitionMap != null) {
             return columnDefinitionMap;
@@ -354,82 +350,108 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
         columnDefinitionMap = Collections.unmodifiableMap(columnDefinitionMap);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.stratio.deep.config.IICassandraDeepJobConfig#columnFamily(java.lang.String)
      */
 
+    @Override
     public CassandraDeepJobConfig<T> columnFamily(String columnFamily) {
         this.table = columnFamily;
 
         return this;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.stratio.deep.config.IICassandraDeepJobConfig#columnFamily(java.lang.String)
      */
 
+    @Override
     public CassandraDeepJobConfig<T> table(String table) {
         return columnFamily(table);
     }
 
-    /* (non-Javadoc)
-    * @see com.stratio.deep.config.IICassandraDeepJobConfig#getColumnFamily()
-    */
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.stratio.deep.config.IICassandraDeepJobConfig#getColumnFamily()
+     */
 
+    @Override
     public String getColumnFamily() {
         checkInitialized();
         return table;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.stratio.deep.config.IICassandraDeepJobConfig#getColumnFamily()
      */
 
+    @Override
     public String getTable() {
         return getColumnFamily();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.stratio.deep.config.IICassandraDeepJobConfig#getHost()
      */
 
+    @Override
     public String getHost() {
         checkInitialized();
         return host;
     }
 
+    @Override
     public String[] getInputColumns() {
         checkInitialized();
         return inputColumns == null ? new String[0] : inputColumns.clone();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.stratio.deep.config.IICassandraDeepJobConfig#getKeyspace()
      */
 
+    @Override
     public String getKeyspace() {
         checkInitialized();
         return catalog;
     }
 
+    @Override
     public String getPartitionerClassName() {
         checkInitialized();
         return partitionerClassName;
     }
 
-    /* (non-Javadoc)
-    * @see com.stratio.deep.config.IICassandraDeepJobConfig#getPassword()
-    */
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.stratio.deep.config.IICassandraDeepJobConfig#getPassword()
+     */
 
+    @Override
     public String getPassword() {
         checkInitialized();
         return password;
     }
 
-    /* (non-Javadoc)
-    * @see com.stratio.deep.config.IICassandraDeepJobConfig#getRpcPort()
-    */
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.stratio.deep.config.IICassandraDeepJobConfig#getRpcPort()
+     */
 
+    @Override
     public Integer getRpcPort() {
         checkInitialized();
         return rpcPort;
@@ -439,6 +461,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public Integer getCqlPort() {
         checkInitialized();
         return cqlPort;
@@ -448,6 +471,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public String getUsername() {
         checkInitialized();
         return username;
@@ -457,6 +481,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public CassandraDeepJobConfig<T> host(String hostname) {
         this.host = hostname;
 
@@ -467,6 +492,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public CassandraDeepJobConfig<T> initialize() {
         if (isInitialized) {
             return this;
@@ -489,8 +515,8 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
         return this;
     }
 
+    @Override
     public CassandraDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
-
 
         Map<String, Serializable> values = extractorConfig.getValues();
 
@@ -551,26 +577,24 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
             bisectFactor(extractorConfig.getInteger(BISECT_FACTOR));
         }
 
-//        if(values.get(SPLIT_SIZE)!=null){
-//            splitSize(extractorConfig.getInteger(SPLIT_SIZE));
-//        }
+        // if(values.get(SPLIT_SIZE)!=null){
+        // splitSize(extractorConfig.getInteger(SPLIT_SIZE));
+        // }
 
-
-        if(values.get(ExtractorConstants.FILTER_FIELD)!=null){
-            Pair<String, Serializable> filterFields =  extractorConfig.getPair(ExtractorConstants.FILTER_FIELD, String.class, Serializable.class);
+        if (values.get(ExtractorConstants.FILTER_FIELD) != null) {
+            Pair<String, Serializable> filterFields = extractorConfig.getPair(ExtractorConstants.FILTER_FIELD,
+                    String.class, Serializable.class);
             filterByField(filterFields.left, filterFields.right);
         }
 
-        if(values.get(ExtractorConstants.FILTER_QUERY)!=null){
+        if (values.get(ExtractorConstants.FILTER_QUERY) != null) {
             filters(extractorConfig.getFilterArray(ExtractorConstants.FILTER_QUERY));
-
 
         }
         this.initialize();
 
         return this;
     }
-
 
     @Override
     public CassandraDeepJobConfig<T> filters(Filter... filters) {
@@ -584,10 +608,11 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
         return filters;
     }
 
-        /**
-         * {@inheritDoc}
-         */
+    /**
+     * {@inheritDoc}
+     */
 
+    @Override
     public CassandraDeepJobConfig<T> inputColumns(String... columns) {
         this.inputColumns = columns;
 
@@ -598,11 +623,13 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public CassandraDeepJobConfig<T> keyspace(String keyspace) {
         this.catalog = keyspace;
         return this;
     }
 
+    @Override
     public CassandraDeepJobConfig<T> bisectFactor(int bisectFactor) {
         this.isSplitModeSet = false;
         this.isBisectModeSet = true;
@@ -614,6 +641,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public CassandraDeepJobConfig<T> partitioner(String partitionerClassName) {
         this.partitionerClassName = partitionerClassName;
         return this;
@@ -623,6 +651,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public CassandraDeepJobConfig<T> password(String password) {
         this.password = password;
 
@@ -633,6 +662,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public CassandraDeepJobConfig<T> rpcPort(Integer port) {
         this.rpcPort = port;
 
@@ -643,6 +673,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public CassandraDeepJobConfig<T> cqlPort(Integer port) {
         this.cqlPort = port;
 
@@ -653,6 +684,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public CassandraDeepJobConfig<T> username(String username) {
         this.username = username;
 
@@ -660,9 +692,8 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
     }
 
     /**
-     * Validates if any of the mandatory fields have been configured or not.
-     * Throws an {@link IllegalArgumentException} if any of the mandatory
-     * properties have not been configured.
+     * Validates if any of the mandatory fields have been configured or not. Throws an {@link IllegalArgumentException}
+     * if any of the mandatory properties have not been configured.
      */
     void validate() {
         validateCassandraParams();
@@ -795,6 +826,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public CassandraDeepJobConfig<T> batchSize(int batchSize) {
         this.batchSize = batchSize;
         return this;
@@ -804,6 +836,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public Boolean isCreateTableOnWrite() {
         return createTableOnWrite;
     }
@@ -812,6 +845,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public CassandraDeepJobConfig<T> createTableOnWrite(Boolean createTableOnWrite) {
         this.createTableOnWrite = createTableOnWrite;
         this.isWriteConfig = createTableOnWrite;
@@ -822,10 +856,12 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
     /**
      * {@inheritDoc}
      */
+    @Override
     public Map<String, Serializable> getAdditionalFilters() {
         return Collections.unmodifiableMap(additionalFilters);
     }
 
+    @Override
     public int getPageSize() {
         checkInitialized();
         return this.pageSize;
@@ -835,12 +871,14 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public CassandraDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue) {
         /* check if there's an index specified on the provided column */
         additionalFilters.put(filterColumnName, filterValue);
         return this;
     }
 
+    @Override
     public CassandraDeepJobConfig<T> pageSize(int pageSize) {
         this.pageSize = pageSize;
         return this;
@@ -850,6 +888,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public String getReadConsistencyLevel() {
         return readConsistencyLevel;
     }
@@ -858,6 +897,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public String getWriteConsistencyLevel() {
         return writeConsistencyLevel;
     }
@@ -866,6 +906,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public CassandraDeepJobConfig<T> readConsistencyLevel(String level) {
         this.readConsistencyLevel = level;
 
@@ -876,6 +917,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public CassandraDeepJobConfig<T> writeConsistencyLevel(String level) {
         this.writeConsistencyLevel = level;
         return this;
@@ -885,6 +927,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public int getBatchSize() {
         return batchSize;
     }
@@ -893,6 +936,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      * {@inheritDoc}
      */
 
+    @Override
     public Boolean getIsWriteConfig() {
         return isWriteConfig;
     }
@@ -902,12 +946,12 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
         return bisectFactor;
     }
 
-//TODO: It will be added in a future release
+    // TODO: It will be added in a future release
     @Override
     public CassandraDeepJobConfig<T> splitSize(int splitSize) {
-//        this.isSplitModeSet = true;
-//        this.isBisectModeSet = false;
-//        this.splitSize = splitSize;
+        // this.isSplitModeSet = true;
+        // this.isBisectModeSet = false;
+        // this.splitSize = splitSize;
         return this;
     }
 
@@ -925,6 +969,5 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
     public boolean isBisectModeSet() {
         return this.isBisectModeSet;
     }
-
 
 }

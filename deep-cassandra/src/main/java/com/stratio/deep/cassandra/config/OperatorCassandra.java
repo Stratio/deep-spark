@@ -16,50 +16,43 @@
 
 package com.stratio.deep.cassandra.config;
 
-import com.stratio.deep.commons.filter.FilterOperator;
+import com.stratio.deep.commons.filter.FilterType;
 
 /**
  * Created by rcrespo on 6/10/14.
  */
 public enum OperatorCassandra {
 
+    IS(FilterType.EQ, "="),
+    GT(FilterType.GT, ">"),
+    GTE(FilterType.GET, ">="),
+    LT(FilterType.LT, "<"),
+    LTE(FilterType.LET, "<="),
+    NE(FilterType.NEQ, "!=");
 
-    OR(FilterOperator.OR, "or"),
-    AND(FilterOperator.AND, "and"),
-    IS(FilterOperator.IS, "="),
-    GT(FilterOperator.GT, ">"),
-    GTE(FilterOperator.GTE, ">="),
-    LT(FilterOperator.LT, "<"),
-    LTE(FilterOperator.LTE, "<="),
-    NE(FilterOperator.NE, "!=");
-
-    private String operatorName;
+    private FilterType filterType;
 
     private String operator;
 
-    OperatorCassandra (String operatorName, String operator){
-        this.operatorName = operatorName;
+    OperatorCassandra(FilterType filterType, String operator) {
+        this.filterType = filterType;
         this.operator = operator;
     }
 
-    public static OperatorCassandra getOperatorCassandra (String operatorName){
-        switch (operatorName){
+    public static OperatorCassandra getOperatorCassandra(FilterType filterType) {
 
-        case FilterOperator.OR:
-                return OperatorCassandra.OR;
-        case FilterOperator.AND:
-            return OperatorCassandra.AND;
-        case FilterOperator.IS:
+        switch (filterType) {
+        case EQ:
             return OperatorCassandra.IS;
-        case FilterOperator.GT:
+        case GT:
             return OperatorCassandra.GT;
-        case FilterOperator.GTE:
+        case GET:
             return OperatorCassandra.GTE;
-        case FilterOperator.LT:
+        case LT:
             return OperatorCassandra.LT;
-        case FilterOperator.LTE:
+        case LET:
             return OperatorCassandra.LTE;
-        case FilterOperator.NE:
+        case NEQ:
             return OperatorCassandra.NE;
         default:
             return null;
@@ -67,13 +60,12 @@ public enum OperatorCassandra {
 
     }
 
-    public String getOperatorName() {
-        return operatorName;
+    public FilterType getFilterType() {
+        return filterType;
     }
 
     public String getOperator() {
         return operator;
     }
-
 
 }
