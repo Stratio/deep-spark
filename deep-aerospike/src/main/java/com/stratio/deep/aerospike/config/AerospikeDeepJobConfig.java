@@ -23,7 +23,7 @@ import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.HadoopConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.filter.Filter;
-import com.stratio.deep.commons.filter.FilterOperator;
+import com.stratio.deep.commons.filter.FilterType;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
 import scala.Tuple2;
@@ -357,7 +357,7 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
             Filter deepFilter = filters[0];
             if(!isValidAerospikeFilter(deepFilter)) {
                 throw new UnsupportedOperationException("Aerospike currently supports only equality and range filter operations");
-            } else if(!deepFilter.getOperation().equals(FilterOperator.IS)) {
+            } else if(!deepFilter.getFilterType().equals(FilterType.EQ)) {
                 operation("numrange");
                 setAerospikeNumrange(deepFilter);
             } else {
@@ -369,11 +369,11 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
     }
 
     private boolean isValidAerospikeFilter(Filter filter) {
-        return filter.getOperation().equals(FilterOperator.IS) ||
-                filter.getOperation().equals(FilterOperator.LT) ||
-                filter.getOperation().equals(FilterOperator.GT) ||
-                filter.getOperation().equals(FilterOperator.GTE) ||
-                filter.getOperation().equals(FilterOperator.LTE);
+        return filter.getFilterType().equals(FilterType.EQ) ||
+                filter.getFilterType().equals(FilterType.LT) ||
+                filter.getFilterType().equals(FilterType.GT) ||
+                filter.getFilterType().equals(FilterType.GET) ||
+                filter.getFilterType().equals(FilterType.LET);
     }
 
     private void setAerospikeNumrange(Filter filter) {
@@ -381,16 +381,16 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         if(!filter.getValue().getClass().equals(Long.class)){
             throw new UnsupportedOperationException("Range filters only accept Long type as parameters");
         }
-        if(filter.getOperation().equals(FilterOperator.LT)) {
+        if(filter.getFilterType().equals(FilterType.LT)) {
             numrangeFilter(new Tuple3<String, Object, Object>(field, Long.MIN_VALUE, (Long)filter.getValue() -1));
         }
-        if(filter.getOperation().equals(FilterOperator.LTE)) {
+        if(filter.getFilterType().equals(FilterType.LET)) {
             numrangeFilter(new Tuple3<String, Object, Object>(field, Long.MIN_VALUE, (Long)filter.getValue()));
         }
-        if(filter.getOperation().equals(FilterOperator.GT)) {
+        if(filter.getFilterType().equals(FilterType.GT)) {
             numrangeFilter(new Tuple3<String, Object, Object>(field, (Long)filter.getValue() + 1, Long.MAX_VALUE));
         }
-        if(filter.getOperation().equals(FilterOperator.GTE)) {
+        if(filter.getFilterType().equals(FilterType.GET)) {
             numrangeFilter(new Tuple3<String, Object, Object>(field, (Long)filter.getValue(), Long.MAX_VALUE));
         }
     }

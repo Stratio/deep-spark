@@ -24,7 +24,7 @@ import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepTransformException;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.commons.filter.FilterOperator;
+import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.MessageTestEntity;
@@ -142,12 +142,12 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
         try {
 
             com.stratio.deep.commons.filter.Filter[] filters = null;
-            com.stratio.deep.commons.filter.Filter equalFilter = new com.stratio.deep.commons.filter.Filter("number", FilterOperator.IS, 3L);
-            com.stratio.deep.commons.filter.Filter ltFilter = new com.stratio.deep.commons.filter.Filter("number", FilterOperator.LT, 4L);
-            com.stratio.deep.commons.filter.Filter gtFilter = new com.stratio.deep.commons.filter.Filter("number", FilterOperator.GT, 5L);
-            com.stratio.deep.commons.filter.Filter lteFilter = new com.stratio.deep.commons.filter.Filter("number", FilterOperator.LTE, 3L);
-            com.stratio.deep.commons.filter.Filter gteFilter = new com.stratio.deep.commons.filter.Filter("number", FilterOperator.GTE, 4L);
-            com.stratio.deep.commons.filter.Filter equalFilter2 = new com.stratio.deep.commons.filter.Filter("number", FilterOperator.IS, 4L);
+            com.stratio.deep.commons.filter.Filter equalFilter = new com.stratio.deep.commons.filter.Filter("number", FilterType.EQ, 3L);
+            com.stratio.deep.commons.filter.Filter ltFilter = new com.stratio.deep.commons.filter.Filter("number", FilterType.LT, 4L);
+            com.stratio.deep.commons.filter.Filter gtFilter = new com.stratio.deep.commons.filter.Filter("number", FilterType.GT, 5L);
+            com.stratio.deep.commons.filter.Filter lteFilter = new com.stratio.deep.commons.filter.Filter("number", FilterType.LET, 3L);
+            com.stratio.deep.commons.filter.Filter gteFilter = new com.stratio.deep.commons.filter.Filter("number", FilterType.GET, 4L);
+            com.stratio.deep.commons.filter.Filter equalFilter2 = new com.stratio.deep.commons.filter.Filter("number", FilterType.EQ, 4L);
 
             try {
                 filters = new com.stratio.deep.commons.filter.Filter[] { equalFilter, ltFilter };
@@ -157,14 +157,14 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
             }
 
             try {
-                filters = new com.stratio.deep.commons.filter.Filter[] { new com.stratio.deep.commons.filter.Filter("number", FilterOperator.NE, "invalid")};
+                filters = new com.stratio.deep.commons.filter.Filter[] { new com.stratio.deep.commons.filter.Filter("number", FilterType.NEQ, "invalid")};
                 ExtractorConfig inputConfigEntity = getFilterConfig(filters);
             } catch(UnsupportedOperationException e) {
                 LOG.info("Expected exception thrown for a filter not supported by aerospike");
             }
 
             try {
-                com.stratio.deep.commons.filter.Filter invalidFilter = new com.stratio.deep.commons.filter.Filter("number", FilterOperator.LT, "invalid");
+                com.stratio.deep.commons.filter.Filter invalidFilter = new com.stratio.deep.commons.filter.Filter("number", FilterType.LT, "invalid");
                 filters = new com.stratio.deep.commons.filter.Filter[] { invalidFilter };
                 ExtractorConfig inputConfigEntity = getFilterConfig(filters);
             } catch(UnsupportedOperationException e) {

@@ -19,7 +19,7 @@ import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.Filter;
-import com.stratio.deep.commons.filter.FilterOperator;
+import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.extractor.ExtractorTest;
 import org.apache.spark.rdd.RDD;
@@ -71,12 +71,12 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
         try {
 
             Filter[] filters = null;
-            Filter equalFilter = new Filter("number", FilterOperator.IS, 3L);
-            Filter ltFilter = new Filter("number", FilterOperator.LT, 4L);
-            Filter gtFilter = new Filter("number", FilterOperator.GT, 5L);
-            Filter lteFilter = new Filter("number", FilterOperator.LTE, 3L);
-            Filter gteFilter = new Filter("number", FilterOperator.GTE, 4L);
-            Filter equalFilter2 = new Filter("number", FilterOperator.IS, 4L);
+            Filter equalFilter = new Filter("number", FilterType.EQ, 3L);
+            Filter ltFilter = new Filter("number", FilterType.LT, 4L);
+            Filter gtFilter = new Filter("number", FilterType.GT, 5L);
+            Filter lteFilter = new Filter("number", FilterType.LET, 3L);
+            Filter gteFilter = new Filter("number", FilterType.GET, 4L);
+            Filter equalFilter2 = new Filter("number", FilterType.EQ, 4L);
 
             try {
                 filters = new Filter[] { equalFilter, ltFilter };
@@ -86,14 +86,14 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
             }
 
             try {
-                filters = new Filter[] { new Filter("number", FilterOperator.NE, "invalid")};
+                filters = new Filter[] { new Filter("number", FilterType.NEQ, "invalid")};
                 ExtractorConfig inputConfigEntity = getFilterConfig(filters);
             } catch(UnsupportedOperationException e) {
                 LOG.info("Expected exception thrown for a filter not supported by aerospike");
             }
 
             try {
-                Filter invalidFilter = new Filter("number", FilterOperator.LT, "invalid");
+                Filter invalidFilter = new Filter("number", FilterType.LT, "invalid");
                 filters = new Filter[] { invalidFilter };
                 ExtractorConfig inputConfigEntity = getFilterConfig(filters);
             } catch(UnsupportedOperationException e) {
