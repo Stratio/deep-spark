@@ -117,7 +117,7 @@ public class AerospikeJavaRDDTest {
                 aerospike.delete(new WritePolicy(), key);
             }
         }, new String[] {});
-        }catch(Exception e){
+        }catch(AerospikeException e){
             LOG.error("Error while deleting data", e);
         }
     }
