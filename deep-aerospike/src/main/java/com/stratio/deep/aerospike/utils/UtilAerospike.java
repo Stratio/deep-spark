@@ -21,7 +21,6 @@ import com.aerospike.hadoop.mapreduce.AerospikeRecord;
 import com.stratio.deep.aerospike.config.AerospikeDeepJobConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Utils;
@@ -32,13 +31,15 @@ import scala.Tuple2;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Several utilities to work used in the Spark <=> Aerospike integration.
  */
-public class UtilAerospike {
+final public class UtilAerospike {
 
     private static final Logger LOG = LoggerFactory.getLogger(UtilAerospike.class);
 
@@ -50,10 +51,11 @@ public class UtilAerospike {
     }
 
     /**
-     * converts from AerospikeRecord to an entity class with deep's anotations
+     * Converts from AerospikeRecord to an entity class with deep's anotations.
      *
      * @param classEntity the entity name.
      * @param aerospikeRecord  the instance of the AerospikeRecord to convert.
+     * @param aerospikeConfig Aerospike configuration object.
      * @param <T>         return type.
      * @return the provided aerospikeRecord converted to an instance of T.
      * @throws IllegalAccessException
@@ -65,10 +67,8 @@ public class UtilAerospike {
         String equalsFilterBin = equalsFilter != null ? equalsFilter._1() : null;
         Object equalsFilterValue = equalsFilter != null ? equalsFilter._2() : null;
         Map<String, Object> bins = aerospikeRecord.bins;
-        T t = null;
+        T t = classEntity.newInstance();
         if(equalsFilter == null || checkEqualityFilter(bins, equalsFilterBin, equalsFilterValue)) {
-            t = classEntity.newInstance();
-
             Field[] fields = AnnotationUtils.filterDeepFields(classEntity);
             Object insert = null;
             List<String> inputColumns = null;
@@ -100,7 +100,7 @@ public class UtilAerospike {
                         method.invoke(t, insert);
                     }
                 } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
-                    LOG.error("impossible to create a java object from Bin:" + field.getName() + " and type:" + field.getType() + " and value:" + t + "; recordReceived:" + currentBin + ", binClassReceived:" + currentBin.getClass());
+                    LOG.error("impossible to create a java object from Bin:" + field.getName() + " and type:" + field.getType() + " and value:" + t + "; recordReceived:" + currentBin);
 
                     method.invoke(t, Utils.castNumberType(insert, t));
                 }
@@ -110,7 +110,7 @@ public class UtilAerospike {
     }
 
     /**
-     * converts from an entity class with deep's anotations to AerospikeRecord.
+     * Converts from an entity class with deep's anotations to AerospikeRecord.
      *
      * @param t   an instance of an object of type T to convert to AerospikeRecord.
      * @param <T> the type of the object to convert.
@@ -132,14 +132,15 @@ public class UtilAerospike {
             }
         }
         Record record = new Record(bins, null, 0, 0);
-        AerospikeRecord result = new AerospikeRecord(record);
-        return result;
+        return new AerospikeRecord(record);
     }
 
     /**
-     * converts from AerospikeRecord to cell class with deep's anotations
+     * Converts from AerospikeRecord to cell class with deep's anotations.
      *
      * @param aerospikeRecord
+     * @param key
+     * @param aerospikeConfig
      * @return
      * @throws IllegalAccessException
      * @throws InstantiationException
@@ -187,7 +188,8 @@ public class UtilAerospike {
     }
 
     /**
-     * converts from and entity class with deep's anotations to BsonObject
+     * Converts from and entity class with deep's anotations to BsonObject.
+     * @param cells
      *
      * @return
      * @throws IllegalAccessException
@@ -199,9 +201,9 @@ public class UtilAerospike {
         for(Cell cell:cells.getCells()) {
             bins.put(cell.getCellName(), cell.getValue());
         }
-        Record record = new Record(bins, null, 0, 0);  // Expiration time = 0, defaults to namespace configuration ("default-ttl")
-        AerospikeRecord result = new AerospikeRecord(record);
-        return result;
+        // Expiration time = 0, defaults to namespace configuration ("default-ttl")ø
+        Record record = new Record(bins, null, 0, 0);
+        return new AerospikeRecord(record);
     }
 
 

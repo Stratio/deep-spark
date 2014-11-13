@@ -24,28 +24,50 @@ import java.util.List;
 
 /**
  * Defines the public methods that each Stratio Deep Aerospike configuration object should implement.
+ *
+ * @param <T>
  */
 public interface IAerospikeDeepJobConfig<T> {
 
     /**
-     * Aerospike's set name
+     * Aerospike's set name.
+     *
+     * @param set
+     * @return
      */
     IAerospikeDeepJobConfig<T> set(String set);
 
     /**
-     * Aerospike's namespace
+     * Aerospike's namespace.
+     *
+     * @param namespace
+     * @return
      */
     IAerospikeDeepJobConfig<T> namespace(String namespace);
 
+    /**
+     * Returns Aerospike's namespace.
+     * @return
+     */
     String getNamespace();
 
+    /**
+     * Returns Aerospike's set.
+     * @return
+     */
     String getSet();
 
     /**
-     * Aerospike's bin name
+     * Aerospike's bin name.
+     * @param bin
+     * @return
      */
     IAerospikeDeepJobConfig<T> bin(String bin);
 
+    /**
+     * Returns Aerospike's bin.
+     * @return
+     */
     String getBin();
 
     /**
@@ -76,24 +98,36 @@ public interface IAerospikeDeepJobConfig<T> {
      */
     IAerospikeDeepJobConfig<T> operation(String operation);
 
+    /**
+     * Returns Aerospike's configured operation.
+     * @return
+     */
     String getOperation();
 
     /**
-     * Sets an equality filter for querying Aerospike
-     * @param filter Equality filter value
+     * Sets an equality filter for querying Aerospike.
+     * @param filter Equality filter value.
      * @return
      */
     IAerospikeDeepJobConfig<T> equalsFilter(Tuple2<String, Object> filter);
 
+    /**
+     * Returns the configured Aerospike's equality filter.
+     * @return
+     */
     Tuple2<String, Object> getEqualsFilter();
 
     /**
-     * Sets a numrange filter for querying Aerospike
+     * Sets a numrange filter for querying Aerospike.
      * @param filter
      * @return
      */
     IAerospikeDeepJobConfig<T> numrangeFilter(Tuple3<String, Object, Object> filter);
 
+    /**
+     * Returns the configured Aerospike's numrange filter.
+     * @return
+     */
     Tuple3<String, Object, Object> getNumrangeFilter();
 
 }

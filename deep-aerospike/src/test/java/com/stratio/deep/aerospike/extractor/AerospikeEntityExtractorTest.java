@@ -70,8 +70,8 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
 
             MessageTestEntity messageEntity = inputRDDEntity.first();
 
-            assertNotNull(messageEntity.getId());
-            assertNull(messageEntity.getMessage());
+            assertNotNull(messageEntity.getId(), "Message id should not be null.");
+            assertNull(messageEntity.getMessage(), "Message text should be null.");
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity2 = new ExtractorConfig(MessageTestEntity.class);
             inputConfigEntity2.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
@@ -83,8 +83,8 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
 
             MessageTestEntity messageEntity2 = inputRDDEntity2.first();
 
-            assertNull(messageEntity2.getId());
-            assertNotNull(messageEntity2.getMessage());
+            assertNull(messageEntity2.getId(), "Message id should be null.");
+            assertNotNull(messageEntity2.getMessage(), "Message text should not be null.");
 
         }finally {
             context.stop();
@@ -121,14 +121,14 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
             RDD<MessageTestEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
 
             //Import dataSet was OK and we could read it
-            assertEquals(1, inputRDDEntity.count());
+            assertEquals(1, inputRDDEntity.count(), "There should be 1 read entity.");
 
             List<MessageTestEntity> messages = inputRDDEntity.toJavaRDD().collect();
 
             MessageTestEntity message = messages.get(0);
 
-            assertEquals((String)bins.get("_id"), message.getId());
-            assertEquals((String)bins.get("message"), message.getMessage());
+            assertEquals((String)bins.get("_id"), message.getId(), "Read message id should be the same as expected.");
+            assertEquals((String)bins.get("message"), message.getMessage(), "Read message text should be the same as expected.");
 
         }finally {
             context.stop();
@@ -179,7 +179,7 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
             inputConfigEntity.setExtractorImplClass(AerospikeEntityExtractor.class);
 
             RDD<MessageTestEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
-            assertEquals(1, inputRDDEntity.count());
+            assertEquals(1, inputRDDEntity.count(), "Expected read entity count is 1");
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity2 = new ExtractorConfig(MessageTestEntity.class);
             inputConfigEntity2.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
@@ -189,7 +189,7 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
             inputConfigEntity2.setExtractorImplClass(AerospikeEntityExtractor.class);
 
             RDD<MessageTestEntity> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
-            assertEquals(1, inputRDDEntity2.count());
+            assertEquals(1, inputRDDEntity2.count(), "Expected read entity count is 1");
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity3 = new ExtractorConfig(MessageTestEntity.class);
             inputConfigEntity3.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
@@ -199,7 +199,7 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
             inputConfigEntity3.setExtractorImplClass(AerospikeEntityExtractor.class);
 
             RDD<MessageTestEntity> inputRDDEntity3 = context.createRDD(inputConfigEntity3);
-            assertEquals(0, inputRDDEntity3.count());
+            assertEquals(0, inputRDDEntity3.count(), "Expected read entity count is 0");
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity4 = new ExtractorConfig(MessageTestEntity.class);
             inputConfigEntity4.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
@@ -209,7 +209,7 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
             inputConfigEntity4.setExtractorImplClass(AerospikeEntityExtractor.class);
 
             RDD<MessageTestEntity> inputRDDEntity4 = context.createRDD(inputConfigEntity4);
-            assertEquals(1, inputRDDEntity4.count());
+            assertEquals(1, inputRDDEntity4.count(), "Expected read entity count is 1");
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity5 = new ExtractorConfig(MessageTestEntity.class);
             inputConfigEntity5.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
@@ -219,7 +219,7 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
             inputConfigEntity5.setExtractorImplClass(AerospikeEntityExtractor.class);
 
             RDD<MessageTestEntity> inputRDDEntity5 = context.createRDD(inputConfigEntity5);
-            assertEquals(0, inputRDDEntity5.count());
+            assertEquals(0, inputRDDEntity5.count(), "Expected read entity count is 0");
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity6 = new ExtractorConfig(MessageTestEntity.class);
             inputConfigEntity6.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
@@ -229,7 +229,7 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
             inputConfigEntity6.setExtractorImplClass(AerospikeEntityExtractor.class);
 
             RDD<MessageTestEntity> inputRDDEntity6 = context.createRDD(inputConfigEntity5);
-            assertEquals(0, inputRDDEntity6.count());
+            assertEquals(0, inputRDDEntity6.count(), "Expected read entity count is 0");
 
             //TODO: Equality filter not working properly
 //            ExtractorConfig<MessageTestEntity> inputConfigEntity7 = new ExtractorConfig(MessageTestEntity.class);

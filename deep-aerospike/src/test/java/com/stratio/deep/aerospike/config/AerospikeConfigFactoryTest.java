@@ -33,7 +33,7 @@ public class AerospikeConfigFactoryTest {
     public void testConstructorIsPrivate()
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Constructor<AerospikeConfigFactory> constructor = AerospikeConfigFactory.class.getDeclaredConstructor();
-        assertTrue(Modifier.isPrivate(constructor.getModifiers()));
+        assertTrue(Modifier.isPrivate(constructor.getModifiers()), "AerospikeConfigFactory constructor must be private.");
         constructor.setAccessible(true);
         constructor.newInstance();
     }

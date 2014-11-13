@@ -19,9 +19,10 @@ import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
 import org.apache.log4j.Logger;
 
+/**
+ * Class with factory method for instatiating AerospikeDeepJobConfig objects.
+ */
 public class AerospikeConfigFactory {
-
-    private static final Logger LOG = Logger.getLogger(AerospikeConfigFactory.class);
 
     private AerospikeConfigFactory() {
         throw new UnsupportedOperationException();

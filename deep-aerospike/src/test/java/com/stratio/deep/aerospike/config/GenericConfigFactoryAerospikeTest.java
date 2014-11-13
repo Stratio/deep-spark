@@ -55,7 +55,7 @@ public class GenericConfigFactoryAerospikeTest {
 
         try {
             djc.initialize();
-            fail();
+            fail("Configuration without namespace must fail.");
         } catch (IllegalArgumentException iae) {
             // OK
             log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
@@ -73,7 +73,7 @@ public class GenericConfigFactoryAerospikeTest {
 
         try {
             djc.initialize();
-            fail();
+            fail("Configuration without set must fail.");
         } catch (IllegalArgumentException iae) {
             // OK
             log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
@@ -91,7 +91,7 @@ public class GenericConfigFactoryAerospikeTest {
 
         try {
             djc.initialize();
-            fail();
+            fail("Configuration without host must fail.");
         } catch (IllegalArgumentException iae) {
             // OK
             log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
@@ -102,11 +102,11 @@ public class GenericConfigFactoryAerospikeTest {
 
         djc.initialize();
 
-        assertEquals(djc.getHost(), HOST_TEST);
+        assertEquals(djc.getHost(), HOST_TEST, "Host should be the same as expected.");
 
-        assertEquals(djc.getHostList().get(0), HOST_TEST);
-        assertEquals(djc.getHostList().get(1), HOST_TEST_2);
-        assertEquals(djc.getHostList().get(2), HOST_TEST_3);
+        assertEquals(djc.getHostList().get(0), HOST_TEST, "First host should be the same as expected.");
+        assertEquals(djc.getHostList().get(1), HOST_TEST_2, "Second host should be the same as expected.");
+        assertEquals(djc.getHostList().get(2), HOST_TEST_3, "Third host should be the same as expected.");
 
         List<String> hostList = new ArrayList<>();
         hostList.add(HOST_TEST);
@@ -122,9 +122,9 @@ public class GenericConfigFactoryAerospikeTest {
 
         djc2.namespace(NAMESPACE_TEST).set(SET_TEST).host(hostList).port(portList).initialize();
 
-        assertEquals(djc2.getHostList().get(0), HOST_TEST);
-        assertEquals(djc2.getHostList().get(1), HOST_TEST_2);
-        assertEquals(djc2.getHostList().get(2), HOST_TEST_3);
+        assertEquals(djc2.getHostList().get(0), HOST_TEST, "First host should be the same as expected.");
+        assertEquals(djc2.getHostList().get(1), HOST_TEST_2, "Second host should be the same as expected.");
+        assertEquals(djc2.getHostList().get(2), HOST_TEST_3, "Third host should be the same as expected.");
 
     }
 
@@ -136,7 +136,7 @@ public class GenericConfigFactoryAerospikeTest {
 
         try {
             djc.initialize();
-            fail();
+            fail("Configuration without port must fail.");
         } catch (IllegalArgumentException iae) {
             // OK
             log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
@@ -157,7 +157,7 @@ public class GenericConfigFactoryAerospikeTest {
 
         try {
             djc.initialize();
-            fail();
+            fail("Configuration without right port cardinality must fail.");
         } catch (IllegalArgumentException iae) {
             // OK
             log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
@@ -178,7 +178,7 @@ public class GenericConfigFactoryAerospikeTest {
 
         djc.initialize();
 
-        assertEquals(djc.getEntityClass(), MessageTestEntity.class);
+        assertEquals(djc.getEntityClass(), MessageTestEntity.class, "Configured entity should be the same as expected.");
 
         AerospikeDeepJobConfig<Cells> djcCell = AerospikeConfigFactory.createAerospike();
 
@@ -186,6 +186,6 @@ public class GenericConfigFactoryAerospikeTest {
 
         djcCell.initialize();
 
-        assertEquals(djcCell.getEntityClass(), Cells.class);
+        assertEquals(djcCell.getEntityClass(), Cells.class, "Configured cell should be the same as expected.");
     }
 }

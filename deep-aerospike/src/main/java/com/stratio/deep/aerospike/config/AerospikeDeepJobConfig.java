@@ -15,7 +15,6 @@
  */
 package com.stratio.deep.aerospike.config;
 
-import com.aerospike.client.query.Statement;
 import com.aerospike.hadoop.mapreduce.AerospikeConfigUtil;
 import com.stratio.deep.aerospike.extractor.AerospikeCellExtractor;
 import com.stratio.deep.aerospike.extractor.AerospikeEntityExtractor;
@@ -30,56 +29,65 @@ import scala.Tuple2;
 import scala.Tuple3;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.*;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.SPLIT_SIZE;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_CHUNKS;
 
+/**
+ * Configuration class for Aerospike-Spark integration
+ * @param <T>
+ */
 public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAerospikeDeepJobConfig<T>, Serializable{
 
     private static final long serialVersionUID = 2778930913494063818L;
 
     /**
-     * configuration to be broadcasted to every spark node
+     * Configuration to be broadcasted to every spark node.
      */
     private transient Configuration configHadoop;
 
     /**
-     * A list of aerospike hosts to connect
+     * A list of aerospike hosts to connect.
      */
     private List<String> hostList = new ArrayList<>();
 
     /**
-     * A list of aerospike ports to connect
+     * A list of aerospike ports to connect.
      */
     private List<Integer> portList = new ArrayList<>();
 
     /**
-     * Aerospike's set name
+     * Aerospike's set name.
      */
     private String set;
 
     /**
-     * Aerospike's bin name
+     * Aerospike's bin name.
      */
     private String bin;
 
     /**
-     * Aerospike's operation
+     * Aerospike's operation (defaults to scan).
      */
-    private String operation = AerospikeConfigUtil.DEFAULT_INPUT_OPERATION; //scan
+    private String operation = AerospikeConfigUtil.DEFAULT_INPUT_OPERATION;
 
     /**
-     * Aerospike's equality filter value
+     * Aerospike's equality filter value.
      */
     private Tuple2<String, Object> equalsFilter;
 
     /**
-     * Aerospike's numrange filter value
+     * Aerospike's numrange filter value.
      */
     private Tuple3<String, Object, Object> numrangeFilter;
 
+    /**
+     * Constructor for Entity class-based configuration.
+     * @param entityClass
+     */
     public AerospikeDeepJobConfig(Class<T> entityClass) {
         super(entityClass);
         if(Cells.class.isAssignableFrom(entityClass)){
@@ -110,12 +118,20 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         return this;
     }
 
-
+    /**
+     * Set Aerospike connection port.
+     * @param port
+     * @return
+     */
     public AerospikeDeepJobConfig<T> port(int port) {
         this.portList.add(port);
         return this;
     }
 
+    /**
+     * Gets first Aerospike node connection port.
+     * @return
+     */
     public Integer getAerospikePort() {
         return !portList.isEmpty() ? portList.get(0) : null;
     }
@@ -147,11 +163,21 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         return this;
     }
 
+    /**
+     * Set Aerospike nodes' hosts.
+     * @param hosts
+     * @return
+     */
     public AerospikeDeepJobConfig<T> host(String[] hosts) {
         this.hostList.addAll(Arrays.asList(hosts));
         return this;
     }
 
+    /**
+     * Set Aerospike nodes' ports.
+     * @param ports
+     * @return
+     */
     public AerospikeDeepJobConfig<T> port(Integer[] ports) {
         this.portList.addAll(Arrays.asList(ports));
         return this;
@@ -227,6 +253,10 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         return this;
     }
 
+    /**
+     * Returns a tuple containing the configured equality filter field and its value.
+     * @return
+     */
     public Tuple2<String, Object> getEqualsFilter() {
         return this.equalsFilter;
     }
@@ -237,6 +267,10 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         return this;
     }
 
+    /**
+     * Returns a tuple containing the configured numeric range filter fields and its values.
+     * @return
+     */
     public Tuple3<String, Object, Object> getNumrangeFilter() {
         return this.numrangeFilter;
     }
@@ -283,7 +317,7 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
     }
 
     /**
-     * validates connection parameters
+     * Validates connection parameters.
      */
     private void validate() {
         if (hostList.isEmpty()) {
@@ -349,6 +383,11 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         return this;
     }
 
+    /**
+     * Configure Aerospike filters with the received Deep Filter objects.
+     * @param filters
+     * @return
+     */
     public AerospikeDeepJobConfig<T> filterQuery (Filter[] filters){
         if(filters.length > 1) {
             throw new UnsupportedOperationException("Aerospike currently accepts only one filter operations");

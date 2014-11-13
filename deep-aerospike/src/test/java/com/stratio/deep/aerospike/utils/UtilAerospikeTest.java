@@ -18,6 +18,7 @@ package com.stratio.deep.aerospike.utils;
 import com.aerospike.hadoop.mapreduce.AerospikeRecord;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.CantoEntity;
+import com.stratio.deep.core.entity.MessageTestEntity;
 import com.stratio.deep.core.entity.MetadataEntity;
 import org.testng.annotations.Test;
 
@@ -25,35 +26,25 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import static org.testng.Assert.assertEquals;
 
 @Test
 public class UtilAerospikeTest {
 
-    public static final String KEY_EXAMPLE = "key";
-
-    public static final String AUTHOR = "DANTE ALIGHIERI";
-    public static final String TITLE = "THE DIVINE COMEDY";
-    public static final String SOURCE = "http://www.gutenberg.org/ebooks/8800";
-    public static final Integer PAGES = 649;
-
-
     @Test
     public void testGetRecordFromObject() throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException {
 
+        MessageTestEntity messageEntity = new MessageTestEntity();
+        messageEntity.setId("3");
+        messageEntity.setMessage("Test message");
 
-        MetadataEntity metadataEntity = new MetadataEntity();
-        metadataEntity.setAuthor(AUTHOR);
-        metadataEntity.setTitle(TITLE);
-        metadataEntity.setSource(SOURCE);
+        AerospikeRecord record = UtilAerospike.getRecordFromObject(messageEntity);
+        Map<String, Object> bins = record.bins;
 
-        BookEntity bookEntity = new BookEntity();
-        bookEntity.setId(KEY_EXAMPLE);
-
-        bookEntity.setMetadataEntity(metadataEntity);
-
-        AerospikeRecord record = UtilAerospike.getRecordFromObject(bookEntity);
-
-        // TODO -> Entity extractor logic not yet implemented.
+        assertEquals(bins.get("id"), messageEntity.getId());
+        assertEquals(bins.get("message"), messageEntity.getMessage());
 
     }
 }

@@ -30,13 +30,9 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
 
 import static org.testng.Assert.assertEquals;
 
@@ -59,9 +55,6 @@ public class AerospikeJavaRDDTest {
 
     public static final String DATA_SET_NAME = "divineComedy.json";
 
-    public static final Long WORD_COUNT_SPECTED = 3833L;
-
-
     @BeforeSuite
     public static void init() throws IOException, ParseException {
         aerospike = new AerospikeClient(HOST, PORT);
@@ -71,11 +64,11 @@ public class AerospikeJavaRDDTest {
 
     @Test
     public void testRDD() {
-        assertEquals(true, true);
+        assertEquals(true, true, "Dummy test");
     }
 
     /**
-     * Imports dataset
+     * Imports dataset.
      *
      * @throws java.io.IOException
      */
