@@ -39,7 +39,7 @@ import java.util.Map;
 /**
  * Several utilities to work used in the Spark <=> Aerospike integration.
  */
-final public class UtilAerospike {
+final class UtilAerospike {
 
     private static final Logger LOG = LoggerFactory.getLogger(UtilAerospike.class);
 

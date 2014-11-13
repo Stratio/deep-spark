@@ -30,13 +30,19 @@ import java.lang.reflect.InvocationTargetException;
 
 
 /**
- * Entity RDD to interact with Aerospike
+ * Entity RDD to interact with Aerospike.
+ *
+ * @param <T>
  */
 public class AerospikeEntityExtractor<T> extends AerospikeExtractor<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AerospikeEntityExtractor.class);
     private static final long serialVersionUID = -1054559645533517774L;
 
+    /**
+     * Public constructor for AerospikeEntityExtractor.
+     * @param t
+     */
     public AerospikeEntityExtractor(Class<T> t) {
         super();
         this.deepJobConfig = new AerospikeDeepJobConfig<>(t);
@@ -51,7 +57,7 @@ public class AerospikeEntityExtractor<T> extends AerospikeExtractor<T> {
             return new Tuple2<>(null, UtilAerospike.getRecordFromObject(record));
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             LOG.error(e.getMessage());
-            throw new DeepTransformException(e.getMessage());
+            throw new DeepTransformException(e.getMessage(), e);
         }
     }
 
@@ -64,7 +70,7 @@ public class AerospikeEntityExtractor<T> extends AerospikeExtractor<T> {
             return (T) UtilAerospike.getObjectFromRecord(config.getEntityClass(), tuple._2(), (AerospikeDeepJobConfig)this.deepJobConfig);
         } catch (Exception e) {
             LOG.error("Cannot convert AerospikeRecord: ", e);
-            throw new DeepTransformException("Could not transform from AerospikeRecord to Entity " + e.getMessage());
+            throw new DeepTransformException("Could not transform from AerospikeRecord to Entity " + e.getMessage(), e);
         }
     }
 }
