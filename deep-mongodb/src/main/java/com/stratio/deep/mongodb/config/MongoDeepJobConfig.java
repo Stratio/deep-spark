@@ -657,7 +657,8 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
                     bsonObject.put(filter.getField(), filter.getValue());
                 } else {
                     bsonObject.put(filter.getField(),
-                            new BasicDBObject("$".concat(filter.getFilterType().getFilterTypeId()), filter.getValue()));
+                            new BasicDBObject("$".concat(filter.getFilterType().getFilterTypeId().toLowerCase()),
+                                    filter.getValue()));
                 }
 
                 list.add(bsonObject);

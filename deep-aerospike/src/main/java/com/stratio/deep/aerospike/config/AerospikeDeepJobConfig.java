@@ -372,8 +372,8 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         return filter.getFilterType().equals(FilterType.EQ) ||
                 filter.getFilterType().equals(FilterType.LT) ||
                 filter.getFilterType().equals(FilterType.GT) ||
-                filter.getFilterType().equals(FilterType.GET) ||
-                filter.getFilterType().equals(FilterType.LET);
+                filter.getFilterType().equals(FilterType.GTE) ||
+                filter.getFilterType().equals(FilterType.LTE);
     }
 
     private void setAerospikeNumrange(Filter filter) {
@@ -384,13 +384,13 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         if(filter.getFilterType().equals(FilterType.LT)) {
             numrangeFilter(new Tuple3<String, Object, Object>(field, Long.MIN_VALUE, (Long)filter.getValue() -1));
         }
-        if(filter.getFilterType().equals(FilterType.LET)) {
+        if(filter.getFilterType().equals(FilterType.LTE)) {
             numrangeFilter(new Tuple3<String, Object, Object>(field, Long.MIN_VALUE, (Long)filter.getValue()));
         }
         if(filter.getFilterType().equals(FilterType.GT)) {
             numrangeFilter(new Tuple3<String, Object, Object>(field, (Long)filter.getValue() + 1, Long.MAX_VALUE));
         }
-        if(filter.getFilterType().equals(FilterType.GET)) {
+        if(filter.getFilterType().equals(FilterType.GTE)) {
             numrangeFilter(new Tuple3<String, Object, Object>(field, (Long)filter.getValue(), Long.MAX_VALUE));
         }
     }

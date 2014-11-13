@@ -153,11 +153,11 @@ public final class UtilMongoDB {
      * @throws IllegalAccessException the instantiation exception
      * @throws IllegalAccessException the invocation target exception
      */
-    public static <T> BSONObject getBsonFromObject(T t)
+    public static <T> DBObject getBsonFromObject(T t)
             throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Field[] fields = AnnotationUtils.filterDeepFields(t.getClass());
 
-        BSONObject bson = new BasicBSONObject();
+        DBObject bson = new BasicDBObject();
 
         for (Field field : fields) {
             Method method = Utils.findGetter(field.getName(), t.getClass());
@@ -166,7 +166,7 @@ public final class UtilMongoDB {
                 if (Collection.class.isAssignableFrom(field.getType())) {
                     Collection c = (Collection) object;
                     Iterator iterator = c.iterator();
-                    List<BSONObject> innerBsonList = new ArrayList<>();
+                    List<DBObject> innerBsonList = new ArrayList<>();
 
                     while (iterator.hasNext()) {
                         innerBsonList.add(getBsonFromObject((IDeepType) iterator.next()));

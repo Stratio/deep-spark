@@ -74,8 +74,8 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
             Filter equalFilter = new Filter("number", FilterType.EQ, 3L);
             Filter ltFilter = new Filter("number", FilterType.LT, 4L);
             Filter gtFilter = new Filter("number", FilterType.GT, 5L);
-            Filter lteFilter = new Filter("number", FilterType.LET, 3L);
-            Filter gteFilter = new Filter("number", FilterType.GET, 4L);
+            Filter lteFilter = new Filter("number", FilterType.LTE, 3L);
+            Filter gteFilter = new Filter("number", FilterType.GTE, 4L);
             Filter equalFilter2 = new Filter("number", FilterType.EQ, 4L);
 
             try {

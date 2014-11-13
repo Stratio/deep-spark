@@ -48,7 +48,7 @@ public class Filter implements Serializable {
     }
 
     public Filter greaterThanEquals(Serializable value) {
-        this.filterType = FilterType.GET;
+        this.filterType = FilterType.GTE;
         this.value = value;
         return this;
 
@@ -61,7 +61,7 @@ public class Filter implements Serializable {
     }
 
     public Filter lessThanEquals(Serializable value) {
-        this.filterType = FilterType.LET;
+        this.filterType = FilterType.LTE;
         this.value = value;
         return this;
     }

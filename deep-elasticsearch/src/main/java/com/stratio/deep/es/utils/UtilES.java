@@ -418,13 +418,13 @@ public final class UtilES {
             case LT:
                 rangeQueryBuilder.lt(filter.getValue());
                 break;
-            case LET:
+            case LTE:
                 rangeQueryBuilder.lte(filter.getValue());
                 break;
             case GT:
                 rangeQueryBuilder.gt(filter.getValue());
                 break;
-            case GET:
+            case GTE:
                 rangeQueryBuilder.gte(filter.getValue());
                 break;
             default:

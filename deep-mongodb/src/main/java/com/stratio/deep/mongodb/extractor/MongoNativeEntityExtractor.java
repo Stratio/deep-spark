@@ -58,7 +58,7 @@ public final class MongoNativeEntityExtractor<T> extends MongoNativeExtractor<T,
     @Override
     protected DBObject transformElement(T entity) {
         try {
-            return (DBObject) UtilMongoDB.getBsonFromObject(entity);
+            return UtilMongoDB.getBsonFromObject(entity);
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
         }

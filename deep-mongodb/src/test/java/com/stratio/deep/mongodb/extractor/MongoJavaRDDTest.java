@@ -121,7 +121,7 @@ public class MongoJavaRDDTest {
         DB db = mongo.getDB(DATABASE);
         col = db.getCollection(COLLECTION_INPUT);
         Map<String, String> map = new HashMap<>();
-        map.put("_id", "messageTest");
+        map.put("id", "messageTest");
         map.put("message", MESSAGE_TEST);
         col.save(new BasicDBObject(map));
 

@@ -262,12 +262,12 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
     }
 
-    public <W> ExtractorConfig<W> getWriteExtractorConfig(String output) {
+    public <W> ExtractorConfig<W> getWriteExtractorConfig(String tableOutput) {
         ExtractorConfig<W> extractorConfig = getExtractorConfig(outputEntity);
         extractorConfig.putValue(ExtractorConstants.HOST, host)
-                .putValue(ExtractorConstants.DATABASE, database)
+                .putValue(ExtractorConstants.DATABASE, extractor.getSimpleName().toLowerCase())
                 .putValue(ExtractorConstants.PORT, port)
-                .putValue(ExtractorConstants.COLLECTION, output)
+                .putValue(ExtractorConstants.COLLECTION, tableOutput)
                 .putValue(ExtractorConstants.CREATE_ON_WRITE, true);
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;

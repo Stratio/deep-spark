@@ -50,7 +50,7 @@ import scala.Tuple2;
  * Created by rcrespo on 11/11/14.
  */
 
-@Test(suiteName = "mongoRddTests", groups = { "MongoNativeCellExtractorTest" }, dependsOnGroups = "MongoNativeEntityExtractorTest")
+@Test(suiteName = "mongoRddTests", groups = { "MongoNativeCellExtractorTest" }, dependsOnGroups = "MongoCellExtractorTest")
 public class MongoNativeCellExtractorTest extends ExtractorTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoNativeCellExtractorTest.class);

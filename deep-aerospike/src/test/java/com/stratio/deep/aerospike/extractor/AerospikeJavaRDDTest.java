@@ -109,6 +109,9 @@ public class AerospikeJavaRDDTest {
      * Delete previously loaded data for starting with a fresh dataset.
      */
     private static void deleteData() {
+        try{
+
+
         aerospike.scanAll(new ScanPolicy(), NAMESPACE_TEST, SET_NAME, new ScanCallback() {
             @Override
             public void scanCallback(Key key, Record record) throws AerospikeException {
@@ -121,6 +124,9 @@ public class AerospikeJavaRDDTest {
                 aerospike.delete(new WritePolicy(), key);
             }
         }, new String[] {});
+        }catch(Exception e){
+            LOG.error("Error while deleting data", e);
+        }
     }
 
     @AfterSuite
