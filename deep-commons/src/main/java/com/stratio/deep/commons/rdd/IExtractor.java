@@ -2,10 +2,10 @@ package com.stratio.deep.commons.rdd;
 
 import java.io.Serializable;
 
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.functions.QueryBuilder;
 
 /**
  * Created by rcrespo on 4/08/14.
@@ -24,5 +24,5 @@ public interface IExtractor<T, S extends BaseConfig<T>> extends Serializable {
 
     void saveRDD(T t);
 
-    void initSave(S config, T first, QueryBuilder queryBuilder);
+    void initSave(S config, T first, UpdateQueryBuilder queryBuilder);
 }

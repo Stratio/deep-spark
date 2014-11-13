@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.db.marshal.LongType;
@@ -52,7 +53,6 @@ import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.exception.DeepInstantiationException;
-import com.stratio.deep.commons.functions.QueryBuilder;
 import com.stratio.deep.commons.handler.DeepRecordWriter;
 import com.stratio.deep.commons.utils.Pair;
 
@@ -74,7 +74,7 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
     protected final IPartitioner partitioner;
     protected final InetAddress localhost;
 
-    private final QueryBuilder queryBuilder;
+    private final UpdateQueryBuilder queryBuilder;
 
     /**
      * Con
@@ -96,7 +96,7 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
         init();
     }
 
-    public DeepCqlRecordWriter(ICassandraDeepJobConfig writeConfig, QueryBuilder queryBuilder) {
+    public DeepCqlRecordWriter(ICassandraDeepJobConfig writeConfig, UpdateQueryBuilder queryBuilder) {
         this.clients = new HashMap<>();
         this.removedClients = new HashMap<>();
         this.writeConfig = writeConfig;
@@ -248,6 +248,7 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
         // String localCql = updateQueryGenerator(keys, values, writeConfig.getKeyspace(),
         // quote(writeConfig.getColumnFamily()));
 
+
         String localCql = queryBuilder.prepareQuery(keys, values);
 
         Token range = partitioner.getToken(getPartitionKey(keys));
@@ -269,6 +270,8 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
         }
 
     }
+
+
 
     /**
      * A client that runs in a threadpool and connects to the list of endpoints for a particular range. Bound variables

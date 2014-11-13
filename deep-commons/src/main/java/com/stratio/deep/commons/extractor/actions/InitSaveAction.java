@@ -20,7 +20,8 @@
 package com.stratio.deep.commons.extractor.actions;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.functions.QueryBuilder;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
+
 
 /**
  * Created by rcrespo on 27/08/14.
@@ -33,13 +34,13 @@ public class InitSaveAction<T> extends Action {
 
     private T first;
 
-    private QueryBuilder queryBuilder;
+    private UpdateQueryBuilder queryBuilder;
 
     public InitSaveAction() {
         super();
     }
 
-    public InitSaveAction(ExtractorConfig<T> config, T first, QueryBuilder queryBuilder) {
+    public InitSaveAction(ExtractorConfig<T> config, T first, UpdateQueryBuilder queryBuilder) {
         super(ActionType.INIT_SAVE);
         this.config = config;
         this.first = first;
@@ -54,7 +55,7 @@ public class InitSaveAction<T> extends Action {
         return first;
     }
 
-    public QueryBuilder getQueryBuilder() {
+    public UpdateQueryBuilder getQueryBuilder() {
         return queryBuilder;
     }
 

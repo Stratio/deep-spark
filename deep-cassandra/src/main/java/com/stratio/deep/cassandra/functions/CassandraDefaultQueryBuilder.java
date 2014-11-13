@@ -6,45 +6,41 @@ package com.stratio.deep.cassandra.functions;
 import static com.stratio.deep.commons.utils.Utils.quote;
 
 import java.util.List;
+import java.util.Set;
 
 import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.functions.QueryBuilder;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 
 /**
  *
  */
-public class CassandraDefaultQueryBuilder extends QueryBuilder {
+public class CassandraDefaultQueryBuilder extends UpdateQueryBuilder {
 
-    private final String keyspace;
 
-    private final String columnFamily;
-
-    private final String namespace;
+    protected final String namespace;
 
     public CassandraDefaultQueryBuilder(String keyspace, String columnFamily) {
-
-        this.keyspace = keyspace;
-        this.columnFamily = columnFamily;
+        super(keyspace,columnFamily, null, null);
         this.namespace = keyspace + "." + columnFamily;
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see com.stratio.deep.commons.functions.QueryBuilder#prepareQuery()
+     * @see com.stratio.deep.commons.querybuilder.QueryBuilder#prepareQuery()
      */
     @Override
     public String prepareQuery(Cells keys, Cells values) {
 
-        StringBuilder sb = new StringBuilder("UPDATE ").append(keyspace).append(".").append(columnFamily)
+        StringBuilder sb = new StringBuilder("UPDATE ").append(catalogName).append(".").append(tableName)
                 .append(" SET ");
 
         int k = 0;
 
         StringBuilder keyClause = new StringBuilder(" WHERE ");
-        for (Cell cell : keys.getCells(namespace)) {
+        for (Cell cell : keys.getCells()) {
             if (((CassandraCell) cell).isPartitionKey() || ((CassandraCell) cell).isClusterKey()) {
                 if (k > 0) {
                     keyClause.append(" AND ");
@@ -58,7 +54,7 @@ public class CassandraDefaultQueryBuilder extends QueryBuilder {
         }
 
         k = 0;
-        for (Cell cell : values.getCells(namespace)) {
+        for (Cell cell : values.getCells()) {
             if (k > 0) {
                 sb.append(", ");
             }
@@ -75,7 +71,7 @@ public class CassandraDefaultQueryBuilder extends QueryBuilder {
     /*
      * (non-Javadoc)
      * 
-     * @see com.stratio.deep.commons.functions.QueryBuilder#prepareBatchQuery()
+     * @see com.stratio.deep.commons.querybuilder.QueryBuilder#prepareBatchQuery()
      */
     @Override
     public String prepareBatchQuery(List<String> statements) {

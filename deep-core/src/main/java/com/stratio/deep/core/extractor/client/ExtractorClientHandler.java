@@ -35,7 +35,7 @@ import com.stratio.deep.commons.extractor.response.GetPartitionsResponse;
 import com.stratio.deep.commons.extractor.response.HasNextResponse;
 import com.stratio.deep.commons.extractor.response.NextResponse;
 import com.stratio.deep.commons.extractor.response.Response;
-import com.stratio.deep.commons.functions.QueryBuilder;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.commons.rdd.IExtractor;
 
 public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Response> implements
@@ -228,7 +228,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
     }
 
     @Override
-    public void initSave(ExtractorConfig<T> config, T first, QueryBuilder queryBuilder) {
+    public void initSave(ExtractorConfig<T> config, T first, UpdateQueryBuilder queryBuilder) {
         InitSaveAction<T> initSaveAction = new InitSaveAction<>(config, first, queryBuilder);
 
         channel.writeAndFlush(initSaveAction);

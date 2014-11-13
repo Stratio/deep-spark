@@ -8,42 +8,39 @@ import static com.stratio.deep.commons.utils.Utils.quote;
 import java.util.List;
 import java.util.Set;
 
-import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.functions.QueryBuilder;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 
 /**
  *
  */
-public class IncreaseCountersQueryBuilder extends QueryBuilder {
+public class IncreaseCountersQueryBuilder extends UpdateQueryBuilder {
 
-    public IncreaseCountersQueryBuilder(){
 
+    protected final String namespace;
+
+    public IncreaseCountersQueryBuilder(String keyspace, String columnFamily) {
+        super(keyspace,columnFamily, null, null);
+        this.namespace = keyspace + "." + columnFamily;
     }
-
-
 
     /*
      * (non-Javadoc)
-     * 
-     * @see com.stratio.deep.commons.functions.SaveFunction#call()
+     *
+     * @see com.stratio.deep.commons.querybuilder.QueryBuilder#prepareQuery()
      */
     @Override
     public String prepareQuery(Cells keys, Cells values) {
+
         //TODO validate values > 0
-
-        final String namespace = keyspace + "." + columnFamily;
-
-        final String originNamespace = keys.getnameSpace();
 
         StringBuilder sb = new StringBuilder("UPDATE ").append(namespace)
                 .append(" SET ");
 
 
-
         int k = 0;
-        for (Cell cell : values.getCells(originNamespace)) {
+        for (Cell cell : values.getCells()) {
             if (k > 0) {
                 sb.append(", ");
             }
@@ -56,7 +53,7 @@ public class IncreaseCountersQueryBuilder extends QueryBuilder {
         k = 0;
 
         StringBuilder keyClause = new StringBuilder(" WHERE ");
-        for (Cell cell : keys.getCells(originNamespace)) {
+        for (Cell cell : keys.getCells()) {
                 if (k > 0) {
                     keyClause.append(" AND ");
                 }
@@ -74,7 +71,7 @@ public class IncreaseCountersQueryBuilder extends QueryBuilder {
     /*
      * (non-Javadoc)
      * 
-     * @see com.stratio.deep.commons.functions.QueryBuilder#prepareBatchQuery(java.util.List)
+     * @see com.stratio.deep.commons.querybuilder.QueryBuilder#prepareBatchQuery(java.util.List)
      */
     @Override
     public String prepareBatchQuery(List<String> statements) {

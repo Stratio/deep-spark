@@ -42,7 +42,7 @@ import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.HadoopConfig;
 import com.stratio.deep.commons.exception.DeepGenericException;
-import com.stratio.deep.commons.functions.QueryBuilder;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.commons.utils.DeepSparkHadoopMapReduceUtil;
 
@@ -184,7 +184,7 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, K
     }
 
     @Override
-    public void initSave(S config, T first, QueryBuilder queryBuilder) {
+    public void initSave(S config, T first, UpdateQueryBuilder queryBuilder) {
         int id = config.getRddId();
 
         int partitionIndex = config.getPartitionId();

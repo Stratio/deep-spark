@@ -21,13 +21,13 @@ import static com.stratio.deep.core.util.ExtractorClientUtil.getExtractorClient;
 
 import java.io.Serializable;
 
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import scala.collection.Iterator;
 import scala.runtime.AbstractFunction1;
 import scala.runtime.BoxedUnit;
 
 import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
-import com.stratio.deep.commons.functions.QueryBuilder;
 import com.stratio.deep.commons.rdd.IExtractor;
 
 /**
@@ -42,9 +42,9 @@ public class PrepareSaveFunction<T, S extends BaseConfig<T>> extends AbstractFun
 
     private final T first;
 
-    private final QueryBuilder queryBuilder;
+    private final UpdateQueryBuilder queryBuilder;
 
-    public PrepareSaveFunction(QueryBuilder queryBuilder, S config, T first) {
+    public PrepareSaveFunction(UpdateQueryBuilder queryBuilder, S config, T first) {
         this.first = first;
         this.config = config;
         this.queryBuilder = queryBuilder;

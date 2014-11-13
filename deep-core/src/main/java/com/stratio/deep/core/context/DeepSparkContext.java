@@ -28,7 +28,7 @@ import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepIOException;
-import com.stratio.deep.commons.functions.QueryBuilder;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.core.function.PrepareSaveFunction;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
@@ -160,7 +160,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
     }
 
-    public static <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, QueryBuilder queryBuilder, S config) {
+    public static <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, UpdateQueryBuilder queryBuilder, S config) {
 
         config.setRddId(rdd.id());
         config.setPartitionId(0);

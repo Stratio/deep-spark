@@ -20,6 +20,8 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import org.apache.spark.Partition;
 
 import scala.Tuple2;
@@ -36,7 +38,6 @@ import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
-import com.stratio.deep.commons.functions.QueryBuilder;
 import com.stratio.deep.commons.impl.DeepPartition;
 import com.stratio.deep.commons.rdd.DeepTokenRange;
 import com.stratio.deep.commons.rdd.IDeepRecordReader;
@@ -57,6 +58,8 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     protected CassandraDeepJobConfig<T> cassandraJobConfig;
 
     protected transient AbstractSerializableFunction transformer;
+
+    protected transient UpdateQueryBuilder queryBuilder;
 
     @Override
     public boolean hasNext() {
@@ -170,7 +173,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     }
 
     @Override
-    public void initSave(S config, T first, QueryBuilder queryBuilder) {
+    public void initSave(S config, T first, UpdateQueryBuilder queryBuilder) {
 
         if (config instanceof ExtractorConfig) {
             cassandraJobConfig = (CassandraDeepJobConfig<T>) ((DeepJobConfig) cassandraJobConfig)
@@ -178,6 +181,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
         } else if (config instanceof CassandraDeepJobConfig) {
             cassandraJobConfig = (CassandraDeepJobConfig) config;
         }
+
         cassandraJobConfig
                 .createOutputTableIfNeeded((Tuple2<Cells, Cells>) transformer.apply(first));
 
@@ -185,8 +189,6 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
             writer = new DeepCqlRecordWriter(cassandraJobConfig);
         } else {
             writer = new DeepCqlRecordWriter(cassandraJobConfig, queryBuilder);
-            queryBuilder.setColumnFamily(cassandraJobConfig.getColumnFamily());
-            queryBuilder.setKeyspace(cassandraJobConfig.getKeyspace());
         }
 
     }
@@ -194,9 +196,24 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     @Override
     public void saveRDD(T t) {
 
-        Tuple2<Cells, Cells> tuple = (Tuple2<Cells, Cells>) transformer.apply(t);
+     /*  Cells cells = (Cells) t;
+        String namespace = queryBuilder.getCatalogName()+"."+queryBuilder.getTableName();
+        Cells keys = new Cells();
+        Cells values = new Cells(namespace);
+        //TODO do it with cellByName => originNamespace
+        for(Cell cell: cells.getCells()){
+            final String cellName = cell.getCellName();
+            if(queryBuilder.getPrimaryKeys().contains(cellName)) keys.add(cell);
+            if(queryBuilder.getTargetFields().contains(cellName)) values.add(cell);
+        }
+        TODO that would be used in mongodb, aerospike, elasticsearch. All values are supposed to be written
 
+        */
+
+        //TODO apply a custom transformer in entities
+       Tuple2<Cells, Cells> tuple = (Tuple2<Cells, Cells>) transformer.apply(t);
         writer.write(tuple._1(), tuple._2());
+
     }
 
 }
