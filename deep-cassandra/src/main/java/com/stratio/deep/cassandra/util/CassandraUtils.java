@@ -31,6 +31,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.apache.cassandra.db.marshal.AbstractType;
+import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.db.marshal.TimeUUIDType;
 import org.apache.cassandra.db.marshal.UUIDType;
 import org.apache.commons.collections.MapUtils;
@@ -52,6 +53,7 @@ import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.OperatorCassandra;
 import com.stratio.deep.cassandra.cql.DeepCqlRecordWriter;
 import com.stratio.deep.cassandra.entity.CassandraCell;
+import com.stratio.deep.cassandra.entity.CellValidator;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
@@ -551,6 +553,40 @@ public class CassandraUtils {
         // C* Query builder doubles the ' character.
         result[1] = result[1].replaceAll("^'", "").replaceAll("'$", "");
         return result;
+    }
+
+    /**
+     * Returns the partition key related to a given {@link Cells}.
+     * 
+     * @param cells
+     *            {@link Cells} from Cassandra to extract the partition key.
+     * @param keyValidator
+     *            Cassandra key type.
+     * @param numberOfKeys
+     *            Number of keys.
+     * 
+     * @return Partition key.
+     */
+    public static ByteBuffer getPartitionKey(Cells cells, AbstractType<?> keyValidator, int numberOfKeys) {
+        ByteBuffer partitionKey;
+        if (keyValidator instanceof CompositeType) {
+            ByteBuffer[] keys = new ByteBuffer[numberOfKeys];
+
+            for (int i = 0; i < cells.size(); i++) {
+                CassandraCell c = (CassandraCell) cells.getCellByIdx(i);
+
+                if (c.isPartitionKey()) {
+                    keys[i] = c.getDecomposedCellValue();
+                }
+            }
+
+            partitionKey = CompositeType.build(keys);
+        } else {
+            CassandraCell cell = ((CassandraCell) cells.getCellByIdx(0));
+            cell.setCellValidator(CellValidator.cellValidator(cell.getCellValue()));
+            partitionKey = cell.getDecomposedCellValue();
+        }
+        return partitionKey;
     }
 
 }

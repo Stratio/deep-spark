@@ -40,8 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.ColumnMetadata;
-import com.datastax.driver.core.KeyspaceMetadata;
-import com.datastax.driver.core.Metadata;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
@@ -54,6 +52,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.entity.CassandraCell;
+import com.stratio.deep.cassandra.filter.value.EqualsInValue;
 import com.stratio.deep.cassandra.util.CassandraUtils;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.exception.DeepGenericException;
@@ -256,9 +255,8 @@ public class DeepRecordReader implements IDeepRecordReader {
         /**
          * serialize the prepared query, pair.left is query id, pair.right is query
          */
-        private String composeQuery(String cols) {
-            String generatedColumns = cols;
-            String clause = whereClause();
+        private String composeQuery() {
+            String generatedColumns = columns;
             if (generatedColumns == null) {
                 generatedColumns = "*";
             } else {
@@ -274,10 +272,78 @@ public class DeepRecordReader implements IDeepRecordReader {
                         : partitionKey + "," + clusterKey + generatedColumns;
             }
 
-            return String.format("SELECT %s FROM %s%s%s ALLOW FILTERING",
-                    generatedColumns, quote(cfName), clause,
-                    CassandraUtils.additionalFilterGenerator(config.getAdditionalFilters(), config.getFilters(),
-                            getLuceneIndex()));
+            EqualsInValue equalsInValue = config.getEqualsInValue();
+            String generatedQuery = null;
+            if (equalsInValue == null) {
+                String clause = whereClause();
+                generatedQuery = String.format("SELECT %s FROM %s%s%s ALLOW FILTERING",
+                        generatedColumns, quote(cfName), clause,
+                        CassandraUtils.additionalFilterGenerator(config.getAdditionalFilters(), config.getFilters(),
+                                getLuceneIndex()));
+            } else {
+                partitioner.getToken(getPartitionKey());
+                generatedQuery = String.format("SELECT %s FROM %s%s%s ALLOW FILTERING",
+                        generatedColumns, quote(cfName), null);
+            }
+            return generatedQuery;
+        }
+
+        /**
+         * Prepares a Cassandra statement before being executed
+         * 
+         * @return {@link Statement}
+         */
+        private Statement prepareStatement() {
+
+            String query = composeQuery();
+
+            List<Object> bindValues = preparedQueryBindValues();
+            assert bindValues != null;
+
+            EqualsInValue equalsInValue = config.getEqualsInValue();
+
+            Statement stmt = null;
+            Object[] values = null;
+            if (equalsInValue == null) {
+                values = bindValues.toArray(new Object[bindValues.size()]);
+                LOG.debug("query: " + query + "; values: " + Arrays.toString(values));
+            } else {
+                values = new Object[2];
+                values[0] = equalsInValue.getEqualsValue();
+                values[1] = filterSplits(equalsInValue.getInValues(), bindValues);
+                LOG.debug("query: " + query + "; values: " + Arrays.toString(values));
+            }
+
+            stmt = new SimpleStatement(query, values);
+            stmt.setFetchSize(pageSize);
+
+            return stmt;
+        }
+
+        /**
+         * Filters the splits not included in the current token range.
+         * 
+         * @param inValues
+         *            Full splits set.
+         * @param bindValues
+         *            Boundary values.
+         * 
+         * @return Filtered splits.
+         */
+        private Object filterSplits(List<Serializable> inValues, List<Object> bindValues) {
+
+            List<Serializable> filteredInValues = new ArrayList<>();
+            for (Serializable value : inValues) {
+                Comparable valueComparable = (Comparable) value;
+                if ((valueComparable.compareTo(bindValues.get(0)) > 0)
+                        && (valueComparable.compareTo(bindValues.get(1)) <= 0)) {
+                    filteredInValues.add(value);
+                }
+            }
+            StringBuilder inClause = new StringBuilder();
+            inClause.append("(").append(StringUtils.join(filteredInValues, ",")).append(")");
+
+            return inClause.toString();
         }
 
         /**
@@ -341,6 +407,23 @@ public class DeepRecordReader implements IDeepRecordReader {
         }
 
         /**
+         * serialize the where clause
+         */
+        private String equalsInWhereClause() {
+            if (partitionKeyString == null) {
+                partitionKeyString = keyString(partitionBoundColumns);
+            }
+
+            if (partitionKeyMarkers == null) {
+                partitionKeyMarkers = partitionKeyMarkers();
+            }
+            // initial
+            // query token(k) >= start_token and token(k) <= end_token
+            return String.format(" WHERE token(%s) > ? AND token(%s) <= ?", partitionKeyString,
+                    partitionKeyString);
+        }
+
+        /**
          * serialize the partition key string in format of <key1>, <key2>, <key3>
          */
         private String keyString(List<BoundColumn> columns) {
@@ -389,26 +472,16 @@ public class DeepRecordReader implements IDeepRecordReader {
          * execute the prepared query
          */
         private void executeQuery() {
-            String query = composeQuery(columns);
 
-            List<Object> bindValues = preparedQueryBindValues();
-            assert bindValues != null;
+            Statement stmt = prepareStatement();
 
             rows = null;
-
             int retries = 0;
-
             Exception exception = null;
+
             // only try three times for TimedOutException and UnavailableException
             while (retries < 3) {
                 try {
-                    Object[] values = bindValues.toArray(new Object[bindValues.size()]);
-
-                    LOG.debug("query: " + query + "; values: " + Arrays.toString(values));
-
-                    Statement stmt = new SimpleStatement(query, values);
-                    stmt.setFetchSize(pageSize);
-
                     ResultSet resultSet = session.execute(stmt);
 
                     if (resultSet != null) {
@@ -531,33 +604,19 @@ public class DeepRecordReader implements IDeepRecordReader {
         return rowIterator.next();
     }
 
-    //
-    //
-    // @Override
-    // public void initialize(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException,
-    // InterruptedException {
-    //
-    // }
-    //
-    // @Override
-    // public boolean nextKeyValue() throws IOException, InterruptedException {
-    // return false;
-    // }
-    //
-    // @Override
-    // public Object getCurrentKey() throws IOException, InterruptedException {
-    // return null;
-    // }
-    //
-    // @Override
-    // public Object getCurrentValue() throws IOException, InterruptedException {
-    // return null;
-    // }
-    //
-    // @Override
-    // public float getProgress() throws IOException, InterruptedException {
-    // return 0;
-    // }
-    //
+    private ByteBuffer getPartitionKey() {
+        ByteBuffer partitionKey;
+        if (keyValidator instanceof CompositeType) {
+            ByteBuffer[] keys = new ByteBuffer[partitionBoundColumns.size()];
 
+            for (int i = 0; i < partitionBoundColumns.size(); i++) {
+                keys[i] = partitionBoundColumns.get(i).value;
+            }
+
+            partitionKey = CompositeType.build(keys);
+        } else {
+            partitionKey = partitionBoundColumns.get(0).value;
+        }
+        return partitionKey;
+    }
 }

@@ -58,6 +58,7 @@ import com.datastax.driver.core.ProtocolVersion;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.TableMetadata;
 import com.stratio.deep.cassandra.entity.CassandraCell;
+import com.stratio.deep.cassandra.filter.value.EqualsInValue;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
@@ -148,10 +149,11 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
 
     private boolean isBisectModeSet = true;
 
+    private EqualsInValue equalsInValue = null;
+
     /**
      * {@inheritDoc}
      */
-
     @Override
     public CassandraDeepJobConfig<T> session(Session session) {
         this.session = session;
@@ -591,6 +593,12 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
             filters(extractorConfig.getFilterArray(ExtractorConstants.FILTER_QUERY));
 
         }
+
+        if (values.get(ExtractorConstants.EQUALS_IN_FILTER) != null) {
+            setEqualsInValue((EqualsInValue) extractorConfig.getValue(EqualsInValue.class,
+                    ExtractorConstants.EQUALS_IN_FILTER));
+        }
+
         this.initialize();
 
         return this;
@@ -968,6 +976,14 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
     @Override
     public boolean isBisectModeSet() {
         return this.isBisectModeSet;
+    }
+
+    public EqualsInValue getEqualsInValue() {
+        return equalsInValue;
+    }
+
+    public void setEqualsInValue(EqualsInValue equalsInValue) {
+        this.equalsInValue = equalsInValue;
     }
 
 }
