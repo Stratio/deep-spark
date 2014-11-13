@@ -32,9 +32,9 @@ public class CellDeepJobConfigAerospikeTest {
 
         AerospikeDeepJobConfig<Cells> cellDeepJobConfigAerospike = new AerospikeDeepJobConfig<>(Cells.class);
 
-        assertNotNull(cellDeepJobConfigAerospike);
+        assertNotNull(cellDeepJobConfigAerospike, "Configuration should not be null.");
 
-        assertEquals(cellDeepJobConfigAerospike.getEntityClass(), Cells.class);
+        assertEquals(cellDeepJobConfigAerospike.getEntityClass(), Cells.class, "Entity class should be Cells");
 
     }
 }

@@ -32,12 +32,20 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Implementation for AerospikeOutputFormat
+ * Implementation for AerospikeOutputFormat.
  */
 public class AerospikeDeepOutputFormat extends AerospikeOutputFormat<Object, AerospikeRecord> {
 
+    /**
+     * Hadoop record writer for Aerospike.
+     */
     public static class AerospikeDeepRecordWriter extends AerospikeRecordWriter<Object, AerospikeRecord> {
 
+        /**
+         * Public constructor for AerospikeDeepRecordWriter.
+         * @param cfg
+         * @param progressable
+         */
         public AerospikeDeepRecordWriter(Configuration cfg, Progressable progressable) {
             super(cfg, progressable);
         }
@@ -49,7 +57,8 @@ public class AerospikeDeepOutputFormat extends AerospikeOutputFormat<Object, Aer
                                    WritePolicy writePolicy,
                                    String namespace,
                                    String setName) throws IOException {
-            Key k = new Key(namespace, setName, Long.toString(System.nanoTime())); //TODO -> How should I generate the key?
+            //TODO -> How should I generate the key?
+            Key k = new Key(namespace, setName, Long.toString(System.nanoTime()));
             List<Bin> bins = new ArrayList<>();
             for(Map.Entry<String, Object> bin:record.bins.entrySet()) {
                 Bin aerospikeBin = new Bin(bin.getKey(), bin.getValue());

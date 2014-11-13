@@ -17,11 +17,11 @@ package com.stratio.deep.aerospike.config;
 
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
-import org.apache.log4j.Logger;
 
-public class AerospikeConfigFactory {
-
-    private static final Logger LOG = Logger.getLogger(AerospikeConfigFactory.class);
+/**
+ * Class with factory method for instatiating AerospikeDeepJobConfig objects.
+ */
+public final class AerospikeConfigFactory {
 
     private AerospikeConfigFactory() {
         throw new UnsupportedOperationException();

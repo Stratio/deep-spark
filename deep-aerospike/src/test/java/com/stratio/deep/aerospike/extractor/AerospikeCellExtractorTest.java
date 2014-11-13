@@ -54,7 +54,7 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
             RDD<Cells> inputRDDEntity = context.createRDD(inputConfigEntity);
 
             //Import dataSet was OK and we could read it
-            assertEquals(1, inputRDDEntity.count());
+            assertEquals(1, inputRDDEntity.count(), "Expected read entity count is 1");
 
         }finally {
             context.stop();
@@ -108,7 +108,7 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
             inputConfigEntity.setExtractorImplClass(AerospikeCellExtractor.class);
 
             RDD<Cells> inputRDDEntity = context.createRDD(inputConfigEntity);
-            assertEquals(1, inputRDDEntity.count());
+            assertEquals(1, inputRDDEntity.count(), "Expected read entity count is 1");
 
             ExtractorConfig<Cells> inputConfigEntity2 = new ExtractorConfig(Cells.class);
             inputConfigEntity2.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
@@ -118,7 +118,7 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
             inputConfigEntity2.setExtractorImplClass(AerospikeCellExtractor.class);
 
             RDD<Cells> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
-            assertEquals(1, inputRDDEntity2.count());
+            assertEquals(1, inputRDDEntity2.count(), "Expected read entity count is 1");
 
             ExtractorConfig<Cells> inputConfigEntity3 = new ExtractorConfig(Cells.class);
             inputConfigEntity3.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
@@ -128,7 +128,7 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
             inputConfigEntity3.setExtractorImplClass(AerospikeCellExtractor.class);
 
             RDD<Cells> inputRDDEntity3 = context.createRDD(inputConfigEntity3);
-            assertEquals(0, inputRDDEntity3.count());
+            assertEquals(0, inputRDDEntity3.count(), "Expected read entity count is 0");
 
             ExtractorConfig<Cells> inputConfigEntity4 = new ExtractorConfig(Cells.class);
             inputConfigEntity4.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
@@ -138,7 +138,7 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
             inputConfigEntity4.setExtractorImplClass(AerospikeCellExtractor.class);
 
             RDD<Cells> inputRDDEntity4 = context.createRDD(inputConfigEntity4);
-            assertEquals(1, inputRDDEntity4.count());
+            assertEquals(1, inputRDDEntity4.count(), "Expected read entity count is 1");
 
             ExtractorConfig<Cells> inputConfigEntity5 = new ExtractorConfig(Cells.class);
             inputConfigEntity5.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
@@ -148,7 +148,7 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
             inputConfigEntity5.setExtractorImplClass(AerospikeCellExtractor.class);
 
             RDD<Cells> inputRDDEntity5 = context.createRDD(inputConfigEntity5);
-            assertEquals(0, inputRDDEntity5.count());
+            assertEquals(0, inputRDDEntity5.count(), "Expected read entity count is 0");
 
             ExtractorConfig<Cells> inputConfigEntity6 = new ExtractorConfig(Cells.class);
             inputConfigEntity6.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
@@ -158,7 +158,7 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
             inputConfigEntity6.setExtractorImplClass(AerospikeCellExtractor.class);
 
             RDD<Cells> inputRDDEntity6 = context.createRDD(inputConfigEntity5);
-            assertEquals(0, inputRDDEntity6.count());
+            assertEquals(0, inputRDDEntity6.count(), "Expected read entity count is 0");
 
         }finally {
             context.stop();

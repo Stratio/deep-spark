@@ -24,11 +24,18 @@ import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
 
 import java.io.Serializable;
 
+/**
+ * Abstract class for Aerospike Cells and Entity extractors.
+ * @param <T>
+ */
 public abstract class AerospikeExtractor<T> extends GenericHadoopExtractor<T, AerospikeDeepJobConfig<T>,
         AerospikeKey, AerospikeRecord, Object, AerospikeRecord> implements Serializable {
 
     private static final long serialVersionUID = -5537656625573650019L;
 
+    /**
+     * Public constructor.
+     */
     public AerospikeExtractor(){
         super();
         this.inputFormat = new AerospikeInputFormat();

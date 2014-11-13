@@ -29,13 +29,16 @@ import scala.Tuple2;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Cell RDD to interact with Aerospike
+ * Cell RDD to interact with Aerospike.
  */
 public class AerospikeCellExtractor extends AerospikeExtractor<Cells> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AerospikeCellExtractor.class);
     private static final long serialVersionUID = 6437435944817212233L;
 
+    /**
+     * Public constructor for AerospikeCellExtractor
+     */
     public AerospikeCellExtractor() {
         super();
         this.deepJobConfig = new AerospikeDeepJobConfig(Cells.class);
@@ -51,7 +54,7 @@ public class AerospikeCellExtractor extends AerospikeExtractor<Cells> {
             return UtilAerospike.getCellFromRecord(tuple._1(), tuple._2(), aerospikeConfig) ;
         } catch (Exception e) {
             LOG.error("Cannot convert AerospikeRecord: ", e);
-            throw new DeepTransformException("Could not transform from Bson to Cell " + e.getMessage());
+            throw new DeepTransformException("Could not transform from AerospikeRecord to Cell " + e.getMessage(), e);
         }
     }
 
@@ -63,8 +66,8 @@ public class AerospikeCellExtractor extends AerospikeExtractor<Cells> {
         try {
             return new Tuple2<>(null, UtilAerospike.getRecordFromCell(cells));
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            LOG.error("Cannot transform Cells into AerospikeRecord", e.getMessage());
-            throw new DeepTransformException(e.getMessage());
+            LOG.error("Cannot transform Cells into AerospikeRecord", e.getMessage(), e);
+            throw new DeepTransformException(e.getMessage(), e);
         }
     }
 
