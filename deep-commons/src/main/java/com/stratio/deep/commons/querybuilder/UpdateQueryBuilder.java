@@ -14,8 +14,11 @@ import com.stratio.deep.commons.entity.Cells;
  */
 public abstract class UpdateQueryBuilder implements Serializable {
 
+
     private String catalogName;
     private String tableName;
+
+    private static final long serialVersionUID = 4771318432009656904L;
 
     /**
      * Returns a CQL query
@@ -36,6 +39,7 @@ public abstract class UpdateQueryBuilder implements Serializable {
      */
     public abstract String prepareBatchQuery(List<String> statements);
 
+
     public final void setCatalogName(String catalog){
         this.catalogName=catalog;
     }
@@ -50,6 +54,7 @@ public abstract class UpdateQueryBuilder implements Serializable {
 
     public final String getTableName() {
         return tableName;
+
     }
 
 
