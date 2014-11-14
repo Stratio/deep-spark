@@ -28,13 +28,14 @@ import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.core.function.PrepareSaveFunction;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
 
 /**
  * Entry point to the Cassandra-aware Spark context.
- *
+ * 
  * @author Luca Rosellini <luca@stratio.com>
  */
 public class DeepSparkContext extends JavaSparkContext implements Serializable {
@@ -46,8 +47,9 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
     /**
      * Overridden superclass constructor.
-     *
-     * @param sc an already created spark context.
+     * 
+     * @param sc
+     *            an already created spark context.
      */
     public DeepSparkContext(SparkContext sc) {
         super(sc);
@@ -55,9 +57,11 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
     /**
      * Overridden superclass constructor.
-     *
-     * @param master the url of the master node.
-     * @param appName the name of the application.
+     * 
+     * @param master
+     *            the url of the master node.
+     * @param appName
+     *            the name of the application.
      */
     public DeepSparkContext(String master, String appName) {
         super(master, appName);
@@ -77,6 +81,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
     /**
      * Overridden superclass constructor.
+
      *
      * @param master the url of the master node.
      * @param appName the name of the application.
@@ -146,8 +151,14 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
     public static <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, S config) throws DeepIOException {
         config.setRddId(rdd.id());
         config.setPartitionId(0);
-        rdd.foreachPartition(new PrepareSaveFunction<>(config, rdd.first()));
+        rdd.foreachPartition(new PrepareSaveFunction<>(null, config, rdd.first()));
 
     }
 
+    public static <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, UpdateQueryBuilder queryBuilder, S config) {
+
+        config.setRddId(rdd.id());
+        config.setPartitionId(0);
+        rdd.foreachPartition(new PrepareSaveFunction<>(queryBuilder, config, rdd.first()));
+    }
 }

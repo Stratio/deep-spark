@@ -14,6 +14,9 @@
  */
 package com.stratio.deep.commons.extractor.server;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -39,9 +42,6 @@ import com.stratio.deep.commons.extractor.response.NextResponse;
 import com.stratio.deep.commons.extractor.response.Response;
 import com.stratio.deep.commons.extractor.response.SaveResponse;
 import com.stratio.deep.commons.rdd.IExtractor;
-
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 
 public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Action> {
 
@@ -148,8 +148,8 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
     private void initExtractor(ExtractorConfig<T> config) {
 
         try {
-            Class<T> rdd = (Class<T>) config.getExtractorImplClass();
-            if(rdd==null){
+            Class<T> rdd = config.getExtractorImplClass();
+            if (rdd == null) {
                 rdd = (Class<T>) Class.forName(config.getExtractorImplClassName());
             }
             Constructor<T> c = null;
@@ -160,7 +160,6 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
                 c = rdd.getConstructor(Class.class);
                 this.extractor = (IExtractor<T, ExtractorConfig<T>>) c.newInstance(config.getEntityClass());
             }
-
 
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
@@ -175,7 +174,7 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
             this.initExtractor(initSaveAction.getConfig());
         }
 
-        extractor.initSave(initSaveAction.getConfig(), initSaveAction.getFirst());
+        extractor.initSave(initSaveAction.getConfig(), initSaveAction.getFirst(), initSaveAction.getQueryBuilder());
         return;
 
     }

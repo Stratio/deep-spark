@@ -258,6 +258,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
         if (first._1() == null || first._1().isEmpty()) {
             throw new DeepNoSuchFieldException("no key structure found on row metadata");
         }
+
         String createTableQuery = createTableQueryGenerator(first._1(), first._2(), this.catalog,
                 quote(this.table));
         getSession().execute(createTableQuery);

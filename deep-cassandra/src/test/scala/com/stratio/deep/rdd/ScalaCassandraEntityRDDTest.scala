@@ -16,18 +16,25 @@
 
 package com.stratio.deep.rdd
 
-import com.datastax.driver.core.{Cluster, ResultSet, Row, Session}
-import com.stratio.deep.cassandra.config.{CassandraConfigFactory, CassandraDeepJobConfig}
-import com.stratio.deep.cassandra.embedded.CassandraServer
-import com.stratio.deep.commons.utils.{Constants, Utils}
-import com.stratio.deep.context.AbstractDeepSparkContextTest
-import com.stratio.deep.core.context.DeepSparkContext
-import com.stratio.deep.testentity.DeepScalaPageEntity
-
 import org.apache.spark.Partition
 import org.apache.spark.rdd.RDD
-import org.testng.Assert._
-import org.testng.annotations.{BeforeClass, Test}
+import org.testng.Assert.assertEquals
+import org.testng.Assert.assertNotNull
+import org.testng.annotations.BeforeClass
+import org.testng.annotations.Test
+
+import com.datastax.driver.core.Cluster
+import com.datastax.driver.core.ResultSet
+import com.datastax.driver.core.Row
+import com.datastax.driver.core.Session
+import com.stratio.deep.cassandra.config.CassandraConfigFactory
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig
+import com.stratio.deep.cassandra.embedded.CassandraServer
+import com.stratio.deep.commons.annotations.DeepEntity
+import com.stratio.deep.commons.utils.Constants
+import com.stratio.deep.commons.utils.Utils
+import com.stratio.deep.context.AbstractDeepSparkContextTest
+import com.stratio.deep.testentity.DeepScalaPageEntity
 
 /**
  * Created by luca on 20/03/14.
