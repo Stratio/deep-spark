@@ -27,6 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.datastax.driver.core.TableMetadata;
+import com.stratio.deep.cassandra.querybuilder.CassandraUpdateQueryBuilder;
+import com.stratio.deep.cassandra.querybuilder.DefaultQueryBuilder;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
+import com.stratio.deep.commons.handler.DeepRecordWriter;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
@@ -48,18 +54,19 @@ import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.cassandra.entity.CellValidator;
-import com.stratio.deep.cassandra.functions.CassandraDefaultQueryBuilder;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.exception.DeepInstantiationException;
-import com.stratio.deep.commons.handler.DeepRecordWriter;
 import com.stratio.deep.commons.utils.Pair;
+import scala.Tuple2;
+
+
 
 /**
  * Handles the distributed write to cassandra in batch.
  */
-public final class DeepCqlRecordWriter extends DeepRecordWriter {
+public final class DeepCqlRecordWriter extends DeepRecordWriter{
 
     private static final Logger LOG = LoggerFactory.getLogger(DeepCqlRecordWriter.class);
 
@@ -74,29 +81,10 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
     protected final IPartitioner partitioner;
     protected final InetAddress localhost;
 
-    private final UpdateQueryBuilder queryBuilder;
+    private final CassandraUpdateQueryBuilder queryBuilder;
 
-    /**
-     * Con
-     * 
-     * @param writeConfig
-     */
-    public DeepCqlRecordWriter(ICassandraDeepJobConfig writeConfig) {
-        this.clients = new HashMap<>();
-        this.removedClients = new HashMap<>();
-        this.writeConfig = writeConfig;
-        this.partitioner = RangeUtils.getPartitioner(writeConfig);
-        this.queryBuilder = new CassandraDefaultQueryBuilder(writeConfig.getKeyspace(), writeConfig.getColumnFamily());
 
-        try {
-            this.localhost = InetAddress.getLocalHost();
-        } catch (UnknownHostException e) {
-            throw new DeepInstantiationException("Cannot resolve local hostname", e);
-        }
-        init();
-    }
-
-    public DeepCqlRecordWriter(ICassandraDeepJobConfig writeConfig, UpdateQueryBuilder queryBuilder) {
+    public DeepCqlRecordWriter(ICassandraDeepJobConfig writeConfig, CassandraUpdateQueryBuilder queryBuilder) {
         this.clients = new HashMap<>();
         this.removedClients = new HashMap<>();
         this.writeConfig = writeConfig;
@@ -140,8 +128,8 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
             ByteBuffer[] keys = new ByteBuffer[partitionKeyColumns.length];
 
             for (int i = 0; i < cells.size(); i++) {
-                CassandraCell c = (CassandraCell) cells.getCellByIdx(i);
-
+                Cell cell =  cells.getCellByIdx(i);
+                CassandraCell c =(CassandraCell) ((cell instanceof CassandraCell) ? cell : CassandraCell.create(cell));
                 if (c.isPartitionKey()) {
                     keys[i] = c.getDecomposedCellValue();
                 }
@@ -149,7 +137,8 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
 
             partitionKey = CompositeType.build(keys);
         } else {
-            CassandraCell cell = ((CassandraCell) cells.getCellByIdx(0));
+            Cell c =  cells.getCellByIdx(0);
+            CassandraCell cell = (CassandraCell) ((c instanceof CassandraCell) ? (CassandraCell) c : CassandraCell.create(c));
             cell.setCellValidator(CellValidator.cellValidator(cell.getCellValue()));
             partitionKey = cell.getDecomposedCellValue();
         }
@@ -245,9 +234,6 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
      */
     public void write(Cells keys, Cells values) {
         /* generate SQL */
-        // String localCql = updateQueryGenerator(keys, values, writeConfig.getKeyspace(),
-        // quote(writeConfig.getColumnFamily()));
-
 
         String localCql = queryBuilder.prepareQuery(keys, values);
 
@@ -270,7 +256,6 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
         }
 
     }
-
 
 
     /**

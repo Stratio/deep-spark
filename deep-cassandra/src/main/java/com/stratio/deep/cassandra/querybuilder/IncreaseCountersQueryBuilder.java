@@ -1,14 +1,13 @@
 /**
  * 
  */
-package com.stratio.deep.cassandra.functions;
+package com.stratio.deep.cassandra.querybuilder;
 
 import static com.stratio.deep.commons.utils.Utils.quote;
 
 import java.util.List;
 import java.util.Set;
 
-import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
@@ -16,53 +15,42 @@ import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 /**
  *
  */
-public class CassandraDefaultQueryBuilder extends UpdateQueryBuilder {
+public class IncreaseCountersQueryBuilder extends CassandraUpdateQueryBuilder {
 
-
-    protected final String namespace;
-
-    public CassandraDefaultQueryBuilder(String keyspace, String columnFamily) {
-        super(keyspace,columnFamily, null, null);
-        this.namespace = keyspace + "." + columnFamily;
-    }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.stratio.deep.commons.querybuilder.QueryBuilder#prepareQuery()
      */
     @Override
     public String prepareQuery(Cells keys, Cells values) {
 
-        StringBuilder sb = new StringBuilder("UPDATE ").append(catalogName).append(".").append(tableName)
+        //TODO validate values > 0
+        StringBuilder sb = new StringBuilder("UPDATE ").append(getCatalogName()+"."+getTableName())
                 .append(" SET ");
 
-        int k = 0;
 
+        boolean isFirst = true;
+        for (Cell cell : values.getCells()) {
+            if (!isFirst) {
+                sb.append(", ");
+            }else isFirst=false;
+
+            sb.append(quote(cell.getCellName())).append(" = ").append(quote(cell.getCellName())).append(" + ")
+                    .append("?");
+        }
+
+        isFirst=true;
         StringBuilder keyClause = new StringBuilder(" WHERE ");
         for (Cell cell : keys.getCells()) {
-            if (((CassandraCell) cell).isPartitionKey() || ((CassandraCell) cell).isClusterKey()) {
-                if (k > 0) {
+                if (!isFirst) {
                     keyClause.append(" AND ");
-                }
+                }else isFirst=false;
 
                 keyClause.append(String.format("%s = ?", quote(cell.getCellName())));
 
-                ++k;
-            }
-
         }
-
-        k = 0;
-        for (Cell cell : values.getCells()) {
-            if (k > 0) {
-                sb.append(", ");
-            }
-
-            sb.append(String.format("%s = ?", quote(cell.getCellName())));
-            ++k;
-        }
-
         sb.append(keyClause).append(";");
 
         return sb.toString();
@@ -71,11 +59,11 @@ public class CassandraDefaultQueryBuilder extends UpdateQueryBuilder {
     /*
      * (non-Javadoc)
      * 
-     * @see com.stratio.deep.commons.querybuilder.QueryBuilder#prepareBatchQuery()
+     * @see com.stratio.deep.commons.querybuilder.QueryBuilder#prepareBatchQuery(java.util.List)
      */
     @Override
     public String prepareBatchQuery(List<String> statements) {
-        StringBuilder sb = new StringBuilder("BEGIN BATCH \n");
+        StringBuilder sb = new StringBuilder("BEGIN COUNTER BATCH\n");
 
         for (String statement : statements) {
             sb.append(statement).append("\n");
@@ -85,4 +73,5 @@ public class CassandraDefaultQueryBuilder extends UpdateQueryBuilder {
 
         return sb.toString();
     }
+
 }

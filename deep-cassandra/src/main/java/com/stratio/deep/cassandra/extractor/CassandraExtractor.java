@@ -20,6 +20,8 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
+import com.stratio.deep.cassandra.querybuilder.CassandraUpdateQueryBuilder;
+import com.stratio.deep.cassandra.querybuilder.DefaultQueryBuilder;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import org.apache.spark.Partition;
@@ -59,7 +61,6 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
 
     protected transient AbstractSerializableFunction transformer;
 
-    protected transient UpdateQueryBuilder queryBuilder;
 
     @Override
     public boolean hasNext() {
@@ -186,32 +187,19 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
                 .createOutputTableIfNeeded((Tuple2<Cells, Cells>) transformer.apply(first));
 
         if (queryBuilder == null) {
-            writer = new DeepCqlRecordWriter(cassandraJobConfig);
-        } else {
-            writer = new DeepCqlRecordWriter(cassandraJobConfig, queryBuilder);
+            queryBuilder = new DefaultQueryBuilder();
         }
+        queryBuilder.setCatalogName(cassandraJobConfig.getCatalog());
+        queryBuilder.setTableName(cassandraJobConfig.getTable());
+
+        writer = new DeepCqlRecordWriter(cassandraJobConfig, (CassandraUpdateQueryBuilder) queryBuilder);
+
 
     }
 
     @Override
     public void saveRDD(T t) {
-
-     /*  Cells cells = (Cells) t;
-        String namespace = queryBuilder.getCatalogName()+"."+queryBuilder.getTableName();
-        Cells keys = new Cells();
-        Cells values = new Cells(namespace);
-        //TODO do it with cellByName => originNamespace
-        for(Cell cell: cells.getCells()){
-            final String cellName = cell.getCellName();
-            if(queryBuilder.getPrimaryKeys().contains(cellName)) keys.add(cell);
-            if(queryBuilder.getTargetFields().contains(cellName)) values.add(cell);
-        }
-        TODO that would be used in mongodb, aerospike, elasticsearch. All values are supposed to be written
-
-        */
-
-        //TODO apply a custom transformer in entities
-       Tuple2<Cells, Cells> tuple = (Tuple2<Cells, Cells>) transformer.apply(t);
+        Tuple2<Cells, Cells> tuple = (Tuple2<Cells, Cells>) transformer.apply(t);
         writer.write(tuple._1(), tuple._2());
 
     }

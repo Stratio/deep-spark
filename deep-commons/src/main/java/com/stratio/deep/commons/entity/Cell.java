@@ -45,6 +45,9 @@ public class Cell implements Serializable {
      */
     protected Object cellValue;
 
+    protected Boolean isKey = Boolean.FALSE;
+
+
     protected Cell() {
         super();
     }
@@ -55,9 +58,22 @@ public class Cell implements Serializable {
         this.cellValue = cellValue;
     }
 
-    public static Cell create(String cellName, Object cellValue) {
+    protected Cell(String cellName, Object cellValue, Boolean isKey) {
+        super();
+        this.cellName = cellName;
+        this.cellValue = cellValue;
+        this.isKey=isKey;
+    }
 
+    /**
+     * Create a non-primary key cell.
+     */
+    public static Cell create(String cellName, Object cellValue) {
         return new Cell(cellName, cellValue);
+    }
+
+    public static Cell create(String cellName, Object cellValue, Boolean isKey) {
+        return new Cell(cellName, cellValue,isKey);
     }
 
     public String getCellName() {
@@ -266,6 +282,13 @@ public class Cell implements Serializable {
         }
     }
 
+    /**
+     * @return true is the current cell is a key inside the datastore, false otherwise.
+     */
+    public Boolean isKey() {
+        return isKey;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -289,18 +312,14 @@ public class Cell implements Serializable {
         return result;
     }
 
-    /**
-     * @return true is the current cell is a key inside the datastore, false otherwise.
-     */
-    public Boolean isKey() {
-        return false;
-    }
+
 
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("Cell{");
         sb.append("cellName='").append(this.cellName).append('\'');
         sb.append(", cellValue=").append(this.cellValue);
+        sb.append(",isPK=").append(this.isKey);
         sb.append('}');
         return sb.toString();
     }

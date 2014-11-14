@@ -18,7 +18,6 @@ package com.stratio.deep.examples.java;
 
 import com.stratio.deep.cassandra.config.CassandraConfigFactory;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
-import com.stratio.deep.cassandra.functions.IncreaseCountersQueryBuilder;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.utils.ContextProperties;
@@ -26,17 +25,16 @@ import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 
 import java.util.*;
 
-public class WrittingRddWithMaxQueryBuilderToCassandra {
-    private static final Logger LOG = Logger.getLogger(WrittingRddWithMaxQueryBuilderToCassandra.class);
+public class WrittingRddWithMaxToCassandra {
+    private static final Logger LOG = Logger.getLogger(WrittingRddWithMaxToCassandra.class);
     public static List<Tuple2<String, Integer>> results;
 
-    private WrittingRddWithMaxQueryBuilderToCassandra() {
+    private WrittingRddWithMaxToCassandra() {
     }
 
     /**

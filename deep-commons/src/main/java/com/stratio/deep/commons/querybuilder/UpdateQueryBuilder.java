@@ -14,25 +14,14 @@ import com.stratio.deep.commons.entity.Cells;
  */
 public abstract class UpdateQueryBuilder implements Serializable {
 
+    private String catalogName;
+    private String tableName;
 
-    protected final String catalogName;
-    protected final String tableName;
-    protected final Set<String> primaryKeys;
-    protected final Set<String> targetFields;
-
-    public UpdateQueryBuilder(String catalogName, String tableName, Set<String> primaryKeys, Set<String> targetFields){
-        this.catalogName=catalogName;
-        this.tableName = tableName;
-        this.primaryKeys=primaryKeys;
-        this.targetFields=targetFields;
-    }
     /**
-     *
+     * Returns a CQL query
      *
      * @param keys
      * @param values
-     *
-     *
      * 
      * @return the query statement.
      */
@@ -47,21 +36,21 @@ public abstract class UpdateQueryBuilder implements Serializable {
      */
     public abstract String prepareBatchQuery(List<String> statements);
 
+    public final void setCatalogName(String catalog){
+        this.catalogName=catalog;
+    }
 
-    public String getCatalogName() {
+    public final void setTableName(String table){
+        this.tableName=table;
+    }
+
+    public final String getCatalogName() {
         return catalogName;
     }
 
-    public Set<String> getTargetFields() {
-        return targetFields;
-    }
-
-    public Set<String> getPrimaryKeys() {
-        return primaryKeys;
-    }
-
-    public String getTableName() {
+    public final String getTableName() {
         return tableName;
     }
+
 
 }
