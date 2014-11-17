@@ -18,10 +18,6 @@ package com.stratio.deep.cassandra.cql;
 
 import static com.stratio.deep.cassandra.cql.CassandraClientProvider.trySessionForLocation;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -618,34 +614,16 @@ public class DeepRecordReader implements IDeepRecordReader {
         return rowIterator.next();
     }
 
-    private ByteBuffer getPartitionKey2(Serializable equalsValue, Serializable inValue) {
-
-        ByteBuffer partitionKey;
-        ByteBuffer[] keys = new ByteBuffer[2];
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
-        ObjectOutput out = null;
-
-        try {
-            out = new ObjectOutputStream(bos);
-            out.writeObject(equalsValue);
-
-            out = new ObjectOutputStream(bos2);
-            out.writeObject(inValue);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        byte[] equalsValuesBytes = bos.toByteArray();
-        byte[] inValueBytes = bos2.toByteArray();
-        keys[0] = ByteBuffer.wrap(equalsValuesBytes);
-        keys[1] = ByteBuffer.wrap(inValueBytes);
-
-        partitionKey = CompositeType.build(keys);
-
-        return partitionKey;
-    }
-
+    /**
+     * Builds the partition key in {@link ByteBuffer} format for the given values.
+     * 
+     * @param equalsValue
+     *            Value for the operator equals.
+     * @param inValue
+     *            Value for the operator in.
+     * 
+     * @return {@link ByteBuffer} with the partition key.
+     */
     private ByteBuffer getPartitionKey(Serializable equalsValue, Serializable inValue) {
 
         ByteBuffer partitionKey = ((CompositeType) keyValidator).decompose(equalsValue, inValue);
