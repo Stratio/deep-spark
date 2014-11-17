@@ -16,17 +16,6 @@
 
 package com.stratio.deep.commons.utils;
 
-import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.entity.IDeepType;
-import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
-import com.stratio.deep.commons.exception.DeepGenericException;
-import com.stratio.deep.commons.exception.DeepIOException;
-import com.stratio.deep.commons.rdd.IExtractor;
-import org.apache.commons.lang.StringUtils;
-import scala.Tuple2;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -37,12 +26,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
@@ -352,5 +338,41 @@ public final class Utils {
         }
         throw new ClassCastException("it is not a Number Type");
     }
+
+
+    public static Object castingUtil(String value, Class classCasting){
+        Object object = value;
+
+        //Numeric
+        if(Number.class.isAssignableFrom(classCasting)){
+            if (classCasting.isAssignableFrom(Double.class)) {
+                return Double.valueOf(value);
+            } else if (classCasting.isAssignableFrom(Long.class)) {
+                return Long.valueOf(value);
+
+            } else if (classCasting.isAssignableFrom(Float.class)) {
+                return Float.valueOf(value);
+
+            } else if (classCasting.isAssignableFrom(Integer.class)) {
+                return Integer.valueOf(value);
+
+            } else if (classCasting.isAssignableFrom(Short.class)) {
+                return Short.valueOf(value);
+
+            } else if (classCasting.isAssignableFrom(Byte.class)) {
+                return Byte.valueOf(value);
+            }
+        }else if (String.class.isAssignableFrom(classCasting)){
+            return object.toString();
+
+        } else {
+            //Class not recognise yet
+            return null ;
+
+        }
+        return null;
+
+    }
+
 
 }

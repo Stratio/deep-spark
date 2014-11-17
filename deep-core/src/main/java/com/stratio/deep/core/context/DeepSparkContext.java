@@ -14,10 +14,8 @@
 
 package com.stratio.deep.core.context;
 
-import static com.stratio.deep.commons.utils.Constants.SPARK_PARTITION_ID;
-import static com.stratio.deep.commons.utils.Constants.SPARK_RDD_ID;
-
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -30,10 +28,15 @@ import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.core.function.PrepareSaveFunction;
+import com.stratio.deep.core.hdfs.utils.HDFSConstants;
+import com.stratio.deep.core.hdfs.utils.MapSchemaFromLines;
+import com.stratio.deep.core.hdfs.utils.SchemaMap;
+import com.stratio.deep.core.hdfs.utils.TableMap;
+import com.stratio.deep.core.hdfs.utils.TableName;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
-import com.stratio.deep.core.rdd.DeepJobRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
 
 /**
@@ -145,6 +148,32 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         config.setPartitionId(0);
         rdd.foreachPartition(new PrepareSaveFunction<>(config, rdd.first()));
 
+    }
+
+    public RDD<Cells> createHDFSRDD(ExtractorConfig<Cells> extractorConfig){
+
+        Serializable type  = extractorConfig.getValues().get(HDFSConstants.TYPE);
+        Serializable host  = extractorConfig.getValues().get(HDFSConstants.HOST);
+        Serializable port  = extractorConfig.getValues().get(HDFSConstants.PORT);
+        Serializable path  = extractorConfig.getValues().get(HDFSConstants.PATH);
+        Serializable separator = extractorConfig.getValues().get(HDFSConstants.FILE_SEPARATOR);
+        String catalogName = (String)extractorConfig.getValues().get(HDFSConstants.CATALOG);
+        String tableName   = (String)extractorConfig.getValues().get(HDFSConstants.TABLE);
+
+        final String splitSep = separator.toString();
+        final ArrayList<SchemaMap<?>> columns   = (ArrayList<SchemaMap<?>>) extractorConfig.getValues().get
+                (HDFSConstants.MAP);
+        TableMap tableMap = new TableMap(new TableName(catalogName,tableName),columns);
+        if(type.equals(HDFSConstants.HDFS_TYPE)){
+            path = HDFSConstants.HDFS_ + host.toString() + ":" + port + "/" + path.toString();
+        }else{
+            path = path.toString();
+        }
+        RDD<String> result = this.sc().textFile(path.toString(), 1);
+
+        JavaRDD<Cells> resultCells = result.toJavaRDD().map(new MapSchemaFromLines(tableMap, splitSep));
+
+        return resultCells.rdd();
     }
 
 }
