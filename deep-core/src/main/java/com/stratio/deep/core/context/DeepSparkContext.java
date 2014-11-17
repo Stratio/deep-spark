@@ -139,26 +139,31 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         return (JavaRDD<T>)new DeepJavaRDD<>((DeepRDD<T, DeepJobConfig<T>>) createRDD(config));
     }
 
+
     /**
-     * Saves RDD.
      *
-     * @param <T>  the type parameter
-     * @param <S>  the type parameter
-     * @param rdd the rdd
-     * @param config the config
-     * @throws DeepIOException the deep iO exception
+     * @param rdd
+     * @param config
+     * @param queryBuilder
+     * @param <T>
+     * @param <S>
      */
-    public static <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, S config) throws DeepIOException {
-        config.setRddId(rdd.id());
-        config.setPartitionId(0);
-        rdd.foreachPartition(new PrepareSaveFunction<>(null, config, rdd.first()));
-
-    }
-
-    public static <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, UpdateQueryBuilder queryBuilder, S config) {
+    public static <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, S config, UpdateQueryBuilder queryBuilder) {
 
         config.setRddId(rdd.id());
         config.setPartitionId(0);
         rdd.foreachPartition(new PrepareSaveFunction<>(queryBuilder, config, rdd.first()));
+    }
+
+    /**
+     *
+     * @param rdd
+     * @param config
+     * @param <T>
+     * @param <S>
+     */
+    public static <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, S config) {
+        saveRDD(rdd, config, null);
+
     }
 }
