@@ -14,9 +14,12 @@
  */
 package com.stratio.deep.core.extractor.client;
 
+
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+
+import java.util.List;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -41,6 +44,7 @@ import com.stratio.deep.commons.rdd.IExtractor;
 public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Response> implements
         IExtractor<T, ExtractorConfig<T>> {
 
+    private static final long serialVersionUID = -5313035259708180308L;
     // Stateful properties
     private volatile Channel channel;
 
@@ -249,6 +253,11 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         }
 
         return;
+    }
+
+    @Override
+    public List<String> getPreferredLocations(Partition split) {
+        return null;
     }
 
 }

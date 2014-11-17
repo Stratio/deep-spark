@@ -145,10 +145,9 @@ public class MongoEntityExtractorTest extends ExtractorTest {
             Assert.assertEquals(((Long) outputRDDEntity.cache().count()).longValue(),
                     MongoJavaRDDTest.WORD_COUNT_SPECTED.longValue());
 
-        }finally {
+        } finally {
             context.stop();
         }
-
 
     }
 

@@ -8,8 +8,6 @@ import java.lang.reflect.Modifier;
 
 import org.testng.annotations.Test;
 
-import com.stratio.deep.mongodb.config.MongoConfigFactory;
-
 /**
  * Created by rcrespo on 17/07/14.
  */

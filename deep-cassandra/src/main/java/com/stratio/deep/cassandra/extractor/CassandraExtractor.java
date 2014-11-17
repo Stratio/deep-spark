@@ -149,12 +149,10 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     /**
      * Returns a list of hosts on which the given split resides.
      */
-    public Seq<String> getPreferredLocations(DeepTokenRange tokenRange) {
+    @Override
+    public List<String> getPreferredLocations(Partition tokenRange) {
 
-        List<String> locations = tokenRange.getReplicas();
-        // log().debug("getPreferredLocations: " + p);
-
-        return asScalaBuffer(locations);
+        return ((DeepPartition)tokenRange).splitWrapper().getReplicas();
     }
 
     /**

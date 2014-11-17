@@ -65,6 +65,7 @@ public final class Utils {
     /**
      * Creates a new instance of the given class.
      *
+     * @param <T>  the type parameter
      * @param clazz the class object for which a new instance should be created.
      * @return the new instance of class clazz.
      */
@@ -79,7 +80,9 @@ public final class Utils {
     /**
      * Creates a new instance of the given class name.
      *
+     * @param <T>  the type parameter
      * @param className the class object for which a new instance should be created.
+     * @param returnClass the return class
      * @return the new instance of class clazz.
      */
     @SuppressWarnings("unchecked")
@@ -94,6 +97,8 @@ public final class Utils {
 
     /**
      * Quoting for working with uppercase
+     * @param identifier the identifier
+     * @return the string
      */
     public static String quote(String identifier) {
         if (StringUtils.isEmpty(identifier)) {
@@ -116,6 +121,8 @@ public final class Utils {
 
     /**
      * Quoting for working with uppercase
+     * @param identifier the identifier
+     * @return the string
      */
     public static String singleQuote(String identifier) {
         if (StringUtils.isEmpty(identifier)) {
@@ -134,8 +141,6 @@ public final class Utils {
 
         return res;
     }
-
-
 
     /**
      * Returns a CQL batch query wrapping the given statements.
@@ -192,8 +197,8 @@ public final class Utils {
      * resolve the setter following Scala's naming conventions.
      *
      * @param propertyName the field name of the property whose setter we want to resolve.
-     * @param entityClass  the bean class object in which we want to search for the setter.
-     * @param valueType    the class type of the object that we want to pass to the setter.
+     * @param entityClass the bean class object in which we want to search for the setter.
+     * @param valueType the class type of the object that we want to pass to the setter.
      * @return the resolved setter.
      */
     @SuppressWarnings("unchecked")
@@ -223,7 +228,7 @@ public final class Utils {
      * resolve the setter following Scala's naming conventions.
      *
      * @param propertyName the field name of the property whose getter we want to resolve.
-     * @param entityClass  the bean class object in which we want to search for the getter.
+     * @param entityClass the bean class object in which we want to search for the getter.
      * @return the resolved getter.
      */
     @SuppressWarnings("unchecked")
@@ -262,11 +267,20 @@ public final class Utils {
 
     /**
      * Return the set of fields declared at all level of class hierachy
+     * @param clazz the clazz
+     * @return the field [ ]
      */
     public static Field[] getAllFields(Class clazz) {
         return getAllFieldsRec(clazz, new ArrayList<Field>());
     }
 
+    /**
+     * Get all fields rec.
+     *
+     * @param clazz the clazz
+     * @param fields the fields
+     * @return the field [ ]
+     */
     private static Field[] getAllFieldsRec(Class clazz, List<Field> fields) {
         Class superClazz = clazz.getSuperclass();
         if (superClazz != null) {
@@ -285,8 +299,31 @@ public final class Utils {
     }
 
     /**
-     * @param hosts
-     * @return
+     * Remove address port.
+     *
+     * @param stringList the string list
+     * @return the list
+     */
+    public static List<String> removeAddressPort(List<String> stringList){
+        List<String> adresNoPort = new ArrayList<>();
+
+        for(String s : stringList){
+            int index = s.indexOf(":");
+            if(index>-1){
+                adresNoPort.add(s.substring(0, index));
+                continue;
+            }
+            adresNoPort.add(s);
+
+        }
+        return adresNoPort;
+    }
+
+    /**
+     * Split list by comma.
+     *
+     * @param hosts the hosts
+     * @return string
      */
     public static String splitListByComma(List<String> hosts) {
         boolean firstHost = true;
@@ -301,6 +338,12 @@ public final class Utils {
         return hostConnection.toString();
     }
 
+    /**
+     * Gets extractor instance.
+     *
+     * @param config the config
+     * @return the extractor instance
+     */
     public static <T, S extends BaseConfig<T>> IExtractor<T, S> getExtractorInstance(S config) {
 
         try {
@@ -323,10 +366,11 @@ public final class Utils {
     }
 
     /**
+     * Cast number type.
      *
-     * @param object
-     * @param clazz
-     * @return
+     * @param object the object
+     * @param clazz the clazz
+     * @return object
      */
    public static Object castNumberType(Object object, Object clazz) {
 

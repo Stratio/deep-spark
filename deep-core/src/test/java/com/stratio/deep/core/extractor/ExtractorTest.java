@@ -22,23 +22,22 @@ import static org.testng.AssertJUnit.assertNull;
 
 import java.io.Serializable;
 
-import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.commons.filter.Filter;
-import com.stratio.deep.commons.filter.FilterOperator;
-import com.stratio.deep.commons.rdd.IExtractor;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.core.entity.BookEntity;
-import com.stratio.deep.core.entity.MessageTestEntity;
 import org.apache.spark.rdd.RDD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-
+import com.stratio.deep.commons.config.BaseConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.filter.Filter;
+import com.stratio.deep.commons.filter.FilterType;
+import com.stratio.deep.commons.rdd.IExtractor;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.entity.BookEntity;
+import com.stratio.deep.core.entity.MessageTestEntity;
 
 /**
  * Created by rcrespo on 9/09/14.
@@ -46,23 +45,21 @@ import org.testng.annotations.Test;
 
 /**
  * This is the common test that validate each extractor.
- *
+ * 
  * @param <T>
  */
 public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(ExtractorTest.class);
 
-    Class inputEntity;
+    private Class inputEntity;
 
-    Class outputEntity;
+    private Class outputEntity;
 
-    Class configEntity;
+    private Class configEntity;
 
-    //    protected DeepSparkContext context;
+    private final String host;
 
-    private String host;
-
-    private Integer port;
+    private final Integer port;
 
     protected String database = "test";
 
@@ -75,8 +72,6 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
     private static final String READ_FIELD_EXPECTED = "new message test";
 
     protected Class<IExtractor<T, S>> extractor;
-
-
 
     /**
      * @param extractor
@@ -99,7 +94,6 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
         this.port = port;
         this.extractor = extractor;
     }
-
 
     /**
      * It tests if the extractor can read from the data store
@@ -125,11 +119,9 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
                 Assert.assertEquals(READ_FIELD_EXPECTED, ((MessageTestEntity) inputRDDEntity.first()).getMessage());
             }
 
-        }finally {
+        } finally {
             context.stop();
         }
-
-
 
     }
 
@@ -154,7 +146,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
                 outputConfigEntity = getWriteExtractorConfig("outputEntity");
             }
 
-            //Save RDD in DataSource
+            // Save RDD in DataSource
             context.saveRDD(inputRDDEntity, outputConfigEntity);
 
             RDD<W> outputRDDEntity = context.createRDD(outputConfigEntity);
@@ -166,10 +158,9 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
                 Assert.assertEquals(READ_FIELD_EXPECTED, ((MessageTestEntity) outputRDDEntity.first()).getMessage());
             }
-        }finally {
+        } finally {
             context.stop();
         }
-
 
     }
 
@@ -233,26 +224,23 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
                 assertNotNull(bookEntity.getCantoEntities());
             }
 
-        }finally {
+        } finally {
             context.stop();
         }
 
-
-
     }
 
-
-    private <W> ExtractorConfig<W> getExtractorConfig(Class<W> clazz){
+    private <W> ExtractorConfig<W> getExtractorConfig(Class<W> clazz) {
         return new ExtractorConfig<>(clazz);
     }
 
     @Test
-    protected <W> void testFilter(){
+    protected <W> void testFilter() {
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
         try {
 
             Filter[] filters = null;
-            Filter filter = new Filter("id", FilterOperator.NE, "TestDataSet");
+            Filter filter = new Filter("id", FilterType.NEQ, "TestDataSet");
             filters = new Filter[] { filter };
             ExtractorConfig<W> inputConfigEntity = getFilterConfig(filters);
 
@@ -262,24 +250,24 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
             //
 
-            Filter filter2 = new Filter("id", FilterOperator.IS, "TestDataSet");
+            Filter filter2 = new Filter("id", FilterType.EQ, "TestDataSet");
             filters = new Filter[] { filter2 };
             ExtractorConfig<W> inputConfigEntity2 = getFilterConfig(filters);
 
             RDD<W> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
             assertEquals(inputRDDEntity2.count(), 1);
-        }finally {
+        } finally{
             context.stop();
         }
 
     }
 
-    public <W> ExtractorConfig<W> getWriteExtractorConfig(String output) {
+    public <W> ExtractorConfig<W> getWriteExtractorConfig(String tableOutput) {
         ExtractorConfig<W> extractorConfig = getExtractorConfig(outputEntity);
         extractorConfig.putValue(ExtractorConstants.HOST, host)
-                .putValue(ExtractorConstants.DATABASE, database)
+                .putValue(ExtractorConstants.DATABASE, extractor.getSimpleName().toLowerCase())
                 .putValue(ExtractorConstants.PORT, port)
-                .putValue(ExtractorConstants.COLLECTION, output)
+                .putValue(ExtractorConstants.COLLECTION, tableOutput)
                 .putValue(ExtractorConstants.CREATE_ON_WRITE, true);
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;
@@ -296,7 +284,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
         return extractorConfig;
     }
 
-    public <W>ExtractorConfig<W> getInputColumnConfig(String... inputColumns) {
+    public <W> ExtractorConfig<W> getInputColumnConfig(String... inputColumns) {
 
         ExtractorConfig<W> extractorConfig = getExtractorConfig(configEntity);
         extractorConfig.putValue(ExtractorConstants.HOST, host)
@@ -308,22 +296,18 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
         return extractorConfig;
     }
 
-    public <W>ExtractorConfig<W> getFilterConfig(Filter[] filters) {
+    public <W> ExtractorConfig<W> getFilterConfig(Filter[] filters) {
 
         ExtractorConfig<W> extractorConfig = getExtractorConfig(configEntity);
-        extractorConfig.putValue(ExtractorConstants.HOST,host)
+        extractorConfig.putValue(ExtractorConstants.HOST, host)
                 .putValue(ExtractorConstants.DATABASE, databaseInputColumns)
-                .putValue(ExtractorConstants.COLLECTION,tableRead)
+                .putValue(ExtractorConstants.COLLECTION, tableRead)
                 .putValue(ExtractorConstants.PORT, port)
                 .putValue(ExtractorConstants.FILTER_QUERY, filters);
 
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;
     }
-
-    /**
-     * It closes spark's context
-     */
 
     private boolean isEntityClassCells(ExtractorConfig extractorConfig) {
         if (extractorConfig.getEntityClass().isAssignableFrom(Cells.class)) {

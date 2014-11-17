@@ -16,22 +16,9 @@
 
 package com.stratio.deep.utils;
 
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.filter.Filter;
-import com.stratio.deep.commons.filter.FilterOperator;
-import com.stratio.deep.core.entity.BookEntity;
-import com.stratio.deep.core.entity.CantoEntity;
-import com.stratio.deep.core.entity.MetadataEntity;
-import com.stratio.deep.es.utils.UtilES;
-
-import org.apache.hadoop.io.ArrayWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
-import org.elasticsearch.hadoop.mr.LinkedMapWritable;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.json.simple.JSONObject;
-import org.testng.annotations.Test;
+import static com.stratio.deep.es.utils.UtilES.generateQuery;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -41,8 +28,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.stratio.deep.es.utils.UtilES.generateQuery;
-import static org.testng.Assert.*;
+import org.apache.hadoop.io.ArrayWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.Writable;
+import org.elasticsearch.hadoop.mr.LinkedMapWritable;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.json.simple.JSONObject;
+import org.testng.annotations.Test;
+
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.filter.Filter;
+import com.stratio.deep.commons.filter.FilterType;
+import com.stratio.deep.core.entity.BookEntity;
+import com.stratio.deep.core.entity.CantoEntity;
+import com.stratio.deep.core.entity.MetadataEntity;
+import com.stratio.deep.es.utils.UtilES;
 
 /**
  * Created by rcrespo on 18/06/14.
@@ -149,17 +150,17 @@ public class UtilESTest {
             throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
             InstantiationException {
 
-        //        ESTestEntity commonsBaseTestEntity = new ESTestEntity();
+        // ESTestEntity commonsBaseTestEntity = new ESTestEntity();
         //
-        //        commonsBaseTestEntity.setId(ID_EXAMPLE);
-        //
-        //
-        //        assertEquals(UtilES.getId(commonsBaseTestEntity), ID_EXAMPLE);
+        // commonsBaseTestEntity.setId(ID_EXAMPLE);
         //
         //
-        //        WordCount wordCount = new WordCount();
+        // assertEquals(UtilES.getId(commonsBaseTestEntity), ID_EXAMPLE);
+        //
+        //
+        // WordCount wordCount = new WordCount();
 
-        //        assertNull(UtilES.getId(wordCount));
+        // assertNull(UtilES.getId(wordCount));
     }
 
     private LinkedMapWritable createJsonTest() {
@@ -226,7 +227,7 @@ public class UtilESTest {
             throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
             InstantiationException {
 
-        //Create Medataba Object
+        // Create Medataba Object
 
         Cell authorCell = Cell.create("author", "ANTE ALIGHIERI");
         Cell titleCell = Cell.create("title", "THE DIVINE COMEDY");
@@ -238,7 +239,7 @@ public class UtilESTest {
         metadata.add(titleCell);
         metadata.add(sourceCell);
 
-        //Create Cantos Object
+        // Create Cantos Object
 
         List<Cells> cantos = new ArrayList<>();
 
@@ -298,16 +299,15 @@ public class UtilESTest {
         constructor.newInstance();
     }
 
-
     @Test
     public void testgenerateQuery() {
 
-        Filter filter = new Filter("field1" , FilterOperator.IS, "value1");
-        Filter filter2 = new Filter("field2" , FilterOperator.NE, "value2");
+        Filter filter = new Filter("field1", FilterType.EQ, "value1");
+        Filter filter2 = new Filter("field2", FilterType.NEQ, "value2");
 
         BoolQueryBuilder boolQueryBuilder = (BoolQueryBuilder) generateQuery(filter, filter2);
 
-//        assertEquals(boolQueryBuilder.toString(), "");
+        // assertEquals(boolQueryBuilder.toString(), "");
 
         assertTrue(true, "true");
     }

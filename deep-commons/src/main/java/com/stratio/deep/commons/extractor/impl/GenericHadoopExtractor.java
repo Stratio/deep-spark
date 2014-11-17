@@ -43,6 +43,7 @@ import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.HadoopConfig;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
+import com.stratio.deep.commons.impl.DeepPartition;
 import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.commons.utils.DeepSparkHadoopMapReduceUtil;
 
@@ -78,6 +79,13 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, K
         jobTrackerId = formatter.format(new Date());
 
     }
+
+
+    @Override
+    public List<String> getPreferredLocations(Partition split) {
+        return null;
+    }
+
 
     @Override
     public Partition[] getPartitions(S config) {

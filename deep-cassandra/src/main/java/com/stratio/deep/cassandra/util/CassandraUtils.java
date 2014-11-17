@@ -38,7 +38,6 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.spark.TaskContext;
 import org.apache.spark.rdd.RDD;
-import org.json4s.DefaultWriters.W;
 
 import scala.Function1;
 import scala.Tuple2;
@@ -59,6 +58,7 @@ import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.filter.Filter;
+import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction2;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Pair;
@@ -413,22 +413,43 @@ public class CassandraUtils {
         if (filters != null) {
             for (int i = 0; i < filters.length; i++) {
 
-                String operation = filters[i].getOperation();
+                FilterType filterType = filters[i].getFilterType();
 
-                switch (operation) {
-                case "in":
-                case "between":
+                switch (filterType) {
+                case IN:
+                    List<String> inValues = (List<String>) filters[i].getValue();
+
+                    sb.append(" AND ")
+                            .append(quote(filters[i].getField()))
+                            .append(" IN ").append("(");
+
+                    if (!inValues.isEmpty()) {
+                        if (inValues.get(0) instanceof String) {
+                            sb.append("'").append(StringUtils.join(((List<String>) filters[i].getValue()), "','"))
+                                    .append("'");
+                        } else {
+                            sb.append(StringUtils.join(((List<String>) filters[i].getValue()), ","));
+                        }
+                    }
+                    sb.append(")");
                     break;
-                case "match":
+                case BETWEEN:
+                    break;
+                case MATCH:
                     sb.append(" AND ").append(luceneIndex).append(" = '");
                     sb.append(getLuceneWhereClause(filters[i]));
                     sb.append("'");
                     break;
                 default:
-                    sb.append(" AND ").append(quote(filters[i].getField()))
-                            .append(OperatorCassandra.getOperatorCassandra(filters[i].getOperation
-                                    ()).getOperator()).append
-                            (filters[i].getValue());
+                    String value = filters[i].getValue().toString();
+
+                    if (filters[i].getValue() instanceof String) {
+                        value = singleQuote(value.trim());
+                    }
+
+                    sb.append(" AND ").append(quote(filters[i].getField())).append(" ")
+                            .append(OperatorCassandra.getOperatorCassandra(filters[i].getFilterType()).getOperator())
+                            .append(" ").append(value);
                     break;
                 }
             }

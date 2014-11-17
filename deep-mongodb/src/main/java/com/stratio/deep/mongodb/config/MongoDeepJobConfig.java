@@ -20,10 +20,11 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.COLLEC
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.DATABASE;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.FILTER_QUERY;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.HOST;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PORT;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.IGNORE_ID_FIELD;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_KEY;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PORT;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.READ_PREFERENCE;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.REPLICA_SET;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.SORT;
@@ -32,7 +33,7 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNA
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_CHUNKS;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_SHARD;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_SPLITS;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.IGNORE_ID_FIELD;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,26 +42,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapred.JobConf;
+import org.bson.BSONObject;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.HadoopConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.filter.Filter;
-import com.stratio.deep.commons.filter.FilterOperator;
+import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
 import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapred.JobConf;
-import org.bson.BSONObject;
-import org.bson.BasicBSONObject;
-
 /**
- * @param <T>
+ * The type Mongo deep job config.
+ *
+ * @param <T> the type parameter
  */
 public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeepJobConfig<T>, Serializable {
+    /**
+     * The constant serialVersionUID.
+     */
     private static final long serialVersionUID = -7179376653643603038L;
 
     /**
@@ -73,34 +78,29 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      */
     private List<String> hostList = new ArrayList<>();
 
-
     /**
      * Indicates the replica set's name
      */
     private String replicaSet;
 
-
     /**
-     * Read Preference
-     * primaryPreferred is the recommended read preference. If the primary node go down, can still read from secundaries
+     * Read Preference primaryPreferred is the recommended read preference. If the primary node go down, can still read
+     * from secundaries
      */
     private String readPreference;
 
     /**
-     * OPTIONAL
-     * filter query
+     * OPTIONAL filter query
      */
-    private String query;
+    private DBObject query;
 
     /**
-     * OPTIONAL
-     * fields to be returned
+     * OPTIONAL fields to be returned
      */
-    private BSONObject fields;
+    private DBObject fields;
 
     /**
-     * OPTIONAL
-     * sorting
+     * OPTIONAL sorting
      */
     private String sort;
 
@@ -109,26 +109,44 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      */
     private String inputKey;
 
+    /**
+     * The Create input split.
+     */
     private boolean createInputSplit = true;
 
+    /**
+     * The Use shards.
+     */
     private boolean useShards = false;
 
+    /**
+     * The Splits use chunks.
+     */
     private boolean splitsUseChunks = true;
 
+    /**
+     * The Split size.
+     */
     private Integer splitSize = 8;
 
+    /**
+     * The Custom configuration.
+     */
     private Map<String, Serializable> customConfiguration;
 
 
-
+    /**
+     * Instantiates a new Mongo deep job config.
+     *
+     * @param entityClass the entity class
+     */
     public MongoDeepJobConfig(Class<T> entityClass) {
         super(entityClass);
-        if(Cells.class.isAssignableFrom(entityClass)){
+        if (Cells.class.isAssignableFrom(entityClass)) {
             extractorImplClass = MongoCellExtractor.class;
-        }else{
+        } else {
             extractorImplClass = MongoEntityExtractor.class;
         }
-
 
     }
 
@@ -142,7 +160,6 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
         return this;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -151,6 +168,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
         return !hostList.isEmpty() ? hostList.get(0) : null;
     }
 
+    @Override
     public List<String> getHostList() {
         return hostList;
     }
@@ -197,6 +215,12 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
         return this;
     }
 
+    /**
+     * Host mongo deep job config.
+     *
+     * @param hosts the hosts
+     * @return the mongo deep job config
+     */
     public MongoDeepJobConfig<T> host(String[] hosts) {
         this.hostList.addAll(Arrays.asList(hosts));
         return this;
@@ -206,7 +230,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public MongoDeepJobConfig<T> filterQuery(String query) {
+    public MongoDeepJobConfig<T> filterQuery(DBObject query) {
         this.query = query;
         return this;
     }
@@ -215,17 +239,8 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public MongoDeepJobConfig<T> filterQuery(BSONObject query) {
-        this.query = query.toString();
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public MongoDeepJobConfig<T> filterQuery(QueryBuilder query) {
-        this.query = query.get().toString();
+        this.query = query.get();
         return this;
     }
 
@@ -274,7 +289,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * {@inheritDoc}
      */
     @Override
-    public MongoDeepJobConfig<T> fields(BSONObject fields) {
+    public MongoDeepJobConfig<T> fields(DBObject fields) {
         this.fields = fields;
         return this;
     }
@@ -365,7 +380,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      */
     @Override
     public MongoDeepJobConfig<T> ignoreIdField() {
-        BSONObject bsonFields = fields != null ? fields : new BasicBSONObject();
+        DBObject bsonFields = fields != null ? fields : new BasicDBObject();
         bsonFields.put("_id", 0);
         fields = bsonFields;
         return this;
@@ -378,7 +393,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
 
     @Override
     public String getNameSpace() {
-        if(nameSpace == null){
+        if (nameSpace == null) {
             nameSpace = new StringBuilder().append(getDatabase())
                     .append(".")
                     .append(getCollection()).toString();
@@ -386,10 +401,17 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
         return nameSpace;
     }
 
-    public MongoDeepJobConfig<T> port(int port){
-        for(int i = 0; i< hostList.size() ; i++){
-            if (hostList.get(i).indexOf(":")==-1) {
-                hostList.set(i, hostList.get(i).concat(":").concat(String.valueOf(port))) ;
+
+    /**
+     * Port mongo deep job config.
+     *
+     * @param port the port
+     * @return the mongo deep job config
+     */
+    public MongoDeepJobConfig<T> port(int port) {
+        for (int i = 0; i < hostList.size(); i++) {
+            if (hostList.get(i).indexOf(":") == -1) {
+                hostList.set(i, hostList.get(i).concat(":").concat(String.valueOf(port)));
             }
 
         }
@@ -460,7 +482,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
         configHadoop.set(MongoConfigUtil.SPLITS_USE_CHUNKS, String.valueOf(splitsUseChunks));
 
         if (query != null) {
-            configHadoop.set(MongoConfigUtil.INPUT_QUERY, query);
+            configHadoop.set(MongoConfigUtil.INPUT_QUERY, query.toString());
         }
 
         if (fields != null) {
@@ -507,7 +529,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      */
     @Override
     public MongoDeepJobConfig<T> inputColumns(String... columns) {
-        BSONObject bsonFields = fields != null ? fields : new BasicBSONObject();
+        DBObject bsonFields = fields != null ? fields : new BasicDBObject();
         boolean isIdPresent = false;
         for (String column : columns) {
             if (column.trim().equalsIgnoreCase("_id")) {
@@ -550,11 +572,11 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
             host((extractorConfig.getStringArray(HOST)));
         }
 
-        if(values.get(PORT)!=null){
+        if (values.get(PORT) != null) {
             port((extractorConfig.getInteger(PORT)));
         }
 
-        if(values.get(COLLECTION)!=null){
+        if (values.get(COLLECTION) != null) {
             collection(extractorConfig.getString(COLLECTION));
         }
 
@@ -578,7 +600,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
             sort(extractorConfig.getString(SORT));
         }
 
-        if(values.get(FILTER_QUERY)!=null){
+        if (values.get(FILTER_QUERY) != null) {
             filterQuery(extractorConfig.getFilterArray(FILTER_QUERY));
         }
 
@@ -605,7 +627,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
         if (values.get(USE_CHUNKS) != null) {
             splitsUseChunks(extractorConfig.getBoolean(USE_CHUNKS));
         }
-        if(values.get(SPLIT_SIZE)!=null){
+        if (values.get(SPLIT_SIZE) != null) {
             pageSize(extractorConfig.getInteger(SPLIT_SIZE));
         }
 
@@ -614,9 +636,16 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
         return this;
     }
 
-    public MongoDeepJobConfig<T> filterQuery (Filter[] filters){
 
-        if(filters.length>0) {
+    /**
+     * Filter query.
+     *
+     * @param filters the filters
+     * @return the mongo deep job config
+     */
+    public MongoDeepJobConfig<T> filterQuery(Filter[] filters) {
+
+        if (filters.length > 0) {
             List<BasicDBObject> list = new ArrayList<>();
 
             QueryBuilder queryBuilder = QueryBuilder.start();
@@ -624,11 +653,12 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
                 BasicDBObject bsonObject = new BasicDBObject();
 
                 Filter filter = filters[i];
-                if (filter.getOperation().equals(FilterOperator.IS)) {
+                if (filter.getFilterType().equals(FilterType.EQ)) {
                     bsonObject.put(filter.getField(), filter.getValue());
                 } else {
                     bsonObject.put(filter.getField(),
-                            new BasicDBObject("$".concat(filter.getOperation()), filter.getValue()));
+                            new BasicDBObject("$".concat(filter.getFilterType().getFilterTypeId().toLowerCase()),
+                                    filter.getValue()));
                 }
 
                 list.add(bsonObject);
@@ -639,7 +669,113 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
         }
         return this;
 
-
     }
 
+    /**
+     * Gets input key.
+     *
+     * @return the input key
+     */
+    public String getInputKey() {
+        return inputKey;
+    }
+
+    /**
+     * Sets input key.
+     *
+     * @param inputKey the input key
+     */
+    public void setInputKey(String inputKey) {
+        this.inputKey = inputKey;
+    }
+
+    /**
+     * Is create input split.
+     *
+     * @return the boolean
+     */
+    public boolean isCreateInputSplit() {
+        return createInputSplit;
+    }
+
+    /**
+     * Sets create input split.
+     *
+     * @param createInputSplit the create input split
+     */
+    public void setCreateInputSplit(boolean createInputSplit) {
+        this.createInputSplit = createInputSplit;
+    }
+
+    /**
+     * Is use shards.
+     *
+     * @return the boolean
+     */
+    public boolean isUseShards() {
+        return useShards;
+    }
+
+    /**
+     * Sets use shards.
+     *
+     * @param useShards the use shards
+     */
+    public void setUseShards(boolean useShards) {
+        this.useShards = useShards;
+    }
+
+    /**
+     * Is splits use chunks.
+     *
+     * @return the boolean
+     */
+    public boolean isSplitsUseChunks() {
+        return splitsUseChunks;
+    }
+
+    /**
+     * Sets splits use chunks.
+     *
+     * @param splitsUseChunks the splits use chunks
+     */
+    public void setSplitsUseChunks(boolean splitsUseChunks) {
+        this.splitsUseChunks = splitsUseChunks;
+    }
+
+    /**
+     * Gets split size.
+     *
+     * @return the split size
+     */
+    public Integer getSplitSize() {
+        return splitSize;
+    }
+
+    /**
+     * Sets split size.
+     *
+     * @param splitSize the split size
+     */
+    public void setSplitSize(Integer splitSize) {
+        this.splitSize = splitSize;
+    }
+
+    /**
+     * Gets input fields.
+     *
+     * @return the input fields
+     */
+    public DBObject getInputFields() {
+        return fields;
+    }
+
+    /**
+     * Gets query.
+     *
+     * @return the query
+     */
+    public DBObject getQuery() {
+        return query;
+    }
 }

@@ -21,13 +21,13 @@ import java.util.List;
 import org.apache.hadoop.conf.Configuration;
 import org.bson.BSONObject;
 
+import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
-import com.stratio.deep.commons.config.IDeepJobConfig;
 
 /**
  * Defines the public methods that each Stratio Deep MongoDB configuration object should implement.
  */
-public interface IMongoDeepJobConfig<T>  {
+public interface IMongoDeepJobConfig<T> {
     /**
      * The MongoDB's collection name
      */
@@ -72,7 +72,7 @@ public interface IMongoDeepJobConfig<T>  {
      * @param query
      * @return this object.
      */
-    IMongoDeepJobConfig<T> filterQuery(String query);
+    //    IMongoDeepJobConfig<T> filterQuery(String query);
 
     /**
      * Filter query
@@ -80,7 +80,7 @@ public interface IMongoDeepJobConfig<T>  {
      * @param query
      * @return this object.
      */
-    IMongoDeepJobConfig<T> filterQuery(BSONObject query);
+    IMongoDeepJobConfig<T> filterQuery(DBObject query);
 
     /**
      * Filter query
@@ -96,7 +96,7 @@ public interface IMongoDeepJobConfig<T>  {
      * @param fields
      * @return this object.
      */
-    IMongoDeepJobConfig<T> fields(BSONObject fields);
+    IMongoDeepJobConfig<T> fields(DBObject fields);
 
     /**
      * Sorting

@@ -14,6 +14,7 @@
 
 package com.stratio.deep.core.context;
 
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -26,7 +27,6 @@ import org.apache.spark.rdd.RDD;
 import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.core.function.PrepareSaveFunction;
@@ -40,6 +40,9 @@ import com.stratio.deep.core.rdd.DeepRDD;
  */
 public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
+    /**
+     * The constant LOG.
+     */
     private static final Logger LOG = Logger.getLogger(DeepSparkContext.class);
 
     /**
@@ -54,11 +57,9 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
     /**
      * Overridden superclass constructor.
-     * 
-     * @param master
-     *            the url of the master node.
-     * @param appName
-     *            the name of the application.
+     *
+     * @param master the url of the master node.
+     * @param appName the name of the application.
      */
     public DeepSparkContext(String master, String appName) {
         super(master, appName);
@@ -66,31 +67,23 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
     /**
      * Overridden superclass constructor.
-     * 
-     * @param master
-     *            the url of the master node.
-     * @param appName
-     *            the name of the application.
-     * @param sparkHome
-     *            the spark home folder.
-     * @param jarFile
-     *            the jar file to serialize and send to all the cluster nodes.
+     *
+     * @param master the url of the master node.
+     * @param appName the name of the application.
+     * @param sparkHome the spark home folder.
+     * @param jarFile the jar file to serialize and send to all the cluster nodes
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String jarFile) {
         super(master, appName, sparkHome, jarFile);
     }
 
     /**
-     * Overridden superclass constructor.
-     * 
-     * @param master
-     *            the url of the master node.
-     * @param appName
-     *            the name of the application.
-     * @param sparkHome
-     *            the spark home folder.
-     * @param jars
-     *            the jar file(s) to serialize and send to all the cluster nodes.
+     * Overridden superclass constructor. the jar file(s) to serialize and send to all the cluster nodes.
+     *
+     * @param master the url of the master node.
+     * @param appName the name of the application.
+     * @param sparkHome the spark home folder.
+     * @param jars the jar file(s) to serialize and send to all the cluster nodes.
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String[] jars) {
         super(master, appName, sparkHome, jars);
@@ -98,17 +91,12 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
     /**
      * Overridden superclass constructor.
-     * 
-     * @param master
-     *            the url of the master node.
-     * @param appName
-     *            the name of the application.
-     * @param sparkHome
-     *            the spark home folder.
-     * @param jars
-     *            the jar file(s) to serialize and send to all the cluster nodes.
-     * @param environment
-     *            a map of environment variables.
+     *
+     * @param master the url of the master node.
+     * @param appName the name of the application.
+     * @param sparkHome the spark home folder.
+     * @param jars the jar file(s) to serialize and send to all the cluster nodes.
+     * @param environment a map of environment variables.
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String[] jars,
             Map<String, String> environment) {
@@ -117,42 +105,46 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
     }
 
     /**
-     * @param extractorConfig
-     * @param <T>
-     * @return
+     * Creates a RDD.
+     *
+     * @param <T>  the type parameter
+     * @param config the config
+     * @return the rDD
      */
-    public <T> RDD<T> createRDD(final ExtractorConfig<T> extractorConfig) {
-        return new DeepRDD<>(this.sc(), extractorConfig);
+    public <T> RDD<T> createRDD(ExtractorConfig<T> config) {
+        return new DeepRDD<>(this.sc(), config);
+    }
+
+    public <T> RDD<T> createRDD(DeepJobConfig<T> deepJobConfig) {
+        return new DeepRDD<>(this.sc(),deepJobConfig);
     }
 
     /**
-     * @param deepJobConfig
-     * @param <T>
-     * @return
-     */
-    public <T> RDD<T> createRDD(final IDeepJobConfig<T, ?> deepJobConfig) {
-        return new DeepRDD<T, DeepJobConfig<T>>(this.sc(), (DeepJobConfig) deepJobConfig);
-    }
-
-    /**
-     * @param extractorConfig
-     * @param <T>
-     * @return
+     * Creates a JavaRDD.
+     *
+     * @param <T>  the type parameter
+     * @param <>  the type parameter
+     * @param config the config
+     * @return the java rDD
      */
     public <T> JavaRDD<T> createJavaRDD(
-            ExtractorConfig<T> extractorConfig) {
-        return new DeepJavaRDD((DeepRDD<T, ExtractorConfig<T>>) createRDD(extractorConfig));
+            ExtractorConfig<T> config) {
+        return (JavaRDD<T>)new DeepJavaRDD<>((DeepRDD<T, ExtractorConfig<T>>) createRDD(config));
+    }
+
+    public <T> JavaRDD<T> createJavaRDD(DeepJobConfig<T> config) {
+        return (JavaRDD<T>)new DeepJavaRDD<>((DeepRDD<T, DeepJobConfig<T>>) createRDD(config));
     }
 
     /**
-     * @param deepJobConfig
-     * @param <T>
-     * @return
+     * Saves RDD.
+     *
+     * @param <T>  the type parameter
+     * @param <S>  the type parameter
+     * @param rdd the rdd
+     * @param config the config
+     * @throws DeepIOException the deep iO exception
      */
-    public <T> JavaRDD<T> createJavaRDD(final IDeepJobConfig<T, ?> deepJobConfig) {
-        return new DeepJavaRDD((DeepRDD<T, DeepJobConfig<T>>) createRDD(deepJobConfig));
-    }
-
     public static <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, S config) throws DeepIOException {
         config.setRddId(rdd.id());
         config.setPartitionId(0);
