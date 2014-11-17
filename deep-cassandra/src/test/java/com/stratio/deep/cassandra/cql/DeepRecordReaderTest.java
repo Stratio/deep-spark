@@ -33,8 +33,8 @@ public class DeepRecordReaderTest {
                 .putValue(ExtractorConstants.INPUT_COLUMNS, inputColumns);
         extractorConfig.setExtractorImplClass(com.stratio.deep.cassandra.extractor.CassandraCellExtractor.class);
 
-        Serializable[] inValues = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-        EqualsInValue equalsInValue = new EqualsInValue(1, Arrays.asList(inValues));
+        Serializable[] inValues = { 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L };
+        EqualsInValue equalsInValue = new EqualsInValue("id", 1L, "split", Arrays.asList(inValues));
         extractorConfig.putValue(ExtractorConstants.EQUALS_IN_FILTER, equalsInValue);
 
         DeepSparkContext context = new DeepSparkContext("local", "testAppName");

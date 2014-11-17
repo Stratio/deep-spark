@@ -18,6 +18,10 @@ package com.stratio.deep.cassandra.cql;
 
 import static com.stratio.deep.cassandra.cql.CassandraClientProvider.trySessionForLocation;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -34,6 +38,7 @@ import java.util.Set;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.dht.IPartitioner;
+import org.apache.cassandra.dht.Token;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -75,7 +80,7 @@ import com.stratio.deep.commons.utils.Utils;
 public class DeepRecordReader implements IDeepRecordReader {
     private static final Logger LOG = LoggerFactory.getLogger(DeepRecordReader.class);
 
-    private final DeepTokenRange split;
+    private final DeepTokenRange<?, String> split;
     private RowIterator rowIterator;
 
     private String cfName;
@@ -92,11 +97,11 @@ public class DeepRecordReader implements IDeepRecordReader {
     // the number of cql rows per page
     private final int pageSize;
 
-    private IPartitioner partitioner;
+    private IPartitioner<?> partitioner;
 
     private AbstractType<?> keyValidator;
 
-    private final CassandraDeepJobConfig config;
+    private final CassandraDeepJobConfig<?> config;
 
     private Session session;
 
@@ -108,8 +113,8 @@ public class DeepRecordReader implements IDeepRecordReader {
      * @param split
      *            the token range on which the new reader will be based.
      */
-    public DeepRecordReader(DeepJobConfig config, DeepTokenRange split) {
-        this.config = (CassandraDeepJobConfig) config;
+    public DeepRecordReader(DeepJobConfig<?> config, DeepTokenRange<?, String> split) {
+        this.config = (CassandraDeepJobConfig<?>) config;
         this.split = split;
         this.pageSize = config.getPageSize();
         initialize();
@@ -274,16 +279,18 @@ public class DeepRecordReader implements IDeepRecordReader {
 
             EqualsInValue equalsInValue = config.getEqualsInValue();
             String generatedQuery = null;
+            // Checking whether the job is a EQUALS_IN special query or not
             if (equalsInValue == null) {
-                String clause = whereClause();
+                String whereClause = whereClause();
                 generatedQuery = String.format("SELECT %s FROM %s%s%s ALLOW FILTERING",
-                        generatedColumns, quote(cfName), clause,
+                        generatedColumns, quote(cfName), whereClause,
                         CassandraUtils.additionalFilterGenerator(config.getAdditionalFilters(), config.getFilters(),
                                 getLuceneIndex()));
             } else {
-                partitioner.getToken(getPartitionKey());
-                generatedQuery = String.format("SELECT %s FROM %s%s%s ALLOW FILTERING",
-                        generatedColumns, quote(cfName), null);
+                // partitioner.getToken(getPartitionKey(equalsInValue));
+                String equalsInClause = equalsInWhereClause(equalsInValue);
+                generatedQuery = String.format("SELECT %s FROM %s %s",
+                        generatedColumns, quote(cfName), equalsInClause);
             }
             return generatedQuery;
         }
@@ -310,7 +317,12 @@ public class DeepRecordReader implements IDeepRecordReader {
             } else {
                 values = new Object[2];
                 values[0] = equalsInValue.getEqualsValue();
-                values[1] = filterSplits(equalsInValue.getInValues(), bindValues);
+                values[1] = filterSplits(equalsInValue);
+
+                if (values[1] == null) {
+                    return null;
+                }
+
                 LOG.debug("query: " + query + "; values: " + Arrays.toString(values));
             }
 
@@ -330,20 +342,23 @@ public class DeepRecordReader implements IDeepRecordReader {
          * 
          * @return Filtered splits.
          */
-        private Object filterSplits(List<Serializable> inValues, List<Object> bindValues) {
+        private List<Serializable> filterSplits(EqualsInValue equalsInValue) {
 
             List<Serializable> filteredInValues = new ArrayList<>();
-            for (Serializable value : inValues) {
-                Comparable valueComparable = (Comparable) value;
-                if ((valueComparable.compareTo(bindValues.get(0)) > 0)
-                        && (valueComparable.compareTo(bindValues.get(1)) <= 0)) {
+            for (Serializable value : equalsInValue.getInValues()) {
+                Token<Comparable> token = partitioner.getToken(getPartitionKey(equalsInValue.getEqualsValue(),
+                        value));
+
+                if (split.isTokenIncludedInRange(token)) {
                     filteredInValues.add(value);
                 }
             }
-            StringBuilder inClause = new StringBuilder();
-            inClause.append("(").append(StringUtils.join(filteredInValues, ",")).append(")");
 
-            return inClause.toString();
+            if (filteredInValues.isEmpty()) {
+                return null;
+            }
+
+            return filteredInValues;
         }
 
         /**
@@ -407,20 +422,17 @@ public class DeepRecordReader implements IDeepRecordReader {
         }
 
         /**
-         * serialize the where clause
+         * Generates the special equals_in clause
+         * 
+         * @return Returns the equals in clause
          */
-        private String equalsInWhereClause() {
-            if (partitionKeyString == null) {
-                partitionKeyString = keyString(partitionBoundColumns);
-            }
+        private String equalsInWhereClause(EqualsInValue equalsInValue) {
 
-            if (partitionKeyMarkers == null) {
-                partitionKeyMarkers = partitionKeyMarkers();
-            }
-            // initial
-            // query token(k) >= start_token and token(k) <= end_token
-            return String.format(" WHERE token(%s) > ? AND token(%s) <= ?", partitionKeyString,
-                    partitionKeyString);
+            StringBuffer sb = new StringBuffer();
+            sb.append("WHERE ").append(equalsInValue.getEqualsField()).append(" = ? AND ")
+                    .append(equalsInValue.getInField()).append(" IN ?");
+
+            return sb.toString();
         }
 
         /**
@@ -475,38 +487,40 @@ public class DeepRecordReader implements IDeepRecordReader {
 
             Statement stmt = prepareStatement();
 
-            rows = null;
-            int retries = 0;
-            Exception exception = null;
+            if (stmt != null) {
+                rows = null;
+                int retries = 0;
+                Exception exception = null;
 
-            // only try three times for TimedOutException and UnavailableException
-            while (retries < 3) {
-                try {
-                    ResultSet resultSet = session.execute(stmt);
-
-                    if (resultSet != null) {
-                        rows = resultSet.iterator();
-                    }
-                    return;
-                } catch (NoHostAvailableException e) {
-                    LOG.error("Could not connect to ");
-                    exception = e;
-
+                // only try three times for TimedOutException and UnavailableException
+                while (retries < 3) {
                     try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e1) {
-                        LOG.error("sleep exception", e1);
+                        ResultSet resultSet = session.execute(stmt);
+
+                        if (resultSet != null) {
+                            rows = resultSet.iterator();
+                        }
+                        return;
+                    } catch (NoHostAvailableException e) {
+                        LOG.error("Could not connect to ");
+                        exception = e;
+
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e1) {
+                            LOG.error("sleep exception", e1);
+                        }
+
+                        ++retries;
+
+                    } catch (Exception e) {
+                        throw new DeepIOException(e);
                     }
-
-                    ++retries;
-
-                } catch (Exception e) {
-                    throw new DeepIOException(e);
                 }
-            }
 
-            if (exception != null) {
-                throw new DeepIOException(exception);
+                if (exception != null) {
+                    throw new DeepIOException(exception);
+                }
             }
         }
     }
@@ -604,19 +618,45 @@ public class DeepRecordReader implements IDeepRecordReader {
         return rowIterator.next();
     }
 
-    private ByteBuffer getPartitionKey() {
+    private ByteBuffer getPartitionKey2(Serializable equalsValue, Serializable inValue) {
+
         ByteBuffer partitionKey;
-        if (keyValidator instanceof CompositeType) {
-            ByteBuffer[] keys = new ByteBuffer[partitionBoundColumns.size()];
+        ByteBuffer[] keys = new ByteBuffer[2];
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
+        ObjectOutput out = null;
 
-            for (int i = 0; i < partitionBoundColumns.size(); i++) {
-                keys[i] = partitionBoundColumns.get(i).value;
-            }
+        try {
+            out = new ObjectOutputStream(bos);
+            out.writeObject(equalsValue);
 
-            partitionKey = CompositeType.build(keys);
-        } else {
-            partitionKey = partitionBoundColumns.get(0).value;
+            out = new ObjectOutputStream(bos2);
+            out.writeObject(inValue);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+        byte[] equalsValuesBytes = bos.toByteArray();
+        byte[] inValueBytes = bos2.toByteArray();
+        keys[0] = ByteBuffer.wrap(equalsValuesBytes);
+        keys[1] = ByteBuffer.wrap(inValueBytes);
+
+        partitionKey = CompositeType.build(keys);
+
+        return partitionKey;
+    }
+
+    private ByteBuffer getPartitionKey(Serializable equalsValue, Serializable inValue) {
+
+        ByteBuffer partitionKey = ((CompositeType) keyValidator).decompose(equalsValue, inValue);
+        // ByteBuffer inByteBuffer = ((CompositeType) keyValidator).decompose(inValue);
+        //
+        // ByteBuffer[] keys = new ByteBuffer[2];
+        // keys[0] = equalsByteBuffer;
+        // keys[1] = inByteBuffer;
+        //
+        // ByteBuffer partitionKey = CompositeType.build(keys);
+
         return partitionKey;
     }
 }

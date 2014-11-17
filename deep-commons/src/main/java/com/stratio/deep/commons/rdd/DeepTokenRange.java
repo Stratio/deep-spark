@@ -20,19 +20,23 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.cassandra.dht.Token;
+
 /**
  * Wrapper class holding information of a computed token range.
  */
 public class DeepTokenRange<T, K> implements Comparable<DeepTokenRange>, Serializable {
-    private T startToken;
-    private T endToken;
+    private final T startToken;
+    private final T endToken;
     private List<K> replicas;
 
     /**
      * Construct a new token range with no replica information.
-     *
-     * @param startToken first token of this range.
-     * @param endToken   last token of this range.
+     * 
+     * @param startToken
+     *            first token of this range.
+     * @param endToken
+     *            last token of this range.
      */
     public DeepTokenRange(T startToken, T endToken) {
         this.startToken = startToken;
@@ -41,10 +45,13 @@ public class DeepTokenRange<T, K> implements Comparable<DeepTokenRange>, Seriali
 
     /**
      * Construct a new token range with replica information.
-     *
-     * @param startToken first token of this range.
-     * @param endToken   last token of this range.
-     * @param replicas   the list of replica machines holding this range of tokens.
+     * 
+     * @param startToken
+     *            first token of this range.
+     * @param endToken
+     *            last token of this range.
+     * @param replicas
+     *            the list of replica machines holding this range of tokens.
      */
     public DeepTokenRange(T startToken, T endToken, List<K> replicas) {
         this.startToken = startToken;
@@ -55,30 +62,33 @@ public class DeepTokenRange<T, K> implements Comparable<DeepTokenRange>, Seriali
     public DeepTokenRange(K[] replicas, T startToken, T endToken) {
         this.startToken = startToken;
         this.endToken = endToken;
-        this.replicas =  Arrays.asList(replicas);
+        this.replicas = Arrays.asList(replicas);
     }
 
     /**
      * Construct a new token range with replica information.
-     *
-     * @param startToken first token of this range.
-     * @param endToken   last token of this range.
-     * @param replicas   the list of replica machines holding this range of tokens.
+     * 
+     * @param startToken
+     *            first token of this range.
+     * @param endToken
+     *            last token of this range.
+     * @param replicas
+     *            the list of replica machines holding this range of tokens.
      */
-//    public DeepTokenRange(T startToken, T endToken, List<String> replicas) {
-//        this.startToken = startToken;
-//        this.endToken = endToken;
-//        this.replicas = replicas;
-//    }
+    // public DeepTokenRange(T startToken, T endToken, List<String> replicas) {
+    // this.startToken = startToken;
+    // this.endToken = endToken;
+    // this.replicas = replicas;
+    // }
 
     /**
      * Construct a new token range with replica information
-     *
+     * 
      * @param replicas
      */
-//    public DeepTokenRange(String[] replicas) {
-//        this.replicas = Arrays.asList(replicas);
-//    }
+    // public DeepTokenRange(String[] replicas) {
+    // this.replicas = Arrays.asList(replicas);
+    // }
 
     /**
      * {@inheritDoc}
@@ -131,18 +141,16 @@ public class DeepTokenRange<T, K> implements Comparable<DeepTokenRange>, Seriali
     }
 
     public T getStartTokenAsComparable() {
-        return  startToken;
+        return startToken;
     }
 
-
     public T getEndToken() {
-        return  endToken;
+        return endToken;
     }
 
     public T getEndTokenAsComparable() {
         return endToken;
     }
-
 
     public List<K> getReplicas() {
         return replicas;
@@ -153,9 +161,38 @@ public class DeepTokenRange<T, K> implements Comparable<DeepTokenRange>, Seriali
      */
     @Override
     public int compareTo(DeepTokenRange o) {
-        if(startToken instanceof Comparable){
-            return ((Comparable)startToken).compareTo(o.startToken);
+        if (startToken instanceof Comparable) {
+            return ((Comparable) startToken).compareTo(o.startToken);
         }
         return 0;
+    }
+
+    /**
+     * Checks if a token is included in the current split.
+     * 
+     * @param token
+     *            {@link Token} to be checked.
+     * 
+     * @return true, if the token is included in the interval; false, otherwise.
+     */
+    public boolean isTokenIncludedInRange(Token<Comparable> token) {
+
+        boolean isIncluded = false;
+
+        if (((Comparable) this.startToken).compareTo(this.endToken) <= 0) {
+            isIncluded = token.token.compareTo(this.startToken) > 0;
+
+            if (isIncluded) {
+                isIncluded = token.token.compareTo(this.endToken) <= 0;
+            }
+        } else {
+            isIncluded = token.token.compareTo(this.startToken) > 0;
+
+            if (!isIncluded) {
+                isIncluded = token.token.compareTo(this.endToken) <= 0;
+            }
+        }
+
+        return isIncluded;
     }
 }
