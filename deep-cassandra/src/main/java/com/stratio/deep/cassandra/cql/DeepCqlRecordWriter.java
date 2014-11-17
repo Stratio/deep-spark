@@ -71,15 +71,15 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter{
     private static final Logger LOG = LoggerFactory.getLogger(DeepCqlRecordWriter.class);
 
     // handles for clients for each range exhausted in the threadpool
-    protected final Map<Token, RangeClient> clients;
-    protected final Map<Token, RangeClient> removedClients;
+    private final Map<Token, RangeClient> clients;
+    private final Map<Token, RangeClient> removedClients;
 
-    protected AbstractType<?> keyValidator;
-    protected String[] partitionKeyColumns;
+    private AbstractType<?> keyValidator;
+    private String[] partitionKeyColumns;
 
-    protected final ICassandraDeepJobConfig writeConfig;
-    protected final IPartitioner partitioner;
-    protected final InetAddress localhost;
+    private final ICassandraDeepJobConfig writeConfig;
+    private final IPartitioner partitioner;
+    private final InetAddress localhost;
 
     private final CassandraUpdateQueryBuilder queryBuilder;
 
@@ -122,7 +122,7 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter{
         }
     }
 
-    protected ByteBuffer getPartitionKey(Cells cells) {
+    private ByteBuffer getPartitionKey(Cells cells) {
         ByteBuffer partitionKey;
         if (keyValidator instanceof CompositeType) {
             ByteBuffer[] keys = new ByteBuffer[partitionKeyColumns.length];

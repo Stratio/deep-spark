@@ -43,7 +43,6 @@ import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.HadoopConfig;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
-import com.stratio.deep.commons.impl.DeepPartition;
 import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.commons.utils.DeepSparkHadoopMapReduceUtil;
 

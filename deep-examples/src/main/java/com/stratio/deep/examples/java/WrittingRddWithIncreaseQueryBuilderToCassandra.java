@@ -80,7 +80,7 @@ public class WrittingRddWithIncreaseQueryBuilderToCassandra {
 
 
 
-        deepContext.saveRDD(inputRDD.rdd(),new IncreaseCountersQueryBuilder(), outputConfig);
+        deepContext.saveRDD(inputRDD.rdd(), outputConfig, new IncreaseCountersQueryBuilder());
 
         deepContext.stop();
     }
