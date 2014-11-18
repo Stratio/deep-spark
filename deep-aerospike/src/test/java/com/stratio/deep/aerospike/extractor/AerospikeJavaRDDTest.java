@@ -30,13 +30,9 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
 
 import static org.testng.Assert.assertEquals;
 
@@ -49,7 +45,7 @@ public class AerospikeJavaRDDTest {
 
     public static final Integer PORT = 3000;
 
-    public static final String HOST = "127.0.0.1";
+    public static final String HOST = "10.200.0.58";
 
     public static final String NAMESPACE_TEST = "test";
 
@@ -58,9 +54,6 @@ public class AerospikeJavaRDDTest {
     public static final String SET_NAME = "input";
 
     public static final String DATA_SET_NAME = "divineComedy.json";
-
-    public static final Long WORD_COUNT_SPECTED = 3833L;
-
 
     @BeforeSuite
     public static void init() throws IOException, ParseException {
@@ -132,4 +125,5 @@ public class AerospikeJavaRDDTest {
         }
 
     }
+
 }
