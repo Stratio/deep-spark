@@ -43,6 +43,7 @@ import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.CantoEntity;
 import com.stratio.deep.core.entity.WordCount;
+import com.stratio.deep.core.extractor.ExtractorEntityTest;
 import com.stratio.deep.core.extractor.ExtractorTest;
 
 import scala.Tuple2;
@@ -51,8 +52,8 @@ import scala.Tuple2;
  * Created by rcrespo on 11/11/14.
  */
 
-@Test(suiteName = "mongoRddTests", groups = { "MongoNativeEntityExtractorTest" }, dependsOnGroups = "MongoCellExtractorTest")
-public class MongoNativeEntityExtractorTest extends ExtractorTest {
+@Test(suiteName = "mongoRddTests", groups = { "MongoNativeEntityExtractorTest" }, dependsOnGroups = "MongoNativeCellExtractorTest")
+public class MongoNativeEntityExtractorTest extends ExtractorEntityTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoNativeEntityExtractorTest.class);
 

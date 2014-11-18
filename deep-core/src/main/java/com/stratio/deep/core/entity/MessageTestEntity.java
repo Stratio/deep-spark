@@ -26,7 +26,7 @@ import com.stratio.deep.commons.entity.IDeepType;
 @DeepEntity
 public class MessageTestEntity implements IDeepType {
 
-    @DeepField(fieldName = "_id")
+    @DeepField(fieldName = "id")
     private String id;
 
     @DeepField

@@ -45,8 +45,12 @@ public final class ESCellExtractor
     private static final long serialVersionUID = -3208994171892747470L;
 
     public ESCellExtractor() {
+        this(Cells.class);
+    }
+
+    public ESCellExtractor(Class<Cells> cellsClass) {
         super();
-        this.deepJobConfig = new ESDeepJobConfig(Cells.class);
+        this.deepJobConfig = new ESDeepJobConfig(cellsClass);
         this.inputFormat = new EsInputFormat<>() ;
         this.outputFormat = new EsOutputFormat() ;
     }

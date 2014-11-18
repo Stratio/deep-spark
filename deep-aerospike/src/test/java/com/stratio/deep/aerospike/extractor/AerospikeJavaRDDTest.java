@@ -45,7 +45,7 @@ public class AerospikeJavaRDDTest {
 
     public static final Integer PORT = 3000;
 
-    public static final String HOST = "127.0.0.1";
+    public static final String HOST = "10.200.0.58";
 
     public static final String NAMESPACE_TEST = "test";
 
@@ -102,6 +102,9 @@ public class AerospikeJavaRDDTest {
      * Delete previously loaded data for starting with a fresh dataset.
      */
     private static void deleteData() {
+        try{
+
+
         aerospike.scanAll(new ScanPolicy(), NAMESPACE_TEST, SET_NAME, new ScanCallback() {
             @Override
             public void scanCallback(Key key, Record record) throws AerospikeException {
@@ -114,6 +117,9 @@ public class AerospikeJavaRDDTest {
                 aerospike.delete(new WritePolicy(), key);
             }
         }, new String[] {});
+        }catch(AerospikeException e){
+            LOG.error("Error while deleting data", e);
+        }
     }
 
     @AfterSuite
@@ -125,4 +131,5 @@ public class AerospikeJavaRDDTest {
         }
 
     }
+
 }

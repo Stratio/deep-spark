@@ -73,7 +73,7 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
     @Override
     public Tuple2<Object, BSONObject> transformElement(T record) {
         try {
-            return new Tuple2<>(null, UtilMongoDB.getBsonFromObject(record));
+            return new Tuple2<>(null, (BSONObject) UtilMongoDB.getBsonFromObject(record));
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             LOG.error(e.getMessage());
             throw new DeepTransformException(e.getMessage());

@@ -40,6 +40,10 @@ public class MongoNativeCellExtractor extends MongoNativeExtractor<Cells, MongoD
         this.mongoDeepJobConfig = new MongoDeepJobConfig<>(Cells.class);
     }
 
+    public MongoNativeCellExtractor(Class<Cells> cellsClass) {
+        this.mongoDeepJobConfig = new MongoDeepJobConfig<>(Cells.class);
+    }
+
     @Override
     protected Cells transformElement(DBObject dbObject) {
         try {

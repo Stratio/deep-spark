@@ -30,6 +30,7 @@ import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -42,6 +43,7 @@ import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.extractor.ExtractorCellTest;
 import com.stratio.deep.core.extractor.ExtractorTest;
 
 import scala.Tuple2;
@@ -50,14 +52,15 @@ import scala.Tuple2;
  * Created by rcrespo on 11/11/14.
  */
 
-@Test(suiteName = "mongoRddTests", groups = { "MongoNativeCellExtractorTest" }, dependsOnGroups = "MongoNativeEntityExtractorTest")
-public class MongoNativeCellExtractorTest extends ExtractorTest {
+
+
+@Test(suiteName = "mongoRddTests", groups = { "MongoNativeCellExtractorTest" }, dependsOnGroups = "MongoEntityExtractorTest")
+public class MongoNativeCellExtractorTest extends ExtractorCellTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoNativeCellExtractorTest.class);
 
     public MongoNativeCellExtractorTest() {
         super(MongoNativeCellExtractor.class, "localhost:27890", null, true);
     }
-
 
 }

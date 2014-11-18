@@ -153,11 +153,11 @@ public final class UtilMongoDB {
      * @throws IllegalAccessException the instantiation exception
      * @throws IllegalAccessException the invocation target exception
      */
-    public static <T> BSONObject getBsonFromObject(T t)
+    public static <T> DBObject getBsonFromObject(T t)
             throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Field[] fields = AnnotationUtils.filterDeepFields(t.getClass());
 
-        BSONObject bson = new BasicBSONObject();
+        DBObject bson = new BasicDBObject();
 
         for (Field field : fields) {
             Method method = Utils.findGetter(field.getName(), t.getClass());
@@ -166,7 +166,7 @@ public final class UtilMongoDB {
                 if (Collection.class.isAssignableFrom(field.getType())) {
                     Collection c = (Collection) object;
                     Iterator iterator = c.iterator();
-                    List<BSONObject> innerBsonList = new ArrayList<>();
+                    List<DBObject> innerBsonList = new ArrayList<>();
 
                     while (iterator.hasNext()) {
                         innerBsonList.add(getBsonFromObject((IDeepType) iterator.next()));
@@ -231,11 +231,11 @@ public final class UtilMongoDB {
                 if (List.class.isAssignableFrom(entry.getValue().getClass())) {
                     List<Cells> innerCell = new ArrayList<>();
                     for (BSONObject innerBson : (List<BSONObject>) entry.getValue()) {
-                        innerCell.add(getCellFromBson(innerBson, tableName));
+                        innerCell.add(getCellFromBson(innerBson, null));
                     }
                     cells.add(Cell.create(entry.getKey(), innerCell));
                 } else if (BSONObject.class.isAssignableFrom(entry.getValue().getClass())) {
-                    Cells innerCells = getCellFromBson((BSONObject) entry.getValue(), tableName);
+                    Cells innerCells = getCellFromBson((BSONObject) entry.getValue(),null);
                     cells.add(Cell.create(entry.getKey(), innerCells));
                 } else {
                     cells.add(Cell.create(entry.getKey(), entry.getValue()));
@@ -263,7 +263,7 @@ public final class UtilMongoDB {
 
         BSONObject bson = new BasicBSONObject();
         for (Cell cell : cells) {
-            if (List.class.isAssignableFrom(cell.getCellValue().getClass())) {
+            if (Collection.class.isAssignableFrom(cell.getCellValue().getClass())) {
                 Collection c = (Collection) cell.getCellValue();
                 Iterator iterator = c.iterator();
                 List<BSONObject> innerBsonList = new ArrayList<>();
@@ -297,7 +297,7 @@ public final class UtilMongoDB {
 
         DBObject bson = new BasicDBObject();
         for (Cell cell : cells) {
-            if (List.class.isAssignableFrom(cell.getCellValue().getClass())) {
+            if (Collection.class.isAssignableFrom(cell.getCellValue().getClass())) {
                 Collection c = (Collection) cell.getCellValue();
                 Iterator iterator = c.iterator();
                 List<DBObject> innerBsonList = new ArrayList<>();

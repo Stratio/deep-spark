@@ -28,6 +28,7 @@ import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.MessageTestEntity;
+import com.stratio.deep.core.extractor.ExtractorEntityTest;
 import com.stratio.deep.core.extractor.ExtractorTest;
 import org.apache.spark.rdd.RDD;
 import org.slf4j.Logger;
@@ -46,12 +47,12 @@ import static org.testng.AssertJUnit.assertNull;
  * Created by mariomgal on 07/11/14.
  */
 @Test(suiteName = "aerospikeRddTests", groups = {"AerospikeEntityExtractorTest"} , dependsOnGroups = "AerospikeJavaRDDTest")
-public class AerospikeEntityExtractorTest extends ExtractorTest {
+public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(AerospikeEntityExtractorTest.class);
 
     public AerospikeEntityExtractorTest() {
-        super(AerospikeEntityExtractor.class, "127.0.0.1", 3000, false);
+        super(AerospikeEntityExtractor.class, AerospikeJavaRDDTest.HOST, AerospikeJavaRDDTest.PORT, false);
     }
 
     @Override
@@ -145,8 +146,8 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
             com.stratio.deep.commons.filter.Filter equalFilter = new com.stratio.deep.commons.filter.Filter("number", FilterType.EQ, 3L);
             com.stratio.deep.commons.filter.Filter ltFilter = new com.stratio.deep.commons.filter.Filter("number", FilterType.LT, 4L);
             com.stratio.deep.commons.filter.Filter gtFilter = new com.stratio.deep.commons.filter.Filter("number", FilterType.GT, 5L);
-            com.stratio.deep.commons.filter.Filter lteFilter = new com.stratio.deep.commons.filter.Filter("number", FilterType.LET, 3L);
-            com.stratio.deep.commons.filter.Filter gteFilter = new com.stratio.deep.commons.filter.Filter("number", FilterType.GET, 4L);
+            com.stratio.deep.commons.filter.Filter lteFilter = new com.stratio.deep.commons.filter.Filter("number",FilterType.LTE, 3L);
+            com.stratio.deep.commons.filter.Filter gteFilter = new com.stratio.deep.commons.filter.Filter("number",FilterType.GTE, 4L);
             com.stratio.deep.commons.filter.Filter equalFilter2 = new com.stratio.deep.commons.filter.Filter("number", FilterType.EQ, 4L);
 
             try {
@@ -263,8 +264,7 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
 
             fail();
         } catch(Exception e) {
-            System.out.println("a");
-
+            e.printStackTrace();
         } finally {
             context.stop();
         }

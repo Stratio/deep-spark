@@ -25,9 +25,9 @@ public enum OperatorCassandra {
 
     IS(FilterType.EQ, "="),
     GT(FilterType.GT, ">"),
-    GTE(FilterType.GET, ">="),
+    GTE(FilterType.GTE, ">="),
     LT(FilterType.LT, "<"),
-    LTE(FilterType.LET, "<="),
+    LTE(FilterType.LTE, "<="),
     NE(FilterType.NEQ, "!=");
 
     private FilterType filterType;
@@ -46,11 +46,11 @@ public enum OperatorCassandra {
             return OperatorCassandra.IS;
         case GT:
             return OperatorCassandra.GT;
-        case GET:
+        case GTE:
             return OperatorCassandra.GTE;
         case LT:
             return OperatorCassandra.LT;
-        case LET:
+        case LTE:
             return OperatorCassandra.LTE;
         case NEQ:
             return OperatorCassandra.NE;

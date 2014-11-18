@@ -21,6 +21,8 @@ import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.extractor.ExtractorCellTest;
+import com.stratio.deep.core.extractor.ExtractorEntityTest;
 import com.stratio.deep.core.extractor.ExtractorTest;
 import org.apache.spark.rdd.RDD;
 import org.slf4j.Logger;
@@ -30,12 +32,12 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 
 @Test(suiteName = "aerospikeRddTests", groups = {"AerospikeCellExtractorTest"} , dependsOnGroups = "AerospikeJavaRDDTest")
-public class AerospikeCellExtractorTest extends ExtractorTest {
+public class AerospikeCellExtractorTest extends ExtractorCellTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(AerospikeCellExtractorTest.class);
 
     public AerospikeCellExtractorTest() {
-        super(AerospikeCellExtractor.class, "127.0.0.1", 3000, true);
+        super(AerospikeCellExtractor.class, AerospikeJavaRDDTest.HOST, AerospikeJavaRDDTest.PORT, true);
     }
 
     @Test
@@ -74,8 +76,8 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
             Filter equalFilter = new Filter("number", FilterType.EQ, 3L);
             Filter ltFilter = new Filter("number", FilterType.LT, 4L);
             Filter gtFilter = new Filter("number", FilterType.GT, 5L);
-            Filter lteFilter = new Filter("number", FilterType.LET, 3L);
-            Filter gteFilter = new Filter("number", FilterType.GET, 4L);
+            Filter lteFilter = new Filter("number", FilterType.LTE, 3L);
+            Filter gteFilter = new Filter("number", FilterType.GTE, 4L);
             Filter equalFilter2 = new Filter("number", FilterType.EQ, 4L);
 
             try {
