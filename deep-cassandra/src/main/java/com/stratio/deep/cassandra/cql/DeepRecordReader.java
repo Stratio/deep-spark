@@ -311,11 +311,13 @@ public class DeepRecordReader implements IDeepRecordReader {
                 values = bindValues.toArray(new Object[bindValues.size()]);
                 LOG.debug("query: " + query + "; values: " + Arrays.toString(values));
             } else {
-                values = new Object[2];
-                values[0] = equalsInValue.getEqualsValue();
-                values[1] = filterSplits(equalsInValue);
+                values = new Object[equalsInValue.getEqualsList().size() + 1];
+                for (int i = 0; i < equalsInValue.getEqualsList().size(); i++) {
+                    values[i] = equalsInValue.getEqualsList().get(i).right;
+                }
 
-                if (values[1] == null) {
+                values[values.length - 1] = filterSplits(equalsInValue);
+                if (values[values.length - 1] == null) {
                     return null;
                 }
 
@@ -342,7 +344,8 @@ public class DeepRecordReader implements IDeepRecordReader {
 
             List<Serializable> filteredInValues = new ArrayList<>();
             for (Serializable value : equalsInValue.getInValues()) {
-                Token<Comparable> token = partitioner.getToken(getPartitionKey(equalsInValue.getEqualsValue(),
+                Token<Comparable> token = partitioner.getToken(getPartitionKey(
+                        equalsInValue.getEqualsList(),
                         value));
 
                 if (split.isTokenIncludedInRange(token)) {
@@ -425,8 +428,11 @@ public class DeepRecordReader implements IDeepRecordReader {
         private String equalsInWhereClause(EqualsInValue equalsInValue) {
 
             StringBuffer sb = new StringBuffer();
-            sb.append("WHERE ").append(equalsInValue.getEqualsField()).append(" = ? AND ")
-                    .append(equalsInValue.getInField()).append(" IN ?");
+            sb.append("WHERE ");
+            for (int i = 0; i < equalsInValue.getEqualsList().size(); i++) {
+                sb.append(equalsInValue.getEqualsList().get(i).left).append(" = ? AND ");
+            }
+            sb.append(equalsInValue.getInField()).append(" IN ?");
 
             return sb.toString();
         }
@@ -617,24 +623,26 @@ public class DeepRecordReader implements IDeepRecordReader {
     /**
      * Builds the partition key in {@link ByteBuffer} format for the given values.
      * 
-     * @param equalsValue
-     *            Value for the operator equals.
+     * @param equalsList
+     *            List of equals field and value pairs.
      * @param inValue
      *            Value for the operator in.
      * 
      * @return {@link ByteBuffer} with the partition key.
      */
-    private ByteBuffer getPartitionKey(Serializable equalsValue, Serializable inValue) {
+    private ByteBuffer getPartitionKey(List<Pair<String, Serializable>> equalsList, Serializable inValue) {
 
-        ByteBuffer partitionKey = ((CompositeType) keyValidator).decompose(equalsValue, inValue);
-        // ByteBuffer inByteBuffer = ((CompositeType) keyValidator).decompose(inValue);
-        //
-        // ByteBuffer[] keys = new ByteBuffer[2];
-        // keys[0] = equalsByteBuffer;
-        // keys[1] = inByteBuffer;
-        //
-        // ByteBuffer partitionKey = CompositeType.build(keys);
+        assert (equalsList.size() + 1) == ((CompositeType) keyValidator).componentsCount();
 
-        return partitionKey;
+        ByteBuffer[] serialized = new ByteBuffer[equalsList.size() + 1];
+        for (int i = 0; i < equalsList.size(); i++)
+        {
+            ByteBuffer buffer = ((AbstractType) keyValidator.getComponents().get(i)).decompose(equalsList.get(i).right);
+            serialized[i] = buffer;
+        }
+        serialized[serialized.length - 1] = ((AbstractType) keyValidator.getComponents().get(serialized.length - 1))
+                .decompose(inValue);
+
+        return CompositeType.build(serialized);
     }
 }
