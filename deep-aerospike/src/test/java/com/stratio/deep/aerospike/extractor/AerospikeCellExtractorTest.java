@@ -47,8 +47,8 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
 
             ExtractorConfig<Cells> inputConfigEntity = new ExtractorConfig(Cells.class);
             inputConfigEntity.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, "book")
-                    .putValue(ExtractorConstants.SET, "input");
+                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDTest.NAMESPACE_CELL)
+                    .putValue(ExtractorConstants.SET, ExtractorTest.BOOK_INPUT);
             inputConfigEntity.setExtractorImplClass(AerospikeCellExtractor.class);
 
             RDD<Cells> inputRDDEntity = context.createRDD(inputConfigEntity);
@@ -102,7 +102,7 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
 
             ExtractorConfig<Cells> inputConfigEntity = new ExtractorConfig(Cells.class);
             inputConfigEntity.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, "test")
+                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDTest.NAMESPACE_CELL)
                     .putValue(ExtractorConstants.SET, "input")
                     .putValue(ExtractorConstants.FILTER_QUERY, new Filter[] {equalFilter});
             inputConfigEntity.setExtractorImplClass(AerospikeCellExtractor.class);
@@ -112,7 +112,7 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
 
             ExtractorConfig<Cells> inputConfigEntity2 = new ExtractorConfig(Cells.class);
             inputConfigEntity2.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, "test")
+                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDTest.NAMESPACE_CELL)
                     .putValue(ExtractorConstants.SET, "input")
                     .putValue(ExtractorConstants.FILTER_QUERY, new Filter[] {ltFilter});
             inputConfigEntity2.setExtractorImplClass(AerospikeCellExtractor.class);
@@ -122,7 +122,7 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
 
             ExtractorConfig<Cells> inputConfigEntity3 = new ExtractorConfig(Cells.class);
             inputConfigEntity3.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, "test")
+                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDTest.NAMESPACE_CELL)
                     .putValue(ExtractorConstants.SET, "input")
                     .putValue(ExtractorConstants.FILTER_QUERY, new Filter[] {gtFilter});
             inputConfigEntity3.setExtractorImplClass(AerospikeCellExtractor.class);
@@ -132,7 +132,7 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
 
             ExtractorConfig<Cells> inputConfigEntity4 = new ExtractorConfig(Cells.class);
             inputConfigEntity4.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, "test")
+                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDTest.NAMESPACE_CELL)
                     .putValue(ExtractorConstants.SET, "input")
                     .putValue(ExtractorConstants.FILTER_QUERY, new Filter[] {lteFilter});
             inputConfigEntity4.setExtractorImplClass(AerospikeCellExtractor.class);
@@ -142,7 +142,7 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
 
             ExtractorConfig<Cells> inputConfigEntity5 = new ExtractorConfig(Cells.class);
             inputConfigEntity5.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, "test")
+                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDTest.NAMESPACE_CELL)
                     .putValue(ExtractorConstants.SET, "input")
                     .putValue(ExtractorConstants.FILTER_QUERY, new Filter[] {gteFilter});
             inputConfigEntity5.setExtractorImplClass(AerospikeCellExtractor.class);
@@ -152,7 +152,7 @@ public class AerospikeCellExtractorTest extends ExtractorTest {
 
             ExtractorConfig<Cells> inputConfigEntity6 = new ExtractorConfig(Cells.class);
             inputConfigEntity6.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, "test")
+                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDTest.NAMESPACE_CELL)
                     .putValue(ExtractorConstants.SET, "input")
                     .putValue(ExtractorConstants.FILTER_QUERY, new Filter[] {gteFilter});
             inputConfigEntity6.setExtractorImplClass(AerospikeCellExtractor.class);

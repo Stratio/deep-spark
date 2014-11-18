@@ -37,8 +37,12 @@ public class AerospikeCellExtractor extends AerospikeExtractor<Cells> {
     private static final long serialVersionUID = 6437435944817212233L;
 
     public AerospikeCellExtractor() {
+        this(Cells.class);
+    }
+
+    public AerospikeCellExtractor(Class<Cells> entityClass){
         super();
-        this.deepJobConfig = new AerospikeDeepJobConfig(Cells.class);
+        this.deepJobConfig = new AerospikeDeepJobConfig(entityClass);
     }
 
     /**

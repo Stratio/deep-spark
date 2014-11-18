@@ -84,13 +84,16 @@ public class UtilAerospike {
                 }
                 Object currentBin = null;
                 Method method = null;
+                Class<?> classField = field.getType();
                 try {
                     method = Utils.findSetter(field.getName(), classEntity, field.getType());
-                    Class<?> classField = field.getType();
 
                     currentBin = bins.get(AnnotationUtils.deepFieldName(field));
 
                     if (currentBin != null) {
+                        if(currentBin instanceof Integer && classField.equals(Long.class)) {
+                            currentBin = new Long((Integer)currentBin);
+                        }
                         if(currentBin instanceof String || currentBin instanceof Integer || currentBin instanceof Long) {
                             insert = currentBin;
                         }
@@ -102,7 +105,7 @@ public class UtilAerospike {
                 } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
                     LOG.error("impossible to create a java object from Bin:" + field.getName() + " and type:" + field.getType() + " and value:" + t + "; recordReceived:" + currentBin + ", binClassReceived:" + currentBin.getClass());
 
-                    method.invoke(t, Utils.castNumberType(insert, t));
+                    method.invoke(t, Utils.castNumberType(insert, classField.newInstance()));
                 }
             }
         }
@@ -182,8 +185,12 @@ public class UtilAerospike {
         return cells;
     }
 
-    private static boolean checkEqualityFilter(Map<String, Object> bins, String binName, Object binValue) {
-        return bins.containsKey(binName) && bins.get(binName).equals(binValue);
+    private static boolean checkEqualityFilter(Map<String, Object> bins, String binName, Object expectedBinValue) {
+        Object currentBinValue = bins.get(binName);
+        if(currentBinValue instanceof Integer && expectedBinValue instanceof Long) {
+            currentBinValue = new Long((Integer)currentBinValue);
+        }
+        return bins.containsKey(binName) && currentBinValue.equals(expectedBinValue);
     }
 
     /**

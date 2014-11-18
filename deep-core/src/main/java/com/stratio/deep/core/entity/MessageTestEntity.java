@@ -32,6 +32,9 @@ public class MessageTestEntity implements IDeepType {
     @DeepField
     private String message;
 
+    @DeepField
+    private Long number;
+
     public String getId() {
         return id;
     }
@@ -46,5 +49,13 @@ public class MessageTestEntity implements IDeepType {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public Long getNumber() {
+        return number;
+    }
+
+    public void setNumber(Long number) {
+        this.number = number;
     }
 }

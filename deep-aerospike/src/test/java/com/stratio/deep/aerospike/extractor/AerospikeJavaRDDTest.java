@@ -20,6 +20,7 @@ import com.aerospike.client.policy.ScanPolicy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.client.query.IndexType;
 import com.google.common.io.Resources;
+import com.stratio.deep.core.extractor.ExtractorTest;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -47,11 +48,13 @@ public class AerospikeJavaRDDTest {
 
     public static final String HOST = "10.200.0.58";
 
-    public static final String NAMESPACE_TEST = "test";
+    public static final String NAMESPACE_CELL = "aerospikecellextractor";
 
-    public static final String NAMESPACE_BOOK = "book";
+    public static final String NAMESPACE_ENTITY = "aerospikeentityextractor";
 
     public static final String SET_NAME = "input";
+
+    public static final String SET_NAME_BOOK = "bookinput";
 
     public static final String DATA_SET_NAME = "divineComedy.json";
 
@@ -59,7 +62,7 @@ public class AerospikeJavaRDDTest {
     public static void init() throws IOException, ParseException {
         aerospike = new AerospikeClient(HOST, PORT);
         deleteData();
-        dataSetImport();
+        //dataSetImport();
     }
 
     @Test
@@ -82,38 +85,63 @@ public class AerospikeJavaRDDTest {
         JSONObject metadata = (JSONObject)jsonObject.get("metadata");
         JSONArray cantos = (JSONArray) jsonObject.get("cantos");
 
-        Key key = new Key(NAMESPACE_BOOK, SET_NAME, id);
+        Key key = new Key(NAMESPACE_ENTITY, SET_NAME, id);
         Bin binId = new Bin("id", id);
         Bin binMetadata = new Bin("metadata", metadata);
         Bin binCantos = new Bin("cantos", cantos);
         aerospike.put(null, key, binId, binMetadata, binCantos);
-        aerospike.createIndex(null, NAMESPACE_BOOK, SET_NAME, "id_idx", "id", IndexType.STRING);
+        aerospike.createIndex(null, NAMESPACE_ENTITY, SET_NAME, "id_idx", "id", IndexType.STRING);
 
-        Key key2 = new Key(NAMESPACE_TEST, SET_NAME, 3);
+        Key key2 = new Key(NAMESPACE_CELL, SET_NAME, 3);
         Bin bin_id = new Bin("_id", "3");
         Bin bin_number = new Bin("number", 3);
         Bin bin_text = new Bin("message", "new message test");
         aerospike.put(null, key2, bin_id, bin_number, bin_text);
-        aerospike.createIndex(null, NAMESPACE_TEST, SET_NAME, "num_idx", "number", IndexType.NUMERIC);
-        aerospike.createIndex(null, NAMESPACE_TEST, SET_NAME, "_id_idx", "_id", IndexType.STRING);
+        aerospike.createIndex(null, NAMESPACE_CELL, SET_NAME, "num_idx", "number", IndexType.NUMERIC);
+        aerospike.createIndex(null, NAMESPACE_CELL, SET_NAME, "_id_idx", "_id", IndexType.STRING);
     }
 
     /**
      * Delete previously loaded data for starting with a fresh dataset.
      */
     private static void deleteData() {
+<<<<<<< Updated upstream
         aerospike.scanAll(new ScanPolicy(), NAMESPACE_TEST, SET_NAME, new ScanCallback() {
+=======
+        try{
+
+
+        aerospike.scanAll(new ScanPolicy(), NAMESPACE_CELL, SET_NAME, new ScanCallback() {
+>>>>>>> Stashed changes
             @Override
             public void scanCallback(Key key, Record record) throws AerospikeException {
                 aerospike.delete(new WritePolicy(), key);
             }
         }, new String[] {});
-        aerospike.scanAll(new ScanPolicy(), NAMESPACE_BOOK, SET_NAME, new ScanCallback() {
+            aerospike.scanAll(new ScanPolicy(), NAMESPACE_CELL, SET_NAME_BOOK, new ScanCallback() {
+                @Override
+                public void scanCallback(Key key, Record record) throws AerospikeException {
+                    aerospike.delete(new WritePolicy(), key);
+                }
+            }, new String[] {});
+        aerospike.scanAll(new ScanPolicy(), NAMESPACE_ENTITY, SET_NAME, new ScanCallback() {
             @Override
             public void scanCallback(Key key, Record record) throws AerospikeException {
                 aerospike.delete(new WritePolicy(), key);
             }
         }, new String[] {});
+<<<<<<< Updated upstream
+=======
+            aerospike.scanAll(new ScanPolicy(), NAMESPACE_ENTITY, SET_NAME_BOOK, new ScanCallback() {
+                @Override
+                public void scanCallback(Key key, Record record) throws AerospikeException {
+                    aerospike.delete(new WritePolicy(), key);
+                }
+            }, new String[] {});
+        }catch(AerospikeException e){
+            LOG.error("Error while deleting data", e);
+        }
+>>>>>>> Stashed changes
     }
 
     @AfterSuite
