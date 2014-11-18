@@ -291,7 +291,7 @@ public class CassandraCell extends Cell {
     }
 
     private boolean keyEquals(CassandraCell cell) {
-        return isClusterKey.equals(cell.isClusterKey) && isKey.equals(cell.isKey());
+        return isClusterKey.equals(cell.isClusterKey) && isKey.equals(cell.isPartitionKey());
     }
 
     private boolean cellValidatorEquals(CassandraCell cell) {
