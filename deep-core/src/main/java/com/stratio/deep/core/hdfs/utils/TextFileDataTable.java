@@ -4,14 +4,24 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 
-public class TableMap<T> implements Serializable {
+public class TextFileDataTable<T> implements Serializable {
 
 
     private TableName tableName;
 
+    private String lineSeparator;
+
     ArrayList<SchemaMap<T>> columnMap;
 
-    public TableMap(TableName tableName, ArrayList<SchemaMap<T>> columnMap) {
+    public String getLineSeparator() {
+        return lineSeparator;
+    }
+
+    public void setLineSeparator(String lineSeparator) {
+        this.lineSeparator = lineSeparator;
+    }
+
+    public TextFileDataTable(TableName tableName, ArrayList<SchemaMap<T>> columnMap) {
         this.tableName = tableName;
         this.columnMap = columnMap;
     }

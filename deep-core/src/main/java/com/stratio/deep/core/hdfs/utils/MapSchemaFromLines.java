@@ -21,21 +21,21 @@ public class MapSchemaFromLines implements Function<String, Cells> {
     private String separator;
 
     /**
-     * Separator in the HDFS FIle
+     * TableName of the HDFS FIle
      */
     private String tableName;
 
     /**
-     * Separator in the HDFS FIle
+     * Catalog of the HDFS FIle
      */
     private String catalogName;
 
 
-    public MapSchemaFromLines(TableMap tableMap, String separator){
-        this.tableName   = tableMap.getTableName().getTableName();
-        this.catalogName = tableMap.getTableName().getCatalogName();
-        this.columns   = tableMap.getColumnMap();
-        this.separator = separator;
+    public MapSchemaFromLines(TextFileDataTable textFileDataTable){
+        this.tableName   = textFileDataTable.getTableName().getTableName();
+        this.catalogName = textFileDataTable.getTableName().getCatalogName();
+        this.columns     = textFileDataTable.getColumnMap();
+        this.separator   = textFileDataTable.getLineSeparator();
     }
 
     @Override

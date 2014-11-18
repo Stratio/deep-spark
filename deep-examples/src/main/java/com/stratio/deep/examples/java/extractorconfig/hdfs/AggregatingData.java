@@ -37,8 +37,8 @@ import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.hdfs.utils.HdfsOutputFormat;
 import com.stratio.deep.core.hdfs.utils.MapSchemaFromLines;
+import com.stratio.deep.core.hdfs.utils.TextFileDataTable;
 import com.stratio.deep.core.hdfs.utils.SchemaMap;
-import com.stratio.deep.core.hdfs.utils.TableMap;
 import com.stratio.deep.core.hdfs.utils.TableName;
 import com.stratio.deep.examples.java.extractorconfig.hdfs.utils.ContextProperties;
 
@@ -48,10 +48,9 @@ public class AggregatingData {
     private static final Logger LOG = Logger.getLogger(AggregatingData.class);
 
     /* used to perform external tests */
-    private static Double avg;
-    private static Double variance;
-    private static Double stddev;
-    private static Double count;
+    private static final String keyspaceName = "test";
+    private static final String tableName    = "songs";
+    private static final String  splitSep = ",";
 
     private AggregatingData() {
     }
@@ -73,13 +72,7 @@ public class AggregatingData {
     public static void doMain(String[] args)  {
         String job = "java:aggregatingDataHDFS";
 
-        final String keyspaceName = "test";
-        final String tableName    = "songs";
-        String home = System.getProperty("hadoop.home.dir");
-        final String  splitSep = ",";
-
-
-        // fall back to the system/user-global env variable
+        // fall back to the system/ user-global env variable
         final ArrayList<SchemaMap<?>> listSchemaMap = new ArrayList<>();
         listSchemaMap.add(new SchemaMap("id",    String.class));
         listSchemaMap.add(new SchemaMap("author",String.class));
@@ -88,16 +81,19 @@ public class AggregatingData {
         listSchemaMap.add(new SchemaMap("Length",Integer.class));
         listSchemaMap.add(new SchemaMap("Single",String.class));
 
-        TableMap tableMap = new TableMap(new TableName(keyspaceName,tableName),listSchemaMap);
+        // Create the Object that contains all the data table
+        TextFileDataTable textFileDataTable = new TextFileDataTable(new TableName(keyspaceName,tableName),listSchemaMap);
+        textFileDataTable.setLineSeparator(splitSep);
+
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
 	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
-        // Creating the RDD
+        // Creating the RDD from the hdfs text file
         JavaRDD<String> rdd = deepContext.textFile("hdfs://127.0.0.1:9000/user/hadoop/test/songs.csv");
 
 
-        JavaRDD<Cells> resultCells = rdd.map(new MapSchemaFromLines(tableMap, splitSep));
+        JavaRDD<Cells> resultCells = rdd.map(new MapSchemaFromLines(textFileDataTable));
 
         resultCells.collect();
         long numAsElvis = rdd.filter(new Function<String, Boolean>() {
@@ -107,6 +103,7 @@ public class AggregatingData {
         JavaRDD<String> lines = rdd.flatMap(new FlatMapFunction<String, String>() {
             public Iterable<String> call(String x) { return Arrays.asList(x.split("\n")); }
         });
+
         //words.count();
         JavaPairRDD<String, Integer> result = lines.mapToPair(
                 new PairFunction<String, String, Integer>() {
@@ -120,8 +117,6 @@ public class AggregatingData {
 
         result.first();
         result.count();
-
-
 
         //TEST write over specific file name
         Configuration conf = new Configuration();
@@ -161,19 +156,5 @@ public class AggregatingData {
         deepContext.stop();
     }
 
-    public static Double getAvg() {
-        return avg;
-    }
 
-    public static Double getVariance() {
-        return variance;
-    }
-
-    public static Double getStddev() {
-        return stddev;
-    }
-
-    public static Double getCount() {
-        return count;
-    }
 }

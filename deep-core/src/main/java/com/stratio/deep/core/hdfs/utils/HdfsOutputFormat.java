@@ -19,8 +19,6 @@ public class HdfsOutputFormat<K, V>  extends TextOutputFormat<K,V> {
         return super.getRecordWriter(ignored, job, fileName, progress);
     }
 
-
-
     public String getFileName() {
         return fileName;
     }

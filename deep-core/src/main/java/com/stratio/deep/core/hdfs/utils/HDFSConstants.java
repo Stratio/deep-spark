@@ -5,7 +5,7 @@ public class HDFSConstants {
     public static final String HOST           = "host";
     public static final String PORT           = "port";
     public static final String TYPE           = "type";
-    public static final String PATH           = "path";
+    public static final String FILE_PATH      = "path";
     public static final String FILE_SEPARATOR = "separator";
 
     public static final String HDFS_TYPE  = "hdfsType";
@@ -19,7 +19,8 @@ public class HDFSConstants {
 
     public static final String HDFS_ = "hdfs://";
 
-    public static final String MAP = "map";
+    public static final String MAP     = "map";
     public static final String CATALOG = "catalog";
-    public static final String TABLE = "table";
+    public static final String TABLE   = "table";
+
 }

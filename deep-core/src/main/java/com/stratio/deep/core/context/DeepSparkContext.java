@@ -33,8 +33,8 @@ import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.core.function.PrepareSaveFunction;
 import com.stratio.deep.core.hdfs.utils.HDFSConstants;
 import com.stratio.deep.core.hdfs.utils.MapSchemaFromLines;
+import com.stratio.deep.core.hdfs.utils.TextFileDataTable;
 import com.stratio.deep.core.hdfs.utils.SchemaMap;
-import com.stratio.deep.core.hdfs.utils.TableMap;
 import com.stratio.deep.core.hdfs.utils.TableName;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
@@ -150,20 +150,15 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
     }
 
-    public RDD<Cells> createHDFSRDD(ExtractorConfig<Cells> extractorConfig){
+    public RDD<Cells> createHDFSRDD(ExtractorConfig<Cells> config){
 
-        Serializable type  = extractorConfig.getValues().get(HDFSConstants.TYPE);
-        Serializable host  = extractorConfig.getValues().get(HDFSConstants.HOST);
-        Serializable port  = extractorConfig.getValues().get(HDFSConstants.PORT);
-        Serializable path  = extractorConfig.getValues().get(HDFSConstants.PATH);
-        Serializable separator = extractorConfig.getValues().get(HDFSConstants.FILE_SEPARATOR);
-        String catalogName = (String)extractorConfig.getValues().get(HDFSConstants.CATALOG);
-        String tableName   = (String)extractorConfig.getValues().get(HDFSConstants.TABLE);
+        Serializable type  = config.getValues().get(HDFSConstants.TYPE);
+        Serializable host  = config.getValues().get(HDFSConstants.HOST);
+        Serializable port  = config.getValues().get(HDFSConstants.PORT);
+        Serializable path  = config.getValues().get(HDFSConstants.FILE_PATH);
 
-        final String splitSep = separator.toString();
-        final ArrayList<SchemaMap<?>> columns   = (ArrayList<SchemaMap<?>>) extractorConfig.getValues().get
-                (HDFSConstants.MAP);
-        TableMap tableMap = new TableMap(new TableName(catalogName,tableName),columns);
+        final TextFileDataTable textFileDataTable = createTextFileMetaDataFromConfig(config);
+
         if(type.equals(HDFSConstants.HDFS_TYPE)){
             path = HDFSConstants.HDFS_ + host.toString() + ":" + port + "/" + path.toString();
         }else{
@@ -171,9 +166,29 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         }
         RDD<String> result = this.sc().textFile(path.toString(), 1);
 
-        JavaRDD<Cells> resultCells = result.toJavaRDD().map(new MapSchemaFromLines(tableMap, splitSep));
+        JavaRDD<Cells> resultCells = result.toJavaRDD().map(new MapSchemaFromLines(textFileDataTable));
 
         return resultCells.rdd();
+    }
+
+    private TextFileDataTable createTextFileMetaDataFromConfig(ExtractorConfig<Cells> extractorConfig) {
+
+
+        Serializable separator = extractorConfig.getValues().get(HDFSConstants.FILE_SEPARATOR);
+        String catalogName = (String)extractorConfig.getValues().get(HDFSConstants.CATALOG);
+        String tableName   = (String)extractorConfig.getValues().get(HDFSConstants.TABLE);
+
+        final String splitSep = separator.toString();
+        final ArrayList<SchemaMap<?>> columns   = (ArrayList<SchemaMap<?>>) extractorConfig.getValues().get
+                (HDFSConstants.MAP);
+
+        final TextFileDataTable textFileDataTable = new TextFileDataTable(new TableName(catalogName,tableName),columns);
+        textFileDataTable.setLineSeparator(splitSep);
+
+        textFileDataTable.setLineSeparator(splitSep);
+
+
+        return textFileDataTable;
     }
 
 }
