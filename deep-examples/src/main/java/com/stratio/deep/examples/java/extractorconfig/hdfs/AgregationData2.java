@@ -64,6 +64,8 @@ public class AgregationData2 {
         values.put(HDFSConstants.HOST, "127.0.0.1");
         values.put(HDFSConstants.MAP,listSchemaMap);
         values.put(HDFSConstants.TYPE,HDFSConstants.HDFS_TYPE);
+        values.put(HDFSConstants.TABLE,tableName);
+        values.put(HDFSConstants.CATALOG,keyspaceName);
 
         extractorConfig.setValues(values);
 

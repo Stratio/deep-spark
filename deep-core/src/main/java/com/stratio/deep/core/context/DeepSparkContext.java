@@ -167,7 +167,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         RDD<String> result = this.sc().textFile(path.toString(), 1);
 
         JavaRDD<Cells> resultCells = result.toJavaRDD().map(new MapSchemaFromLines(textFileDataTable));
-
+        resultCells.collect();
         return resultCells.rdd();
     }
 
@@ -183,8 +183,6 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
                 (HDFSConstants.MAP);
 
         final TextFileDataTable textFileDataTable = new TextFileDataTable(new TableName(catalogName,tableName),columns);
-        textFileDataTable.setLineSeparator(splitSep);
-
         textFileDataTable.setLineSeparator(splitSep);
 
 
