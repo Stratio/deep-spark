@@ -37,7 +37,7 @@ public class AerospikeCellExtractorTest extends ExtractorCellTest {
     private static final Logger LOG = LoggerFactory.getLogger(AerospikeCellExtractorTest.class);
 
     public AerospikeCellExtractorTest() {
-        super(AerospikeCellExtractor.class, "127.0.0.1", 3000, true);
+        super(AerospikeCellExtractor.class, AerospikeJavaRDDTest.HOST, AerospikeJavaRDDTest.PORT, true);
     }
 
     @Test

@@ -45,7 +45,7 @@ public class AerospikeJavaRDDTest {
 
     public static final Integer PORT = 3000;
 
-    public static final String HOST = "127.0.0.1";
+    public static final String HOST = "10.200.0.58";
 
     public static final String NAMESPACE_TEST = "test";
 
@@ -131,4 +131,5 @@ public class AerospikeJavaRDDTest {
         }
 
     }
+
 }
