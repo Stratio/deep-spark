@@ -26,7 +26,7 @@ public class DefaultQueryBuilder extends CassandraUpdateQueryBuilder {
     @Override
     public String prepareQuery(Cells keys, Cells values) {
 
-        StringBuilder sb = new StringBuilder("UPDATE ").append(getCatalogName()).append(".").append(getTableName())
+        StringBuilder sb = new StringBuilder("UPDATE ").append(quote(getCatalogName())).append(".").append(quote(getTableName()))
                 .append(" SET ");
 
         boolean isFirst = true;

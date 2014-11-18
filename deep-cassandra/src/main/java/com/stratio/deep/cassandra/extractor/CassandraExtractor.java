@@ -190,6 +190,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
         queryBuilder.setCatalogName(cassandraJobConfig.getCatalog());
         queryBuilder.setTableName(cassandraJobConfig.getTable());
 
+
         writer = new DeepCqlRecordWriter(cassandraJobConfig, (CassandraUpdateQueryBuilder) queryBuilder);
 
 

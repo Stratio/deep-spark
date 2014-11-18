@@ -29,7 +29,7 @@ public class IncreaseCountersQueryBuilder extends CassandraUpdateQueryBuilder {
 
         // TODO validate values > 0
 
-        StringBuilder sb = new StringBuilder("UPDATE ").append(getCatalogName()+"."+getTableName())
+        StringBuilder sb = new StringBuilder("UPDATE ").append(quote(getCatalogName())).append(".").append(getTableName())
                 .append(" SET ");
 
 
