@@ -20,7 +20,6 @@ import com.aerospike.client.policy.ScanPolicy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.client.query.IndexType;
 import com.google.common.io.Resources;
-import com.stratio.deep.core.extractor.ExtractorTest;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -105,55 +104,34 @@ public class AerospikeJavaRDDTest {
      * Delete previously loaded data for starting with a fresh dataset.
      */
     private static void deleteData() {
-<<<<<<< HEAD
         try{
-
-
-=======
-<<<<<<< Updated upstream
->>>>>>> feature/aerospike
-        aerospike.scanAll(new ScanPolicy(), NAMESPACE_TEST, SET_NAME, new ScanCallback() {
-=======
-        try{
-
-
-        aerospike.scanAll(new ScanPolicy(), NAMESPACE_CELL, SET_NAME, new ScanCallback() {
->>>>>>> Stashed changes
-            @Override
-            public void scanCallback(Key key, Record record) throws AerospikeException {
-                aerospike.delete(new WritePolicy(), key);
-            }
-        }, new String[] {});
+            aerospike.scanAll(new ScanPolicy(), NAMESPACE_CELL, SET_NAME, new ScanCallback() {
+                @Override
+                public void scanCallback(Key key, Record record) throws AerospikeException {
+                    aerospike.delete(new WritePolicy(), key);
+                }
+            }, new String[] {});
             aerospike.scanAll(new ScanPolicy(), NAMESPACE_CELL, SET_NAME_BOOK, new ScanCallback() {
                 @Override
                 public void scanCallback(Key key, Record record) throws AerospikeException {
                     aerospike.delete(new WritePolicy(), key);
                 }
             }, new String[] {});
-        aerospike.scanAll(new ScanPolicy(), NAMESPACE_ENTITY, SET_NAME, new ScanCallback() {
-            @Override
-            public void scanCallback(Key key, Record record) throws AerospikeException {
-                aerospike.delete(new WritePolicy(), key);
-            }
-        }, new String[] {});
-<<<<<<< HEAD
-        }catch(AerospikeException e){
-            LOG.error("Error while deleting data", e);
-        }
-=======
-<<<<<<< Updated upstream
-=======
-            aerospike.scanAll(new ScanPolicy(), NAMESPACE_ENTITY, SET_NAME_BOOK, new ScanCallback() {
+            aerospike.scanAll(new ScanPolicy(), NAMESPACE_ENTITY, SET_NAME, new ScanCallback() {
                 @Override
                 public void scanCallback(Key key, Record record) throws AerospikeException {
                     aerospike.delete(new WritePolicy(), key);
                 }
             }, new String[] {});
+            aerospike.scanAll(new ScanPolicy(), NAMESPACE_ENTITY, SET_NAME_BOOK, new ScanCallback() {
+                @Override
+                public void scanCallback(Key key, Record record) throws AerospikeException {
+                    aerospike.delete(new WritePolicy(), key);
+                }
+            }, new String[]{});
         }catch(AerospikeException e){
             LOG.error("Error while deleting data", e);
         }
->>>>>>> Stashed changes
->>>>>>> feature/aerospike
     }
 
     @AfterSuite

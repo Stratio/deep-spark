@@ -26,15 +26,9 @@ import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.MessageTestEntity;
-<<<<<<< HEAD
 import com.stratio.deep.core.extractor.ExtractorEntityTest;
-=======
-<<<<<<< Updated upstream
->>>>>>> feature/aerospike
 import com.stratio.deep.core.extractor.ExtractorTest;
-=======
 import com.stratio.deep.core.extractor.ExtractorEntityTest;
->>>>>>> Stashed changes
 import org.apache.spark.rdd.RDD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,18 +70,8 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
 
             MessageTestEntity messageEntity = inputRDDEntity.first();
 
-<<<<<<< HEAD
-            assertNotNull(messageEntity.getId(), "Message id should not be null.");
-            assertNull(messageEntity.getMessage(), "Message text should be null.");
-=======
-<<<<<<< Updated upstream
-            assertNotNull(messageEntity.getId());
-            assertNull(messageEntity.getMessage());
-=======
             assertNotNull("Message id should not be null.", messageEntity.getId());
             assertNull("Message text should be null.", messageEntity.getMessage());
->>>>>>> Stashed changes
->>>>>>> feature/aerospike
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity2 = new ExtractorConfig(MessageTestEntity.class);
             inputConfigEntity2.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
@@ -99,21 +83,10 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
 
             MessageTestEntity messageEntity2 = inputRDDEntity2.first();
 
-<<<<<<< HEAD
-            assertNull(messageEntity2.getId(), "Message id should be null.");
-            assertNotNull(messageEntity2.getMessage(), "Message text should not be null.");
-=======
-<<<<<<< Updated upstream
-            assertNull(messageEntity2.getId());
-            assertNotNull(messageEntity2.getMessage());
->>>>>>> feature/aerospike
-
-=======
             assertNull("Message id should be null.", messageEntity2.getId());
             assertNotNull("Message text should not be null.", messageEntity2.getMessage());
         } catch(Exception e) {
             System.out.println("a");
->>>>>>> Stashed changes
         }finally {
             context.stop();
         }
@@ -155,20 +128,9 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
 
             MessageTestEntity message = messages.get(0);
 
-<<<<<<< HEAD
-            assertEquals((String)bins.get("_id"), message.getId(), "Read message id should be the same as expected.");
-            assertEquals((String)bins.get("message"), message.getMessage(), "Read message text should be the same as expected.");
-=======
-<<<<<<< Updated upstream
-            assertEquals((String)bins.get("_id"), message.getId());
-            assertEquals((String)bins.get("message"), message.getMessage());
-=======
             assertEquals((String)bins.get("id"), message.getId(), "Read message id should be the same as expected.");
             assertEquals((String)bins.get("message"), message.getMessage(), "Read message text should be the same as expected.");
->>>>>>> Stashed changes
->>>>>>> feature/aerospike
-
-        }finally {
+        } finally {
             context.stop();
         }
     }

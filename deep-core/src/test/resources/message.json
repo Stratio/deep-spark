@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-{"id": "messageTest", "message":"new message test"}
-=======
 {"number":3, "id": "messageTest", "message":"new message test"}
->>>>>>> feature/aerospike
