@@ -51,7 +51,7 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
     private static final Logger LOG = LoggerFactory.getLogger(AerospikeEntityExtractorTest.class);
 
     public AerospikeEntityExtractorTest() {
-        super(AerospikeEntityExtractor.class, "127.0.0.1", 3000, false);
+        super(AerospikeEntityExtractor.class, AerospikeJavaRDDTest.HOST, AerospikeJavaRDDTest.PORT, false);
     }
 
     @Override
