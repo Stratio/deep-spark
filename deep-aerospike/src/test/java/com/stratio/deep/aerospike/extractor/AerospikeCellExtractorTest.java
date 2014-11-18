@@ -21,6 +21,8 @@ import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.extractor.ExtractorCellTest;
+import com.stratio.deep.core.extractor.ExtractorEntityTest;
 import com.stratio.deep.core.extractor.ExtractorTest;
 import org.apache.spark.rdd.RDD;
 import org.slf4j.Logger;
@@ -30,7 +32,7 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 
 @Test(suiteName = "aerospikeRddTests", groups = {"AerospikeCellExtractorTest"} , dependsOnGroups = "AerospikeJavaRDDTest")
-public class AerospikeCellExtractorTest extends ExtractorTest {
+public class AerospikeCellExtractorTest extends ExtractorCellTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(AerospikeCellExtractorTest.class);
 

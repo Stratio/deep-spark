@@ -28,6 +28,7 @@ import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.MessageTestEntity;
+import com.stratio.deep.core.extractor.ExtractorEntityTest;
 import com.stratio.deep.core.extractor.ExtractorTest;
 import org.apache.spark.rdd.RDD;
 import org.slf4j.Logger;
@@ -46,7 +47,7 @@ import static org.testng.AssertJUnit.assertNull;
  * Created by mariomgal on 07/11/14.
  */
 @Test(suiteName = "aerospikeRddTests", groups = {"AerospikeEntityExtractorTest"} , dependsOnGroups = "AerospikeJavaRDDTest")
-public class AerospikeEntityExtractorTest extends ExtractorTest {
+public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(AerospikeEntityExtractorTest.class);
 
@@ -263,8 +264,7 @@ public class AerospikeEntityExtractorTest extends ExtractorTest {
 
             fail();
         } catch(Exception e) {
-            System.out.println("a");
-
+            e.printStackTrace();
         } finally {
             context.stop();
         }

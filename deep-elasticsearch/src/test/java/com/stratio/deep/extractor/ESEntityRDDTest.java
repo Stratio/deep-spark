@@ -46,6 +46,7 @@ import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.CantoEntity;
 import com.stratio.deep.core.entity.WordCount;
+import com.stratio.deep.core.extractor.ExtractorEntityTest;
 import com.stratio.deep.core.extractor.ExtractorTest;
 import com.stratio.deep.es.extractor.ESEntityExtractor;
 
@@ -54,10 +55,8 @@ import scala.Tuple2;
 /**
  * Created by rcrespo on 29/08/14.
  */
-@Test(suiteName = "ESRddTests", groups = { "ESEntityRDDTest" }, dependsOnGroups = "ESJavaRDDTest")
-public class ESEntityRDDTest extends ExtractorTest implements Serializable {
-
-    private static final Logger LOG = Logger.getLogger(ESEntityRDDTest.class);
+@Test(suiteName = "ESRddTests", groups = { "ESEntityRDDTest" }, dependsOnGroups = "ESCellRDDTest")
+public class ESEntityRDDTest extends ExtractorEntityTest implements Serializable {
 
     public ESEntityRDDTest() {
 
@@ -65,116 +64,5 @@ public class ESEntityRDDTest extends ExtractorTest implements Serializable {
     }
 
 
-
-//    @Override
-//    @Test
-//    public void testInputColumns() {
-//        assertEquals(true, true);
-//    }
-
-    public void testDataSet() {
-
-        DeepSparkContext context = null;
-
-        // Creating the Deep Context where args are Spark Master and Job Name
-        String hostConcat = ESJavaRDDTest.HOST.concat(":").concat(ESJavaRDDTest.PORT.toString());
-        try {
-
-            context = new DeepSparkContext("local", "deepSparkContextTest");
-
-            ExtractorConfig<BookEntity> inputConfigEntity = new ExtractorConfig(BookEntity.class);
-            inputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.INDEX, "book")
-                    .putValue(ExtractorConstants.TYPE, "input");
-            inputConfigEntity.setExtractorImplClass(ESEntityExtractor.class);
-
-            RDD<BookEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
-
-            //Import dataSet was OK and we could read it
-            //Assert.assertEquals(1, inputRDDEntity.count());
-
-            List<BookEntity> books = inputRDDEntity.toJavaRDD().collect();
-
-            BookEntity book = books.get(0);
-
-            // -------------Another Kind to recover ENtities---------
-            //        GetResponse response = ESJavaRDDTest.client.prepareGet("book", "input", "idXXXX").execute().actionGet();
-            //        response.getFields();
-
-            //tests subDocuments
-            SearchResponse searchResponse = ESJavaRDDTest.client.prepareSearch("book")
-                    .setQuery(termQuery("_type", "input")).execute().actionGet();
-            SearchHit[] sh = searchResponse.getHits().getHits();
-            List<JSONObject> listCantos = new ArrayList<>();
-            for (SearchHit hit : sh) {
-
-                listCantos.add((JSONObject) JSONValue.parse(hit.sourceAsString()));
-            }
-
-            //      tests List<subDocuments>
-            for (int i = 0; i < listCantos.size(); i++) {
-                JSONObject cantosObject = listCantos.get(i);
-                JSONObject jsonObject = (JSONObject) ((JSONArray) cantosObject.get("cantos")).get(i);
-                Assert.assertEquals(jsonObject.get("canto"), book.getCantoEntities().get(i).getNumber());
-                Assert.assertEquals(jsonObject.get("text"), book.getCantoEntities().get(i).getText());
-            }
-
-            RDD<BookEntity> inputRDDEntity2 = context.createRDD(inputConfigEntity);
-
-            //Find all the words
-            JavaRDD<String> words = inputRDDEntity2.toJavaRDD().flatMap(new FlatMapFunction<BookEntity, String>() {
-                @Override
-                public Iterable<String> call(BookEntity bookEntity) throws Exception {
-
-                    List<String> words = new ArrayList<>();
-                    for (CantoEntity canto : bookEntity.getCantoEntities()) {
-                        words.addAll(Arrays.asList(canto.getText().split(" ")));
-                    }
-                    return words;
-                }
-            });
-
-            words.count();
-
-            JavaPairRDD<String, Long> wordCount = words.mapToPair(new PairFunction<String, String, Long>() {
-                @Override
-                public Tuple2<String, Long> call(String s) throws Exception {
-                    return new Tuple2<String, Long>(s, 1L);
-                }
-            });
-
-            JavaPairRDD<String, Long> wordCountReduced = wordCount.reduceByKey(new Function2<Long, Long, Long>() {
-                @Override
-                public Long call(Long integer, Long integer2) throws Exception {
-                    return integer + integer2;
-                }
-            });
-
-            JavaRDD<WordCount> outputRDD = wordCountReduced.map(new Function<Tuple2<String, Long>, WordCount>() {
-                @Override
-                public WordCount call(Tuple2<String, Long> stringIntegerTuple2) throws Exception {
-                    return new WordCount(stringIntegerTuple2._1(), stringIntegerTuple2._2());
-                }
-            });
-
-            ExtractorConfig<WordCount> outputConfigEntity = new ExtractorConfig(WordCount.class);
-            outputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat)
-                    .putValue(ExtractorConstants.DATABASE, "book")
-                    .putValue(ExtractorConstants.TYPE, "words");
-            ;
-            outputConfigEntity.setExtractorImplClass(ESEntityExtractor.class);
-
-            context.saveRDD(outputRDD.rdd(), outputConfigEntity);
-
-            RDD<WordCount> outputRDDEntity = context.createRDD(outputConfigEntity);
-
-            Assert.assertEquals(((Long) outputRDDEntity.cache().count()).longValue(),
-                    ESJavaRDDTest.WORD_COUNT_SPECTED.longValue());
-
-        }finally {
-            context.stop();
-        }
-
-
-    }
 
 }

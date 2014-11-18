@@ -271,13 +271,13 @@ public final class UtilES {
         for (Map.Entry<Writable, Writable> entry : entryJson) {
 
             if (LinkedMapWritable.class.isAssignableFrom(entry.getValue().getClass())) {
-                Cells innerCells = getCellFromJson((LinkedMapWritable) entry.getValue(), tableName);
+                Cells innerCells = getCellFromJson((LinkedMapWritable) entry.getValue(), null);
                 cells.add(Cell.create(entry.getKey().toString(), innerCells));
             } else if (ArrayWritable.class.isAssignableFrom(entry.getValue().getClass())) {
                 Writable[] writetable = ((ArrayWritable) entry.getValue()).get();
                 List<Cells> innerCell = new ArrayList<>();
                 for (int i = 0; i < writetable.length; i++) {
-                    innerCell.add(getCellFromJson((LinkedMapWritable) writetable[i], tableName));
+                    innerCell.add(getCellFromJson((LinkedMapWritable) writetable[i], null));
                 }
                 cells.add(Cell.create(entry.getKey().toString(), innerCell));
             } else {

@@ -117,15 +117,15 @@ public class MongoJavaRDDTest {
 
         mongod = mongodExecutable.start();
 
-        mongo = new MongoClient(HOST, PORT);
-        DB db = mongo.getDB(DATABASE);
-        col = db.getCollection(COLLECTION_INPUT);
-        Map<String, String> map = new HashMap<>();
-        map.put("id", "messageTest");
-        map.put("message", MESSAGE_TEST);
-        col.save(new BasicDBObject(map));
+//        mongo = new MongoClient(HOST, PORT);
+//        DB db = mongo.getDB(DATABASE);
+//        col = db.getCollection(COLLECTION_INPUT);
+//        Map<String, String> map = new HashMap<>();
+//        map.put("id", "messageTest");
+//        map.put("message", MESSAGE_TEST);
+//        col.save(new BasicDBObject(map));
 
-        dataSetImport();
+//        dataSetImport();
 
     }
 

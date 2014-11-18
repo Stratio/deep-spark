@@ -17,10 +17,12 @@
 package com.stratio.deep.extractor;
 
 
+import com.stratio.deep.core.extractor.ExtractorCellTest;
 import com.stratio.deep.core.extractor.ExtractorTest;
 import com.stratio.deep.es.extractor.ESCellExtractor;
 
 import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
 import org.testng.annotations.Test;
 
 
@@ -30,15 +32,11 @@ import org.testng.annotations.Test;
  * Created by rcrespo on 29/08/14.
  */
 @Test(suiteName = "ESRddTests", groups = { "ESCellRDDTest" }, dependsOnGroups = "ESJavaRDDTest")
-public class ESCellRDDTest extends ExtractorTest {
-    private Logger LOG = Logger.getLogger(getClass());
+public class ESCellRDDTest extends ExtractorCellTest {
 
     public ESCellRDDTest() {
         super(ESCellExtractor.class,"localhost",9200, true);
     }
-
-
-
 
 
 }
