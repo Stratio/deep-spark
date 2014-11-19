@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.examples.java;
+package com.stratio.deep.examples.java.savewithfunction;
 
 import com.stratio.deep.cassandra.config.CassandraConfigFactory;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
@@ -25,20 +25,16 @@ import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-public class WrittingRddWithMinToCassandra {
-    private static final Logger LOG = Logger.getLogger(WrittingRddWithMinToCassandra.class);
+public class WrittingRddWithMaxToCassandra {
+    private static final Logger LOG = Logger.getLogger(WrittingRddWithMaxToCassandra.class);
     public static List<Tuple2<String, Integer>> results;
 
-    private WrittingRddWithMinToCassandra() {
+    private WrittingRddWithMaxToCassandra() {
     }
 
     /**
@@ -93,6 +89,16 @@ public class WrittingRddWithMinToCassandra {
 
 
 
+        //EXAMPLE: MAX BETWEEN favorite_count de inputRDD y statsRDD =>guardar en output(que será stats)
+        //TODO add filter in => extractorConfig
+
+        /* JavaPairRDD<String,Cells> mappedRDD = inputRDD.flatMapToPair();
+        JavaPairRDD<String, Iterable<Cells>> mappedRDD2 = inputRDD.groupBy();
+        JavaPairRDD<String,Cells> mappedRDD3 = inputRDD.keyBy();
+        JavaPairRDD<String,Cells> mappedRDD4 = inputRDD.mapPartitionsToPair();
+        JavaPairRDD<String,Cells> mappedRDD5 = inputRDD.mapToPair();*/
+
+
         final String [] commonPrimaryKeys = new String[]{"tweet_id"};
         final String namespaceA = keyspaceName+"."+inputTableName;
 
@@ -103,6 +109,7 @@ public class WrittingRddWithMinToCassandra {
                 //TODO Cells => delete pKey??
                 for (String pKey:commonPrimaryKeys){
                     pkValues.add(cells.getCellByName(namespaceA,pKey).getValue());
+                    //cells.remove(namespaceA,pKey);
                 }
 
                 return new Tuple2<List<Object>, Cells>(pkValues,cells);
@@ -122,6 +129,7 @@ public class WrittingRddWithMinToCassandra {
                 List<Object> pkValues = new ArrayList<Object>(commonPrimaryKeys.length);
                 for (String pKey:commonPrimaryKeys){
                     pkValues.add(cells.getCellByName(statsNamespace,pKey).getValue());
+                    //cells.remove(statsNamespace,pKey);
                 }
                 return new Tuple2<List<Object>, Cells>(pkValues,cells);
             }
@@ -133,48 +141,52 @@ public class WrittingRddWithMinToCassandra {
         initTime = System.currentTimeMillis();
 
         JavaPairRDD<List<Object>, Tuple2<Cells, Cells>> join = mappedRddA.join(mappedRddB);
-
+       /* join.reduceByKey(new Function2<Tuple2<Cells, Cells>, Tuple2<Cells, Cells>, Tuple2<Cells, Cells>>() {
+            @Override
+            public Tuple2<Cells, Cells> call(Tuple2<Cells, Cells> cellsCellsTuple2, Tuple2<Cells, Cells> cellsCellsTuple22) throws Exception {
+                return null;
+            }
+        });
+*/
         System.out.println("**********************"+join.count()+System.currentTimeMillis());
         long timeJoin = System.currentTimeMillis() - initTime;
         initTime = System.currentTimeMillis();
 
+        //List<Tuple2<List<Object>, Tuple2<Cells, Cells>>> collect = join.collect();
 
-        final String minField = "favorite_count";
+        final String maxField = "favorite_count";
 
-        //=> JOIN (RIGHT => stored stats) (LEFT=>Streaming)
-        JavaRDD<Cells> matchedCells = join.map(new Function<Tuple2<List<Object>,Tuple2<Cells,Cells>>, Cells>() {
+       /* //=> JOIN (RIGHT => stored stats) (LEFT=>Streaming)
+        JavaRDD<Cells> matchedCells = join.map(new Function<Tuple2<List<Object>, Tuple2<Cells, Cells>>, Cells>() {
             @Override
             public Cells call(Tuple2<List<Object>, Tuple2<Cells, Cells>> listTuple2Tuple2) throws Exception {
                 Cells preparedCell;
-                boolean isCurrentLower = listTuple2Tuple2._2()._2().getLong(statsNamespace,minField) < listTuple2Tuple2._2()._1().getLong(namespaceA,minField);
+                boolean isCurrentHigher = listTuple2Tuple2._2()._2().getLong(statsNamespace,maxField) >= listTuple2Tuple2._2()._1().getLong(namespaceA,maxField);
 
-                preparedCell = isCurrentLower ? null :  listTuple2Tuple2._2()._1();
+                preparedCell = isCurrentHigher ? null :  listTuple2Tuple2._2()._1();
                 return preparedCell;
+            }
+        });*/
+
+
+        //=> JOIN (RIGHT => stored stats) (LEFT=>Streaming)
+        JavaRDD<Cells> matchedCells = join.flatMap(new FlatMapFunction<Tuple2<List<Object>, Tuple2<Cells, Cells>>, Cells>() {
+            @Override
+            public Iterable<Cells> call(Tuple2<List<Object>, Tuple2<Cells, Cells>> listTuple2Tuple2) throws Exception {
+
+                boolean isCurrentHigher = listTuple2Tuple2._2()._2().getLong(statsNamespace,maxField) > listTuple2Tuple2._2()._1().getLong(namespaceA,maxField);
+                return (isCurrentHigher) ? Collections.EMPTY_LIST :  Arrays.asList(listTuple2Tuple2._2()._1());
             }
         });
 
         System.out.println("**********************"+matchedCells.count()+System.currentTimeMillis());
-        long timeMap = System.currentTimeMillis() - initTime;
+        long timeFlatMap = System.currentTimeMillis() - initTime;
         initTime = System.currentTimeMillis();
 
-
-        //=> JOIN (RIGHT => stored stats) (LEFT=>Streaming)
-        JavaRDD<Cells> filterCells = matchedCells.filter(new Function<Cells, Boolean>() {
-            @Override
-            public Boolean call(Cells cells) throws Exception {
-                return (cells == null);
-            }
-        });
-
-
-
-        System.out.println("**********************"+filterCells.count()+System.currentTimeMillis());
-        long timeFilter = System.currentTimeMillis() - initTime;
-        initTime = System.currentTimeMillis();
-
+        //Long numMatchedCells = matchedCells.count();
 
         //numMatched > 4 siempre=> si no hay rdd => error
-        deepContext.saveRDD(filterCells.rdd(), statsConfig);
+        deepContext.saveRDD(matchedCells.rdd(), statsConfig);
 
         System.out.println("**********************"+matchedCells.count()+System.currentTimeMillis());
         long timeSave = System.currentTimeMillis() - initTime;
@@ -184,8 +196,7 @@ public class WrittingRddWithMinToCassandra {
                 "mapA"+timeMappedRDDA+"\n"+
                 "mapB"+timeMappedRDDB+"\n"+
                 "join"+timeJoin+"\n"+
-                "map"+timeMap+"\n"+
-                "filter"+timeFilter+"\n"+
+                "flatMap"+timeFlatMap+"\n"+
                 "save"+timeSave
         );
 

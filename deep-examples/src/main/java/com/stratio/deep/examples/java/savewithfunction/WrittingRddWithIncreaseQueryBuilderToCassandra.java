@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.examples.java;
+package com.stratio.deep.examples.java.savewithfunction;
 
-import com.stratio.deep.cassandra.config.CassandraConfigFactory;
-import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.utils.ContextProperties;
-import org.apache.log4j.Logger;
-import org.apache.spark.api.java.JavaRDD;
-import scala.Tuple2;
+        import com.stratio.deep.cassandra.config.CassandraConfigFactory;
+        import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
+        import com.stratio.deep.cassandra.querybuilder.IncreaseCountersQueryBuilder;
+        import com.stratio.deep.commons.entity.Cells;
+        import com.stratio.deep.core.context.DeepSparkContext;
+        import com.stratio.deep.utils.ContextProperties;
+        import org.apache.log4j.Logger;
+        import org.apache.spark.api.java.JavaRDD;
+        import scala.Tuple2;
 
-import java.util.List;
+        import java.util.*;
 
-public class WrittingBIGRddToCassandra {
-    private static final Logger LOG = Logger.getLogger(WrittingBIGRddToCassandra.class);
+public class WrittingRddWithIncreaseQueryBuilderToCassandra {
+    private static final Logger LOG = Logger.getLogger(WrittingRddWithIncreaseQueryBuilderToCassandra.class);
     public static List<Tuple2<String, Integer>> results;
 
-    private WrittingBIGRddToCassandra() {
+    private WrittingRddWithIncreaseQueryBuilderToCassandra() {
     }
 
     /**
@@ -52,14 +53,13 @@ public class WrittingBIGRddToCassandra {
         String job = "java:saveWithQueryBuilder";
 
         String keyspaceName = "test";
-        String inputTableName = "tweetsbig";
-        final String outputTableName = "copy_tweetsbig";
-
+        String inputTableName = "tweets2";
+        final String outputTableName = "counters";
+        String statsTableName = "counters";
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
-
 
 
         // --- INPUT RDD
@@ -68,22 +68,19 @@ public class WrittingBIGRddToCassandra {
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
 
-        long initTime= System.currentTimeMillis();
-
-
         JavaRDD<Cells> inputRDD = deepContext.createJavaRDD(inputConfig);
 
-        System.out.println("**********************"+inputRDD.count()+System.currentTimeMillis());
-        long timeCreate = System.currentTimeMillis() - initTime;
-        initTime= System.currentTimeMillis();
 
         // --- OUTPUT RDD
-        CassandraDeepJobConfig<Cells> outputConfig = CassandraConfigFactory.create()
+        CassandraDeepJobConfig<Cells> outputConfig = CassandraConfigFactory.createWriteConfig()
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
-                .keyspace(keyspaceName).table(outputTableName).batchSize(2).createTableOnWrite(true)
-                .initialize();
+                .keyspace(keyspaceName).table(outputTableName)
+                .createTableOnWrite(true);
+        outputConfig.initialize();
 
-        deepContext.saveRDD(inputRDD.rdd(), outputConfig);
+
+
+        deepContext.saveRDD(inputRDD.rdd(), outputConfig, new IncreaseCountersQueryBuilder());
 
         deepContext.stop();
     }

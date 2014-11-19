@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.examples.java;
+package com.stratio.deep.examples.java.savewithfunction;
 
 import com.stratio.deep.cassandra.config.CassandraConfigFactory;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
@@ -22,15 +22,9 @@ import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class WrittingRddWithDefaultQueryBuilderToCassandra {
