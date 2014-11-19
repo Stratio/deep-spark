@@ -28,7 +28,7 @@
     <parent>
         <groupId>com.stratio.deep</groupId>
         <artifactId>deep-parent</artifactId>
-        <version>0.5.0</version>
+        <version>0.6.0</version>
         <relativePath>../deep-parent</relativePath>
     </parent>
 
@@ -96,7 +96,7 @@
         <dependency>
             <groupId>com.aerospike</groupId>
             <artifactId>aerospike-client</artifactId>
-            <version>[3.0.0,)</version>
+            <version>3.0.31</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>

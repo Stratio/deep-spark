@@ -18,33 +18,21 @@
 
 package com.aerospike.hadoop.mapreduce;
 
-import java.io.IOException;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
-
-import org.apache.hadoop.mapreduce.InputSplit;
-import org.apache.hadoop.mapreduce.RecordReader;
-import org.apache.hadoop.mapreduce.TaskAttemptContext;
-
-import com.aerospike.client.AerospikeClient;
-import com.aerospike.client.AerospikeException;
+import com.aerospike.client.*;
 import com.aerospike.client.AerospikeException.ScanTerminated;
-import com.aerospike.client.Key;
 import com.aerospike.client.policy.QueryPolicy;
 import com.aerospike.client.policy.ScanPolicy;
 import com.aerospike.client.query.Filter;
 import com.aerospike.client.query.RecordSet;
-import com.aerospike.client.query.ResultSet;
 import com.aerospike.client.query.Statement;
-import com.aerospike.client.Record;
-import com.aerospike.client.ScanCallback;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+
+import java.io.IOException;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class AerospikeRecordReader
     extends RecordReader<AerospikeKey, AerospikeRecord>

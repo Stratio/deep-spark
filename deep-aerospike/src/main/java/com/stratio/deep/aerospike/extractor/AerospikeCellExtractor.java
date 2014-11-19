@@ -40,8 +40,12 @@ public class AerospikeCellExtractor extends AerospikeExtractor<Cells> {
      * Public constructor for AerospikeCellExtractor
      */
     public AerospikeCellExtractor() {
+        this(Cells.class);
+    }
+
+    public AerospikeCellExtractor(Class<Cells> entityClass){
         super();
-        this.deepJobConfig = new AerospikeDeepJobConfig(Cells.class);
+        this.deepJobConfig = new AerospikeDeepJobConfig(entityClass);
     }
 
     /**
