@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import com.stratio.deep.cassandra.querybuilder.DefaultQueryBuilder;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.db.marshal.TimeUUIDType;
@@ -142,7 +143,7 @@ public class CassandraUtils {
                     @Override
                     public Integer apply(TaskContext context, Iterator<Tuple2<Cells, Cells>> rows) {
 
-                        try (DeepCqlRecordWriter writer = new DeepCqlRecordWriter(writeConfig)) {
+                        try (DeepCqlRecordWriter writer = new DeepCqlRecordWriter(writeConfig,new DefaultQueryBuilder())) {
                             while (rows.hasNext()) {
                                 Tuple2<Cells, Cells> row = rows.next();
                                 writer.write(row._1(), row._2());
@@ -271,6 +272,12 @@ public class CassandraUtils {
         boolean isFirstField = true;
 
         for (Cell key : keys) {
+
+
+            if(!(key instanceof CassandraCell)){
+                    key = CassandraCell.create(key);
+            }
+
             String cellName = quote(key.getCellName());
 
             if (!isFirstField) {
@@ -291,6 +298,11 @@ public class CassandraUtils {
 
         if (values != null) {
             for (Cell key : values) {
+
+                if(!(key instanceof CassandraCell)){
+                    key = CassandraCell.create(key);
+                }
+
                 sb.append(", ");
                 sb.append(quote(key.getCellName())).append(" ").append(((CassandraCell) key).getCql3TypeClassName());
             }

@@ -16,9 +16,6 @@
 
 package com.stratio.deep.cassandra.cql;
 
-import static com.stratio.deep.cassandra.util.CassandraUtils.updateQueryGenerator;
-import static com.stratio.deep.commons.utils.Utils.quote;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -46,18 +43,19 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
+import com.stratio.deep.cassandra.querybuilder.CassandraUpdateQueryBuilder;
 import com.stratio.deep.cassandra.util.CassandraUtils;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.exception.DeepInstantiationException;
+import com.stratio.deep.commons.handler.DeepRecordWriter;
 import com.stratio.deep.commons.utils.Pair;
-import com.stratio.deep.commons.utils.Utils;
 
 /**
  * Handles the distributed write to cassandra in batch.
  */
-public class DeepCqlRecordWriter implements AutoCloseable {
+public final class DeepCqlRecordWriter extends DeepRecordWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(DeepCqlRecordWriter.class);
 
@@ -72,16 +70,19 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     private final IPartitioner partitioner;
     private final InetAddress localhost;
 
+    private final CassandraUpdateQueryBuilder queryBuilder;
+
     /**
      * Con
      * 
      * @param writeConfig
      */
-    public DeepCqlRecordWriter(ICassandraDeepJobConfig writeConfig) {
+    public DeepCqlRecordWriter(ICassandraDeepJobConfig writeConfig, CassandraUpdateQueryBuilder queryBuilder) {
         this.clients = new HashMap<>();
         this.removedClients = new HashMap<>();
         this.writeConfig = writeConfig;
         this.partitioner = RangeUtils.getPartitioner(writeConfig);
+        this.queryBuilder = queryBuilder;
         try {
             this.localhost = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
@@ -203,10 +204,9 @@ public class DeepCqlRecordWriter implements AutoCloseable {
      */
     public void write(Cells keys, Cells values) {
         /* generate SQL */
-        String localCql = updateQueryGenerator(keys, values, writeConfig.getKeyspace(),
-                quote(writeConfig.getColumnFamily()));
 
-        // Token range = partitioner.getToken(getPartitionKey(keys));
+        String localCql = queryBuilder.prepareQuery(keys, values);
+
         Token range = partitioner.getToken(CassandraUtils.getPartitionKey(keys, keyValidator,
                 partitionKeyColumns.length));
 
@@ -232,7 +232,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
      * A client that runs in a threadpool and connects to the list of endpoints for a particular range. Bound variables
      * for keys in that range are sent to this client via a queue.
      */
-    private class RangeClient extends Thread implements Closeable {
+    protected class RangeClient extends Thread implements Closeable {
 
         private final int batchSize = writeConfig.getBatchSize();
         private final List<String> batchStatements = new ArrayList<>();
@@ -268,7 +268,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
                 return;
             }
 
-            cql = Utils.batchQueryGenerator(batchStatements);
+            cql = queryBuilder.prepareBatchQuery(batchStatements);
             this.start();
         }
 

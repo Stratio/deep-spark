@@ -79,6 +79,7 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
         rddConfig = initReadConfig();
         writeConfig = initWriteConfig();
         rdd = initRDD();
+
     }
 
 
