@@ -48,7 +48,7 @@ import scala.Tuple2;
 /**
  * Created by rcrespo on 17/11/14.
  */
-public  class ExtractorCellTest<S extends ExtractorConfig<Cells>> extends ExtractorTest<Cells, S> {
+public abstract class ExtractorCellTest<S extends ExtractorConfig<Cells>> extends ExtractorTest<Cells, S> {
     private static final long serialVersionUID = -7147600574221227223L;
 
     /**
