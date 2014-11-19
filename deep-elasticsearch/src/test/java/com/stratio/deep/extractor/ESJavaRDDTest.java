@@ -97,9 +97,6 @@ public class ESJavaRDDTest {
 
 
 
-         dataSetImport();
-
-
 
     }
 
@@ -172,21 +169,17 @@ public class ESJavaRDDTest {
                     .actionGet();
             delete.status();
 
-            //assertEquals(delete.getCount(), 1);
         } catch (Exception e) {
 
-            e.printStackTrace();
+//            e.printStackTrace();
         }
     }
 
     @Test
     public void testRDD() throws IOException, ExecutionException, InterruptedException {
-        // dataSetImport();
 
         Assert.assertEquals(true, true);
 
-        //deleteDataSet();
-        //cleanup();
     }
 
     @AfterSuite

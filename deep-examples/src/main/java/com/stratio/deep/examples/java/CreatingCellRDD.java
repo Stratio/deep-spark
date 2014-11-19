@@ -66,9 +66,9 @@ public final class CreatingCellRDD {
                 .setMaster(p.getCluster())
                 .setAppName(job)
                 .setJars(p.getJars())
-                .setSparkHome(p.getSparkHome())
-                .set("spark.serializer","org.apache.spark.serializer.KryoSerializer")
-                .set("spark.kryo.registrator","com.stratio.deep.serializer.DeepKryoRegistrator");
+                .setSparkHome(p.getSparkHome());
+                //.set("spark.serializer","org.apache.spark.serializer.KryoSerializer")
+                //.set("spark.kryo.registrator","com.stratio.deep.serializer.DeepKryoRegistrator");
 
         SparkContext sc = new SparkContext(p.getCluster(), job, sparkConf);
 
@@ -82,8 +82,8 @@ public final class CreatingCellRDD {
                 .host(p.getCassandraHost())
                 .cqlPort(p.getCassandraCqlPort())
                 .rpcPort(p.getCassandraThriftPort())
-                .keyspace(keyspaceName)
-                .table(tableName)
+                .keyspace("onestore")
+                .table("bitemporal_index")
                 .initialize();
 
         // Creating the RDD
