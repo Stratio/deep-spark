@@ -3,14 +3,17 @@ package com.stratio.deep.cassandra.entity;
 import static com.stratio.deep.commons.utils.AnnotationUtils.MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE;
 import static com.stratio.deep.commons.utils.AnnotationUtils.deepFieldName;
 import static com.stratio.deep.commons.utils.AnnotationUtils.getBeanFieldValue;
-
+import org.apache.cassandra.db.marshal.MapType;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 
 import org.apache.cassandra.db.marshal.AbstractType;
+import org.apache.cassandra.db.marshal.UTF8Type;
+import org.apache.cassandra.db.marshal.UUIDType;
 
 import com.datastax.driver.core.DataType;
+import com.datastax.driver.core.ProtocolVersion;
 import com.stratio.deep.commons.annotations.DeepField;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.IDeepType;
@@ -35,6 +38,8 @@ public class CassandraCell extends Cell {
     private Boolean isClusterKey = Boolean.FALSE;
 
     private transient CellValidator cellValidator;
+
+    private transient DataType dataType;
 
     private String cql3TypeClassName;
 
@@ -168,9 +173,14 @@ public class CassandraCell extends Cell {
         this.cellName = cellName;
         this.isClusterKey = isClusterKey;
         this.isPartitionKey = isPartitionKey;
+        this.dataType = cellType;
         this.cellValidator = getValueType(cellType);
         this.cql3TypeClassName = cellValidator.getAbstractType().asCQL3Type().toString();
 
+    }
+
+    public DataType getDataType() {
+        return dataType;
     }
 
     /**
@@ -182,10 +192,9 @@ public class CassandraCell extends Cell {
         this.isPartitionKey = ((CassandraCell) metadata).isPartitionKey;
         this.cellValidator = ((CassandraCell) metadata).cellValidator;
         if (cellValue != null) {
-            this.cellValue = ((CassandraCell) metadata).marshaller().compose(cellValue);
+            this.cellValue = ((CassandraCell)metadata).getDataType().deserialize(cellValue, ProtocolVersion.V2);
         }
         this.cql3TypeClassName = cellValidator.getAbstractType().asCQL3Type().toString();
-
     }
 
     /**
