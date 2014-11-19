@@ -1,13 +1,13 @@
 package com.stratio.deep.commons.rdd;
 
-import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
 import java.io.Serializable;
-import java.util.List;
 
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
+import java.util.List;
+import java.util.List;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import org.apache.spark.Partition;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.config.BaseConfig;
 
 import scala.collection.Seq;
 
@@ -61,19 +61,23 @@ public interface IExtractor<T, S extends BaseConfig<T>> extends Serializable {
     void saveRDD(T t);
 
     /**
-     * Init save.
-     *
-     * @param config the config
-     * @param first the first
-     */
-    void initSave(S config, T first);
-
-    /**
      * Gets preferred locations.
      *
      * @param split the split
      * @return the preferred locations
      */
     List<String> getPreferredLocations(Partition split);
+
+
+
+    /**
+     * Init save.
+     *
+     * @param config the config
+     * @param first the first
+     * @param queryBuilder the query builder
+     */
+    void initSave(S config, T first, UpdateQueryBuilder queryBuilder);
+
 
 }

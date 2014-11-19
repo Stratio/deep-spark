@@ -27,14 +27,14 @@ import org.apache.spark.rdd.RDD;
 import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.core.function.PrepareSaveFunction;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
 
 /**
  * Entry point to the Cassandra-aware Spark context.
- *
+ * 
  * @author Luca Rosellini <luca@stratio.com>
  */
 public class DeepSparkContext extends JavaSparkContext implements Serializable {
@@ -46,8 +46,9 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
     /**
      * Overridden superclass constructor.
-     *
-     * @param sc an already created spark context.
+     * 
+     * @param sc
+     *            an already created spark context.
      */
     public DeepSparkContext(SparkContext sc) {
         super(sc);
@@ -134,20 +135,31 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         return (JavaRDD<T>)new DeepJavaRDD<>((DeepRDD<T, DeepJobConfig<T>>) createRDD(config));
     }
 
+
     /**
-     * Saves RDD.
      *
-     * @param <T>  the type parameter
-     * @param <S>  the type parameter
-     * @param rdd the rdd
-     * @param config the config
-     * @throws DeepIOException the deep iO exception
+     * @param rdd
+     * @param config
+     * @param queryBuilder
+     * @param <T>
+     * @param <S>
      */
-    public static <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, S config) throws DeepIOException {
+    public static <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, S config, UpdateQueryBuilder queryBuilder) {
+
         config.setRddId(rdd.id());
         config.setPartitionId(0);
-        rdd.foreachPartition(new PrepareSaveFunction<>(config, rdd.first()));
-
+        rdd.foreachPartition(new PrepareSaveFunction<>(queryBuilder, config, rdd.first()));
     }
 
+    /**
+     *
+     * @param rdd
+     * @param config
+     * @param <T>
+     * @param <S>
+     */
+    public static <T, S extends BaseConfig<T>> void saveRDD(RDD<T> rdd, S config) {
+        saveRDD(rdd, config, null);
+
+    }
 }

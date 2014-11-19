@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import org.apache.spark.Partition;
 
 import com.mongodb.BasicDBList;
@@ -409,7 +410,7 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
     }
 
     @Override
-    public void initSave(S config, T first) {
+    public void initSave(S config, T first, UpdateQueryBuilder queryBuilder) {
         initMongoDeepJobConfig(config);
 
         try {

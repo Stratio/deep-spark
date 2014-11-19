@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.stratio.deep</groupId>
     <artifactId>deep-parent</artifactId>
-    <version>0.6.0</version>
+    <version>0.6.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>http://www.stratio.com</url>
     <name>deep parent</name>
@@ -339,7 +339,7 @@
                 <version>2.17</version>
                 <configuration>
                     <argLine>-noverify</argLine>
-                    <testFailureIgnore>true</testFailureIgnore>
+		    <testFailureIgnore>true</testFailureIgnore>
                 </configuration>
             </plugin>
 
