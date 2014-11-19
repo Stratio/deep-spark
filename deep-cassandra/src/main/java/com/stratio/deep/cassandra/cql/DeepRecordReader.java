@@ -300,14 +300,13 @@ public class DeepRecordReader implements IDeepRecordReader {
 
             String query = composeQuery();
 
-            List<Object> bindValues = preparedQueryBindValues();
-            assert bindValues != null;
-
             EqualsInValue equalsInValue = config.getEqualsInValue();
 
-            Statement stmt = null;
             Object[] values = null;
             if (equalsInValue == null) {
+                List<Object> bindValues = preparedQueryBindValues();
+                assert bindValues != null;
+
                 values = bindValues.toArray(new Object[bindValues.size()]);
                 LOG.debug("query: " + query + "; values: " + Arrays.toString(values));
             } else {
@@ -324,7 +323,7 @@ public class DeepRecordReader implements IDeepRecordReader {
                 LOG.debug("query: " + query + "; values: " + Arrays.toString(values));
             }
 
-            stmt = new SimpleStatement(query, values);
+            Statement stmt = new SimpleStatement(query, values);
             stmt.setFetchSize(pageSize);
 
             return stmt;
