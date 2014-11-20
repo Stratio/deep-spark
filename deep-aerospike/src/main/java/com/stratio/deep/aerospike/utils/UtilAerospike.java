@@ -166,7 +166,7 @@ final public class UtilAerospike {
             AerospikeDeepJobConfig aerospikeConfig) throws IllegalAccessException,
             InstantiationException, InvocationTargetException {
 
-        String namespace = key.namespace;
+        String namespace = key.namespace + "." + key.setName;
         String setName = aerospikeConfig.getSet();
         String[] inputColumns = aerospikeConfig.getInputColumns();
         Tuple2<String, Object> equalsFilter = aerospikeConfig.getEqualsFilter();
