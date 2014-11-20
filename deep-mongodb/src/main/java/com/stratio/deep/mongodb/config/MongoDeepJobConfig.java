@@ -45,6 +45,7 @@ import java.util.Set;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
 import org.bson.BSONObject;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
@@ -133,7 +134,6 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
      * The Custom configuration.
      */
     private Map<String, Serializable> customConfiguration;
-
 
     /**
      * Instantiates a new Mongo deep job config.
@@ -401,7 +401,6 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
         return nameSpace;
     }
 
-
     /**
      * Port mongo deep job config.
      *
@@ -635,7 +634,6 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T> implements IMongoDeep
 
         return this;
     }
-
 
     /**
      * Filter query.

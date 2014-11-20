@@ -5,16 +5,12 @@ import static org.testng.Assert.assertEquals;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import com.google.common.io.Resources;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 
@@ -117,15 +113,15 @@ public class MongoJavaRDDTest {
 
         mongod = mongodExecutable.start();
 
-//        mongo = new MongoClient(HOST, PORT);
-//        DB db = mongo.getDB(DATABASE);
-//        col = db.getCollection(COLLECTION_INPUT);
-//        Map<String, String> map = new HashMap<>();
-//        map.put("id", "messageTest");
-//        map.put("message", MESSAGE_TEST);
-//        col.save(new BasicDBObject(map));
+        //        mongo = new MongoClient(HOST, PORT);
+        //        DB db = mongo.getDB(DATABASE);
+        //        col = db.getCollection(COLLECTION_INPUT);
+        //        Map<String, String> map = new HashMap<>();
+        //        map.put("id", "messageTest");
+        //        map.put("message", MESSAGE_TEST);
+        //        col.save(new BasicDBObject(map));
 
-//        dataSetImport();
+        //        dataSetImport();
 
     }
 
