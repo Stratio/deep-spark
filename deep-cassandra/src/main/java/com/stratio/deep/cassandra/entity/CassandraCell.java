@@ -203,7 +203,11 @@ public class CassandraCell extends Cell {
         this.isKey = ((CassandraCell)metadata).isPartitionKey();
         this.cellValidator = ((CassandraCell) metadata).cellValidator;
         if (cellValue != null) {
-            this.cellValue = ((CassandraCell)metadata).getDataType().deserialize(cellValue, ProtocolVersion.V2);
+            if(((CassandraCell)metadata).getDataType()!=null){
+                this.cellValue = ((CassandraCell)metadata).getDataType().deserialize(cellValue, ProtocolVersion.V2);
+            }else{
+                this.cellValue = ((CassandraCell) metadata).marshaller().compose(cellValue);
+            }
         }
         this.cql3TypeClassName = cellValidator.getAbstractType().asCQL3Type().toString();
     }
