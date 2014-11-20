@@ -88,16 +88,15 @@
             <groupId>com.stratio.deep</groupId>
             <artifactId>deep-core</artifactId>
             <version>${project.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-
-        <!-- Logging with SLF4J & LogBack -->
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
+            <groupId>com.stratio.deep</groupId>
+            <artifactId>deep-core</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>com.stratio.deep</groupId>
             <artifactId>deep-commons</artifactId>
