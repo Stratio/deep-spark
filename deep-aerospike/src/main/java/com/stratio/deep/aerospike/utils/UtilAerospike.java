@@ -173,7 +173,7 @@ final public class UtilAerospike {
         String equalsFilterBin = equalsFilter != null ? equalsFilter._1() : null;
         Object equalsFilterValue = equalsFilter != null ? equalsFilter._2() : null;
 
-        Cells cells = setName != null ? new Cells(setName) : new Cells(namespace);
+        Cells cells = namespace != null ? new Cells(namespace) : new Cells();
 
         Map<String, Object> map = aerospikeRecord.bins;
         if (inputColumns != null) {
@@ -193,7 +193,7 @@ final public class UtilAerospike {
             if (equalsFilter == null || checkEqualityFilter(map, equalsFilterBin, equalsFilterValue)) {
                 for (Map.Entry<String, Object> bin : map.entrySet()) {
                     Cell cell = Cell.create(bin.getKey(), bin.getValue());
-                    cells.add(cell);
+                    cells.add(namespace, cell);
                 }
             }
         }
