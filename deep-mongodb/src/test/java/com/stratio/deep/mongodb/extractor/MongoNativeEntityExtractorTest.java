@@ -16,43 +16,18 @@
 
 package com.stratio.deep.mongodb.extractor;
 
-import static org.testng.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.rdd.RDD;
-import org.bson.BSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.core.entity.BookEntity;
-import com.stratio.deep.core.entity.CantoEntity;
-import com.stratio.deep.core.entity.WordCount;
 import com.stratio.deep.core.extractor.ExtractorEntityTest;
-import com.stratio.deep.core.extractor.ExtractorTest;
-
-import scala.Tuple2;
 
 /**
  * Created by rcrespo on 11/11/14.
  */
 
-@Test(suiteName = "mongoRddTests", groups = { "MongoNativeEntityExtractorTest" }, dependsOnGroups = "MongoNativeCellExtractorTest")
+@Test(suiteName = "mongoRddTests", groups = { "MongoNativeEntityExtractorTest" },
+        dependsOnGroups = "MongoNativeCellExtractorTest")
 public class MongoNativeEntityExtractorTest extends ExtractorEntityTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoNativeEntityExtractorTest.class);
@@ -60,7 +35,5 @@ public class MongoNativeEntityExtractorTest extends ExtractorEntityTest {
     public MongoNativeEntityExtractorTest() {
         super(MongoNativeEntityExtractor.class, "localhost", 27890, false);
     }
-
-
 
 }

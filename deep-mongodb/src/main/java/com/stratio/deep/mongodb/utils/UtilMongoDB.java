@@ -235,7 +235,7 @@ public final class UtilMongoDB {
                     }
                     cells.add(Cell.create(entry.getKey(), innerCell));
                 } else if (BSONObject.class.isAssignableFrom(entry.getValue().getClass())) {
-                    Cells innerCells = getCellFromBson((BSONObject) entry.getValue(),null);
+                    Cells innerCells = getCellFromBson((BSONObject) entry.getValue(), null);
                     cells.add(Cell.create(entry.getKey(), innerCells));
                 } else {
                     cells.add(Cell.create(entry.getKey(), entry.getValue()));
@@ -297,7 +297,7 @@ public final class UtilMongoDB {
 
         DBObject bson = new BasicDBObject();
         for (Cell cell : cells) {
-            if(cell.getValue()!=null) {
+            if (cell.getValue() != null) {
                 if (Collection.class.isAssignableFrom(cell.getCellValue().getClass())) {
                     Collection c = (Collection) cell.getCellValue();
                     Iterator iterator = c.iterator();

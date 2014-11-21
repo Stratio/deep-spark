@@ -51,11 +51,12 @@ import com.stratio.deep.commons.exception.DeepGenericException;
 public class Cells implements Iterable<Cell>, Serializable {
     private static final long serialVersionUID = 3074521612130550380L;
 
+
+    private final String nameSpace;
+
     /**
      * Internal default table name used when no table name is specified.
      */
-    private final String nameSpace;
-
     private final static String DEFAULT_TABLE_NAME = "3fa2fbc6d8abbc77cdab9e3216d957dffd64a64b";
 
     /**

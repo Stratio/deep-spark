@@ -14,26 +14,18 @@
  *  limitations under the License.
  */
 
-package com.stratio.deep.mongodb.extractor;
+package com.stratio.deep.cassandra.extractor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
+import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
 import com.stratio.deep.core.extractor.ExtractorCellTest;
 
 /**
- * Created by rcrespo on 11/11/14.
+ * Created by rcrespo on 20/11/14.
  */
+@Test(suiteName = "cassandraRddTests", groups = { "CassandraCellExtractorTest" } , dependsOnGroups = {"cassandraJavaRDDTest"})
+public class CassandraCellExtractorTest {
 
-@Test(suiteName = "mongoRddTests", groups = { "MongoNativeCellExtractorTest" },
-        dependsOnGroups = "MongoEntityExtractorTest")
-public class MongoNativeCellExtractorTest extends ExtractorCellTest {
-
-    private static final Logger LOG = LoggerFactory.getLogger(MongoNativeCellExtractorTest.class);
-
-    public MongoNativeCellExtractorTest() {
-        super(MongoNativeCellExtractor.class, "localhost:27890", null, true);
-    }
 
 }
