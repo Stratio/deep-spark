@@ -263,19 +263,21 @@ public final class UtilMongoDB {
 
         BSONObject bson = new BasicBSONObject();
         for (Cell cell : cells) {
-            if (Collection.class.isAssignableFrom(cell.getCellValue().getClass())) {
-                Collection c = (Collection) cell.getCellValue();
-                Iterator iterator = c.iterator();
-                List<BSONObject> innerBsonList = new ArrayList<>();
+            if (cell.getValue() != null) {
+                if (Collection.class.isAssignableFrom(cell.getCellValue().getClass())) {
+                    Collection c = (Collection) cell.getCellValue();
+                    Iterator iterator = c.iterator();
+                    List<BSONObject> innerBsonList = new ArrayList<>();
 
-                while (iterator.hasNext()) {
-                    innerBsonList.add(getBsonFromCell((Cells) iterator.next()));
+                    while (iterator.hasNext()) {
+                        innerBsonList.add(getBsonFromCell((Cells) iterator.next()));
+                    }
+                    bson.put(cell.getCellName(), innerBsonList);
+                } else if (Cells.class.isAssignableFrom(cell.getCellValue().getClass())) {
+                    bson.put(cell.getCellName(), getBsonFromCell((Cells) cell.getCellValue()));
+                } else {
+                    bson.put(cell.getCellName(), cell.getCellValue());
                 }
-                bson.put(cell.getCellName(), innerBsonList);
-            } else if (Cells.class.isAssignableFrom(cell.getCellValue().getClass())) {
-                bson.put(cell.getCellName(), getBsonFromCell((Cells) cell.getCellValue()));
-            } else {
-                bson.put(cell.getCellName(), cell.getCellValue());
             }
 
         }
