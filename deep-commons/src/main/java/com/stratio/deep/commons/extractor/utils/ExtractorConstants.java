@@ -3,168 +3,58 @@ package com.stratio.deep.commons.extractor.utils;
 /**
  * Created by dgomez on 25/08/14.
  */
-public interface ExtractorConstants {
+// TODO Make it final!
+public class ExtractorConstants {
 
-    /**
-     * The PASSWORD.
-     */
-    String PASSWORD = "password";
+    public static String PASSWORD = "password";
 
-    /**
-     * The CATALOG.
-     */
-    String CATALOG = "catalog";
-    /**
-     * The KEYSPACE.
-     */
-    String KEYSPACE = CATALOG;
-    /**
-     * The DATABASE.
-     */
-    String DATABASE = KEYSPACE;
-    /**
-     * The INDEX.
-     */
-    String INDEX = CATALOG;
-    /**
-     * The TABLE.
-     */
-    String TABLE = "table";
-    /**
-     * The COLLECTION.
-     */
-    String COLLECTION = TABLE;
-    /**
-     * The TYPE.
-     */
-    String TYPE = TABLE;
-    /**
-     * The NAMESPACE.
-     */
-    String NAMESPACE = CATALOG;
-    /**
-     * The SET.
-     */
-    String SET = TABLE;
-    /**
-     * The HOST.
-     */
-    String HOST = "host";
-    /**
-     * The PORT.
-     */
-    String PORT = "Port";
-    /**
-     * The INPUT _ cOLUMNS.
-     */
-    String INPUT_COLUMNS = "inputColumns";
-    /**
-     * The USERNAME.
-     */
-    String USERNAME = "user";
-    /**
-     * The PAGE _ sIZE.
-     */
-    String PAGE_SIZE = "page";
-    /**
-     * The SESSION.
-     */
-    String SESSION = "session";
-    /**
-     * The PORT 2.
-     */
-    String PORT2 = "port2";
-    /**
-     * The CQLPORT.
-     */
-    String CQLPORT = PORT2;
-    /**
-     * The RPCPORT.
-     */
-    String RPCPORT = PORT;
-    /**
-     * The COLUMN _ fAMILY.
-     */
-    String COLUMN_FAMILY = "columnFamily";
-    /**
-     * The BISECT _ fACTOR.
-     */
-    String BISECT_FACTOR = "bisecFactor";
-    /**
-     * The CREATE _ oN _ wRITE.
-     */
-    String CREATE_ON_WRITE = "createOnWrite";
-    /**
-     * The BATCHSIZE.
-     */
-    String BATCHSIZE = "batchSize";
-    /**
-     * The READ _ cONSISTENCY _ lEVEL.
-     */
-    String READ_CONSISTENCY_LEVEL = "readConsistencyLevel";
-    /**
-     * The WRITE _ cONSISTENCY _ lEVEL.
-     */
-    String WRITE_CONSISTENCY_LEVEL = "writeConsistencyLevel";
+    public static String CATALOG = "catalog";
+    public static String KEYSPACE = CATALOG;
+    public static String DATABASE = KEYSPACE;
+    public static String INDEX = CATALOG;
+    public static String TABLE = "table";
+    public static String COLLECTION = TABLE;
+    public static String TYPE = TABLE;
+    public static String NAMESPACE = CATALOG;
+    public static String SET = TABLE;
+    public static String HOST = "host";
+    public static String PORT = "Port";
+    public static String INPUT_COLUMNS = "inputColumns";
+    public static String USERNAME = "user";
+    public static String PAGE_SIZE = "page";
+    public static String SESSION = "session";
+    public static String PORT2 = "port2";
+    public static String CQLPORT = PORT2;
+    public static String RPCPORT = PORT;
+    public static String COLUMN_FAMILY = "columnFamily";
+    public static String BISECT_FACTOR = "bisecFactor";
+    public static String CREATE_ON_WRITE = "createOnWrite";
+    public static String BATCHSIZE = "batchSize";
+    public static String READ_CONSISTENCY_LEVEL = "readConsistencyLevel";
+    public static String WRITE_CONSISTENCY_LEVEL = "writeConsistencyLevel";
 
-    /**
-     * The REPLICA _ sET.
-     */
-    String REPLICA_SET = "replicaSet";
+    public static String REPLICA_SET = "replicaSet";
 
-    /**
-     * The READ _ pREFERENCE.
-     */
-    String READ_PREFERENCE = "readPreference";
+    public static String READ_PREFERENCE = "readPreference";
 
-    /**
-     * The SORT.
-     */
-    String SORT = "sort";
+    public static String SORT = "sort";
 
-    /**
-     * The FILTER _ fIELD.
-     */
-    String FILTER_FIELD = "filterField";
+    public static String FILTER_FIELD = "filterField";
 
-    /**
-     * The FILTER _ qUERY.
-     */
-    String FILTER_QUERY = "filterQuery";
+    public static String FILTER_QUERY = "filterQuery";
 
-    /**
-     * The INPUT _ kEY.
-     */
-    String INPUT_KEY = "inputKey";
+    public static String INPUT_KEY = "inputKey";
 
-    /**
-     * The IGNORE _ iD _ fIELD.
-     */
-    String IGNORE_ID_FIELD = "ignoreIdField";
+    public static String IGNORE_ID_FIELD = "ignoreIdField";
 
-    /**
-     * The USE _ sHARD.
-     */
-    String USE_SHARD = "useShard";
+    public static String USE_SHARD = "useShard";
 
-    /**
-     * The USE _ sPLITS.
-     */
-    String USE_SPLITS = "useSplit";
+    public static String USE_SPLITS = "useSplit";
 
-    /**
-     * The USE _ cHUNKS.
-     */
-    String USE_CHUNKS = "useChunk";
+    public static String USE_CHUNKS = "useChunk";
 
-    /**
-     * The SPLIT _ sIZE.
-     */
-    String SPLIT_SIZE = "splitSize";
+    public static String SPLIT_SIZE = "splitSize";
 
-    /**
-     * The EQUALS _ iN _ fILTER.
-     */
-    String EQUALS_IN_FILTER = "equalsInFilter";
+    public static String EQUALS_IN_FILTER = "equalsInFilter";
 
 }
