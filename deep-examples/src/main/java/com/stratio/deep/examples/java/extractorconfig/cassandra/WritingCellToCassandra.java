@@ -29,7 +29,6 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
 
 import com.google.common.collect.Lists;
-import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
@@ -121,8 +120,8 @@ public final class WritingCellToCassandra {
         JavaRDD<Cells> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
             public Cells call(Tuple2<String, Integer> t) {
-                Cell c1 = CassandraCell.create("domain", t._1(), true, false);
-                Cell c2 = CassandraCell.create("num_pages", t._2());
+                Cell c1 = Cell.create("domain", t._1(), true, false);
+                Cell c2 = Cell.create("num_pages", t._2());
                 return new Cells(outputTableName, c1, c2);
             }
         });

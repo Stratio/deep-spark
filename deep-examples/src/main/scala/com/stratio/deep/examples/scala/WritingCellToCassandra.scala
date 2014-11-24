@@ -18,8 +18,7 @@ package com.stratio.deep.examples.scala
 
 
 import com.stratio.deep.cassandra.config.CassandraConfigFactory
-import com.stratio.deep.cassandra.entity.CassandraCell
-import com.stratio.deep.commons.entity.Cells
+import com.stratio.deep.commons.entity.{Cell, Cells}
 import com.stratio.deep.core.context.DeepSparkContext
 import com.stratio.deep.utils.ContextProperties
 import org.apache.spark.rdd.RDD
@@ -74,8 +73,8 @@ object WritingCellToCassandra {
 
     val outputRDD: RDD[Cells] = numPerKey map {
       t: (String, Integer) =>
-        val c1 = CassandraCell.create("domain", t._1, true, false);
-        val c2 = CassandraCell.create("num_pages", t._2);
+        val c1 = Cell.create("domain", t._1, true, false);
+        val c2 = Cell.create("num_pages", t._2);
         new Cells(outputKeyspaceName, c1, c2)
     }
 

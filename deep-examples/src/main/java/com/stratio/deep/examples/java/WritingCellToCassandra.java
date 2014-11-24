@@ -21,7 +21,6 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.stratio.deep.cassandra.config.CassandraConfigFactory;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
-import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.core.context.DeepSparkContext;
@@ -113,8 +112,8 @@ public final class WritingCellToCassandra {
         JavaRDD<Cells> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
             public Cells call(Tuple2<String, Integer> t) {
-                Cell c1 = CassandraCell.create("domain", t._1(), true, false);
-                Cell c2 = CassandraCell.create("num_pages", t._2());
+                Cell c1 = Cell.create("domain", t._1(), true, false);
+                Cell c2 = Cell.create("num_pages", t._2());
                 return new Cells(outputTableName,c1, c2);
             }
         });

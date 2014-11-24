@@ -91,7 +91,7 @@ public interface ExtractorConstants {
      */
     String BISECT_FACTOR = "bisecFactor";
     /**
-     * The CREATE _ oN _ wRITE.
+     * The CREATE _ ON _ WRITE.
      */
     String CREATE_ON_WRITE = "createOnWrite";
     /**
@@ -99,21 +99,21 @@ public interface ExtractorConstants {
      */
     String BATCHSIZE = "batchSize";
     /**
-     * The READ _ cONSISTENCY _ lEVEL.
+     * The READ _ CONSISTENCY _ lEVEL.
      */
     String READ_CONSISTENCY_LEVEL = "readConsistencyLevel";
     /**
-     * The WRITE _ cONSISTENCY _ lEVEL.
+     * The WRITE _ CONSISTENCY _ lEVEL.
      */
     String WRITE_CONSISTENCY_LEVEL = "writeConsistencyLevel";
 
     /**
-     * The REPLICA _ sET.
+     * The REPLICA _ SET.
      */
     String REPLICA_SET = "replicaSet";
 
     /**
-     * The READ _ pREFERENCE.
+     * The READ _ PREFERENCE.
      */
     String READ_PREFERENCE = "readPreference";
 
@@ -123,12 +123,12 @@ public interface ExtractorConstants {
     String SORT = "sort";
 
     /**
-     * The FILTER _ fIELD.
+     * The FILTER _ FIELD.
      */
     String FILTER_FIELD = "filterField";
 
     /**
-     * The FILTER _ qUERY.
+     * The FILTER _ QUERY.
      */
     String FILTER_QUERY = "filterQuery";
 
@@ -138,7 +138,7 @@ public interface ExtractorConstants {
     String INPUT_KEY = "inputKey";
 
     /**
-     * The IGNORE _ iD _ fIELD.
+     * The IGNORE _ ID _ FIELD.
      */
     String IGNORE_ID_FIELD = "ignoreIdField";
 
@@ -148,22 +148,22 @@ public interface ExtractorConstants {
     String USE_SHARD = "useShard";
 
     /**
-     * The USE _ sPLITS.
+     * The USE _ SPLITS.
      */
     String USE_SPLITS = "useSplit";
 
     /**
-     * The USE _ cHUNKS.
+     * The USE _ CHUNKS.
      */
     String USE_CHUNKS = "useChunk";
 
     /**
-     * The SPLIT _ sIZE.
+     * The SPLIT _ SIZE.
      */
     String SPLIT_SIZE = "splitSize";
 
     /**
-     * The EQUALS _ iN _ fILTER.
+     * The EQUALS _ IN _ FILTER.
      */
     String EQUALS_IN_FILTER = "equalsInFilter";
 

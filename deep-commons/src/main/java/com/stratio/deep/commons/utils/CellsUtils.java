@@ -225,6 +225,59 @@ public class CellsUtils {
         return t;
     }
 
+
+    public static <T> T getObjectWithMapFromJson(Class<T> classEntity, JSONObject bsonObject)
+            throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        T t = classEntity.newInstance();
+
+        Field[] fields = AnnotationUtils.filterDeepFields(classEntity);
+
+        Object insert = null;
+
+        for (Field field : fields) {
+            Object currentBson = null;
+            Method method = null;
+            try {
+                method = Utils.findSetter(field.getName(), classEntity, field.getType());
+
+                Class<?> classField = field.getType();
+
+                currentBson = bsonObject.get(AnnotationUtils.deepFieldName(field));
+                if (currentBson != null) {
+
+                    if (Collection.class.isAssignableFrom(classField)) {
+                        Type type = field.getGenericType();
+                        List list = new ArrayList();
+                        for(Object o : (List) bsonObject.get(AnnotationUtils.deepFieldName(field))){
+                            list.add((String) o);
+                        }
+                        insert = list;
+
+                    } else if (IDeepType.class.isAssignableFrom(classField)) {
+                        insert = getObjectFromJson(classField, (JSONObject) bsonObject.get(AnnotationUtils.deepFieldName
+                                (field)));
+                    } else {
+                        insert = currentBson;
+                    }
+                    if(insert!=null){
+                        method.invoke(t, insert);
+                    }
+
+                }
+            } catch (IllegalAccessException | InstantiationException | InvocationTargetException | IllegalArgumentException e) {
+                //                LOG.error("impossible to create a java object from Bson field:" + field.getName() + " and type:" + field
+                //                        .getType() + " and value:" + t + "; bsonReceived:" + currentBson + ", bsonClassReceived:"
+                //                        + currentBson.getClass());
+
+//                method.invoke(t, Utils.castNumberType(insert, t));
+                e.printStackTrace();
+            }
+
+        }
+
+        return t;
+    }
+
     /**
      * Sub document list case.
      *

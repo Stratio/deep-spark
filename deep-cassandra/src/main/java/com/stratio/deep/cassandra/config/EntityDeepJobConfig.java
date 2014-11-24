@@ -26,16 +26,14 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
-
-import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
 import com.stratio.deep.commons.annotations.DeepEntity;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Utils;
@@ -157,7 +155,7 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends CassandraDee
      */
     public void setInstancePropertyFromDbName(T instance, String dbName, Object value) {
         Map<String, Cell> cfs = columnDefinitions();
-        CassandraCell metadataCell = (CassandraCell) cfs.get(dbName);
+        Cell metadataCell = cfs.get(dbName);
 
         String f = mapDBNameToEntityName.get(dbName);
 
@@ -166,28 +164,18 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends CassandraDee
             return;
         }
 
-        Method setter = Utils.findSetter(f, entityClass, metadataCell.getValueType());
+        try{
+            Method setter = Utils.findSetter(f, entityClass, value.getClass());
+            setter.invoke(instance, value);
 
-        try {
-            setter.invoke(instance, packageCollectionValue(metadataCell, value));
-        } catch (Exception e) {
-            throw new DeepGenericException(e);
+        }catch (DeepIOException e){
+            Utils.setFieldWithReflection(instance, f, value);
+        }catch (Exception e1) {
+            throw new DeepGenericException(e1);
         }
-    }
 
-    @SuppressWarnings("unchecked")
-    private Object packageCollectionValue(CassandraCell metadataCell, Object value) {
-        switch (metadataCell.getCellValidator().validatorKind()) {
-        case SET:
-            return new LinkedHashSet((Collection) value);
-        case LIST:
-            return new LinkedList((Collection) value);
-        case MAP:
-            return new LinkedHashMap((Map) value);
-        default:
-            return value;
-        }
-    }
 
+
+    }
 
 }

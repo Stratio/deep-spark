@@ -41,7 +41,6 @@ import org.json.simple.JSONObject;
 import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepIllegalAccessException;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.filter.FilterType;
@@ -49,7 +48,6 @@ import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.MessageTestEntity;
-import static com.stratio.deep.commons.utils.CellsUtils.getCellFromJson;
 
 /**
  * Created by rcrespo on 9/09/14.
@@ -93,7 +91,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      */
     private Integer port;
 
-    private Integer port2 = 9160;
+    private Integer port2 = 9360;
 
     /**
      * The Database.
@@ -114,6 +112,8 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      * The constant READ_FIELD_EXPECTED.
      */
     private static final String READ_FIELD_EXPECTED = "new message test";
+
+    private static final String ID_MESSAGE_EXPECTED = "messageTest";
 
     /**
      * The Extractor.
@@ -140,6 +140,12 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      */
     protected Long WORD_COUNT_SPECTED = 3833L;
 
+    private static final String DATA_TEST_DIVINE_COMEDY = "/divineComedy.json";
+
+    private static final String DATA_TEST_MESSAGE = "/message.json";
+
+    private String customDataSet;
+
     /**
      * The Database extractor name.
      */
@@ -154,7 +160,10 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      * @param isCells the is cells
      */
     public ExtractorTest(Class<IExtractor<T, S>> extractor, String host, Integer port, boolean isCells) {
-        super();
+        this(extractor, host, port, isCells, null);
+    }
+    public ExtractorTest(Class<IExtractor<T, S>> extractor, String host, Integer port, boolean isCells,
+                         Class dataSetClass) {
         if (isCells) {
             this.inputEntity = Cells.class;
             this.outputEntity = Cells.class;
@@ -162,7 +171,12 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
         } else {
             this.inputEntity = MessageTestEntity.class;
             this.outputEntity = MessageTestEntity.class;
-            this.configEntity = BookEntity.class;
+            if(dataSetClass!=null){
+                this.configEntity = dataSetClass;
+            }else{
+                this.configEntity = BookEntity.class;
+            }
+
         }
 
         this.host = host;
@@ -171,13 +185,14 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
         this.databaseExtractorName = extractor.getSimpleName().toLowerCase();
     }
 
+
     /**
      * Read file.
      *
      * @param path the path
      * @return the list
      */
-    private List<String> readFile(String path){
+    protected List<String> readFile(String path){
         List<String> lineas = new ArrayList<>();
         try{
             InputStream in = getClass().getResourceAsStream(path);
@@ -203,7 +218,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      * @param entityClass the entity class
      * @return the java rDD
      */
-    private <T> JavaRDD<T> transformRDD(JavaRDD<String> stringJavaRDD, final Class<T> entityClass){
+    protected <T> JavaRDD<T> transformRDD(JavaRDD<String> stringJavaRDD, final Class<T> entityClass){
 
 
         JavaRDD<JSONObject> jsonObjectJavaRDD = stringJavaRDD.map(new Function<String, JSONObject>() {
@@ -233,10 +248,21 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
     public void initDataSet() throws IOException {
         DeepSparkContext context = getDeepSparkContext();
 
+
+
+        initDataSetDivineComedy(context);
+
+        initDataSetMessage(context);
+
+
+        context.stop();
+    }
+
+    protected void initDataSetDivineComedy(DeepSparkContext context){
         JavaRDD<String> stringJavaRDD;
 
         //Divine Comedy
-        List<String> lineas = readFile("/divineComedy.json");
+        List<String> lineas = readFile(DATA_TEST_DIVINE_COMEDY);
 
 
 
@@ -244,37 +270,39 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
         JavaRDD<T> javaRDD =  transformRDD(stringJavaRDD, configEntity);
 
+
         originBook = javaRDD.first();
+
         DeepSparkContext.saveRDD(javaRDD.rdd(), (ExtractorConfig<T>) getWriteExtractorConfig(BOOK_INPUT,
-                configEntity.getClass()));
+                configEntity));
+    }
 
 
+    protected void initDataSetMessage(DeepSparkContext context){
         //Test Message
 
-        lineas = readFile("/message.json");
+        List<String> lineas = readFile(DATA_TEST_MESSAGE);
 
-        stringJavaRDD = context.parallelize(lineas);
+        JavaRDD<String>  stringJavaRDD = context.parallelize(lineas);
 
-        javaRDD =  transformRDD(stringJavaRDD, inputEntity);
+        JavaRDD<T> javaRDD =  transformRDD(stringJavaRDD, inputEntity);
 
 
 
         DeepSparkContext.saveRDD(javaRDD.rdd(), (ExtractorConfig<T>) getWriteExtractorConfig(tableRead,
-                inputEntity.getClass()));
-
-        context.stop();
+                inputEntity));
     }
 
     /**
      * Transform to T type.
      *
-     * @param <T>   the type parameter
+     * @param <W>   the type parameter
      * @param jsonObject the json object
      * @param nameSpace the name space
      * @param entityClass the entity class
      * @return the t
      */
-    protected abstract <T> T transform(JSONObject jsonObject, String nameSpace, Class<T> entityClass);
+    protected abstract <W> W transform(JSONObject jsonObject, String nameSpace, Class<W> entityClass);
 
     /**
      * It tests if the extractor can read from the data store
@@ -295,9 +323,12 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
             if (inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)) {
                 Assert.assertEquals(((Cells) inputRDDEntity.first()).getCellByName("message").getCellValue(), READ_FIELD_EXPECTED);
-            } else {
 
+                Assert.assertEquals(((Cells) inputRDDEntity.first()).getCellByName("id").getCellValue(), ID_MESSAGE_EXPECTED);
+            } else {
                 Assert.assertEquals(((MessageTestEntity) inputRDDEntity.first()).getMessage(), READ_FIELD_EXPECTED);
+
+                Assert.assertEquals(((MessageTestEntity) inputRDDEntity.first()).getId(), ID_MESSAGE_EXPECTED);
             }
 
         } finally {

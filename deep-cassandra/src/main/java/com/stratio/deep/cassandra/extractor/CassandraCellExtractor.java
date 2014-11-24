@@ -19,9 +19,8 @@ import java.util.Map;
 
 import com.stratio.deep.cassandra.config.CellDeepJobConfig;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
-import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
-import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.cassandra.functions.CellList2TupleFunction;
+import com.stratio.deep.cassandra.util.CassandraUtils;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.utils.Pair;
@@ -52,12 +51,12 @@ public class CassandraCellExtractor extends CassandraExtractor<Cells, CellDeepJo
     public Cells transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
                                   CassandraDeepJobConfig<Cells> config) {
 
-        Cells cells = new Cells(((ICassandraDeepJobConfig) config).getNameSpace());
-        Map<String, Cell> columnDefinitions = ((ICassandraDeepJobConfig) config).columnDefinitions();
+        Cells cells = new Cells(config.getNameSpace());
+        Map<String, Cell> columnDefinitions = config.columnDefinitions();
 
         for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
             Cell cd = columnDefinitions.get(entry.getKey());
-            cells.add(CassandraCell.create(cd, entry.getValue()));
+            cells.add(CassandraUtils.createFromByteBuffer(cd, entry.getValue()));
         }
 
         for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
@@ -66,7 +65,7 @@ public class CassandraCellExtractor extends CassandraExtractor<Cells, CellDeepJo
                 continue;
             }
 
-            cells.add(CassandraCell.create(cd, entry.getValue()));
+            cells.add(CassandraUtils.createFromByteBuffer(cd, entry.getValue()));
         }
 
         return cells;

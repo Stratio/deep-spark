@@ -37,7 +37,7 @@ import org.testng.annotations.Test;
 
 import scala.Tuple2;
 
-import com.stratio.deep.cassandra.entity.CassandraCell;
+import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.filter.Filter;
@@ -77,11 +77,11 @@ public class CassandraRDDUtilsTest {
     @Test
     public void testUpdateQueryGenerator() {
         Cells keys = new Cells("defaultTable",
-                CassandraCell.create("id1", "", true, false), CassandraCell.create("id2", "", true, false));
+                Cell.create("id1", "", true, false), Cell.create("id2", "", true, false));
 
-        Cells values = new Cells("defaultTable", CassandraCell.create("domain_name", ""), CassandraCell.create("url",
-                ""), CassandraCell.create("response_time",
-                ""), CassandraCell.create("response_code", ""), CassandraCell.create("download_time", ""));
+        Cells values = new Cells("defaultTable", Cell.create("domain_name", ""), Cell.create("url",
+                ""), Cell.create("response_time",
+                ""), Cell.create("response_code", ""), Cell.create("download_time", ""));
 
         String sql = updateQueryGenerator(keys, values, OUTPUT_KEYSPACE_NAME, OUTPUT_COLUMN_FAMILY);
 
@@ -109,16 +109,16 @@ public class CassandraRDDUtilsTest {
 
         UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
 
-        Cells keys = new Cells("defaultTable", CassandraCell.create("id1", "", true, false),
-                CassandraCell.create("id2", testTimeUUID, true, false),
-                CassandraCell.create("id3", new Integer(0), false, true));
+        Cells keys = new Cells("defaultTable", Cell.create("id1", "", true, false),
+                Cell.create("id2", testTimeUUID, true, false),
+                Cell.create("id3", new Integer(0), false, true));
 
         Cells values = new Cells("defaultTable",
-                CassandraCell.create("domain_name", ""),
-                CassandraCell.create("url", ""),
-                CassandraCell.create("response_time", new Long(0)),
-                CassandraCell.create("response_code", new Integer(200)),
-                CassandraCell.create("download_time", new Date()));
+                Cell.create("domain_name", ""),
+                Cell.create("url", ""),
+                Cell.create("response_time", new Long(0)),
+                Cell.create("response_code", new Integer(200)),
+                Cell.create("download_time", new Date()));
 
         String sql = createTableQueryGenerator(keys, values, OUTPUT_KEYSPACE_NAME, OUTPUT_COLUMN_FAMILY);
 
@@ -135,14 +135,14 @@ public class CassandraRDDUtilsTest {
 
         UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
 
-        Cells keys = new Cells("defaultTable", CassandraCell.create("id1", testTimeUUID, true, false));
+        Cells keys = new Cells("defaultTable", Cell.create("id1", testTimeUUID, true, false));
 
         Cells values = new Cells("defaultTable",
-                CassandraCell.create("domain_name", ""),
-                CassandraCell.create("url", ""),
-                CassandraCell.create("response_time", new Long(0)),
-                CassandraCell.create("response_code", new Integer(200)),
-                CassandraCell.create("download_time", new Date()));
+                Cell.create("domain_name", ""),
+                Cell.create("url", ""),
+                Cell.create("response_time", new Long(0)),
+                Cell.create("response_code", new Integer(200)),
+                Cell.create("download_time", new Date()));
 
         String sql = createTableQueryGenerator(keys, values, OUTPUT_KEYSPACE_NAME, OUTPUT_COLUMN_FAMILY);
 
@@ -158,16 +158,16 @@ public class CassandraRDDUtilsTest {
         UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
         Date testDate = new Date();
 
-        Cells keys = new Cells("defaultTable", CassandraCell.create("id1", "", true, false),
-                CassandraCell.create("id2", testTimeUUID, true, false),
-                CassandraCell.create("id3", new Integer(0), false, true));
+        Cells keys = new Cells("defaultTable", Cell.create("id1", "", true, false),
+                Cell.create("id2", testTimeUUID, true, false),
+                Cell.create("id3", new Integer(0), false, true));
 
         Cells values = new Cells("defaultTable",
-                CassandraCell.create("domain_name", ""),
-                CassandraCell.create("url", ""),
-                CassandraCell.create("response_time", new Long(0)),
-                CassandraCell.create("response_code", new Integer(200)),
-                CassandraCell.create("download_time", testDate));
+                Cell.create("domain_name", ""),
+                Cell.create("url", ""),
+                Cell.create("response_time", new Long(0)),
+                Cell.create("response_code", new Integer(200)),
+                Cell.create("download_time", testDate));
 
         Tuple2<String[], Object[]> bindVars = prepareTuple4CqlDriver(new Tuple2<Cells, Cells>(keys, values));
 

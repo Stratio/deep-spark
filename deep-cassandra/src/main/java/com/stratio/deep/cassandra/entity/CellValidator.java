@@ -362,25 +362,7 @@ public class CellValidator {
 
             } else {
                 throw new DeepGenericException("Cannot determine collection kind for " + validatorKind);
-//
-//
-//                CQL3Type cql3Type = null;
-//                if(Set.class.isAssignableFrom(o.getClass())) {
-//
-//                    cql3Type = CQL3Type.Native.valueOf();
-//                    abstractType = SetType.getInstance(cql3Type.getType());
-//                } else if (true){
-//                    cql3Type = CQL3Type.Native.valueOf(types.next().toUpperCase());
-//                    abstractType = ListType.getInstance(cql3Type.getType());
-//                } else if (false){
-//                    cql3Type = CQL3Type.Native.valueOf(types.next().toUpperCase());
-//                    CQL3Type cql3Type2 = CQL3Type.Native.valueOf(types.next().toUpperCase());
-//                    abstractType = MapType.getInstance(cql3Type.getType(), cql3Type2.getType(
-//                }else{
-//                    throw new DeepGenericException("Cannot determine collection kind for " + validatorKind);
-//                }
-//
-//
+
                 }
 
 

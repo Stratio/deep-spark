@@ -21,9 +21,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.db.marshal.UTF8Type;
-
 /**
  * Maps an object property to a Database column.
  */
@@ -49,8 +46,8 @@ public @interface DeepField {
 
     /**
      * Specifies the cassandra validator class to be used to marshall/unmarshall the field value to the database.
-     * Defaults to org.apache.cassandra.db.marshal.UTF8Type.class
+     *
      */
-    Class<? extends AbstractType> validationClass() default UTF8Type.class;
+    Class validationClass() default String.class;
 
 }

@@ -47,6 +47,7 @@ public class Cell implements Serializable {
 
     protected Boolean isKey = Boolean.FALSE;
 
+    protected Boolean isClusterKey = Boolean.FALSE;
 
     protected Cell() {
         super();
@@ -65,6 +66,14 @@ public class Cell implements Serializable {
         this.isKey=isKey;
     }
 
+    protected Cell(String cellName, Object cellValue, Boolean isKey, Boolean isClusterKey) {
+        super();
+        this.cellName = cellName;
+        this.cellValue = cellValue;
+        this.isKey=isKey;
+        this.isClusterKey = isClusterKey;
+    }
+
     /**
      * Create a non-primary key cell.
      */
@@ -74,6 +83,10 @@ public class Cell implements Serializable {
 
     public static Cell create(String cellName, Object cellValue, Boolean isKey) {
         return new Cell(cellName, cellValue,isKey);
+    }
+
+    public static Cell create(String cellName, Object cellValue, Boolean isKey, Boolean isClusterKey) {
+        return new Cell(cellName, cellValue,isKey, isClusterKey);
     }
 
     public String getCellName() {
@@ -324,5 +337,19 @@ public class Cell implements Serializable {
         return sb.toString();
     }
 
+    public Boolean getIsKey() {
+        return isKey;
+    }
 
+    public void setIsKey(Boolean isKey) {
+        this.isKey = isKey;
+    }
+
+    public Boolean isClusterKey() {
+        return isClusterKey;
+    }
+
+    public void setIsClusterKey(Boolean isClusterKey) {
+        this.isClusterKey = isClusterKey;
+    }
 }

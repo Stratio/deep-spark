@@ -52,7 +52,7 @@ import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
-import com.stratio.deep.cassandra.entity.CassandraCell;
+import com.stratio.deep.cassandra.entity.CellValidator;
 import com.stratio.deep.cassandra.filter.value.EqualsInValue;
 import com.stratio.deep.cassandra.util.CassandraUtils;
 import com.stratio.deep.commons.config.DeepJobConfig;
@@ -604,14 +604,14 @@ public class DeepRecordReader implements IDeepRecordReader {
         for (ColumnMetadata key : partitionKeys) {
             String columnName = key.getName();
             BoundColumn boundColumn = new BoundColumn(columnName);
-            boundColumn.validator = CassandraCell.getValueType(key.getType()).getAbstractType();
+            boundColumn.validator = CellValidator.cellValidator(key.getType()).getAbstractType();
             partitionBoundColumns.add(boundColumn);
             types.add(boundColumn.validator);
         }
         for (ColumnMetadata key : clusteringKeys) {
             String columnName = key.getName();
             BoundColumn boundColumn = new BoundColumn(columnName);
-            boundColumn.validator = CassandraCell.getValueType(key.getType()).getAbstractType();
+            boundColumn.validator = CellValidator.cellValidator(key.getType()).getAbstractType();
             clusterColumns.add(boundColumn);
         }
 
