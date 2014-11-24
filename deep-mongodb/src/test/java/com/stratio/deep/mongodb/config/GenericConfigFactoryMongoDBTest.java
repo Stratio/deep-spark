@@ -34,7 +34,7 @@ public class GenericConfigFactoryMongoDBTest {
     public void testDatabaseValidation() {
         MongoDeepJobConfig<MessageTestEntity> djc = MongoConfigFactory.createMongoDB(MessageTestEntity.class);
 
-        djc.host(HOST_TEST).collection(COLLECTION_TEST);
+        djc.collection(COLLECTION_TEST).host(HOST_TEST);
 
         try {
             djc.initialize();
@@ -52,7 +52,7 @@ public class GenericConfigFactoryMongoDBTest {
     public void testCollectionValidation() {
         MongoDeepJobConfig<MessageTestEntity> djc = MongoConfigFactory.createMongoDB(MessageTestEntity.class);
 
-        djc.host(HOST_TEST).database(DATATABASE_TEST);
+        djc.database(DATATABASE_TEST).host(HOST_TEST);
 
         try {
             djc.initialize();

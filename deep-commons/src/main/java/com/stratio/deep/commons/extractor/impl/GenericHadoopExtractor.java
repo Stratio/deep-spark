@@ -51,7 +51,7 @@ import com.stratio.deep.commons.utils.DeepSparkHadoopMapReduceUtil;
  */
 public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, KOut, VOut> implements IExtractor<T, S> {
 
-    protected DeepJobConfig<T> deepJobConfig;
+    protected DeepJobConfig deepJobConfig;
 
     protected transient RecordReader<K, V> reader;
 
@@ -92,7 +92,8 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, K
         if (config instanceof ExtractorConfig) {
             addSparkIdToDeepJobConfig((ExtractorConfig) config);
         } else if (config instanceof DeepJobConfig) {
-            deepJobConfig = ((DeepJobConfig) config).initialize();
+            deepJobConfig = ((DeepJobConfig) config);
+            deepJobConfig.initialize();
         }
 
         int id = config.getRddId();
@@ -170,12 +171,12 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, K
     private void addSparkIdToDeepJobConfig(ExtractorConfig<T> config) {
         int id = config.getRddId();
 
-        deepJobConfig = deepJobConfig.initialize(config);
+        deepJobConfig = (DeepJobConfig) deepJobConfig.initialize(config);
 
         deepJobConfig.setRddId(id);
     }
 
-    public abstract T transformElement(Tuple2<K, V> tuple, DeepJobConfig<T> config);
+    public abstract T transformElement(Tuple2<K, V> tuple, DeepJobConfig<T, ?> config);
 
     @Override
     public void saveRDD(T t) {

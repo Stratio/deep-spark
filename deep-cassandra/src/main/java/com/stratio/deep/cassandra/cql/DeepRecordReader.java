@@ -143,10 +143,10 @@ public class DeepRecordReader implements IDeepRecordReader {
      * @param config             the deep configuration object.
      * @param split             the token range on which the new reader will be based.
      */
-    public DeepRecordReader(DeepJobConfig<?> config, DeepTokenRange<?, String> split) {
+    public DeepRecordReader(DeepJobConfig<?, ?> config, DeepTokenRange<?, String> split) {
         this.config = (CassandraDeepJobConfig<?>) config;
         this.split = split;
-        this.pageSize = config.getPageSize();
+        this.pageSize = ((CassandraDeepJobConfig<?>) config).getPageSize();
         initialize();
     }
 
@@ -159,8 +159,8 @@ public class DeepRecordReader implements IDeepRecordReader {
     private void initialize() {
         cfName = config.getTable();
 
-        if (!ArrayUtils.isEmpty(config.getInputColumns())) {
-            columns = StringUtils.join(config.getInputColumns(), ",");
+        if (!ArrayUtils.isEmpty(config.getFields())) {
+            columns = StringUtils.join(config.getFields(), ",");
         }
 
         partitioner = Utils.newTypeInstance(config.getPartitionerClassName(), IPartitioner.class);
@@ -252,8 +252,8 @@ public class DeepRecordReader implements IDeepRecordReader {
          * @return the boolean
          */
         private boolean isColumnWanted(String columnName) {
-            return ArrayUtils.isEmpty(config.getInputColumns()) ||
-                    ArrayUtils.contains(config.getInputColumns(), columnName);
+            return ArrayUtils.isEmpty(config.getFields()) ||
+                    ArrayUtils.contains(config.getFields(), columnName);
         }
 
         /**

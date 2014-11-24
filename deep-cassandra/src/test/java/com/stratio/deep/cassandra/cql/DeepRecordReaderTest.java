@@ -76,7 +76,7 @@ public class DeepRecordReaderTest {
         // Stubbing
         when(config.getPageSize()).thenReturn(PAGE_SIZE_CONSTANT);
         when(config.getTable()).thenReturn(TABLE_NAME_CONSTANT);
-        when(config.getInputColumns()).thenReturn(INPUT_COLUMNS_CONSTANT);
+        when(config.getFields()).thenReturn(INPUT_COLUMNS_CONSTANT);
         when(config.fetchTableMetadata()).thenReturn(tableMetadata);
         when(config.getEqualsInValue()).thenReturn(equalsInValue);
         when(config.getPartitionerClassName()).thenReturn("org.apache.cassandra.dht.Murmur3Partitioner");
@@ -105,8 +105,6 @@ public class DeepRecordReaderTest {
 
         // TODO Apply the matcher to check the field into the statement
         when(session.execute(any(Statement.class))).thenReturn(resultSet);
-
-        DeepRecordReader recordReader = new DeepRecordReader(config, tokenRange);
 
         Object[] statementValues = Whitebox.getInternalState(stmt, "values");
         assert (statementValues[0] == values[0]);

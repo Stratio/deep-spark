@@ -43,7 +43,7 @@ import com.stratio.deep.es.utils.UtilES;
 /**
  * @param <T>
  */
-public class ESDeepJobConfig<T> extends HadoopConfig<T> implements IESDeepJobConfig<T> {
+public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig> implements IESDeepJobConfig<T> {
     private static final long serialVersionUID = -7179376653643603038L;
 
 
@@ -90,10 +90,10 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T> implements IESDeepJobCon
     }
 
 
-    @Override
-    public ESDeepJobConfig<T> pageSize(int pageSize) {
-        return this;
-    }
+//    @Override
+//    public ESDeepJobConfig<T> pageSize(int pageSize) {
+//        return this;
+//    }
 
     @Override
     public Class<T> getEntityClass() {
@@ -108,10 +108,10 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T> implements IESDeepJobCon
         return hostList.get(0);
     }
 
-    @Override
-    public String[] getInputColumns() {
-        return fields;
-    }
+//    @Override
+//    public String[] getInputColumns() {
+//        return fields;
+//    }
 
 
     @Override
@@ -193,7 +193,6 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T> implements IESDeepJobCon
     /**
      * {@inheritDoc}
      */
-    @Override
     public ESDeepJobConfig<T> inputColumns(String... columns) {
         List<String> fields = new ArrayList<>();
         for (String field : columns){
@@ -215,11 +214,6 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T> implements IESDeepJobCon
     public ESDeepJobConfig<T> username(String username) {
         this.username = username;
         return this;
-    }
-
-    @Override
-    public int getPageSize() {
-        return pageSize;
     }
 
     @Override

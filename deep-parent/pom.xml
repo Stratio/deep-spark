@@ -137,7 +137,6 @@
                 <module>../deep-core</module>
                 <module>../deep-mongodb</module>
                 <module>../deep-elasticsearch</module>
-                <module>../deep-examples</module>
                 <module>../deep-aerospike</module>
             </modules>
         </profile>
@@ -149,7 +148,6 @@
                 <module>../deep-core</module>
                 <module>../deep-mongodb</module>
                 <module>../deep-elasticsearch</module>
-                <module>../deep-examples</module>
                 <module>../deep-aerospike</module>
             </modules>
         </profile>
@@ -244,7 +242,6 @@
         <module>../deep-core</module>
         <module>../deep-mongodb</module>
         <module>../deep-elasticsearch</module>
-        <module>../deep-examples</module>
         <module>../deep-aerospike</module>
     </modules>
 
@@ -488,19 +485,6 @@
                     </configuration>
                 </plugin>
 
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.18</version>
-                    <configuration>
-                        <includes>
-                            <include>**/*Test.java</include>
-                        </includes>
-                        <argLine>${jacocoUT-argline}</argLine>
-                        <argLine>-noverify</argLine>
-                        <testFailureIgnore>true</testFailureIgnore>
-                    </configuration>
-                </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
