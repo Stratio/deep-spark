@@ -17,6 +17,8 @@
 package com.stratio.deep.cassandra.util;
 
 import static com.stratio.deep.commons.utils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
+import static com.stratio.deep.commons.utils.AnnotationUtils.deepFieldName;
+import static com.stratio.deep.commons.utils.AnnotationUtils.getBeanFieldValue;
 import static com.stratio.deep.commons.utils.Utils.quote;
 import static com.stratio.deep.commons.utils.Utils.singleQuote;
 
@@ -33,6 +35,7 @@ import java.util.regex.Pattern;
 
 import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.ProtocolVersion;
+import com.stratio.deep.cassandra.entity.CellValidator;
 import com.stratio.deep.cassandra.querybuilder.DefaultQueryBuilder;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.ListType;
@@ -59,8 +62,7 @@ import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.OperatorCassandra;
 import com.stratio.deep.cassandra.cql.DeepCqlRecordWriter;
-import com.stratio.deep.cassandra.entity.CassandraCell;
-import com.stratio.deep.cassandra.entity.CellValidator;
+import com.stratio.deep.commons.annotations.DeepField;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
@@ -255,7 +257,7 @@ public class CassandraUtils {
 
         StringBuilder keyClause = new StringBuilder(" WHERE ");
         for (Cell cell : keys.getCells()) {
-            if (((CassandraCell) cell).isPartitionKey() || ((CassandraCell) cell).isClusterKey()) {
+            if (((Cell) cell).isKey() || cell.isClusterKey() ) {
                 if (k > 0) {
                     keyClause.append(" AND ");
                 }
@@ -314,10 +316,6 @@ public class CassandraUtils {
         for (Cell key : keys) {
 
 
-            if(!(key instanceof CassandraCell)){
-                    key = CassandraCell.create(key);
-            }
-
             String cellName = quote(key.getCellName());
 
             if (!isFirstField) {
@@ -327,9 +325,9 @@ public class CassandraUtils {
             // CellValidator cellValidator = CellValidator.cellValidator(key.getCellValue());
             sb.append(cellName).append(" ").append(CassandraUtils.marshallerInstance(key.getValue()).asCQL3Type().toString());
 
-            if (((CassandraCell) key).isPartitionKey()) {
+            if (((Cell) key).isKey()) {
                 partitionKey.add(cellName);
-            } else if (((CassandraCell) key).isClusterKey()) {
+            } else if (((Cell) key).isClusterKey()) {
                 clusterKey.add(cellName);
             }
 
@@ -339,9 +337,6 @@ public class CassandraUtils {
         if (values != null) {
             for (Cell cell : values) {
 
-                if(!(cell instanceof CassandraCell)){
-                    cell = CassandraCell.create(cell);
-                }
 
                 sb.append(", ");
                 sb.append(quote(cell.getCellName())).append(" ").append(CassandraUtils.marshallerInstance(cell.getValue()).asCQL3Type().toString());
@@ -414,11 +409,10 @@ public class CassandraUtils {
         Cells values = new Cells(e.getClass().getName());
 
         for (Field keyField : keyFields) {
-            keys.add(CassandraCell.create(e, keyField));
+            keys.add(createFromEntity(e, keyField));
         }
-
         for (Field valueField : otherFields) {
-            values.add(CassandraCell.create(e, valueField));
+            values.add(createFromEntity(e, valueField));
         }
 
         return new Tuple2<>(keys, values);
@@ -648,6 +642,30 @@ public class CassandraUtils {
             partitionKey = DataType.serializeValue(cell.getValue(), ProtocolVersion.V2);
         }
         return partitionKey;
+    }
+
+    public static Cell createFromByteBuffer(Cell metadata, ByteBuffer cellValue) {
+        String cellName = metadata.getCellName();
+        boolean isClusterKey = metadata.isClusterKey();
+        boolean isKey = metadata.isKey();
+
+        Object o = null;
+        if (cellValue != null) {
+            o = ((DataType)metadata.getValue()).deserialize(cellValue, ProtocolVersion.V2);
+
+        }
+
+        return Cell.create(cellName, o,isKey, isClusterKey);
+    }
+
+    public static Cell createFromEntity(IDeepType e, Field field) {
+        DeepField annotation = field.getAnnotation(DeepField.class);
+        String cellName = deepFieldName(field);
+        Object cellValue = getBeanFieldValue(e, field);
+        boolean isClusterKey = annotation.isPartOfClusterKey();
+        boolean isKey = annotation.isPartOfPartitionKey();
+        return Cell.create(cellName, cellValue, isKey, isClusterKey);
+
     }
 
 }

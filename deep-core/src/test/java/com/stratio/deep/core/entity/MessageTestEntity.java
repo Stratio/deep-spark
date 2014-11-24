@@ -21,50 +21,41 @@ import com.stratio.deep.commons.annotations.DeepField;
 import com.stratio.deep.commons.entity.IDeepType;
 
 /**
- * Created by rcrespo on 25/06/14.
+ * Created by rcrespo on 18/06/14.
  */
 @DeepEntity
-public class WordCount implements IDeepType {
+public class MessageTestEntity implements IDeepType {
+
+    @DeepField(fieldName = "id", isPartOfClusterKey = true, isPartOfPartitionKey = true)
+    private String id;
 
     @DeepField
-    private String word;
+    private String message;
 
     @DeepField
-    private Long count;
+    private Long number;
 
-    public WordCount() {
+    public String getId() {
+        return id;
     }
 
-    public WordCount(String word, Long count) {
-        this.word = word;
-        this.count = count;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public WordCount(Long count) {
-        this.count = count;
-    }
-    public String getWord() {
-        return word;
+    public String getMessage() {
+        return message;
     }
 
-    public void setWord(String word) {
-        this.word = word;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public Long getCount() {
-        return count;
+    public Long getNumber() {
+        return number;
     }
 
-    public void setCount(Long count) {
-        this.count = count;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("WordCount{");
-        sb.append("word='").append(word).append('\'');
-        sb.append(", count=").append(count);
-        sb.append('}');
-        return sb.toString();
+    public void setNumber(Long number) {
+        this.number = number;
     }
 }

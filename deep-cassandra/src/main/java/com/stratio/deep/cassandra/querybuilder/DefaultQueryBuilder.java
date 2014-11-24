@@ -8,7 +8,6 @@ import static com.stratio.deep.commons.utils.Utils.quote;
 import java.util.List;
 import java.util.Set;
 
-import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;

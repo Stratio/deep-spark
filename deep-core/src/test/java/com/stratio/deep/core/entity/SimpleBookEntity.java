@@ -16,24 +16,27 @@
 
 package com.stratio.deep.core.entity;
 
+import java.util.List;
+import java.util.Map;
+
 import com.stratio.deep.commons.annotations.DeepEntity;
 import com.stratio.deep.commons.annotations.DeepField;
 import com.stratio.deep.commons.entity.IDeepType;
 
 /**
- * Created by rcrespo on 18/06/14.
+ * Created by rcrespo on 25/06/14.
  */
 @DeepEntity
-public class MessageTestEntity implements IDeepType {
+public class SimpleBookEntity implements IDeepType {
 
-    @DeepField(fieldName = "id")
+    @DeepField(fieldName = "id", isPartOfPartitionKey = true, isPartOfClusterKey = true)
     private String id;
 
-    @DeepField
-    private String message;
+    @DeepField(fieldName = "cantos")
+    private List<String> cantos;
 
-    @DeepField
-    private Long number;
+    @DeepField(fieldName = "metadata")
+    private Map<String, String> metadata;
 
     public String getId() {
         return id;
@@ -43,19 +46,29 @@ public class MessageTestEntity implements IDeepType {
         this.id = id;
     }
 
-    public String getMessage() {
-        return message;
+    public List<String> getCantos() {
+        return cantos;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setCantos(List<String> cantos) {
+        this.cantos = cantos;
     }
 
-    public Long getNumber() {
-        return number;
+    public Map<String, String> getMetadata() {
+        return metadata;
     }
 
-    public void setNumber(Long number) {
-        this.number = number;
+    public void setMetadata(Map<String, String> metadata) {
+        this.metadata = metadata;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("SimpleBookEntity{");
+        sb.append("id=").append(id);
+        sb.append(", cantos=").append(cantos);
+        sb.append(", metadata=").append(metadata);
+        sb.append('}');
+        return sb.toString();
     }
 }

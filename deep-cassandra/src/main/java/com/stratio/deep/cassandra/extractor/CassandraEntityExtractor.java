@@ -19,10 +19,10 @@ import java.util.Map;
 
 import org.apache.cassandra.db.marshal.AbstractType;
 
+import com.datastax.driver.core.DataType;
+import com.datastax.driver.core.ProtocolVersion;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.EntityDeepJobConfig;
-import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
-import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.cassandra.functions.DeepType2TupleFunction;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.IDeepType;
@@ -55,7 +55,7 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
     @Override
     public T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
                               CassandraDeepJobConfig<T> config) {
-        Map<String, Cell> columnDefinitions = ((ICassandraDeepJobConfig)config).columnDefinitions();
+        Map<String, Cell> columnDefinitions = ((CassandraDeepJobConfig)config).columnDefinitions();
 
         Class<T> entityClass = config.getEntityClass();
 
@@ -63,10 +63,9 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
         T instance = Utils.newTypeInstance(entityClass);
 
         for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
-            CassandraCell metadata = (CassandraCell) columnDefinitions.get(entry.getKey());
-            AbstractType<?> marshaller = metadata.marshaller();
-            edjc.setInstancePropertyFromDbName(instance, entry.getKey(),
-                    marshaller.compose(entry.getValue()));
+            Cell metadata = columnDefinitions.get(entry.getKey());
+            edjc.setInstancePropertyFromDbName(instance, entry.getKey(), ((DataType) metadata.getValue())
+                    .deserialize(entry.getValue(), ProtocolVersion.V2));
         }
 
         for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
@@ -74,12 +73,13 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
                 continue;
             }
 
-            CassandraCell metadata = (CassandraCell) columnDefinitions.get(entry.getKey());
-            AbstractType<?> marshaller = metadata.marshaller();
+            Cell metadata = columnDefinitions.get(entry.getKey());
             try {
-                edjc.setInstancePropertyFromDbName(instance, entry.getKey(),
-                        marshaller.compose(entry.getValue()));
+
+                edjc.setInstancePropertyFromDbName(instance, entry.getKey(),((DataType)metadata.getValue())
+                        .deserialize(entry.getValue(), ProtocolVersion.V2));
             } catch (DeepNoSuchFieldException e) {
+                e.printStackTrace();
                 // log().debug(e.getMessage());
             }
         }

@@ -41,7 +41,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 
-@Test(suiteName = "cassandraRddTests", groups = { "cassandraJavaRDDTest" })
+@Test(suiteName = "cassandraExtractorTests", groups = { "cassandraJavaRDDTest" })
 public class CassandraJavaRDDTest {
 
     private Logger logger = Logger.getLogger(getClass());
