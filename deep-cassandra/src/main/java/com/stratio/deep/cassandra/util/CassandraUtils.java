@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import com.datastax.driver.core.DataType;
+import com.datastax.driver.core.ProtocolVersion;
 import com.stratio.deep.cassandra.querybuilder.DefaultQueryBuilder;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.ListType;
@@ -633,18 +635,17 @@ public class CassandraUtils {
             ByteBuffer[] keys = new ByteBuffer[numberOfKeys];
 
             for (int i = 0; i < cells.size(); i++) {
-                CassandraCell c = (CassandraCell) cells.getCellByIdx(i);
+                Cell c = cells.getCellByIdx(i);
 
-                if (c.isPartitionKey()) {
-                    keys[i] = c.getDecomposedCellValue();
+                if (c.isKey()) {
+                    keys[i] = DataType.serializeValue(c.getValue(), ProtocolVersion.V2);
                 }
             }
 
             partitionKey = CompositeType.build(keys);
         } else {
-            CassandraCell cell = ((CassandraCell) cells.getCellByIdx(0));
-            cell.setCellValidator(CellValidator.cellValidator(cell.getCellValue()));
-            partitionKey = cell.getDecomposedCellValue();
+            Cell cell = cells.getCellByIdx(0);
+            partitionKey = DataType.serializeValue(cell.getValue(), ProtocolVersion.V2);
         }
         return partitionKey;
     }
