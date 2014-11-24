@@ -6,12 +6,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 
+import com.stratio.deep.testutils.UnitTest;
 import org.testng.annotations.Test;
 
 /**
  * Created by rcrespo on 17/07/14.
  */
 @Test
+@UnitTest
 public class MongoConfigFactoryTest {
 
     @Test(expectedExceptions = InvocationTargetException.class)

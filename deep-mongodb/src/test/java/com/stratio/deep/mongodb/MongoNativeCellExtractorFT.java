@@ -14,26 +14,32 @@
  *  limitations under the License.
  */
 
-package com.stratio.deep.mongodb.extractor;
+package com.stratio.deep.mongodb;
 
+import static org.testng.Assert.assertEquals;
+
+import com.stratio.deep.mongodb.extractor.MongoNativeCellExtractor;
+import com.stratio.deep.testutils.FunctionalTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
-import com.stratio.deep.core.extractor.ExtractorEntityTest;
+import com.stratio.deep.core.extractor.ExtractorCellTest;
 
 /**
  * Created by rcrespo on 11/11/14.
  */
 
-@Test(suiteName = "mongoRddTests", groups = { "MongoNativeEntityExtractorTest" },
-        dependsOnGroups = "MongoNativeCellExtractorTest")
-public class MongoNativeEntityExtractorTest extends ExtractorEntityTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MongoNativeEntityExtractorTest.class);
 
-    public MongoNativeEntityExtractorTest() {
-        super(MongoNativeEntityExtractor.class, "localhost", 27890, false);
+@Test(suiteName = "mongoRddTests", groups = { "MongoNativeCellExtractorTest" }, dependsOnGroups = "MongoEntityExtractorTest")
+@FunctionalTest
+public class MongoNativeCellExtractorFT extends ExtractorCellTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MongoNativeCellExtractorTest.class);
+
+    public MongoNativeCellExtractorTest() {
+        super(MongoNativeCellExtractor.class, "localhost:27890", null, true);
     }
 
 }

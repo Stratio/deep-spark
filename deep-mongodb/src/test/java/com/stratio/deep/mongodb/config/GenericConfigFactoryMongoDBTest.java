@@ -2,6 +2,7 @@ package com.stratio.deep.mongodb.config;
 
 import static org.testng.Assert.fail;
 
+import com.stratio.deep.testutils.UnitTest;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
 
@@ -11,6 +12,7 @@ import com.stratio.deep.mongodb.testentity.MessageTestEntity;
  * Created by rcrespo on 18/06/14.
  */
 @Test
+@UnitTest
 public class GenericConfigFactoryMongoDBTest {
 
     private static final String DATATABASE_TEST = "test";

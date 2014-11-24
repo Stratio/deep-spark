@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.deep.aerospike.extractor;
+package com.stratio.deep.aerospike;
 
 import com.aerospike.client.*;
 import com.aerospike.client.policy.ScanPolicy;
@@ -36,10 +36,10 @@ import java.net.URL;
 
 import static org.testng.Assert.assertEquals;
 
-@Test(suiteName = "aerospikeRddTests", groups = { "AerospikeJavaRDDTest" })
-public class AerospikeJavaRDDTest {
+@Test(groups = { "AerospikeJavaRDDFT", "FunctionalTests" })
+public class AerospikeJavaRDDFT {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AerospikeJavaRDDTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AerospikeJavaRDDFT.class);
 
     public static AerospikeClient aerospike = null;
 
@@ -59,6 +59,9 @@ public class AerospikeJavaRDDTest {
 
     @BeforeSuite
     public static void init() throws IOException, ParseException {
+        System.out.println("*******************");
+        System.out.println("TEST JAVARDD");
+        System.out.println("*******************");
         aerospike = new AerospikeClient(HOST, PORT);
         deleteData();
         //dataSetImport();

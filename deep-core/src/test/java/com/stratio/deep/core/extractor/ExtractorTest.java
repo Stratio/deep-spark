@@ -157,7 +157,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
         return javaRDD;
     }
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initDataSet() throws IOException {
         DeepSparkContext context = getDeepSparkContext();
 
@@ -198,8 +198,11 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
     /**
      * It tests if the extractor can read from the data store
      */
-    @Test
+    @Test(alwaysRun = true, groups = {"FunctionalTests"})
     public <W> void testRead() {
+        System.out.println("*******************");
+        System.out.println("TEST READ");
+        System.out.println("*******************");
 
         DeepSparkContext context = getDeepSparkContext();
 
@@ -227,8 +230,11 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
     /**
      * It tests if the extractor can write to the data store
      */
-    @Test
+    @Test(alwaysRun = true)
     public <W> void testWrite() {
+        System.out.println("*******************");
+        System.out.println("TEST WRITE");
+        System.out.println("*******************");
 
 
         DeepSparkContext context = getDeepSparkContext();
@@ -263,8 +269,11 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
     }
 
-    @Test
+    @Test(alwaysRun = true)
     public <W> void testInputColumns() {
+        System.out.println("*******************");
+        System.out.println("TEST INPUT COLUMNS");
+        System.out.println("*******************");
 
         DeepSparkContext context = getDeepSparkContext();
         try {
@@ -333,8 +342,11 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
         return new ExtractorConfig<>(clazz);
     }
 
-    @Test
+    @Test(alwaysRun = true, dependsOnGroups = {"FunctionalTests"})
     protected <W> void testFilter() {
+        System.out.println("*******************");
+        System.out.println("TEST FILTER");
+        System.out.println("*******************");
         DeepSparkContext context = getDeepSparkContext();
         try {
 

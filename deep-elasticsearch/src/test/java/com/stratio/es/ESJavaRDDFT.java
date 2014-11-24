@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.extractor;
+package com.stratio.es;
 
 import com.google.common.io.Resources;
+import com.stratio.deep.testutils.FunctionalTest;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.count.CountResponse;
@@ -40,7 +41,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
 import java.util.concurrent.*;
 
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
@@ -51,9 +51,10 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
  * Created by rcrespo on 29/08/14.
  */
 @Test(suiteName = "ESRddTests", groups = { "ESJavaRDDTest" })
-public class ESJavaRDDTest {
+@FunctionalTest
+public class ESJavaRDDFT {
 
-    private static final Logger LOG = Logger.getLogger(ESJavaRDDTest.class);
+    private static final Logger LOG = Logger.getLogger(ESJavaRDDFT.class);
 
     public static final String MESSAGE_TEST = "new message test";
     public static final Integer PORT = 9200;

@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.config;
+package com.stratio.es.config;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
+import com.stratio.deep.testutils.UnitTest;
 import org.testng.annotations.Test;
 
 import com.stratio.deep.commons.entity.Cells;
@@ -28,6 +29,7 @@ import com.stratio.deep.es.config.ESDeepJobConfig;
  * Created by rcrespo on 29/08/14.
  */
 @Test
+@UnitTest
 public class CellDeepJobConfigESTest {
 
     @Test

@@ -1,10 +1,11 @@
-package com.stratio.deep.mongodb.extractor;
+package com.stratio.deep.mongodb;
 
 import static org.testng.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
 
+import com.stratio.deep.testutils.FunctionalTest;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
@@ -30,7 +31,7 @@ import de.flapdoodle.embed.process.runtime.Network;
  * Created by rcrespo on 16/07/14.
  */
 @Test(suiteName = "mongoRddTests", groups = { "MongoJavaRDDTest" })
-public class MongoJavaRDDTest {
+public class MongoJavaRDDFT {
 
     public static MongodExecutable mongodExecutable = null;
 

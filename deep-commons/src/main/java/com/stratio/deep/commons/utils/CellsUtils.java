@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.spark.sql.api.java.Row;
 import org.json.simple.JSONObject;
 
 import com.stratio.deep.commons.entity.Cell;
@@ -172,6 +173,31 @@ public class CellsUtils {
         }
 
         return t;
+    }
+
+    /**
+     * Creates a SparkSQL Row object from a Stratio Cells object
+     * @param cells Stratio Cells object for transforming.
+     * @return SparkSQL Row created from Cells.
+     */
+    public static Row getRowFromCells(Cells cells) {
+        Object[] values = cells.getCellValues().toArray();
+        Row row = Row.create(values);
+        return row;
+    }
+
+    /**
+     * Returns a Collection of SparkSQL Row objects from a collection of Stratio Cells
+     * objects
+     * @param cellsCol Collection of Cells for transforming
+     * @return Collection of SparkSQL Row created from Cells.
+     */
+    public static Collection<Row> getRowsFromsCells(Collection<Cells> cellsCol) {
+        Collection<Row> result = new ArrayList<>();
+        for(Cells cells:cellsCol) {
+            result.add(getRowFromCells(cells));
+        }
+        return result;
     }
 
     /**
