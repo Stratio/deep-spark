@@ -27,12 +27,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
 import com.stratio.deep.cassandra.querybuilder.DefaultQueryBuilder;
 import org.apache.cassandra.db.marshal.AbstractType;
+import org.apache.cassandra.db.marshal.ListType;
+import org.apache.cassandra.db.marshal.MapType;
 import org.apache.cassandra.db.marshal.TimeUUIDType;
+import org.apache.cassandra.db.marshal.UTF8Type;
 import org.apache.cassandra.db.marshal.UUIDType;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
@@ -179,6 +183,40 @@ public class CassandraUtils {
                 abstractType = UUIDType.instance;
             }
         }
+        //TODO Set, List, Map
+
+        if (abstractType == null){
+            //LIST Case
+            if (List.class.isAssignableFrom(obj.getClass())){
+
+                List list = (List) obj;
+                if(!list.isEmpty()){
+                    abstractType = ListType.getInstance(marshallerInstance(list.get(0)));
+                }
+
+            }
+            // SET Case
+            else if (Set.class.isAssignableFrom(obj.getClass())){
+
+            }
+            // MAP Case
+            else if (Map.class.isAssignableFrom(obj.getClass())){
+                Set set = ((Map)obj).keySet();
+                if(!set.isEmpty()){
+                    java.util.Iterator i = set.iterator();
+                    Object o = i.next();
+                    abstractType = MapType.getInstance(marshallerInstance(o), marshallerInstance(((Map) obj).get(o)));
+                }
+
+            }
+            // Cells Case?
+            else if (Cells.class.isAssignableFrom(obj.getClass())){
+//                abstractType = MapType.getInstance(UTF8Type.instance, UTF8Type.instance);
+
+            }
+
+
+        }
 
         if (abstractType == null) {
             throw new DeepGenericException("parameter class " + obj.getClass().getCanonicalName() + " does not have a" +
@@ -283,7 +321,7 @@ public class CassandraUtils {
             }
 
             // CellValidator cellValidator = CellValidator.cellValidator(key.getCellValue());
-            sb.append(cellName).append(" ").append(((CassandraCell) key).getCql3TypeClassName());
+            sb.append(cellName).append(" ").append(CassandraUtils.marshallerInstance(key.getValue()).asCQL3Type().toString());
 
             if (((CassandraCell) key).isPartitionKey()) {
                 partitionKey.add(cellName);
@@ -295,14 +333,14 @@ public class CassandraUtils {
         }
 
         if (values != null) {
-            for (Cell key : values) {
+            for (Cell cell : values) {
 
-                if(!(key instanceof CassandraCell)){
-                    key = CassandraCell.create(key);
+                if(!(cell instanceof CassandraCell)){
+                    cell = CassandraCell.create(cell);
                 }
 
                 sb.append(", ");
-                sb.append(quote(key.getCellName())).append(" ").append(((CassandraCell) key).getCql3TypeClassName());
+                sb.append(quote(cell.getCellName())).append(" ").append(CassandraUtils.marshallerInstance(cell.getValue()).asCQL3Type().toString());
             }
         }
 
@@ -415,7 +453,15 @@ public class CassandraUtils {
 
                 FilterType filterType = filters[i].getFilterType();
 
+                String value = filters[i].getValue().toString();
+
+                if (filters[i].getValue() instanceof String) {
+                    value = singleQuote(value.trim());
+                }
+
                 switch (filterType) {
+
+
                 case IN:
                     List<String> inValues = (List<String>) filters[i].getValue();
 
@@ -440,13 +486,15 @@ public class CassandraUtils {
                     sb.append(getLuceneWhereClause(filters[i]));
                     sb.append("'");
                     break;
+                case NEQ:
+                    sb.append(" AND ").append(quote(filters[i].getField())).append(" ")
+                            .append(" < ")
+                            .append(" ").append(value)
+                            .append(" AND ").append(quote(filters[i].getField())).append(" ")
+                            .append(" > ")
+                            .append(" ").append(value);
+                    break;
                 default:
-                    String value = filters[i].getValue().toString();
-
-                    if (filters[i].getValue() instanceof String) {
-                        value = singleQuote(value.trim());
-                    }
-
                     sb.append(" AND ").append(quote(filters[i].getField())).append(" ")
                             .append(OperatorCassandra.getOperatorCassandra(filters[i].getFilterType()).getOperator())
                             .append(" ").append(value);

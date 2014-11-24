@@ -14,6 +14,7 @@ import org.apache.cassandra.db.marshal.UUIDType;
 
 import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.ProtocolVersion;
+import com.stratio.deep.cassandra.util.CassandraUtils;
 import com.stratio.deep.commons.annotations.DeepField;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.IDeepType;
@@ -35,8 +36,6 @@ public class CassandraCell extends Cell {
     private transient CellValidator cellValidator;
 
     private transient DataType dataType;
-
-    private String cql3TypeClassName;
 
 
 
@@ -173,7 +172,6 @@ public class CassandraCell extends Cell {
         this.isKey = isPartitionKey;
         this.isClusterKey = isClusterKey;
         this.cellValidator = getValueType(cellValue);
-        this.cql3TypeClassName = cellValidator != null ? cellValidator.getAbstractType().asCQL3Type().toString() : null;
 
     }
 
@@ -185,8 +183,6 @@ public class CassandraCell extends Cell {
         this.isClusterKey = isClusterKey;
         this.dataType = cellType;
         this.isKey = isPartitionKey;
-        this.cellValidator = getValueType(cellType);
-        this.cql3TypeClassName = cellValidator.getAbstractType().asCQL3Type().toString();
 
     }
 
@@ -209,7 +205,6 @@ public class CassandraCell extends Cell {
                 this.cellValue = ((CassandraCell) metadata).marshaller().compose(cellValue);
             }
         }
-        this.cql3TypeClassName = cellValidator.getAbstractType().asCQL3Type().toString();
     }
 
     /**
@@ -224,7 +219,6 @@ public class CassandraCell extends Cell {
         this.isClusterKey = ((CassandraCell) metadata).isClusterKey;
         this.isKey = ((CassandraCell)metadata).isPartitionKey();
         this.cellValidator = ((CassandraCell) metadata).cellValidator;
-        this.cql3TypeClassName = cellValidator.getAbstractType().asCQL3Type().toString();
         this.cellValue = cellValue;
     }
 
@@ -236,7 +230,6 @@ public class CassandraCell extends Cell {
             this.cellValue = cell.getCellValue();
             this.isKey = cell.isKey();
             this.cellValidator = getValueType(cellValue);
-            this.cql3TypeClassName = cellValidator != null ? cellValidator.getAbstractType().asCQL3Type().toString() : null;
     }
 
 
@@ -251,7 +244,6 @@ public class CassandraCell extends Cell {
         this.isClusterKey = annotation.isPartOfClusterKey();
         this.isKey = annotation.isPartOfPartitionKey();
         this.cellValidator = CellValidator.cellValidator(field);
-        this.cql3TypeClassName = cellValidator.getAbstractType().asCQL3Type().toString();
 
     }
 
@@ -284,18 +276,14 @@ public class CassandraCell extends Cell {
 
         CassandraCell cell = (CassandraCell) o;
 
-        boolean isCellEqual = cellEquals(cell);
+//        boolean isCellEqual = cellEquals(cell);
         boolean isKey = keyEquals(cell);
         //        boolean isCellValidatorEqual = cellValidatorEquals(cell);
         boolean iscql3TypeClassNameEquals = cql3TypeClassNameEquals(cell);
-        return isCellEqual && isKey && iscql3TypeClassNameEquals;
+        return isKey && iscql3TypeClassNameEquals;
     }
 
-    private boolean cellEquals(CassandraCell cell) {
-        return cql3TypeClassName != null ?
-                cql3TypeClassName.equals(cell.cql3TypeClassName) :
-                cell.cql3TypeClassName == null;
-    }
+
 
     private boolean cql3TypeClassNameEquals(CassandraCell cell) {
         return cellName.equals(cell.cellName) && cellValue != null ?
@@ -375,13 +363,7 @@ public class CassandraCell extends Cell {
         }
     }
 
-    public String getCql3TypeClassName() {
-        return cql3TypeClassName;
-    }
 
-    public void setCql3TypeClassName(String cql3TypeClassName) {
-        this.cql3TypeClassName = cql3TypeClassName;
-    }
 
     @Override
     public String toString() {
@@ -392,7 +374,6 @@ public class CassandraCell extends Cell {
         sb.append(", isPartitionKey=").append(isKey);
         sb.append(", isClusterKey=").append(isClusterKey);
         sb.append(", cellValidator=").append(cellValidator);
-        sb.append(", cql3TypeClassName='").append(cql3TypeClassName).append('\'');
         sb.append('}');
         return sb.toString();
     }

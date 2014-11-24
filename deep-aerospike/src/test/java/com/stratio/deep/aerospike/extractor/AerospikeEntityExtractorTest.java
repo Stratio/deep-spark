@@ -135,7 +135,18 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
         }
     }
 
+
     @Override
+    protected void testFilterEQ(){
+
+    }
+
+    @Override
+    protected void testFilterNEQ(){
+
+    }
+
+//    @Override
     @Test
     protected void testFilter() {
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");

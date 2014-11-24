@@ -317,9 +317,19 @@ public class Cells implements Iterable<Cell>, Serializable {
      * @return the Cell whose name is cellName contained in this Cells object. null if no cell named cellName is
      *         present.
      */
-    @Deprecated
     public Cell getCellByName(String cellName) {
-        return getCellByName(nameSpace, cellName);
+
+        Set<String> keys = cells.keySet();
+        for(String key : keys){
+            List<Cell> cellList = cells.get(key);
+            for(Cell c : cellList){
+                if (c.getCellName().equals(cellName)) {
+                    return c;
+                }
+            }
+
+        }
+        return null;
     }
 
     /**

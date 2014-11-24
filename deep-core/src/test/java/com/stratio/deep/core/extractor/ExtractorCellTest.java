@@ -35,6 +35,7 @@ import org.json.simple.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
@@ -48,7 +49,7 @@ import scala.Tuple2;
 /**
  * Created by rcrespo on 17/11/14.
  */
-public abstract class ExtractorCellTest<S extends ExtractorConfig<Cells>> extends ExtractorTest<Cells, S> {
+public abstract class ExtractorCellTest<S extends BaseConfig<Cells>> extends ExtractorTest<Cells, S> {
     private static final long serialVersionUID = -7147600574221227223L;
 
     /**

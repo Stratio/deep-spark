@@ -256,6 +256,7 @@ public class DeepRecordReader implements IDeepRecordReader {
         /**
          * serialize the prepared query, pair.left is query id, pair.right is query
          */
+//TODO: return id column
         private String composeQuery(String cols) {
             String generatedColumns = cols;
             String clause = whereClause();
@@ -441,6 +442,7 @@ public class DeepRecordReader implements IDeepRecordReader {
     /**
      * retrieve the partition keys and cluster keys from system.schema_columnfamilies table
      */
+    //TODO check this
     private void retrieveKeys() {
         TableMetadata tableMetadata = config.fetchTableMetadata();
 
@@ -531,33 +533,6 @@ public class DeepRecordReader implements IDeepRecordReader {
         return rowIterator.next();
     }
 
-    //
-    //
-    // @Override
-    // public void initialize(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException,
-    // InterruptedException {
-    //
-    // }
-    //
-    // @Override
-    // public boolean nextKeyValue() throws IOException, InterruptedException {
-    // return false;
-    // }
-    //
-    // @Override
-    // public Object getCurrentKey() throws IOException, InterruptedException {
-    // return null;
-    // }
-    //
-    // @Override
-    // public Object getCurrentValue() throws IOException, InterruptedException {
-    // return null;
-    // }
-    //
-    // @Override
-    // public float getProgress() throws IOException, InterruptedException {
-    // return 0;
-    // }
-    //
+
 
 }

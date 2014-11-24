@@ -23,8 +23,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.json.simple.JSONObject;
@@ -108,7 +110,12 @@ public class CellsUtils {
                     Cells innerCells = getCellFromJson((JSONObject) value, null);
                     cells.add(Cell.create(key, innerCells));
                 } else {
-                    cells.add(Cell.create(key, value));
+                    if(key.equalsIgnoreCase("id")){
+                        cells.add(Cell.create(key, value, true));
+                    }else{
+                        cells.add(Cell.create(key, value));
+
+                    }
                 }
             }
             catch ( IllegalAccessException | InstantiationException | InvocationTargetException | IllegalArgumentException e){
@@ -119,6 +126,50 @@ public class CellsUtils {
         return cells;
     }
 
+
+    public static Cells getCellWithMapFromJson(JSONObject Json, String tableName)
+            throws IllegalAccessException, InstantiationException, InvocationTargetException {
+
+
+        Cells cells = tableName!= null ?new Cells(tableName): new Cells();
+
+
+
+        Set<String> entrySet = Json.keySet();
+
+        for (String key : entrySet) {
+            try {
+                Object value = Json.get(key);
+
+                if (List.class.isAssignableFrom(value.getClass())) {
+                    List<String> innerCell = new ArrayList<>();
+                    for (String innerBson : (List<String>) value) {
+                        innerCell.add(innerBson);
+                    }
+                    cells.add(Cell.create(key, innerCell));
+                } else if (JSONObject.class.isAssignableFrom(value.getClass())) {
+                    Map<String, Object> map = new HashMap<>();
+                    Cells innerCells = getCellFromJson((JSONObject) value, null);
+                    for(Cell cell : innerCells){
+                        map.put(cell.getName(), cell.getValue());
+                    }
+                    cells.add(Cell.create(key,map));
+                } else {
+                    if(key.equalsIgnoreCase("id")){
+                        cells.add(Cell.create(key, value, true));
+                    }else{
+                        cells.add(Cell.create(key, value));
+
+                    }
+                }
+            }
+            catch ( IllegalAccessException | InstantiationException | InvocationTargetException | IllegalArgumentException e){
+                //                LOG.error("impossible to create a java cell from Bson field:"+entry.getKey()+", type:"+entry.getValue().getClass()+", value:"+entry.getValue());
+            }
+
+        }
+        return cells;
+    }
     /**
      * Gets object from json.
      *

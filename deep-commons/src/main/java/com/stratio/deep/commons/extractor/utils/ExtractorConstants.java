@@ -77,11 +77,11 @@ public interface ExtractorConstants {
     /**
      * The CQLPORT.
      */
-    String CQLPORT = PORT2;
+    String CQLPORT = PORT;
     /**
      * The RPCPORT.
      */
-    String RPCPORT = PORT;
+    String RPCPORT = PORT2;
     /**
      * The COLUMN _ fAMILY.
      */
