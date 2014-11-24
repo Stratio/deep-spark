@@ -18,8 +18,11 @@ package com.stratio.deep.commons.utils;
 
 import static org.testng.Assert.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.apache.spark.sql.api.java.Row;
 import org.json.simple.JSONValue;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -76,4 +79,28 @@ public class CellsUtilsTest {
 
 
     }
+
+    @Test
+    public void testGetRowFromCells() {
+        Cells cells = new Cells("namespace", Cell.create("cell1", 1), Cell.create("cell2", "test"),
+                Cell.create("cell3", new ArrayList<String>()));
+        Row row = CellsUtils.getRowFromCells(cells);
+        assertEquals(row.length(), cells.size());
+        assertEquals(row.get(0), 1);
+        assertEquals(row.get(1), "test");
+        assertEquals(row.get(2), new ArrayList<String>());
+    }
+
+    @Test
+    public void testGetRowsFromsCells() {
+        Collection<Cells> cellsCol = new ArrayList<>();
+        Cells cells = new Cells("namespace", Cell.create("cell1", 1), Cell.create("cell2", "test"));
+        Cells cells2 = new Cells("namespace", Cell.create("cell1", 2), Cell.create("cell2", "test2"),
+                Cell.create("cell3", new ArrayList<String>()));
+        cellsCol.add(cells);
+        cellsCol.add(cells2);
+        Collection<Row> rows = CellsUtils.getRowsFromsCells(cellsCol);
+        assertEquals(rows.size(), cellsCol.size());
+    }
+
 }

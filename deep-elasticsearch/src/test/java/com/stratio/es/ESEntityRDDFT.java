@@ -14,29 +14,25 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.extractor;
+package com.stratio.es;
 
-
-import com.stratio.deep.core.extractor.ExtractorCellTest;
-import com.stratio.deep.core.extractor.ExtractorTest;
-import com.stratio.deep.es.extractor.ESCellExtractor;
-
-import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
+import java.io.Serializable;
 import org.testng.annotations.Test;
 
-
-
+import com.stratio.deep.core.extractor.ExtractorEntityTest;
+import com.stratio.deep.es.extractor.ESEntityExtractor;
 
 /**
  * Created by rcrespo on 29/08/14.
  */
-@Test(suiteName = "ESRddTests", groups = { "ESCellRDDTest" }, dependsOnGroups = "ESJavaRDDTest")
-public class ESCellRDDTest extends ExtractorCellTest {
+@Test(suiteName = "ESRddTests", groups = { "ESEntityRDDTest", "FunctionalTests" }, dependsOnGroups = "ESCellRDDTest")
+public class ESEntityRDDFT extends ExtractorEntityTest implements Serializable {
 
-    public ESCellRDDTest() {
-        super(ESCellExtractor.class,"localhost",9200, true);
+    public ESEntityRDDFT() {
+
+        super(ESEntityExtractor.class,"localhost",9200,false);
     }
+
 
 
 }

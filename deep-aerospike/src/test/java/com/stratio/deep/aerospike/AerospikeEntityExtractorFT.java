@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.deep.aerospike.extractor;
+package com.stratio.deep.aerospike;
 
 import com.aerospike.client.Record;
 import com.aerospike.client.query.Filter;
 import com.aerospike.client.query.RecordSet;
 import com.aerospike.client.query.Statement;
 import com.aerospike.hadoop.mapreduce.AerospikeRecord;
+import com.stratio.deep.aerospike.extractor.AerospikeEntityExtractor;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.FilterType;
@@ -27,13 +28,13 @@ import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.MessageTestEntity;
 import com.stratio.deep.core.extractor.ExtractorEntityTest;
-import com.stratio.deep.core.extractor.ExtractorTest;
-import com.stratio.deep.core.extractor.ExtractorEntityTest;
 import org.apache.spark.rdd.RDD;
+import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -45,13 +46,13 @@ import static org.testng.AssertJUnit.assertNull;
 /**
  * Created by mariomgal on 07/11/14.
  */
-@Test(suiteName = "aerospikeRddTests", groups = {"AerospikeEntityExtractorTest"} , dependsOnGroups = "AerospikeJavaRDDTest")
-public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
+@Test(groups = {"AerospikeEntityExtractorFT", "FunctionalTests"})
+public class AerospikeEntityExtractorFT extends ExtractorEntityTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AerospikeEntityExtractorTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AerospikeEntityExtractorFT.class);
 
-    public AerospikeEntityExtractorTest() {
-        super(AerospikeEntityExtractor.class, AerospikeJavaRDDTest.HOST, AerospikeJavaRDDTest.PORT, false);
+    public AerospikeEntityExtractorFT() {
+        super(AerospikeEntityExtractor.class, AerospikeJavaRDDFT.HOST, AerospikeJavaRDDFT.PORT, false);
     }
 
     @Override
@@ -61,8 +62,8 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
         try {
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity = new ExtractorConfig(MessageTestEntity.class);
-            inputConfigEntity.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDTest.NAMESPACE_ENTITY)
+            inputConfigEntity.putValue(ExtractorConstants.HOST, AerospikeJavaRDDFT.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDFT.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDFT.NAMESPACE_ENTITY)
                     .putValue(ExtractorConstants.SET, "input").putValue(ExtractorConstants.INPUT_COLUMNS, new String[]{"id"});
             inputConfigEntity.setExtractorImplClass(AerospikeEntityExtractor.class);
 
@@ -74,8 +75,8 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
             assertNull("Message text should be null.", messageEntity.getMessage());
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity2 = new ExtractorConfig(MessageTestEntity.class);
-            inputConfigEntity2.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDTest.NAMESPACE_ENTITY)
+            inputConfigEntity2.putValue(ExtractorConstants.HOST, AerospikeJavaRDDFT.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDFT.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDFT.NAMESPACE_ENTITY)
                     .putValue(ExtractorConstants.SET, "input").putValue(ExtractorConstants.INPUT_COLUMNS, new String[]{"message"});
             inputConfigEntity2.setExtractorImplClass(AerospikeEntityExtractor.class);
 
@@ -85,9 +86,7 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
 
             assertNull("Message id should be null.", messageEntity2.getId());
             assertNotNull("Message text should not be null.", messageEntity2.getMessage());
-        } catch(Exception e) {
-            System.out.println("a");
-        }finally {
+        } finally {
             context.stop();
         }
     }
@@ -99,12 +98,12 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
         try {
 
             Statement stmnt = new Statement();
-            stmnt.setNamespace(AerospikeJavaRDDTest.NAMESPACE_ENTITY);
+            stmnt.setNamespace(AerospikeJavaRDDFT.NAMESPACE_ENTITY);
             stmnt.setSetName("input");
 
             stmnt.setFilters(Filter.equal("id", "messageTest"));
 
-            RecordSet recordSet = AerospikeJavaRDDTest.aerospike.query(null, stmnt);
+            RecordSet recordSet = AerospikeJavaRDDFT.aerospike.query(null, stmnt);
             Record record = null;
             while(recordSet.next()) {
                 record = recordSet.getRecord();
@@ -114,8 +113,8 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
             Map<String, Object> bins = aerospikeRecord.bins;
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity = new ExtractorConfig(MessageTestEntity.class);
-            inputConfigEntity.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDTest.NAMESPACE_ENTITY)
+            inputConfigEntity.putValue(ExtractorConstants.HOST, AerospikeJavaRDDFT.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDFT.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDFT.NAMESPACE_ENTITY)
                     .putValue(ExtractorConstants.SET, "input");
             inputConfigEntity.setExtractorImplClass(AerospikeEntityExtractor.class);
 
@@ -183,8 +182,8 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
             }
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity = new ExtractorConfig(MessageTestEntity.class);
-            inputConfigEntity.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDTest.NAMESPACE_ENTITY)
+            inputConfigEntity.putValue(ExtractorConstants.HOST, AerospikeJavaRDDFT.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDFT.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDFT.NAMESPACE_ENTITY)
                     .putValue(ExtractorConstants.SET, "input")
                     .putValue(ExtractorConstants.FILTER_QUERY, new com.stratio.deep.commons.filter.Filter[] {equalFilter});
             inputConfigEntity.setExtractorImplClass(AerospikeEntityExtractor.class);
@@ -193,8 +192,8 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
             assertEquals(1, inputRDDEntity.count(), "Expected read entity count is 1");
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity2 = new ExtractorConfig(MessageTestEntity.class);
-            inputConfigEntity2.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDTest.NAMESPACE_ENTITY)
+            inputConfigEntity2.putValue(ExtractorConstants.HOST, AerospikeJavaRDDFT.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDFT.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDFT.NAMESPACE_ENTITY)
                     .putValue(ExtractorConstants.SET, "input")
                     .putValue(ExtractorConstants.FILTER_QUERY, new com.stratio.deep.commons.filter.Filter[] {ltFilter});
             inputConfigEntity2.setExtractorImplClass(AerospikeEntityExtractor.class);
@@ -203,8 +202,8 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
             assertEquals(1, inputRDDEntity2.count(), "Expected read entity count is 1");
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity3 = new ExtractorConfig(MessageTestEntity.class);
-            inputConfigEntity3.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDTest.NAMESPACE_ENTITY)
+            inputConfigEntity3.putValue(ExtractorConstants.HOST, AerospikeJavaRDDFT.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDFT.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDFT.NAMESPACE_ENTITY)
                     .putValue(ExtractorConstants.SET, "input")
                     .putValue(ExtractorConstants.FILTER_QUERY, new com.stratio.deep.commons.filter.Filter[] {gtFilter});
             inputConfigEntity3.setExtractorImplClass(AerospikeEntityExtractor.class);
@@ -213,8 +212,8 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
             assertEquals(0, inputRDDEntity3.count(), "Expected read entity count is 0");
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity4 = new ExtractorConfig(MessageTestEntity.class);
-            inputConfigEntity4.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDTest.NAMESPACE_ENTITY)
+            inputConfigEntity4.putValue(ExtractorConstants.HOST, AerospikeJavaRDDFT.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDFT.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDFT.NAMESPACE_ENTITY)
                     .putValue(ExtractorConstants.SET, "input")
                     .putValue(ExtractorConstants.FILTER_QUERY, new com.stratio.deep.commons.filter.Filter[] {lteFilter});
             inputConfigEntity4.setExtractorImplClass(AerospikeEntityExtractor.class);
@@ -223,8 +222,8 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
             assertEquals(1, inputRDDEntity4.count(), "Expected read entity count is 1");
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity5 = new ExtractorConfig(MessageTestEntity.class);
-            inputConfigEntity5.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDTest.NAMESPACE_ENTITY)
+            inputConfigEntity5.putValue(ExtractorConstants.HOST, AerospikeJavaRDDFT.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDFT.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDFT.NAMESPACE_ENTITY)
                     .putValue(ExtractorConstants.SET, "input")
                     .putValue(ExtractorConstants.FILTER_QUERY, new com.stratio.deep.commons.filter.Filter[] {gteFilter});
             inputConfigEntity5.setExtractorImplClass(AerospikeEntityExtractor.class);
@@ -233,8 +232,8 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
             assertEquals(0, inputRDDEntity5.count(), "Expected read entity count is 0");
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity6 = new ExtractorConfig(MessageTestEntity.class);
-            inputConfigEntity6.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
-                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDTest.NAMESPACE_ENTITY)
+            inputConfigEntity6.putValue(ExtractorConstants.HOST, AerospikeJavaRDDFT.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDFT.PORT)
+                    .putValue(ExtractorConstants.NAMESPACE, AerospikeJavaRDDFT.NAMESPACE_ENTITY)
                     .putValue(ExtractorConstants.SET, "input")
                     .putValue(ExtractorConstants.FILTER_QUERY, new com.stratio.deep.commons.filter.Filter[] {gteFilter});
             inputConfigEntity6.setExtractorImplClass(AerospikeEntityExtractor.class);
@@ -263,7 +262,7 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
         try {
             ExtractorConfig<BookEntity> inputConfigEntity = new ExtractorConfig(BookEntity.class);
-            inputConfigEntity.putValue(ExtractorConstants.HOST, AerospikeJavaRDDTest.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDTest.PORT)
+            inputConfigEntity.putValue(ExtractorConstants.HOST, AerospikeJavaRDDFT.HOST).putValue(ExtractorConstants.PORT, AerospikeJavaRDDFT.PORT)
                     .putValue(ExtractorConstants.NAMESPACE, "bookinput")
                     .putValue(ExtractorConstants.SET, "input");
             inputConfigEntity.setExtractorImplClass(AerospikeEntityExtractor.class);
@@ -274,7 +273,7 @@ public class AerospikeEntityExtractorTest extends ExtractorEntityTest {
 
             fail();
         } catch(Exception e) {
-            e.printStackTrace();
+
         } finally {
             context.stop();
         }

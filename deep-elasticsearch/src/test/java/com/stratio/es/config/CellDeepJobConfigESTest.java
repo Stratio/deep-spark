@@ -14,27 +14,28 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.extractor;
+package com.stratio.es.config;
 
-import static org.elasticsearch.index.query.QueryBuilders.termQuery;
-import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
-import java.io.Serializable;
-
+import com.stratio.deep.testutils.UnitTest;
 import org.testng.annotations.Test;
 
-import com.stratio.deep.core.extractor.ExtractorEntityTest;
-import com.stratio.deep.es.extractor.ESEntityExtractor;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.es.config.ESDeepJobConfig;
 
 /**
  * Created by rcrespo on 29/08/14.
  */
-@Test(suiteName = "ESRddTests", groups = { "ESEntityRDDTest" }, dependsOnGroups = "ESCellRDDTest")
-public class ESEntityRDDTest extends ExtractorEntityTest implements Serializable {
+@Test(groups = {"UnitTests"})
+public class CellDeepJobConfigESTest {
 
-    public ESEntityRDDTest() {
-
-        super(ESEntityExtractor.class,"localhost",9200,false);
+    @Test
+    public void createTest() {
+        ESDeepJobConfig<Cells> cellDeepJobConfigES = new ESDeepJobConfig(Cells.class);
+        assertNotNull(cellDeepJobConfigES);
+        assertEquals(cellDeepJobConfigES.getEntityClass(), Cells.class);
     }
 
 

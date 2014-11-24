@@ -15,6 +15,7 @@
  */
 package com.stratio.deep.aerospike.config;
 
+import com.stratio.deep.testutils.UnitTest;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Constructor;
@@ -24,9 +25,9 @@ import java.lang.reflect.Modifier;
 import static org.testng.Assert.assertTrue;
 
 /**
- * Created by mariomgal on 01/11/14.
+ * AerospikeConfigFactoryTests
  */
-@Test
+@Test(groups = {"UnitTests"})
 public class AerospikeConfigFactoryTest {
 
     @Test(expectedExceptions = InvocationTargetException.class)
