@@ -15,6 +15,7 @@
  */
 package com.stratio.deep.aerospike;
 
+import com.stratio.deep.aerospike.extractor.AerospikeCellExtractor;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
