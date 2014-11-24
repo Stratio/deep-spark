@@ -20,22 +20,13 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.datastax.driver.core.TableMetadata;
-import com.stratio.deep.cassandra.querybuilder.CassandraUpdateQueryBuilder;
-import com.stratio.deep.cassandra.querybuilder.DefaultQueryBuilder;
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
-import com.stratio.deep.commons.handler.DeepRecordWriter;
-import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.db.marshal.LongType;
 import org.apache.cassandra.db.marshal.TypeParser;
 import org.apache.cassandra.dht.IPartitioner;
@@ -52,21 +43,19 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
-import com.stratio.deep.cassandra.entity.CassandraCell;
-import com.stratio.deep.cassandra.entity.CellValidator;
+import com.stratio.deep.cassandra.querybuilder.CassandraUpdateQueryBuilder;
+import com.stratio.deep.cassandra.util.CassandraUtils;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.exception.DeepInstantiationException;
+import com.stratio.deep.commons.handler.DeepRecordWriter;
 import com.stratio.deep.commons.utils.Pair;
-import scala.Tuple2;
-
-
 
 /**
  * Handles the distributed write to cassandra in batch.
  */
-public final class DeepCqlRecordWriter extends DeepRecordWriter{
+public final class DeepCqlRecordWriter extends DeepRecordWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(DeepCqlRecordWriter.class);
 
@@ -83,7 +72,11 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter{
 
     private final CassandraUpdateQueryBuilder queryBuilder;
 
-
+    /**
+     * Con
+     * 
+     * @param writeConfig
+     */
     public DeepCqlRecordWriter(ICassandraDeepJobConfig writeConfig, CassandraUpdateQueryBuilder queryBuilder) {
         this.clients = new HashMap<>();
         this.removedClients = new HashMap<>();
@@ -120,29 +113,6 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter{
                 LOG.error("exception", e);
             }
         }
-    }
-
-    private ByteBuffer getPartitionKey(Cells cells) {
-        ByteBuffer partitionKey;
-        if (keyValidator instanceof CompositeType) {
-            ByteBuffer[] keys = new ByteBuffer[partitionKeyColumns.length];
-
-            for (int i = 0; i < cells.size(); i++) {
-                Cell cell =  cells.getCellByIdx(i);
-                CassandraCell c =(CassandraCell) ((cell instanceof CassandraCell) ? cell : CassandraCell.create(cell));
-                if (c.isPartitionKey()) {
-                    keys[i] = c.getDecomposedCellValue();
-                }
-            }
-
-            partitionKey = CompositeType.build(keys);
-        } else {
-            Cell c =  cells.getCellByIdx(0);
-            CassandraCell cell = (CassandraCell) ((c instanceof CassandraCell) ? (CassandraCell) c : CassandraCell.create(c));
-            cell.setCellValidator(CellValidator.cellValidator(cell.getCellValue()));
-            partitionKey = cell.getDecomposedCellValue();
-        }
-        return partitionKey;
     }
 
     private void init() {
@@ -237,7 +207,8 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter{
 
         String localCql = queryBuilder.prepareQuery(keys, values);
 
-        Token range = partitioner.getToken(getPartitionKey(keys));
+        Token range = partitioner.getToken(CassandraUtils.getPartitionKey(keys, keyValidator,
+                partitionKeyColumns.length));
 
         // add primary key columns to the bind variables
         List<Object> allValues = new ArrayList<>(values.getCellValues());
@@ -256,7 +227,6 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter{
         }
 
     }
-
 
     /**
      * A client that runs in a threadpool and connects to the list of endpoints for a particular range. Bound variables
