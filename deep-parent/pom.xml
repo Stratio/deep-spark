@@ -133,7 +133,7 @@
             <id>functional-tests</id>
             <modules>
                 <module>../deep-commons</module>
-                <!--<module>../deep-cassandra</module>-->
+                <module>../deep-cassandra</module>
                 <module>../deep-core</module>
                 <module>../deep-mongodb</module>
                 <module>../deep-elasticsearch</module>
@@ -145,7 +145,7 @@
             <id>integration</id>
             <modules>
                 <module>../deep-commons</module>
-                <!--<module>../deep-cassandra</module>-->
+                <module>../deep-cassandra</module>
                 <module>../deep-core</module>
                 <module>../deep-mongodb</module>
                 <module>../deep-elasticsearch</module>
@@ -240,7 +240,7 @@
 
     <modules>
         <module>../deep-commons</module>
-        <!--<module>../deep-cassandra</module>-->
+        <module>../deep-cassandra</module>
         <module>../deep-core</module>
         <module>../deep-mongodb</module>
         <module>../deep-elasticsearch</module>
