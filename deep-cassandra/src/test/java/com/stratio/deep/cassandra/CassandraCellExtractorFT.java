@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.stratio.deep.cassandra.extractor;
+package com.stratio.deep.cassandra;
 
 import static com.stratio.deep.commons.utils.CellsUtils.getCellFromJson;
 import static com.stratio.deep.commons.utils.CellsUtils.getCellWithMapFromJson;
@@ -49,12 +49,12 @@ import scala.Tuple2;
 /**
  * Created by rcrespo on 20/11/14.
  */
-@Test(suiteName = "cassandraExtractorTests", groups = { "CassandraCellExtractorTest" }, dependsOnGroups = {"cassandraJavaRDDTest"})
-public class CassandraCellExtractorTest extends ExtractorCellTest {
+@Test(suiteName = "cassandraExtractorTests", groups = { "CassandraCellExtractorFT" }, dependsOnGroups = {"cassandraJavaRDDFT"})
+public class CassandraCellExtractorFT extends ExtractorCellTest {
 
     private static final long serialVersionUID = -5201767473793541285L;
 
-    public CassandraCellExtractorTest() {
+    public CassandraCellExtractorFT() {
         super(CassandraCellExtractor.class, "localhost", 9242, true);
     }
 

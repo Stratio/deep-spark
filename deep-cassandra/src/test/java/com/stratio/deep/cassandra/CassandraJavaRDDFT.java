@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.cassandra.extractor;
+package com.stratio.deep.cassandra;
 
 import java.io.*;
 import java.net.URL;
@@ -28,6 +28,8 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.cassandra.embedded.CassandraServer;
+import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
+import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
 import com.stratio.deep.commons.utils.Constants;
 import com.stratio.deep.core.context.DeepSparkContext;
 import org.apache.cassandra.exceptions.ConfigurationException;
@@ -41,8 +43,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 
-@Test(suiteName = "cassandraExtractorTests", groups = { "cassandraJavaRDDTest" })
-public class CassandraJavaRDDTest {
+@Test(suiteName = "cassandraExtractorTests", groups = { "cassandraJavaRDDFT" })
+public class CassandraJavaRDDFT {
 
     private Logger logger = Logger.getLogger(getClass());
 

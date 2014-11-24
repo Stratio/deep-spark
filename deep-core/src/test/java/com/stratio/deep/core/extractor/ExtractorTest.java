@@ -462,7 +462,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      * @param <W>  the type parameter
      */
     @Test(alwaysRun = true, dependsOnGroups = {"FunctionalTests"})
-    protected <W> void testFilter() {
+    protected <W> void testFilterEQ() {
         DeepSparkContext context = getDeepSparkContext();
         try {
 

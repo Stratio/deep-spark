@@ -33,7 +33,7 @@ import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 
-@Test(groups = {"AerospikeCellExtractorFT", "FunctionalTests"})
+@Test(groups = {"AerospikeCellExtractorFT", "FunctionalTests"}, dependsOnGroups = {"AerospikeJavaRDDFT"})
 public class AerospikeCellExtractorFT extends ExtractorCellTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(AerospikeCellExtractorFT.class);
@@ -70,7 +70,7 @@ public class AerospikeCellExtractorFT extends ExtractorCellTest {
 
     @Test
     @Override
-    protected void testFilter() {
+    protected void testFilterEQ() {
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
         try {
 
@@ -167,5 +167,11 @@ public class AerospikeCellExtractorFT extends ExtractorCellTest {
         }finally {
             context.stop();
         }
+    }
+
+    @Test(expectedExceptions = UnsupportedOperationException.class)
+    @Override
+    public void testFilterNEQ() {
+        super.testFilterNEQ();
     }
 }

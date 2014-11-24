@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.stratio.deep.cassandra.extractor;
+package com.stratio.deep.cassandra;
 
 import static com.stratio.deep.commons.utils.CellsUtils.getObjectWithMapFromJson;
 import static org.testng.Assert.assertEquals;
@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -48,12 +49,12 @@ import scala.Tuple2;
 /**
  * Created by rcrespo on 24/11/14.
  */
-@Test(suiteName = "cassandraExtractorTests", groups = { "CassandraEntityExtractorTest" }, dependsOnGroups = {"CassandraCellExtractorTest"})
-public class CassandraEntityExtractorTest extends ExtractorEntityTest {
+@Test(suiteName = "cassandraExtractorTests", groups = { "CassandraEntityExtractorFT" }, dependsOnGroups = {"CassandraCellExtractorFT"})
+public class CassandraEntityExtractorFT extends ExtractorEntityTest {
 
     private static final long serialVersionUID = -172112587882501217L;
 
-    public CassandraEntityExtractorTest() {
+    public CassandraEntityExtractorFT() {
         super(CassandraEntityExtractor.class, "localhost", 9242, false, SimpleBookEntity.class);
     }
 

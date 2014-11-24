@@ -46,7 +46,7 @@ import static org.testng.AssertJUnit.assertNull;
 /**
  * Created by mariomgal on 07/11/14.
  */
-@Test(groups = {"AerospikeEntityExtractorFT", "FunctionalTests"})
+@Test(groups = {"AerospikeEntityExtractorFT", "FunctionalTests"}, dependsOnGroups = {"AerospikeJavaRDDFT"})
 public class AerospikeEntityExtractorFT extends ExtractorEntityTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(AerospikeEntityExtractorFT.class);
@@ -136,13 +136,14 @@ public class AerospikeEntityExtractorFT extends ExtractorEntityTest {
 
 
     @Override
+    @Test(expectedExceptions = UnsupportedOperationException.class)
     protected void testFilterNEQ(){
-
+        super.testFilterNEQ();
     }
 
-//    @Override
+    @Override
     @Test
-    protected void testFilter() {
+    protected void testFilterEQ() {
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
         try {
 
