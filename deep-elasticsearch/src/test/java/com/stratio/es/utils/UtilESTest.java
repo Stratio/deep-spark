@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.utils;
+package com.stratio.es.utils;
 
 import static com.stratio.deep.es.utils.UtilES.generateQuery;
 import static org.testng.Assert.assertEquals;

@@ -14,29 +14,30 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.extractor;
+package com.stratio.es.config;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
-import com.stratio.deep.core.extractor.ExtractorCellTest;
-import com.stratio.deep.core.extractor.ExtractorTest;
-import com.stratio.deep.es.extractor.ESCellExtractor;
-
-import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
+import com.stratio.deep.testutils.UnitTest;
 import org.testng.annotations.Test;
 
-
-
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.es.config.ESDeepJobConfig;
 
 /**
  * Created by rcrespo on 29/08/14.
  */
-@Test(suiteName = "ESRddTests", groups = { "ESCellRDDTest" }, dependsOnGroups = "ESJavaRDDTest")
-public class ESCellRDDTest extends ExtractorCellTest {
+@Test(groups = {"UnitTests"})
+public class CellDeepJobConfigESTest {
 
-    public ESCellRDDTest() {
-        super(ESCellExtractor.class,"localhost",9200, true);
+    @Test
+    public void createTest() {
+        ESDeepJobConfig<Cells> cellDeepJobConfigES = new ESDeepJobConfig(Cells.class);
+        assertNotNull(cellDeepJobConfigES);
+        assertEquals(cellDeepJobConfigES.getEntityClass(), Cells.class);
     }
+
 
 
 }

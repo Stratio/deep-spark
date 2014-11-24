@@ -76,7 +76,6 @@ public abstract class ExtractorCellTest<S extends BaseConfig<Cells>> extends Ext
 
     @Test
     public void testDataSet() {
-
         DeepSparkContext context = getDeepSparkContext();
 
         try {

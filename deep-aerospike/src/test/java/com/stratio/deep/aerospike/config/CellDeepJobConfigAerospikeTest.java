@@ -16,6 +16,7 @@
 package com.stratio.deep.aerospike.config;
 
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.testutils.UnitTest;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -24,7 +25,7 @@ import static org.testng.Assert.assertNotNull;
 /**
  * Created by mariomgal on 01/11/14.
  */
-@Test
+@Test(groups = {"UnitTests"})
 public class CellDeepJobConfigAerospikeTest {
 
     @Test

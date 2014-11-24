@@ -17,6 +17,7 @@ package com.stratio.deep.aerospike.config;
 
 import com.stratio.deep.aerospike.testentity.MessageTestEntity;
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.testutils.UnitTest;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
 
@@ -26,7 +27,7 @@ import java.util.List;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
-@Test
+@Test(groups = {"UnitTests"})
 public class GenericConfigFactoryAerospikeTest {
 
     private static final String HOST_TEST = "localhost";
@@ -84,21 +85,10 @@ public class GenericConfigFactoryAerospikeTest {
     }
 
     @Test
-    public void testHostValidation() {
+    public void testHostListBuilderValidation() {
         AerospikeDeepJobConfig<MessageTestEntity> djc = AerospikeConfigFactory.createAerospike(MessageTestEntity.class);
 
-        djc.namespace(NAMESPACE_TEST).set(SET_TEST);
-
-        try {
-            djc.initialize();
-            fail("Configuration without host must fail.");
-        } catch (IllegalArgumentException iae) {
-            // OK
-            log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
-
-        }
-
-        djc.host(HOST_TEST).port(PORT_TEST).host(HOST_TEST_2).port(PORT_TEST_2).host(HOST_TEST_3).port(PORT_TEST_3);
+        djc.namespace(NAMESPACE_TEST).set(SET_TEST).host(HOST_TEST).port(PORT_TEST).host(HOST_TEST_2).port(PORT_TEST_2).host(HOST_TEST_3).port(PORT_TEST_3);
 
         djc.initialize();
 
@@ -107,7 +97,10 @@ public class GenericConfigFactoryAerospikeTest {
         assertEquals(djc.getHostList().get(0), HOST_TEST, "First host should be the same as expected.");
         assertEquals(djc.getHostList().get(1), HOST_TEST_2, "Second host should be the same as expected.");
         assertEquals(djc.getHostList().get(2), HOST_TEST_3, "Third host should be the same as expected.");
+    }
 
+    @Test
+    public void testHostListValidation() {
         List<String> hostList = new ArrayList<>();
         hostList.add(HOST_TEST);
         hostList.add(HOST_TEST_2);
@@ -125,7 +118,6 @@ public class GenericConfigFactoryAerospikeTest {
         assertEquals(djc2.getHostList().get(0), HOST_TEST, "First host should be the same as expected.");
         assertEquals(djc2.getHostList().get(1), HOST_TEST_2, "Second host should be the same as expected.");
         assertEquals(djc2.getHostList().get(2), HOST_TEST_3, "Third host should be the same as expected.");
-
     }
 
     @Test

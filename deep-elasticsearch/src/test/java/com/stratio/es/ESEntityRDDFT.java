@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.extractor;
+package com.stratio.es;
 
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 import static org.testng.AssertJUnit.assertEquals;
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.stratio.deep.testutils.FunctionalTest;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -55,10 +56,10 @@ import scala.Tuple2;
 /**
  * Created by rcrespo on 29/08/14.
  */
-@Test(suiteName = "ESRddTests", groups = { "ESEntityRDDTest" }, dependsOnGroups = "ESCellRDDTest")
-public class ESEntityRDDTest extends ExtractorEntityTest implements Serializable {
+@Test(suiteName = "ESRddTests", groups = { "ESEntityRDDTest", "FunctionalTests" }, dependsOnGroups = "ESCellRDDTest")
+public class ESEntityRDDFT extends ExtractorEntityTest implements Serializable {
 
-    public ESEntityRDDTest() {
+    public ESEntityRDDFT() {
 
         super(ESEntityExtractor.class,"localhost",9200,false);
     }

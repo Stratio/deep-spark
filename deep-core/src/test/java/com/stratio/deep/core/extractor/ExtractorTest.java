@@ -171,12 +171,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
         this.databaseExtractorName = extractor.getSimpleName().toLowerCase();
     }
 
-    /**
-     * Read file.
-     *
-     * @param path the path
-     * @return the list
-     */
+
     private List<String> readFile(String path){
         List<String> lineas = new ArrayList<>();
         try{
@@ -229,7 +224,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      *
      * @throws IOException the iO exception
      */
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initDataSet() throws IOException {
         DeepSparkContext context = getDeepSparkContext();
 
@@ -280,7 +275,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      * It tests if the extractor can read from the data store
      * @param <W>   the type parameter
      */
-    @Test
+    @Test(alwaysRun = true, groups = {"FunctionalTests"})
     public <W> void testRead() {
 
         DeepSparkContext context = getDeepSparkContext();
@@ -310,9 +305,8 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      * It tests if the extractor can write to the data store
      * @param <W>   the type parameter
      */
-    @Test
+    @Test(alwaysRun = true)
     public <W> void testWrite() {
-
 
         DeepSparkContext context = getDeepSparkContext();
 
@@ -346,11 +340,12 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
     }
 
+    
     /**
      * Test input columns.
      * @param <W>   the type parameter
      */
-    @Test
+    @Test(alwaysRun = true)
     public <W> void testInputColumns() {
 
         DeepSparkContext context = getDeepSparkContext();
@@ -430,8 +425,8 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      * Test filter EQ.
      * @param <W>  the type parameter
      */
-    @Test
-    protected <W> void testFilterEQ() {
+    @Test(alwaysRun = true, dependsOnGroups = {"FunctionalTests"})
+    protected <W> void testFilter() {
         DeepSparkContext context = getDeepSparkContext();
         try {
 

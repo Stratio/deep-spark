@@ -72,7 +72,7 @@ public abstract class ExtractorEntityTest<S extends BaseConfig<BookEntity>> exte
         }
     }
 
-    @Test
+    @Test(alwaysRun = true)
     public void testDataSet() {
 
         DeepSparkContext context = getDeepSparkContext();

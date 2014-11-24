@@ -20,7 +20,6 @@ import com.stratio.deep.cassandra.config.CassandraConfigFactory
 import com.stratio.deep.core.context.DeepSparkContext
 import com.stratio.deep.utils.ContextProperties
 import org.apache.spark.SparkContext._
-import com.stratio.deep.config._
 
 
 import org.apache.spark.rdd.RDD
