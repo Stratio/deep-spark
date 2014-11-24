@@ -59,9 +59,6 @@ public class AerospikeJavaRDDFT {
 
     @BeforeSuite
     public static void init() throws IOException, ParseException {
-        System.out.println("*******************");
-        System.out.println("TEST JAVARDD");
-        System.out.println("*******************");
         aerospike = new AerospikeClient(HOST, PORT);
         deleteData();
         //dataSetImport();

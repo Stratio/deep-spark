@@ -200,9 +200,6 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      */
     @Test(alwaysRun = true, groups = {"FunctionalTests"})
     public <W> void testRead() {
-        System.out.println("*******************");
-        System.out.println("TEST READ");
-        System.out.println("*******************");
 
         DeepSparkContext context = getDeepSparkContext();
 
@@ -232,10 +229,6 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      */
     @Test(alwaysRun = true)
     public <W> void testWrite() {
-        System.out.println("*******************");
-        System.out.println("TEST WRITE");
-        System.out.println("*******************");
-
 
         DeepSparkContext context = getDeepSparkContext();
 
@@ -271,9 +264,6 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
     @Test(alwaysRun = true)
     public <W> void testInputColumns() {
-        System.out.println("*******************");
-        System.out.println("TEST INPUT COLUMNS");
-        System.out.println("*******************");
 
         DeepSparkContext context = getDeepSparkContext();
         try {
@@ -344,9 +334,6 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
     @Test(alwaysRun = true, dependsOnGroups = {"FunctionalTests"})
     protected <W> void testFilter() {
-        System.out.println("*******************");
-        System.out.println("TEST FILTER");
-        System.out.println("*******************");
         DeepSparkContext context = getDeepSparkContext();
         try {
 

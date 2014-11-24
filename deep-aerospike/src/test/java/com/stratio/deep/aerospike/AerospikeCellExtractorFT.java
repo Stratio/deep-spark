@@ -44,9 +44,6 @@ public class AerospikeCellExtractorFT extends ExtractorCellTest {
     @Test
     @Override
     public void testDataSet() {
-        System.out.println("*******************");
-        System.out.println("TESTDATA DATASET CELL");
-        System.out.println("*******************");
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
         try {
@@ -74,9 +71,6 @@ public class AerospikeCellExtractorFT extends ExtractorCellTest {
     @Test
     @Override
     protected void testFilter() {
-        System.out.println("*******************");
-        System.out.println("TESTDATA FILTER CELL");
-        System.out.println("*******************");
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
         try {
 

@@ -128,9 +128,6 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <properties>
-                <testcase.groups>com.stratio.deep.testutils.UnitTest</testcase.groups>
-            </properties>
         </profile>
         <profile>
             <id>functional-tests</id>
@@ -143,11 +140,6 @@
                 <module>../deep-examples</module>
                 <module>../deep-aerospike</module>
             </modules>
-            <properties>
-                <testcase.groups>
-                    com.stratio.deep.testutils.FunctionalTest
-                </testcase.groups>
-            </properties>
         </profile>
         <profile>
             <id>integration</id>
@@ -160,11 +152,6 @@
                 <module>../deep-examples</module>
                 <module>../deep-aerospike</module>
             </modules>
-            <properties>
-                <testcase.groups>
-                    com.stratio.deep.testutils.FunctionalTest
-                </testcase.groups>
-            </properties>
         </profile>
         <profile>
             <id>release</id>
@@ -457,7 +444,7 @@
                             </goals>
                             <configuration>
                                 <destFile>${project.build.directory}/jacocoUT.exec</destFile>
-                                <propertyName>admin-jacocoUT-argline</propertyName>
+                                <propertyName>jacocoUT-argline</propertyName>
                             </configuration>
                         </execution>
                         <execution>
@@ -467,7 +454,7 @@
                             </goals>
                             <configuration>
                                 <destFile>${project.build.directory}/jacocoIT.exec</destFile>
-                                <propertyName>admin-jacocoIT-argline</propertyName>
+                                <propertyName>jacocoIT-argline</propertyName>
                             </configuration>
                         </execution>
                     </executions>
@@ -506,8 +493,10 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.18</version>
                     <configuration>
-                        <groups>UnitTests</groups>
-                        <argLine>${admin-jacocoUT-argline}</argLine>
+                        <includes>
+                            <include>**/*Test.java</include>
+                        </includes>
+                        <argLine>${jacocoUT-argline}</argLine>
                         <argLine>-noverify</argLine>
                         <testFailureIgnore>true</testFailureIgnore>
                     </configuration>
@@ -518,10 +507,8 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>2.18</version>
                     <configuration>
-                        <groups>FunctionalTests</groups>
-                        <excludedGroups>UnitTests</excludedGroups>
                         <includes>
-                            <include>**/*.java</include>
+                            <include>**/*FT.java</include>
                         </includes>
                     </configuration>
                     <executions>
@@ -531,7 +518,7 @@
                             </goals>
                             <configuration>
                                 <includes>
-                                    <include>**/*.class</include>
+                                    <include>**/*FT.class</include>
                                 </includes>
                             </configuration>
                         </execution>

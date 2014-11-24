@@ -56,8 +56,7 @@ import scala.Tuple2;
 /**
  * Created by rcrespo on 29/08/14.
  */
-@Test(suiteName = "ESRddTests", groups = { "ESEntityRDDTest" }, dependsOnGroups = "ESCellRDDTest")
-@FunctionalTest
+@Test(suiteName = "ESRddTests", groups = { "ESEntityRDDTest", "FunctionalTests" }, dependsOnGroups = "ESCellRDDTest")
 public class ESEntityRDDFT extends ExtractorEntityTest implements Serializable {
 
     public ESEntityRDDFT() {

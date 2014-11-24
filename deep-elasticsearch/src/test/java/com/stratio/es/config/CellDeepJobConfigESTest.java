@@ -28,8 +28,7 @@ import com.stratio.deep.es.config.ESDeepJobConfig;
 /**
  * Created by rcrespo on 29/08/14.
  */
-@Test
-@UnitTest
+@Test(groups = {"UnitTests"})
 public class CellDeepJobConfigESTest {
 
     @Test

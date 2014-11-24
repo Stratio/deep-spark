@@ -11,8 +11,7 @@ import com.stratio.deep.commons.entity.Cells;
 /**
  * Created by rcrespo on 16/07/14.
  */
-@Test
-@UnitTest
+@Test(groups = {"UnitTests"})
 public class CellDeepJobConfigMongoDBTest {
 
     @Test

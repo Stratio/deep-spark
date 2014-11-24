@@ -75,9 +75,6 @@ public abstract class ExtractorEntityTest<S extends BaseConfig<BookEntity>> exte
     @Test(alwaysRun = true)
     public void testDataSet() {
 
-        System.out.println("*******************");
-        System.out.println("TESTDATA SET ENTITY");
-        System.out.println("*******************");
         DeepSparkContext context = getDeepSparkContext();
         try {
 

@@ -30,8 +30,7 @@ import com.stratio.deep.core.extractor.ExtractorEntityTest;
  * Created by rcrespo on 18/06/14.
  */
 
-@Test(suiteName = "mongoRddTests", groups = { "MongoEntityExtractorTest" }, dependsOnGroups = "MongoCellExtractorTest")
-@FunctionalTest
+@Test(suiteName = "mongoRddTests", groups = { "MongoEntityExtractorTest", "FunctionalTests" }, dependsOnGroups = "MongoCellExtractorTest")
 public class MongoEntityExtractorFT extends ExtractorEntityTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoEntityExtractorFT.class);

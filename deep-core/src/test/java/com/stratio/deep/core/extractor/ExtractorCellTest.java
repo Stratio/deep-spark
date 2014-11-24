@@ -75,9 +75,6 @@ public abstract class ExtractorCellTest<S extends ExtractorConfig<Cells>> extend
 
     @Test
     public void testDataSet() {
-        System.out.println("*******************");
-        System.out.println("TEST DATASET");
-        System.out.println("*******************");
         DeepSparkContext context = getDeepSparkContext();
 
         try {

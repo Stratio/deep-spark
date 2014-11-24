@@ -50,8 +50,7 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 /**
  * Created by rcrespo on 29/08/14.
  */
-@Test(suiteName = "ESRddTests", groups = { "ESJavaRDDTest" })
-@FunctionalTest
+@Test(suiteName = "ESRddTests", groups = { "ESJavaRDDTest", "FunctionalTests" })
 public class ESJavaRDDFT {
 
     private static final Logger LOG = Logger.getLogger(ESJavaRDDFT.class);

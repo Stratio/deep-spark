@@ -32,8 +32,7 @@ import org.testng.annotations.Test;
 /**
  * Created by rcrespo on 29/08/14.
  */
-@Test(suiteName = "ESRddTests", groups = { "ESCellRDDTest" }, dependsOnGroups = "ESJavaRDDTest")
-@FunctionalTest
+@Test(suiteName = "ESRddTests", groups = { "ESCellRDDTest", "FunctionalTests" }, dependsOnGroups = "ESJavaRDDTest")
 public class ESCellRDDFT extends ExtractorCellTest {
 
     public ESCellRDDFT() {

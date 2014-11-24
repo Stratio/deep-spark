@@ -45,8 +45,7 @@ import com.stratio.deep.mongodb.testentity.MongoDBTestEntity;
  * Created by rcrespo on 18/06/14.
  */
 
-@Test
-@UnitTest
+@Test(groups = {"UnitTests"})
 public class UtilMongoDBTest {
 
     public static final String ID_EXAMPLE = "ID";

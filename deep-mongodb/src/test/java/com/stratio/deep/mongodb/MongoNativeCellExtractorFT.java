@@ -32,13 +32,12 @@ import com.stratio.deep.core.extractor.ExtractorCellTest;
 
 
 
-@Test(suiteName = "mongoRddTests", groups = { "MongoNativeCellExtractorTest" }, dependsOnGroups = "MongoEntityExtractorTest")
-@FunctionalTest
+@Test(suiteName = "mongoRddTests", groups = { "MongoNativeCellExtractorTest", "FunctionalTests" }, dependsOnGroups = "MongoEntityExtractorTest")
 public class MongoNativeCellExtractorFT extends ExtractorCellTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MongoNativeCellExtractorTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MongoNativeCellExtractorFT.class);
 
-    public MongoNativeCellExtractorTest() {
+    public MongoNativeCellExtractorFT() {
         super(MongoNativeCellExtractor.class, "localhost:27890", null, true);
     }
 

@@ -12,8 +12,7 @@ import org.testng.annotations.Test;
 /**
  * Created by rcrespo on 17/07/14.
  */
-@Test
-@UnitTest
+@Test(groups = {"UnitTests"})
 public class MongoConfigFactoryTest {
 
     @Test(expectedExceptions = InvocationTargetException.class)

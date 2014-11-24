@@ -58,9 +58,6 @@ public class AerospikeEntityExtractorFT extends ExtractorEntityTest {
     @Override
     @Test
     public void testInputColumns() {
-        System.out.println("*******************");
-        System.out.println("TESTDATA INPUT COLUMNS ENTITY");
-        System.out.println("*******************");
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
         try {
 
@@ -96,10 +93,6 @@ public class AerospikeEntityExtractorFT extends ExtractorEntityTest {
 
     @Test
     public void testDataSet() {
-
-        System.out.println("*******************");
-        System.out.println("TEST DATASET ENTITY");
-        System.out.println("*******************");
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
         try {
@@ -144,9 +137,6 @@ public class AerospikeEntityExtractorFT extends ExtractorEntityTest {
     @Override
     @Test
     protected void testFilter() {
-        System.out.println("*******************");
-        System.out.println("TESTDATA FILTER ENTITY");
-        System.out.println("*******************");
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
         try {
 

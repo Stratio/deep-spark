@@ -30,7 +30,7 @@ import de.flapdoodle.embed.process.runtime.Network;
 /**
  * Created by rcrespo on 16/07/14.
  */
-@Test(suiteName = "mongoRddTests", groups = { "MongoJavaRDDTest" })
+@Test(suiteName = "mongoRddTests", groups = { "MongoJavaRDDTest", "FunctionalTests" })
 public class MongoJavaRDDFT {
 
     public static MongodExecutable mongodExecutable = null;
