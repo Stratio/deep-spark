@@ -136,11 +136,6 @@ public class AerospikeEntityExtractorFT extends ExtractorEntityTest {
 
 
     @Override
-    protected void testFilterEQ(){
-
-    }
-
-    @Override
     protected void testFilterNEQ(){
 
     }
