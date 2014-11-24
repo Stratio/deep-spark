@@ -81,8 +81,8 @@ final public class UtilAerospike {
             Object insert = null;
             List<String> inputColumns = null;
 
-            if (aerospikeConfig.getInputColumns() != null) {
-                inputColumns = Arrays.asList(aerospikeConfig.getInputColumns());
+            if (aerospikeConfig.getFields() != null) {
+                inputColumns = Arrays.asList(aerospikeConfig.getFields());
             }
 
             for (Field field : fields) {
@@ -168,7 +168,7 @@ final public class UtilAerospike {
 
         String namespace = key.namespace + "." + key.setName;
         String setName = aerospikeConfig.getSet();
-        String[] inputColumns = aerospikeConfig.getInputColumns();
+        String[] inputColumns = aerospikeConfig.getFields();
         Tuple2<String, Object> equalsFilter = aerospikeConfig.getEqualsFilter();
         String equalsFilterBin = equalsFilter != null ? equalsFilter._1() : null;
         Object equalsFilterValue = equalsFilter != null ? equalsFilter._2() : null;
