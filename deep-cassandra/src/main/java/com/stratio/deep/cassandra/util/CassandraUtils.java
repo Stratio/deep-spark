@@ -41,6 +41,7 @@ import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.ListType;
 import org.apache.cassandra.db.marshal.MapType;
 import org.apache.cassandra.db.marshal.CompositeType;
+import org.apache.cassandra.db.marshal.SetType;
 import org.apache.cassandra.db.marshal.TimeUUIDType;
 import org.apache.cassandra.db.marshal.UTF8Type;
 import org.apache.cassandra.db.marshal.UUIDType;
@@ -189,7 +190,6 @@ public class CassandraUtils {
                 abstractType = UUIDType.instance;
             }
         }
-        //TODO Set, List, Map
 
         if (abstractType == null){
             //LIST Case
@@ -203,7 +203,12 @@ public class CassandraUtils {
             }
             // SET Case
             else if (Set.class.isAssignableFrom(obj.getClass())){
-
+                Set set = (Set) obj;
+                if(!set.isEmpty()){
+                    java.util.Iterator i = set.iterator();
+                    Object o = i.next();
+                    abstractType = SetType.getInstance(marshallerInstance(o));
+                }
             }
             // MAP Case
             else if (Map.class.isAssignableFrom(obj.getClass())){
@@ -212,16 +217,10 @@ public class CassandraUtils {
                     java.util.Iterator i = set.iterator();
                     Object o = i.next();
                     abstractType = MapType.getInstance(marshallerInstance(o), marshallerInstance(((Map) obj).get(o)));
+
                 }
 
             }
-            // Cells Case?
-            else if (Cells.class.isAssignableFrom(obj.getClass())){
-//                abstractType = MapType.getInstance(UTF8Type.instance, UTF8Type.instance);
-
-            }
-
-
         }
 
         if (abstractType == null) {
