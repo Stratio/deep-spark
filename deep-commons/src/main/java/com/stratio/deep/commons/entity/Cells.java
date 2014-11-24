@@ -392,9 +392,9 @@ public class Cells implements Iterable<Cell>, Serializable {
      * 
      * @return a collection of Cell(s) values converted to byte buffers using the appropriate marshaller.
      */
-    public Collection<ByteBuffer> getDecomposedCellValues() {
-        return getDecomposedCellValues(nameSpace);
-    }
+//    public Collection<ByteBuffer> getDecomposedCellValues() {
+//        return getDecomposedCellValues(nameSpace);
+//    }
 
     /**
      * Converts every Cell (associated to <i>table</i>) contained in this object to an ArrayBuffer. In order to perform
@@ -402,20 +402,20 @@ public class Cells implements Iterable<Cell>, Serializable {
      * 
      * @return a collection of Cell(s) values converted to byte buffers using the appropriate marshaller.
      */
-    public Collection<ByteBuffer> getDecomposedCellValues(String table) {
-        List<ByteBuffer> res = new ArrayList<>();
-
-        for (Cell c : getCellsByTable(table)) {
-            ByteBuffer bb = c.getDecomposedCellValue();
-
-            if (bb != null) {
-                res.add(bb);
-            }
-
-        }
-
-        return res;
-    }
+//    public Collection<ByteBuffer> getDecomposedCellValues(String table) {
+//        List<ByteBuffer> res = new ArrayList<>();
+//
+//        for (Cell c : getCellsByTable(table)) {
+//            ByteBuffer bb = c.getDecomposedCellValue();
+//
+//            if (bb != null) {
+//                res.add(bb);
+//            }
+//
+//        }
+//
+//        return res;
+//    }
 
     /**
      * Converts every Cell (associated to <i>table</i>) contained in this object to an ArrayBuffer. In order to perform

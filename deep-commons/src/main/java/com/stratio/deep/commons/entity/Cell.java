@@ -324,9 +324,5 @@ public class Cell implements Serializable {
         return sb.toString();
     }
 
-    @SuppressWarnings("unchecked")
-    public ByteBuffer getDecomposedCellValue() {
-        return null;
-    }
 
 }

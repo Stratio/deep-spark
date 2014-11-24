@@ -309,7 +309,6 @@ public class CassandraCell extends Cell {
         return valueType;
     }
 
-    @Override
     @SuppressWarnings("unchecked")
     public ByteBuffer getDecomposedCellValue() {
 
