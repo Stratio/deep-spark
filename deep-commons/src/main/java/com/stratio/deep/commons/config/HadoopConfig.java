@@ -23,10 +23,9 @@ import org.apache.hadoop.conf.Configuration;
 /**
  * Created by rcrespo on 13/10/14.
  */
-public class HadoopConfig<T> extends DeepJobConfig<T> implements Serializable {
+public class HadoopConfig<T, S extends DeepJobConfig> extends DeepJobConfig<T, S> implements Serializable {
 
     protected transient Configuration configHadoop;
-
 
     public HadoopConfig(Class<T> t) {
         super(t);
@@ -36,7 +35,5 @@ public class HadoopConfig<T> extends DeepJobConfig<T> implements Serializable {
         return configHadoop;
     }
 
-    public void setHadoopConfiguration(Configuration configHadoop) {
-        this.configHadoop = configHadoop;
-    }
+
 }

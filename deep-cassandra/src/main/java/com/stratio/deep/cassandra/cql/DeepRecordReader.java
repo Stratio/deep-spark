@@ -143,10 +143,10 @@ public class DeepRecordReader implements IDeepRecordReader {
      * @param config             the deep configuration object.
      * @param split             the token range on which the new reader will be based.
      */
-    public DeepRecordReader(DeepJobConfig<?> config, DeepTokenRange<?, String> split) {
+    public DeepRecordReader(DeepJobConfig<?, ?> config, DeepTokenRange<?, String> split) {
         this.config = (CassandraDeepJobConfig<?>) config;
         this.split = split;
-        this.pageSize = config.getPageSize();
+        this.pageSize = ((CassandraDeepJobConfig<?>) config).getPageSize();
         initialize();
     }
 

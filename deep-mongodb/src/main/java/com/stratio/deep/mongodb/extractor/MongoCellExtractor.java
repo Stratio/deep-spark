@@ -67,7 +67,7 @@ public final class MongoCellExtractor extends MongoExtractor<Cells> {
      */
     @Override
     public Cells transformElement(Tuple2<Object, BSONObject> tuple,
-                                  DeepJobConfig<Cells> config) {
+                                  DeepJobConfig<Cells,MongoDeepJobConfig<Cells>> config) {
 
         try {
             return UtilMongoDB.getCellFromBson(tuple._2(), deepJobConfig.getNameSpace());

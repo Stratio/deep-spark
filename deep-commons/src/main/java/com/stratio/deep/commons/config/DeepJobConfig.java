@@ -16,17 +16,30 @@
 
 package com.stratio.deep.commons.config;
 
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.COLLECTION;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.DATABASE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.HOST;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PORT;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNAME;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
 
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.filter.Filter;
 
 /**
  * Created by rcrespo on 13/10/14.
  * @param <T>  the type parameter
  */
-public class DeepJobConfig<T> extends BaseConfig<T> implements Serializable {
+public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
 
     /**
      * The Username.
@@ -39,24 +52,19 @@ public class DeepJobConfig<T> extends BaseConfig<T> implements Serializable {
     protected String password;
 
     /**
-     * The Name space.
+     * The Name space (catalog+table / database+collection).
      */
     protected String nameSpace;
 
     /**
-     * The Catalog.
+     * The Catalog / database.
      */
     protected String catalog;
 
     /**
-     * The Table.
+     * The Table / collection.
      */
     protected String table;
-
-    /**
-     * The Page size.
-     */
-    protected int pageSize;
 
     /**
      * The Port.
@@ -66,18 +74,24 @@ public class DeepJobConfig<T> extends BaseConfig<T> implements Serializable {
     /**
      * The Host.
      */
-    protected String host;
+    protected List<String> host = new ArrayList<>();
 
     /**
-     * The Fields.
+     * The inputColumns.
      */
-    protected String[] fields;
+    protected String[] inputColumns;
+
+
+    /**
+     * Database filters
+     */
+    protected Filter[] filters;
 
     /**
      * Instantiates a new Deep job config.
      */
     public DeepJobConfig(){
-        super(null);
+        super((Class<T>) Cells.class);
     }
 
     /**
@@ -98,24 +112,6 @@ public class DeepJobConfig<T> extends BaseConfig<T> implements Serializable {
         return username;
     }
 
-    /**
-     * Host deep job config.
-     *
-     * @param hostname the hostname
-     * @return the deep job config
-     */
-    public DeepJobConfig host(String hostname) {
-        return this;
-    }
-
-    /**
-     * Sets username.
-     *
-     * @param username the username
-     */
-    public void setUsername(String username) {
-        this.username = username;
-    }
 
     /**
      * Gets password.
@@ -126,24 +122,7 @@ public class DeepJobConfig<T> extends BaseConfig<T> implements Serializable {
         return password;
     }
 
-    /**
-     * Page size.
-     *
-     * @param pageSize the page size
-     * @return the deep job config
-     */
-    public DeepJobConfig pageSize(int pageSize) {
-        return null;
-    }
 
-    /**
-     * Sets password.
-     *
-     * @param password the password
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     /**
      * Get name space.
@@ -159,15 +138,6 @@ public class DeepJobConfig<T> extends BaseConfig<T> implements Serializable {
     }
 
     /**
-     * Sets name space.
-     *
-     * @param nameSpace the name space
-     */
-    public void setNameSpace(String nameSpace) {
-        this.nameSpace = nameSpace;
-    }
-
-    /**
      * Gets catalog.
      *
      * @return the catalog
@@ -176,14 +146,6 @@ public class DeepJobConfig<T> extends BaseConfig<T> implements Serializable {
         return catalog;
     }
 
-    /**
-     * Sets catalog.
-     *
-     * @param catalog the catalog
-     */
-    public void setCatalog(String catalog) {
-        this.catalog = catalog;
-    }
 
     /**
      * Gets table.
@@ -194,49 +156,12 @@ public class DeepJobConfig<T> extends BaseConfig<T> implements Serializable {
         return table;
     }
 
-    /**
-     * Sets table.
-     *
-     * @param table the table
-     */
-    public void setTable(String table) {
-        this.table = table;
+    public String[] getInputColumns() {
+        return inputColumns;
     }
 
-    /**
-     * Gets page size.
-     *
-     * @return the page size
-     */
-    public int getPageSize() {
-        return pageSize;
-    }
-
-    /**
-     * Sets page size.
-     *
-     * @param pageSize the page size
-     */
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
-    }
-
-    /**
-     * Get fields.
-     *
-     * @return the string [ ]
-     */
-    public String[] getFields() {
-        return fields;
-    }
-
-    /**
-     * Sets fields.
-     *
-     * @param fields the fields
-     */
-    public void setFields(String... fields) {
-        this.fields = fields;
+    public Filter[] getFilters() {
+        return filters;
     }
 
     /**
@@ -248,92 +173,170 @@ public class DeepJobConfig<T> extends BaseConfig<T> implements Serializable {
         return port;
     }
 
-    /**
-     * Sets port.
-     *
-     * @param port the port
-     */
-    public void setPort(int port) {
-        this.port = port;
-    }
 
     /**
      * Gets host.
      *
      * @return the host
      */
-    public String getHost() {
+    public List<String> getHostList() {
         return host;
     }
 
-    /**
-     * Get input columns.
-     *
-     * @return the string [ ]
-     */
-    public String[] getInputColumns() {
-        return new String[0];
+    public String getHost() {
+        return !host.isEmpty() ? host.get(0) : null;
     }
 
-    /**
-     * Sets host.
-     *
-     * @param host the host
-     */
-    public void setHost(String host) {
-        this.host = host;
-    }
 
     /**
      * Initialize s.
      *
-     * @param <S>  the type parameter
+     
      * @param extractorConfig the extractor config
      * @return the s
      */
-    public <S extends DeepJobConfig> S initialize(ExtractorConfig extractorConfig){
-        return null;
+    public S initialize(ExtractorConfig extractorConfig){
+        Map<String, Serializable> values = extractorConfig.getValues();
+
+        if (values.get(USERNAME) != null) {
+            username(extractorConfig.getString(USERNAME));
+        }
+
+        if (values.get(PASSWORD) != null) {
+            password(extractorConfig.getString(PASSWORD));
+        }
+
+        if (values.get(HOST) != null) {
+            host((extractorConfig.getStringArray(HOST)));
+        }
+
+        if (values.get(PORT) != null) {
+            port((extractorConfig.getInteger(PORT)));
+        }
+
+        if (values.get(COLLECTION) != null) {
+            table(extractorConfig.getString(COLLECTION));
+        }
+
+        if (values.get(INPUT_COLUMNS) != null) {
+            inputColumns(extractorConfig.getStringArray(INPUT_COLUMNS));
+        }
+
+        if (values.get(DATABASE) != null) {
+            catalog(extractorConfig.getString(DATABASE));
+        }
+        return (S) this;
     }
 
     /**
-     * Input columns.
+     * Host deep job config.
      *
-     * @param <S>  the type parameter
-     * @param columns the columns
-     * @return the s
+     * @param hostName the hostname
+     * @return the deep job config
      */
-    public <S extends DeepJobConfig> S inputColumns(String... columns) {
-        return null;
+    public S host(String hostName) {
+        host.add(hostName);
+        return (S) this;
     }
 
+    public S host(String... hostNames) {
+        for(String hostName : hostNames)
+        host.add(hostName);
+        return (S) this;
+    }
+
+    public S host(List<String> hostNames) {
+        this.host.addAll(hostNames);
+        return (S) this;
+    }
     /**
      * Password s.
      *
-     * @param <S>  the type parameter
      * @param password the password
      * @return the s
      */
-    public <S extends DeepJobConfig> S password(String password) {
-        return null;
+    public S password(String password) {
+        this.password=password;
+        return (S) this;
+    }
+
+
+    public S table(String table) {
+        this.table=table;
+        return (S) this;
+    }
+
+    public S catalog(String catalog) {
+        this.catalog=catalog;
+        return (S) this;
     }
 
     /**
      * Username s.
      *
-     * @param <S>  the type parameter
      * @param username the username
      * @return the s
      */
-    public <S extends DeepJobConfig> S username(String username) {
-        return null;
+    public S username(String username) {
+        this.username=username;
+        return (S) this;
     }
 
     /**
-     * Initialize s.
-     * @param <S>  the type parameter
+     * Port s.
+     *
+     * @param port the username
      * @return the s
      */
-    public <S extends DeepJobConfig> S initialize(){
-        return null;
+    public S port(Integer port) {
+        this.port=port;
+        return (S) this;
+    }
+
+    /**
+     *
+     * @param inputColumns
+     * @return
+     */
+    public S inputColumns(String[] inputColumns) {
+        this.inputColumns=inputColumns;
+        return (S) this;
+    }
+
+    /**
+     *
+     * @param filters
+     * @return
+     */
+    public S filters(Filter[] filters) {
+        this.filters=filters;
+        return (S) this;
+    }
+
+
+
+    /**
+     * Initialize s.
+     * @return the s
+     */
+    public S initialize(){
+        return (S) this;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("DeepJobConfig{");
+        sb.append("username='").append(username).append('\'');
+        sb.append(", password='").append(password).append('\'');
+        sb.append(", nameSpace='").append(nameSpace).append('\'');
+        sb.append(", catalog='").append(catalog).append('\'');
+        sb.append(", table='").append(table).append('\'');
+        sb.append(", port=").append(port);
+        sb.append(", host=").append(host);
+        sb.append(", inputColumns=").append(inputColumns == null ? "null" : Arrays.asList(inputColumns).toString());
+        sb.append(", filters=").append(filters == null ? "null" : Arrays.asList(filters).toString());
+        sb.append('}');
+        sb.append(super.toString());
+        return sb.toString();
     }
 }

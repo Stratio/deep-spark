@@ -137,7 +137,7 @@ public class MongoReader<T> {
             collection = db.getCollection(mongoDeepJobConfig.getCollection());
 
             dbCursor = collection.find(generateFilterQuery((MongoPartition) partition),
-                    mongoDeepJobConfig.getInputFields());
+                    mongoDeepJobConfig.getDBFields());
 
         } catch (UnknownHostException e) {
             throw new DeepExtractorinitializationException(e.getMessage());
