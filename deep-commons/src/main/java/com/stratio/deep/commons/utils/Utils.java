@@ -306,6 +306,7 @@ public final class Utils {
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             throw new DeepExtractorinitializationException(e.getMessage());
         }
+
     }
 
     /**

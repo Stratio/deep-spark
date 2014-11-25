@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.spark.rdd.RDD;
+import org.apache.spark.api.java.JavaRDD;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.core.hdfs.utils.HDFSConstants;
 import com.stratio.deep.core.hdfs.utils.SchemaMap;
 import com.stratio.deep.examples.java.extractorconfig.hdfs.utils.ContextProperties;
 
@@ -58,19 +58,19 @@ public class AgregationData2 {
         listSchemaMap.add(new SchemaMap("Length",Integer.class));
         listSchemaMap.add(new SchemaMap("Single",String.class));
 
-        values.put(HDFSConstants.PORT, "9000");
-        values.put(HDFSConstants.FILE_SEPARATOR, ",");
-        values.put(HDFSConstants.FILE_PATH, "user/hadoop/test/songs.csv");
-        values.put(HDFSConstants.HOST, "127.0.0.1");
-        values.put(HDFSConstants.MAP,listSchemaMap);
-        values.put(HDFSConstants.TYPE,HDFSConstants.HDFS_TYPE);
-        values.put(HDFSConstants.TABLE,tableName);
-        values.put(HDFSConstants.CATALOG,keyspaceName);
+        values.put(ExtractorConstants.PORT, "9000");
+        values.put(ExtractorConstants.HDFS_FILE_SEPARATOR, ",");
+        values.put(ExtractorConstants.HDFS_FILE_PATH, "user/hadoop/test/songs.csv");
+        values.put(ExtractorConstants.HOST, "127.0.0.1");
+        values.put(ExtractorConstants.HDFS_SCHEMA,listSchemaMap);
+        values.put(ExtractorConstants.HDFS_TYPE,ExtractorConstants.HDFS_TYPE);
+        values.put(ExtractorConstants.TABLE,tableName);
+        values.put(ExtractorConstants.CATALOG,keyspaceName);
 
         extractorConfig.setValues(values);
 
         // Creating the RDD
-        RDD<Cells> rdd = deepContext.createHDFSRDD(extractorConfig);
+        JavaRDD<Cells> rdd = deepContext.createHDFSRDD(extractorConfig);
 
         rdd.collect();
         deepContext.stop();

@@ -2,8 +2,11 @@ package com.stratio.deep.core.hdfs.utils;
 
 public class HDFSConstants {
 
-    public static final String HOST           = "host";
-    public static final String PORT           = "port";
+    public static final String HOSTS      = "Hosts";
+    public static final String HOST       = "Host";
+    public static final String PORTS      = "Ports";
+    public static final String PORT       = "Port";
+
     public static final String TYPE           = "type";
     public static final String FILE_PATH      = "path";
     public static final String FILE_SEPARATOR = "separator";
@@ -23,4 +26,5 @@ public class HDFSConstants {
     public static final String CATALOG = "catalog";
     public static final String TABLE   = "table";
 
+    public static final String FILEDATATABLE = "TextFileDataTable";
 }

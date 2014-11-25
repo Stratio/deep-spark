@@ -30,12 +30,12 @@ import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.core.function.PrepareSaveFunction;
-import com.stratio.deep.core.hdfs.utils.HDFSConstants;
 import com.stratio.deep.core.hdfs.utils.MapSchemaFromLines;
-import com.stratio.deep.core.hdfs.utils.TextFileDataTable;
 import com.stratio.deep.core.hdfs.utils.SchemaMap;
 import com.stratio.deep.core.hdfs.utils.TableName;
+import com.stratio.deep.core.hdfs.utils.TextFileDataTable;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
 
@@ -150,43 +150,52 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
     }
 
-    public RDD<Cells> createHDFSRDD(ExtractorConfig<Cells> config){
+    public JavaRDD<Cells> createHDFSRDD(ExtractorConfig<Cells> config){
 
-        Serializable type  = config.getValues().get(HDFSConstants.TYPE);
-        Serializable host  = config.getValues().get(HDFSConstants.HOST);
-        Serializable port  = config.getValues().get(HDFSConstants.PORT);
-        Serializable path  = config.getValues().get(HDFSConstants.FILE_PATH);
+
+        Serializable host  = config.getValues().get(ExtractorConstants.HOST);
+        Serializable port  = config.getValues().get(ExtractorConstants.PORT);
+        Serializable path  = config.getValues().get(ExtractorConstants.HDFS_FILE_PATH);
 
         final TextFileDataTable textFileDataTable = createTextFileMetaDataFromConfig(config);
 
-        if(type.equals(HDFSConstants.HDFS_TYPE)){
-            path = HDFSConstants.HDFS_ + host.toString() + ":" + port + "/" + path.toString();
+        if(config.getExtractorImplClassName().equals(ExtractorConstants.HDFS)){
+            path = ExtractorConstants.HDFS_PREFIX + host.toString() + ":" + port + "/" + path.toString();
         }else{
             path = path.toString();
         }
         RDD<String> result = this.sc().textFile(path.toString(), 1);
 
         JavaRDD<Cells> resultCells = result.toJavaRDD().map(new MapSchemaFromLines(textFileDataTable));
-        resultCells.collect();
-        return resultCells.rdd();
+
+        return resultCells;
     }
 
     private TextFileDataTable createTextFileMetaDataFromConfig(ExtractorConfig<Cells> extractorConfig) {
 
 
-        Serializable separator = extractorConfig.getValues().get(HDFSConstants.FILE_SEPARATOR);
-        String catalogName = (String)extractorConfig.getValues().get(HDFSConstants.CATALOG);
-        String tableName   = (String)extractorConfig.getValues().get(HDFSConstants.TABLE);
+        if(extractorConfig.getValues().get(ExtractorConstants.HDFS_FILEDATATABLE)!=null ){
+            final TextFileDataTable textFileDataTable  = (TextFileDataTable)extractorConfig.getValues().get(ExtractorConstants.HDFS_FILEDATATABLE);
 
-        final String splitSep = separator.toString();
-        final ArrayList<SchemaMap<?>> columns   = (ArrayList<SchemaMap<?>>) extractorConfig.getValues().get
-                (HDFSConstants.MAP);
+            return textFileDataTable;
+        }else {
 
-        final TextFileDataTable textFileDataTable = new TextFileDataTable(new TableName(catalogName,tableName),columns);
-        textFileDataTable.setLineSeparator(splitSep);
+            Serializable separator = extractorConfig.getValues().get(ExtractorConstants.HDFS_FILE_SEPARATOR);
+            String catalogName = (String) extractorConfig.getValues().get(ExtractorConstants.CATALOG);
+            String tableName = (String) extractorConfig.getValues().get(ExtractorConstants.TABLE);
+
+            final String splitSep = separator.toString();
+            final ArrayList<SchemaMap<?>> columns = (ArrayList<SchemaMap<?>>) extractorConfig.getValues().get
+                    (ExtractorConstants.HDFS_SCHEMA);
+
+            final TextFileDataTable textFileDataTableTemp = new TextFileDataTable(new TableName(catalogName, tableName),
+                    columns);
+            textFileDataTableTemp.setLineSeparator(splitSep);
+            return textFileDataTableTemp;
+        }
 
 
-        return textFileDataTable;
+
     }
 
 }
