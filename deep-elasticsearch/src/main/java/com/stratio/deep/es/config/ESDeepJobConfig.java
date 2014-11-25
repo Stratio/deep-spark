@@ -21,6 +21,7 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,6 @@ import org.elasticsearch.hadoop.mr.EsOutputFormat;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.HadoopConfig;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.utils.Utils;
 import com.stratio.deep.es.extractor.ESCellExtractor;
@@ -43,31 +43,17 @@ import com.stratio.deep.es.utils.UtilES;
 /**
  * @param <T>
  */
-public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig> implements IESDeepJobConfig<T> {
+public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig<T>> implements IESDeepJobConfig<T> {
     private static final long serialVersionUID = -7179376653643603038L;
 
 
-    /**
-     * A list of elasticsearch host to connect
-     */
-    private List<String> hostList = new ArrayList<>();
-
-
-
-    private String index;
-
-    private String type;
-
-
-
-    private List<String> inputColumns = new ArrayList<>();
 
     /**
      * OPTIONAL filter query
      */
     private String query;
 
-    private Map<String, Object> customConfiguration;
+    private Map<String, Serializable> customConfiguration;
 
 
 
@@ -84,45 +70,10 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig> impleme
     }
 
 
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-
-//    @Override
-//    public ESDeepJobConfig<T> pageSize(int pageSize) {
-//        return this;
-//    }
-
-    @Override
-    public Class<T> getEntityClass() {
-        return entityClass;
-    }
-
-    @Override
-    public String getHost() {
-        if (hostList.isEmpty()) {
-            return null;
-        }
-        return hostList.get(0);
-    }
-
-//    @Override
-//    public String[] getInputColumns() {
-//        return fields;
-//    }
-
-
-    @Override
-    public ESDeepJobConfig<T> host(String host) {
-        hostList.add(host);
-        return this;
-    }
 
 
     public String getResource(){
-        return type!=null?index.concat("/").concat(type):index;
+        return table!=null?catalog.concat("/").concat(table):catalog;
     }
     /**
      * {@inheritDoc}
@@ -142,11 +93,12 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig> impleme
             configHadoop.set(ConfigurationOptions.ES_QUERY, query);
         }
 
-        if(!inputColumns.isEmpty()){
-            configHadoop.set(ConfigurationOptions.ES_SCROLL_FIELDS, Utils.splitListByComma(inputColumns));
+        if(inputColumns!=null && inputColumns.length>0){
+            configHadoop.set(ConfigurationOptions.ES_SCROLL_FIELDS, Utils.splitListByComma(Arrays.asList
+                    (inputColumns)));
         }
 
-        configHadoop.set(ConfigurationOptions.ES_NODES, Utils.splitListByComma(hostList));
+        configHadoop.set(ConfigurationOptions.ES_NODES, Utils.splitListByComma(host));
         configHadoop.set(ConfigurationOptions.ES_PORT, String.valueOf(port));
         configHadoop.set(ConfigurationOptions.ES_INPUT_JSON, "yes");
 
@@ -164,10 +116,10 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig> impleme
         // configHadoop.set("es.write.operation","");
 
         if (customConfiguration != null) {
-            Set<Map.Entry<String, Object>> set = customConfiguration.entrySet();
-            Iterator<Map.Entry<String, Object>> iterator = set.iterator();
+            Set<Map.Entry<String, Serializable>> set = customConfiguration.entrySet();
+            Iterator<Map.Entry<String, Serializable>> iterator = set.iterator();
             while (iterator.hasNext()) {
-                Map.Entry<String, Object> entry = iterator.next();
+                Map.Entry<String, Serializable> entry = iterator.next();
                 configHadoop.set(entry.getKey(), entry.getValue().toString());
             }
 
@@ -179,54 +131,17 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig> impleme
      * validates connection parameters
      */
     private void validate() {
-        if (hostList.isEmpty()) {
+        if (host.isEmpty()) {
             throw new IllegalArgumentException("host cannot be null");
         }
-        if (index == null) {
+        if (catalog == null) {
             throw new IllegalArgumentException("index cannot be null");
         }
-        if (type == null) {
+        if (table == null) {
             throw new IllegalArgumentException("type cannot be null");
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public ESDeepJobConfig<T> inputColumns(String... columns) {
-        List<String> fields = new ArrayList<>();
-        for (String field : columns){
-            fields.add(field.trim());
-        }
-
-        inputColumns.addAll(fields);
-
-        return this;
-    }
-
-    @Override
-    public ESDeepJobConfig<T> password(String password) {
-        this.password = password;
-        return this;
-    }
-
-    @Override
-    public ESDeepJobConfig<T> username(String username) {
-        this.username = username;
-        return this;
-    }
-
-    @Override
-    public ESDeepJobConfig<T> database(String database) {
-        this.index = database;
-        return this;
-    }
-
-    @Override
-    public ESDeepJobConfig<T> host(List<String> host) {
-        hostList.addAll(host);
-        return this;
-    }
 
     /**
      * {@inheritDoc}
@@ -250,19 +165,10 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig> impleme
         return null;
     }
 
-    @Override
-    public ESDeepJobConfig<T> inputKey(String inputKey) {
-        return null;
-    }
-
-    @Override
-    public List<String> getHostList() {
-        return hostList;
-    }
 
     @Override
     public ESDeepJobConfig<T> type(String type) {
-        this.type=type;
+        this.table=type;
         return this;
     }
 
@@ -272,24 +178,24 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig> impleme
      * @return
      */
     public ESDeepJobConfig<T> tipe(String type) {
-        this.type=type;
+        this.table=type;
         return this;
     }
 
     @Override
     public ESDeepJobConfig<T> index(String index) {
-        this.index=index;
+        this.catalog=index;
         return this;
     }
 
     @Override
     public String getType() {
-        return type;
+        return table;
     }
 
     @Override
     public String getIndex() {
-        return index;
+        return catalog;
     }
 
     @Override
@@ -304,44 +210,21 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig> impleme
 
     @Override
     public ESDeepJobConfig<T> customConfiguration(Map<String, Serializable> customConfiguration) {
-        return null;
+        this.customConfiguration = customConfiguration;
+        return this;
     }
 
     @Override
     public Map<String, Serializable> getCustomConfiguration() {
-        return null;
+        return customConfiguration;
     }
 
     @Override
     public ESDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
-
+        super.initialize(extractorConfig);
 
         Map<String, String> values = extractorConfig.getValues();
 
-        if (values.get(ExtractorConstants.USERNAME) != null) {
-            username(extractorConfig.getString(ExtractorConstants.USERNAME));
-        }
-
-        if (values.get(ExtractorConstants.PASSWORD) != null) {
-            password(extractorConfig.getString(ExtractorConstants.PASSWORD));
-        }
-
-        if (values.get(ExtractorConstants.HOST) != null) {
-            host(extractorConfig.getString(ExtractorConstants.HOST));
-        }
-
-        if (values.get(ExtractorConstants.PORT) != null) {
-            port(extractorConfig.getInteger(ExtractorConstants.PORT));
-        }
-
-        if(values.get(ExtractorConstants.INDEX)!=null){
-            index = extractorConfig.getString(ExtractorConstants.INDEX);
-
-        }
-
-        if(values.get(ExtractorConstants.TYPE)!= null){
-            type = extractorConfig.getString(ExtractorConstants.TYPE);
-        }
 
         if (values.get(INPUT_COLUMNS) != null) {
             inputColumns(extractorConfig.getStringArray(INPUT_COLUMNS));
@@ -364,10 +247,5 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig> impleme
         return this;
     }
 
-
-    public ESDeepJobConfig<T> port(int port) {
-        this.port = port;
-        return this;
-    }
 
 }

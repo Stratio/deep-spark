@@ -26,6 +26,7 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNA
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -76,9 +77,9 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
     protected List<String> host = new ArrayList<>();
 
     /**
-     * The Fields.
+     * The inputColumns.
      */
-    protected String[] fields;
+    protected String[] inputColumns;
 
 
     /**
@@ -155,16 +156,13 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
         return table;
     }
 
-
-    /**
-     * Get fields.
-     *
-     * @return the string [ ]
-     */
-    public String[] getFields() {
-        return fields;
+    public String[] getInputColumns() {
+        return inputColumns;
     }
 
+    public Filter[] getFilters() {
+        return filters;
+    }
 
     /**
      * Gets port.
@@ -221,7 +219,7 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
         }
 
         if (values.get(INPUT_COLUMNS) != null) {
-            fields(extractorConfig.getStringArray(INPUT_COLUMNS));
+            inputColumns(extractorConfig.getStringArray(INPUT_COLUMNS));
         }
 
         if (values.get(DATABASE) != null) {
@@ -236,20 +234,20 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
      * @param hostName the hostname
      * @return the deep job config
      */
-    public DeepJobConfig host(String hostName) {
+    public S host(String hostName) {
         host.add(hostName);
-        return this;
+        return (S) this;
     }
 
-    public DeepJobConfig host(String... hostNames) {
+    public S host(String... hostNames) {
         for(String hostName : hostNames)
         host.add(hostName);
-        return this;
+        return (S) this;
     }
 
-    public DeepJobConfig host(List<String> hostNames) {
+    public S host(List<String> hostNames) {
         this.host.addAll(hostNames);
-        return this;
+        return (S) this;
     }
     /**
      * Password s.
@@ -297,11 +295,11 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
 
     /**
      *
-     * @param fields
+     * @param inputColumns
      * @return
      */
-    public S fields(String[] fields) {
-        this.fields=fields;
+    public S inputColumns(String[] inputColumns) {
+        this.inputColumns=inputColumns;
         return (S) this;
     }
 
@@ -323,5 +321,22 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
      */
     public S initialize(){
         return (S) this;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("DeepJobConfig{");
+        sb.append("username='").append(username).append('\'');
+        sb.append(", password='").append(password).append('\'');
+        sb.append(", nameSpace='").append(nameSpace).append('\'');
+        sb.append(", catalog='").append(catalog).append('\'');
+        sb.append(", table='").append(table).append('\'');
+        sb.append(", port=").append(port);
+        sb.append(", host=").append(host);
+        sb.append(", inputColumns=").append(inputColumns == null ? "null" : Arrays.asList(inputColumns).toString());
+        sb.append(", filters=").append(filters == null ? "null" : Arrays.asList(filters).toString());
+        sb.append('}');
+        sb.append(super.toString());
+        return sb.toString();
     }
 }

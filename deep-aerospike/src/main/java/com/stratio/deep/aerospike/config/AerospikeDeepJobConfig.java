@@ -40,7 +40,8 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.*;
  * Configuration class for Aerospike-Spark integration
  * @param <T>
  */
-public class AerospikeDeepJobConfig<T> extends HadoopConfig<T, AerospikeDeepJobConfig> implements IAerospikeDeepJobConfig<T>, Serializable{
+public class AerospikeDeepJobConfig<T> extends HadoopConfig<T, AerospikeDeepJobConfig<T>> implements
+        IAerospikeDeepJobConfig<T>, Serializable{
 
     private static final long serialVersionUID = 2778930913494063818L;
 
@@ -107,6 +108,12 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T, AerospikeDeepJobC
     @Override
     public AerospikeDeepJobConfig<T> port(List<Integer> port) {
         this.portList.addAll(port);
+        return this;
+    }
+
+    @Override
+    public AerospikeDeepJobConfig<T> port(Integer port) {
+        this.portList.add(port);
         return this;
     }
 
@@ -284,15 +291,10 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T, AerospikeDeepJobC
 
     @Override
     public AerospikeDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
+        super.initialize(extractorConfig);
+
         Map<String, Serializable> values = extractorConfig.getValues();
 
-        if (values.get(HOST) != null) {
-            host((extractorConfig.getStringArray(HOST)));
-        }
-
-        if(values.get(PORT)!=null){
-            port((extractorConfig.getInteger(PORT)));
-        }
 
         if(values.get(NAMESPACE)!=null){
             namespace(extractorConfig.getString(NAMESPACE));
@@ -304,10 +306,6 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T, AerospikeDeepJobC
 
         if (values.get(FILTER_QUERY) != null) {
             filterQuery(extractorConfig.getFilterArray(FILTER_QUERY));
-        }
-
-        if (values.get(INPUT_COLUMNS) != null) {
-//            inputColumns(extractorConfig.getStringArray(INPUT_COLUMNS));
         }
 
         this.initialize();

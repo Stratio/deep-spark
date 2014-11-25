@@ -159,8 +159,8 @@ public class DeepRecordReader implements IDeepRecordReader {
     private void initialize() {
         cfName = config.getTable();
 
-        if (!ArrayUtils.isEmpty(config.getFields())) {
-            columns = StringUtils.join(config.getFields(), ",");
+        if (!ArrayUtils.isEmpty(config.getInputColumns())) {
+            columns = StringUtils.join(config.getInputColumns(), ",");
         }
 
         partitioner = Utils.newTypeInstance(config.getPartitionerClassName(), IPartitioner.class);
@@ -252,8 +252,8 @@ public class DeepRecordReader implements IDeepRecordReader {
          * @return the boolean
          */
         private boolean isColumnWanted(String columnName) {
-            return ArrayUtils.isEmpty(config.getFields()) ||
-                    ArrayUtils.contains(config.getFields(), columnName);
+            return ArrayUtils.isEmpty(config.getInputColumns()) ||
+                    ArrayUtils.contains(config.getInputColumns(), columnName);
         }
 
         /**

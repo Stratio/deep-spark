@@ -36,7 +36,7 @@ public class MongoEntityExtractorFT extends ExtractorEntityTest {
     private static final Logger LOG = LoggerFactory.getLogger(MongoEntityExtractorFT.class);
 
     public MongoEntityExtractorFT() {
-        super(MongoEntityExtractor.class, "localhost:27890", null, false);
+        super(MongoEntityExtractor.class, "localhost", 27890, false);
     }
 
 

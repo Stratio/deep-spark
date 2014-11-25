@@ -76,7 +76,7 @@ public class DeepRecordReaderTest {
         // Stubbing
         when(config.getPageSize()).thenReturn(PAGE_SIZE_CONSTANT);
         when(config.getTable()).thenReturn(TABLE_NAME_CONSTANT);
-        when(config.getFields()).thenReturn(INPUT_COLUMNS_CONSTANT);
+        when(config.getInputColumns()).thenReturn(INPUT_COLUMNS_CONSTANT);
         when(config.fetchTableMetadata()).thenReturn(tableMetadata);
         when(config.getEqualsInValue()).thenReturn(equalsInValue);
         when(config.getPartitionerClassName()).thenReturn("org.apache.cassandra.dht.Murmur3Partitioner");

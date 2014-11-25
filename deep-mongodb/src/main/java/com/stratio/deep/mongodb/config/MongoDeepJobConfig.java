@@ -49,6 +49,7 @@ import org.bson.BSONObject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
+import com.mongodb.ReadPreference;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.HadoopConfig;
@@ -85,7 +86,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
      * Read Preference primaryPreferred is the recommended read preference. If the primary node go down, can still read
      * from secundaries
      */
-    private String readPreference;
+    private String readPreference = ReadPreference.nearest().getName();
 
     /**
      * OPTIONAL filter query
@@ -337,7 +338,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
     @Override
     public MongoDeepJobConfig<T> initialize() {
         validate();
-
+        super.initialize();
         configHadoop = new JobConf();
         configHadoop = new Configuration();
         StringBuilder connection = new StringBuilder();
@@ -353,7 +354,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
             if (!firstHost) {
                 connection.append(",");
             }
-            connection.append(host);
+            connection.append(hostName);
             firstHost = false;
         }
 
@@ -446,6 +447,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
     /**
      * {@inheritDoc}
      */
+    @Override
     public MongoDeepJobConfig<T> inputColumns(String... columns) {
         DBObject bsonFields = fields != null ? fields : new BasicDBObject();
         boolean isIdPresent = false;
@@ -668,5 +670,25 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
 
     public DBObject getDBFields() {
         return fields;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("MongoDeepJobConfig{");
+        sb.append("configHadoop=").append(configHadoop);
+        sb.append(", replicaSet='").append(replicaSet).append('\'');
+        sb.append(", readPreference='").append(readPreference).append('\'');
+        sb.append(", query=").append(query);
+        sb.append(", fields=").append(fields);
+        sb.append(", sort='").append(sort).append('\'');
+        sb.append(", inputKey='").append(inputKey).append('\'');
+        sb.append(", createInputSplit=").append(createInputSplit);
+        sb.append(", useShards=").append(useShards);
+        sb.append(", splitsUseChunks=").append(splitsUseChunks);
+        sb.append(", splitSize=").append(splitSize);
+        sb.append(", customConfiguration=").append(customConfiguration);
+        sb.append('}');
+        sb.append(super.toString());
+        return sb.toString();
     }
 }

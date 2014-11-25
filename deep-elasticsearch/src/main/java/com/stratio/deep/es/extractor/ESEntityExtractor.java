@@ -58,7 +58,7 @@ public final class ESEntityExtractor<T>
      */
     @Override
     public T transformElement(Tuple2<Object, LinkedMapWritable> tuple,
-            DeepJobConfig<T,?> config) {
+            DeepJobConfig<T,ESDeepJobConfig<T>> config) {
 
         try {
             return (T) UtilES.getObjectFromJson(config.getEntityClass(), tuple._2());

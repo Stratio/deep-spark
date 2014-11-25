@@ -92,8 +92,7 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, K
         if (config instanceof ExtractorConfig) {
             addSparkIdToDeepJobConfig((ExtractorConfig) config);
         } else if (config instanceof DeepJobConfig) {
-            deepJobConfig = ((DeepJobConfig) config);
-            deepJobConfig.initialize();
+            deepJobConfig = (DeepJobConfig)((DeepJobConfig) config).initialize();
         }
 
         int id = config.getRddId();
@@ -176,7 +175,7 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, K
         deepJobConfig.setRddId(id);
     }
 
-    public abstract T transformElement(Tuple2<K, V> tuple, DeepJobConfig<T, ?> config);
+    public abstract T transformElement(Tuple2<K, V> tuple, DeepJobConfig<T, S> config);
 
     @Override
     public void saveRDD(T t) {

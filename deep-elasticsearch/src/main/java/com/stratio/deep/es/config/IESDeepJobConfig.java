@@ -29,19 +29,6 @@ public interface IESDeepJobConfig<T> {
 
 
     /**
-     * The ES's database name
-     */
-    IESDeepJobConfig<T> database(String database);
-
-    /**
-     * Sets the list of available ElasticSearch hosts.
-     *
-     * @param host the list of available ElasticSearch hosts.
-     * @return this object.
-     */
-    IESDeepJobConfig<T> host(List<String> host);
-
-    /**
      * @return the hadoop configuration object if the concrete implementation has one, null otherwise.
      */
     Configuration getHadoopConfiguration();
@@ -62,16 +49,7 @@ public interface IESDeepJobConfig<T> {
      */
     IESDeepJobConfig<T> sort(String sort);
 
-    /**
-     * @param inputKey
-     * @return this object.
-     */
-    IESDeepJobConfig<T> inputKey(String inputKey);
 
-    /**
-     * @return Hosts list
-     */
-    List<String> getHostList();
 
     ESDeepJobConfig<T> type(String type);
 
@@ -80,8 +58,6 @@ public interface IESDeepJobConfig<T> {
     String getType();
 
     String getIndex();
-
-    String getNameSpace();
 
 
     /**
