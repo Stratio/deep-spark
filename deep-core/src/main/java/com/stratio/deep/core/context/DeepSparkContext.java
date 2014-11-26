@@ -181,7 +181,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         final TextFileDataTable textFileDataTable = createTextFileMetaDataFromConfig(config);
 
         if(config.getExtractorImplClassName().equals(ExtractorConstants.HDFS)){
-            path = ExtractorConstants.HDFS_PREFIX + host.toString() + ":" + port + "/" + path.toString();
+            path = ExtractorConstants.HDFS_PREFIX + host.toString() + ":" + port + path.toString();
         }else{
             path = path.toString();
         }
