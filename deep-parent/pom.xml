@@ -36,7 +36,7 @@
 
         <java.version>1.7</java.version>
 
-        <hadoop.version>2.4.0</hadoop.version>
+        <hadoop.version>2.4.1</hadoop.version>
 
         <!-- Artifacts include -->
         <distribution.include>
@@ -383,9 +383,24 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+            <version>${hadoop.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <artifactId>guava</artifactId>
             <groupId>com.google.guava</groupId>
-            <version>16.0</version>
+            <version>15.0</version>
         </dependency>
 
         <!-- test -->
