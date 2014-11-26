@@ -15,7 +15,7 @@ import com.stratio.deep.core.hdfs.utils.SchemaMap;
 import com.stratio.deep.examples.java.extractorconfig.hdfs.utils.ContextProperties;
 
 
-public class AgregationData2 {
+public class AgregationData {
 
     /**
      * Application entry point.

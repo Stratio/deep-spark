@@ -35,6 +35,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
 
@@ -53,6 +54,18 @@ public class DeepSparkContextTest {
         DeepRDD deepRDD = createDeepRDD(deepSparkContext.sc(), deepJobConfig);
 
         DeepRDD rddReturn = (DeepRDD) deepSparkContext.createRDD(deepJobConfig);
+
+        assertSame("The DeepRDD is the same", deepRDD, rddReturn);
+
+    }
+
+    @Test
+    public void createHDFSRDDTest() throws Exception {
+        DeepSparkContext deepSparkContext = createDeepSparkContext();
+        ExtractorConfig<Cells> deepJobConfig = createDeepJobConfig();
+        DeepRDD deepRDD = createDeepRDD(deepSparkContext.sc(), deepJobConfig);
+
+        JavaRDD rddReturn = deepSparkContext.createHDFSRDD(deepJobConfig);
 
         assertSame("The DeepRDD is the same", deepRDD, rddReturn);
 
