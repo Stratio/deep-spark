@@ -49,7 +49,7 @@ public interface ICassandraDeepJobConfig<T> {
      * @throws com.stratio.deep.commons.exception.DeepNoSuchFieldException   if the specified field is not a valid column in
      *                                                                       Cassandra.
      */
-    public ICassandraDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue);
+
 
     /**
      * Fetches table metadata from the underlying datastore and generates a Map<K, V> where the key is the column name, and the value
@@ -64,14 +64,14 @@ public interface ICassandraDeepJobConfig<T> {
      *
      * @return the map of configured additional filters.
      */
-    public abstract Map<String, Serializable> getAdditionalFilters();
+    Map<String, Serializable> getAdditionalFilters();
 
     /**
      * Returns the partitioner class name.
      *
      * @return the partitioner class name.
      */
-    public abstract String getPartitionerClassName();
+    String getPartitionerClassName();
 
     /**
      * Let's the user specify an alternative partitioner class. The default partitioner is
@@ -80,21 +80,21 @@ public interface ICassandraDeepJobConfig<T> {
      * @param partitionerClassName the partitioner class name.
      * @return this object.
      */
-    public abstract ICassandraDeepJobConfig<T> partitioner(String partitionerClassName);
+    ICassandraDeepJobConfig<T> partitioner(String partitionerClassName);
 
     /**
      * Returns the session opened to the cassandra server.
      *
      * @return the Session opened by this configuration object to the cassandra server.
      */
-    public abstract Session getSession();
+    Session getSession();
 
     /**
      * Returns the name of the keyspace.
      *
      * @return the name of the configured keyspace.
      */
-    public abstract String getKeyspace();
+    String getKeyspace();
 
     /**
      * RPC port where the remote Cassandra cluster is listening to.
@@ -102,7 +102,7 @@ public interface ICassandraDeepJobConfig<T> {
      *
      * @return the thrift port.
      */
-    public abstract Integer getRpcPort();
+    Integer getRpcPort();
 
     /**
      * CQL port where the remote Cassandra cluster is listening to.
@@ -110,7 +110,7 @@ public interface ICassandraDeepJobConfig<T> {
      *
      * @return the cql port.
      */
-    public abstract Integer getCqlPort();
+    Integer getCqlPort();
 
     ICassandraDeepJobConfig<T> filters(Filter... filters);
 
@@ -122,7 +122,7 @@ public interface ICassandraDeepJobConfig<T> {
      * @param keyspace the keyspace to use.
      * @return this object.
      */
-    public abstract ICassandraDeepJobConfig<T> keyspace(String keyspace);
+    ICassandraDeepJobConfig<T> keyspace(String keyspace);
 
     /**
      * Sets cassandra host rpcPort.
@@ -130,7 +130,7 @@ public interface ICassandraDeepJobConfig<T> {
      * @param port the thrift port number.
      * @return this object.
      */
-    public abstract ICassandraDeepJobConfig<T> rpcPort(Integer port);
+    ICassandraDeepJobConfig<T> rpcPort(Integer port);
 
     /**
      * Sets cassandra host rpcPort.
@@ -138,7 +138,7 @@ public interface ICassandraDeepJobConfig<T> {
      * @param port the cql port number.
      * @return this object.
      */
-    public abstract ICassandraDeepJobConfig<T> cqlPort(Integer port);
+    ICassandraDeepJobConfig<T> cqlPort(Integer port);
 
     /**
      * Sets read consistency level. <br/>
@@ -148,7 +148,7 @@ public interface ICassandraDeepJobConfig<T> {
      * @param level the read consistency level to use.
      * @return this configuration object.
      */
-    public abstract ICassandraDeepJobConfig<T> readConsistencyLevel(String level);
+    ICassandraDeepJobConfig<T> readConsistencyLevel(String level);
 
     /**
      * Sets write consistency level. <br/>
@@ -158,21 +158,21 @@ public interface ICassandraDeepJobConfig<T> {
      * @param level the write consistency level to use.
      * @return this configuration object.
      */
-    public abstract ICassandraDeepJobConfig<T> writeConsistencyLevel(String level);
+    ICassandraDeepJobConfig<T> writeConsistencyLevel(String level);
 
     /**
      * Returns the configured read consistency level.
      *
      * @return the read consistency level.
      */
-    public abstract String getReadConsistencyLevel();
+    String getReadConsistencyLevel();
 
     /**
      * Returns the configured write consistency level.
      *
      * @return the write consistency level.
      */
-    public abstract String getWriteConsistencyLevel();
+    String getWriteConsistencyLevel();
 
     /**
      * Sets the token range bisect factor.
@@ -182,12 +182,12 @@ public interface ICassandraDeepJobConfig<T> {
      * @param bisectFactor the bisect factor to use.
      * @return this configuration object.
      */
-    public abstract ICassandraDeepJobConfig<T> bisectFactor(int bisectFactor);
+    ICassandraDeepJobConfig<T> bisectFactor(int bisectFactor);
 
     /**
      * @return the configured bisect factor.
      */
-    public int getBisectFactor();
+    int getBisectFactor();
 
     /**
      * Sets the underlying datastore table or collection from which data will be read from.
@@ -195,7 +195,7 @@ public interface ICassandraDeepJobConfig<T> {
      * @param table the table name.
      * @return this configuration object.
      */
-    public abstract ICassandraDeepJobConfig<T> table(String table);
+    ICassandraDeepJobConfig<T> table(String table);
 
     /**
      * Returns the name of the configured column family.
@@ -203,7 +203,7 @@ public interface ICassandraDeepJobConfig<T> {
      *
      * @return the table name.
      */
-    public abstract String getTable();
+    String getTable();
 
     /**
      * Sets the cassandra CF from which data will be read from.
@@ -212,28 +212,28 @@ public interface ICassandraDeepJobConfig<T> {
      * @param columnFamily the table name data will be fetched from.
      * @return this configuration object.
      */
-    public abstract ICassandraDeepJobConfig<T> columnFamily(String columnFamily);
+    ICassandraDeepJobConfig<T> columnFamily(String columnFamily);
 
     /**
      * Returns whether this configuration config is suitable for writing out data to the datastore.
      *
      * @return true if this configuratuon object is suitable for writing to cassandra, false otherwise.
      */
-    public abstract Boolean getIsWriteConfig();
+    Boolean getIsWriteConfig();
 
     /**
      * Sets the batch size used to write to Cassandra.
      *
      * @return this object.
      */
-    public abstract ICassandraDeepJobConfig<T> batchSize(int batchSize);
+    ICassandraDeepJobConfig<T> batchSize(int batchSize);
 
     /**
      * Returns the batch size used for writing objects to the underying Cassandra datastore.
      *
      * @return the batch size.
      */
-    public abstract int getBatchSize();
+    int getBatchSize();
 
     /**
      * Returns whether or not in this configuration object we specify to automatically create
@@ -241,7 +241,7 @@ public interface ICassandraDeepJobConfig<T> {
      *
      * @return true if this configuration object has been configured to create missing tables on writes.
      */
-    public abstract Boolean isCreateTableOnWrite();
+    Boolean isCreateTableOnWrite();
 
     /**
      * Whether or not to create the output column family on write.<br/>.
@@ -251,21 +251,21 @@ public interface ICassandraDeepJobConfig<T> {
      * @param createTableOnWrite a boolean that tells this configuration obj to create missing tables on write.
      * @return this configuration object.
      */
-    public abstract ICassandraDeepJobConfig<T> createTableOnWrite(Boolean createTableOnWrite);
+    ICassandraDeepJobConfig<T> createTableOnWrite(Boolean createTableOnWrite);
 
     /**
      * Returns the name of the configured column family.
      *
      * @return the configured column family.
      */
-    public abstract String getColumnFamily();
+    String getColumnFamily();
 
     /**
      * Sets the session to use. If a session is not provided, this object will open a new one.
      *
      * @param session the session to use.
      */
-    public abstract ICassandraDeepJobConfig<T> session(Session session);
+    ICassandraDeepJobConfig<T> session(Session session);
 
     ICassandraDeepJobConfig<T> splitSize(int splitSize);
 

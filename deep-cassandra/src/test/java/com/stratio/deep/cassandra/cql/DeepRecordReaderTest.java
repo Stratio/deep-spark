@@ -106,8 +106,6 @@ public class DeepRecordReaderTest {
         // TODO Apply the matcher to check the field into the statement
         when(session.execute(any(Statement.class))).thenReturn(resultSet);
 
-        DeepRecordReader recordReader = new DeepRecordReader(config, tokenRange);
-
         Object[] statementValues = Whitebox.getInternalState(stmt, "values");
         assert (statementValues[0] == values[0]);
         assert (statementValues[1] == values[1]);

@@ -60,10 +60,10 @@ public final class ESCellExtractor
      */
     @Override
     public Cells transformElement(Tuple2<Object, LinkedMapWritable> tuple,
-            DeepJobConfig<Cells> config) {
+            DeepJobConfig<Cells,ESDeepJobConfig<Cells>> config) {
 
         try {
-            return UtilES.getCellFromJson(tuple._2(), ((IESDeepJobConfig) deepJobConfig).getNameSpace());
+            return UtilES.getCellFromJson(tuple._2(), deepJobConfig.getNameSpace());
         } catch (Exception e) {
             LOG.error("Cannot convert JSON: ", e);
             throw new DeepTransformException("Could not transform from Json to Cell " + e.getMessage());

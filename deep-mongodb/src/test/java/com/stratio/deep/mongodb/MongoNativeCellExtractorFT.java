@@ -38,7 +38,7 @@ public class MongoNativeCellExtractorFT extends ExtractorCellTest {
     private static final Logger LOG = LoggerFactory.getLogger(MongoNativeCellExtractorFT.class);
 
     public MongoNativeCellExtractorFT() {
-        super(MongoNativeCellExtractor.class, "localhost:27890", null, true);
+        super(MongoNativeCellExtractor.class, "localhost", 27890, true);
     }
 
 }

@@ -40,7 +40,8 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.*;
  * Configuration class for Aerospike-Spark integration
  * @param <T>
  */
-public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAerospikeDeepJobConfig<T>, Serializable{
+public class AerospikeDeepJobConfig<T> extends HadoopConfig<T, AerospikeDeepJobConfig<T>> implements
+        IAerospikeDeepJobConfig<T>, Serializable{
 
     private static final long serialVersionUID = 2778930913494063818L;
 
@@ -49,16 +50,7 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
      */
     private transient Configuration configHadoop;
 
-    /**
-     * A list of aerospike hosts to connect.
-     */
-    private List<String> hostList = new ArrayList<>();
-
-    /**
-     * A list of aerospike ports to connect.
-     */
     private List<Integer> portList = new ArrayList<>();
-
     /**
      * Aerospike's set name.
      */
@@ -97,36 +89,8 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getHost() {
-        return !hostList.isEmpty() ? hostList.get(0) : null;
-    }
 
-    public List<String> getHostList() {
-        return hostList;
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AerospikeDeepJobConfig<T> host(String host) {
-        this.hostList.add(host);
-        return this;
-    }
-
-    /**
-     * Set Aerospike connection port.
-     * @param port
-     * @return
-     */
-    public AerospikeDeepJobConfig<T> port(int port) {
-        this.portList.add(port);
-        return this;
-    }
 
     /**
      * Gets first Aerospike node connection port.
@@ -136,14 +100,7 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         return !portList.isEmpty() ? portList.get(0) : null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AerospikeDeepJobConfig<T> host(List<String> host) {
-        this.hostList.addAll(host);
-        return this;
-    }
+
 
     /**
      * {@inheritDoc}
@@ -151,6 +108,12 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
     @Override
     public AerospikeDeepJobConfig<T> port(List<Integer> port) {
         this.portList.addAll(port);
+        return this;
+    }
+
+    @Override
+    public AerospikeDeepJobConfig<T> port(Integer port) {
+        this.portList.add(port);
         return this;
     }
 
@@ -163,15 +126,7 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         return this;
     }
 
-    /**
-     * Set Aerospike nodes' hosts.
-     * @param hosts
-     * @return
-     */
-    public AerospikeDeepJobConfig<T> host(String[] hosts) {
-        this.hostList.addAll(Arrays.asList(hosts));
-        return this;
-    }
+
 
     /**
      * Set Aerospike nodes' ports.
@@ -205,22 +160,6 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String[] getInputColumns() {
-        return fields;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AerospikeDeepJobConfig<T> inputColumns(String... columns) {
-        fields = columns;
-        return this;
-    }
 
     @Override
     public String getBin() {
@@ -320,7 +259,7 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
      * Validates connection parameters.
      */
     private void validate() {
-        if (hostList.isEmpty()) {
+        if (host.isEmpty()) {
             throw new IllegalArgumentException("host cannot be null");
         }
         if (nameSpace == null) {
@@ -332,7 +271,7 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
         if (portList.isEmpty()) {
             throw new IllegalArgumentException("port cannot be null");
         }
-        if (hostList.size() != portList.size()) {
+        if (host.size() != portList.size()) {
             throw new IllegalArgumentException("Host and ports cardinality must be the same");
         }
 
@@ -352,15 +291,10 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
 
     @Override
     public AerospikeDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
+        super.initialize(extractorConfig);
+
         Map<String, Serializable> values = extractorConfig.getValues();
 
-        if (values.get(HOST) != null) {
-            host((extractorConfig.getStringArray(HOST)));
-        }
-
-        if(values.get(PORT)!=null){
-            port((extractorConfig.getInteger(PORT)));
-        }
 
         if(values.get(NAMESPACE)!=null){
             namespace(extractorConfig.getString(NAMESPACE));
@@ -372,10 +306,6 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T> implements IAeros
 
         if (values.get(FILTER_QUERY) != null) {
             filterQuery(extractorConfig.getFilterArray(FILTER_QUERY));
-        }
-
-        if (values.get(INPUT_COLUMNS) != null) {
-            inputColumns(extractorConfig.getStringArray(INPUT_COLUMNS));
         }
 
         this.initialize();

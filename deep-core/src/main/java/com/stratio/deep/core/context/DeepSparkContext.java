@@ -122,7 +122,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         return new DeepRDD<>(this.sc(), config);
     }
 
-    public <T> RDD<T> createRDD(DeepJobConfig<T> deepJobConfig) {
+    public <T> RDD<T> createRDD(DeepJobConfig<T, ?> deepJobConfig) {
         return new DeepRDD<>(this.sc(),deepJobConfig);
     }
 
@@ -139,8 +139,8 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         return (JavaRDD<T>)new DeepJavaRDD<>((DeepRDD<T, ExtractorConfig<T>>) createRDD(config));
     }
 
-    public <T> JavaRDD<T> createJavaRDD(DeepJobConfig<T> config) {
-        return (JavaRDD<T>)new DeepJavaRDD<>((DeepRDD<T, DeepJobConfig<T>>) createRDD(config));
+    public <T> JavaRDD<T> createJavaRDD(DeepJobConfig<T, ?> config) {
+        return (JavaRDD<T>)new DeepJavaRDD<>((DeepRDD<T, DeepJobConfig<T,?>>) createRDD(config));
     }
 
 

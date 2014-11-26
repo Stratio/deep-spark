@@ -75,7 +75,8 @@ import com.stratio.deep.commons.utils.Pair;
  * Base class for all config implementations providing default implementations for methods defined in
  * {@link ICassandraDeepJobConfig}.
  */
-public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> implements AutoCloseable,
+public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, CassandraDeepJobConfig<T>> implements
+        AutoCloseable,
         ICassandraDeepJobConfig<T> {
 
     private static final Logger LOG = Logger.getLogger("com.stratio.deep.config.GenericICassandraDeepJobConfig");
@@ -99,7 +100,6 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
      */
     private final Map<String, Serializable> additionalFilters = new TreeMap<>();
 
-    private Filter[] filters;
 
     /**
      * Defines a projection over the CF columns.
@@ -168,7 +168,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
         if (session == null) {
             Cluster cluster = Cluster.builder()
                     .withPort(this.cqlPort)
-                    .addContactPoint(this.host)
+                    .addContactPoint(this.getHost())
                     .withCredentials(this.username, this.password)
                     .withProtocolVersion(ProtocolVersion.V2)
                     .build();
@@ -398,23 +398,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
         return getColumnFamily();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.stratio.deep.config.IICassandraDeepJobConfig#getHost()
-     */
 
-    @Override
-    public String getHost() {
-        checkInitialized();
-        return host;
-    }
-
-    @Override
-    public String[] getInputColumns() {
-        checkInitialized();
-        return inputColumns == null ? new String[0] : inputColumns.clone();
-    }
 
     /*
      * (non-Javadoc)
@@ -468,26 +452,8 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
         return cqlPort;
     }
 
-    /**
-     * {@inheritDoc}
-     */
 
-    @Override
-    public String getUsername() {
-        checkInitialized();
-        return username;
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-
-    @Override
-    public CassandraDeepJobConfig<T> host(String hostname) {
-        this.host = hostname;
-
-        return this;
-    }
 
     /**
      * {@inheritDoc}
@@ -499,12 +465,12 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
             return this;
         }
 
-        if (StringUtils.isEmpty(host)) {
+        if (StringUtils.isEmpty(getHost())) {
             try {
-                host = InetAddress.getLocalHost().getCanonicalHostName();
+                host.add(InetAddress.getLocalHost().getCanonicalHostName());
             } catch (UnknownHostException e) {
                 LOG.warn("Cannot resolve local host canonical name, using \"localhost\"");
-                host = InetAddress.getLoopbackAddress().getCanonicalHostName();
+                host.add(InetAddress.getLoopbackAddress().getCanonicalHostName());
             }
         }
 
@@ -518,20 +484,9 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
 
     @Override
     public CassandraDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
+        super.initialize(extractorConfig);
 
         Map<String, Serializable> values = extractorConfig.getValues();
-
-        if (values.get(USERNAME) != null) {
-            username(extractorConfig.getString(USERNAME));
-        }
-
-        if (values.get(PASSWORD) != null) {
-            password(extractorConfig.getString(PASSWORD));
-        }
-
-        if (values.get(HOST) != null) {
-            host(extractorConfig.getString(HOST));
-        }
 
         if (values.get(BATCHSIZE) != null) {
             batchSize(extractorConfig.getInteger(BATCHSIZE));
@@ -539,15 +494,6 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
 
         if (values.get(CQLPORT) != null) {
             cqlPort(extractorConfig.getInteger(CQLPORT));
-        }
-        if (values.get(TABLE) != null) {
-            table(extractorConfig.getString(TABLE));
-        }
-        if (values.get(KEYSPACE) != null) {
-            keyspace(extractorConfig.getString(KEYSPACE));
-        }
-        if (values.get(COLUMN_FAMILY) != null) {
-            columnFamily(extractorConfig.getString(COLUMN_FAMILY));
         }
 
         if (values.get(RPCPORT) != null) {
@@ -570,23 +516,16 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
             writeConsistencyLevel(extractorConfig.getString(WRITE_CONSISTENCY_LEVEL));
         }
 
-        if (values.get(INPUT_COLUMNS) != null) {
-            inputColumns(extractorConfig.getStringArray(INPUT_COLUMNS));
-        }
-
         if (values.get(BISECT_FACTOR) != null) {
             bisectFactor(extractorConfig.getInteger(BISECT_FACTOR));
         }
 
-        // if(values.get(SPLIT_SIZE)!=null){
-        // splitSize(extractorConfig.getInteger(SPLIT_SIZE));
-        // }
 
-        if (values.get(ExtractorConstants.FILTER_FIELD) != null) {
-            Pair<String, Serializable> filterFields = extractorConfig.getPair(ExtractorConstants.FILTER_FIELD,
-                    String.class, Serializable.class);
-            filterByField(filterFields.left, filterFields.right);
-        }
+//        if (values.get(ExtractorConstants.FILTER_FIELD) != null) {
+//            Pair<String, Serializable> filterFields = extractorConfig.getPair(ExtractorConstants.FILTER_FIELD,
+//                    String.class, Serializable.class);
+//            filterByField(filterFields.left, filterFields.right);
+//        }
 
         if (values.get(ExtractorConstants.FILTER_QUERY) != null) {
             filters(extractorConfig.getFilterArray(ExtractorConstants.FILTER_QUERY));
@@ -615,16 +554,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
         return filters;
     }
 
-    /**
-     * {@inheritDoc}
-     */
 
-    @Override
-    public CassandraDeepJobConfig<T> inputColumns(String... columns) {
-        this.inputColumns = columns;
-
-        return this;
-    }
 
     /**
      * {@inheritDoc}
@@ -743,7 +673,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
     }
 
     private void validateCassandraParams() {
-        if (StringUtils.isEmpty(host)) {
+        if (StringUtils.isEmpty(getHost())) {
             throw new IllegalArgumentException("host cannot be null");
         }
 
@@ -868,24 +798,12 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T> impleme
         return Collections.unmodifiableMap(additionalFilters);
     }
 
-    @Override
     public int getPageSize() {
         checkInitialized();
         return this.pageSize;
     }
 
-    /**
-     * {@inheritDoc}
-     */
 
-    @Override
-    public CassandraDeepJobConfig<T> filterByField(String filterColumnName, Serializable filterValue) {
-        /* check if there's an index specified on the provided column */
-        additionalFilters.put(filterColumnName, filterValue);
-        return this;
-    }
-
-    @Override
     public CassandraDeepJobConfig<T> pageSize(int pageSize) {
         this.pageSize = pageSize;
         return this;
