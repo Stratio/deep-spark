@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.stratio.deep.testutils.UnitTest;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 import org.testng.annotations.Test;
@@ -45,7 +44,7 @@ import com.stratio.deep.mongodb.testentity.MongoDBTestEntity;
  * Created by rcrespo on 18/06/14.
  */
 
-@Test(groups = {"UnitTests"})
+@Test(groups = { "UnitTests" })
 public class UtilMongoDBTest {
 
     public static final String ID_EXAMPLE = "ID";

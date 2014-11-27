@@ -5,7 +5,6 @@ import static org.testng.Assert.assertEquals;
 import java.io.File;
 import java.io.IOException;
 
-import com.stratio.deep.testutils.FunctionalTest;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;

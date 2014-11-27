@@ -59,7 +59,7 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T transformElement(Tuple2<Object, BSONObject> tuple, DeepJobConfig<T,MongoDeepJobConfig<T>> config) {
+    public T transformElement(Tuple2<Object, BSONObject> tuple, DeepJobConfig<T, MongoDeepJobConfig<T>> config) {
 
         try {
             return (T) UtilMongoDB.getObjectFromBson(config.getEntityClass(), tuple._2());
