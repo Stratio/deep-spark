@@ -212,6 +212,8 @@ service spark restart
 ##############
 ## DATASET  ##
 ##############
+touch /tmp/deep.log
+chmod 666 /tmp/deep.log
 
 dataset_dir='/opt/sds/dataset'
 mkdir $dataset_dir
