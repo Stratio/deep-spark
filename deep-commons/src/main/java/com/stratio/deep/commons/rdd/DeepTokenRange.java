@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.cassandra.dht.Token;
 
 /**
  * Wrapper class holding information of a computed token range.
@@ -167,32 +166,5 @@ public class DeepTokenRange<T, K> implements Comparable<DeepTokenRange>, Seriali
         return 0;
     }
 
-    /**
-     * Checks if a token is included in the current split.
-     * 
-     * @param token
-     *            {@link Token} to be checked.
-     * 
-     * @return true, if the token is included in the interval; false, otherwise.
-     */
-    public boolean isTokenIncludedInRange(Token<Comparable> token) {
 
-        boolean isIncluded = false;
-
-        if (((Comparable) this.startToken).compareTo(this.endToken) <= 0) {
-            isIncluded = token.token.compareTo(this.startToken) > 0;
-
-            if (isIncluded) {
-                isIncluded = token.token.compareTo(this.endToken) <= 0;
-            }
-        } else {
-            isIncluded = token.token.compareTo(this.startToken) > 0;
-
-            if (!isIncluded) {
-                isIncluded = token.token.compareTo(this.endToken) <= 0;
-            }
-        }
-
-        return isIncluded;
-    }
 }

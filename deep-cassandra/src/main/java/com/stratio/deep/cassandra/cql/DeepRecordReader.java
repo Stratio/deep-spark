@@ -17,6 +17,7 @@
 package com.stratio.deep.cassandra.cql;
 
 import static com.stratio.deep.cassandra.cql.CassandraClientProvider.trySessionForLocation;
+import static com.stratio.deep.cassandra.util.CassandraUtils.isTokenIncludedInRange;
 
 import java.io.Serializable;
 import java.nio.ByteBuffer;
@@ -400,7 +401,7 @@ public class DeepRecordReader implements IDeepRecordReader {
                         equalsInValue.getEqualsList(),
                         value));
 
-                if (split.isTokenIncludedInRange(token)) {
+                if (isTokenIncludedInRange(split, token)) {
                     filteredInValues.add(value);
                 }
             }

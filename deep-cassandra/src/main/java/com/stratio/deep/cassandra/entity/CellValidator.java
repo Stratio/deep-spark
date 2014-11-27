@@ -19,7 +19,9 @@ package com.stratio.deep.cassandra.entity;
 import static java.lang.Class.forName;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableCollection;
-
+import static com.stratio.deep.cassandra.util.AnnotationUtils.MAP_ABSTRACT_TYPE_CLASS_TO_ABSTRACT_TYPE;
+import static com.stratio.deep.cassandra.util.AnnotationUtils.MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE;
+import static com.stratio.deep.cassandra.util.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -314,7 +316,7 @@ public class CellValidator {
         cqlTypeName = type.getName();
 
         if (!type.isCollection()) {
-            validatorClassName = AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(type.asJavaClass()).getClass()
+            validatorClassName = MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(type.asJavaClass()).getClass()
                     .getName();
         } else {
             validatorTypes = new ArrayList<>();
@@ -357,7 +359,7 @@ public class CellValidator {
         try {
 
             if (validatorKind == Kind.NOT_A_COLLECTION) {
-                abstractType = AnnotationUtils.MAP_ABSTRACT_TYPE_CLASS_TO_ABSTRACT_TYPE.get(forName
+                abstractType = MAP_ABSTRACT_TYPE_CLASS_TO_ABSTRACT_TYPE.get(forName
                         (validatorClassName));
 
             } else {
