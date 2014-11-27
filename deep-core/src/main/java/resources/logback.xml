@@ -41,7 +41,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.stratio" level="INFO" additivity="false">
+    <logger name="com.stratio" level="ERROR" additivity="false">
         <appender-ref ref="STDOUT" />
     </logger>
 

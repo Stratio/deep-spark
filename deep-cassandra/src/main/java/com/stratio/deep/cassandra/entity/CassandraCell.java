@@ -1,8 +1,9 @@
 package com.stratio.deep.cassandra.entity;
 
-import static com.stratio.deep.commons.utils.AnnotationUtils.MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE;
+
 import static com.stratio.deep.commons.utils.AnnotationUtils.deepFieldName;
 import static com.stratio.deep.commons.utils.AnnotationUtils.getBeanFieldValue;
+import static com.stratio.deep.cassandra.util.AnnotationUtils.MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE;
 import org.apache.cassandra.db.marshal.MapType;
 import java.io.Serializable;
 import java.lang.reflect.Field;

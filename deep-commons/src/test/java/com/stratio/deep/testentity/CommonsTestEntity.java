@@ -21,11 +21,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.cassandra.db.marshal.Int32Type;
-import org.apache.cassandra.db.marshal.ListType;
-import org.apache.cassandra.db.marshal.LongType;
-import org.apache.cassandra.db.marshal.MapType;
-import org.apache.cassandra.db.marshal.SetType;
 
 import com.stratio.deep.commons.annotations.DeepEntity;
 import com.stratio.deep.commons.annotations.DeepField;
@@ -37,7 +32,7 @@ public class CommonsTestEntity extends CommonsBaseTestEntity {
     @DeepField
     private String url;
 
-    @DeepField(validationClass = Int32Type.class, fieldName = "response_time")
+    @DeepField(fieldName = "response_time")
     private Integer responseTime;
 
     public static long getSerialVersionUID() {
@@ -68,21 +63,21 @@ public class CommonsTestEntity extends CommonsBaseTestEntity {
         this.uuid2id = uuid2id;
     }
 
-    @DeepField(fieldName = "response_code", validationClass = Int32Type.class)
+    @DeepField(fieldName = "response_code")
     private Integer responseCode;
 
-    @DeepField(validationClass = LongType.class, fieldName = "download_time")
+    @DeepField(fieldName = "download_time")
     private Long downloadTime;
 
     private String notMappedField;
 
-    @DeepField(validationClass = SetType.class)
+    @DeepField
     private Set<String> emails;
 
-    @DeepField(validationClass = ListType.class)
+    @DeepField
     private List<String> phones;
 
-    @DeepField(validationClass = MapType.class)
+    @DeepField
     private Map<UUID, Integer> uuid2id;
 
     public CommonsTestEntity() {
