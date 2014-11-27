@@ -282,10 +282,10 @@ CREATE TABLE "Page" (
 
 EOF
 
-/ops/sds/cassandra/bin/cqlsh -f /opt/sds/dataset/crawler.cql
+/opt/sds/cassandra/bin/cqlsh -f /opt/sds/dataset/crawler.cql
 cd /opt/sds/dataset
 tar -zxvf crawler-Page.tgz
-/ops/sds/cassandra/bin/sstableloader -d localhost crawler/Page/
+/opt/sds/cassandra/bin/sstableloader -d localhost crawler/Page/
 
 
 
