@@ -32,7 +32,7 @@ public class MessageTestEntity implements IDeepType {
     @DeepField
     private String message;
 
-    @DeepField
+    //@DeepField
     private Long number;
 
     public String getId() {

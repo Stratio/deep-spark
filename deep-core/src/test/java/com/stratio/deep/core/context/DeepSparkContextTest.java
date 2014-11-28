@@ -25,8 +25,12 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import com.stratio.deep.commons.entity.Cells;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.sql.api.java.JavaSQLContext;
+import org.apache.spark.sql.api.java.JavaSchemaRDD;
+import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -55,6 +59,26 @@ public class DeepSparkContextTest {
         DeepRDD rddReturn = (DeepRDD) deepSparkContext.createRDD(deepJobConfig);
 
         assertSame("The DeepRDD is the same", deepRDD, rddReturn);
+
+    }
+
+    @Test
+    public void createJavaRowRDD() throws Exception {
+        DeepSparkContext deepSparkContext = createDeepSparkContext();
+        ExtractorConfig deepJobConfig = createDeepJobConfig();
+        JavaSchemaRDD schemaRDD = createJavaSchemaRDD(deepSparkContext.getSQLContext(), mock(LogicalPlan.class));
+
+        JavaSchemaRDD schemaRDDReturn = deepSparkContext.createJavaSchemaRDD(deepJobConfig);
+        assertSame("The JavaSchemaRDD is the same", schemaRDD, schemaRDDReturn);
+    }
+
+    @Test
+    public void createJavaSchemaRDDTest() throws Exception {
+
+    }
+
+    @Test
+    public void deepSparkContextSQL() {
 
     }
 
@@ -117,4 +141,19 @@ public class DeepSparkContextTest {
         whenNew(DeepRDD.class).withArguments(sc, deepJobConfig).thenReturn(deepRDD);
         return deepRDD;
     }
+
+    private JavaSchemaRDD createJavaSchemaRDD(JavaSQLContext sqlContext, LogicalPlan logicalPlan) throws Exception {
+        JavaSchemaRDD schemaRDD = mock(JavaSchemaRDD.class);
+
+        whenNew(JavaSchemaRDD.class).withArguments(sqlContext, logicalPlan).thenReturn(schemaRDD);
+        return schemaRDD;
+    }
+
+    private JavaRDD createJavaRDD(SparkContext sc, ExtractorConfig deepJobConfig) throws Exception {
+
+        JavaRDD<Cells> javaRDD = (JavaRDD<Cells>)mock(JavaRDD.class);
+        whenNew(JavaRDD.class).withArguments(sc, deepJobConfig).thenReturn(javaRDD);
+        return javaRDD;
+    }
+
 }
