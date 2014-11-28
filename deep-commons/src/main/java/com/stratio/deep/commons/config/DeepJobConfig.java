@@ -23,21 +23,21 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PORT;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNAME;
-
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.FILTER_QUERY;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.hadoop.conf.Configuration;
-
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.Filter;
 
 /**
  * Created by rcrespo on 13/10/14.
- * @param <T>  the type parameter
+ *
+ * @param <T> the type parameter
  */
 public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
 
@@ -81,7 +81,6 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
      */
     protected String[] inputColumns;
 
-
     /**
      * Database filters
      */
@@ -90,7 +89,7 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
     /**
      * Instantiates a new Deep job config.
      */
-    public DeepJobConfig(){
+    public DeepJobConfig() {
         super((Class<T>) Cells.class);
     }
 
@@ -112,7 +111,6 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
         return username;
     }
 
-
     /**
      * Gets password.
      *
@@ -122,15 +120,13 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
         return password;
     }
 
-
-
     /**
      * Get name space.
      *
      * @return the string
      */
-    public String getNameSpace(){
-        if (nameSpace==null){
+    public String getNameSpace() {
+        if (nameSpace == null) {
             nameSpace = new StringBuilder().append(catalog).append(".").append(table).toString();
         }
         return nameSpace;
@@ -145,7 +141,6 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
     public String getCatalog() {
         return catalog;
     }
-
 
     /**
      * Gets table.
@@ -173,7 +168,6 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
         return port;
     }
 
-
     /**
      * Gets host.
      *
@@ -187,15 +181,13 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
         return !host.isEmpty() ? host.get(0) : null;
     }
 
-
     /**
      * Initialize s.
      *
-     
      * @param extractorConfig the extractor config
      * @return the s
      */
-    public S initialize(ExtractorConfig extractorConfig){
+    public S initialize(ExtractorConfig extractorConfig) {
         Map<String, Serializable> values = extractorConfig.getValues();
 
         if (values.get(USERNAME) != null) {
@@ -225,6 +217,11 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
         if (values.get(DATABASE) != null) {
             catalog(extractorConfig.getString(DATABASE));
         }
+
+        if (values.get(FILTER_QUERY) != null) {
+            filters(extractorConfig.getFilterArray(FILTER_QUERY));
+        }
+
         return (S) this;
     }
 
@@ -240,8 +237,9 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
     }
 
     public S host(String... hostNames) {
-        for(String hostName : hostNames)
-        host.add(hostName);
+        for (String hostName : hostNames) {
+            host.add(hostName);
+        }
         return (S) this;
     }
 
@@ -249,6 +247,7 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
         this.host.addAll(hostNames);
         return (S) this;
     }
+
     /**
      * Password s.
      *
@@ -256,18 +255,17 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
      * @return the s
      */
     public S password(String password) {
-        this.password=password;
+        this.password = password;
         return (S) this;
     }
 
-
     public S table(String table) {
-        this.table=table;
+        this.table = table;
         return (S) this;
     }
 
     public S catalog(String catalog) {
-        this.catalog=catalog;
+        this.catalog = catalog;
         return (S) this;
     }
 
@@ -278,7 +276,7 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
      * @return the s
      */
     public S username(String username) {
-        this.username=username;
+        this.username = username;
         return (S) this;
     }
 
@@ -289,37 +287,34 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
      * @return the s
      */
     public S port(Integer port) {
-        this.port=port;
+        this.port = port;
         return (S) this;
     }
 
     /**
-     *
      * @param inputColumns
      * @return
      */
     public S inputColumns(String[] inputColumns) {
-        this.inputColumns=inputColumns;
+        this.inputColumns = inputColumns;
         return (S) this;
     }
 
     /**
-     *
      * @param filters
      * @return
      */
     public S filters(Filter[] filters) {
-        this.filters=filters;
+        this.filters = filters;
         return (S) this;
     }
 
-
-
     /**
      * Initialize s.
+     *
      * @return the s
      */
-    public S initialize(){
+    public S initialize() {
         return (S) this;
     }
 

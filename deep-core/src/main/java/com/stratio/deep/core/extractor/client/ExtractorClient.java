@@ -14,7 +14,6 @@
  */
 package com.stratio.deep.core.extractor.client;
 
-
 import java.util.List;
 
 import javax.net.ssl.SSLException;
@@ -23,7 +22,9 @@ import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.commons.rdd.IExtractor;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -31,8 +32,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
-
 
 /**
  * Sends a list of continent/city pairs to a {@link } to get the local times of the specified cities.

@@ -18,20 +18,19 @@ package com.stratio.deep.es.extractor;
 
 import java.lang.reflect.InvocationTargetException;
 
-import com.stratio.deep.commons.config.DeepJobConfig;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepTransformException;
-import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
-import com.stratio.deep.es.config.ESDeepJobConfig;
-import com.stratio.deep.es.config.IESDeepJobConfig;
-import com.stratio.deep.es.utils.UtilES;
-
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
 import org.elasticsearch.hadoop.mr.LinkedMapWritable;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepTransformException;
+import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
+import com.stratio.deep.es.config.ESDeepJobConfig;
+import com.stratio.deep.es.utils.UtilES;
 
 import scala.Tuple2;
 
@@ -51,8 +50,8 @@ public final class ESCellExtractor
     public ESCellExtractor(Class<Cells> cellsClass) {
         super();
         this.deepJobConfig = new ESDeepJobConfig(cellsClass);
-        this.inputFormat = new EsInputFormat<>() ;
-        this.outputFormat = new EsOutputFormat() ;
+        this.inputFormat = new EsInputFormat<>();
+        this.outputFormat = new EsOutputFormat();
     }
 
     /**
@@ -60,7 +59,7 @@ public final class ESCellExtractor
      */
     @Override
     public Cells transformElement(Tuple2<Object, LinkedMapWritable> tuple,
-            DeepJobConfig<Cells,ESDeepJobConfig<Cells>> config) {
+                                  DeepJobConfig<Cells, ESDeepJobConfig<Cells>> config) {
 
         try {
             return UtilES.getCellFromJson(tuple._2(), deepJobConfig.getNameSpace());

@@ -18,9 +18,6 @@ package com.stratio.deep.commons.config;
 
 import java.io.Serializable;
 
-import org.apache.hadoop.conf.Configuration;
-
-
 /**
  * Defines the public methods that each Stratio Deep configuration object should implement.
  *
@@ -35,7 +32,6 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?, ?>> extends Seria
      * @return the password used to login to the remote cluster.
      */
     String getPassword();
-
 
     /**
      * Returns the hostname of the cassandra server.
@@ -60,14 +56,12 @@ public interface IDeepJobConfig<T, S extends IDeepJobConfig<?, ?>> extends Seria
      */
     String getUsername();
 
-
     /**
      * Returns the maximum number of rows that will be retrieved when fetching data pages from Cassandra.
      *
      * @return the page size
      */
     int getPageSize();
-
 
     void setRddId(int rddId);
 

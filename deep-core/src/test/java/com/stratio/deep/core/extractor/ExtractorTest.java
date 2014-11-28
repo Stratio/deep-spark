@@ -31,13 +31,14 @@ import java.util.List;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.rdd.RDD;
+import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import org.json.simple.JSONObject;
+
 import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
@@ -56,8 +57,8 @@ import com.stratio.deep.core.entity.MessageTestEntity;
 /**
  * This is the common test that validate each extractor.
  *
- * @param <T>   the type parameter
- * @param <S>   the type parameter
+ * @param <T> the type parameter
+ * @param <S> the type parameter
  */
 public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Serializable {
 
@@ -149,19 +150,20 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
     /**
      * The Database extractor name.
      */
-    protected String databaseExtractorName ;
+    protected String databaseExtractorName;
 
     /**
      * Instantiates a new Extractor test.
      *
      * @param extractor the extractor
-     * @param host the host
-     * @param port the port
-     * @param isCells the is cells
+     * @param host      the host
+     * @param port      the port
+     * @param isCells   the is cells
      */
     public ExtractorTest(Class<IExtractor<T, S>> extractor, String host, Integer port, boolean isCells) {
         this(extractor, host, port, isCells, null);
     }
+
     public ExtractorTest(Class<IExtractor<T, S>> extractor, String host, Integer port, boolean isCells,
                          Class dataSetClass) {
         if (isCells) {
@@ -171,9 +173,9 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
         } else {
             this.inputEntity = MessageTestEntity.class;
             this.outputEntity = MessageTestEntity.class;
-            if(dataSetClass!=null){
+            if (dataSetClass != null) {
                 this.configEntity = dataSetClass;
-            }else{
+            } else {
                 this.configEntity = BookEntity.class;
             }
 
@@ -185,16 +187,15 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
         this.databaseExtractorName = extractor.getSimpleName().toLowerCase();
     }
 
-
     /**
      * Read file.
      *
      * @param path the path
      * @return the list
      */
-    protected List<String> readFile(String path){
+    protected List<String> readFile(String path) {
         List<String> lineas = new ArrayList<>();
-        try{
+        try {
             InputStream in = getClass().getResourceAsStream(path);
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String uniqueLine = reader.readLine();
@@ -203,7 +204,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
             reader.close();
             in.close();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
 
         }
@@ -213,13 +214,12 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
     /**
      * Transform RDD.
      *
-     * @param <T>   the type parameter
+     * @param <T>           the type parameter
      * @param stringJavaRDD the string java rDD
-     * @param entityClass the entity class
+     * @param entityClass   the entity class
      * @return the java rDD
      */
-    protected <T> JavaRDD<T> transformRDD(JavaRDD<String> stringJavaRDD, final Class<T> entityClass){
-
+    protected <T> JavaRDD<T> transformRDD(JavaRDD<String> stringJavaRDD, final Class<T> entityClass) {
 
         JavaRDD<JSONObject> jsonObjectJavaRDD = stringJavaRDD.map(new Function<String, JSONObject>() {
             @Override
@@ -248,28 +248,22 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
     public void initDataSet() throws IOException {
         DeepSparkContext context = getDeepSparkContext();
 
-
-
         initDataSetDivineComedy(context);
 
         initDataSetMessage(context);
 
-
         context.stop();
     }
 
-    protected void initDataSetDivineComedy(DeepSparkContext context){
+    protected void initDataSetDivineComedy(DeepSparkContext context) {
         JavaRDD<String> stringJavaRDD;
 
         //Divine Comedy
         List<String> lineas = readFile(DATA_TEST_DIVINE_COMEDY);
 
-
-
         stringJavaRDD = context.parallelize(lineas);
 
-        JavaRDD<T> javaRDD =  transformRDD(stringJavaRDD, configEntity);
-
+        JavaRDD<T> javaRDD = transformRDD(stringJavaRDD, configEntity);
 
         originBook = javaRDD.first();
 
@@ -277,17 +271,14 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
                 configEntity));
     }
 
-
-    protected void initDataSetMessage(DeepSparkContext context){
+    protected void initDataSetMessage(DeepSparkContext context) {
         //Test Message
 
         List<String> lineas = readFile(DATA_TEST_MESSAGE);
 
-        JavaRDD<String>  stringJavaRDD = context.parallelize(lineas);
+        JavaRDD<String> stringJavaRDD = context.parallelize(lineas);
 
-        JavaRDD<T> javaRDD =  transformRDD(stringJavaRDD, inputEntity);
-
-
+        JavaRDD<T> javaRDD = transformRDD(stringJavaRDD, inputEntity);
 
         DeepSparkContext.saveRDD(javaRDD.rdd(), (ExtractorConfig<T>) getWriteExtractorConfig(tableRead,
                 inputEntity));
@@ -296,9 +287,9 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
     /**
      * Transform to T type.
      *
-     * @param <W>   the type parameter
-     * @param jsonObject the json object
-     * @param nameSpace the name space
+     * @param <W>         the type parameter
+     * @param jsonObject  the json object
+     * @param nameSpace   the name space
      * @param entityClass the entity class
      * @return the t
      */
@@ -306,25 +297,29 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
     /**
      * It tests if the extractor can read from the data store
-     * @param <W>   the type parameter
+     *
+     * @param <W> the type parameter
      */
-    @Test(alwaysRun = true, groups = {"FunctionalTests"})
+    @Test(alwaysRun = true, groups = { "FunctionalTests" })
     public <W> void testRead() {
 
         DeepSparkContext context = getDeepSparkContext();
 
         try {
 
-            ExtractorConfig<W> inputConfigEntity = getReadExtractorConfig(databaseExtractorName, tableRead, inputEntity);
+            ExtractorConfig<W> inputConfigEntity = getReadExtractorConfig(databaseExtractorName, tableRead,
+                    inputEntity);
 
             RDD<W> inputRDDEntity = context.createRDD(inputConfigEntity);
 
             Assert.assertEquals(READ_COUNT_EXPECTED, inputRDDEntity.count());
 
             if (inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)) {
-                Assert.assertEquals(((Cells) inputRDDEntity.first()).getCellByName("message").getCellValue(), READ_FIELD_EXPECTED);
+                Assert.assertEquals(((Cells) inputRDDEntity.first()).getCellByName("message").getCellValue(),
+                        READ_FIELD_EXPECTED);
 
-                Assert.assertEquals(((Cells) inputRDDEntity.first()).getCellByName("id").getCellValue(), ID_MESSAGE_EXPECTED);
+                Assert.assertEquals(((Cells) inputRDDEntity.first()).getCellByName("id").getCellValue(),
+                        ID_MESSAGE_EXPECTED);
             } else {
                 Assert.assertEquals(((MessageTestEntity) inputRDDEntity.first()).getMessage(), READ_FIELD_EXPECTED);
 
@@ -339,7 +334,8 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
     /**
      * It tests if the extractor can write to the data store
-     * @param <W>   the type parameter
+     *
+     * @param <W> the type parameter
      */
     @Test(alwaysRun = true)
     public <W> void testWrite() {
@@ -348,7 +344,8 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
         try {
 
-            ExtractorConfig<W> inputConfigEntity = getReadExtractorConfig(databaseExtractorName, tableRead, inputEntity);
+            ExtractorConfig<W> inputConfigEntity = getReadExtractorConfig(databaseExtractorName, tableRead,
+                    inputEntity);
 
             RDD<W> inputRDDEntity = context.createRDD(inputConfigEntity);
 
@@ -356,7 +353,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
             if (inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)) {
                 outputConfigEntity = getWriteExtractorConfig("outputCells", Cells.class);
             } else {
-                outputConfigEntity = getWriteExtractorConfig("outputEntity",MessageTestEntity.class);
+                outputConfigEntity = getWriteExtractorConfig("outputEntity", MessageTestEntity.class);
             }
 
             // Save RDD in DataSource
@@ -365,7 +362,8 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
             RDD<W> outputRDDEntity = context.createRDD(outputConfigEntity);
 
             if (inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)) {
-                Assert.assertEquals(((Cells) outputRDDEntity.first()).getCellByName("message").getCellValue(), READ_FIELD_EXPECTED);
+                Assert.assertEquals(((Cells) outputRDDEntity.first()).getCellByName("message").getCellValue(),
+                        READ_FIELD_EXPECTED);
             } else {
 
                 Assert.assertEquals(((MessageTestEntity) outputRDDEntity.first()).getMessage(), READ_FIELD_EXPECTED);
@@ -376,10 +374,10 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
     }
 
-    
     /**
      * Test input columns.
-     * @param <W>   the type parameter
+     *
+     * @param <W> the type parameter
      */
     @Test(alwaysRun = true)
     public <W> void testInputColumns() {
@@ -408,7 +406,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
             ExtractorConfig<W> inputConfigEntity2 = getInputColumnConfig("cantos");
 
             RDD<W> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
-//TODO check this
+            //TODO check this
             if (isEntityClassCells(inputConfigEntity2)) {
                 Cells bookCells = (Cells) inputRDDEntity2.first();
 
@@ -459,9 +457,10 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
     /**
      * Test filter EQ.
-     * @param <W>  the type parameter
+     *
+     * @param <W> the type parameter
      */
-    @Test(alwaysRun = true, dependsOnGroups = {"FunctionalTests"})
+    @Test(alwaysRun = true, dependsOnGroups = { "FunctionalTests" })
     protected <W> void testFilterEQ() {
         DeepSparkContext context = getDeepSparkContext();
         try {
@@ -474,7 +473,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
             RDD<W> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
             assertEquals(inputRDDEntity2.count(), 1);
-        } finally{
+        } finally {
             context.stop();
         }
 
@@ -482,7 +481,8 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
     /**
      * Test filter NEQ.
-     * @param <W>  the type parameter
+     *
+     * @param <W> the type parameter
      */
     @Test
     protected <W> void testFilterNEQ() {
@@ -498,8 +498,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
             assertEquals(inputRDDEntity.count(), 0);
 
-
-        } finally{
+        } finally {
             context.stop();
         }
 
@@ -536,8 +535,8 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
     /**
      * Gets read extractor config.
      *
-     * @param database the database
-     * @param collection the collection
+     * @param database    the database
+     * @param collection  the collection
      * @param entityClass the entity class
      * @return the read extractor config
      */
@@ -609,7 +608,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      *
      * @return the deep spark context
      */
-    protected static DeepSparkContext getDeepSparkContext(){
+    protected static DeepSparkContext getDeepSparkContext() {
         return new DeepSparkContext("local", "deepSparkContextTest");
     }
 

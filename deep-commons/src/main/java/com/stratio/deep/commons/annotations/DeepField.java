@@ -46,7 +46,6 @@ public @interface DeepField {
 
     /**
      * Specifies the cassandra validator class to be used to marshall/unmarshall the field value to the database.
-     *
      */
     Class validationClass() default String.class;
 

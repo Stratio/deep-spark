@@ -141,8 +141,8 @@ public class DeepRecordReader implements IDeepRecordReader {
     /**
      * public constructor. Takes a list of filters to pass to the underlying data stores.
      *
-     * @param config             the deep configuration object.
-     * @param split             the token range on which the new reader will be based.
+     * @param config the deep configuration object.
+     * @param split  the token range on which the new reader will be based.
      */
     public DeepRecordReader(DeepJobConfig<?, ?> config, DeepTokenRange<?, String> split) {
         this.config = (CassandraDeepJobConfig<?>) config;
@@ -278,7 +278,7 @@ public class DeepRecordReader implements IDeepRecordReader {
          * Init columns.
          *
          * @param valueColumns the value columns
-         * @param keyColumns the key columns
+         * @param keyColumns   the key columns
          */
         private void initColumns(Map<String, ByteBuffer> valueColumns, Map<String, ByteBuffer> keyColumns) {
             Row row = rows.next();
@@ -311,6 +311,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
         /**
          * serialize the prepared query, pair.left is query id, pair.right is query
+         *
          * @return the string
          */
         //TODO: return id column
@@ -435,6 +436,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
         /**
          * remove key columns from the column string
+         *
          * @param columnString the column string
          * @return the string
          */
@@ -460,6 +462,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
         /**
          * serialize the where clause
+         *
          * @return the string
          */
         private String whereClause() {
@@ -496,6 +499,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
         /**
          * serialize the partition key string in format of <key1>, <key2>, <key3>
+         *
          * @param columns the columns
          * @return the string
          */
@@ -510,6 +514,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
         /**
          * serialize the question marks for partition key string in format of ?, ? , ?
+         *
          * @return the string
          */
         private String partitionKeyMarkers() {
@@ -523,6 +528,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
         /**
          * serialize the query binding variables, pair.left is query id, pair.right is the binding variables
+         *
          * @return the list
          */
         private List<Object> preparedQueryBindValues() {
@@ -538,6 +544,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
         /**
          * Quoting for working with uppercase
+         *
          * @param identifier the identifier
          * @return the string
          */
@@ -628,6 +635,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
     /**
      * check whether current row is at the end of range
+     *
      * @return the boolean
      */
     private boolean reachEndRange() {
@@ -681,7 +689,7 @@ public class DeepRecordReader implements IDeepRecordReader {
     /**
      * Returns a boolean indicating if the underlying rowIterator has a new element or not. DOES NOT advance the
      * iterator to the next element.
-     * 
+     *
      * @return a boolean indicating if the underlying rowIterator has a new element or not.
      */
     @Override
@@ -691,7 +699,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
     /**
      * Returns the next element in the underlying rowIterator.
-     * 
+     *
      * @return the next element in the underlying rowIterator.
      */
     @Override
@@ -705,8 +713,8 @@ public class DeepRecordReader implements IDeepRecordReader {
     /**
      * Builds the partition key in {@link ByteBuffer} format for the given values.
      *
-     * @param equalsList             List of equals field and value pairs.
-     * @param inValue             Value for the operator in.
+     * @param equalsList List of equals field and value pairs.
+     * @param inValue    Value for the operator in.
      * @return with the partition key.
      */
     private ByteBuffer getPartitionKey(List<Pair<String, Serializable>> equalsList, Serializable inValue) {
@@ -714,8 +722,7 @@ public class DeepRecordReader implements IDeepRecordReader {
         assert (equalsList.size() + 1) == ((CompositeType) keyValidator).componentsCount();
 
         ByteBuffer[] serialized = new ByteBuffer[equalsList.size() + 1];
-        for (int i = 0; i < equalsList.size(); i++)
-        {
+        for (int i = 0; i < equalsList.size(); i++) {
             ByteBuffer buffer = ((AbstractType) keyValidator.getComponents().get(i)).decompose(equalsList.get(i).right);
             serialized[i] = buffer;
         }

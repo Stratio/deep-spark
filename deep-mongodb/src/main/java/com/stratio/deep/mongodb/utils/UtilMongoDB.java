@@ -216,8 +216,7 @@ public final class UtilMongoDB {
      * @throws IllegalAccessException the instantiation exception
      * @throws IllegalAccessException the invocation target exception
      */
-    public static Cells getCellFromBson(BSONObject bsonObject, String tableName) throws IllegalAccessException,
-            InstantiationException, InvocationTargetException {
+    public static Cells getCellFromBson(BSONObject bsonObject, String tableName) {
 
         Cells cells = tableName != null ? new Cells(tableName) : new Cells();
 
@@ -240,7 +239,7 @@ public final class UtilMongoDB {
                 } else {
                     cells.add(Cell.create(entry.getKey(), entry.getValue()));
                 }
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException | IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 LOG.error("impossible to create a java cell from Bson field:" + entry.getKey() + ", type:" + entry
                         .getValue().getClass() + ", value:" + entry.getValue());
             }
@@ -254,12 +253,8 @@ public final class UtilMongoDB {
      *
      * @param cells the cells
      * @return bson from cell
-     * @throws IllegalAccessException the illegal access exception
-     * @throws IllegalAccessException the instantiation exception
-     * @throws IllegalAccessException the invocation target exception
      */
-    public static BSONObject getBsonFromCell(Cells cells)
-            throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    public static BSONObject getBsonFromCell(Cells cells) {
 
         BSONObject bson = new BasicBSONObject();
         for (Cell cell : cells) {
@@ -290,12 +285,8 @@ public final class UtilMongoDB {
      *
      * @param cells the cells
      * @return bson from cell
-     * @throws IllegalAccessException the illegal access exception
-     * @throws IllegalAccessException the instantiation exception
-     * @throws IllegalAccessException the invocation target exception
      */
-    public static DBObject getDBObjectFromCell(Cells cells)
-            throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    public static DBObject getDBObjectFromCell(Cells cells) {
 
         DBObject bson = new BasicDBObject();
         for (Cell cell : cells) {

@@ -38,7 +38,6 @@ import scala.Tuple2;
  */
 public final class ReadingSQLEntityFromMongoDB {
     private static final Logger LOG = Logger.getLogger(ReadingSQLEntityFromMongoDB.class);
-    public static List<Tuple2<String, Integer>> results;
 
     private ReadingSQLEntityFromMongoDB() {
     }
@@ -55,15 +54,12 @@ public final class ReadingSQLEntityFromMongoDB {
         String database = "test";
         String inputCollection = "prueba";
 
-
-
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
         JavaSQLContext sqlContext = new org.apache.spark.sql.api.java.JavaSQLContext(deepContext);
-
 
         ExtractorConfig<MessageTestEntity> inputConfigEntity = new ExtractorConfig<>(MessageTestEntity.class);
         inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database)
@@ -72,17 +68,14 @@ public final class ReadingSQLEntityFromMongoDB {
 
         RDD<MessageTestEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
 
-
-
         JavaSchemaRDD schema = sqlContext.applySchema(inputRDDEntity.toJavaRDD(), MessageTestEntity.class);
         schema.registerTempTable("input");
 
         JavaSchemaRDD messagesFiltered = sqlContext.sql("SELECT * FROM input WHERE message != \"message2\" ");
 
-
         List<Row> rows = messagesFiltered.collect();
 
-        for(Row row : rows){
+        for (Row row : rows) {
             System.out.println(row.get(0));
             System.out.println(row.get(1));
         }

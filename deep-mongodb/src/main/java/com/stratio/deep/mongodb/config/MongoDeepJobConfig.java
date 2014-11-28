@@ -26,6 +26,7 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.SPLIT_
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_CHUNKS;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_SHARD;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_SPLITS;
+import static com.stratio.deep.mongodb.utils.UtilMongoDB.MONGO_DEFAULT_ID;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -309,7 +310,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
     @Override
     public MongoDeepJobConfig<T> ignoreIdField() {
         DBObject bsonFields = fields != null ? fields : new BasicDBObject();
-        bsonFields.put("_id", 0);
+        bsonFields.put(MONGO_DEFAULT_ID, 0);
         fields = bsonFields;
         return this;
     }
@@ -439,14 +440,14 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
         DBObject bsonFields = fields != null ? fields : new BasicDBObject();
         boolean isIdPresent = false;
         for (String column : columns) {
-            if (column.trim().equalsIgnoreCase("_id")) {
+            if (column.trim().equalsIgnoreCase(MONGO_DEFAULT_ID)) {
                 isIdPresent = true;
             }
 
             bsonFields.put(column.trim(), 1);
         }
         if (!isIdPresent) {
-            bsonFields.put("_id", 0);
+            bsonFields.put(MONGO_DEFAULT_ID, 0);
         }
         fields = bsonFields;
         return this;
@@ -479,10 +480,6 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
 
         if (values.get(SORT) != null) {
             sort(extractorConfig.getString(SORT));
-        }
-
-        if (values.get(FILTER_QUERY) != null) {
-            filterQuery(extractorConfig.getFilterArray(FILTER_QUERY));
         }
 
         if (values.get(INPUT_KEY) != null) {

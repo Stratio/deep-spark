@@ -50,12 +50,10 @@ public final class ReadingEntityFromES {
     }
 
     public static void doMain(String[] args) {
-        String job      = "java:readingEntityWithES";
-        String host     = "localhost:9200";
-        String index    = "book";
-        String type     = "test";
-
-
+        String job = "java:readingEntityWithES";
+        String host = "localhost:9200";
+        String index = "book";
+        String type = "test";
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -66,9 +64,9 @@ public final class ReadingEntityFromES {
 
         Map<String, Serializable> values = new HashMap<>();
 
-        values.put(ExtractorConstants.INDEX,    index);
-        values.put(ExtractorConstants.TYPE,    type);
-        values.put(ExtractorConstants.HOST,        host );
+        values.put(ExtractorConstants.INDEX, index);
+        values.put(ExtractorConstants.TYPE, type);
+        values.put(ExtractorConstants.HOST, host);
 
         config.setExtractorImplClass(ESEntityExtractor.class);
         config.setEntityClass(WordCount.class);

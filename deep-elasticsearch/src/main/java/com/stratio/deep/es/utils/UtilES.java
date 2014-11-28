@@ -76,13 +76,10 @@ public final class UtilES {
 
     /**
      * converts from JSONObject to an entity class with deep's anotations
-     * 
-     * @param classEntity
-     *            the entity name.
-     * @param jsonObject
-     *            the instance of the JSONObject to convert.
-     * @param <T>
-     *            return type.
+     *
+     * @param classEntity the entity name.
+     * @param jsonObject  the instance of the JSONObject to convert.
+     * @param <T>         return type.
      * @return the provided JSONObject converted to an instance of T.
      * @throws IllegalAccessException
      * @throws InstantiationException
@@ -148,11 +145,9 @@ public final class UtilES {
 
     /**
      * converts from an entity class with deep's anotations to JSONObject.
-     * 
-     * @param t
-     *            an instance of an object of type T to convert to JSONObject.
-     * @param <T>
-     *            the type of the object to convert.
+     *
+     * @param t   an instance of an object of type T to convert to JSONObject.
+     * @param <T> the type of the object to convert.
      * @return the provided object converted to JSONObject.
      * @throws IllegalAccessException
      * @throws InstantiationException
@@ -190,11 +185,9 @@ public final class UtilES {
 
     /**
      * converts from an entity class with deep's anotations to JSONObject.
-     * 
-     * @param t
-     *            an instance of an object of type T to convert to JSONObject.
-     * @param <T>
-     *            the type of the object to convert.
+     *
+     * @param t   an instance of an object of type T to convert to JSONObject.
+     * @param <T> the type of the object to convert.
      * @return the provided object converted to JSONObject.
      * @throws IllegalAccessException
      * @throws InstantiationException
@@ -235,11 +228,9 @@ public final class UtilES {
 
     /**
      * returns the id value annotated with @DeepField(fieldName = "_id")
-     * 
-     * @param t
-     *            an instance of an object of type T to convert to JSONObject.
-     * @param <T>
-     *            the type of the object to convert.
+     *
+     * @param t   an instance of an object of type T to convert to JSONObject.
+     * @param <T> the type of the object to convert.
      * @return the provided object converted to Object.
      * @throws IllegalAccessException
      * @throws InstantiationException
@@ -254,7 +245,7 @@ public final class UtilES {
 
     /**
      * converts from JSONObject to cell class
-     * 
+     *
      * @param jsonObject
      * @return
      * @throws IllegalAccessException
@@ -291,7 +282,7 @@ public final class UtilES {
 
     /**
      * Returns the object inside Writable
-     * 
+     *
      * @param writable
      * @return
      * @throws IllegalAccessException
@@ -330,7 +321,7 @@ public final class UtilES {
 
     /**
      * Returns the object inside Writable
-     * 
+     *
      * @param object
      * @return
      * @throws IllegalAccessException
@@ -361,7 +352,7 @@ public final class UtilES {
 
     /**
      * converts from cell class to JSONObject
-     * 
+     *
      * @return
      * @throws IllegalAccessException
      * @throws InstantiationException

@@ -170,21 +170,21 @@ public interface ExtractorConstants {
     /**
      * The HOSTS.
      */
-    String HOSTS    = "Hosts";
+    String HOSTS = "Hosts";
 
     /**
      * The PORTS.
      */
-    String PORTS    = "Port";
+    String PORTS = "Port";
 
     /**
      * The HDFS.
      */
-    String HDFS       = "hdfs";
+    String HDFS = "hdfs";
     /**
      * The HDFS _ tYPE.
      */
-    String HDFS_TYPE  = "hdfsType";
+    String HDFS_TYPE = "hdfsType";
     /**
      * The HDFS _ fILEDATATABLE.
      */
@@ -196,7 +196,7 @@ public interface ExtractorConstants {
     /**
      * The HDFS MAP.
      */
-    String HDFS_MAP     = "map";
+    String HDFS_MAP = "map";
     /**
      * The HDFS Prefix
      */
@@ -221,5 +221,5 @@ public interface ExtractorConstants {
     /**
      * The INNERCLASS.
      */
-    String INNERCLASS  ="implClass";
+    String INNERCLASS = "implClass";
 }

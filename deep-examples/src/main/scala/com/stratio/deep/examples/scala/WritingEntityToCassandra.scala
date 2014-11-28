@@ -18,11 +18,10 @@ package com.stratio.deep.examples.scala
 
 import com.stratio.deep.cassandra.config.CassandraConfigFactory
 import com.stratio.deep.core.context.DeepSparkContext
+import com.stratio.deep.testentity.{DomainEntity, PageEntity}
 import com.stratio.deep.utils.ContextProperties
 import org.apache.spark.SparkContext._
-
 import org.apache.spark.rdd.RDD
-import com.stratio.deep.testentity.{PageEntity, DomainEntity}
 
 /**
  * Author: Emmanuelle Raffenne

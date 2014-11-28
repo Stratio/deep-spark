@@ -15,6 +15,15 @@
  */
 package com.stratio.deep.aerospike.config;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapred.RecordWriter;
+import org.apache.hadoop.util.Progressable;
+
 import com.aerospike.client.AerospikeClient;
 import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
@@ -22,14 +31,6 @@ import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.hadoop.mapreduce.AerospikeOutputFormat;
 import com.aerospike.hadoop.mapreduce.AerospikeRecord;
 import com.aerospike.hadoop.mapreduce.AerospikeRecordWriter;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapred.RecordWriter;
-import org.apache.hadoop.util.Progressable;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Implementation for AerospikeOutputFormat.
@@ -43,6 +44,7 @@ public class AerospikeDeepOutputFormat extends AerospikeOutputFormat<Object, Aer
 
         /**
          * Public constructor for AerospikeDeepRecordWriter.
+         *
          * @param cfg
          * @param progressable
          */
@@ -60,7 +62,7 @@ public class AerospikeDeepOutputFormat extends AerospikeOutputFormat<Object, Aer
             //TODO -> How should I generate the key?
             Key k = new Key(namespace, setName, Long.toString(System.nanoTime()));
             List<Bin> bins = new ArrayList<>();
-            for(Map.Entry<String, Object> bin:record.bins.entrySet()) {
+            for (Map.Entry<String, Object> bin : record.bins.entrySet()) {
                 Bin aerospikeBin = new Bin(bin.getKey(), bin.getValue());
                 bins.add(aerospikeBin);
             }

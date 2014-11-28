@@ -26,8 +26,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import scala.Tuple2;
-
 import com.aerospike.client.Record;
 import com.aerospike.hadoop.mapreduce.AerospikeKey;
 import com.aerospike.hadoop.mapreduce.AerospikeRecord;
@@ -37,6 +35,8 @@ import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Utils;
+
+import scala.Tuple2;
 
 /**
  * Several utilities to work used in the Spark <=> Aerospike integration.
@@ -54,22 +54,19 @@ final public class UtilAerospike {
 
     /**
      * Converts from AerospikeRecord to an entity class with deep's anotations.
-     * 
-     * @param classEntity
-     *            the entity name.
-     * @param aerospikeRecord
-     *            the instance of the AerospikeRecord to convert.
-     * @param aerospikeConfig
-     *            Aerospike configuration object.
-     * @param <T>
-     *            return type.
+     *
+     * @param classEntity     the entity name.
+     * @param aerospikeRecord the instance of the AerospikeRecord to convert.
+     * @param aerospikeConfig Aerospike configuration object.
+     * @param <T>             return type.
      * @return the provided aerospikeRecord converted to an instance of T.
      * @throws IllegalAccessException
      * @throws InstantiationException
      * @throws java.lang.reflect.InvocationTargetException
      */
     public static <T> T getObjectFromRecord(Class<T> classEntity, AerospikeRecord aerospikeRecord,
-            AerospikeDeepJobConfig aerospikeConfig) throws IllegalAccessException, InstantiationException,
+                                            AerospikeDeepJobConfig aerospikeConfig)
+            throws IllegalAccessException, InstantiationException,
             InvocationTargetException {
         Tuple2<String, Object> equalsFilter = aerospikeConfig.getEqualsFilter();
         String equalsFilterBin = equalsFilter != null ? equalsFilter._1() : null;
@@ -102,10 +99,10 @@ final public class UtilAerospike {
                         if (currentBin instanceof Integer && classField.equals(Long.class)) {
                             currentBin = new Long((Integer) currentBin);
                         }
-                        if (currentBin instanceof String || currentBin instanceof Integer || currentBin instanceof Long) {
+                        if (currentBin instanceof String || currentBin instanceof Integer
+                                || currentBin instanceof Long) {
                             insert = currentBin;
-                        }
-                        else {
+                        } else {
                             throw new DeepGenericException("Data type [" + classField.toString()
                                     + "] not supported in Aerospike entity extractor (only Strings and Integers)");
                         }
@@ -124,11 +121,9 @@ final public class UtilAerospike {
 
     /**
      * Converts from an entity class with deep's anotations to AerospikeRecord.
-     * 
-     * @param t
-     *            an instance of an object of type T to convert to AerospikeRecord.
-     * @param <T>
-     *            the type of the object to convert.
+     *
+     * @param t   an instance of an object of type T to convert to AerospikeRecord.
+     * @param <T> the type of the object to convert.
      * @return the provided object converted to AerospikeRecord.
      * @throws IllegalAccessException
      * @throws InstantiationException
@@ -153,7 +148,7 @@ final public class UtilAerospike {
 
     /**
      * Converts from AerospikeRecord to cell class with deep's anotations.
-     * 
+     *
      * @param aerospikeRecord
      * @param key
      * @param aerospikeConfig
@@ -163,7 +158,7 @@ final public class UtilAerospike {
      * @throws InvocationTargetException
      */
     public static Cells getCellFromRecord(AerospikeKey key, AerospikeRecord aerospikeRecord,
-            AerospikeDeepJobConfig aerospikeConfig) throws IllegalAccessException,
+                                          AerospikeDeepJobConfig aerospikeConfig) throws IllegalAccessException,
             InstantiationException, InvocationTargetException {
 
         String namespace = aerospikeConfig.getNamespace() + "." + aerospikeConfig.getSet();
@@ -211,9 +206,8 @@ final public class UtilAerospike {
 
     /**
      * Converts from and entity class with deep's anotations to BsonObject.
-     * 
+     *
      * @param cells
-     * 
      * @return
      * @throws IllegalAccessException
      * @throws InstantiationException

@@ -16,20 +16,21 @@
 
 package com.stratio.deep.examples.java.savewithfunction;
 
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.apache.spark.api.java.JavaRDD;
+
 import com.stratio.deep.cassandra.config.CassandraConfigFactory;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.utils.ContextProperties;
-import org.apache.log4j.Logger;
-import org.apache.spark.api.java.JavaRDD;
-import scala.Tuple2;
 
-import java.util.List;
+import scala.Tuple2;
 
 public class WrittingRddWithDefaultQueryBuilderToCassandra {
     private static final Logger LOG = Logger.getLogger(WrittingRddWithDefaultQueryBuilderToCassandra.class);
-    public static List<Tuple2<String, Integer>> results;
 
     private WrittingRddWithDefaultQueryBuilderToCassandra() {
     }
@@ -55,12 +56,9 @@ public class WrittingRddWithDefaultQueryBuilderToCassandra {
         String inputTableName = "tweets2";
         final String outputTableName = "copy_tweets3";
 
-
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
-
-
 
         // --- INPUT RDD
         CassandraDeepJobConfig<Cells> inputConfig = CassandraConfigFactory.create()
@@ -68,14 +66,13 @@ public class WrittingRddWithDefaultQueryBuilderToCassandra {
                 .keyspace(keyspaceName).table(inputTableName)
                 .initialize();
 
-        long initTime= System.currentTimeMillis();
-
+        long initTime = System.currentTimeMillis();
 
         JavaRDD<Cells> inputRDD = deepContext.createJavaRDD(inputConfig);
 
-        System.out.println("**********************"+inputRDD.count()+System.currentTimeMillis());
+        System.out.println("**********************" + inputRDD.count() + System.currentTimeMillis());
         long timeCreate = System.currentTimeMillis() - initTime;
-        initTime= System.currentTimeMillis();
+        initTime = System.currentTimeMillis();
 
         // --- OUTPUT RDD
         CassandraDeepJobConfig<Cells> outputConfig = CassandraConfigFactory.create()
@@ -87,8 +84,8 @@ public class WrittingRddWithDefaultQueryBuilderToCassandra {
 
         System.out.println("**********************");
         long timeSave = System.currentTimeMillis() - initTime;
-        initTime= System.currentTimeMillis();
-        System.out.println("initTime"+timeCreate+"save"+timeSave);
+        initTime = System.currentTimeMillis();
+        System.out.println("initTime" + timeCreate + "save" + timeSave);
 
         deepContext.stop();
     }

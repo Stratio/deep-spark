@@ -16,7 +16,11 @@
 
 package com.stratio.deep.examples.java;
 
-import com.mongodb.QueryBuilder;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.apache.spark.api.java.JavaRDD;
+
 import com.stratio.deep.cassandra.config.CassandraConfigFactory;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.commons.entity.Cells;
@@ -24,14 +28,8 @@ import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.mongodb.config.MongoConfigFactory;
 import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
 import com.stratio.deep.utils.ContextProperties;
-import org.apache.log4j.Logger;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.rdd.RDD;
-import org.bson.BSONObject;
-import org.bson.BasicBSONObject;
-import scala.Tuple2;
 
-import java.util.List;
+import scala.Tuple2;
 
 public class WrittingRddFromMongoToCassandra {
     private static final Logger LOG = Logger.getLogger(WrittingRddFromMongoToCassandra.class);
@@ -57,7 +55,6 @@ public class WrittingRddFromMongoToCassandra {
     public static void doMain(String[] args) {
         String job = "java:saveFromMongoToCassandra";
 
-
         String keyspaceName = "test";
         final String outputTableName = "copy_mongo";
         String host = "127.0.0.1:27017";
@@ -65,10 +62,10 @@ public class WrittingRddFromMongoToCassandra {
         String inputCollection = "input";
 
         // Creating the Deep Context where args are Spark Master and Job Name
-        com.stratio.deep.examples.java.extractorconfig.mongodb.utils.ContextProperties p = new com.stratio.deep.examples.java.extractorconfig.mongodb.utils.ContextProperties(args);
+        com.stratio.deep.examples.java.extractorconfig.mongodb.utils.ContextProperties p = new com.stratio.deep.examples.java.extractorconfig.mongodb.utils.ContextProperties(
+                args);
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
-
 
         // --- INPUT RDD
         MongoDeepJobConfig inputConfigCell = MongoConfigFactory.createMongoDB().host(host).database(database)
@@ -76,7 +73,6 @@ public class WrittingRddFromMongoToCassandra {
                 .createInputSplit(false).initialize();
 
         JavaRDD<Cells> inputRDD = deepContext.createJavaRDD(inputConfigCell);
-
 
         for (Cells cells : inputRDD.collect()) {
             cells.getCells();

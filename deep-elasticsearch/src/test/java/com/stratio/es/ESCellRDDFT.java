@@ -16,18 +16,10 @@
 
 package com.stratio.es;
 
-
-import com.stratio.deep.core.extractor.ExtractorCellTest;
-import com.stratio.deep.core.extractor.ExtractorTest;
-import com.stratio.deep.es.extractor.ESCellExtractor;
-
-import com.stratio.deep.testutils.FunctionalTest;
-import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
 import org.testng.annotations.Test;
 
-
-
+import com.stratio.deep.core.extractor.ExtractorCellTest;
+import com.stratio.deep.es.extractor.ESCellExtractor;
 
 /**
  * Created by rcrespo on 29/08/14.
@@ -36,8 +28,7 @@ import org.testng.annotations.Test;
 public class ESCellRDDFT extends ExtractorCellTest {
 
     public ESCellRDDFT() {
-        super(ESCellExtractor.class,"localhost",9200, true);
+        super(ESCellExtractor.class, "localhost", 9200, true);
     }
-
 
 }

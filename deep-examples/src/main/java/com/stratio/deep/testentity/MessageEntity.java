@@ -3,7 +3,6 @@ package com.stratio.deep.testentity;
 import com.stratio.deep.commons.annotations.DeepEntity;
 import com.stratio.deep.commons.annotations.DeepField;
 import com.stratio.deep.commons.entity.IDeepType;
-import org.bson.types.ObjectId;
 
 /**
  * Created by mariomgal on 19/11/14.

@@ -17,7 +17,7 @@ package com.stratio.deep.examples.scala
 
 
 import com.stratio.deep.core.context.DeepSparkContext
-import com.stratio.deep.mongodb.config.{MongoDeepJobConfig, MongoConfigFactory}
+import com.stratio.deep.mongodb.config.{MongoConfigFactory, MongoDeepJobConfig}
 import com.stratio.deep.mongodb.testentity.MessageTestEntity
 import com.stratio.deep.utils.ContextProperties
 import org.apache.spark.rdd.RDD

@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-
 /**
  * Wrapper class holding information of a computed token range.
  */
@@ -31,11 +30,9 @@ public class DeepTokenRange<T, K> implements Comparable<DeepTokenRange>, Seriali
 
     /**
      * Construct a new token range with no replica information.
-     * 
-     * @param startToken
-     *            first token of this range.
-     * @param endToken
-     *            last token of this range.
+     *
+     * @param startToken first token of this range.
+     * @param endToken   last token of this range.
      */
     public DeepTokenRange(T startToken, T endToken) {
         this.startToken = startToken;
@@ -44,13 +41,10 @@ public class DeepTokenRange<T, K> implements Comparable<DeepTokenRange>, Seriali
 
     /**
      * Construct a new token range with replica information.
-     * 
-     * @param startToken
-     *            first token of this range.
-     * @param endToken
-     *            last token of this range.
-     * @param replicas
-     *            the list of replica machines holding this range of tokens.
+     *
+     * @param startToken first token of this range.
+     * @param endToken   last token of this range.
+     * @param replicas   the list of replica machines holding this range of tokens.
      */
     public DeepTokenRange(T startToken, T endToken, List<K> replicas) {
         this.startToken = startToken;
@@ -66,7 +60,7 @@ public class DeepTokenRange<T, K> implements Comparable<DeepTokenRange>, Seriali
 
     /**
      * Construct a new token range with replica information.
-     * 
+     *
      * @param startToken
      *            first token of this range.
      * @param endToken
@@ -82,7 +76,7 @@ public class DeepTokenRange<T, K> implements Comparable<DeepTokenRange>, Seriali
 
     /**
      * Construct a new token range with replica information
-     * 
+     *
      * @param replicas
      */
     // public DeepTokenRange(String[] replicas) {
@@ -165,6 +159,5 @@ public class DeepTokenRange<T, K> implements Comparable<DeepTokenRange>, Seriali
         }
         return 0;
     }
-
 
 }

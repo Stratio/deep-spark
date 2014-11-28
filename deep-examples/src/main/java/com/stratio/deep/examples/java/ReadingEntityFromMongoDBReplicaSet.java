@@ -29,22 +29,20 @@ import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
  * Example class to read an entity from a mongoDB replica set
  */
 public final class ReadingEntityFromMongoDBReplicaSet {
-	private static final Logger LOG = Logger.getLogger(com.stratio.deep.examples.java.ReadingEntityFromMongoDBReplicaSet.class);
+    private static final Logger LOG = Logger
+            .getLogger(com.stratio.deep.examples.java.ReadingEntityFromMongoDBReplicaSet.class);
 
     private ReadingEntityFromMongoDBReplicaSet() {
     }
-
 
     public static void main(String[] args) {
         doMain(args);
     }
 
-
     public static void doMain(String[] args) {
 
         // Spark jobName
         String job = "java:readingEntityFromMongoDBReplicaSet";
-
 
         // Connect to a replica set and provide three seed nodes
         String host1 = "localhost:47017";
@@ -63,27 +61,23 @@ public final class ReadingEntityFromMongoDBReplicaSet {
         // Recommended read preference. If the primary node go down, can still read from secundaries
         String readPreference = "primaryPreferred";
 
-
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
 
         // creates Deep Spark Context (spark context wrapper)
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
-
 
         // can give a list of host.
         MongoDeepJobConfig inputConfigEntity = MongoConfigFactory.createMongoDB(MessageTestEntity.class).host(host1)
                 .host(host2).host(host3)
-                .database(database).collection(inputCollection).replicaSet(replicaSet).readPreference(readPreference).initialize();
-
+                .database(database).collection(inputCollection).replicaSet(replicaSet).readPreference(readPreference)
+                .initialize();
 
         // createJavaRDD
         JavaRDD<MessageTestEntity> inputRDDEntity = deepContext.createJavaRDD(inputConfigEntity);
 
-
         LOG.info("count : " + inputRDDEntity.cache().count());
-
 
         deepContext.stop();
     }

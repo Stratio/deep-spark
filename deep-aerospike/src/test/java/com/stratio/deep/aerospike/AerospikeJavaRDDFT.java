@@ -15,11 +15,12 @@
  */
 package com.stratio.deep.aerospike;
 
-import com.aerospike.client.*;
-import com.aerospike.client.policy.ScanPolicy;
-import com.aerospike.client.policy.WritePolicy;
-import com.aerospike.client.query.IndexType;
-import com.google.common.io.Resources;
+import static org.testng.Assert.assertEquals;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URL;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -30,11 +31,16 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URL;
-
-import static org.testng.Assert.assertEquals;
+import com.aerospike.client.AerospikeClient;
+import com.aerospike.client.AerospikeException;
+import com.aerospike.client.Bin;
+import com.aerospike.client.Key;
+import com.aerospike.client.Record;
+import com.aerospike.client.ScanCallback;
+import com.aerospike.client.policy.ScanPolicy;
+import com.aerospike.client.policy.WritePolicy;
+import com.aerospike.client.query.IndexType;
+import com.google.common.io.Resources;
 
 @Test(groups = { "AerospikeJavaRDDFT", "FunctionalTests" })
 public class AerospikeJavaRDDFT {
@@ -80,8 +86,8 @@ public class AerospikeJavaRDDFT {
         Object obj = parser.parse(new FileReader(url.getFile()));
         JSONObject jsonObject = (JSONObject) obj;
 
-        String id = (String)jsonObject.get("id");
-        JSONObject metadata = (JSONObject)jsonObject.get("metadata");
+        String id = (String) jsonObject.get("id");
+        JSONObject metadata = (JSONObject) jsonObject.get("metadata");
         JSONArray cantos = (JSONArray) jsonObject.get("cantos");
 
         Key key = new Key(NAMESPACE_ENTITY, SET_NAME, id);
@@ -104,32 +110,32 @@ public class AerospikeJavaRDDFT {
      * Delete previously loaded data for starting with a fresh dataset.
      */
     private static void deleteData() {
-        try{
+        try {
             aerospike.scanAll(new ScanPolicy(), NAMESPACE_CELL, SET_NAME, new ScanCallback() {
                 @Override
                 public void scanCallback(Key key, Record record) throws AerospikeException {
                     aerospike.delete(new WritePolicy(), key);
                 }
-            }, new String[] {});
+            }, new String[] { });
             aerospike.scanAll(new ScanPolicy(), NAMESPACE_CELL, SET_NAME_BOOK, new ScanCallback() {
                 @Override
                 public void scanCallback(Key key, Record record) throws AerospikeException {
                     aerospike.delete(new WritePolicy(), key);
                 }
-            }, new String[] {});
+            }, new String[] { });
             aerospike.scanAll(new ScanPolicy(), NAMESPACE_ENTITY, SET_NAME, new ScanCallback() {
                 @Override
                 public void scanCallback(Key key, Record record) throws AerospikeException {
                     aerospike.delete(new WritePolicy(), key);
                 }
-            }, new String[] {});
+            }, new String[] { });
             aerospike.scanAll(new ScanPolicy(), NAMESPACE_ENTITY, SET_NAME_BOOK, new ScanCallback() {
                 @Override
                 public void scanCallback(Key key, Record record) throws AerospikeException {
                     aerospike.delete(new WritePolicy(), key);
                 }
-            }, new String[]{});
-        }catch(AerospikeException e){
+            }, new String[] { });
+        } catch (AerospikeException e) {
             LOG.error("Error while deleting data", e);
         }
     }
@@ -138,7 +144,7 @@ public class AerospikeJavaRDDFT {
     public static void cleanup() {
         try {
             aerospike.close();
-        } catch(Exception e) {
+        } catch (Exception e) {
             LOG.error("Error while closing Aerospike client connection", e);
         }
 

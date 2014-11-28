@@ -22,7 +22,6 @@ package com.stratio.deep.commons.extractor.actions;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 
-
 /**
  * Created by rcrespo on 27/08/14.
  */

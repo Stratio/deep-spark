@@ -51,7 +51,7 @@ public final class Utils {
     /**
      * Creates a new instance of the given class.
      *
-     * @param <T>  the type parameter
+     * @param <T>   the type parameter
      * @param clazz the class object for which a new instance should be created.
      * @return the new instance of class clazz.
      */
@@ -66,8 +66,8 @@ public final class Utils {
     /**
      * Creates a new instance of the given class name.
      *
-     * @param <T>  the type parameter
-     * @param className the class object for which a new instance should be created.
+     * @param <T>         the type parameter
+     * @param className   the class object for which a new instance should be created.
      * @param returnClass the return class
      * @return the new instance of class clazz.
      */
@@ -83,6 +83,7 @@ public final class Utils {
 
     /**
      * Quoting for working with uppercase
+     *
      * @param identifier the identifier
      * @return the string
      */
@@ -107,6 +108,7 @@ public final class Utils {
 
     /**
      * Quoting for working with uppercase
+     *
      * @param identifier the identifier
      * @return the string
      */
@@ -183,8 +185,8 @@ public final class Utils {
      * resolve the setter following Scala's naming conventions.
      *
      * @param propertyName the field name of the property whose setter we want to resolve.
-     * @param entityClass the bean class object in which we want to search for the setter.
-     * @param valueType the class type of the object that we want to pass to the setter.
+     * @param entityClass  the bean class object in which we want to search for the setter.
+     * @param valueType    the class type of the object that we want to pass to the setter.
      * @return the resolved setter.
      */
     @SuppressWarnings("unchecked")
@@ -208,7 +210,6 @@ public final class Utils {
     }
 
     /**
-     *
      * @param object
      * @param fieldName
      * @param fieldValue
@@ -238,7 +239,7 @@ public final class Utils {
      * resolve the setter following Scala's naming conventions.
      *
      * @param propertyName the field name of the property whose getter we want to resolve.
-     * @param entityClass the bean class object in which we want to search for the getter.
+     * @param entityClass  the bean class object in which we want to search for the getter.
      * @return the resolved getter.
      */
     @SuppressWarnings("unchecked")
@@ -277,6 +278,7 @@ public final class Utils {
 
     /**
      * Return the set of fields declared at all level of class hierachy
+     *
      * @param clazz the clazz
      * @return the field [ ]
      */
@@ -287,7 +289,7 @@ public final class Utils {
     /**
      * Get all fields rec.
      *
-     * @param clazz the clazz
+     * @param clazz  the clazz
      * @param fields the fields
      * @return the field [ ]
      */
@@ -314,12 +316,12 @@ public final class Utils {
      * @param stringList the string list
      * @return the list
      */
-    public static List<String> removeAddressPort(List<String> stringList){
+    public static List<String> removeAddressPort(List<String> stringList) {
         List<String> adresNoPort = new ArrayList<>();
 
-        for(String s : stringList){
+        for (String s : stringList) {
             int index = s.indexOf(":");
-            if(index>-1){
+            if (index > -1) {
                 adresNoPort.add(s.substring(0, index));
                 continue;
             }
@@ -347,8 +349,6 @@ public final class Utils {
         }
         return hostConnection.toString();
     }
-
-
 
     /**
      * Gets extractor instance.
@@ -382,10 +382,10 @@ public final class Utils {
      * Cast number type.
      *
      * @param object the object
-     * @param clazz the clazz
+     * @param clazz  the clazz
      * @return object
      */
-   public static Object castNumberType(Object object, Object clazz) {
+    public static Object castNumberType(Object object, Object clazz) {
 
         if (object instanceof Number) {
 
@@ -410,12 +410,11 @@ public final class Utils {
         throw new ClassCastException("it is not a Number Type");
     }
 
-
-    public static Object castingUtil(String value, Class classCasting){
+    public static Object castingUtil(String value, Class classCasting) {
         Object object = value;
 
         //Numeric
-        if(Number.class.isAssignableFrom(classCasting)){
+        if (Number.class.isAssignableFrom(classCasting)) {
             if (classCasting.isAssignableFrom(Double.class)) {
                 return Double.valueOf(value);
             } else if (classCasting.isAssignableFrom(Long.class)) {
@@ -433,17 +432,16 @@ public final class Utils {
             } else if (classCasting.isAssignableFrom(Byte.class)) {
                 return Byte.valueOf(value);
             }
-        }else if (String.class.isAssignableFrom(classCasting)){
+        } else if (String.class.isAssignableFrom(classCasting)) {
             return object.toString();
 
         } else {
             //Class not recognise yet
-            return null ;
+            return null;
 
         }
         return null;
 
     }
-
 
 }

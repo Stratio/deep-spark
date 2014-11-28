@@ -74,7 +74,7 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
 
     /**
      * Con
-     * 
+     *
      * @param writeConfig
      */
     public DeepCqlRecordWriter(ICassandraDeepJobConfig writeConfig, CassandraUpdateQueryBuilder queryBuilder) {
@@ -174,13 +174,10 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
 
     /**
      * Fetches row metadata for the given column family.
-     * 
-     * @param sessionWithHost
-     *            the connection to the DB.
-     * @param keyspace
-     *            the keyspace name
-     * @param cfName
-     *            the column family
+     *
+     * @param sessionWithHost the connection to the DB.
+     * @param keyspace        the keyspace name
+     * @param cfName          the column family
      * @return the Row object
      */
     private static Row getRowMetadata(Pair<Session, String> sessionWithHost, String keyspace, String cfName) {
@@ -196,11 +193,9 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
     /**
      * Adds the provided row to a batch. If the batch size reaches the threshold configured in
      * IDeepJobConfig.getBatchSize the batch will be sent to the data store.
-     * 
-     * @param keys
-     *            the Cells object containing the row keys.
-     * @param values
-     *            the Cells object containing all the other row columns.
+     *
+     * @param keys   the Cells object containing the row keys.
+     * @param values the Cells object containing all the other row columns.
      */
     public void write(Cells keys, Cells values) {
         /* generate SQL */
@@ -242,11 +237,9 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
 
         /**
          * Returns true if adding the current element triggers the batch execution.
-         * 
-         * @param stmt
-         *            the query to add to the batch.
-         * @param values
-         *            the list of binding values.
+         *
+         * @param stmt   the query to add to the batch.
+         * @param values the list of binding values.
          * @return a boolean indicating if the batch has been triggered or not.
          */
         public synchronized boolean put(String stmt, List<Object> values) {

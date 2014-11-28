@@ -31,6 +31,8 @@ import java.util.Set;
 
 import org.apache.spark.sql.api.java.Row;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
@@ -40,6 +42,9 @@ import com.stratio.deep.commons.entity.IDeepType;
  * Created by rcrespo on 20/10/14.
  */
 public class CellsUtils {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CellsUtils.class);
+
 
     /**
      * converts from cell class to JSONObject
@@ -80,7 +85,7 @@ public class CellsUtils {
     /**
      * converts from cell class to JSONObject
      *
-     * @param Json the json
+     * @param Json      the json
      * @param tableName the table name
      * @return cell from json
      * @throws IllegalAccessException the illegal access exception
@@ -90,16 +95,13 @@ public class CellsUtils {
     public static Cells getCellFromJson(JSONObject Json, String tableName)
             throws IllegalAccessException, InstantiationException, InvocationTargetException {
 
-
-        Cells cells = tableName!= null ?new Cells(tableName): new Cells();
-
-
+        Cells cells = tableName != null ? new Cells(tableName) : new Cells();
 
         Set<String> entrySet = Json.keySet();
 
         for (String key : entrySet) {
             try {
-            Object value = Json.get(key);
+                Object value = Json.get(key);
 
                 if (List.class.isAssignableFrom(value.getClass())) {
                     List<Cells> innerCell = new ArrayList<>();
@@ -111,30 +113,25 @@ public class CellsUtils {
                     Cells innerCells = getCellFromJson((JSONObject) value, null);
                     cells.add(Cell.create(key, innerCells));
                 } else {
-                    if(key.equalsIgnoreCase("id")){
+                    if (key.equalsIgnoreCase("id")) {
                         cells.add(Cell.create(key, value, true));
-                    }else{
+                    } else {
                         cells.add(Cell.create(key, value));
 
                     }
                 }
-            }
-            catch ( IllegalAccessException | InstantiationException | InvocationTargetException | IllegalArgumentException e){
-//                LOG.error("impossible to create a java cell from Bson field:"+entry.getKey()+", type:"+entry.getValue().getClass()+", value:"+entry.getValue());
+            } catch (IllegalAccessException | InstantiationException | InvocationTargetException | IllegalArgumentException e) {
+                                LOG.error("impossible to create a java cell from Json field:"+key);
             }
 
         }
         return cells;
     }
 
-
     public static Cells getCellWithMapFromJson(JSONObject Json, String tableName)
             throws IllegalAccessException, InstantiationException, InvocationTargetException {
 
-
-        Cells cells = tableName!= null ?new Cells(tableName): new Cells();
-
-
+        Cells cells = tableName != null ? new Cells(tableName) : new Cells();
 
         Set<String> entrySet = Json.keySet();
 
@@ -151,34 +148,34 @@ public class CellsUtils {
                 } else if (JSONObject.class.isAssignableFrom(value.getClass())) {
                     Map<String, Object> map = new HashMap<>();
                     Cells innerCells = getCellFromJson((JSONObject) value, null);
-                    for(Cell cell : innerCells){
+                    for (Cell cell : innerCells) {
                         map.put(cell.getName(), cell.getValue());
                     }
-                    cells.add(Cell.create(key,map));
+                    cells.add(Cell.create(key, map));
                 } else {
-                    if(key.equalsIgnoreCase("id")){
+                    if (key.equalsIgnoreCase("id")) {
                         cells.add(Cell.create(key, value, true));
-                    }else{
+                    } else {
                         cells.add(Cell.create(key, value));
 
                     }
                 }
-            }
-            catch ( IllegalAccessException | InstantiationException | InvocationTargetException | IllegalArgumentException e){
-                //                LOG.error("impossible to create a java cell from Bson field:"+entry.getKey()+", type:"+entry.getValue().getClass()+", value:"+entry.getValue());
+            } catch (IllegalAccessException | InstantiationException | InvocationTargetException | IllegalArgumentException e) {
+                                LOG.error("impossible to create a java cell from Bson field:"+key);
             }
 
         }
         return cells;
     }
+
     /**
      * Gets object from json.
      *
      * @param classEntity the class entity
-     * @param bsonObject the bson object
+     * @param bsonObject  the bson object
      * @return the object from json
-     * @throws IllegalAccessException the illegal access exception
-     * @throws InstantiationException the instantiation exception
+     * @throws IllegalAccessException    the illegal access exception
+     * @throws InstantiationException    the instantiation exception
      * @throws InvocationTargetException the invocation target exception
      */
     public static <T> T getObjectFromJson(Class<T> classEntity, JSONObject bsonObject)
@@ -214,9 +211,9 @@ public class CellsUtils {
                     method.invoke(t, insert);
                 }
             } catch (IllegalAccessException | InstantiationException | InvocationTargetException | IllegalArgumentException e) {
-//                LOG.error("impossible to create a java object from Bson field:" + field.getName() + " and type:" + field
-//                        .getType() + " and value:" + t + "; bsonReceived:" + currentBson + ", bsonClassReceived:"
-//                        + currentBson.getClass());
+                                LOG.error("impossible to create a java object from Bson field:" + field.getName() + " and type:" + field
+                                        .getType() + " and value:" + t + "; bsonReceived:" + currentBson + ", bsonClassReceived:"
+                                        + currentBson.getClass());
 
                 method.invoke(t, Utils.castNumberType(insert, t));
             }
@@ -225,7 +222,6 @@ public class CellsUtils {
 
         return t;
     }
-
 
     public static <T> T getObjectWithMapFromJson(Class<T> classEntity, JSONObject bsonObject)
             throws IllegalAccessException, InstantiationException, InvocationTargetException {
@@ -249,7 +245,7 @@ public class CellsUtils {
                     if (Collection.class.isAssignableFrom(classField)) {
                         Type type = field.getGenericType();
                         List list = new ArrayList();
-                        for(Object o : (List) bsonObject.get(AnnotationUtils.deepFieldName(field))){
+                        for (Object o : (List) bsonObject.get(AnnotationUtils.deepFieldName(field))) {
                             list.add((String) o);
                         }
                         insert = list;
@@ -260,18 +256,16 @@ public class CellsUtils {
                     } else {
                         insert = currentBson;
                     }
-                    if(insert!=null){
+                    if (insert != null) {
                         method.invoke(t, insert);
                     }
 
                 }
             } catch (IllegalAccessException | InstantiationException | InvocationTargetException | IllegalArgumentException e) {
-                //                LOG.error("impossible to create a java object from Bson field:" + field.getName() + " and type:" + field
-                //                        .getType() + " and value:" + t + "; bsonReceived:" + currentBson + ", bsonClassReceived:"
-                //                        + currentBson.getClass());
-
-//                method.invoke(t, Utils.castNumberType(insert, t));
-                e.printStackTrace();
+                                LOG.error("impossible to create a java object from Bson field:" + field.getName() + " and type:" + field
+                                        .getType() + " and value:" + t + "; bsonReceived:" + currentBson + ", bsonClassReceived:"
+                                        + currentBson.getClass());
+                                method.invoke(t, Utils.castNumberType(insert, t));
             }
 
         }
@@ -281,24 +275,25 @@ public class CellsUtils {
 
     /**
      * Creates a SparkSQL Row object from a Stratio Cells object
+     *
      * @param cells Stratio Cells object for transforming.
      * @return SparkSQL Row created from Cells.
      */
     public static Row getRowFromCells(Cells cells) {
         Object[] values = cells.getCellValues().toArray();
-        Row row = Row.create(values);
-        return row;
+        return Row.create(values);
     }
 
     /**
      * Returns a Collection of SparkSQL Row objects from a collection of Stratio Cells
      * objects
+     *
      * @param cellsCol Collection of Cells for transforming
      * @return Collection of SparkSQL Row created from Cells.
      */
     public static Collection<Row> getRowsFromsCells(Collection<Cells> cellsCol) {
         Collection<Row> result = new ArrayList<>();
-        for(Cells cells:cellsCol) {
+        for (Cells cells : cellsCol) {
             result.add(getRowFromCells(cells));
         }
         return result;
@@ -307,12 +302,12 @@ public class CellsUtils {
     /**
      * Sub document list case.
      *
-     * @param <T>  the type parameter
-     * @param type the type
+     * @param <T>        the type parameter
+     * @param type       the type
      * @param jsonObject the json object
      * @return the object
-     * @throws IllegalAccessException the illegal access exception
-     * @throws InstantiationException the instantiation exception
+     * @throws IllegalAccessException    the illegal access exception
+     * @throws InstantiationException    the instantiation exception
      * @throws InvocationTargetException the invocation target exception
      */
     private static <T> Object subDocumentListCase(Type type, List<T> jsonObject)

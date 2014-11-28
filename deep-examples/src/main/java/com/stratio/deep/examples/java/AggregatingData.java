@@ -16,20 +16,20 @@
 
 package com.stratio.deep.examples.java;
 
-import com.google.common.collect.Lists;
-
-import com.stratio.deep.cassandra.config.CassandraConfigFactory;
-import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.testentity.TweetEntity;
-import com.stratio.deep.utils.ContextProperties;
-
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
+
+import com.google.common.collect.Lists;
+import com.stratio.deep.cassandra.config.CassandraConfigFactory;
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.testentity.TweetEntity;
+import com.stratio.deep.utils.ContextProperties;
+
 import scala.Tuple2;
 import scala.Tuple3;
 
@@ -71,7 +71,7 @@ public class AggregatingData {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // Creating a configuration for the RDD and initialize it
         CassandraDeepJobConfig<TweetEntity> config = CassandraConfigFactory.create(TweetEntity.class)

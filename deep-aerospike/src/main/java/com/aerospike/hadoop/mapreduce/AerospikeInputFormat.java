@@ -24,39 +24,29 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.hadoop.conf.Configuration;
-
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
-
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Reporter;
-
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.InputSplit;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 
 import com.aerospike.client.AerospikeClient;
-import com.aerospike.client.AerospikeException;
-import com.aerospike.client.cluster.Node;
 import com.aerospike.client.Host;
-import com.aerospike.client.policy.ClientPolicy;
-import com.aerospike.client.policy.ScanPolicy;
+import com.aerospike.client.cluster.Node;
 
 /**
  * An {@link InputFormat} for data stored in an Aerospike database.
  */
 public class AerospikeInputFormat
-    extends InputFormat<AerospikeKey, AerospikeRecord>
-    implements org.apache.hadoop.mapred.InputFormat<AerospikeKey,
-                                                        AerospikeRecord> {
+        extends InputFormat<AerospikeKey, AerospikeRecord>
+        implements org.apache.hadoop.mapred.InputFormat<AerospikeKey,
+        AerospikeRecord> {
 
     private static final Log log =
-        LogFactory.getLog(AerospikeInputFormat.class);
+            LogFactory.getLog(AerospikeInputFormat.class);
 
     // ---------------- NEW API ----------------
 
@@ -65,19 +55,19 @@ public class AerospikeInputFormat
         Configuration cfg = context.getConfiguration();
         JobConf jobconf = AerospikeConfigUtil.asJobConf(cfg);
         return Arrays.asList((InputSplit[]) getSplits(jobconf,
-                                                      jobconf.getNumMapTasks()));
+                jobconf.getNumMapTasks()));
     }
 
     public RecordReader<AerospikeKey, AerospikeRecord>
-        createRecordReader(InputSplit split, TaskAttemptContext context)
-        throws IOException, InterruptedException {
+    createRecordReader(InputSplit split, TaskAttemptContext context)
+            throws IOException, InterruptedException {
         return new AerospikeRecordReader();
     }
 
     // ---------------- OLD API ----------------
 
     public org.apache.hadoop.mapred.InputSplit[]
-        getSplits(JobConf job, int numSplits) throws IOException {
+    getSplits(JobConf job, int numSplits) throws IOException {
         try {
 
             String oper = AerospikeConfigUtil.getInputOperation(job);
@@ -93,9 +83,9 @@ public class AerospikeInputFormat
                 numrangeBegin = AerospikeConfigUtil.getInputNumRangeBegin(job);
                 numrangeEnd = AerospikeConfigUtil.getInputNumRangeEnd(job);
             }
-            
+
             log.info(String.format("using: %s %d %s %s",
-                                   host, port, namespace, setName));
+                    host, port, namespace, setName));
 
             AerospikeClient client = new AerospikeClient(host, port);
             try {
@@ -125,28 +115,26 @@ public class AerospikeInputFormat
                         }
                     }
                     splits[ii] = new AerospikeSplit(oper, nodeName,
-                                                    nodehost.name, nodehost.port,
-                                                    namespace, setName,
-                                                    numrangeBin, numrangeBegin,
-                                                    numrangeEnd);
+                            nodehost.name, nodehost.port,
+                            namespace, setName,
+                            numrangeBin, numrangeBegin,
+                            numrangeEnd);
                     log.info("split: " + splits[ii]);
                 }
                 return splits;
-            }
-            finally {
+            } finally {
                 client.close();
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new IOException("exception in getSplits", ex);
         }
     }
 
     public org.apache.hadoop.mapred.RecordReader<AerospikeKey, AerospikeRecord>
-        getRecordReader(org.apache.hadoop.mapred.InputSplit split,
-                        JobConf job,
-                        Reporter reporter
-                        ) throws IOException {
+    getRecordReader(org.apache.hadoop.mapred.InputSplit split,
+                    JobConf job,
+                    Reporter reporter
+    ) throws IOException {
         return new AerospikeRecordReader((AerospikeSplit) split);
     }
 

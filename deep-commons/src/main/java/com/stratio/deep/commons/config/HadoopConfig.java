@@ -35,5 +35,4 @@ public class HadoopConfig<T, S extends DeepJobConfig> extends DeepJobConfig<T, S
         return configHadoop;
     }
 
-
 }

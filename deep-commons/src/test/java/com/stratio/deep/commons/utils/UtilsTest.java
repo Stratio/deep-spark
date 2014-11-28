@@ -17,7 +17,7 @@
 package com.stratio.deep.commons.utils;
 
 import static com.stratio.deep.commons.utils.Utils.removeAddressPort;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ import org.junit.Test;
 
 /**
  * The type Utils test.
- *
+ * <p/>
  * Created by rcrespo on 12/11/14.
  */
 public class UtilsTest {
@@ -143,7 +143,6 @@ public class UtilsTest {
         expected.add("stratio2");
         expected.add("stratio3");
         expected.add("stratio4");
-
 
         List<String> test = new ArrayList();
         test.add("stratio1:2010");

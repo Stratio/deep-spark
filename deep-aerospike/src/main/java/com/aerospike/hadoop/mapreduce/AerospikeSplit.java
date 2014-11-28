@@ -22,13 +22,12 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
 
 public class AerospikeSplit
-    extends InputSplit
-    implements org.apache.hadoop.mapred.InputSplit {
+        extends InputSplit
+        implements org.apache.hadoop.mapred.InputSplit {
 
     private String type;
     private String node;
@@ -99,7 +98,7 @@ public class AerospikeSplit
 
     public String toString() {
         return type + ':' + node + ":" + host + ":" + port + ":"
-            + namespace + ":" + setName;
+                + namespace + ":" + setName;
     }
 
     public void write(DataOutput out) throws IOException {
@@ -127,7 +126,7 @@ public class AerospikeSplit
     }
 
     public String[] getLocations() throws IOException {
-        return new String[]{ host };
+        return new String[] { host };
     }
 }
 

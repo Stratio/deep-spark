@@ -67,9 +67,9 @@ public abstract class ExtractorEntityTest<T, S extends BaseConfig<T>> extends Ex
     }
 
     @Override
-    public  Object transform(JSONObject jsonObject, String nameSpace, Class entityClass) {
+    public Object transform(JSONObject jsonObject, String nameSpace, Class entityClass) {
         try {
-            return  getObjectFromJson(entityClass, jsonObject);
+            return getObjectFromJson(entityClass, jsonObject);
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new DeepTransformException(e.getMessage());
         }
@@ -94,11 +94,11 @@ public abstract class ExtractorEntityTest<T, S extends BaseConfig<T>> extends Ex
             BookEntity book = books.get(0);
 
             //      tests subDocuments
-            assertEquals( ((BookEntity)originBook).getMetadataEntity().getAuthor() ,
+            assertEquals(((BookEntity) originBook).getMetadataEntity().getAuthor(),
                     book.getMetadataEntity().getAuthor());
 
             //      tests List<subDocuments>
-            List<CantoEntity> listCantos = ((BookEntity)originBook).getCantoEntities();
+            List<CantoEntity> listCantos = ((BookEntity) originBook).getCantoEntities();
 
             for (int i = 0; i < listCantos.size(); i++) {
                 assertEquals(listCantos.get(i).getNumber(), book.getCantoEntities().get(i).getNumber());

@@ -79,12 +79,7 @@ public final class MongoCellExtractor extends MongoExtractor<Cells> {
 
     @Override
     public Tuple2<Object, BSONObject> transformElement(Cells record) {
-        try {
-            return new Tuple2<>(null, UtilMongoDB.getBsonFromCell(record));
-        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            LOG.error(e.getMessage());
-            throw new DeepTransformException(e.getMessage());
-        }
+        return new Tuple2<>(null, UtilMongoDB.getBsonFromCell(record));
     }
 
 }

@@ -74,8 +74,6 @@ public final class WritingEntityToCassandra {
 
         final String outputTableName = "newlistdomains";
 
-
-
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
@@ -134,7 +132,6 @@ public final class WritingEntityToCassandra {
         });
 
         deepContext.saveRDD(outputRDD.rdd(), outputConfig);
-
 
         deepContext.stop();
     }

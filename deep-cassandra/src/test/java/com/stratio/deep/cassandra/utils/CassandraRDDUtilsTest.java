@@ -35,14 +35,14 @@ import java.util.UUID;
 
 import org.testng.annotations.Test;
 
-import scala.Tuple2;
-
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.testentity.CommonsTestEntity;
+
+import scala.Tuple2;
 
 /**
  * Created by luca on 11/07/14.

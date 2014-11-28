@@ -20,7 +20,6 @@ package com.aerospike.hadoop.mapreduce;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.hadoop.conf.Configuration;
 
 public class AerospikeConfigUtil {
@@ -83,9 +82,10 @@ public class AerospikeConfigUtil {
 
     public static String getInputNamespace(Configuration conf) {
         String namespace = conf.get(INPUT_NAMESPACE);
-        if (namespace == null)
+        if (namespace == null) {
             throw new UnsupportedOperationException
-                ("you must set the input namespace");
+                    ("you must set the input namespace");
+        }
         log.info("using " + INPUT_NAMESPACE + " = " + namespace);
         return namespace;
     }
@@ -103,9 +103,10 @@ public class AerospikeConfigUtil {
 
     public static void setInputOperation(Configuration conf, String operation) {
         if (!operation.equals("scan") &&
-                !operation.equals("numrange"))
+                !operation.equals("numrange")) {
             throw new UnsupportedOperationException
-                ("input operation must be 'scan' or 'numrange'");
+                    ("input operation must be 'scan' or 'numrange'");
+        }
         log.info("setting " + INPUT_OPERATION + " to " + operation);
         conf.set(INPUT_OPERATION, operation);
     }
@@ -113,9 +114,10 @@ public class AerospikeConfigUtil {
     public static String getInputOperation(Configuration conf) {
         String operation = conf.get(INPUT_OPERATION, DEFAULT_INPUT_OPERATION);
         if (!operation.equals("scan") &&
-                !operation.equals("numrange"))
+                !operation.equals("numrange")) {
             throw new UnsupportedOperationException
-                ("input operation must be 'scan' or 'numrange'");
+                    ("input operation must be 'scan' or 'numrange'");
+        }
         log.info("using " + INPUT_OPERATION + " = " + operation);
         return operation;
     }
@@ -138,9 +140,10 @@ public class AerospikeConfigUtil {
 
     public static long getInputNumRangeBegin(Configuration conf) {
         long begin = conf.getLong(INPUT_NUMRANGE_BEGIN, INVALID_LONG);
-        if (begin == INVALID_LONG && getInputOperation(conf).equals("numrange"))
+        if (begin == INVALID_LONG && getInputOperation(conf).equals("numrange")) {
             throw new UnsupportedOperationException
-                ("missing input numrange begin");
+                    ("missing input numrange begin");
+        }
         log.info("using " + INPUT_NUMRANGE_BEGIN + " = " + begin);
         return begin;
     }
@@ -152,9 +155,10 @@ public class AerospikeConfigUtil {
 
     public static long getInputNumRangeEnd(Configuration conf) {
         long end = conf.getLong(INPUT_NUMRANGE_END, INVALID_LONG);
-        if (end == INVALID_LONG && getInputOperation(conf).equals("numrange"))
+        if (end == INVALID_LONG && getInputOperation(conf).equals("numrange")) {
             throw new UnsupportedOperationException
-                ("missing input numrange end");
+                    ("missing input numrange end");
+        }
         log.info("using " + INPUT_NUMRANGE_END + " = " + end);
         return end;
     }
@@ -190,9 +194,10 @@ public class AerospikeConfigUtil {
 
     public static String getOutputNamespace(Configuration conf) {
         String namespace = conf.get(OUTPUT_NAMESPACE);
-        if (namespace == null)
+        if (namespace == null) {
             throw new UnsupportedOperationException
-                ("you must set the output namespace");
+                    ("you must set the output namespace");
+        }
         log.info("using " + OUTPUT_NAMESPACE + " = " + namespace);
         return namespace;
     }
@@ -234,8 +239,8 @@ public class AerospikeConfigUtil {
 
     public static org.apache.hadoop.mapred.JobConf asJobConf(Configuration cfg) {
         return cfg instanceof org.apache.hadoop.mapred.JobConf
-            ? (org.apache.hadoop.mapred.JobConf) cfg
-            : new org.apache.hadoop.mapred.JobConf(cfg);
+                ? (org.apache.hadoop.mapred.JobConf) cfg
+                : new org.apache.hadoop.mapred.JobConf(cfg);
     }
 }
 

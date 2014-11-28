@@ -18,6 +18,9 @@ package com.stratio.deep.mongodb.extractor;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.mongodb.DBObject;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
@@ -28,6 +31,7 @@ import com.stratio.deep.mongodb.utils.UtilMongoDB;
  */
 public class MongoNativeCellExtractor extends MongoNativeExtractor<Cells, MongoDeepJobConfig<Cells>> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MongoNativeCellExtractor.class);
     /**
      * The constant serialVersionUID.
      */
@@ -46,21 +50,11 @@ public class MongoNativeCellExtractor extends MongoNativeExtractor<Cells, MongoD
 
     @Override
     protected Cells transformElement(DBObject dbObject) {
-        try {
             return UtilMongoDB.getCellFromBson(dbObject, mongoDeepJobConfig.getNameSpace());
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @Override
     protected DBObject transformElement(Cells entity) {
-        try {
             return UtilMongoDB.getDBObjectFromCell(entity);
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }

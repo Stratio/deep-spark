@@ -72,7 +72,6 @@ public final class GroupingByKey {
         String RPCPORT = "9160";
         String HOST = "127.0.0.1";
 
-
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());

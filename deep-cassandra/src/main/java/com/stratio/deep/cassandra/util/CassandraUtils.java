@@ -16,11 +16,11 @@
 
 package com.stratio.deep.cassandra.util;
 
+import static com.stratio.deep.cassandra.util.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
 import static com.stratio.deep.commons.utils.AnnotationUtils.deepFieldName;
 import static com.stratio.deep.commons.utils.AnnotationUtils.getBeanFieldValue;
 import static com.stratio.deep.commons.utils.Utils.quote;
 import static com.stratio.deep.commons.utils.Utils.singleQuote;
-import static com.stratio.deep.cassandra.util.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -33,17 +33,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import com.datastax.driver.core.DataType;
-import com.datastax.driver.core.ProtocolVersion;
-import com.stratio.deep.cassandra.entity.CellValidator;
-import com.stratio.deep.cassandra.querybuilder.DefaultQueryBuilder;
 import org.apache.cassandra.db.marshal.AbstractType;
+import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.db.marshal.ListType;
 import org.apache.cassandra.db.marshal.MapType;
-import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.db.marshal.SetType;
 import org.apache.cassandra.db.marshal.TimeUUIDType;
-import org.apache.cassandra.db.marshal.UTF8Type;
 import org.apache.cassandra.db.marshal.UUIDType;
 import org.apache.cassandra.dht.Token;
 import org.apache.commons.collections.MapUtils;
@@ -51,12 +46,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.spark.TaskContext;
 import org.apache.spark.rdd.RDD;
 
-import scala.Function1;
-import scala.Tuple2;
-import scala.collection.Iterator;
-import scala.reflect.ClassTag;
-import scala.reflect.ClassTag$;
-
+import com.datastax.driver.core.DataType;
+import com.datastax.driver.core.ProtocolVersion;
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
@@ -64,6 +55,7 @@ import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.OperatorCassandra;
 import com.stratio.deep.cassandra.cql.DeepCqlRecordWriter;
+import com.stratio.deep.cassandra.querybuilder.DefaultQueryBuilder;
 import com.stratio.deep.commons.annotations.DeepField;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
@@ -77,6 +69,12 @@ import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Pair;
 import com.stratio.deep.commons.utils.Utils;
 
+import scala.Function1;
+import scala.Tuple2;
+import scala.collection.Iterator;
+import scala.reflect.ClassTag;
+import scala.reflect.ClassTag$;
+
 /**
  * Created by luca on 16/04/14.
  */
@@ -89,14 +87,14 @@ public class CassandraUtils {
     }
 
     public static <W> void doCql3SaveToCassandra(RDD<W> rdd, ICassandraDeepJobConfig<W> writeConfig,
-            Function1<W, Tuple2<Cells, Cells>> transformer) {
+                                                 Function1<W, Tuple2<Cells, Cells>> transformer) {
         if (!writeConfig.getIsWriteConfig()) {
             throw new IllegalArgumentException("Provided configuration object is not suitable for writing");
         }
         Tuple2<Map<String, ByteBuffer>, Map<String, ByteBuffer>> tuple = new Tuple2<>(null, null);
 
         RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
-                ClassTag$.MODULE$.<Tuple2<Cells, Cells>> apply(tuple.getClass()));
+                ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
 
         ((CassandraDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD.first());
 
@@ -127,13 +125,13 @@ public class CassandraUtils {
     /**
      * Provided the mapping function <i>transformer</i> that transforms a generic RDD to an RDD<Tuple2<Cells, Cells>>,
      * this generic method persists the RDD to underlying Cassandra datastore.
-     * 
+     *
      * @param rdd
      * @param writeConfig
      * @param transformer
      */
     public static <W> void doSaveToCassandra(RDD<W> rdd, final ICassandraDeepJobConfig<W> writeConfig,
-            Function1<W, Tuple2<Cells, Cells>> transformer) {
+                                             Function1<W, Tuple2<Cells, Cells>> transformer) {
 
         if (!writeConfig.getIsWriteConfig()) {
             throw new IllegalArgumentException("Provided configuration object is not suitable for writing");
@@ -142,7 +140,7 @@ public class CassandraUtils {
         Tuple2<Map<String, ByteBuffer>, Map<String, ByteBuffer>> tuple = new Tuple2<>(null, null);
 
         final RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
-                ClassTag$.MODULE$.<Tuple2<Cells, Cells>> apply(tuple.getClass()));
+                ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
 
         ((CassandraDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD.first());
 
@@ -154,7 +152,8 @@ public class CassandraUtils {
                     @Override
                     public Integer apply(TaskContext context, Iterator<Tuple2<Cells, Cells>> rows) {
 
-                        try (DeepCqlRecordWriter writer = new DeepCqlRecordWriter(writeConfig,new DefaultQueryBuilder())) {
+                        try (DeepCqlRecordWriter writer = new DeepCqlRecordWriter(writeConfig,
+                                new DefaultQueryBuilder())) {
                             while (rows.hasNext()) {
                                 Tuple2<Cells, Cells> row = rows.next();
                                 writer.write(row._1(), row._2());
@@ -164,70 +163,75 @@ public class CassandraUtils {
                         return null;
                     }
                 }, uClassTag
-                );
+        );
 
     }
 
     /**
      * Returns an instance of the Cassandra validator that matches the provided object.
-     * 
-     * @param obj
-     *            the object to use to resolve the cassandra marshaller.
-     * @param <T>
-     *            the generic object type.
+     *
+     * @param obj the object to use to resolve the cassandra marshaller.
+     * @param <T> the generic object type.
      * @return an instance of the Cassandra validator that matches the provided object.
-     * @throws com.stratio.deep.commons.exception.DeepGenericException
-     *             if no validator can be found for the specified object.
+     * @throws com.stratio.deep.commons.exception.DeepGenericException if no validator can be found for the specified object.
      */
     public static <T> AbstractType<?> marshallerInstance(T obj) {
-        AbstractType<?> abstractType = MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(obj.getClass());
 
-        if (obj instanceof UUID) {
-            UUID uuid = (UUID) obj;
+        AbstractType<?> abstractType = null;
 
-            if (uuid.version() == 1) {
-                abstractType = TimeUUIDType.instance;
+        if (obj != null) {
+            abstractType = MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(obj.getClass());
 
-            } else {
-                abstractType = UUIDType.instance;
-            }
-        }
+            if (obj instanceof UUID) {
+                UUID uuid = (UUID) obj;
 
-        if (abstractType == null){
-            //LIST Case
-            if (List.class.isAssignableFrom(obj.getClass())){
+                if (uuid.version() == 1) {
+                    abstractType = TimeUUIDType.instance;
 
-                List list = (List) obj;
-                if(!list.isEmpty()){
-                    abstractType = ListType.getInstance(marshallerInstance(list.get(0)));
-                }
-
-            }
-            // SET Case
-            else if (Set.class.isAssignableFrom(obj.getClass())){
-                Set set = (Set) obj;
-                if(!set.isEmpty()){
-                    java.util.Iterator i = set.iterator();
-                    Object o = i.next();
-                    abstractType = SetType.getInstance(marshallerInstance(o));
+                } else {
+                    abstractType = UUIDType.instance;
                 }
             }
-            // MAP Case
-            else if (Map.class.isAssignableFrom(obj.getClass())){
-                Set set = ((Map)obj).keySet();
-                if(!set.isEmpty()){
-                    java.util.Iterator i = set.iterator();
-                    Object o = i.next();
-                    abstractType = MapType.getInstance(marshallerInstance(o), marshallerInstance(((Map) obj).get(o)));
+
+            if (abstractType == null) {
+                //LIST Case
+                if (List.class.isAssignableFrom(obj.getClass())) {
+
+                    List list = (List) obj;
+                    if (!list.isEmpty()) {
+                        abstractType = ListType.getInstance(marshallerInstance(list.get(0)));
+                    }
 
                 }
+                // SET Case
+                else if (Set.class.isAssignableFrom(obj.getClass())) {
+                    Set set = (Set) obj;
+                    if (!set.isEmpty()) {
+                        java.util.Iterator i = set.iterator();
+                        Object o = i.next();
+                        abstractType = SetType.getInstance(marshallerInstance(o));
+                    }
+                }
+                // MAP Case
+                else if (Map.class.isAssignableFrom(obj.getClass())) {
+                    Set set = ((Map) obj).keySet();
+                    if (!set.isEmpty()) {
+                        java.util.Iterator i = set.iterator();
+                        Object o = i.next();
+                        abstractType = MapType
+                                .getInstance(marshallerInstance(o), marshallerInstance(((Map) obj).get(o)));
 
+                    }
+
+                }
             }
+
         }
 
         if (abstractType == null) {
-            throw new DeepGenericException("parameter class " + obj.getClass().getCanonicalName() + " does not have a" +
-                    " Cassandra marshaller");
+            throw new DeepGenericException(
+                    "parameter class " + obj.getClass().getCanonicalName() + " does not have a" +
+                            " Cassandra marshaller");
         }
 
         return abstractType;
@@ -237,19 +241,15 @@ public class CassandraUtils {
      * Generates the update query for the provided IDeepType. The UPDATE query takes into account all the columns of the
      * testentity, even those containing the null value. We do not generate the key part of the update query. The
      * provided query will be concatenated with the key part by CqlRecordWriter.
-     * 
-     * @param keys
-     *            the row keys wrapped inside a Cells object.
-     * @param values
-     *            all the other row columns wrapped inside a Cells object.
-     * @param outputKeyspace
-     *            the output keyspace.
-     * @param outputColumnFamily
-     *            the output column family.
+     *
+     * @param keys               the row keys wrapped inside a Cells object.
+     * @param values             all the other row columns wrapped inside a Cells object.
+     * @param outputKeyspace     the output keyspace.
+     * @param outputColumnFamily the output column family.
      * @return the update query statement.
      */
     public static String updateQueryGenerator(Cells keys, Cells values, String outputKeyspace,
-            String outputColumnFamily) {
+                                              String outputColumnFamily) {
 
         StringBuilder sb = new StringBuilder("UPDATE ").append(outputKeyspace).append(".").append(outputColumnFamily)
                 .append(" SET ");
@@ -258,7 +258,7 @@ public class CassandraUtils {
 
         StringBuilder keyClause = new StringBuilder(" WHERE ");
         for (Cell cell : keys.getCells()) {
-            if (((Cell) cell).isKey() || cell.isClusterKey() ) {
+            if (((Cell) cell).isKey() || cell.isClusterKey()) {
                 if (k > 0) {
                     keyClause.append(" AND ");
                 }
@@ -287,19 +287,15 @@ public class CassandraUtils {
 
     /**
      * Generates a create table cql statement from the given Cells description.
-     * 
-     * @param keys
-     *            the row keys wrapped inside a Cells object.
-     * @param values
-     *            all the other row columns wrapped inside a Cells object.
-     * @param outputKeyspace
-     *            the output keyspace.
-     * @param outputColumnFamily
-     *            the output column family.
+     *
+     * @param keys               the row keys wrapped inside a Cells object.
+     * @param values             all the other row columns wrapped inside a Cells object.
+     * @param outputKeyspace     the output keyspace.
+     * @param outputColumnFamily the output column family.
      * @return the create table statement.
      */
     public static String createTableQueryGenerator(Cells keys, Cells values, String outputKeyspace,
-            String outputColumnFamily) {
+                                                   String outputColumnFamily) {
 
         if (keys == null || StringUtils.isEmpty(outputKeyspace)
                 || StringUtils.isEmpty(outputColumnFamily)) {
@@ -316,7 +312,6 @@ public class CassandraUtils {
 
         for (Cell key : keys) {
 
-
             String cellName = quote(key.getCellName());
 
             if (!isFirstField) {
@@ -324,7 +319,8 @@ public class CassandraUtils {
             }
 
             // CellValidator cellValidator = CellValidator.cellValidator(key.getCellValue());
-            sb.append(cellName).append(" ").append(CassandraUtils.marshallerInstance(key.getValue()).asCQL3Type().toString());
+            sb.append(cellName).append(" ")
+                    .append(CassandraUtils.marshallerInstance(key.getValue()).asCQL3Type().toString());
 
             if (((Cell) key).isKey()) {
                 partitionKey.add(cellName);
@@ -337,10 +333,11 @@ public class CassandraUtils {
 
         if (values != null) {
             for (Cell cell : values) {
-
-
                 sb.append(", ");
-                sb.append(quote(cell.getCellName())).append(" ").append(CassandraUtils.marshallerInstance(cell.getValue()).asCQL3Type().toString());
+                if (cell.getValue() != null) {
+                    sb.append(quote(cell.getCellName())).append(" ")
+                            .append(CassandraUtils.marshallerInstance(cell.getValue()).asCQL3Type().toString());
+                }
             }
         }
 
@@ -391,13 +388,11 @@ public class CassandraUtils {
      * Convers an instance of type <T> to a tuple of ( Map<String, ByteBuffer>, List<ByteBuffer> ). The first map
      * contains the key column names and the corresponding values. The ByteBuffer list contains the value of the columns
      * that will be bounded to CQL query parameters.
-     * 
-     * @param e
-     *            the entity object to process.
-     * @param <T>
-     *            the entity object generic type.
+     *
+     * @param e   the entity object to process.
+     * @param <T> the entity object generic type.
      * @return a pair whose first element is a Cells object containing key Cell(s) and whose second element contains all
-     *         of the other Cell(s).
+     * of the other Cell(s).
      */
     public static <T extends IDeepType> Tuple2<Cells, Cells> deepType2tuple(T e) {
 
@@ -421,13 +416,12 @@ public class CassandraUtils {
 
     /**
      * Generates the part of the query where clause that will hit the Cassandra's secondary indexes.
-     * 
-     * @param additionalFilters
-     *            the map of filters names and values.
+     *
+     * @param additionalFilters the map of filters names and values.
      * @return the query subpart corresponding to the provided additional filters.
      */
     public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters, Filter[] filters,
-            String luceneIndex) {
+                                                   String luceneIndex) {
 
         StringBuilder sb = new StringBuilder("");
 
@@ -459,7 +453,6 @@ public class CassandraUtils {
                 }
 
                 switch (filterType) {
-
 
                 case IN:
                     List<String> inValues = (List<String>) filters[i].getValue();
@@ -507,9 +500,8 @@ public class CassandraUtils {
 
     /**
      * Generates the part of the query where clause that will hit the Cassandra's secondary indexes.
-     * 
-     * @param additionalFilters
-     *            the map of filters names and values.
+     *
+     * @param additionalFilters the map of filters names and values.
      * @return the query subpart corresponding to the provided additional filters.
      */
     public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters) {
@@ -578,9 +570,8 @@ public class CassandraUtils {
      * Match: Default query, supporting escaped symbols: *, ?, [, ], etc.
      * </ul>
      * </li>
-     * 
-     * @param query
-     *            The user query.
+     *
+     * @param query The user query.
      * @return An array with the type of query and the processed query.
      */
     private static String[] processLuceneQueryType(String query) {
@@ -614,14 +605,10 @@ public class CassandraUtils {
 
     /**
      * Returns the partition key related to a given {@link Cells}.
-     * 
-     * @param cells
-     *            {@link Cells} from Cassandra to extract the partition key.
-     * @param keyValidator
-     *            Cassandra key type.
-     * @param numberOfKeys
-     *            Number of keys.
-     * 
+     *
+     * @param cells        {@link Cells} from Cassandra to extract the partition key.
+     * @param keyValidator Cassandra key type.
+     * @param numberOfKeys Number of keys.
      * @return Partition key.
      */
     public static ByteBuffer getPartitionKey(Cells cells, AbstractType<?> keyValidator, int numberOfKeys) {
@@ -652,11 +639,11 @@ public class CassandraUtils {
 
         Object o = null;
         if (cellValue != null) {
-            o = ((DataType)metadata.getValue()).deserialize(cellValue, ProtocolVersion.V2);
+            o = ((DataType) metadata.getValue()).deserialize(cellValue, ProtocolVersion.V2);
 
         }
 
-        return Cell.create(cellName, o,isKey, isClusterKey);
+        return Cell.create(cellName, o, isKey, isClusterKey);
     }
 
     public static Cell createFromEntity(IDeepType e, Field field) {
@@ -669,20 +656,18 @@ public class CassandraUtils {
 
     }
 
-
     /**
      * Checks if a token is included in the current split.
      *
-     * @param token
-     *            {@link Token} to be checked.
-     *
+     * @param token {@link Token} to be checked.
      * @return true, if the token is included in the interval; false, otherwise.
      */
     public static boolean isTokenIncludedInRange(DeepTokenRange deepTokenRange, Token<Comparable> token) {
 
         boolean isIncluded = false;
 
-        if (((Comparable) deepTokenRange.getStartTokenAsComparable()).compareTo(deepTokenRange.getEndTokenAsComparable()) <= 0) {
+        if (((Comparable) deepTokenRange.getStartTokenAsComparable())
+                .compareTo(deepTokenRange.getEndTokenAsComparable()) <= 0) {
             isIncluded = token.token.compareTo(deepTokenRange.getStartTokenAsComparable()) > 0;
 
             if (isIncluded) {

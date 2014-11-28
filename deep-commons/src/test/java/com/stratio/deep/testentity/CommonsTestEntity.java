@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-
 import com.stratio.deep.commons.annotations.DeepEntity;
 import com.stratio.deep.commons.annotations.DeepField;
 
@@ -85,7 +84,7 @@ public class CommonsTestEntity extends CommonsBaseTestEntity {
     }
 
     public CommonsTestEntity(String id, String domain, String url, Integer responseTime, Integer responseCode,
-            String notMappedField) {
+                             String notMappedField) {
         super(id, domain);
         this.url = url;
         this.responseTime = responseTime;

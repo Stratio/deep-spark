@@ -14,14 +14,7 @@
  */
 package com.stratio.deep.core.extractor.client;
 
-
-
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-
 import java.util.List;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -41,6 +34,10 @@ import com.stratio.deep.commons.extractor.response.NextResponse;
 import com.stratio.deep.commons.extractor.response.Response;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.commons.rdd.IExtractor;
+
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 
 public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Response> implements
         IExtractor<T, ExtractorConfig<T>> {
@@ -91,7 +88,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (;;) {
+        for (; ; ) {
             try {
                 response = answer.take();
                 break;
@@ -115,7 +112,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (;;) {
+        for (; ; ) {
             try {
                 response = answer.take();
                 break;
@@ -139,7 +136,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (;;) {
+        for (; ; ) {
             try {
                 response = answer.take();
                 break;
@@ -163,7 +160,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (;;) {
+        for (; ; ) {
             try {
                 response = answer.take();
                 break;
@@ -187,7 +184,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (;;) {
+        for (; ; ) {
             try {
                 response = answer.take();
                 break;
@@ -216,7 +213,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (;;) {
+        for (; ; ) {
             try {
                 response = answer.take();
                 break;
@@ -240,7 +237,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (;;) {
+        for (; ; ) {
             try {
                 response = answer.take();
                 break;

@@ -16,11 +16,11 @@
 
 package com.stratio.deep.testentity
 
-import com.stratio.deep.commons.annotations.{DeepField, DeepEntity}
+import com.stratio.deep.commons.annotations.{DeepEntity, DeepField}
 import com.stratio.deep.commons.entity.IDeepType
+import org.apache.cassandra.db.marshal.Int32Type
 
 import scala.beans.BeanProperty
-import org.apache.cassandra.db.marshal.Int32Type
 
 /**
  * Author: Luca Rosellini

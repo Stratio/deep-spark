@@ -1,21 +1,17 @@
 package com.stratio.deep.cassandra.entity;
 
-
+import static com.stratio.deep.cassandra.util.AnnotationUtils.MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE;
 import static com.stratio.deep.commons.utils.AnnotationUtils.deepFieldName;
 import static com.stratio.deep.commons.utils.AnnotationUtils.getBeanFieldValue;
-import static com.stratio.deep.cassandra.util.AnnotationUtils.MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE;
-import org.apache.cassandra.db.marshal.MapType;
+
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 
 import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.db.marshal.UTF8Type;
-import org.apache.cassandra.db.marshal.UUIDType;
 
 import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.ProtocolVersion;
-import com.stratio.deep.cassandra.util.CassandraUtils;
 import com.stratio.deep.commons.annotations.DeepField;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.IDeepType;
@@ -28,25 +24,20 @@ import com.stratio.deep.commons.exception.DeepInstantiationException;
 @Deprecated
 public class CassandraCell extends Cell {
 
-
-
     private transient CellValidator cellValidator;
 
     private transient DataType dataType;
 
-
-
     /**
      * Factory method, creates a new CassandraCell from a basic Cell. The keys in the cell will be partitionsKey<br/>
      *
-     * @param basicCell  the cell object carrying the metadata and the value
+     * @param basicCell the cell object carrying the metadata and the value
      * @return an instance of a Cell object for the provided parameters.
      */
     public static Cell create(Cell basicCell) {
         //TODO if basicCell instanceof CassandraCell => return basicCell;
         return new CassandraCell(basicCell);
     }
-
 
     /**
      * Factory method, creates a new CassandraCell from its value and metadata information<br/>
@@ -103,7 +94,7 @@ public class CassandraCell extends Cell {
      * @return an instance of a Cell object for the provided parameters.
      */
     public static Cell create(String cellName, Object cellValue, Boolean isPartitionKey,
-            Boolean isClusterKey) {
+                              Boolean isClusterKey) {
         return new CassandraCell(cellName, cellValue, isPartitionKey, isClusterKey);
     }
 
@@ -117,7 +108,7 @@ public class CassandraCell extends Cell {
      * @return an instance of a Cell object for the provided parameters.
      */
     public static Cell create(String cellName, DataType cellType, Boolean isPartitionKey,
-            Boolean isClusterKey) {
+                              Boolean isClusterKey) {
         return new CassandraCell(cellName, cellType, isPartitionKey, isClusterKey);
     }
 
@@ -193,12 +184,12 @@ public class CassandraCell extends Cell {
     private CassandraCell(Cell metadata, ByteBuffer cellValue) {
         this.cellName = metadata.getCellName();
         this.isClusterKey = ((CassandraCell) metadata).isClusterKey;
-        this.isKey = ((CassandraCell)metadata).isPartitionKey();
+        this.isKey = ((CassandraCell) metadata).isPartitionKey();
         this.cellValidator = ((CassandraCell) metadata).cellValidator;
         if (cellValue != null) {
-            if(((CassandraCell)metadata).getDataType()!=null){
-                this.cellValue = ((CassandraCell)metadata).getDataType().deserialize(cellValue, ProtocolVersion.V2);
-            }else{
+            if (((CassandraCell) metadata).getDataType() != null) {
+                this.cellValue = ((CassandraCell) metadata).getDataType().deserialize(cellValue, ProtocolVersion.V2);
+            } else {
                 this.cellValue = ((CassandraCell) metadata).marshaller().compose(cellValue);
             }
         }
@@ -214,7 +205,7 @@ public class CassandraCell extends Cell {
 
         this.cellName = metadata.getCellName();
         this.isClusterKey = ((CassandraCell) metadata).isClusterKey;
-        this.isKey = ((CassandraCell)metadata).isPartitionKey();
+        this.isKey = ((CassandraCell) metadata).isPartitionKey();
         this.cellValidator = ((CassandraCell) metadata).cellValidator;
         this.cellValue = cellValue;
     }
@@ -223,12 +214,11 @@ public class CassandraCell extends Cell {
      * Private constructor.Cassandra cell from a basic cell.
      */
     private CassandraCell(Cell cell) {
-            this.cellName = cell.getCellName();
-            this.cellValue = cell.getCellValue();
-            this.isKey = cell.isKey();
-            this.cellValidator = getValueType(cellValue);
+        this.cellName = cell.getCellName();
+        this.cellValue = cell.getCellValue();
+        this.isKey = cell.isKey();
+        this.cellValidator = getValueType(cellValue);
     }
-
 
     /**
      * Private constructor.
@@ -246,10 +236,6 @@ public class CassandraCell extends Cell {
     public CellValidator getCellValidator() {
         return cellValidator;
     }
-
-
-
-
 
     public Class getValueType() {
         Class valueType = MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE.get(cellValidator.getValidatorClassName());
@@ -272,19 +258,6 @@ public class CassandraCell extends Cell {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int result = cellName.hashCode();
-        result = 31 * result + (cellValue != null ? cellValue.hashCode() : 0);
-        result = 31 * result + isKey.hashCode();
-        result = 31 * result + isClusterKey.hashCode();
-        result = 31 * result + (cellValidator != null ? cellValidator.hashCode() : 0);
-        return result;
-    }
-
     public Boolean isClusterKey() {
         return isClusterKey;
     }
@@ -292,7 +265,6 @@ public class CassandraCell extends Cell {
     public Boolean isPartitionKey() {
         return isKey;
     }
-
 
     public Boolean isKey() {
         return isClusterKey || isKey;
@@ -313,8 +285,6 @@ public class CassandraCell extends Cell {
             return null;
         }
     }
-
-
 
     @Override
     public String toString() {

@@ -20,17 +20,17 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.FILTER
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
 import org.elasticsearch.hadoop.cfg.ConfigurationOptions;
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
+
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.HadoopConfig;
 import com.stratio.deep.commons.entity.Cells;
@@ -46,8 +46,6 @@ import com.stratio.deep.es.utils.UtilES;
 public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig<T>> implements IESDeepJobConfig<T> {
     private static final long serialVersionUID = -7179376653643603038L;
 
-
-
     /**
      * OPTIONAL filter query
      */
@@ -55,26 +53,22 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig<T>> impl
 
     private Map<String, Serializable> customConfiguration;
 
-
-
     /**
      * Default constructor
      */
     public ESDeepJobConfig(Class<T> entityClass) {
         super(entityClass);
-        if(Cells.class.isAssignableFrom(entityClass)){
+        if (Cells.class.isAssignableFrom(entityClass)) {
             extractorImplClass = ESCellExtractor.class;
-        }else{
+        } else {
             extractorImplClass = ESEntityExtractor.class;
         }
     }
 
-
-
-
-    public String getResource(){
-        return table!=null?catalog.concat("/").concat(table):catalog;
+    public String getResource() {
+        return table != null ? catalog.concat("/").concat(table) : catalog;
     }
+
     /**
      * {@inheritDoc}
      */
@@ -83,8 +77,8 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig<T>> impl
         validate();
 
         configHadoop = new JobConf();
-        ((JobConf)configHadoop).setInputFormat(EsInputFormat.class);
-        ((JobConf)configHadoop).setOutputFormat(EsOutputFormat.class);
+        ((JobConf) configHadoop).setInputFormat(EsInputFormat.class);
+        ((JobConf) configHadoop).setOutputFormat(EsOutputFormat.class);
 
         configHadoop.set(ConfigurationOptions.ES_RESOURCE, getResource());
         configHadoop.set(ConfigurationOptions.ES_FIELD_READ_EMPTY_AS_NULL, "false");
@@ -93,7 +87,7 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig<T>> impl
             configHadoop.set(ConfigurationOptions.ES_QUERY, query);
         }
 
-        if(inputColumns!=null && inputColumns.length>0){
+        if (inputColumns != null && inputColumns.length > 0) {
             configHadoop.set(ConfigurationOptions.ES_SCROLL_FIELDS, Utils.splitListByComma(Arrays.asList
                     (inputColumns)));
         }
@@ -142,7 +136,6 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig<T>> impl
         }
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -165,26 +158,26 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig<T>> impl
         return null;
     }
 
-
     @Override
     public ESDeepJobConfig<T> type(String type) {
-        this.table=type;
+        this.table = type;
         return this;
     }
 
     /**
      * Same as type
+     *
      * @param type
      * @return
      */
     public ESDeepJobConfig<T> tipe(String type) {
-        this.table=type;
+        this.table = type;
         return this;
     }
 
     @Override
     public ESDeepJobConfig<T> index(String index) {
-        this.catalog=index;
+        this.catalog = index;
         return this;
     }
 
@@ -200,7 +193,7 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig<T>> impl
 
     @Override
     public String getNameSpace() {
-        if(nameSpace == null){
+        if (nameSpace == null) {
             nameSpace = new StringBuilder().append(getIndex())
                     .append(".")
                     .append(getType()).toString();
@@ -225,7 +218,6 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig<T>> impl
 
         Map<String, String> values = extractorConfig.getValues();
 
-
         if (values.get(INPUT_COLUMNS) != null) {
             inputColumns(extractorConfig.getStringArray(INPUT_COLUMNS));
         }
@@ -246,6 +238,5 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig<T>> impl
         query = "{ \"query\" :".concat((UtilES.generateQuery(filterArray)).toString()).concat("}");
         return this;
     }
-
 
 }

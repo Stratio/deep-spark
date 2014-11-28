@@ -58,7 +58,6 @@ public final class ReadingEntityFromMongoDBReplicaSet {
         // replica set name
         String replicaSet = "s1";
 
-
         // Recommended read preference. If the primary node go down, can still read from secundaries
         String readPreference = "primaryPreferred";
 
@@ -86,7 +85,6 @@ public final class ReadingEntityFromMongoDBReplicaSet {
         RDD<MessageTestEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
 
         LOG.info("count : " + inputRDDEntity.cache().count());
-
 
         deepContext.stop();
 
