@@ -18,7 +18,6 @@ package com.stratio.deep.examples.java;
 
 import java.util.List;
 
-
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
 
@@ -35,16 +34,13 @@ import scala.Tuple2;
  */
 public final class ReadingEntityFromMongoDB {
     private static final Logger LOG = Logger.getLogger(com.stratio.deep.examples.java.ReadingEntityFromMongoDB.class);
-    public static List<Tuple2<String, Integer>> results;
 
     private ReadingEntityFromMongoDB() {
     }
 
-
     public static void main(String[] args) {
         doMain(args);
     }
-
 
     public static void doMain(String[] args) {
         String job = "java:readingEntityFromMongoDB";
@@ -56,18 +52,16 @@ public final class ReadingEntityFromMongoDB {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
-
         MongoDeepJobConfig<MessageTestEntity> inputConfigEntity =
-				        MongoConfigFactory.createMongoDB(MessageTestEntity.class).host(host).database(database).collection(inputCollection).initialize();
+                MongoConfigFactory.createMongoDB(MessageTestEntity.class).host(host).database(database)
+                        .collection(inputCollection).initialize();
 
         JavaRDD<MessageTestEntity> inputRDDEntity = deepContext.createJavaRDD(inputConfigEntity);
 
-
-	    LOG.info("count : " + inputRDDEntity.cache().count());
-
+        LOG.info("count : " + inputRDDEntity.cache().count());
 
         deepContext.stop();
     }

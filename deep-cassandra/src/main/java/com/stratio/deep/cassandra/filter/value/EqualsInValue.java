@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.stratio.deep.cassandra.filter.value;
 

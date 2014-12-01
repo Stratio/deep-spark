@@ -15,30 +15,27 @@
  */
 package com.stratio.deep.aerospike.utils;
 
-import com.aerospike.client.Record;
-import com.aerospike.hadoop.mapreduce.AerospikeRecord;
-import com.stratio.deep.aerospike.config.AerospikeDeepJobConfig;
-import com.stratio.deep.core.entity.BookEntity;
-import com.stratio.deep.core.entity.CantoEntity;
-import com.stratio.deep.core.entity.MessageTestEntity;
-import com.stratio.deep.core.entity.MetadataEntity;
-import com.stratio.deep.testutils.UnitTest;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static org.testng.Assert.assertEquals;
+import org.testng.annotations.Test;
 
-@Test(groups = {"UnitTests"})
+import com.aerospike.client.Record;
+import com.aerospike.hadoop.mapreduce.AerospikeRecord;
+import com.stratio.deep.aerospike.config.AerospikeDeepJobConfig;
+import com.stratio.deep.core.entity.MessageTestEntity;
+
+@Test(groups = { "UnitTests" })
 public class UtilAerospikeTest {
 
     @Test
-    public void testGetRecordFromObject() throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public void testGetRecordFromObject()
+            throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+            InstantiationException {
 
         MessageTestEntity messageEntity = new MessageTestEntity();
         messageEntity.setId("3");
@@ -53,14 +50,17 @@ public class UtilAerospikeTest {
     }
 
     @Test
-    public void testGetObjectFromRecord() throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public void testGetObjectFromRecord()
+            throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+            InstantiationException {
         Map<String, Object> bins = new HashMap<>();
         bins.put("id", "3");
         bins.put("message", "Message");
         bins.put("number", 3L);
         Record data = new Record(bins, null, 0, 0);
         AerospikeRecord record = new AerospikeRecord(data);
-        MessageTestEntity messageEntity = UtilAerospike.getObjectFromRecord(MessageTestEntity.class, record, new AerospikeDeepJobConfig(MessageTestEntity.class));
+        MessageTestEntity messageEntity = UtilAerospike.getObjectFromRecord(MessageTestEntity.class, record,
+                new AerospikeDeepJobConfig(MessageTestEntity.class));
 
         assertEquals(messageEntity.getId(), bins.get("id"));
         assertEquals(messageEntity.getMessage(), bins.get("message"));

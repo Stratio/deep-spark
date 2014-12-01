@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.stratio.deep.commons.filter;
 

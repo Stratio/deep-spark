@@ -16,8 +16,15 @@
 
 package com.stratio.es;
 
-import com.google.common.io.Resources;
-import com.stratio.deep.testutils.FunctionalTest;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
+import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URL;
+import java.util.concurrent.ExecutionException;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.count.CountResponse;
@@ -37,15 +44,7 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URL;
-import java.util.concurrent.*;
-
-import static org.elasticsearch.index.query.QueryBuilders.termQuery;
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
-
+import com.google.common.io.Resources;
 
 /**
  * Created by rcrespo on 29/08/14.
@@ -63,7 +62,7 @@ public class ESJavaRDDFT {
     public static final String ES_TYPE = "tweet";
     public static final String ES_INDEX_BOOK = "book";
     public static final String ES_INDEX_MESSAGE = "test";
-    public static final String ES_TYPE_MESSAGE  = "input";
+    public static final String ES_TYPE_MESSAGE = "input";
     public static final String ES_SEPARATOR = "/";
     public static final String ES_TYPE_INPUT = "input";
     public static final String ES_TYPE_OUTPUT = "output";
@@ -94,10 +93,6 @@ public class ESJavaRDDFT {
 
         LOG.info("Started local node at " + DB_FOLDER_NAME + " settings " + node.settings().getAsMap());
 
-
-
-
-
     }
 
     /**
@@ -114,7 +109,7 @@ public class ESJavaRDDFT {
 
         JSONObject jsonObject = (JSONObject) obj;
 
-        IndexResponse responseBook = client.prepareIndex(ES_INDEX_BOOK, ES_TYPE_INPUT,"id")
+        IndexResponse responseBook = client.prepareIndex(ES_INDEX_BOOK, ES_TYPE_INPUT, "id")
                 .setSource(jsonObject.toJSONString())
                 .execute()
                 .actionGet();
@@ -171,7 +166,7 @@ public class ESJavaRDDFT {
 
         } catch (Exception e) {
 
-//            e.printStackTrace();
+            //            e.printStackTrace();
         }
     }
 

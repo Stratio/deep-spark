@@ -15,6 +15,11 @@
  */
 package com.stratio.deep.aerospike.extractor;
 
+import java.lang.reflect.InvocationTargetException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aerospike.hadoop.mapreduce.AerospikeKey;
 import com.aerospike.hadoop.mapreduce.AerospikeRecord;
 import com.stratio.deep.aerospike.config.AerospikeDeepJobConfig;
@@ -22,11 +27,8 @@ import com.stratio.deep.aerospike.utils.UtilAerospike;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepTransformException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
-import java.lang.reflect.InvocationTargetException;
+import scala.Tuple2;
 
 /**
  * Cell RDD to interact with Aerospike.
@@ -43,7 +45,7 @@ public class AerospikeCellExtractor extends AerospikeExtractor<Cells> {
         this(Cells.class);
     }
 
-    public AerospikeCellExtractor(Class<Cells> entityClass){
+    public AerospikeCellExtractor(Class<Cells> entityClass) {
         super();
         this.deepJobConfig = new AerospikeDeepJobConfig(entityClass);
     }
@@ -55,7 +57,7 @@ public class AerospikeCellExtractor extends AerospikeExtractor<Cells> {
     public Cells transformElement(Tuple2<AerospikeKey, AerospikeRecord> tuple,
                                   DeepJobConfig<Cells, AerospikeDeepJobConfig<Cells>> config) {
         try {
-            return UtilAerospike.getCellFromRecord(tuple._1(), tuple._2(), (AerospikeDeepJobConfig) deepJobConfig) ;
+            return UtilAerospike.getCellFromRecord(tuple._1(), tuple._2(), (AerospikeDeepJobConfig) deepJobConfig);
         } catch (Exception e) {
             LOG.error("Cannot convert AerospikeRecord: ", e);
             throw new DeepTransformException("Could not transform from AerospikeRecord to Cell " + e.getMessage(), e);

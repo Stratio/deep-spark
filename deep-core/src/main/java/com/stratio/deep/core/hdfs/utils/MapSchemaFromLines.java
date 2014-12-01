@@ -30,33 +30,29 @@ public class MapSchemaFromLines implements Function<String, Cells> {
      */
     private String catalogName;
 
-
-    public MapSchemaFromLines(TextFileDataTable textFileDataTable){
-        this.tableName   = textFileDataTable.getTableName().getTableName();
+    public MapSchemaFromLines(TextFileDataTable textFileDataTable) {
+        this.tableName = textFileDataTable.getTableName().getTableName();
         this.catalogName = textFileDataTable.getTableName().getCatalogName();
-        this.columns     = textFileDataTable.getColumnMap();
-        this.separator   = textFileDataTable.getLineSeparator();
+        this.columns = textFileDataTable.getColumnMap();
+        this.separator = textFileDataTable.getLineSeparator();
     }
 
     @Override
     public Cells call(String s) throws Exception {
 
-        Cells cellsOut = new Cells(catalogName+"."+tableName);
+        Cells cellsOut = new Cells(catalogName + "." + tableName);
 
         String[] splits = s.split(separator);
 
         int i = 0;
-        for(SchemaMap schemaMap : columns){
+        for (SchemaMap schemaMap : columns) {
 
-            Cell cell = Cell.create(schemaMap.getFieldName(), Utils.castingUtil(splits[i], schemaMap.getFieldType()) );
+            Cell cell = Cell.create(schemaMap.getFieldName(), Utils.castingUtil(splits[i], schemaMap.getFieldType()));
             cellsOut.add(cell);
             i++;
         }
 
-
         return cellsOut;
     }
-
-
 
 }

@@ -41,10 +41,9 @@ public class BaseConfig<T> implements Serializable {
         this.entityClass = t;
     }
 
-    public BaseConfig(){
+    public BaseConfig() {
         entityClass = Cells.class;
     }
-
 
     public Class getExtractorImplClass() {
         return extractorImplClass;

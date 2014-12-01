@@ -92,7 +92,7 @@ public class ContextProperties {
             }
 
             jar = (line.hasOption("jars") ? line.getOptionValues("jars") : new String[] { });
-            cluster = line.getOptionValue  ("master", defaultIfEmpty(System.getProperty("spark.master"), "local"));
+            cluster = line.getOptionValue("master", defaultIfEmpty(System.getProperty("spark.master"), "local"));
             sparkHome = line.getOptionValue("sparkHome", defaultIfEmpty(System.getProperty("spark.home"), ""));
             hdfsCluster = line.getOptionValue("hdfsHost", Constants.DEFAULT_HDFS_HOST);
 
@@ -113,7 +113,5 @@ public class ContextProperties {
     public String[] getJars() {
         return jar;
     }
-
-
 
 }

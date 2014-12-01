@@ -35,7 +35,6 @@ import scala.Tuple2;
  */
 public final class WritingEntityToMongoDB {
     private static final Logger LOG = Logger.getLogger(WritingEntityToMongoDB.class);
-    public static List<Tuple2<String, Integer>> results;
 
     private WritingEntityToMongoDB() {
     }
@@ -60,7 +59,6 @@ public final class WritingEntityToMongoDB {
 
         String readPreference = "nearest";
 
-
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
@@ -79,7 +77,6 @@ public final class WritingEntityToMongoDB {
         outputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
         deepContext.saveRDD(inputRDDEntity, outputConfigEntity);
-
 
         deepContext.stop();
     }

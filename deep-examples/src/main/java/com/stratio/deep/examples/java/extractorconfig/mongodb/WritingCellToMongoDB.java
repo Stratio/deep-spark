@@ -49,7 +49,6 @@ public final class WritingCellToMongoDB {
 
         String outputCollection = "output";
 
-
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
@@ -76,7 +75,6 @@ public final class WritingCellToMongoDB {
 
         LOG.info("count output : " + outputRDDCell.count());
         LOG.info("prints first output cell: " + outputRDDCell.first());
-
 
         deepContext.stop();
     }

@@ -16,18 +16,19 @@
 
 package com.stratio.deep.aerospike.extractor;
 
+import java.lang.reflect.InvocationTargetException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aerospike.hadoop.mapreduce.AerospikeKey;
 import com.aerospike.hadoop.mapreduce.AerospikeRecord;
 import com.stratio.deep.aerospike.config.AerospikeDeepJobConfig;
 import com.stratio.deep.aerospike.utils.UtilAerospike;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.exception.DeepTransformException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import scala.Tuple2;
-
-import java.lang.reflect.InvocationTargetException;
-
 
 /**
  * Entity RDD to interact with Aerospike.
@@ -41,6 +42,7 @@ public class AerospikeEntityExtractor<T> extends AerospikeExtractor<T> {
 
     /**
      * Public constructor for AerospikeEntityExtractor.
+     *
      * @param t
      */
     public AerospikeEntityExtractor(Class<T> t) {
@@ -68,7 +70,8 @@ public class AerospikeEntityExtractor<T> extends AerospikeExtractor<T> {
     public T transformElement(Tuple2<AerospikeKey, AerospikeRecord> tuple, DeepJobConfig<T,
             AerospikeDeepJobConfig<T>> config) {
         try {
-            return (T) UtilAerospike.getObjectFromRecord(config.getEntityClass(), tuple._2(), (AerospikeDeepJobConfig)this.deepJobConfig);
+            return (T) UtilAerospike.getObjectFromRecord(config.getEntityClass(), tuple._2(),
+                    (AerospikeDeepJobConfig) this.deepJobConfig);
         } catch (Exception e) {
             LOG.error("Cannot convert AerospikeRecord: ", e);
             throw new DeepTransformException("Could not transform from AerospikeRecord to Entity " + e.getMessage(), e);

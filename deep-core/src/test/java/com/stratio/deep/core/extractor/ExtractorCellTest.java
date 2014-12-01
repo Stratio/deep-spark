@@ -40,7 +40,6 @@ import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepTransformException;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.core.context.DeepSparkContext;
 
@@ -73,7 +72,6 @@ public abstract class ExtractorCellTest<S extends BaseConfig<Cells>> extends Ext
         }
     }
 
-
     @Test
     public void testDataSet() {
         DeepSparkContext context = getDeepSparkContext();
@@ -91,7 +89,6 @@ public abstract class ExtractorCellTest<S extends BaseConfig<Cells>> extends Ext
             List<Cells> books = inputRDDEntity.toJavaRDD().collect();
 
             Cells book = books.get(0);
-
 
             //      tests subDocuments
 

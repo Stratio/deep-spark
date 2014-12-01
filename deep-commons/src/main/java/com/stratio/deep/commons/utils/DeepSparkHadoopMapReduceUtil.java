@@ -52,7 +52,7 @@ public class DeepSparkHadoopMapReduceUtil {
     }
 
     public static TaskAttemptID newTaskAttemptID(String jtIdentifier, int jobId, boolean isMap, int taskId,
-            int attemptId) {
+                                                 int attemptId) {
         Class clazz = null;
         try {
             clazz = Class.forName("org.apache.hadoop.mapreduce.TaskAttemptID");

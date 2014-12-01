@@ -18,13 +18,13 @@ package com.stratio.deep.examples.scala
 
 import com.stratio.deep.cassandra.config.{CassandraConfigFactory, CassandraDeepJobConfig}
 import com.stratio.deep.core.context.DeepSparkContext
-import com.stratio.deep.utils.ContextProperties
-import org.apache.spark.{SparkContext, SparkConf}
-import org.apache.spark.rdd.RDD
-import scala.math._
-
-import org.apache.spark.SparkContext._
 import com.stratio.deep.testentity.{ScalaOutputEntity, ScalaPageEntity}
+import com.stratio.deep.utils.ContextProperties
+import org.apache.spark.SparkContext._
+import org.apache.spark.rdd.RDD
+import org.apache.spark.{SparkConf, SparkContext}
+
+import scala.math._
 
 /**
  * Author: Luca Rosellini

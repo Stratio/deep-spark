@@ -16,11 +16,12 @@
 
 package com.stratio.deep.aerospike.config;
 
+import java.util.List;
+
 import org.apache.hadoop.conf.Configuration;
+
 import scala.Tuple2;
 import scala.Tuple3;
-
-import java.util.List;
 
 /**
  * Defines the public methods that each Stratio Deep Aerospike configuration object should implement.
@@ -47,18 +48,21 @@ public interface IAerospikeDeepJobConfig<T> {
 
     /**
      * Returns Aerospike's namespace.
+     *
      * @return
      */
     String getNamespace();
 
     /**
      * Returns Aerospike's set.
+     *
      * @return
      */
     String getSet();
 
     /**
      * Aerospike's bin name.
+     *
      * @param bin
      * @return
      */
@@ -66,6 +70,7 @@ public interface IAerospikeDeepJobConfig<T> {
 
     /**
      * Returns Aerospike's bin.
+     *
      * @return
      */
     String getBin();
@@ -75,9 +80,9 @@ public interface IAerospikeDeepJobConfig<T> {
      */
     Configuration getHadoopConfiguration();
 
-
     /**
      * Sets the list of available Aerospike ports.
+     *
      * @param port
      * @return
      */
@@ -93,12 +98,14 @@ public interface IAerospikeDeepJobConfig<T> {
 
     /**
      * Returns Aerospike's configured operation.
+     *
      * @return
      */
     String getOperation();
 
     /**
      * Sets an equality filter for querying Aerospike.
+     *
      * @param filter Equality filter value.
      * @return
      */
@@ -106,12 +113,14 @@ public interface IAerospikeDeepJobConfig<T> {
 
     /**
      * Returns the configured Aerospike's equality filter.
+     *
      * @return
      */
     Tuple2<String, Object> getEqualsFilter();
 
     /**
      * Sets a numrange filter for querying Aerospike.
+     *
      * @param filter
      * @return
      */
@@ -119,6 +128,7 @@ public interface IAerospikeDeepJobConfig<T> {
 
     /**
      * Returns the configured Aerospike's numrange filter.
+     *
      * @return
      */
     Tuple3<String, Object, Object> getNumrangeFilter();

@@ -21,9 +21,8 @@ import com.stratio.deep.cassandra.config.CassandraConfigFactory
 import com.stratio.deep.commons.entity.{Cell, Cells}
 import com.stratio.deep.core.context.DeepSparkContext
 import com.stratio.deep.utils.ContextProperties
-import org.apache.spark.rdd.RDD
-
 import org.apache.spark.SparkContext._
+import org.apache.spark.rdd.RDD
 
 
 /**

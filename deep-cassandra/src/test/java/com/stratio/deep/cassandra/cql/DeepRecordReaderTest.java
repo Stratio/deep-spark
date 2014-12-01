@@ -1,9 +1,8 @@
 /**
- * 
+ *
  */
 package com.stratio.deep.cassandra.cql;
 
-import static com.stratio.deep.cassandra.util.CassandraUtils.isTokenIncludedInRange;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
@@ -11,7 +10,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.apache.cassandra.dht.Token;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -83,8 +81,8 @@ public class DeepRecordReaderTest {
         when(config.getPartitionerClassName()).thenReturn("org.apache.cassandra.dht.Murmur3Partitioner");
 
         when(tokenRange.getReplicas()).thenReturn(Arrays.asList(LOCALHOST_CONSTANT));
-//        when(isTokenIncludedInRange(tokenRange, (any(Token.class))).thenReturn(true, false,
-//                false, true, true);
+        //        when(isTokenIncludedInRange(tokenRange, (any(Token.class))).thenReturn(true, false,
+        //                false, true, true);
 
         when(CassandraClientProvider.trySessionForLocation(any(String.class), any(CassandraDeepJobConfig.class),
                 any(Boolean.class))).thenReturn(Pair.create(session, LOCALHOST_CONSTANT));

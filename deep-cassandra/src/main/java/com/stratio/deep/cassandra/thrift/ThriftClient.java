@@ -16,6 +16,8 @@
 
 package com.stratio.deep.cassandra.thrift;
 
+import java.io.Closeable;
+
 import org.apache.cassandra.thrift.Cassandra;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -23,8 +25,6 @@ import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
-
-import java.io.Closeable;
 
 /**
  * {@link org.apache.cassandra.thrift.Cassandra.Client} that encapsulates the transport management.

@@ -14,26 +14,19 @@
 
 package com.stratio.deep.cassandra.extractor;
 
-import static scala.collection.JavaConversions.asScalaBuffer;
-
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
-import com.stratio.deep.cassandra.querybuilder.CassandraUpdateQueryBuilder;
-import com.stratio.deep.cassandra.querybuilder.DefaultQueryBuilder;
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import org.apache.spark.Partition;
-
-import scala.Tuple2;
-import scala.collection.Seq;
 
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.cql.DeepCqlRecordWriter;
 import com.stratio.deep.cassandra.cql.DeepRecordReader;
 import com.stratio.deep.cassandra.cql.RangeUtils;
+import com.stratio.deep.cassandra.querybuilder.CassandraUpdateQueryBuilder;
+import com.stratio.deep.cassandra.querybuilder.DefaultQueryBuilder;
 import com.stratio.deep.cassandra.thrift.ThriftRangeUtils;
 import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.DeepJobConfig;
@@ -41,10 +34,13 @@ import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
 import com.stratio.deep.commons.impl.DeepPartition;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.commons.rdd.DeepTokenRange;
 import com.stratio.deep.commons.rdd.IDeepRecordReader;
 import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.commons.utils.Pair;
+
+import scala.Tuple2;
 
 /**
  * Base class that abstracts the complexity of interacting with the Cassandra Datastore.<br/>
@@ -60,7 +56,6 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     protected CassandraDeepJobConfig<T> cassandraJobConfig;
 
     protected transient AbstractSerializableFunction transformer;
-
 
     @Override
     public boolean hasNext() {
@@ -86,7 +81,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
 
     @Override
     public void initIterator(final Partition dp,
-            S config) {
+                             S config) {
         if (config instanceof ExtractorConfig) {
             initWithExtractorConfig((ExtractorConfig) config);
         } else {
@@ -152,18 +147,17 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     @Override
     public List<String> getPreferredLocations(Partition tokenRange) {
 
-        return ((DeepPartition)tokenRange).splitWrapper().getReplicas();
+        return ((DeepPartition) tokenRange).splitWrapper().getReplicas();
     }
 
     /**
      * Instantiates a new deep record reader object associated to the provided partition.
-     * 
-     * @param dp
-     *            a spark deep partition
+     *
+     * @param dp a spark deep partition
      * @return the deep record reader associated to the provided partition.
      */
     private IDeepRecordReader initRecordReader(final DeepPartition dp,
-            CassandraDeepJobConfig<T> config) {
+                                               CassandraDeepJobConfig<T> config) {
 
         IDeepRecordReader recordReader = new DeepRecordReader(config, dp.splitWrapper());
 
@@ -190,9 +184,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
         queryBuilder.setCatalogName(cassandraJobConfig.getCatalog());
         queryBuilder.setTableName(cassandraJobConfig.getTable());
 
-
         writer = new DeepCqlRecordWriter(cassandraJobConfig, (CassandraUpdateQueryBuilder) queryBuilder);
-
 
     }
 

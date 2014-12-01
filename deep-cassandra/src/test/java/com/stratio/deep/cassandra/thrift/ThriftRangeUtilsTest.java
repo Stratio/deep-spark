@@ -1,18 +1,22 @@
 package com.stratio.deep.cassandra.thrift;
 
-import com.stratio.deep.cassandra.thrift.ThriftRangeUtils;
-import com.stratio.deep.commons.rdd.DeepTokenRange;
-
-import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.dht.*;
-import org.apache.cassandra.thrift.CfSplit;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
+import org.apache.cassandra.db.marshal.AbstractType;
+import org.apache.cassandra.dht.ByteOrderedPartitioner;
+import org.apache.cassandra.dht.IPartitioner;
+import org.apache.cassandra.dht.Murmur3Partitioner;
+import org.apache.cassandra.dht.OrderPreservingPartitioner;
+import org.apache.cassandra.dht.RandomPartitioner;
+import org.apache.cassandra.dht.Token;
+import org.apache.cassandra.thrift.CfSplit;
+import org.testng.annotations.Test;
+
+import com.stratio.deep.commons.rdd.DeepTokenRange;
 
 /**
  * Created by adelapena on 10/09/14.
@@ -75,8 +79,8 @@ public class ThriftRangeUtilsTest {
     }
 
     private static <K extends Comparable, T extends Token<K>> void testDeepTokenRanges(IPartitioner<T> partitioner,
-                                                                                          K start,
-                                                                                          K end) {
+                                                                                       K start,
+                                                                                       K end) {
         K min = partitioner.getMinimumToken().token;
         testDeepTokenRangesAux(partitioner, start, end);
         testDeepTokenRangesAux(partitioner, end, start);

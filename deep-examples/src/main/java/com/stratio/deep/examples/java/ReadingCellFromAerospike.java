@@ -15,12 +15,13 @@
  */
 package com.stratio.deep.examples.java;
 
+import org.apache.log4j.Logger;
+import org.apache.spark.rdd.RDD;
+
 import com.stratio.deep.aerospike.config.AerospikeConfigFactory;
 import com.stratio.deep.aerospike.config.AerospikeDeepJobConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.utils.ContextProperties;
-import org.apache.log4j.Logger;
-import org.apache.spark.rdd.RDD;
 
 /**
  * Simple example for reading a Spark RDD from Aerospike.
@@ -32,11 +33,9 @@ public class ReadingCellFromAerospike {
     private ReadingCellFromAerospike() {
     }
 
-
     public static void main(String[] args) {
         doMain(args);
     }
-
 
     public static void doMain(String[] args) {
         String job = "java:readingCellFromAerospike";

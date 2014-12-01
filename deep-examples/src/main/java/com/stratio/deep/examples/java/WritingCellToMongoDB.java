@@ -16,7 +16,6 @@
 
 package com.stratio.deep.examples.java;
 
-
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 
@@ -34,11 +33,9 @@ public final class WritingCellToMongoDB {
     private WritingCellToMongoDB() {
     }
 
-
     public static void main(String[] args) {
         doMain(args);
     }
-
 
     public static void doMain(String[] args) {
         String job = "java:writingCellToMongoDB";
@@ -52,28 +49,26 @@ public final class WritingCellToMongoDB {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
-
-        MongoDeepJobConfig inputConfigEntity = MongoConfigFactory.createMongoDB().host(host).database(database).collection(inputCollection).initialize();
+        MongoDeepJobConfig inputConfigEntity = MongoConfigFactory.createMongoDB().host(host).database(database)
+                .collection(inputCollection).initialize();
 
         RDD inputRDDCell = deepContext.createRDD(inputConfigEntity);
 
+        LOG.info("count : " + inputRDDCell.count());
+        LOG.info("prints first cell : " + inputRDDCell.first());
 
-	    LOG.info("count : " + inputRDDCell.count());
-	    LOG.info("prints first cell : " + inputRDDCell.first());
-
-        MongoDeepJobConfig outputConfigEntity = MongoConfigFactory.createMongoDB().host(host).database(database).collection(outputCollection).initialize();
-
+        MongoDeepJobConfig outputConfigEntity = MongoConfigFactory.createMongoDB().host(host).database(database)
+                .collection(outputCollection).initialize();
 
         deepContext.saveRDD(inputRDDCell, outputConfigEntity);
-
 
         RDD outputRDDCell = deepContext.createRDD(outputConfigEntity);
 
         LOG.info("count output : " + outputRDDCell.count());
-	    LOG.info("prints first output cell: " + outputRDDCell.first());
+        LOG.info("prints first output cell: " + outputRDDCell.first());
 
         deepContext.stop();
     }

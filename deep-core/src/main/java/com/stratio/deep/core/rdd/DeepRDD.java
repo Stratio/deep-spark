@@ -69,15 +69,13 @@ public class DeepRDD<T, S extends BaseConfig<T>> extends RDD<T> implements Seria
         initExtractorClient();
 
         List<String> locations = extractorClient.getPreferredLocations(split);
-        if(locations==null || locations.isEmpty()){
+        if (locations == null || locations.isEmpty()) {
             return super.getPreferredLocations(split);
         }
 
         return asScalaBuffer(locations);
 
-
     }
-
 
     @Override
     public Iterator<T> compute(Partition split, TaskContext context) {

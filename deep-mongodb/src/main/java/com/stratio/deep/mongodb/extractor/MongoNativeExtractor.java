@@ -17,7 +17,7 @@
 package com.stratio.deep.mongodb.extractor;
 
 import static com.stratio.deep.commons.utils.Utils.removeAddressPort;
-
+import static com.stratio.deep.mongodb.utils.UtilMongoDB.MONGO_DEFAULT_ID;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,12 +75,11 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
     /**
      * The Split size.
      */
-    public int splitSize = 10;
+    private int splitSize = 10;
 
     /**
-     * The constant MONGODB_ID.
+     * The constant MONGO_DEFAULT_ID.
      */
-    public static String MONGODB_ID = "_id";
     /**
      * The Reader.
      */
@@ -138,7 +137,7 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
         DB config = collection.getDB().getMongo().getDB("config");
         DBCollection configCollections = config.getCollection("collections");
 
-        DBObject dbObject = configCollections.findOne(new BasicDBObject(MONGODB_ID, collection.getFullName()));
+        DBObject dbObject = configCollections.findOne(new BasicDBObject(MONGO_DEFAULT_ID, collection.getFullName()));
         return dbObject != null;
     }
 
@@ -160,7 +159,7 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
             String currentHost = (String) currentShard.get("host");
             int slashIndex = currentHost.indexOf("/");
             if (slashIndex > 0) {
-                map.put((String) currentShard.get(MONGODB_ID),
+                map.put((String) currentShard.get(MONGO_DEFAULT_ID),
                         currentHost.substring(slashIndex + 1).split(","));
             }
         }
@@ -213,17 +212,17 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
 
             BasicDBObject currentKey = (BasicDBObject) aSplitData;
 
-            Object currentO = currentKey.get(MONGODB_ID);
+            Object currentO = currentKey.get(MONGO_DEFAULT_ID);
 
             partitions[i] = new MongoPartition(mongoDeepJobConfig.getRddId(), i, new DeepTokenRange(lastKey,
-                    currentO, stringHosts), MONGODB_ID);
+                    currentO, stringHosts), MONGO_DEFAULT_ID);
 
             lastKey = currentO;
             i++;
         }
-        QueryBuilder queryBuilder = QueryBuilder.start(MONGODB_ID);
+        QueryBuilder queryBuilder = QueryBuilder.start(MONGO_DEFAULT_ID);
         queryBuilder.greaterThanEquals(lastKey);
-        partitions[i] = new MongoPartition(0, i, new DeepTokenRange(lastKey, null, stringHosts), MONGODB_ID);
+        partitions[i] = new MongoPartition(0, i, new DeepTokenRange(lastKey, null, stringHosts), MONGO_DEFAULT_ID);
         return partitions;
     }
 
@@ -236,7 +235,7 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
     private BasicDBList getSplitData(DBCollection collection) {
 
         final DBObject cmd = BasicDBObjectBuilder.start("splitVector", collection.getFullName())
-                .add("keyPattern", new BasicDBObject(MONGODB_ID, 1))
+                .add("keyPattern", new BasicDBObject(MONGO_DEFAULT_ID, 1))
                 .add("force", false)
                 .add("maxChunkSize", splitSize)
                 .get();
@@ -274,7 +273,7 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
                 }
             }
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            throw new DeepGenericException(e);
         } finally {
             if (mongoClient != null) {
                 mongoClient.close();
@@ -407,7 +406,7 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
                     mongoDeepJobConfig.getDatabase(),
                     mongoDeepJobConfig.getCollection(), mongoDeepJobConfig.getWriteConcern());
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            throw new DeepGenericException(e);
         }
     }
 

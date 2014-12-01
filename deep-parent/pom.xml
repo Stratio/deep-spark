@@ -38,7 +38,7 @@
         <java.version>1.7</java.version>
 
         <!-- Hadoop  -->
-        <hadoop.version>2.4.1</hadoop.version>
+        <hadoop.version>2.5.2</hadoop.version>
 
         <!-- Guava -->
         <guava.version>15.0</guava.version>
@@ -397,11 +397,11 @@
             <version>2.24.0</version>
         </dependency>
 
-    <!--    <dependency>
-            <groupId>com.twitter</groupId>
-            <artifactId>chill_2.10</artifactId>
-            <version>0.3.6</version>
-        </dependency> -->
+        <!--    <dependency>
+                <groupId>com.twitter</groupId>
+                <artifactId>chill_2.10</artifactId>
+                <version>0.3.6</version>
+            </dependency> -->
 
         <dependency>
             <groupId>org.powermock</groupId>
@@ -440,9 +440,6 @@
             <version>${guava.version}</version>
         </dependency>
     </dependencies>
-
-
-
 
 
     <build>

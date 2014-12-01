@@ -42,15 +42,12 @@ import scala.Tuple2;
  */
 public final class GroupingEntityWithMongoDB {
 
-
     private GroupingEntityWithMongoDB() {
     }
-
 
     public static void main(String[] args) {
         doMain(args);
     }
-
 
     public static void doMain(String[] args) {
         String job = "scala:groupingEntityWithMongoDB";
@@ -61,55 +58,52 @@ public final class GroupingEntityWithMongoDB {
         String inputCollection = "input";
         String outputCollection = "output";
 
-
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
-
         MongoDeepJobConfig<BookEntity> inputConfigEntity =
-				        MongoConfigFactory.createMongoDB(BookEntity.class).host(host).database(database).collection(inputCollection).initialize();
+                MongoConfigFactory.createMongoDB(BookEntity.class).host(host).database(database)
+                        .collection(inputCollection).initialize();
 
         JavaRDD<BookEntity> inputRDDEntity = deepContext.createJavaRDD(inputConfigEntity);
-        JavaRDD<String> words =inputRDDEntity.flatMap(new FlatMapFunction<BookEntity, String>() {
+        JavaRDD<String> words = inputRDDEntity.flatMap(new FlatMapFunction<BookEntity, String>() {
             @Override
             public Iterable<String> call(BookEntity bookEntity) throws Exception {
 
                 List<String> words = new ArrayList<>();
-                for (CantoEntity canto : bookEntity.getCantoEntities()){
+                for (CantoEntity canto : bookEntity.getCantoEntities()) {
                     words.addAll(Arrays.asList(canto.getText().split(" ")));
                 }
                 return words;
             }
         });
 
-
         JavaPairRDD<String, Long> wordCount = words.mapToPair(new PairFunction<String, String, Long>() {
             @Override
             public Tuple2<String, Long> call(String s) throws Exception {
-                return new Tuple2<>(s,1l);
+                return new Tuple2<>(s, 1l);
             }
         });
 
-
-        JavaPairRDD<String, Long>  wordCountReduced = wordCount.reduceByKey(new Function2<Long, Long, Long>() {
+        JavaPairRDD<String, Long> wordCountReduced = wordCount.reduceByKey(new Function2<Long, Long, Long>() {
             @Override
             public Long call(Long integer, Long integer2) throws Exception {
                 return integer + integer2;
             }
         });
 
-        JavaRDD<WordCount>  outputRDD =  wordCountReduced.map(new Function<Tuple2<String, Long>, WordCount>() {
+        JavaRDD<WordCount> outputRDD = wordCountReduced.map(new Function<Tuple2<String, Long>, WordCount>() {
             @Override
             public WordCount call(Tuple2<String, Long> stringIntegerTuple2) throws Exception {
                 return new WordCount(stringIntegerTuple2._1(), stringIntegerTuple2._2());
             }
         });
 
-
         MongoDeepJobConfig<WordCount> outputConfigEntity =
-				        MongoConfigFactory.createMongoDB(WordCount.class).host(host).database(database).collection(outputCollection).initialize();
+                MongoConfigFactory.createMongoDB(WordCount.class).host(host).database(database)
+                        .collection(outputCollection).initialize();
 
         deepContext.saveRDD(outputRDD.rdd(), outputConfigEntity);
 

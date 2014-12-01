@@ -1,20 +1,18 @@
 package com.stratio.deep.commons.rdd;
 
 import java.io.Serializable;
+import java.util.List;
 
-import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
-import java.util.List;
-import java.util.List;
-import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import org.apache.spark.Partition;
-import com.stratio.deep.commons.config.BaseConfig;
 
-import scala.collection.Seq;
+import com.stratio.deep.commons.config.BaseConfig;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 
 /**
  * Created by rcrespo on 4/08/14.
- * @param <T>  the type parameter
- * @param <S>  the type parameter
+ *
+ * @param <T> the type parameter
+ * @param <S> the type parameter
  */
 public interface IExtractor<T, S extends BaseConfig<T>> extends Serializable {
 
@@ -48,7 +46,7 @@ public interface IExtractor<T, S extends BaseConfig<T>> extends Serializable {
     /**
      * Init iterator.
      *
-     * @param dp the dp
+     * @param dp     the dp
      * @param config the config
      */
     void initIterator(Partition dp, S config);
@@ -68,16 +66,13 @@ public interface IExtractor<T, S extends BaseConfig<T>> extends Serializable {
      */
     List<String> getPreferredLocations(Partition split);
 
-
-
     /**
      * Init save.
      *
-     * @param config the config
-     * @param first the first
+     * @param config       the config
+     * @param first        the first
      * @param queryBuilder the query builder
      */
     void initSave(S config, T first, UpdateQueryBuilder queryBuilder);
-
 
 }

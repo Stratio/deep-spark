@@ -48,7 +48,7 @@ public class DeepInstantiationException extends RuntimeException {
      * Public constructor.
      */
     public DeepInstantiationException(String message, Throwable cause, boolean enableSuppression,
-            boolean writableStackTrace) {
+                                      boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 

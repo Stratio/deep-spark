@@ -16,12 +16,12 @@
 
 package com.stratio.deep.cassandra.entity;
 
+import static com.stratio.deep.cassandra.util.AnnotationUtils.MAP_ABSTRACT_TYPE_CLASS_TO_ABSTRACT_TYPE;
+import static com.stratio.deep.cassandra.util.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
 import static java.lang.Class.forName;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableCollection;
-import static com.stratio.deep.cassandra.util.AnnotationUtils.MAP_ABSTRACT_TYPE_CLASS_TO_ABSTRACT_TYPE;
-import static com.stratio.deep.cassandra.util.AnnotationUtils.MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE;
-import static com.stratio.deep.cassandra.util.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
+
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -31,7 +31,6 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -263,7 +262,7 @@ public class CellValidator {
      * private constructor.
      */
     private CellValidator(String validatorClassName, Kind validatorKind, Collection<String> validatorTypes,
-            DataType.Name cqlTypeName) {
+                          DataType.Name cqlTypeName) {
         this.validatorClassName = validatorClassName != null ? validatorClassName : DEFAULT_VALIDATOR_CLASSNAME;
         this.validatorKind = validatorKind;
         this.validatorTypes = validatorTypes;
@@ -365,8 +364,7 @@ public class CellValidator {
             } else {
                 throw new DeepGenericException("Cannot determine collection kind for " + validatorKind);
 
-                }
-
+            }
 
         } catch (ClassNotFoundException e) {
             throw new DeepGenericException(e);

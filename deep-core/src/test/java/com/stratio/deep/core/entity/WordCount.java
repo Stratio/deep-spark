@@ -26,7 +26,7 @@ import com.stratio.deep.commons.entity.IDeepType;
 @DeepEntity
 public class WordCount implements IDeepType {
 
-    @DeepField( isPartOfClusterKey = true, isPartOfPartitionKey = true)
+    @DeepField(isPartOfClusterKey = true, isPartOfPartitionKey = true)
     private String word;
 
     @DeepField
@@ -43,6 +43,7 @@ public class WordCount implements IDeepType {
     public WordCount(Long count) {
         this.count = count;
     }
+
     public String getWord() {
         return word;
     }

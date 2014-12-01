@@ -1,16 +1,14 @@
 /**
- * 
+ *
  */
 package com.stratio.deep.cassandra.querybuilder;
 
 import static com.stratio.deep.commons.utils.Utils.quote;
 
 import java.util.List;
-import java.util.Set;
 
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 
 /**
  *
@@ -25,25 +23,30 @@ public class DefaultQueryBuilder extends CassandraUpdateQueryBuilder {
     @Override
     public String prepareQuery(Cells keys, Cells values) {
 
-        StringBuilder sb = new StringBuilder("UPDATE ").append(quote(getCatalogName())).append(".").append(quote(getTableName()))
+        StringBuilder sb = new StringBuilder("UPDATE ").append(quote(getCatalogName())).append(".")
+                .append(quote(getTableName()))
                 .append(" SET ");
 
         boolean isFirst = true;
         StringBuilder keyClause = new StringBuilder(" WHERE ");
 
         for (Cell cell : keys.getCells()) {
-                if (!isFirst) {
-                    keyClause.append(" AND ");
-                }else isFirst=false;
-                keyClause.append(String.format("%s = ?", quote(cell.getCellName())));
+            if (!isFirst) {
+                keyClause.append(" AND ");
+            } else {
+                isFirst = false;
+            }
+            keyClause.append(String.format("%s = ?", quote(cell.getCellName())));
         }
 
-        isFirst=true;
+        isFirst = true;
 
         for (Cell cell : values.getCells()) {
             if (!isFirst) {
                 sb.append(", ");
-            }else isFirst=false;
+            } else {
+                isFirst = false;
+            }
             sb.append(String.format("%s = ?", quote(cell.getCellName())));
 
         }

@@ -145,7 +145,7 @@ public class MongoReader<T> {
                     mongoDeepJobConfig.getDBFields());
 
         } catch (UnknownHostException e) {
-            throw new DeepExtractorinitializationException(e.getMessage());
+            throw new DeepExtractorinitializationException(e);
         }
     }
 

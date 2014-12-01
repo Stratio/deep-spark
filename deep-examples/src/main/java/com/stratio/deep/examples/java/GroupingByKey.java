@@ -16,6 +16,13 @@
 
 package com.stratio.deep.examples.java;
 
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.PairFunction;
+
 import com.google.common.collect.Lists;
 import com.stratio.deep.cassandra.config.CassandraConfigFactory;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
@@ -23,13 +30,7 @@ import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.utils.ContextProperties;
 
-import org.apache.log4j.Logger;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
-
-import java.util.List;
 
 /**
  * Author: Emmanuelle Raffenne
@@ -66,12 +67,11 @@ public final class GroupingByKey {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
-
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // Creating a configuration for the RDD and initialize it
         CassandraDeepJobConfig<TweetEntity> config = CassandraConfigFactory.create(TweetEntity.class)
-                .host (p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
+                .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(tableName)
                 .initialize();
 
@@ -86,10 +86,10 @@ public final class GroupingByKey {
             }
         });
 
-// grouping
+        // grouping
         JavaPairRDD<String, Iterable<TweetEntity>> groups = pairsRDD.groupByKey();
 
-// counting elements in groups
+        // counting elements in groups
         JavaPairRDD<String, Integer> counts = groups.mapToPair(new PairFunction<Tuple2<String,
                 Iterable<TweetEntity>>, String,
                 Integer>() {
@@ -99,7 +99,7 @@ public final class GroupingByKey {
             }
         });
 
-// fetching results
+        // fetching results
         result = counts.collect();
 
         LOG.info("Este es el resultado con groupByKey: ");

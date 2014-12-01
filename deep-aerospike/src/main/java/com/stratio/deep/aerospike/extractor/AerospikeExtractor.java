@@ -15,6 +15,8 @@
  */
 package com.stratio.deep.aerospike.extractor;
 
+import java.io.Serializable;
+
 import com.aerospike.hadoop.mapreduce.AerospikeInputFormat;
 import com.aerospike.hadoop.mapreduce.AerospikeKey;
 import com.aerospike.hadoop.mapreduce.AerospikeRecord;
@@ -22,10 +24,9 @@ import com.stratio.deep.aerospike.config.AerospikeDeepJobConfig;
 import com.stratio.deep.aerospike.config.AerospikeDeepOutputFormat;
 import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
 
-import java.io.Serializable;
-
 /**
  * Abstract class for Aerospike Cells and Entity extractors.
+ *
  * @param <T>
  */
 public abstract class AerospikeExtractor<T> extends GenericHadoopExtractor<T, AerospikeDeepJobConfig<T>,
@@ -36,7 +37,7 @@ public abstract class AerospikeExtractor<T> extends GenericHadoopExtractor<T, Ae
     /**
      * Public constructor.
      */
-    public AerospikeExtractor(){
+    public AerospikeExtractor() {
         super();
         this.inputFormat = new AerospikeInputFormat();
         this.outputFormat = new AerospikeDeepOutputFormat();

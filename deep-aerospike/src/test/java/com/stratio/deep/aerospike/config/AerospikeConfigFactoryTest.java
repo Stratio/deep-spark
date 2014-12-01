@@ -15,26 +15,26 @@
  */
 package com.stratio.deep.aerospike.config;
 
-import com.stratio.deep.testutils.UnitTest;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertTrue;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 /**
  * AerospikeConfigFactoryTests
  */
-@Test(groups = {"UnitTests"})
+@Test(groups = { "UnitTests" })
 public class AerospikeConfigFactoryTest {
 
     @Test(expectedExceptions = InvocationTargetException.class)
     public void testConstructorIsPrivate()
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Constructor<AerospikeConfigFactory> constructor = AerospikeConfigFactory.class.getDeclaredConstructor();
-        assertTrue(Modifier.isPrivate(constructor.getModifiers()), "AerospikeConfigFactory constructor must be private.");
+        assertTrue(Modifier.isPrivate(constructor.getModifiers()),
+                "AerospikeConfigFactory constructor must be private.");
         constructor.setAccessible(true);
         constructor.newInstance();
     }

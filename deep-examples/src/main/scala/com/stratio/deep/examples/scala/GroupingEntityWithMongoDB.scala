@@ -18,11 +18,11 @@ package com.stratio.deep.examples.scala
 
 
 import com.stratio.deep.core.context.DeepSparkContext
-import com.stratio.deep.core.entity.{WordCount, BookEntity}
+import com.stratio.deep.core.entity.{BookEntity, WordCount}
 import com.stratio.deep.examples.java.extractorconfig.mongodb.utils.ContextProperties
 import com.stratio.deep.mongodb.config.{MongoConfigFactory, MongoDeepJobConfig}
-import org.apache.spark.rdd.RDD
 import org.apache.spark.SparkContext._
+import org.apache.spark.rdd.RDD
 
 import scala.collection.JavaConversions._
 
@@ -53,11 +53,11 @@ final object GroupingEntityWithMongoDB {
       e: BookEntity => (for (canto <- e.getCantoEntities) yield canto.getText.split(" ")).flatten
     }
 
-    val wordCount : RDD[(String, Long)] = words map { s:String => (s,1l) }
+    val wordCount: RDD[(String, Long)] = words map { s: String => (s, 1l)}
 
-    val wordCountReduced  = wordCount reduceByKey { (a,b) =>a + b }
+    val wordCountReduced = wordCount reduceByKey { (a, b) => a + b}
 
-    val outputRDD = wordCountReduced map { e:(String, Long) => new WordCount(e._1, e._2)  }
+    val outputRDD = wordCountReduced map { e: (String, Long) => new WordCount(e._1, e._2)}
 
     val outputConfigEntity: MongoDeepJobConfig[WordCount] =
       MongoConfigFactory.createMongoDB(classOf[WordCount]).host(host).database(database).collection(outputCollection).initialize

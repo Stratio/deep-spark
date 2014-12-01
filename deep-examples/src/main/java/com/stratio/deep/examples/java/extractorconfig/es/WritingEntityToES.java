@@ -23,15 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.core.entity.BookEntity;
-import com.stratio.deep.core.entity.CantoEntity;
-import com.stratio.deep.core.entity.WordCount;
-import com.stratio.deep.es.extractor.ESEntityExtractor;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-
-import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -41,6 +32,14 @@ import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
 
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.entity.BookEntity;
+import com.stratio.deep.core.entity.CantoEntity;
+import com.stratio.deep.core.entity.WordCount;
+import com.stratio.deep.es.extractor.ESEntityExtractor;
+import com.stratio.deep.utils.ContextProperties;
 
 import scala.Tuple2;
 
@@ -49,7 +48,6 @@ import scala.Tuple2;
  */
 public final class WritingEntityToES {
     private static final Logger LOG = Logger.getLogger(WritingEntityToES.class);
-    public static List<Tuple2<String, Integer>> results;
     private static Long counts;
 
     private WritingEntityToES() {
@@ -66,10 +64,10 @@ public final class WritingEntityToES {
 
     public static void doMain(String[] args) {
         String job = "java:writingEntityToES";
-        String host     = "localhost:9200";
-        String index    = "book";
-        String type     = "test";
-        String typeOut     = "out";
+        String host = "localhost:9200";
+        String index = "book";
+        String type = "test";
+        String typeOut = "out";
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -80,8 +78,8 @@ public final class WritingEntityToES {
 
         Map<String, Serializable> values = new HashMap<>();
 
-        values.put(ExtractorConstants.INDEX,    index);
-        values.put(ExtractorConstants.TYPE,        type );
+        values.put(ExtractorConstants.INDEX, index);
+        values.put(ExtractorConstants.TYPE, type);
 
         config.setExtractorImplClass(ESEntityExtractor.class);
         config.setEntityClass(BookEntity.class);

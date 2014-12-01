@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -37,8 +36,9 @@ import org.apache.spark.rdd.RDD;
 import org.json.simple.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.SimpleBookEntity;
 import com.stratio.deep.core.entity.WordCount;
@@ -49,7 +49,8 @@ import scala.Tuple2;
 /**
  * Created by rcrespo on 24/11/14.
  */
-@Test(suiteName = "cassandraExtractorTests", groups = { "CassandraEntityExtractorFT" }, dependsOnGroups = {"CassandraCellExtractorFT"})
+@Test(suiteName = "cassandraExtractorTests", groups = { "CassandraEntityExtractorFT" }, dependsOnGroups = {
+        "CassandraCellExtractorFT" })
 public class CassandraEntityExtractorFT extends ExtractorEntityTest {
 
     private static final long serialVersionUID = -172112587882501217L;
@@ -68,31 +69,30 @@ public class CassandraEntityExtractorFT extends ExtractorEntityTest {
     }
 
     @Override
-    protected void initDataSetDivineComedy(DeepSparkContext context){
+    protected void initDataSetDivineComedy(DeepSparkContext context) {
         JavaRDD<String> stringJavaRDD;
 
         //Divine Comedy
         List<String> lineas = readFile("/simpleDivineComedy.json");
 
-
-
         stringJavaRDD = context.parallelize(lineas);
 
-        JavaRDD javaRDD =  transformRDD(stringJavaRDD, SimpleBookEntity.class);
-
+        JavaRDD javaRDD = transformRDD(stringJavaRDD, SimpleBookEntity.class);
 
         originBook = javaRDD.first();
 
         DeepSparkContext.saveRDD(javaRDD.rdd(), getWriteExtractorConfig(BOOK_INPUT,
                 SimpleBookEntity.class));
     }
+
     @Test
     public void testDataSet() {
 
         DeepSparkContext context = getDeepSparkContext();
         try {
 
-            ExtractorConfig<SimpleBookEntity> inputConfigEntity = getReadExtractorConfig(databaseExtractorName, BOOK_INPUT,
+            ExtractorConfig<SimpleBookEntity> inputConfigEntity = getReadExtractorConfig(databaseExtractorName,
+                    BOOK_INPUT,
                     SimpleBookEntity.class);
 
             RDD<SimpleBookEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
@@ -104,25 +104,22 @@ public class CassandraEntityExtractorFT extends ExtractorEntityTest {
 
             SimpleBookEntity book = books.get(0);
 
-
-//                  tests subDocuments
+            //                  tests subDocuments
 
             Map<String, String> originMap = ((SimpleBookEntity) originBook).getMetadata();
 
             Map<String, String> bookMap = book.getMetadata();
 
-
             Set<String> keys = originMap.keySet();
 
             assertEquals(keys, bookMap.keySet());
-            for(String key : keys){
+            for (String key : keys) {
                 assertEquals(bookMap.get(key), originMap.get(key));
 
             }
 
-
             //      tests List<subDocuments>
-            List<String> listCantos = ((SimpleBookEntity)originBook).getCantos();
+            List<String> listCantos = ((SimpleBookEntity) originBook).getCantos();
 
             for (int i = 0; i < listCantos.size(); i++) {
                 assertEquals(listCantos.get(i), book.getCantos().get(i));
@@ -130,17 +127,18 @@ public class CassandraEntityExtractorFT extends ExtractorEntityTest {
 
             RDD<SimpleBookEntity> inputRDDEntity2 = context.createRDD(inputConfigEntity);
 
-            JavaRDD<String> words = inputRDDEntity2.toJavaRDD().flatMap(new FlatMapFunction<SimpleBookEntity, String>() {
-                @Override
-                public Iterable<String> call(SimpleBookEntity bookEntity) throws Exception {
+            JavaRDD<String> words = inputRDDEntity2.toJavaRDD()
+                    .flatMap(new FlatMapFunction<SimpleBookEntity, String>() {
+                        @Override
+                        public Iterable<String> call(SimpleBookEntity bookEntity) throws Exception {
 
-                    List<String> words = new ArrayList<>();
-                    for (String canto : bookEntity.getCantos()) {
-                        words.addAll(Arrays.asList(canto.split(" ")));
-                    }
-                    return words;
-                }
-            });
+                            List<String> words = new ArrayList<>();
+                            for (String canto : bookEntity.getCantos()) {
+                                words.addAll(Arrays.asList(canto.split(" ")));
+                            }
+                            return words;
+                        }
+                    });
 
             JavaPairRDD<String, Long> wordCount = words.mapToPair(new PairFunction<String, String, Long>() {
                 @Override
@@ -169,7 +167,7 @@ public class CassandraEntityExtractorFT extends ExtractorEntityTest {
 
             RDD<WordCount> outputRDDEntity = context.createRDD(outputConfigEntity);
 
-            Assert.assertEquals(WORD_COUNT_SPECTED.longValue()-1l, ((Long) outputRDDEntity.cache().count()).longValue
+            Assert.assertEquals(WORD_COUNT_SPECTED.longValue() - 1l, ((Long) outputRDDEntity.cache().count()).longValue
                     ());
 
         } finally {
@@ -180,19 +178,19 @@ public class CassandraEntityExtractorFT extends ExtractorEntityTest {
 
     //TODO
     @Override
-    public void testFilterEQ(){
+    public void testFilterEQ() {
 
     }
 
     //TODO
     @Override
-    public void testFilterNEQ(){
+    public void testFilterNEQ() {
 
     }
 
     //TODO
     @Override
-    public void testInputColumns(){
+    public void testInputColumns() {
 
     }
 }

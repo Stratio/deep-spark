@@ -16,7 +16,6 @@
 
 package com.stratio.deep.cassandra;
 
-import static com.stratio.deep.commons.utils.CellsUtils.getCellFromJson;
 import static com.stratio.deep.commons.utils.CellsUtils.getCellWithMapFromJson;
 import static org.testng.Assert.assertEquals;
 
@@ -49,7 +48,8 @@ import scala.Tuple2;
 /**
  * Created by rcrespo on 20/11/14.
  */
-@Test(suiteName = "cassandraExtractorTests", groups = { "CassandraCellExtractorFT" }, dependsOnGroups = {"cassandraJavaRDDFT"})
+@Test(suiteName = "cassandraExtractorTests", groups = { "CassandraCellExtractorFT" }, dependsOnGroups = {
+        "cassandraJavaRDDFT" })
 public class CassandraCellExtractorFT extends ExtractorCellTest {
 
     private static final long serialVersionUID = -5201767473793541285L;
@@ -57,7 +57,6 @@ public class CassandraCellExtractorFT extends ExtractorCellTest {
     public CassandraCellExtractorFT() {
         super(CassandraCellExtractor.class, "localhost", 9242, true);
     }
-
 
     @Override
     protected Cells transform(JSONObject jsonObject, String nameSpace, Class entityClass) {
@@ -69,18 +68,15 @@ public class CassandraCellExtractorFT extends ExtractorCellTest {
     }
 
     @Override
-    protected void initDataSetDivineComedy(DeepSparkContext context){
+    protected void initDataSetDivineComedy(DeepSparkContext context) {
         JavaRDD<String> stringJavaRDD;
 
         //Divine Comedy
         List<String> lineas = readFile("/simpleDivineComedy.json");
 
-
-
         stringJavaRDD = context.parallelize(lineas);
 
-        JavaRDD javaRDD =  transformRDD(stringJavaRDD, Cells.class);
-
+        JavaRDD javaRDD = transformRDD(stringJavaRDD, Cells.class);
 
         originBook = javaRDD.first();
 
@@ -107,14 +103,13 @@ public class CassandraCellExtractorFT extends ExtractorCellTest {
 
             Cells book = books.get(0);
 
-
             //      tests subDocuments
 
-            assertEquals((book.getCellByName("metadata").getValue()), ((Cells)originBook).getCellByName("metadata")
+            assertEquals((book.getCellByName("metadata").getValue()), ((Cells) originBook).getCellByName("metadata")
                     .getValue());
 
             //      tests List<subDocuments>
-            List<String> listCantos = (List<String>) ((Cells)originBook).getCellByName("cantos").getValue();
+            List<String> listCantos = (List<String>) ((Cells) originBook).getCellByName("cantos").getValue();
 
             for (int i = 0; i < listCantos.size(); i++) {
                 String s = listCantos.get(i);
@@ -156,9 +151,9 @@ public class CassandraCellExtractorFT extends ExtractorCellTest {
             JavaRDD<Cells> outputRDD = wordCountReduced.map(new Function<Tuple2<String, Integer>, Cells>() {
                 @Override
                 public Cells call(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
-                    return new Cells(Cell.create("word", stringIntegerTuple2._1()!=null&&!stringIntegerTuple2._1()
-                                    .isEmpty()?stringIntegerTuple2._1()
-                                    :"space",
+                    return new Cells(Cell.create("word", stringIntegerTuple2._1() != null && !stringIntegerTuple2._1()
+                                    .isEmpty() ? stringIntegerTuple2._1()
+                                    : "space",
                             true, true),
                             Cell.create("count", stringIntegerTuple2._2()));
                 }
@@ -170,8 +165,9 @@ public class CassandraCellExtractorFT extends ExtractorCellTest {
 
             RDD<Cells> outputRDDEntity = context.createRDD(outputConfigEntity);
 
-            Assert.assertEquals(WORD_COUNT_SPECTED.longValue()-1l ,((Long) outputRDDEntity.cache().count()).longValue()
-                    );
+            Assert.assertEquals(WORD_COUNT_SPECTED.longValue() - 1l,
+                    ((Long) outputRDDEntity.cache().count()).longValue()
+            );
         } finally {
             context.stop();
         }
@@ -180,19 +176,19 @@ public class CassandraCellExtractorFT extends ExtractorCellTest {
 
     //TODO
     @Override
-    public void testFilterEQ(){
+    public void testFilterEQ() {
 
     }
 
     //TODO
     @Override
-    public void testFilterNEQ(){
+    public void testFilterNEQ() {
 
     }
 
     //TODO
     @Override
-    public void testInputColumns(){
+    public void testInputColumns() {
 
     }
 

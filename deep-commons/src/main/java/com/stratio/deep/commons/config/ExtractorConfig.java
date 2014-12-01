@@ -26,7 +26,8 @@ import com.stratio.deep.commons.utils.Utils;
 
 /**
  * Created by rcrespo on 19/08/14.
- * @param <T>  the type parameter
+ *
+ * @param <T> the type parameter
  */
 public class ExtractorConfig<T> extends BaseConfig<T> implements Serializable, Cloneable {
 
@@ -71,7 +72,7 @@ public class ExtractorConfig<T> extends BaseConfig<T> implements Serializable, C
     /**
      * Put value.
      *
-     * @param key the key
+     * @param key   the key
      * @param value the value
      * @return the extractor config
      */
@@ -202,8 +203,8 @@ public class ExtractorConfig<T> extends BaseConfig<T> implements Serializable, C
     /**
      * Gets pair.
      *
-     * @param key the key
-     * @param keyClass the key class
+     * @param key        the key
+     * @param keyClass   the key class
      * @param valueClass the value class
      * @return the pair
      */
@@ -225,8 +226,8 @@ public class ExtractorConfig<T> extends BaseConfig<T> implements Serializable, C
     /**
      * Returns the cell value casted to the specified class.
      *
-     * @param clazz             the expected class
-     * @param key the key
+     * @param clazz the expected class
+     * @param key   the key
      * @return the cell value casted to the specified class
      */
     public <W> W getValue(Class<W> clazz, String key) {

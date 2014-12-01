@@ -17,6 +17,7 @@
 package com.stratio.es;
 
 import java.io.Serializable;
+
 import org.testng.annotations.Test;
 
 import com.stratio.deep.core.extractor.ExtractorEntityTest;
@@ -30,9 +31,7 @@ public class ESEntityRDDFT extends ExtractorEntityTest implements Serializable {
 
     public ESEntityRDDFT() {
 
-        super(ESEntityExtractor.class,"localhost",9200,false);
+        super(ESEntityExtractor.class, "localhost", 9200, false);
     }
-
-
 
 }

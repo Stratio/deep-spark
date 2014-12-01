@@ -19,15 +19,13 @@ package com.stratio.deep.cassandra.config;
 import java.lang.annotation.AnnotationTypeMismatchException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
+
 import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
 import com.stratio.deep.commons.annotations.DeepEntity;
 import com.stratio.deep.commons.entity.Cell;
@@ -75,9 +73,6 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends CassandraDee
         return this;
     }
 
-
-
-
     public Configuration getHadoopConfiguration() {
         return null;
     }
@@ -99,7 +94,6 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends CassandraDee
         this.isWriteConfig = isWriteConfig;
         this.createTableOnWrite = isWriteConfig;
     }
-
 
     /* (non-Javadoc)
        * @see IDeepJobConfig#validate()
@@ -164,17 +158,15 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends CassandraDee
             return;
         }
 
-        try{
+        try {
             Method setter = Utils.findSetter(f, entityClass, value.getClass());
             setter.invoke(instance, value);
 
-        }catch (DeepIOException e){
+        } catch (DeepIOException e) {
             Utils.setFieldWithReflection(instance, f, value);
-        }catch (Exception e1) {
+        } catch (Exception e1) {
             throw new DeepGenericException(e1);
         }
-
-
 
     }
 

@@ -16,16 +16,12 @@
 
 package com.stratio.deep.cassandra.config;
 
-import com.datastax.driver.core.Session;
-import com.stratio.deep.commons.config.IDeepJobConfig;
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.commons.filter.Filter;
-
 import java.io.Serializable;
 import java.util.Map;
 
 import com.datastax.driver.core.Session;
-import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.filter.Filter;
 
 /**
  * Defines the public methods that each Stratio Deep Cassandra configuration object should implement.
@@ -49,7 +45,6 @@ public interface ICassandraDeepJobConfig<T> {
      * @throws com.stratio.deep.commons.exception.DeepNoSuchFieldException   if the specified field is not a valid column in
      *                                                                       Cassandra.
      */
-
 
     /**
      * Fetches table metadata from the underlying datastore and generates a Map<K, V> where the key is the column name, and the value

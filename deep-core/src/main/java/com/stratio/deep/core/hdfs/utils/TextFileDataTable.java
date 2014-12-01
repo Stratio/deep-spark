@@ -3,9 +3,7 @@ package com.stratio.deep.core.hdfs.utils;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-
 public class TextFileDataTable<T> implements Serializable {
-
 
     private TableName tableName;
 

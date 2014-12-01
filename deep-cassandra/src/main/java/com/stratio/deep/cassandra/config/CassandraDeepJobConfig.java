@@ -19,18 +19,11 @@ package com.stratio.deep.cassandra.config;
 import static com.stratio.deep.cassandra.util.CassandraUtils.createTableQueryGenerator;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.BATCHSIZE;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.BISECT_FACTOR;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.COLUMN_FAMILY;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.CQLPORT;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.CREATE_ON_WRITE;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.HOST;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.KEYSPACE;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PAGE_SIZE;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.READ_CONSISTENCY_LEVEL;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.RPCPORT;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.TABLE;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNAME;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.WRITE_CONSISTENCY_LEVEL;
 import static com.stratio.deep.commons.utils.Utils.quote;
 
@@ -46,8 +39,6 @@ import java.util.TreeMap;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
-import scala.Tuple2;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ColumnMetadata;
@@ -69,7 +60,8 @@ import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.utils.Constants;
-import com.stratio.deep.commons.utils.Pair;
+
+import scala.Tuple2;
 
 /**
  * Base class for all config implementations providing default implementations for methods defined in
@@ -99,7 +91,6 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
      * default "where" filter to use to access ColumnFamily's data.
      */
     private final Map<String, Serializable> additionalFilters = new TreeMap<>();
-
 
     /**
      * Defines a projection over the CF columns.
@@ -196,14 +187,13 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @Override protected void finalize() { LOG.debug("finalizing " + getClass().getCanonicalName()); close(); }
      */
     /**
      * Checks if this configuration object has been initialized or not.
-     * 
-     * @throws com.stratio.deep.commons.exception.DeepIllegalAccessException
-     *             if not initialized
+     *
+     * @throws com.stratio.deep.commons.exception.DeepIllegalAccessException if not initialized
      */
     protected void checkInitialized() {
         if (!isInitialized) {
@@ -213,7 +203,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
 
     /**
      * Fetches table metadata from the underlying datastore, using DataStax java driver.
-     * 
+     *
      * @return the table metadata as returned by the driver.
      */
     public TableMetadata fetchTableMetadata() {
@@ -235,9 +225,8 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
      * <p>
      * This is a very heavy operation since to obtain the schema we need to get at least one element of the output RDD.
      * </p>
-     * 
-     * @param first
-     *            the pair RDD.
+     *
+     * @param first the pair RDD.
      */
     public void createOutputTableIfNeeded(Tuple2<Cells, Cells> first) {
 
@@ -452,9 +441,6 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
         return cqlPort;
     }
 
-
-
-
     /**
      * {@inheritDoc}
      */
@@ -520,12 +506,11 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
             bisectFactor(extractorConfig.getInteger(BISECT_FACTOR));
         }
 
-
-//        if (values.get(ExtractorConstants.FILTER_FIELD) != null) {
-//            Pair<String, Serializable> filterFields = extractorConfig.getPair(ExtractorConstants.FILTER_FIELD,
-//                    String.class, Serializable.class);
-//            filterByField(filterFields.left, filterFields.right);
-//        }
+        //        if (values.get(ExtractorConstants.FILTER_FIELD) != null) {
+        //            Pair<String, Serializable> filterFields = extractorConfig.getPair(ExtractorConstants.FILTER_FIELD,
+        //                    String.class, Serializable.class);
+        //            filterByField(filterFields.left, filterFields.right);
+        //        }
 
         if (values.get(ExtractorConstants.FILTER_QUERY) != null) {
             filters(extractorConfig.getFilterArray(ExtractorConstants.FILTER_QUERY));
@@ -553,8 +538,6 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
     public Filter[] getFilters() {
         return filters;
     }
-
-
 
     /**
      * {@inheritDoc}
@@ -802,7 +785,6 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
         checkInitialized();
         return this.pageSize;
     }
-
 
     public CassandraDeepJobConfig<T> pageSize(int pageSize) {
         this.pageSize = pageSize;

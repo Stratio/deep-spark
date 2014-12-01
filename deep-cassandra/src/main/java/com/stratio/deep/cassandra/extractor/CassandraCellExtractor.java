@@ -17,8 +17,8 @@ package com.stratio.deep.cassandra.extractor;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
-import com.stratio.deep.cassandra.config.CellDeepJobConfig;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
+import com.stratio.deep.cassandra.config.CellDeepJobConfig;
 import com.stratio.deep.cassandra.functions.CellList2TupleFunction;
 import com.stratio.deep.cassandra.util.CassandraUtils;
 import com.stratio.deep.commons.entity.Cell;

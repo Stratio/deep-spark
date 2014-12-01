@@ -14,9 +14,6 @@
  */
 package com.stratio.deep.commons.extractor.server;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -42,6 +39,9 @@ import com.stratio.deep.commons.extractor.response.NextResponse;
 import com.stratio.deep.commons.extractor.response.Response;
 import com.stratio.deep.commons.extractor.response.SaveResponse;
 import com.stratio.deep.commons.rdd.IExtractor;
+
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 
 public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Action> {
 
@@ -100,7 +100,7 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+        LOG.error(cause.getMessage());
         ctx.close();
     }
 

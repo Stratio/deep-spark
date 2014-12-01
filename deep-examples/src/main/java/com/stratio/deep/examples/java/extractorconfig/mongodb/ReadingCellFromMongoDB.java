@@ -16,22 +16,23 @@
 
 package com.stratio.deep.examples.java.extractorconfig.mongodb;
 
-import com.mongodb.QueryBuilder;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.commons.filter.Filter;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
-import com.stratio.deep.utils.ContextProperties;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import com.mongodb.QueryBuilder;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.filter.Filter;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
+import com.stratio.deep.utils.ContextProperties;
 
 /**
  * Example class to read a collection from mongoDB
@@ -54,8 +55,6 @@ public final class ReadingCellFromMongoDB {
         String database = "test";
         String inputCollection = "input";
 
-
-
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
@@ -77,7 +76,7 @@ public final class ReadingCellFromMongoDB {
         filter.greaterThan(1);
         Filter filter2 = new Filter("number");
         filter2.lessThanEquals(10);
-        Filter[] filters = new Filter[]{filter, filter2};
+        Filter[] filters = new Filter[] { filter, filter2 };
 
         ExtractorConfig<Cells> config = new ExtractorConfig();
 
@@ -85,8 +84,8 @@ public final class ReadingCellFromMongoDB {
         Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.DATABASE, database);
         values.put(ExtractorConstants.FILTER_QUERY, filters);
-        values.put(ExtractorConstants.COLLECTION,    inputCollection);
-        values.put(ExtractorConstants.HOST,  host);
+        values.put(ExtractorConstants.COLLECTION, inputCollection);
+        values.put(ExtractorConstants.HOST, host);
 
         config.setValues(values);
 
@@ -95,9 +94,6 @@ public final class ReadingCellFromMongoDB {
         LOG.info("count : " + inputRDDEntity.count());
 
         LOG.info("prints first cell  : " + inputRDDEntity.first());
-
-
-
 
         deepContext.stop();
     }

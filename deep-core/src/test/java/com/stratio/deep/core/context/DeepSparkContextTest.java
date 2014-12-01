@@ -65,13 +65,13 @@ public class DeepSparkContextTest {
 
     @Test
     public void createHDFSRDDTest() throws Exception {
-//        DeepSparkContext deepSparkContext = createDeepSparkContext();
-//        ExtractorConfig<Cells> deepJobConfig = createDeepJobConfig();
-//        DeepRDD deepRDD = createDeepRDD(deepSparkContext.sc(), deepJobConfig);
-//
-//        JavaRDD rddReturn = deepSparkContext.createHDFSRDD(deepJobConfig);
-//
-//        assertSame("The DeepRDD is the same", deepRDD, rddReturn);
+        //        DeepSparkContext deepSparkContext = createDeepSparkContext();
+        //        ExtractorConfig<Cells> deepJobConfig = createDeepJobConfig();
+        //        DeepRDD deepRDD = createDeepRDD(deepSparkContext.sc(), deepJobConfig);
+        //
+        //        JavaRDD rddReturn = deepSparkContext.createHDFSRDD(deepJobConfig);
+        //
+        //        assertSame("The DeepRDD is the same", deepRDD, rddReturn);
 
     }
 
@@ -140,7 +140,6 @@ public class DeepSparkContextTest {
         return extractorConfig;
     }
 
-
     private DeepRDD createDeepRDD(SparkContext sc, ExtractorConfig deepJobConfig) throws Exception {
 
         DeepRDD deepRDD = mock(DeepRDD.class);
@@ -148,6 +147,5 @@ public class DeepSparkContextTest {
         whenNew(DeepRDD.class).withArguments(sc, deepJobConfig).thenReturn(deepRDD);
         return deepRDD;
     }
-
 
 }

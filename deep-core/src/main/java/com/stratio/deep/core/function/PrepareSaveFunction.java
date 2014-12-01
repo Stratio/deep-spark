@@ -21,14 +21,14 @@ import static com.stratio.deep.core.util.ExtractorClientUtil.getExtractorClient;
 
 import java.io.Serializable;
 
+import com.stratio.deep.commons.config.BaseConfig;
+import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
+import com.stratio.deep.commons.rdd.IExtractor;
+
 import scala.collection.Iterator;
 import scala.runtime.AbstractFunction1;
 import scala.runtime.BoxedUnit;
-
-import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
-import com.stratio.deep.commons.rdd.IExtractor;
 
 /**
  * Created by rcrespo on 28/08/14.

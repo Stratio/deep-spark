@@ -23,14 +23,10 @@ import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
-import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cassandra.db.marshal.Int32Type;
-import org.apache.cassandra.db.marshal.LongType;
-import org.apache.cassandra.db.marshal.UTF8Type;
 import org.testng.annotations.Test;
 
 import com.stratio.deep.commons.entity.Cell;
@@ -177,8 +173,8 @@ public class CellsTest {
 
         assertNotNull(c);
         assertEquals(c.getCellName(), "id2");
-//        assertEquals(UTF8Type.instance.compose(c.getDecomposedCellValue()), "payload2");
-//        assertTrue(c.marshallerClassName().equals(UTF8Type.class.getCanonicalName()));
+        //        assertEquals(UTF8Type.instance.compose(c.getDecomposedCellValue()), "payload2");
+        //        assertTrue(c.marshallerClassName().equals(UTF8Type.class.getCanonicalName()));
     }
 
     @Test
@@ -229,15 +225,15 @@ public class CellsTest {
 
         assertNotNull(c);
         assertEquals(c.getCellName(), "id2");
-//        assertEquals(UTF8Type.instance.compose(c.getDecomposedCellValue()), "payload2");
-//        assertTrue((c.marshallerClassName().equals(UTF8Type.class.getCanonicalName())));
+        //        assertEquals(UTF8Type.instance.compose(c.getDecomposedCellValue()), "payload2");
+        //        assertTrue((c.marshallerClassName().equals(UTF8Type.class.getCanonicalName())));
 
         c = (Cell) keys.getCellByIdx("mySecondTable", 0);
 
         assertNotNull(c);
         assertEquals(c.getCellName(), "id2");
-//        assertEquals(UTF8Type.instance.compose(c.getDecomposedCellValue()), "payload2");
-//        assertTrue(c.marshallerClassName().equals(UTF8Type.class.getCanonicalName()));
+        //        assertEquals(UTF8Type.instance.compose(c.getDecomposedCellValue()), "payload2");
+        //        assertTrue(c.marshallerClassName().equals(UTF8Type.class.getCanonicalName()));
     }
 
     @Test
@@ -251,8 +247,8 @@ public class CellsTest {
         Cell c = (Cell) values.getCellByName("domain_name");
         assertNotNull(c);
         assertEquals(c.getCellName(), "domain_name");
-//        assertEquals(UTF8Type.instance.compose(c.getDecomposedCellValue()), "abc.es");
-//        assertTrue(c.marshallerClassName().equals(UTF8Type.class.getCanonicalName()));
+        //        assertEquals(UTF8Type.instance.compose(c.getDecomposedCellValue()), "abc.es");
+        //        assertTrue(c.marshallerClassName().equals(UTF8Type.class.getCanonicalName()));
     }
 
     @Test
@@ -341,22 +337,22 @@ public class CellsTest {
                         downloadTime)
         );
 
-//        List<ByteBuffer> dcv = (List<ByteBuffer>) values.getDecomposedCellValues();
-//        ByteBuffer bb0 = dcv.get(0);
-//        assertNotNull(bb0);
-//        assertEquals(bb0, UTF8Type.instance.decompose("abc.es"));
-//
-//        ByteBuffer bb1 = dcv.get(1);
-//        assertEquals(bb1, UTF8Type.instance.decompose("http://www.abc.es"));
-//
-//        ByteBuffer bb2 = dcv.get(2);
-//        assertEquals(bb2, Int32Type.instance.decompose(102));
-//
-//        ByteBuffer bb3 = dcv.get(3);
-//        assertEquals(bb3, Int32Type.instance.decompose(200));
-//
-//        ByteBuffer bb4 = dcv.get(4);
-//        assertEquals(bb4, LongType.instance.decompose(downloadTime));
+        //        List<ByteBuffer> dcv = (List<ByteBuffer>) values.getDecomposedCellValues();
+        //        ByteBuffer bb0 = dcv.get(0);
+        //        assertNotNull(bb0);
+        //        assertEquals(bb0, UTF8Type.instance.decompose("abc.es"));
+        //
+        //        ByteBuffer bb1 = dcv.get(1);
+        //        assertEquals(bb1, UTF8Type.instance.decompose("http://www.abc.es"));
+        //
+        //        ByteBuffer bb2 = dcv.get(2);
+        //        assertEquals(bb2, Int32Type.instance.decompose(102));
+        //
+        //        ByteBuffer bb3 = dcv.get(3);
+        //        assertEquals(bb3, Int32Type.instance.decompose(200));
+        //
+        //        ByteBuffer bb4 = dcv.get(4);
+        //        assertEquals(bb4, LongType.instance.decompose(downloadTime));
     }
 
     @Test
@@ -374,38 +370,38 @@ public class CellsTest {
         values.add("secondTable", Cell.create("response_time", 432));
         values.add("secondTable", Cell.create("download_time", 3829432));
 
-//        List<ByteBuffer> dcv = (List<ByteBuffer>) values.getDecomposedCellValues("firstTable");
-//        assertEquals(dcv.size(), 5);
-//        ByteBuffer bb0 = dcv.get(0);
-//        assertNotNull(bb0);
-//        assertEquals(bb0, UTF8Type.instance.decompose("abc.es"));
-//
-//        ByteBuffer bb1 = dcv.get(1);
-//        assertEquals(bb1, UTF8Type.instance.decompose("http://www.abc.es"));
-//
-//        ByteBuffer bb2 = dcv.get(2);
-//        assertEquals(bb2, Int32Type.instance.decompose(102));
-//
-//        ByteBuffer bb3 = dcv.get(3);
-//        assertEquals(bb3, Int32Type.instance.decompose(200));
-//
-//        ByteBuffer bb4 = dcv.get(4);
-//        assertEquals(bb4, LongType.instance.decompose(downloadTime));
-//
-//        dcv = (List<ByteBuffer>) values.getDecomposedCellValues("secondTable");
-//
-//        bb0 = dcv.get(0);
-//        assertNotNull(bb0);
-//        assertEquals(bb0, UTF8Type.instance.decompose("abc.es"));
-//
-//        bb1 = dcv.get(1);
-//        assertEquals(bb1, UTF8Type.instance.decompose(""));
-//
-//        bb2 = dcv.get(2);
-//        assertEquals(bb2, Int32Type.instance.decompose(432));
-//
-//        bb3 = dcv.get(3);
-//        assertEquals(bb3, Int32Type.instance.decompose(3829432));
+        //        List<ByteBuffer> dcv = (List<ByteBuffer>) values.getDecomposedCellValues("firstTable");
+        //        assertEquals(dcv.size(), 5);
+        //        ByteBuffer bb0 = dcv.get(0);
+        //        assertNotNull(bb0);
+        //        assertEquals(bb0, UTF8Type.instance.decompose("abc.es"));
+        //
+        //        ByteBuffer bb1 = dcv.get(1);
+        //        assertEquals(bb1, UTF8Type.instance.decompose("http://www.abc.es"));
+        //
+        //        ByteBuffer bb2 = dcv.get(2);
+        //        assertEquals(bb2, Int32Type.instance.decompose(102));
+        //
+        //        ByteBuffer bb3 = dcv.get(3);
+        //        assertEquals(bb3, Int32Type.instance.decompose(200));
+        //
+        //        ByteBuffer bb4 = dcv.get(4);
+        //        assertEquals(bb4, LongType.instance.decompose(downloadTime));
+        //
+        //        dcv = (List<ByteBuffer>) values.getDecomposedCellValues("secondTable");
+        //
+        //        bb0 = dcv.get(0);
+        //        assertNotNull(bb0);
+        //        assertEquals(bb0, UTF8Type.instance.decompose("abc.es"));
+        //
+        //        bb1 = dcv.get(1);
+        //        assertEquals(bb1, UTF8Type.instance.decompose(""));
+        //
+        //        bb2 = dcv.get(2);
+        //        assertEquals(bb2, Int32Type.instance.decompose(432));
+        //
+        //        bb3 = dcv.get(3);
+        //        assertEquals(bb3, Int32Type.instance.decompose(3829432));
     }
 
     @Test
@@ -420,100 +416,100 @@ public class CellsTest {
         );
 
         int idx = 0;
-//        for (Cell cell : values) {
-//            ByteBuffer bb = ((Cell) cell).getDecomposedCellValue();
-//
-//            switch (idx) {
-//            case 0:
-//                assertEquals(bb, UTF8Type.instance.decompose("abc.es"));
-//                break;
-//            case 1:
-//                assertEquals(bb, UTF8Type.instance.decompose("http://www.abc.es"));
-//                break;
-//            case 2:
-//                assertEquals(bb, Int32Type.instance.decompose(102));
-//                break;
-//            case 3:
-//                assertEquals(bb, Int32Type.instance.decompose(200));
-//                break;
-//            case 4:
-//                assertEquals(bb, LongType.instance.decompose(downloadTime));
-//                break;
-//            default:
-//                fail();
-//                break;
-//            }
-//
-//            ++idx;
-//        }
+        //        for (Cell cell : values) {
+        //            ByteBuffer bb = ((Cell) cell).getDecomposedCellValue();
+        //
+        //            switch (idx) {
+        //            case 0:
+        //                assertEquals(bb, UTF8Type.instance.decompose("abc.es"));
+        //                break;
+        //            case 1:
+        //                assertEquals(bb, UTF8Type.instance.decompose("http://www.abc.es"));
+        //                break;
+        //            case 2:
+        //                assertEquals(bb, Int32Type.instance.decompose(102));
+        //                break;
+        //            case 3:
+        //                assertEquals(bb, Int32Type.instance.decompose(200));
+        //                break;
+        //            case 4:
+        //                assertEquals(bb, LongType.instance.decompose(downloadTime));
+        //                break;
+        //            default:
+        //                fail();
+        //                break;
+        //            }
+        //
+        //            ++idx;
+        //        }
     }
 
     @Test
     public void testSplitCells() {
 
-//        Cells cells = new Cells("defaultTable",
-//                Cell.create("domain_name", ""),
-//                Cell.create("id2", "", false, true),
-//                Cell.create("response_time", ""),
-//                Cell.create("url", ""),
-//                Cell.create("id1", "", true, false),
-//                Cell.create("response_code", ""),
-//                Cell.create("download_time", ""));
-//
-//        Cells keys = cells.getIndexCells();
-//        assertNotNull(keys);
-//        assertTrue(keys.equals(new Cells("defaultTable", Cell.create("id2", "", false, true),
-//                Cell.create("id1", "", true, false))));
-//
-//        Cells values = cells.getValueCells();
-//        assertNotNull(values);
-//        assertTrue(values.equals(
-//                new Cells("defaultTable", Cell.create("domain_name", ""),
-//                        Cell.create("response_time", ""), Cell.create("url", ""),
-//                        Cell.create("response_code", ""), Cell.create("download_time", ""))
-//        ));
+        //        Cells cells = new Cells("defaultTable",
+        //                Cell.create("domain_name", ""),
+        //                Cell.create("id2", "", false, true),
+        //                Cell.create("response_time", ""),
+        //                Cell.create("url", ""),
+        //                Cell.create("id1", "", true, false),
+        //                Cell.create("response_code", ""),
+        //                Cell.create("download_time", ""));
+        //
+        //        Cells keys = cells.getIndexCells();
+        //        assertNotNull(keys);
+        //        assertTrue(keys.equals(new Cells("defaultTable", Cell.create("id2", "", false, true),
+        //                Cell.create("id1", "", true, false))));
+        //
+        //        Cells values = cells.getValueCells();
+        //        assertNotNull(values);
+        //        assertTrue(values.equals(
+        //                new Cells("defaultTable", Cell.create("domain_name", ""),
+        //                        Cell.create("response_time", ""), Cell.create("url", ""),
+        //                        Cell.create("response_code", ""), Cell.create("download_time", ""))
+        //        ));
     }
 
     @Test
     public void testSplitCellsForTable() {
 
-//        Cells cells = new Cells("firstTable",
-//                Cell.create("domain_name", ""),
-//                Cell.create("id2", "", false, true),
-//                Cell.create("response_time", ""));
-//
-//        cells.add("secondTable", Cell.create("url", ""));
-//        cells.add("secondTable", Cell.create("id1", "", true, false));
-//        cells.add("secondTable", Cell.create("response_code", "", false, true));
-//        cells.add("secondTable", Cell.create("download_time", ""));
-//
-//        Cells keys = cells.getIndexCells("firstTable");
-//        assertNotNull(keys);
-//        assertEquals(keys.getCells("firstTable").size(), 1);
-//
-//        keys = cells.getIndexCells("secondTable");
-//        assertNotNull(keys);
-//        assertEquals(keys.getCells("secondTable").size(), 2);
-//
-//        Cells values = cells.getValueCells("firstTable");
-//        assertNotNull(values);
-//        assertEquals(values.getCells("firstTable").size(), 2);
-//
-//        values = cells.getValueCells("secondTable");
-//        assertNotNull(values);
-//        assertEquals(values.getCells("secondTable").size(), 2);
-//
-//        keys = cells.getIndexCells();
-//        assertEquals(keys.getInternalCells().size(), 2);
-//        assertEquals(keys.getCells("firstTable").size(), 1);
-//        assertEquals(keys.getCells("secondTable").size(), 2);
-//        assertEquals(keys.getCells().size(), 3);
-//
-//        values = cells.getValueCells();
-//        assertEquals(values.getInternalCells().size(), 2);
-//        assertEquals(values.getCells("firstTable").size(), 2);
-//        assertEquals(values.getCells("secondTable").size(), 2);
-//        assertEquals(values.getCells().size(), 4);
+        //        Cells cells = new Cells("firstTable",
+        //                Cell.create("domain_name", ""),
+        //                Cell.create("id2", "", false, true),
+        //                Cell.create("response_time", ""));
+        //
+        //        cells.add("secondTable", Cell.create("url", ""));
+        //        cells.add("secondTable", Cell.create("id1", "", true, false));
+        //        cells.add("secondTable", Cell.create("response_code", "", false, true));
+        //        cells.add("secondTable", Cell.create("download_time", ""));
+        //
+        //        Cells keys = cells.getIndexCells("firstTable");
+        //        assertNotNull(keys);
+        //        assertEquals(keys.getCells("firstTable").size(), 1);
+        //
+        //        keys = cells.getIndexCells("secondTable");
+        //        assertNotNull(keys);
+        //        assertEquals(keys.getCells("secondTable").size(), 2);
+        //
+        //        Cells values = cells.getValueCells("firstTable");
+        //        assertNotNull(values);
+        //        assertEquals(values.getCells("firstTable").size(), 2);
+        //
+        //        values = cells.getValueCells("secondTable");
+        //        assertNotNull(values);
+        //        assertEquals(values.getCells("secondTable").size(), 2);
+        //
+        //        keys = cells.getIndexCells();
+        //        assertEquals(keys.getInternalCells().size(), 2);
+        //        assertEquals(keys.getCells("firstTable").size(), 1);
+        //        assertEquals(keys.getCells("secondTable").size(), 2);
+        //        assertEquals(keys.getCells().size(), 3);
+        //
+        //        values = cells.getValueCells();
+        //        assertEquals(values.getInternalCells().size(), 2);
+        //        assertEquals(values.getCells("firstTable").size(), 2);
+        //        assertEquals(values.getCells("secondTable").size(), 2);
+        //        assertEquals(values.getCells().size(), 4);
     }
 
     @Test

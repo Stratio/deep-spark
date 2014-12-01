@@ -298,7 +298,9 @@ public class RangeUtilsTest {
                 new Function<String, Long>() {
                     @Nullable
                     @Override
-                    public Long apply(@Nullable String input) {
+                    public Long apply(
+                            @Nullable
+                            String input) {
                         return Long.parseLong(input);
                     }
                 }));
@@ -316,7 +318,9 @@ public class RangeUtilsTest {
                 new Function<String, Long>() {
                     @Nullable
                     @Override
-                    public Long apply(@Nullable String input) {
+                    public Long apply(
+                            @Nullable
+                            String input) {
                         return Long.parseLong(input);
                     }
                 }));
@@ -344,7 +348,9 @@ public class RangeUtilsTest {
                 new Function<String, Long>() {
                     @Nullable
                     @Override
-                    public Long apply(@Nullable String input) {
+                    public Long apply(
+                            @Nullable
+                            String input) {
                         return Long.parseLong(input);
                     }
                 }));
@@ -362,7 +368,9 @@ public class RangeUtilsTest {
                 new Function<String, Long>() {
                     @Nullable
                     @Override
-                    public Long apply(@Nullable String input) {
+                    public Long apply(
+                            @Nullable
+                            String input) {
                         return Long.parseLong(input);
                     }
                 }));

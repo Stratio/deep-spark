@@ -61,25 +61,22 @@ public final class WritingEntityToMongoDB {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
-
         MongoDeepJobConfig<MessageTestEntity> inputConfigEntity =
-				        MongoConfigFactory.createMongoDB(MessageTestEntity.class).host(host).database(database).collection(inputCollection).readPreference(readPreference).initialize();
+                MongoConfigFactory.createMongoDB(MessageTestEntity.class).host(host).database(database)
+                        .collection(inputCollection).readPreference(readPreference).initialize();
 
         RDD<MessageTestEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
 
-
         MongoDeepJobConfig<MessageTestEntity> outputConfigEntityPruebaGuardado =
-				        MongoConfigFactory.createMongoDB(MessageTestEntity.class).host(host).database(database).collection(outputCollection).readPreference(readPreference).initialize();
-
+                MongoConfigFactory.createMongoDB(MessageTestEntity.class).host(host).database(database)
+                        .collection(outputCollection).readPreference(readPreference).initialize();
 
         deepContext.saveRDD(inputRDDEntity, outputConfigEntityPruebaGuardado);
 
-
         deepContext.stop();
     }
-
 
 }
