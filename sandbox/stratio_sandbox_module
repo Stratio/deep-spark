@@ -288,7 +288,3 @@ EOF
 cd /opt/sds/dataset
 tar -zxvf crawler-Page.tgz
 /opt/sds/cassandra/bin/sstableloader -d localhost crawler/Page/
-
-
-
-
