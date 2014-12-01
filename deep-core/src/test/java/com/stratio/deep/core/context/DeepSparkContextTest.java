@@ -18,28 +18,36 @@ package com.stratio.deep.core.context;
 
 import static junit.framework.Assert.assertSame;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
+import java.io.Serializable;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.rdd.RDD;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.core.hdfs.utils.SchemaMap;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
 
@@ -50,6 +58,15 @@ import com.stratio.deep.core.rdd.DeepRDD;
 @PrepareForTest(value = { SparkContext.class, DeepJavaRDD.class, DeepSparkContext.class, DeepRDD.class, Method.class,
         AccessibleObject.class, System.class })
 public class DeepSparkContextTest {
+
+
+    DeepSparkContext deepSparkContext;
+
+    @Mock
+    SparkContext sparkContext;
+
+    @Mock
+    private JavaRDD<Cells> singleRdd;
 
     @Test
     public void createRDDTest() throws Exception {
@@ -65,13 +82,24 @@ public class DeepSparkContextTest {
 
     @Test
     public void createHDFSRDDTest() throws Exception {
-//        DeepSparkContext deepSparkContext = createDeepSparkContext();
-//        ExtractorConfig<Cells> deepJobConfig = createDeepJobConfig();
-//        DeepRDD deepRDD = createDeepRDD(deepSparkContext.sc(), deepJobConfig);
-//
-//        JavaRDD rddReturn = deepSparkContext.createHDFSRDD(deepJobConfig);
-//
-//        assertSame("The DeepRDD is the same", deepRDD, rddReturn);
+
+
+        deepSparkContext= new DeepSparkContext(sparkContext);
+        Whitebox.setInternalState(deepSparkContext,"sc",sparkContext);
+        RDD<String> rdd = mock(RDD.class);
+        JavaRDD<String> javaRdd = mock(JavaRDD.class);
+        when(deepSparkContext.sc().textFile(anyString(), anyInt())).thenReturn(rdd);
+
+        when(rdd.toJavaRDD()).thenReturn(javaRdd);
+        when(rdd.toJavaRDD().map(any(Function.class))).thenReturn(singleRdd);
+
+        ExtractorConfig<Cells> config = createHDFSDeepJobConfig();
+
+        JavaRDD rddReturn = deepSparkContext.createHDFSRDD(config);
+
+        verify(deepSparkContext.sc(), times(1)).textFile(anyString(),anyInt());
+
+        verify(javaRdd,times(1)).map(any(Function.class));
 
     }
 
@@ -128,15 +156,21 @@ public class DeepSparkContextTest {
     }
 
     private ExtractorConfig createHDFSDeepJobConfig() {
-        ExtractorConfig extractorConfig = mock(ExtractorConfig.class);
-        when(extractorConfig.getExtractorImplClass()).thenReturn(new Object().getClass());
-        when(extractorConfig.getValues()).thenReturn(any(Map.class));
 
-        when(extractorConfig.getValues().get(ExtractorConstants.HDFS_SCHEMA)).thenReturn(new ArrayList<SchemaMap<?>>());
-        when(extractorConfig.getValues().get(ExtractorConstants.TABLE)).thenReturn(any(String.class));
-        when(extractorConfig.getValues().get(ExtractorConstants.CATALOG)).thenReturn(any(String.class));
-        when(extractorConfig.getValues().get(ExtractorConstants.HDFS_FILE_SEPARATOR)).thenReturn(",");
-        //when(extractorConfig.getInputFormatClass()).thenReturn(null);
+        ExtractorConfig extractorConfig = new ExtractorConfig();
+        extractorConfig.setExtractorImplClassName("hdfs");
+        Map<String, Serializable> values = new HashMap<>();
+        values.put(ExtractorConstants.PORT, "9000");
+        values.put(ExtractorConstants.HDFS_FILE_SEPARATOR, ",");
+        values.put(ExtractorConstants.HDFS_FILE_PATH, "/user/hadoop/test/songs.csv");
+        values.put(ExtractorConstants.HOST, "127.0.0.1");
+
+        values.put(ExtractorConstants.HDFS_TYPE,ExtractorConstants.HDFS_TYPE);
+        values.put(ExtractorConstants.TABLE,"");
+        values.put(ExtractorConstants.CATALOG,"");
+
+        extractorConfig.setValues(values);
+
         return extractorConfig;
     }
 

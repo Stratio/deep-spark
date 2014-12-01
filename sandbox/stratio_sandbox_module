@@ -19,6 +19,7 @@ rpm -q stratio-scala || yum -y -q --nogpgcheck install stratio-scala
 echo -e 'Installing Spark...'
 rpm -q stratio-spark || yum -y -q --nogpgcheck install stratio-spark 
 
+ipaddress=$(ip -4 addr show dev eth0 | grep inet | sed 's/^ *//g' | cut -d' ' -f 2 | cut -d'/' -f1)
 mkdir /opt/sds/spark/.ssh
 chmod 700 /opt/sds/spark/.ssh
 ssh-keygen -t rsa -b 2048 -f /opt/sds/spark/.ssh/id_rsa -N ""
@@ -195,9 +196,6 @@ sed -i "s/^#\(SPARK_EXECUTOR_MEMORY=\)/\1/" /etc/sds/spark/spark-env.sh
 sed -i "s/^#\(SPARK_DRIVER_MEMORY=\)/\1/" /etc/sds/spark/spark-env.sh
 
 
-
-
-
 ##############
 ## SERVICES ##
 ##############
@@ -210,4 +208,87 @@ service cassandra restart
 #service elasticsearch restart
 sleep 10
 service spark restart
+
+##############
+## DATASET  ##
+##############
+touch /tmp/deep.log
+chmod 666 /tmp/deep.log
+
+dataset_dir='/opt/sds/dataset'
+mkdir $dataset_dir
+cd $dataset_dir
+wget http://docs.openstratio.org/resources/datasets/crawler-Page.tgz
+wget https://github.com/Stratio/deep-spark/blob/develop/doc/resources/table-Page-create.cql
+wget https://github.com/Stratio/deep-spark/blob/develop/doc/resources/table-listdomains-create.cql
+cat >/opt/sds/dataset/crawler.cql <<EOF
+CREATE KEYSPACE crawler WITH replication = {
+      'class': 'SimpleStrategy',
+      'replication_factor': '1'
+};
+
+use crawler;
+
+CREATE TABLE "Page" (
+ key text,
+ "___class" text,
+ charset text,
+ content text,
+ "domainName" text,
+ "downloadTime" bigint,
+ "enqueuedForTransforming" bigint,
+ etag text,
+ "firstDownloadTime" bigint,
+ "lastModified" text,
+ "responseCode" varint,
+ "responseTime" bigint,
+ "timeTransformed" bigint,
+ title text,
+ url text,
+ PRIMARY KEY (key)
+) WITH
+ bloom_filter_fp_chance=0.010000 AND
+ caching='KEYS_ONLY' AND
+ comment='' AND
+ dclocal_read_repair_chance=0.000000 AND
+ gc_grace_seconds=864000 AND
+ index_interval=128 AND
+ read_repair_chance=0.100000 AND
+ replicate_on_write='true' AND
+ populate_io_cache_on_flush='false' AND
+ default_time_to_live=0 AND
+ speculative_retry='99.0PERCENTILE' AND
+ memtable_flush_period_in_ms=0 AND
+ compaction={'class': 'SizeTieredCompactionStrategy'} AND
+ compression={'sstable_compression': 'LZ4Compressor'};
+
+ CREATE TABLE listdomains (
+ domain text,
+ num_pages int,
+ PRIMARY KEY (domain)
+) WITH
+ bloom_filter_fp_chance=0.010000 AND
+ caching='KEYS_ONLY' AND
+ comment='' AND
+ dclocal_read_repair_chance=0.000000 AND
+ gc_grace_seconds=864000 AND
+ index_interval=128 AND
+ read_repair_chance=0.100000 AND
+ replicate_on_write='true' AND
+ populate_io_cache_on_flush='false' AND
+ default_time_to_live=0 AND
+ speculative_retry='99.0PERCENTILE' AND
+ memtable_flush_period_in_ms=0 AND
+ compaction={'class': 'SizeTieredCompactionStrategy'} AND
+ compression={'sstable_compression': 'SnappyCompressor'};
+
+EOF
+
+/opt/sds/cassandra/bin/cqlsh -f /opt/sds/dataset/crawler.cql
+cd /opt/sds/dataset
+tar -zxvf crawler-Page.tgz
+/opt/sds/cassandra/bin/sstableloader -d localhost crawler/Page/
+
+
+
 
