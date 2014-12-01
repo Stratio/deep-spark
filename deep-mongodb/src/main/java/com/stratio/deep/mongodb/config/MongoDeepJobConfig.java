@@ -16,27 +16,19 @@
 
 package com.stratio.deep.mongodb.config;
 
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.COLLECTION;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.DATABASE;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.FILTER_QUERY;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.HOST;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.IGNORE_ID_FIELD;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_KEY;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PORT;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.READ_PREFERENCE;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.REPLICA_SET;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.SORT;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.SPLIT_SIZE;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNAME;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_CHUNKS;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_SHARD;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_SPLITS;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +36,6 @@ import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
-import org.bson.BSONObject;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -56,8 +47,8 @@ import com.stratio.deep.commons.config.HadoopConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.filter.FilterType;
-import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
-import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
+import com.stratio.deep.mongodb.extractor.MongoNativeCellExtractor;
+import com.stratio.deep.mongodb.extractor.MongoNativeEntityExtractor;
 
 /**
  * The type Mongo deep job config.
@@ -75,7 +66,6 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
      * configuration to be broadcasted to every spark node
      */
     private transient Configuration configHadoop;
-
 
     /**
      * Indicates the replica set's name
@@ -141,9 +131,9 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
     public MongoDeepJobConfig(Class<T> entityClass) {
         super(entityClass);
         if (Cells.class.isAssignableFrom(entityClass)) {
-            extractorImplClass = MongoCellExtractor.class;
+            extractorImplClass = MongoNativeCellExtractor.class;
         } else {
-            extractorImplClass = MongoEntityExtractor.class;
+            extractorImplClass = MongoNativeEntityExtractor.class;
         }
 
     }
@@ -152,11 +142,10 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
      * {@inheritDoc}
      */
 
-   public MongoDeepJobConfig<T> pageSize(int pageSize) {
+    public MongoDeepJobConfig<T> pageSize(int pageSize) {
         this.splitSize = pageSize;
         return this;
     }
-
 
     /**
      * {@inheritDoc}
@@ -165,7 +154,6 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
     public String getUsername() {
         return username;
     }
-
 
     /**
      * {@inheritDoc}
@@ -331,7 +319,6 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
         return catalog;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -481,7 +468,6 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
         super.initialize(extractorConfig);
 
         Map<String, Serializable> values = extractorConfig.getValues();
-
 
         if (values.get(REPLICA_SET) != null) {
             replicaSet(extractorConfig.getString(REPLICA_SET));
@@ -655,9 +641,6 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
         this.splitSize = splitSize;
     }
 
-
-
-
     /**
      * Gets query.
      *
@@ -666,7 +649,6 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
     public DBObject getQuery() {
         return query;
     }
-
 
     public DBObject getDBFields() {
         return fields;

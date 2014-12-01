@@ -3,7 +3,6 @@ package com.stratio.deep.mongodb.config;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
-import com.stratio.deep.testutils.UnitTest;
 import org.testng.annotations.Test;
 
 import com.stratio.deep.commons.entity.Cells;
@@ -11,7 +10,7 @@ import com.stratio.deep.commons.entity.Cells;
 /**
  * Created by rcrespo on 16/07/14.
  */
-@Test(groups = {"UnitTests"})
+@Test(groups = { "UnitTests" })
 public class CellDeepJobConfigMongoDBTest {
 
     @Test
