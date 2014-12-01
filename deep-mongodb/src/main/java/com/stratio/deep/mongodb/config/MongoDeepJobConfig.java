@@ -26,6 +26,7 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.SPLIT_
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_CHUNKS;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_SHARD;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USE_SPLITS;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.WRITE_MODE;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import com.mongodb.ReadPreference;
+import com.mongodb.WriteConcern;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.HadoopConfig;
@@ -76,7 +78,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
      * Read Preference primaryPreferred is the recommended read preference. If the primary node go down, can still read
      * from secundaries
      */
-    private String readPreference = ReadPreference.nearest().getName();
+    private ReadPreference readPreference = ReadPreference.nearest();
 
     /**
      * OPTIONAL filter query
@@ -122,6 +124,9 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
      * The Custom configuration.
      */
     private Map<String, Serializable> customConfiguration;
+
+
+    private WriteConcern writeConcern = WriteConcern.NORMAL;
 
     /**
      * Instantiates a new Mongo deep job config.
@@ -277,13 +282,6 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    // TODO: cheking
-    public int getPageSize() {
-        return 0;
-    }
 
     /**
      * {@inheritDoc}
@@ -299,7 +297,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
      */
     @Override
     public MongoDeepJobConfig<T> readPreference(String readPreference) {
-        this.readPreference = readPreference;
+        this.readPreference = ReadPreference.valueOf(readPreference);
         return this;
     }
 
@@ -410,16 +408,19 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
         return this;
     }
 
-    /**
-     * validates connection parameters
-     */
-    private void validate() {
-
+    private void concantHostPort(){
         for (int i = 0; i < host.size(); i++) {
             if (host.get(i).indexOf(":") == -1) {
                 host.set(i, host.get(i).concat(":").concat(String.valueOf(port)));
             }
         }
+    }
+
+    /**
+     * validates connection parameters
+     */
+    private void validate() {
+
         if (host.isEmpty()) {
             throw new IllegalArgumentException("host cannot be null");
         }
@@ -429,6 +430,8 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
         if (table == null) {
             throw new IllegalArgumentException("collection cannot be null");
         }
+
+        concantHostPort();
     }
 
     /**
@@ -511,6 +514,11 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
         if (values.get(SPLIT_SIZE) != null) {
             pageSize(extractorConfig.getInteger(SPLIT_SIZE));
         }
+
+        if (values.get(WRITE_MODE) != null) {
+            writeConcern((WriteConcern) extractorConfig.getValue(WriteConcern.class, WRITE_MODE));
+        }
+
 
         this.initialize();
 
@@ -654,6 +662,32 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
         return fields;
     }
 
+    public WriteConcern getWriteConcern() {
+        return writeConcern;
+    }
+
+    public MongoDeepJobConfig<T> writeConcern(WriteConcern writeConcern) {
+        this.writeConcern = writeConcern;
+        return this;
+    }
+
+    public MongoDeepJobConfig<T> query(DBObject query) {
+        this.query = query;
+        return this;
+    }
+
+    public String getReplicaSet() {
+        return replicaSet;
+    }
+
+    public ReadPreference getReadPreference() {
+        return readPreference;
+    }
+
+    public String getSort() {
+        return sort;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("MongoDeepJobConfig{");
@@ -668,6 +702,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
         sb.append(", useShards=").append(useShards);
         sb.append(", splitsUseChunks=").append(splitsUseChunks);
         sb.append(", splitSize=").append(splitSize);
+        sb.append(", writeConcern=").append(writeConcern);
         sb.append(", customConfiguration=").append(customConfiguration);
         sb.append('}');
         sb.append(super.toString());

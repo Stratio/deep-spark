@@ -66,6 +66,8 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      */
     private static final Logger LOG = LoggerFactory.getLogger(ExtractorTest.class);
 
+    private static final long serialVersionUID = -4496047807269893090L;
+
     /**
      * The Input entity.
      */

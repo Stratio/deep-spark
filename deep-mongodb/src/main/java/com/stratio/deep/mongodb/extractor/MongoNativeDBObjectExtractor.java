@@ -17,6 +17,7 @@
 package com.stratio.deep.mongodb.extractor;
 
 import com.mongodb.DBObject;
+import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
 
 /**
@@ -29,6 +30,10 @@ public class MongoNativeDBObjectExtractor extends MongoNativeExtractor<DBObject,
      */
     private static final long serialVersionUID = 4437817175333677270L;
 
+
+    public MongoNativeDBObjectExtractor(Class<DBObject> dBObject) {
+        this.mongoDeepJobConfig = new MongoDeepJobConfig<>(dBObject);
+    }
     /**
      * Instantiates a new Mongo native dB object extractor.
      */

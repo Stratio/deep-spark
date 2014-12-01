@@ -222,4 +222,7 @@ public interface ExtractorConstants {
      * The INNERCLASS.
      */
     String INNERCLASS  ="implClass";
+
+
+    String WRITE_MODE = "writeMode";
 }

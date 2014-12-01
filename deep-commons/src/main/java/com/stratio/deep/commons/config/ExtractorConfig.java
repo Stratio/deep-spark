@@ -229,19 +229,17 @@ public class ExtractorConfig<T> extends BaseConfig<T> implements Serializable, C
      * @param key the key
      * @return the cell value casted to the specified class
      */
-    public <T> T getValue(Class<T> clazz, String key) {
+    public <W> W getValue(Class<W> clazz, String key) {
         if (values.get(key) == null) {
             return null;
         } else {
             try {
-                return (T) values.get(key);
+                return (W) values.get(key);
             } catch (ClassCastException e) {
                 if (Number.class.isAssignableFrom(clazz)) {
                     try {
-                        return (T) Utils.castNumberType(values.get(key), clazz.newInstance());
-                    } catch (InstantiationException e1) {
-                        return null;
-                    } catch (IllegalAccessException e1) {
+                        return (W) Utils.castNumberType(values.get(key), clazz.newInstance());
+                    } catch (InstantiationException | IllegalAccessException e1) {
                         return null;
                     }
                 } else {

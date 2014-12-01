@@ -18,6 +18,7 @@ package com.stratio.deep.mongodb.partition;
 
 import com.stratio.deep.commons.impl.DeepPartition;
 import com.stratio.deep.commons.rdd.DeepTokenRange;
+import com.stratio.deep.mongodb.utils.UtilMongoDB;
 
 /**
  * Created by rcrespo on 7/11/14.
@@ -32,7 +33,7 @@ public class MongoPartition extends DeepPartition {
     /**
      * The Key.
      */
-    private String key = "_id";
+    private String key = UtilMongoDB.MONGO_DEFAULT_ID;
 
     /**
      * Instantiates a new Mongo partition.

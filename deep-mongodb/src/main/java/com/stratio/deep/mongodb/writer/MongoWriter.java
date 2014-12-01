@@ -22,6 +22,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
+import com.mongodb.WriteConcern;
 
 /**
  * Created by rcrespo on 5/11/14.
@@ -37,6 +38,9 @@ public class MongoWriter {
      */
     private DBCollection dbCollection = null;
 
+
+    private WriteConcern writeConcern = null;
+
     /**
      * Instantiates a new Mongo writer.
      *
@@ -44,9 +48,10 @@ public class MongoWriter {
      * @param databaseName    the database name
      * @param collectionName  the collection name
      */
-    public MongoWriter(List<ServerAddress> serverAddresses, String databaseName, String collectionName) {
+    public MongoWriter(List<ServerAddress> serverAddresses, String databaseName, String collectionName, WriteConcern writeConcern) {
         mongoClient = new MongoClient(serverAddresses);
         dbCollection = mongoClient.getDB(databaseName).getCollection(collectionName);
+        this.writeConcern = writeConcern;
     }
 
     /**
@@ -55,7 +60,7 @@ public class MongoWriter {
      * @param dbObject the db object
      */
     public void save(DBObject dbObject) {
-        dbCollection.insert(dbObject);
+        dbCollection.insert(writeConcern, dbObject);
     }
 
     /**

@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.spark.Partition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -42,6 +44,9 @@ import com.stratio.deep.mongodb.partition.MongoPartition;
  * @param <T> the type parameter
  */
 public class MongoReader<T> {
+
+
+    private static final Logger LOG = LoggerFactory.getLogger(MongoReader.class);
 
     /**
      * The Mongo client.
@@ -132,7 +137,7 @@ public class MongoReader<T> {
             }
 
             mongoClient = new MongoClient(addressList, mongoCredentials);
-            mongoClient.setReadPreference(ReadPreference.nearest());
+            mongoClient.setReadPreference(mongoDeepJobConfig.getReadPreference());
             db = mongoClient.getDB(mongoDeepJobConfig.getDatabase());
             collection = db.getCollection(mongoDeepJobConfig.getCollection());
 
@@ -167,6 +172,8 @@ public class MongoReader<T> {
             queryBuilder.and(bsonObjectMax);
         }
 
+        LOG.debug("mongodb query "+queryBuilder.get());
+
         return queryBuilder.get();
     }
 
@@ -182,6 +189,8 @@ public class MongoReader<T> {
             QueryBuilder queryBuilder = QueryBuilder.start();
 
             queryBuilder.and(createQueryPartition(partition), mongoDeepJobConfig.getQuery());
+
+            LOG.debug("mongodb query "+queryBuilder.get());
 
             return queryBuilder.get();
         }

@@ -104,8 +104,6 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
 
             initMongoDeepJobConfig(config);
 
-            splitSize = mongoDeepJobConfig.getPageSize() > 0 ? mongoDeepJobConfig.getPageSize() : splitSize;
-
             DBCollection collection;
             ServerAddress address = new ServerAddress(mongoDeepJobConfig.getHost());
 
@@ -128,15 +126,6 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
         }
     }
 
-    /**
-     * The entry point of application.
-     *
-     * @param args the input arguments
-     */
-    public static void main(String... args) {
-        MongoNativeExtractor mongoNativeExtractor = new MongoNativeCellExtractor();
-
-    }
 
     /**
      * Is sharded collection.
@@ -416,7 +405,7 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
         try {
             writer = new MongoWriter(getServerAddressList(mongoDeepJobConfig.getHostList()),
                     mongoDeepJobConfig.getDatabase(),
-                    mongoDeepJobConfig.getCollection());
+                    mongoDeepJobConfig.getCollection(), mongoDeepJobConfig.getWriteConcern());
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
