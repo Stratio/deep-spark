@@ -17,13 +17,21 @@
 package com.stratio.deep.core.context;
 
 import static junit.framework.Assert.assertSame;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
+import java.io.Serializable;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.stratio.deep.commons.entity.Cells;
 import org.apache.spark.SparkContext;
@@ -39,6 +47,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
 
@@ -49,6 +59,15 @@ import com.stratio.deep.core.rdd.DeepRDD;
 @PrepareForTest(value = { SparkContext.class, DeepJavaRDD.class, DeepSparkContext.class, DeepRDD.class, Method.class,
         AccessibleObject.class, System.class })
 public class DeepSparkContextTest {
+
+
+    DeepSparkContext deepSparkContext;
+
+    @Mock
+    SparkContext sparkContext;
+
+    @Mock
+    private JavaRDD<Cells> singleRdd;
 
     @Test
     public void createRDDTest() throws Exception {
@@ -79,6 +98,29 @@ public class DeepSparkContextTest {
 
     @Test
     public void deepSparkContextSQL() {
+
+    }
+
+    @Test
+    public void createHDFSRDDTest() throws Exception {
+
+
+        deepSparkContext= new DeepSparkContext(sparkContext);
+        Whitebox.setInternalState(deepSparkContext,"sc",sparkContext);
+        RDD<String> rdd = mock(RDD.class);
+        JavaRDD<String> javaRdd = mock(JavaRDD.class);
+        when(deepSparkContext.sc().textFile(anyString(), anyInt())).thenReturn(rdd);
+
+        when(rdd.toJavaRDD()).thenReturn(javaRdd);
+        when(rdd.toJavaRDD().map(any(Function.class))).thenReturn(singleRdd);
+
+        ExtractorConfig<Cells> config = createHDFSDeepJobConfig();
+
+        JavaRDD rddReturn = deepSparkContext.createHDFSRDD(config);
+
+        verify(deepSparkContext.sc(), times(1)).textFile(anyString(),anyInt());
+
+        verify(javaRdd,times(1)).map(any(Function.class));
 
     }
 
@@ -134,6 +176,26 @@ public class DeepSparkContextTest {
         return extractorConfig;
     }
 
+    private ExtractorConfig createHDFSDeepJobConfig() {
+
+        ExtractorConfig extractorConfig = new ExtractorConfig();
+        extractorConfig.setExtractorImplClassName("hdfs");
+        Map<String, Serializable> values = new HashMap<>();
+        values.put(ExtractorConstants.PORT, "9000");
+        values.put(ExtractorConstants.HDFS_FILE_SEPARATOR, ",");
+        values.put(ExtractorConstants.HDFS_FILE_PATH, "/user/hadoop/test/songs.csv");
+        values.put(ExtractorConstants.HOST, "127.0.0.1");
+
+        values.put(ExtractorConstants.HDFS_TYPE,ExtractorConstants.HDFS_TYPE);
+        values.put(ExtractorConstants.TABLE,"");
+        values.put(ExtractorConstants.CATALOG,"");
+
+        extractorConfig.setValues(values);
+
+        return extractorConfig;
+    }
+
+
     private DeepRDD createDeepRDD(SparkContext sc, ExtractorConfig deepJobConfig) throws Exception {
 
         DeepRDD deepRDD = mock(DeepRDD.class);
@@ -155,5 +217,7 @@ public class DeepSparkContextTest {
         whenNew(JavaRDD.class).withArguments(sc, deepJobConfig).thenReturn(javaRDD);
         return javaRDD;
     }
+
+
 
 }

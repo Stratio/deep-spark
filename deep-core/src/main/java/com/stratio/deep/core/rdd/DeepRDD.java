@@ -15,7 +15,6 @@
  */
 package com.stratio.deep.core.rdd;
 
-import static com.stratio.deep.commons.utils.Constants.SPARK_RDD_ID;
 import static com.stratio.deep.commons.utils.Utils.getExtractorInstance;
 import static com.stratio.deep.core.util.ExtractorClientUtil.getExtractorClient;
 import static scala.collection.JavaConversions.asScalaBuffer;
@@ -32,7 +31,6 @@ import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.rdd.RDD;
 
 import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.rdd.IExtractor;
@@ -63,8 +61,6 @@ public class DeepRDD<T, S extends BaseConfig<T>> extends RDD<T> implements Seria
         this.config =
                 sc.broadcast(config, ClassTag$.MODULE$
                         .<S>apply(config.getClass()));
-
-
 
     }
 

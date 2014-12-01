@@ -16,11 +16,11 @@
 
 package com.stratio.deep.cassandra.util;
 
-import static com.stratio.deep.commons.utils.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
 import static com.stratio.deep.commons.utils.AnnotationUtils.deepFieldName;
 import static com.stratio.deep.commons.utils.AnnotationUtils.getBeanFieldValue;
 import static com.stratio.deep.commons.utils.Utils.quote;
 import static com.stratio.deep.commons.utils.Utils.singleQuote;
+import static com.stratio.deep.cassandra.util.AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -45,6 +45,7 @@ import org.apache.cassandra.db.marshal.SetType;
 import org.apache.cassandra.db.marshal.TimeUUIDType;
 import org.apache.cassandra.db.marshal.UTF8Type;
 import org.apache.cassandra.db.marshal.UUIDType;
+import org.apache.cassandra.dht.Token;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.spark.TaskContext;
@@ -71,6 +72,7 @@ import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction2;
+import com.stratio.deep.commons.rdd.DeepTokenRange;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Pair;
 import com.stratio.deep.commons.utils.Utils;
@@ -665,6 +667,36 @@ public class CassandraUtils {
         boolean isKey = annotation.isPartOfPartitionKey();
         return Cell.create(cellName, cellValue, isKey, isClusterKey);
 
+    }
+
+
+    /**
+     * Checks if a token is included in the current split.
+     *
+     * @param token
+     *            {@link Token} to be checked.
+     *
+     * @return true, if the token is included in the interval; false, otherwise.
+     */
+    public static boolean isTokenIncludedInRange(DeepTokenRange deepTokenRange, Token<Comparable> token) {
+
+        boolean isIncluded = false;
+
+        if (((Comparable) deepTokenRange.getStartTokenAsComparable()).compareTo(deepTokenRange.getEndTokenAsComparable()) <= 0) {
+            isIncluded = token.token.compareTo(deepTokenRange.getStartTokenAsComparable()) > 0;
+
+            if (isIncluded) {
+                isIncluded = token.token.compareTo(deepTokenRange.getEndTokenAsComparable()) <= 0;
+            }
+        } else {
+            isIncluded = token.token.compareTo(deepTokenRange.getStartTokenAsComparable()) > 0;
+
+            if (!isIncluded) {
+                isIncluded = token.token.compareTo(deepTokenRange.getEndTokenAsComparable()) <= 0;
+            }
+        }
+
+        return isIncluded;
     }
 
 }

@@ -167,5 +167,59 @@ public interface ExtractorConstants {
      */
     String EQUALS_IN_FILTER = "equalsInFilter";
 
+    /**
+     * The HOSTS.
+     */
+    String HOSTS    = "Hosts";
 
+    /**
+     * The PORTS.
+     */
+    String PORTS    = "Port";
+
+    /**
+     * The HDFS.
+     */
+    String HDFS       = "hdfs";
+    /**
+     * The HDFS _ tYPE.
+     */
+    String HDFS_TYPE  = "hdfsType";
+    /**
+     * The HDFS _ fILEDATATABLE.
+     */
+    String HDFS_FILEDATATABLE = "TextFileDataTable";
+    /**
+     * The HDFS file Separator.
+     */
+    String HDFS_FILE_SEPARATOR = "FileSeparator";
+    /**
+     * The HDFS MAP.
+     */
+    String HDFS_MAP     = "map";
+    /**
+     * The HDFS Prefix
+     */
+    String HDFS_PREFIX = "hdfs://";
+    /**
+     * The HDFS file path.
+     */
+    String HDFS_FILE_PATH = "path";
+    /**
+     * The HDFS schema
+     */
+    String HDFS_SCHEMA = "schemaMap";
+    /**
+     * The HDFS file extension
+     */
+    String HDFS_FILE_EXTENSION = "Extension";
+
+    /**
+     * The TYPE
+     */
+    String TYPE_CONSTANT = "type";
+    /**
+     * The INNERCLASS.
+     */
+    String INNERCLASS  ="implClass";
 }
