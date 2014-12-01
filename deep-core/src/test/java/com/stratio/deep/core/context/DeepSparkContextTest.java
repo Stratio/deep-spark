@@ -19,6 +19,7 @@ package com.stratio.deep.core.context;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.utils.CellsUtils;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
 import org.apache.spark.SparkContext;
@@ -27,6 +28,8 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.api.java.JavaSQLContext;
 import org.apache.spark.sql.api.java.JavaSchemaRDD;
+import org.apache.spark.sql.api.java.Row;
+import org.apache.spark.sql.api.java.StructType;
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,15 +50,18 @@ import static junit.framework.Assert.assertSame;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.*;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.*;
+import static org.powermock.api.mockito.PowerMockito.spy;
 
 /**
  * Tests DeepSparkContext instantiations.
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(value = { SparkContext.class, DeepJavaRDD.class, DeepSparkContext.class, DeepRDD.class, Method.class,
-        AccessibleObject.class, System.class })
+        AccessibleObject.class, System.class, CellsUtils.class, JavaRDD.class })
 public class DeepSparkContextTest {
 
 
@@ -82,22 +88,63 @@ public class DeepSparkContextTest {
     @Test
     public void createJavaRowRDD() throws Exception {
         DeepSparkContext deepSparkContext = createDeepSparkContext();
-        ExtractorConfig deepJobConfig = createDeepJobConfig();
-        JavaSchemaRDD schemaRDD = createJavaSchemaRDD(deepSparkContext.getSQLContext(), mock(LogicalPlan.class));
 
-        JavaSchemaRDD schemaRDDReturn = deepSparkContext.createJavaSchemaRDD(deepJobConfig);
-        assertSame("The JavaSchemaRDD is the same", schemaRDD, schemaRDDReturn);
+        deepSparkContext.createJavaRowRDD(singleRdd);
+        verify(singleRdd).map(any(Function.class));
     }
 
     @Test
     public void createJavaSchemaRDDTest() throws Exception {
+        deepSparkContext = createDeepSparkContext();
+        DeepSparkContext deepSparkContextSpy = spy(deepSparkContext);
+        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        ExtractorConfig config = createDeepJobConfig();
+        Whitebox.setInternalState(deepSparkContextSpy,"sc",sparkContext);
+        Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
+        PowerMockito.doReturn(singleRdd).when(deepSparkContextSpy).createJavaRDD(config);
+        JavaRDD<Row> rowRDD = mock(JavaRDD.class);
+        mockStatic(DeepSparkContext.class);
+        when(DeepSparkContext.createJavaRowRDD(singleRdd)).thenReturn(rowRDD);
+        Cells cells = mock(Cells.class);
+        when(singleRdd.first()).thenReturn(cells);
+        StructType schema = mock(StructType.class);
+        mockStatic(CellsUtils.class);
+        when(CellsUtils.getStructTypeFromCells(cells)).thenReturn(schema);
 
+        deepSparkContextSpy.createJavaSchemaRDD(config);
+
+        verify(sqlContext).applySchema(rowRDD, schema);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void createJavaSchemaFromEmptyRDDTest() throws Exception {
+        deepSparkContext = createDeepSparkContext();
+        DeepSparkContext deepSparkContextSpy = spy(deepSparkContext);
+        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        ExtractorConfig config = createDeepJobConfig();
+        Whitebox.setInternalState(deepSparkContextSpy,"sc",sparkContext);
+        Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
+        PowerMockito.doReturn(singleRdd).when(deepSparkContextSpy).createJavaRDD(config);
+        JavaRDD<Row> rowRDD = mock(JavaRDD.class);
+        mockStatic(DeepSparkContext.class);
+        when(DeepSparkContext.createJavaRowRDD(singleRdd)).thenReturn(rowRDD);
+        when(singleRdd.first()).thenThrow(new UnsupportedOperationException());
+
+        deepSparkContextSpy.createJavaSchemaRDD(config);
     }
 
     @Test
     public void deepSparkContextSQL() {
+        deepSparkContext= new DeepSparkContext(sparkContext);
+        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        Whitebox.setInternalState(deepSparkContext, "sqlContext", sqlContext);
+        String query = "SELECT * FROM input";
 
+        deepSparkContext.sql(query);
+
+        verify(sqlContext).sql(query);
     }
+
 
     @Test
     public void createHDFSRDDTest() throws Exception {

@@ -15,22 +15,9 @@
 package com.stratio.deep.core.context;
 
 
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.apache.spark.SparkContext;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.rdd.RDD;
-
 import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
@@ -42,12 +29,22 @@ import com.stratio.deep.core.hdfs.utils.TableName;
 import com.stratio.deep.core.hdfs.utils.TextFileDataTable;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
+import org.apache.log4j.Logger;
+import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.rdd.RDD;
+import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.api.java.JavaSQLContext;
 import org.apache.spark.sql.api.java.JavaSchemaRDD;
 import org.apache.spark.sql.api.java.Row;
 import org.apache.spark.sql.api.java.StructType;
 
 import javax.activation.UnsupportedDataTypeException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Entry point to the Cassandra-aware Spark context.
@@ -184,12 +181,16 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * @return A JavaSchemaRDD built from Cells.
      * @throws UnsupportedDataTypeException
      */
-    public JavaSchemaRDD createJavaSchemaRDD(ExtractorConfig<Cells> config) throws UnsupportedDataTypeException {
+    public JavaSchemaRDD createJavaSchemaRDD(ExtractorConfig<Cells> config) throws UnsupportedDataTypeException, UnsupportedOperationException {
         JavaRDD<Cells> cellsRDD = createJavaRDD(config);
         JavaRDD<Row> rowsRDD = DeepSparkContext.createJavaRowRDD(cellsRDD);
-        Cells firstCells = cellsRDD.first();
-        StructType schema = CellsUtils.getStructTypeFromCells(firstCells);
-        return sqlContext.applySchema(rowsRDD, schema);
+        try {
+            Cells firstCells = cellsRDD.first();
+            StructType schema = CellsUtils.getStructTypeFromCells(firstCells);
+            return sqlContext.applySchema(rowsRDD, schema);
+        } catch(UnsupportedOperationException e) {
+            throw new UnsupportedOperationException("Cannot infer schema from empty data RDD", e);
+        }
     }
 
     /**
