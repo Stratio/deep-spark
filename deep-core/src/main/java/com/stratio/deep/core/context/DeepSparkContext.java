@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function;
 import org.apache.spark.rdd.RDD;
 
 import com.stratio.deep.commons.config.BaseConfig;
@@ -41,6 +42,12 @@ import com.stratio.deep.core.hdfs.utils.TableName;
 import com.stratio.deep.core.hdfs.utils.TextFileDataTable;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
+import org.apache.spark.sql.api.java.JavaSQLContext;
+import org.apache.spark.sql.api.java.JavaSchemaRDD;
+import org.apache.spark.sql.api.java.Row;
+import org.apache.spark.sql.api.java.StructType;
+
+import javax.activation.UnsupportedDataTypeException;
 
 /**
  * Entry point to the Cassandra-aware Spark context.
