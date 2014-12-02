@@ -16,21 +16,19 @@
 
 package com.stratio.deep.mongodb;
 
-import static org.testng.Assert.assertEquals;
-
-import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
-import com.stratio.deep.testutils.FunctionalTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import com.stratio.deep.core.extractor.ExtractorEntityTest;
+import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
 
 /**
  * Created by rcrespo on 18/06/14.
  */
 
-@Test(suiteName = "mongoRddTests", groups = { "MongoEntityExtractorTest", "FunctionalTests" }, dependsOnGroups = "MongoCellExtractorTest")
+@Test(suiteName = "mongoRddTests", groups = { "MongoEntityExtractorTest", "FunctionalTests" },
+        dependsOnGroups = "MongoCellExtractorTest")
 public class MongoEntityExtractorFT extends ExtractorEntityTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoEntityExtractorFT.class);
@@ -38,7 +36,5 @@ public class MongoEntityExtractorFT extends ExtractorEntityTest {
     public MongoEntityExtractorFT() {
         super(MongoEntityExtractor.class, "localhost", 27890, false);
     }
-
-
 
 }

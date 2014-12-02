@@ -17,18 +17,21 @@
 package com.stratio.deep.commons.utils;
 
 import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.*;
 
-import org.apache.spark.sql.api.java.Row;
+import org.apache.spark.sql.api.java.*;
 import org.json.simple.JSONValue;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
+
+import javax.activation.UnsupportedDataTypeException;
 
 public class CellsUtilsTest {
 
@@ -101,6 +104,89 @@ public class CellsUtilsTest {
         cellsCol.add(cells2);
         Collection<Row> rows = CellsUtils.getRowsFromsCells(cellsCol);
         assertEquals(rows.size(), cellsCol.size());
+    }
+
+    @Test
+    public void testGetSimpleTypesStructTypeFromCells() {
+        Cells cells = new Cells("namespace",
+                                Cell.create("string", "test"),
+                                Cell.create("bytearray", new Byte[] {}),
+                                Cell.create("boolean", true),
+                                Cell.create("timestamp", new Timestamp(System.currentTimeMillis())),
+                                Cell.create("bigdecimal", new BigDecimal(1)),
+                                Cell.create("double", 3.0d),
+                                Cell.create("float", 4f),
+                                Cell.create("byte", (byte)0xea),
+                                Cell.create("integer", 1),
+                                Cell.create("long", 3L),
+                                Cell.create("short", (short)1));
+        StructType struct = CellsUtils.getStructTypeFromCells(cells);
+        StructField[] fields = struct.getFields();
+        assertEquals(fields.length, cells.size());
+        assertEquals(fields[0].getDataType(), DataType.StringType);
+        assertEquals(fields[0].getName(), "string");
+        assertEquals(fields[1].getDataType(), DataType.BinaryType);
+        assertEquals(fields[1].getName(), "bytearray");
+        assertEquals(fields[2].getDataType(), DataType.BooleanType);
+        assertEquals(fields[2].getName(), "boolean");
+        assertEquals(fields[3].getDataType(), DataType.TimestampType);
+        assertEquals(fields[3].getName(), "timestamp");
+        assertEquals(fields[4].getName(), "bigdecimal");
+        assertEquals(fields[4].getDataType(), DataType.DecimalType);
+        assertEquals(fields[5].getName(), "double");
+        assertEquals(fields[5].getDataType(), DataType.DoubleType);
+        assertEquals(fields[6].getName(), "float");
+        assertEquals(fields[6].getDataType(), DataType.FloatType);
+        assertEquals(fields[7].getName(), "byte");
+        assertEquals(fields[7].getDataType(), DataType.ByteType);
+        assertEquals(fields[8].getName(), "integer");
+        assertEquals(fields[8].getDataType(), DataType.IntegerType);
+        assertEquals(fields[9].getName(), "long");
+        assertEquals(fields[9].getDataType(), DataType.LongType);
+        assertEquals(fields[10].getName(), "short");
+        assertEquals(fields[10].getDataType(), DataType.ShortType);
+    }
+
+    @Test
+    public void testGetComplexTypesStructTypeFromCells()  {
+        List<String> testList = new ArrayList<>();
+        testList.add("testString");
+        Map<Integer, String> testMap = new HashMap<>();
+        testMap.put(1, "testMapEntry");
+        Cells cells = new Cells("namespace",
+                                Cell.create("list", testList),
+                                Cell.create("map", testMap));
+        StructType struct = CellsUtils.getStructTypeFromCells(cells);
+        StructField[] fields = struct.getFields();
+        assertEquals(fields.length, cells.size());
+        assertEquals(fields[0].getName(), "list");
+        assertTrue(fields[0].getDataType() instanceof ArrayType);
+        assertEquals(fields[1].getName(), "map");
+        assertTrue(fields[1].getDataType() instanceof MapType);
+    }
+
+    @Test
+    public void testGetStructTypeEmptyList() {
+        List<Object> testList = new ArrayList<>();
+        Cells cells = new Cells("namespace",
+                Cell.create("list", testList));
+        StructType struct = CellsUtils.getStructTypeFromCells(cells);
+        StructField[] fields = struct.getFields();
+        assertEquals(fields.length, cells.size());
+        assertEquals(fields[0].getName(), "list");
+        assertTrue(fields[0].getDataType() instanceof ArrayType);
+    }
+
+    @Test
+    public void testGetStructTypeEmptyMap() {
+        Map<Integer, Integer> testMap = new HashMap<>();
+        Cells cells = new Cells("namespace",
+                Cell.create("map", testMap));
+        StructType struct = CellsUtils.getStructTypeFromCells(cells);
+        StructField[] fields = struct.getFields();
+        assertEquals(fields.length, cells.size());
+        assertEquals(fields[0].getName(), "map");
+        assertTrue(fields[0].getDataType() instanceof MapType);
     }
 
 }

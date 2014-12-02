@@ -28,14 +28,12 @@ public interface IMongoDeepJobConfig<T> {
      */
     IMongoDeepJobConfig<T> collection(String collection);
 
-
     String getCollection();
 
     /**
      * The MongoDB's database name
      */
     IMongoDeepJobConfig<T> database(String database);
-
 
     /**
      * The replica set identifier.
@@ -49,7 +47,6 @@ public interface IMongoDeepJobConfig<T> {
      * @return this object.
      */
     IMongoDeepJobConfig<T> readPreference(String readPreference);
-
 
     /**
      * Filter query
@@ -127,7 +124,6 @@ public interface IMongoDeepJobConfig<T> {
      */
     IMongoDeepJobConfig<T> inputKey(String inputKey);
 
-
     /**
      * If use it, MongoDB will not return _id field.
      *
@@ -136,6 +132,5 @@ public interface IMongoDeepJobConfig<T> {
     IMongoDeepJobConfig<T> ignoreIdField();
 
     String getDatabase();
-
 
 }
