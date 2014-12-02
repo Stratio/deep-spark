@@ -138,7 +138,7 @@ public final class WritingCellToCassandra {
         valuesOutput.put(ExtractorConstants.CQLPORT, cqlPort);
         valuesOutput.put(ExtractorConstants.RPCPORT, rpcPort);
         valuesOutput.put(ExtractorConstants.HOST, HOST);
-        valuesOutput.put(ExtractorConstants.CREATE_ON_WRITE, "true");
+        valuesOutput.put(ExtractorConstants.CREATE_ON_WRITE, true);
 
         outputConfig.setValues(valuesOutput);
 

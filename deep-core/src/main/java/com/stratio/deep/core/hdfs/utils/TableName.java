@@ -6,6 +6,9 @@ public class TableName {
 
     private String CatalogName;
 
+    public TableName() {
+    }
+
     public TableName(String catalogName , String tableName ) {
         this.tableName = tableName;
         CatalogName = catalogName;
