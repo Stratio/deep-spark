@@ -69,7 +69,7 @@ public class MongoDeepJobConfigTest {
         assertEquals(mongoDeepJobConfig.getDatabase(), database);
         assertEquals(mongoDeepJobConfig.getCollection(), collection);
         assertEquals(mongoDeepJobConfig.getReplicaSet(), replicaSetName);
-        assertEquals(mongoDeepJobConfig.getReadPreference().getName(), readPreference);
+        assertEquals(mongoDeepJobConfig.getReadPreference(), readPreference);
         assertEquals(mongoDeepJobConfig.getSort(), sort);
         assertEquals(mongoDeepJobConfig.getInputKey(), inputKey);
         assertEquals(mongoDeepJobConfig.isUseShards(), useShards);

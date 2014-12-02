@@ -137,7 +137,7 @@ public class MongoReader<T> {
             }
 
             mongoClient = new MongoClient(addressList, mongoCredentials);
-            mongoClient.setReadPreference(mongoDeepJobConfig.getReadPreference());
+            mongoClient.setReadPreference(ReadPreference.valueOf(mongoDeepJobConfig.getReadPreference()));
             db = mongoClient.getDB(mongoDeepJobConfig.getDatabase());
             collection = db.getCollection(mongoDeepJobConfig.getCollection());
 

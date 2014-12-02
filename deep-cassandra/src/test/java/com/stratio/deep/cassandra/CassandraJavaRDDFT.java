@@ -67,7 +67,7 @@ public class CassandraJavaRDDFT {
 
         cassandraServer = new CassandraServer();
         cassandraServer.setStartupCommands(startupCommands);
-        cassandraServer.start();
+//        cassandraServer.start();
 
     }
 

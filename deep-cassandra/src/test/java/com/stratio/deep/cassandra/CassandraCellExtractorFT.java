@@ -55,7 +55,7 @@ public class CassandraCellExtractorFT extends ExtractorCellTest {
     private static final long serialVersionUID = -5201767473793541285L;
 
     public CassandraCellExtractorFT() {
-        super(CassandraCellExtractor.class, "localhost", 9242, true);
+        super(CassandraCellExtractor.class, "127.0.0.1", 9042, true);
     }
 
     @Override

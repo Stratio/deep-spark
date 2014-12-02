@@ -56,7 +56,7 @@ public class CassandraEntityExtractorFT extends ExtractorEntityTest {
     private static final long serialVersionUID = -172112587882501217L;
 
     public CassandraEntityExtractorFT() {
-        super(CassandraEntityExtractor.class, "localhost", 9242, false, SimpleBookEntity.class);
+        super(CassandraEntityExtractor.class, "127.0.0.1", 9042, false, SimpleBookEntity.class);
     }
 
     public Object transform(JSONObject jsonObject, String nameSpace, Class entityClass) {
