@@ -17,6 +17,7 @@
 package com.stratio.deep.commons.utils;
 
 import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
