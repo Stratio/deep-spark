@@ -1,27 +1,40 @@
 /*
-        * Copyright 2014, Stratio.
-        *
-        * Licensed under the Apache License, Version 2.0 (the "License");
-        * you may not use this file except in compliance with the License.
-        * You may obtain a copy of the License at
-        *
-        * http://www.apache.org/licenses/LICENSE-2.0
-        *
-        * Unless required by applicable law or agreed to in writing, software
-        * distributed under the License is distributed on an "AS IS" BASIS,
-        * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-        * See the License for the specific language governing permissions and
-        * limitations under the License.
-        */
+ * Copyright 2014, Stratio.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.stratio.deep.core.context;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.commons.utils.CellsUtils;
-import com.stratio.deep.core.rdd.DeepJavaRDD;
-import com.stratio.deep.core.rdd.DeepRDD;
+import static junit.framework.Assert.assertSame;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
+
+import java.io.Serializable;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -39,22 +52,12 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import java.io.Serializable;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-
-import static junit.framework.Assert.assertSame;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.*;
-import static org.powermock.api.mockito.PowerMockito.spy;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.utils.CellsUtils;
+import com.stratio.deep.core.rdd.DeepJavaRDD;
+import com.stratio.deep.core.rdd.DeepRDD;
 
 /**
  * Tests DeepSparkContext instantiations.
@@ -63,7 +66,6 @@ import static org.powermock.api.mockito.PowerMockito.spy;
 @PrepareForTest(value = { SparkContext.class, DeepJavaRDD.class, DeepSparkContext.class, DeepRDD.class, Method.class,
         AccessibleObject.class, System.class, CellsUtils.class, JavaRDD.class })
 public class DeepSparkContextTest {
-
 
     DeepSparkContext deepSparkContext;
 
@@ -99,7 +101,7 @@ public class DeepSparkContextTest {
         DeepSparkContext deepSparkContextSpy = spy(deepSparkContext);
         JavaSQLContext sqlContext = mock(JavaSQLContext.class);
         ExtractorConfig config = createDeepJobConfig();
-        Whitebox.setInternalState(deepSparkContextSpy,"sc",sparkContext);
+        Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
         Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
         PowerMockito.doReturn(singleRdd).when(deepSparkContextSpy).createJavaRDD(config);
         JavaRDD<Row> rowRDD = mock(JavaRDD.class);
@@ -122,7 +124,7 @@ public class DeepSparkContextTest {
         DeepSparkContext deepSparkContextSpy = spy(deepSparkContext);
         JavaSQLContext sqlContext = mock(JavaSQLContext.class);
         ExtractorConfig config = createDeepJobConfig();
-        Whitebox.setInternalState(deepSparkContextSpy,"sc",sparkContext);
+        Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
         Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
         PowerMockito.doReturn(singleRdd).when(deepSparkContextSpy).createJavaRDD(config);
         JavaRDD<Row> rowRDD = mock(JavaRDD.class);
@@ -135,7 +137,7 @@ public class DeepSparkContextTest {
 
     @Test
     public void deepSparkContextSQL() {
-        deepSparkContext= new DeepSparkContext(sparkContext);
+        deepSparkContext = new DeepSparkContext(sparkContext);
         JavaSQLContext sqlContext = mock(JavaSQLContext.class);
         Whitebox.setInternalState(deepSparkContext, "sqlContext", sqlContext);
         String query = "SELECT * FROM input";
@@ -145,13 +147,11 @@ public class DeepSparkContextTest {
         verify(sqlContext).sql(query);
     }
 
-
     @Test
     public void createHDFSRDDTest() throws Exception {
 
-
-        deepSparkContext= new DeepSparkContext(sparkContext);
-        Whitebox.setInternalState(deepSparkContext,"sc",sparkContext);
+        deepSparkContext = new DeepSparkContext(sparkContext);
+        Whitebox.setInternalState(deepSparkContext, "sc", sparkContext);
         RDD<String> rdd = mock(RDD.class);
         JavaRDD<String> javaRdd = mock(JavaRDD.class);
         when(deepSparkContext.sc().textFile(anyString(), anyInt())).thenReturn(rdd);
@@ -163,9 +163,9 @@ public class DeepSparkContextTest {
 
         JavaRDD rddReturn = deepSparkContext.createHDFSRDD(config);
 
-        verify(deepSparkContext.sc(), times(1)).textFile(anyString(),anyInt());
+        verify(deepSparkContext.sc(), times(1)).textFile(anyString(), anyInt());
 
-        verify(javaRdd,times(1)).map(any(Function.class));
+        verify(javaRdd, times(1)).map(any(Function.class));
 
     }
 
@@ -184,23 +184,20 @@ public class DeepSparkContextTest {
     @Test
     public void saveRDDTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 
-      /*  DeepSparkContext deepSparkContext = createDeepSparkContext();
-
-        IDeepJobConfig<Cell,  IDeepJobConfig<?, ?>> ideepJobConfig = mock(IDeepJobConfig.class);
-        RDD<Cell> rdd = mock(RDD.class);
-        Method method = new Method(){
-            public Object invoke(Object obj, Object... args){
-
-                   return null;
-            }
-        };
-
-        Collection aa = PowerMockito.mock(Collection.class);
-        when(ideepJobConfig.getSaveMethod()).thenReturn(method);
-
-        deepSparkContext.saveRDD(rdd,ideepJobConfig);
-
-        Mockito.verify(method).invoke(null, rdd, ideepJobConfig);*/
+        /*
+         * DeepSparkContext deepSparkContext = createDeepSparkContext();
+         * 
+         * IDeepJobConfig<Cell, IDeepJobConfig<?, ?>> ideepJobConfig = mock(IDeepJobConfig.class); RDD<Cell> rdd =
+         * mock(RDD.class); Method method = new Method(){ public Object invoke(Object obj, Object... args){
+         * 
+         * return null; } };
+         * 
+         * Collection aa = PowerMockito.mock(Collection.class); when(ideepJobConfig.getSaveMethod()).thenReturn(method);
+         * 
+         * deepSparkContext.saveRDD(rdd,ideepJobConfig);
+         * 
+         * Mockito.verify(method).invoke(null, rdd, ideepJobConfig);
+         */
     }
 
     private DeepJavaRDD createDeepJAvaRDD(DeepRDD deepRDD) throws Exception {
@@ -217,7 +214,7 @@ public class DeepSparkContextTest {
     private ExtractorConfig createDeepJobConfig() {
         ExtractorConfig extractorConfig = mock(ExtractorConfig.class);
         when(extractorConfig.getExtractorImplClass()).thenReturn(new Object().getClass());
-        //when(extractorConfig.getInputFormatClass()).thenReturn(null);
+        // when(extractorConfig.getInputFormatClass()).thenReturn(null);
         return extractorConfig;
     }
 
@@ -231,15 +228,14 @@ public class DeepSparkContextTest {
         values.put(ExtractorConstants.HDFS_FILE_PATH, "/user/hadoop/test/songs.csv");
         values.put(ExtractorConstants.HOST, "127.0.0.1");
 
-        values.put(ExtractorConstants.HDFS_TYPE,ExtractorConstants.HDFS_TYPE);
-        values.put(ExtractorConstants.TABLE,"");
-        values.put(ExtractorConstants.CATALOG,"");
+        values.put(ExtractorConstants.HDFS_TYPE, ExtractorConstants.HDFS_TYPE);
+        values.put(ExtractorConstants.TABLE, "");
+        values.put(ExtractorConstants.CATALOG, "");
 
         extractorConfig.setValues(values);
 
         return extractorConfig;
     }
-
 
     private DeepRDD createDeepRDD(SparkContext sc, ExtractorConfig deepJobConfig) throws Exception {
 
@@ -258,11 +254,9 @@ public class DeepSparkContextTest {
 
     private JavaRDD createJavaRDD(SparkContext sc, ExtractorConfig deepJobConfig) throws Exception {
 
-        JavaRDD<Cells> javaRDD = (JavaRDD<Cells>)mock(JavaRDD.class);
+        JavaRDD<Cells> javaRDD = mock(JavaRDD.class);
         whenNew(JavaRDD.class).withArguments(sc, deepJobConfig).thenReturn(javaRDD);
         return javaRDD;
     }
-
-
 
 }
