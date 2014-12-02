@@ -325,9 +325,10 @@ public class Cell implements Serializable {
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("Cell{");
-        sb.append("cellName='").append(this.cellName).append('\'');
-        sb.append(", cellValue=").append(this.cellValue);
-        sb.append(",isPK=").append(this.isKey);
+        sb.append("cellName='").append(cellName).append('\'');
+        sb.append(", cellValue=").append(cellValue);
+        sb.append(", isKey=").append(isKey);
+        sb.append(", isClusterKey=").append(isClusterKey);
         sb.append('}');
         return sb.toString();
     }
