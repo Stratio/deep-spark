@@ -98,7 +98,7 @@ public class DeepSparkContextTest {
     @Test
     public void createJavaSchemaRDDTest() throws Exception {
         deepSparkContext = createDeepSparkContext();
-        DeepSparkContext deepSparkContextSpy = spy(deepSparkContext);
+        DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
         JavaSQLContext sqlContext = mock(JavaSQLContext.class);
         ExtractorConfig config = createDeepJobConfig();
         Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
@@ -121,7 +121,7 @@ public class DeepSparkContextTest {
     @Test(expected = UnsupportedOperationException.class)
     public void createJavaSchemaFromEmptyRDDTest() throws Exception {
         deepSparkContext = createDeepSparkContext();
-        DeepSparkContext deepSparkContextSpy = spy(deepSparkContext);
+        DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
         JavaSQLContext sqlContext = mock(JavaSQLContext.class);
         ExtractorConfig config = createDeepJobConfig();
         Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
