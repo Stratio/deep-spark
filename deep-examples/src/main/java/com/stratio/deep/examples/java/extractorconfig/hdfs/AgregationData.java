@@ -12,7 +12,6 @@ import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.hdfs.utils.SchemaMap;
-import com.stratio.deep.core.hdfs.utils.TextFileDataTable;
 import com.stratio.deep.examples.java.extractorconfig.hdfs.utils.ContextProperties;
 
 
@@ -58,9 +57,7 @@ public class AgregationData {
         listSchemaMap.add(new SchemaMap("Year",  Integer.class));
         listSchemaMap.add(new SchemaMap("Length",Integer.class));
         listSchemaMap.add(new SchemaMap("Single",String.class));
-        TextFileDataTable textFileDataTable = createTextFileDataFromfile(ExtractorConstants.HDFS_FILE_PATH);
-
-
+      
         values.put(ExtractorConstants.PORT, "9000");
         values.put(ExtractorConstants.HDFS_FILE_SEPARATOR, ",");
         values.put(ExtractorConstants.HDFS_FILE_PATH, "user/hadoop/test/songs.csv");
@@ -79,10 +76,5 @@ public class AgregationData {
         deepContext.stop();
     }
 
-    private static TextFileDataTable createTextFileDataFromfile(String hdfsFilePath) {
 
-
-        deepContext.te
-        return null;
-    }
 }
