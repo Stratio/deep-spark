@@ -21,15 +21,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.*;
 
-import org.apache.spark.sql.api.java.Row;
+import org.apache.spark.sql.api.java.*;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
+
+import javax.activation.UnsupportedDataTypeException;
 
 /**
  * Created by rcrespo on 20/10/14.
@@ -297,6 +295,66 @@ public class CellsUtils {
             result.add(getRowFromCells(cells));
         }
         return result;
+    }
+
+    public static StructType getStructTypeFromCells(Cells cells) {
+        List<StructField> fields = new ArrayList<>();
+        for(Cell cell:cells.getCells()) {
+            StructField field = getStructFieldFromCell(cell);
+            fields.add(field);
+        }
+        return StructType.createStructType(fields);
+    }
+
+    private static StructField getStructFieldFromCell(Cell cell) {
+        StructField field = DataType.createStructField(cell.getName(), getDataType(cell.getValue()), false);
+        return field;
+    }
+
+    private static DataType getDataType(Object value) {
+        Class cls = value.getClass();
+        DataType dataType;
+        if(cls.equals(String.class)) {
+            dataType = DataType.StringType;
+        } else if(cls.equals(Byte[].class)) {
+            dataType = DataType.BinaryType;
+        } else if(cls.equals(Boolean.class)) {
+            dataType = DataType.BooleanType;
+        } else if(cls.equals(Timestamp.class)) {
+            dataType = DataType.TimestampType;
+        } else if(cls.equals(BigDecimal.class)) {
+            dataType = DataType.DecimalType;
+        } else if(cls.equals(Double.class)) {
+            dataType = DataType.DoubleType;
+        } else if(cls.equals(Float.class)) {
+            dataType = DataType.FloatType;
+        } else if(cls.equals(Byte.class)) {
+            dataType = DataType.ByteType;
+        } else if(cls.equals(Integer.class)) {
+            dataType = DataType.IntegerType;
+        } else if(cls.equals(Long.class)) {
+            dataType = DataType.LongType;
+        } else if(cls.equals(Short.class)) {
+            dataType = DataType.ShortType;
+        } else if(value instanceof List) {
+            List listValue = (List)value;
+            if(listValue.isEmpty()) {
+                dataType = DataType.createArrayType(DataType.StringType);
+            } else {
+                dataType = DataType.createArrayType(getDataType(listValue.get(0)));
+            }
+        } else if(value instanceof Map) {
+            Map mapValue = (Map)value;
+            if(mapValue.isEmpty()) {
+                dataType = DataType.createMapType(DataType.StringType, DataType.StringType);
+            } else {
+                Map.Entry entry = (Map.Entry) mapValue.entrySet().iterator().next();
+                dataType = DataType.createMapType(getDataType(entry.getKey()), getDataType(entry.getValue()));
+            }
+        } else {
+            dataType = DataType.StringType;
+        }
+        return dataType;
     }
 
     /**
