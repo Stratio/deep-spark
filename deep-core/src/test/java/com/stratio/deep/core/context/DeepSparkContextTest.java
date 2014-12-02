@@ -16,25 +16,12 @@
 
 package com.stratio.deep.core.context;
 
-import static org.junit.Assert.assertSame;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
-
-import java.io.Serializable;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.utils.CellsUtils;
+import com.stratio.deep.core.rdd.DeepJavaRDD;
+import com.stratio.deep.core.rdd.DeepRDD;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -52,12 +39,20 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.commons.utils.CellsUtils;
-import com.stratio.deep.core.rdd.DeepJavaRDD;
-import com.stratio.deep.core.rdd.DeepRDD;
+import java.io.Serializable;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertSame;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 /**
  * Tests DeepSparkContext instantiations.
