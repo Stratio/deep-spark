@@ -1,6 +1,5 @@
----
-title: First Steps with Stratio Deep and MongoDB
----
+First Steps with Stratio Deep and MongoDB
+==========================================
 
 StratioDeep-MongoDB is an integration layer between Spark, a distributed computing framework and MongoDB, 
 a NoSQL database. [MongoDB](http://www.mongodb.org/ "MongoDB website") provides a documental data model 
