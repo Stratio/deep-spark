@@ -121,7 +121,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
      * Enables/Disables auto-creation of column family when writing to Cassandra. By Default we do not create the output
      * column family.
      */
-    protected Boolean createTableOnWrite = Boolean.FALSE;
+    protected Boolean createTableOnWrite = Boolean.TRUE;
 
     private transient Session session;
 
@@ -129,7 +129,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
 
     private int pageSize = Constants.DEFAULT_PAGE_SIZE;
 
-    protected Boolean isWriteConfig = Boolean.FALSE;
+    protected Boolean isWriteConfig = Boolean.TRUE;
 
     private int bisectFactor = Constants.DEFAULT_BISECT_FACTOR;
 

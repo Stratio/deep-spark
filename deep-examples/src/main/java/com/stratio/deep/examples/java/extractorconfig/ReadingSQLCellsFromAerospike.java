@@ -21,12 +21,12 @@ import java.util.List;
 /**
  * Example for reading Cells and Entities from Aerospike using SparkSQL.
  */
-public class ReadingSQLEntityFromAerospike {
+public class ReadingSQLCellsFromAerospike {
 
-    private static final Logger LOG = Logger.getLogger(ReadingSQLEntityFromAerospike.class);
+    private static final Logger LOG = Logger.getLogger(ReadingSQLCellsFromAerospike.class);
     public static List<Tuple2<String, Integer>> results;
 
-    private ReadingSQLEntityFromAerospike() {
+    private ReadingSQLCellsFromAerospike() {
 
     }
 
