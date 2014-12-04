@@ -27,10 +27,8 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.api.java.JavaSQLContext;
-import org.apache.spark.sql.api.java.JavaSchemaRDD;
 import org.apache.spark.sql.api.java.Row;
 import org.apache.spark.sql.api.java.StructType;
-import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -94,7 +92,7 @@ public class DeepSparkContextTest {
     public void createJavaSchemaRDDTest() throws Exception {
         deepSparkContext = createDeepSparkContext();
         DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
-        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        JavaSQLContext sqlContext = PowerMockito.mock(JavaSQLContext.class);
         ExtractorConfig config = createDeepJobConfig();
         Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
         Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
@@ -132,12 +130,14 @@ public class DeepSparkContextTest {
 
     @Test
     public void deepSparkContextSQL() {
-        deepSparkContext = new DeepSparkContext(sparkContext);
+        deepSparkContext = createDeepSparkContext();
+        DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
         JavaSQLContext sqlContext = mock(JavaSQLContext.class);
-        Whitebox.setInternalState(deepSparkContext, "sqlContext", sqlContext);
+        Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
+        Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
         String query = "SELECT * FROM input";
 
-        deepSparkContext.sql(query);
+        deepSparkContextSpy.sql(query);
 
         verify(sqlContext).sql(query);
     }
@@ -145,20 +145,24 @@ public class DeepSparkContextTest {
     @Test
     public void createHDFSRDDTest() throws Exception {
 
-        deepSparkContext = new DeepSparkContext(sparkContext);
-        Whitebox.setInternalState(deepSparkContext, "sc", sparkContext);
+        deepSparkContext = createDeepSparkContext();
+        DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
+        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
+        Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
+
         RDD<String> rdd = mock(RDD.class);
         JavaRDD<String> javaRdd = mock(JavaRDD.class);
-        when(deepSparkContext.sc().textFile(anyString(), anyInt())).thenReturn(rdd);
+        when(deepSparkContextSpy.sc().textFile(anyString(), anyInt())).thenReturn(rdd);
 
         when(rdd.toJavaRDD()).thenReturn(javaRdd);
         when(rdd.toJavaRDD().map(any(Function.class))).thenReturn(singleRdd);
 
         ExtractorConfig<Cells> config = createHDFSDeepJobConfig();
 
-        JavaRDD rddReturn = deepSparkContext.createHDFSRDD(config);
+        JavaRDD rddReturn = deepSparkContextSpy.createHDFSRDD(config);
 
-        verify(deepSparkContext.sc(), times(1)).textFile(anyString(), anyInt());
+        verify(deepSparkContextSpy.sc(), times(1)).textFile(anyString(), anyInt());
 
         verify(javaRdd, times(1)).map(any(Function.class));
 
@@ -238,20 +242,6 @@ public class DeepSparkContextTest {
 
         whenNew(DeepRDD.class).withArguments(sc, deepJobConfig).thenReturn(deepRDD);
         return deepRDD;
-    }
-
-    private JavaSchemaRDD createJavaSchemaRDD(JavaSQLContext sqlContext, LogicalPlan logicalPlan) throws Exception {
-        JavaSchemaRDD schemaRDD = mock(JavaSchemaRDD.class);
-
-        whenNew(JavaSchemaRDD.class).withArguments(sqlContext, logicalPlan).thenReturn(schemaRDD);
-        return schemaRDD;
-    }
-
-    private JavaRDD createJavaRDD(SparkContext sc, ExtractorConfig deepJobConfig) throws Exception {
-
-        JavaRDD<Cells> javaRDD = mock(JavaRDD.class);
-        whenNew(JavaRDD.class).withArguments(sc, deepJobConfig).thenReturn(javaRDD);
-        return javaRDD;
     }
 
 }
