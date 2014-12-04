@@ -1,6 +1,5 @@
----
-title: Using Stratio Deep with Cassandra (examples)
----
+Using Stratio Deep with Cassandra (examples)
+===================================================
 
 In the examples below, generic names have been used for the following objects:
 

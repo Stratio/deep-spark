@@ -80,9 +80,6 @@ public class MongoDeepJobConfigTest {
     }
 
 
-
-
-
     private ExtractorConfig getExtractorConfig (){
         ExtractorConfig extractorConfig = new ExtractorConfig();
         extractorConfig.putValue(HOST, host);
@@ -106,52 +103,4 @@ public class MongoDeepJobConfigTest {
 
     }
 
-
-
-//    if (values.get(REPLICA_SET) != null) {
-//        replicaSet(extractorConfig.getString(REPLICA_SET));
-//    }
-//
-//    if (values.get(READ_PREFERENCE) != null) {
-//        readPreference(extractorConfig.getString(READ_PREFERENCE));
-//    }
-//
-//    if (values.get(SORT) != null) {
-//        sort(extractorConfig.getString(SORT));
-//    }
-//
-//    if (values.get(FILTER_QUERY) != null) {
-//        filterQuery(extractorConfig.getFilterArray(FILTER_QUERY));
-//    }
-//
-//    if (values.get(INPUT_KEY) != null) {
-//        inputKey(extractorConfig.getString(INPUT_KEY));
-//    }
-//
-//    if (values.get(IGNORE_ID_FIELD) != null && extractorConfig.getBoolean(IGNORE_ID_FIELD) == true) {
-//        ignoreIdField();
-//    }
-//
-//    if (values.get(INPUT_KEY) != null) {
-//        inputKey(extractorConfig.getString(INPUT_KEY));
-//    }
-//
-//    if (values.get(USE_SHARD) != null) {
-//        useShards(extractorConfig.getBoolean(USE_SHARD));
-//    }
-//
-//    if (values.get(USE_SPLITS) != null) {
-//        createInputSplit(extractorConfig.getBoolean(USE_SPLITS));
-//    }
-//
-//    if (values.get(USE_CHUNKS) != null) {
-//        splitsUseChunks(extractorConfig.getBoolean(USE_CHUNKS));
-//    }
-//    if (values.get(SPLIT_SIZE) != null) {
-//        pageSize(extractorConfig.getInteger(SPLIT_SIZE));
-//    }
-//
-//    if (values.get(WRITE_MODE) != null) {
-//        writeConcern((WriteConcern) extractorConfig.getValue(WriteConcern.class, WRITE_MODE));
-//    }
 }
