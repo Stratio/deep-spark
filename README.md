@@ -128,24 +128,42 @@ The package will be called ``spark-deep-distribution-X.Y.Z.tgz``, untar it to a 
         
 
       ``import com.stratio.deep.commons.annotations._``
+
       ``import com.stratio.deep.commons.config._``
+      
       ``import com.stratio.deep.commons.entity._``
+      
       ``import com.stratio.deep.core.context._``
+      
       ``import com.stratio.deep.cassandra.config._``
+      
       ``import com.stratio.deep.cassandra.extractor._``
+      
       ``import com.stratio.deep.mongodb.config._``
+      
       ``import com.stratio.deep.mongodb.extractor._``
+      
       ``import com.stratio.deep.es.config._``
+      
       ``import com.stratio.deep.es.extractor._``
+      
       ``import com.stratio.deep.aerospike.config._``
+      
       ``import com.stratio.deep.aerospike.extractor._``
+      
       ``import org.apache.spark.rdd._``
+      
       ``import org.apache.spark.SparkContext._``
+      
       ``import org.apache.spark.sql.api.java.JavaSQLContext``
+      
       ``import org.apache.spark.sql.api.java.JavaSchemaRDD``
+      
       ``import org.apache.spark.sql.api.java.Row``
+      
       ``import scala.collection.JavaConversions._``
 			
+      
 
 Once you have a working development environment you can finally start testing Deep. This are the basic steps you will always have to perform in order to use Deep:
 
