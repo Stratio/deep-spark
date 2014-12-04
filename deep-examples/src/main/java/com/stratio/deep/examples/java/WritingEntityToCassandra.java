@@ -18,6 +18,12 @@ package com.stratio.deep.examples.java;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.PairFunction;
+
 import com.google.common.collect.Lists;
 import com.stratio.deep.cassandra.config.CassandraConfigFactory;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
@@ -26,11 +32,6 @@ import com.stratio.deep.testentity.DomainEntity;
 import com.stratio.deep.testentity.PageEntity;
 import com.stratio.deep.utils.ContextProperties;
 
-import org.apache.log4j.Logger;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 
 /**
@@ -67,8 +68,7 @@ public final class WritingEntityToCassandra {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
-
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // --- INPUT RDD
         CassandraDeepJobConfig<PageEntity> inputConfig = CassandraConfigFactory.create(PageEntity.class)

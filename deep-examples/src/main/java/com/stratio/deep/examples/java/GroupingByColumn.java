@@ -18,17 +18,19 @@ package com.stratio.deep.examples.java;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.PairFunction;
+
 import com.google.common.collect.Lists;
 import com.stratio.deep.cassandra.config.CassandraConfigFactory;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.utils.ContextProperties;
-import org.apache.log4j.Logger;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.PairFunction;
+
 import scala.Tuple2;
 
 // !!Important!!
@@ -66,18 +68,17 @@ public final class GroupingByColumn {
         String keyspaceName = "test";
         String tableName = "tweets";
 
-
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
-// Create a configuration for the RDD and initialize it
+        // Create a configuration for the RDD and initialize it
         CassandraDeepJobConfig<TweetEntity> config = CassandraConfigFactory.create(TweetEntity.class)
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
                 .keyspace(keyspaceName).table(tableName)
                 .initialize();
 
-// Creating the RDD
+        // Creating the RDD
         JavaRDD<TweetEntity> rdd = deepContext.createJavaRDD(config);
 
         // grouping
@@ -88,7 +89,7 @@ public final class GroupingByColumn {
             }
         });
 
-// counting elements in groups
+        // counting elements in groups
         JavaPairRDD<String, Integer> counts = groups.mapToPair(new PairFunction<Tuple2<String,
                 Iterable<TweetEntity>>, String,
                 Integer>() {
@@ -98,7 +99,7 @@ public final class GroupingByColumn {
             }
         });
 
-// fetching the results
+        // fetching the results
         results = counts.collect();
 
         LOG.info("Este es el resultado con groupBy: ");

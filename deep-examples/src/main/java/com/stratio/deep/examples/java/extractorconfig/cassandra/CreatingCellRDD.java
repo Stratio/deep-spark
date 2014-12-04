@@ -67,7 +67,6 @@ public final class CreatingCellRDD {
         String RPCPORT = "9160";
         String HOST = "127.0.0.1";
 
-
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
         SparkConf sparkConf = new SparkConf()

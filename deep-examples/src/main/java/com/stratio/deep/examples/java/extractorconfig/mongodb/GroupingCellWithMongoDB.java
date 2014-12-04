@@ -20,13 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.utils.ContextProperties;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -34,6 +27,14 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
+
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
+import com.stratio.deep.utils.ContextProperties;
 
 import scala.Tuple2;
 
@@ -100,7 +101,8 @@ public final class GroupingCellWithMongoDB {
         JavaRDD<Cells> outputRDD = wordCountReduced.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
             public Cells call(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
-                return new Cells(Cell.create("word", stringIntegerTuple2._1()) , Cell.create("count", stringIntegerTuple2._2()));
+                return new Cells(Cell.create("word", stringIntegerTuple2._1()),
+                        Cell.create("count", stringIntegerTuple2._2()));
             }
         });
 

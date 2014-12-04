@@ -44,22 +44,21 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.elasticsearch.hadoop.mr.LinkedMapWritable;
-import org.json.simple.JSONObject;
-
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.filter.Filter;
-import com.stratio.deep.commons.filter.FilterOperator;
-import com.stratio.deep.commons.utils.AnnotationUtils;
-import com.stratio.deep.commons.utils.Utils;
-import com.stratio.deep.commons.entity.IDeepType;
-
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.entity.IDeepType;
+import com.stratio.deep.commons.filter.Filter;
+import com.stratio.deep.commons.filter.FilterType;
+import com.stratio.deep.commons.utils.AnnotationUtils;
+import com.stratio.deep.commons.utils.Utils;
 
 /**
  * Created by rcrespo on 29/07/14.
@@ -113,11 +112,10 @@ public final class UtilES {
                     method.invoke(t, (insert));
                 } else {
                     insert = currentJson;
-                    try{
+                    try {
                         method.invoke(t, getObjectFromWritable((Writable) insert));
-                    }
-                    catch(Exception e){
-                        LOG.error("impossible to convert field " +t + " :"+ field + " error: "+ e.getMessage());
+                    } catch (Exception e) {
+                        LOG.error("impossible to convert field " + t + " :" + field + " error: " + e.getMessage());
                         method.invoke(t, Utils.castNumberType(getObjectFromWritable((Writable) insert), t));
                     }
 
@@ -129,12 +127,8 @@ public final class UtilES {
         return t;
     }
 
-
-
-
-
-
-    private static <T> Object subDocumentListCase(Type type, ArrayWritable arrayWritable) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+    private static <T> Object subDocumentListCase(Type type, ArrayWritable arrayWritable)
+            throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
         ParameterizedType listType = (ParameterizedType) type;
 
         Class<?> listClass = (Class<?>) listType.getActualTypeArguments()[0];
@@ -217,7 +211,8 @@ public final class UtilES {
                     while (iterator.hasNext()) {
                         innerJsonList.add(getLinkedMapWritableFromObject((IDeepType) iterator.next()));
                     }
-                    //linkedMapWritable.put(new Text(AnnotationUtils.deepFieldName(field)), new LinkedMapWritable[innerJsonList.size()]);
+                    // linkedMapWritable.put(new Text(AnnotationUtils.deepFieldName(field)), new
+                    // LinkedMapWritable[innerJsonList.size()]);
                 } else if (IDeepType.class.isAssignableFrom(field.getType())) {
                     linkedMapWritable.put(new Text(AnnotationUtils.deepFieldName(field)),
                             getLinkedMapWritableFromObject((IDeepType) object));
@@ -243,7 +238,7 @@ public final class UtilES {
      */
     public static <T extends IDeepType> Object getId(T t)
             throws IllegalAccessException, InstantiationException, InvocationTargetException {
-        //TODO : implement
+        // TODO : implement
 
         return null;
     }
@@ -260,20 +255,20 @@ public final class UtilES {
     public static Cells getCellFromJson(LinkedMapWritable jsonObject, String tableName) throws IllegalAccessException,
             InstantiationException, InvocationTargetException, NoSuchMethodException {
 
-        Cells cells = tableName!= null ?new Cells(tableName): new Cells();
+        Cells cells = tableName != null ? new Cells(tableName) : new Cells();
 
         Set<Map.Entry<Writable, Writable>> entryJson = jsonObject.entrySet();
 
         for (Map.Entry<Writable, Writable> entry : entryJson) {
 
             if (LinkedMapWritable.class.isAssignableFrom(entry.getValue().getClass())) {
-                Cells innerCells = getCellFromJson((LinkedMapWritable) entry.getValue(), tableName);
+                Cells innerCells = getCellFromJson((LinkedMapWritable) entry.getValue(), null);
                 cells.add(Cell.create(entry.getKey().toString(), innerCells));
             } else if (ArrayWritable.class.isAssignableFrom(entry.getValue().getClass())) {
                 Writable[] writetable = ((ArrayWritable) entry.getValue()).get();
                 List<Cells> innerCell = new ArrayList<>();
-                for (int i = 0 ; i < writetable.length ; i++){
-                    innerCell.add(getCellFromJson((LinkedMapWritable) writetable[i], tableName));
+                for (int i = 0; i < writetable.length; i++) {
+                    innerCell.add(getCellFromJson((LinkedMapWritable) writetable[i], null));
                 }
                 cells.add(Cell.create(entry.getKey().toString(), innerCell));
             } else {
@@ -318,7 +313,7 @@ public final class UtilES {
         } else if (writable instanceof FloatWritable) {
             object = ((FloatWritable) writable).get();
         } else {
-            //TODO : do nothing
+            // TODO : do nothing
         }
 
         return object;
@@ -390,39 +385,37 @@ public final class UtilES {
         return json;
     }
 
-
-    public static QueryBuilder generateQuery (Filter... filterArray){
+    public static QueryBuilder generateQuery(Filter... filterArray) {
         List<Filter> range = new ArrayList<>();
         List<Filter> ne = new ArrayList<>();
         List<Filter> is = new ArrayList<>();
         BoolQueryBuilder qb = QueryBuilders.boolQuery();
 
-
-        for (Filter filter : filterArray){
-            if (! filter.getOperation().equals(FilterOperator.IS) && !filter.getOperation().equals(FilterOperator.NE)){
+        for (Filter filter : filterArray) {
+            if (!filter.getFilterType().equals(FilterType.EQ) && !filter.getFilterType().equals(FilterType.NEQ)) {
                 range.add(filter);
-            }else if (filter.getOperation().equals(FilterOperator.IS)) {
+            } else if (filter.getFilterType().equals(FilterType.EQ)) {
                 is.add(filter);
-            }else{
+            } else {
                 ne.add(filter);
             }
         }
 
-        for (Filter filter : range){
+        for (Filter filter : range) {
 
             RangeQueryBuilder rangeQueryBuilder = QueryBuilders
                     .rangeQuery(filter.getField());
-            switch (filter.getOperation()){
-            case FilterOperator.LT:
+            switch (filter.getFilterType()) {
+            case LT:
                 rangeQueryBuilder.lt(filter.getValue());
                 break;
-            case FilterOperator.LTE:
+            case LTE:
                 rangeQueryBuilder.lte(filter.getValue());
                 break;
-            case FilterOperator.GT:
+            case GT:
                 rangeQueryBuilder.gt(filter.getValue());
                 break;
-            case FilterOperator.GTE:
+            case GTE:
                 rangeQueryBuilder.gte(filter.getValue());
                 break;
             default:
@@ -431,17 +424,14 @@ public final class UtilES {
             qb.must(rangeQueryBuilder);
         }
 
-        for(Filter filter : is){
+        for (Filter filter : is) {
             qb.must(QueryBuilders.matchQuery(filter.getField(), filter.getValue()));
         }
 
-        for(Filter filter : ne){
+        for (Filter filter : ne) {
             qb.mustNot(QueryBuilders.matchQuery(filter.getField(), filter.getValue()));
         }
         return qb;
     }
-
-
-
 
 }

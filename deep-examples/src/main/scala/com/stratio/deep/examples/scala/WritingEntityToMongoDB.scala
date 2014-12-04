@@ -15,13 +15,10 @@
  */
 package com.stratio.deep.examples.scala
 
-import java.util.List
-
 import com.stratio.deep.core.context.DeepSparkContext
 import com.stratio.deep.examples.java.extractorconfig.mongodb.utils.ContextProperties
-import com.stratio.deep.mongodb.config.{IMongoDeepJobConfig, MongoDeepJobConfig, MongoConfigFactory}
+import com.stratio.deep.mongodb.config.{MongoConfigFactory, MongoDeepJobConfig}
 import com.stratio.deep.mongodb.testentity.MessageTestEntity
-import org.apache.log4j.Logger
 import org.apache.spark.rdd.RDD
 
 /**
@@ -59,9 +56,6 @@ object WritingEntityToMongoDB {
 
     deepContext.stop
   }
-
-
-
 
 
 }

@@ -20,6 +20,9 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.stratio.deep.commons.extractor.actions.Action;
 
 import io.netty.buffer.ByteBuf;
@@ -27,6 +30,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
 public class ActionDecoder extends ByteToMessageDecoder {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ActionDecoder.class);
 
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
 
@@ -53,7 +58,7 @@ public class ActionDecoder extends ByteToMessageDecoder {
             inObj = new ObjectInputStream(bis);
             action = (Action) inObj.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage());
         } finally {
             try {
                 bis.close();

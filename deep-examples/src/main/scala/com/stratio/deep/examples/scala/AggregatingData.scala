@@ -20,20 +20,18 @@ package com.stratio.deep.examples.scala
 
 import com.stratio.deep.cassandra.config.CassandraConfigFactory
 import com.stratio.deep.core.context.DeepSparkContext
+import com.stratio.deep.testentity.TweetEntity
 import com.stratio.deep.utils.ContextProperties
 import org.apache.spark.rdd.RDD
-import com.stratio.deep.testentity.TweetEntity
 
 // for deep
-
 
 
 // for POJOs
 
 // for math stuff
 
-import java.lang.Math.pow
-import java.lang.Math.sqrt
+import java.lang.Math.{pow, sqrt}
 
 /**
  * Author: Emmanuelle Raffenne
@@ -49,7 +47,7 @@ object AggregatingData {
 
     // Creating the Deep Context where args are Spark Master and Job Name
     val p = new ContextProperties(args)
-    val deepContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome,p.getJars)
+    val deepContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
 
     // Creating a configuration for the RDD and initialize it
     val config = CassandraConfigFactory.create(classOf[TweetEntity])

@@ -52,8 +52,6 @@ public final class ReadingEntityFromMongoDB {
         String database = "test";
         String inputCollection = "input";
 
-
-
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
@@ -68,7 +66,6 @@ public final class ReadingEntityFromMongoDB {
 
         LOG.info("count : " + inputRDDEntity.cache().count());
         LOG.info("count : " + inputRDDEntity.first());
-
 
         deepContext.stop();
 

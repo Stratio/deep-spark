@@ -48,7 +48,7 @@ public class DeepTransformException extends RuntimeException {
      * Public constructor.
      */
     public DeepTransformException(String message, Throwable cause, boolean enableSuppression,
-            boolean writableStackTrace) {
+                                  boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 

@@ -14,36 +14,35 @@
  */
 package com.stratio.deep.core.extractor.client;
 
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.extractor.actions.CloseAction;
-import com.stratio.deep.commons.extractor.actions.ExtractorInstanceAction;
 import com.stratio.deep.commons.extractor.actions.GetPartitionsAction;
 import com.stratio.deep.commons.extractor.actions.HasNextAction;
 import com.stratio.deep.commons.extractor.actions.InitIteratorAction;
 import com.stratio.deep.commons.extractor.actions.InitSaveAction;
 import com.stratio.deep.commons.extractor.actions.NextAction;
 import com.stratio.deep.commons.extractor.actions.SaveAction;
-import com.stratio.deep.commons.extractor.response.ExtractorInstanceResponse;
 import com.stratio.deep.commons.extractor.response.GetPartitionsResponse;
 import com.stratio.deep.commons.extractor.response.HasNextResponse;
 import com.stratio.deep.commons.extractor.response.NextResponse;
 import com.stratio.deep.commons.extractor.response.Response;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.commons.rdd.IExtractor;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Response> implements
         IExtractor<T, ExtractorConfig<T>> {
 
+    private static final long serialVersionUID = -5313035259708180308L;
     // Stateful properties
     private volatile Channel channel;
 
@@ -66,10 +65,9 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
     /*
      * (non-Javadoc)
-     *
-     * @see
-     * io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext
-     * , java.lang.Object)
+     * 
+     * @see io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext ,
+     * java.lang.Object)
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Response msg) throws Exception {
@@ -78,7 +76,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(org.apache.spark.broadcast.Broadcast, int)
      */
     @Override
@@ -105,8 +103,6 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         return ((GetPartitionsResponse) response).getPartitions();
     }
-
-
 
     @Override
     public void close() {
@@ -203,7 +199,12 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return;
     }
 
-
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.stratio.deep.commons.rdd.IExtractor#saveRDD(java.lang.Object,
+     * com.stratio.deep.commons.functions.SaveFunction)
+     */
     @Override
     public void saveRDD(T t) {
         SaveAction<T> saveAction = new SaveAction<>(t);
@@ -229,8 +230,8 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
     }
 
     @Override
-    public void initSave(ExtractorConfig<T> config, T first) {
-        InitSaveAction<T> initSaveAction = new InitSaveAction<>(config, first);
+    public void initSave(ExtractorConfig<T> config, T first, UpdateQueryBuilder queryBuilder) {
+        InitSaveAction<T> initSaveAction = new InitSaveAction<>(config, first, queryBuilder);
 
         channel.writeAndFlush(initSaveAction);
 
@@ -250,6 +251,11 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         }
 
         return;
+    }
+
+    @Override
+    public List<String> getPreferredLocations(Partition split) {
+        return null;
     }
 
 }

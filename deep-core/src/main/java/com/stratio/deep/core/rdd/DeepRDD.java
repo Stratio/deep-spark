@@ -15,12 +15,13 @@
  */
 package com.stratio.deep.core.rdd;
 
-import static com.stratio.deep.commons.utils.Constants.SPARK_RDD_ID;
 import static com.stratio.deep.commons.utils.Utils.getExtractorInstance;
 import static com.stratio.deep.core.util.ExtractorClientUtil.getExtractorClient;
+import static scala.collection.JavaConversions.asScalaBuffer;
 import static scala.collection.JavaConversions.asScalaIterator;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.apache.spark.InterruptibleIterator;
 import org.apache.spark.Partition;
@@ -30,12 +31,12 @@ import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.rdd.RDD;
 
 import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.rdd.IExtractor;
 
 import scala.collection.Iterator;
+import scala.collection.Seq;
 import scala.reflect.ClassTag$;
 
 /**
@@ -61,11 +62,20 @@ public class DeepRDD<T, S extends BaseConfig<T>> extends RDD<T> implements Seria
                 sc.broadcast(config, ClassTag$.MODULE$
                         .<S>apply(config.getClass()));
 
-
-
     }
 
+    @Override
+    public Seq<String> getPreferredLocations(Partition split) {
+        initExtractorClient();
 
+        List<String> locations = extractorClient.getPreferredLocations(split);
+        if (locations == null || locations.isEmpty()) {
+            return super.getPreferredLocations(split);
+        }
+
+        return asScalaBuffer(locations);
+
+    }
 
     @Override
     public Iterator<T> compute(Partition split, TaskContext context) {

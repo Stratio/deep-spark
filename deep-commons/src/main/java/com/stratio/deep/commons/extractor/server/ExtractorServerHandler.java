@@ -100,7 +100,7 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+        LOG.error(cause.getMessage());
         ctx.close();
     }
 
@@ -148,8 +148,8 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
     private void initExtractor(ExtractorConfig<T> config) {
 
         try {
-            Class<T> rdd = (Class<T>) config.getExtractorImplClass();
-            if(rdd==null){
+            Class<T> rdd = config.getExtractorImplClass();
+            if (rdd == null) {
                 rdd = (Class<T>) Class.forName(config.getExtractorImplClassName());
             }
             Constructor<T> c = null;
@@ -160,7 +160,6 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
                 c = rdd.getConstructor(Class.class);
                 this.extractor = (IExtractor<T, ExtractorConfig<T>>) c.newInstance(config.getEntityClass());
             }
-
 
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
@@ -175,7 +174,7 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
             this.initExtractor(initSaveAction.getConfig());
         }
 
-        extractor.initSave(initSaveAction.getConfig(), initSaveAction.getFirst());
+        extractor.initSave(initSaveAction.getConfig(), initSaveAction.getFirst(), initSaveAction.getQueryBuilder());
         return;
 
     }

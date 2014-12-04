@@ -27,7 +27,7 @@ public class Filter implements Serializable {
 
     private final String field;
 
-    private String operation;
+    private FilterType filterType;
 
     private Serializable value;
 
@@ -35,51 +35,57 @@ public class Filter implements Serializable {
         this.field = field;
     }
 
-    public Filter(String field, String operation, Serializable value) {
+    public Filter(String field, FilterType filterType, Serializable value) {
         this.field = field;
-        this.operation = operation;
+        this.filterType = filterType;
         this.value = value;
     }
 
     public Filter greaterThan(Serializable value) {
-        this.operation = FilterOperator.GT;
+        this.filterType = FilterType.GT;
         this.value = value;
         return this;
     }
 
     public Filter greaterThanEquals(Serializable value) {
-        this.operation = FilterOperator.GTE;
+        this.filterType = FilterType.GTE;
         this.value = value;
         return this;
 
     }
 
     public Filter lessThan(Serializable value) {
-        this.operation = FilterOperator.LT;
+        this.filterType = FilterType.LT;
         this.value = value;
         return this;
     }
 
     public Filter lessThanEquals(Serializable value) {
-        this.operation = FilterOperator.LTE;
+        this.filterType = FilterType.LTE;
         this.value = value;
         return this;
     }
 
     public Filter notEquals(Serializable value) {
-        this.operation = FilterOperator.NE;
+        this.filterType = FilterType.NEQ;
         this.value = value;
         return this;
     }
 
     public Filter is(Serializable value) {
-        this.operation = FilterOperator.IS;
+        this.filterType = FilterType.EQ;
         this.value = value;
         return this;
     }
 
     public Filter match(Serializable value) {
-        this.operation = FilterOperator.MATCH;
+        this.filterType = FilterType.MATCH;
+        this.value = value;
+        return this;
+    }
+
+    public Filter in(Serializable value) {
+        this.filterType = FilterType.IN;
         this.value = value;
         return this;
     }
@@ -88,8 +94,8 @@ public class Filter implements Serializable {
         return field;
     }
 
-    public String getOperation() {
-        return operation;
+    public FilterType getFilterType() {
+        return filterType;
     }
 
     public Serializable getValue() {
@@ -100,7 +106,7 @@ public class Filter implements Serializable {
     public String toString() {
         final StringBuffer sb = new StringBuffer("Filter{");
         sb.append("field='").append(field).append('\'');
-        sb.append(", operation='").append(operation).append('\'');
+        sb.append(", operation='").append(filterType).append('\'');
         sb.append(", value=").append(value);
         sb.append('}');
         return sb.toString();

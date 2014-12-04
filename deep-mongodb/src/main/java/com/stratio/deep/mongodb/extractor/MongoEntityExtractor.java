@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.stratio.deep.commons.config.DeepJobConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepTransformException;
 import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
@@ -33,13 +32,24 @@ import scala.Tuple2;
 /**
  * EntityRDD to interact with mongoDB
  *
- * @param <T>
+ * @param <T> the type parameter
  */
 public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
 
+    /**
+     * The constant LOG.
+     */
     private static final Logger LOG = LoggerFactory.getLogger(MongoEntityExtractor.class);
+    /**
+     * The constant serialVersionUID.
+     */
     private static final long serialVersionUID = -3208994171892747470L;
 
+    /**
+     * Instantiates a new Mongo entity extractor.
+     *
+     * @param t the t
+     */
     public MongoEntityExtractor(Class<T> t) {
         super();
         this.deepJobConfig = new MongoDeepJobConfig(t);
@@ -49,7 +59,7 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T transformElement(Tuple2<Object, BSONObject> tuple, DeepJobConfig<T> config) {
+    public T transformElement(Tuple2<Object, BSONObject> tuple, DeepJobConfig<T, MongoDeepJobConfig<T>> config) {
 
         try {
             return (T) UtilMongoDB.getObjectFromBson(config.getEntityClass(), tuple._2());
@@ -63,7 +73,7 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
     @Override
     public Tuple2<Object, BSONObject> transformElement(T record) {
         try {
-            return new Tuple2<>(null, UtilMongoDB.getBsonFromObject(record));
+            return new Tuple2<>(null, (BSONObject) UtilMongoDB.getBsonFromObject(record));
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             LOG.error(e.getMessage());
             throw new DeepTransformException(e.getMessage());

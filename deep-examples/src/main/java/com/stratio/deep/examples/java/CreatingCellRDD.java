@@ -16,7 +16,6 @@
 
 package com.stratio.deep.examples.java;
 
-
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
@@ -66,24 +65,24 @@ public final class CreatingCellRDD {
                 .setMaster(p.getCluster())
                 .setAppName(job)
                 .setJars(p.getJars())
-                .setSparkHome(p.getSparkHome())
-                .set("spark.serializer","org.apache.spark.serializer.KryoSerializer")
-                .set("spark.kryo.registrator","com.stratio.deep.serializer.DeepKryoRegistrator");
+                .setSparkHome(p.getSparkHome());
+        //.set("spark.serializer","org.apache.spark.serializer.KryoSerializer")
+        //.set("spark.kryo.registrator","com.stratio.deep.serializer.DeepKryoRegistrator");
 
         SparkContext sc = new SparkContext(p.getCluster(), job, sparkConf);
 
         LOG.info("spark.serializer: " + System.getProperty("spark.serializer"));
         LOG.info("spark.kryo.registrator: " + System.getProperty("spark.kryo.registrator"));
 
-	    DeepSparkContext deepContext = new DeepSparkContext(sc);
+        DeepSparkContext deepContext = new DeepSparkContext(sc);
 
         // Configuration and initialization
         CassandraDeepJobConfig<Cells> config = CassandraConfigFactory.create()
                 .host(p.getCassandraHost())
                 .cqlPort(p.getCassandraCqlPort())
                 .rpcPort(p.getCassandraThriftPort())
-                .keyspace(keyspaceName)
-                .table(tableName)
+                .keyspace("onestore")
+                .table("bitemporal_index")
                 .initialize();
 
         // Creating the RDD

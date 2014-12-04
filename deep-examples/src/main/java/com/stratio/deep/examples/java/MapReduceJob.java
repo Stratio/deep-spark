@@ -18,7 +18,6 @@ package com.stratio.deep.examples.java;
 
 import java.util.List;
 
-
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -40,7 +39,7 @@ import scala.Tuple2;
 
 public final class MapReduceJob {
     private static final Logger LOG = Logger.getLogger(MapReduceJob.class);
-    public static List<Tuple2<String, Integer>> results;
+    private static List<Tuple2<String, Integer>> results;
 
     private MapReduceJob() {
     }
@@ -67,8 +66,7 @@ public final class MapReduceJob {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
-
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // Creating a configuration for the RDD and initialize it
         CassandraDeepJobConfig<TweetEntity> config = CassandraConfigFactory.create(TweetEntity.class)

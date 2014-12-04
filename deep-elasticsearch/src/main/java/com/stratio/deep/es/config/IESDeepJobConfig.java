@@ -17,7 +17,6 @@
 package com.stratio.deep.es.config;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
@@ -26,20 +25,6 @@ import org.apache.hadoop.conf.Configuration;
  * Defines the public methods that each Stratio Deep ES configuration object should implement.
  */
 public interface IESDeepJobConfig<T> {
-
-
-    /**
-     * The ES's database name
-     */
-    IESDeepJobConfig<T> database(String database);
-
-    /**
-     * Sets the list of available ElasticSearch hosts.
-     *
-     * @param host the list of available ElasticSearch hosts.
-     * @return this object.
-     */
-    IESDeepJobConfig<T> host(List<String> host);
 
     /**
      * @return the hadoop configuration object if the concrete implementation has one, null otherwise.
@@ -62,17 +47,6 @@ public interface IESDeepJobConfig<T> {
      */
     IESDeepJobConfig<T> sort(String sort);
 
-    /**
-     * @param inputKey
-     * @return this object.
-     */
-    IESDeepJobConfig<T> inputKey(String inputKey);
-
-    /**
-     * @return Hosts list
-     */
-    List<String> getHostList();
-
     ESDeepJobConfig<T> type(String type);
 
     ESDeepJobConfig<T> index(String index);
@@ -80,9 +54,6 @@ public interface IESDeepJobConfig<T> {
     String getType();
 
     String getIndex();
-
-    String getNameSpace();
-
 
     /**
      * In case you want to add custom configuration, this could override any other configuration,
@@ -94,6 +65,5 @@ public interface IESDeepJobConfig<T> {
     IESDeepJobConfig<T> customConfiguration(Map<String, Serializable> customConfiguration);
 
     Map<String, Serializable> getCustomConfiguration();
-
 
 }

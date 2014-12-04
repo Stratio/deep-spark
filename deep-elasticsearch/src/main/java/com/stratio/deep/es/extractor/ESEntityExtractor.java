@@ -18,12 +18,6 @@ package com.stratio.deep.es.extractor;
 
 import java.lang.reflect.InvocationTargetException;
 
-import com.stratio.deep.commons.config.DeepJobConfig;
-import com.stratio.deep.es.config.ESDeepJobConfig;
-import com.stratio.deep.commons.exception.DeepTransformException;
-import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
-import com.stratio.deep.es.utils.UtilES;
-
 import org.elasticsearch.hadoop.mr.EsInputFormat;
 import org.elasticsearch.hadoop.mr.EsOutputFormat;
 import org.elasticsearch.hadoop.mr.LinkedMapWritable;
@@ -31,6 +25,11 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.exception.DeepTransformException;
+import com.stratio.deep.commons.extractor.impl.GenericHadoopExtractor;
+import com.stratio.deep.es.config.ESDeepJobConfig;
+import com.stratio.deep.es.utils.UtilES;
 
 import scala.Tuple2;
 
@@ -48,8 +47,8 @@ public final class ESEntityExtractor<T>
     public ESEntityExtractor(Class<T> t) {
         super();
         this.deepJobConfig = new ESDeepJobConfig(t);
-        this.inputFormat = new EsInputFormat<>() ;
-        this.outputFormat = new EsOutputFormat() ;
+        this.inputFormat = new EsInputFormat<>();
+        this.outputFormat = new EsOutputFormat();
 
     }
 
@@ -58,7 +57,7 @@ public final class ESEntityExtractor<T>
      */
     @Override
     public T transformElement(Tuple2<Object, LinkedMapWritable> tuple,
-            DeepJobConfig<T> config) {
+                              DeepJobConfig<T, ESDeepJobConfig<T>> config) {
 
         try {
             return (T) UtilES.getObjectFromJson(config.getEntityClass(), tuple._2());

@@ -75,7 +75,6 @@ public final class GroupingByColumn {
         String RPCPORT = "9160";
         String HOST = "127.0.0.1";
 
-
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
@@ -124,7 +123,6 @@ public final class GroupingByColumn {
         for (Tuple2 t : results) {
             LOG.info(t._1() + ": " + t._2().toString());
         }
-
 
         deepContext.stop();
     }

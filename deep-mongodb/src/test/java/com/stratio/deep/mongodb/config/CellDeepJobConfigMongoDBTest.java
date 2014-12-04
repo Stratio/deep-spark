@@ -6,15 +6,11 @@ import static org.testng.Assert.assertNotNull;
 import org.testng.annotations.Test;
 
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
 
 /**
  * Created by rcrespo on 16/07/14.
  */
-@Test
+@Test(groups = { "UnitTests" })
 public class CellDeepJobConfigMongoDBTest {
 
     @Test

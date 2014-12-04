@@ -14,7 +14,7 @@ fi
 SPARK_BRANCH="$2"
 
 if [ -z "$2" ]; then
-    SPARK_BRANCH="stratio-branch-1.1.0"
+    SPARK_BRANCH="stratio-branch-1.1.1"
 fi
 
 LOCAL_EDITOR=$(which vim)

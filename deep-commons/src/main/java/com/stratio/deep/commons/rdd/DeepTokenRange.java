@@ -23,10 +23,10 @@ import java.util.List;
 /**
  * Wrapper class holding information of a computed token range.
  */
-public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable {
-    private Comparable startToken;
-    private Comparable endToken;
-    private List<String> replicas;
+public class DeepTokenRange<T, K> implements Comparable<DeepTokenRange>, Serializable {
+    private final T startToken;
+    private final T endToken;
+    private List<K> replicas;
 
     /**
      * Construct a new token range with no replica information.
@@ -34,7 +34,7 @@ public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable 
      * @param startToken first token of this range.
      * @param endToken   last token of this range.
      */
-    public DeepTokenRange(Comparable startToken, Comparable endToken) {
+    public DeepTokenRange(T startToken, T endToken) {
         this.startToken = startToken;
         this.endToken = endToken;
     }
@@ -46,20 +46,42 @@ public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable 
      * @param endToken   last token of this range.
      * @param replicas   the list of replica machines holding this range of tokens.
      */
-    public DeepTokenRange(Comparable startToken, Comparable endToken, List<String> replicas) {
+    public DeepTokenRange(T startToken, T endToken, List<K> replicas) {
         this.startToken = startToken;
         this.endToken = endToken;
         this.replicas = replicas;
     }
+
+    public DeepTokenRange(K[] replicas, T startToken, T endToken) {
+        this.startToken = startToken;
+        this.endToken = endToken;
+        this.replicas = Arrays.asList(replicas);
+    }
+
+    /**
+     * Construct a new token range with replica information.
+     *
+     * @param startToken
+     *            first token of this range.
+     * @param endToken
+     *            last token of this range.
+     * @param replicas
+     *            the list of replica machines holding this range of tokens.
+     */
+    // public DeepTokenRange(T startToken, T endToken, List<String> replicas) {
+    // this.startToken = startToken;
+    // this.endToken = endToken;
+    // this.replicas = replicas;
+    // }
 
     /**
      * Construct a new token range with replica information
      *
      * @param replicas
      */
-    public DeepTokenRange(String[] replicas) {
-        this.replicas = Arrays.asList(replicas);
-    }
+    // public DeepTokenRange(String[] replicas) {
+    // this.replicas = Arrays.asList(replicas);
+    // }
 
     /**
      * {@inheritDoc}
@@ -107,23 +129,23 @@ public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable 
         return result;
     }
 
-    public Comparable getStartToken() {
+    public T getStartToken() {
         return startToken;
     }
 
-    public void setStartToken(Comparable startToken) {
-        this.startToken = startToken;
+    public T getStartTokenAsComparable() {
+        return startToken;
     }
 
-    public Comparable getEndToken() {
+    public T getEndToken() {
         return endToken;
     }
 
-    public void setEndToken(Comparable endToken) {
-        this.endToken = endToken;
+    public T getEndTokenAsComparable() {
+        return endToken;
     }
 
-    public List<String> getReplicas() {
+    public List<K> getReplicas() {
         return replicas;
     }
 
@@ -132,6 +154,10 @@ public class DeepTokenRange implements Comparable<DeepTokenRange>, Serializable 
      */
     @Override
     public int compareTo(DeepTokenRange o) {
-        return startToken.compareTo(o.startToken);
+        if (startToken instanceof Comparable) {
+            return ((Comparable) startToken).compareTo(o.startToken);
+        }
+        return 0;
     }
+
 }

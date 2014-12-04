@@ -23,13 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.es.extractor.ESCellExtractor;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -38,6 +31,14 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
+
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.es.extractor.ESCellExtractor;
+import com.stratio.deep.utils.ContextProperties;
 
 import scala.Tuple2;
 
@@ -58,12 +59,10 @@ public final class WritingCellToES {
     public static void doMain(String[] args) {
         String job = "java:writingCellToES";
 
-        String host     = "localhost:9200";
-        String index    = "book";
-        String type     = "test";
-        String typeOut     = "out";
-
-
+        String host = "localhost:9200";
+        String index = "book";
+        String type = "test";
+        String typeOut = "out";
 
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
@@ -74,10 +73,9 @@ public final class WritingCellToES {
 
         Map<String, Serializable> values = new HashMap<>();
 
-        values.put(ExtractorConstants.INDEX,    index);
-        values.put(ExtractorConstants.TYPE,    type);
-        values.put(ExtractorConstants.HOST,        host );
-
+        values.put(ExtractorConstants.INDEX, index);
+        values.put(ExtractorConstants.TYPE, type);
+        values.put(ExtractorConstants.HOST, host);
 
         config.setExtractorImplClass(ESCellExtractor.class);
         config.setValues(values);
@@ -119,7 +117,8 @@ public final class WritingCellToES {
         JavaRDD<Cells> outputRDD = wordCountReduced.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
             public Cells call(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
-                return new Cells(Cell.create("word", stringIntegerTuple2._1()) , Cell.create("count", stringIntegerTuple2._2()));
+                return new Cells(Cell.create("word", stringIntegerTuple2._1()),
+                        Cell.create("count", stringIntegerTuple2._2()));
             }
         });
 

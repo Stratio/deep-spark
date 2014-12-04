@@ -3,54 +3,226 @@ package com.stratio.deep.commons.extractor.utils;
 /**
  * Created by dgomez on 25/08/14.
  */
-public class ExtractorConstants {
+public interface ExtractorConstants {
 
-    public static  String PASSWORD = "password";
+    /**
+     * The PASSWORD.
+     */
+    String PASSWORD = "password";
+
+    /**
+     * The CATALOG.
+     */
+    String CATALOG = "catalog";
+    /**
+     * The KEYSPACE.
+     */
+    String KEYSPACE = CATALOG;
+    /**
+     * The DATABASE.
+     */
+    String DATABASE = KEYSPACE;
+    /**
+     * The INDEX.
+     */
+    String INDEX = CATALOG;
+    /**
+     * The TABLE.
+     */
+    String TABLE = "table";
+    /**
+     * The COLLECTION.
+     */
+    String COLLECTION = TABLE;
+    /**
+     * The TYPE.
+     */
+    String TYPE = TABLE;
+    /**
+     * The NAMESPACE.
+     */
+    String NAMESPACE = CATALOG;
+    /**
+     * The SET.
+     */
+    String SET = TABLE;
+    /**
+     * The HOST.
+     */
+    String HOST = "host";
+    /**
+     * The PORT.
+     */
+    String PORT = "Port";
+    /**
+     * The INPUT _ cOLUMNS.
+     */
+    String INPUT_COLUMNS = "inputColumns";
+    /**
+     * The USERNAME.
+     */
+    String USERNAME = "user";
+    /**
+     * The PAGE _ sIZE.
+     */
+    String PAGE_SIZE = "page";
+    /**
+     * The SESSION.
+     */
+    String SESSION = "session";
+    /**
+     * The PORT 2.
+     */
+    String PORT2 = "port2";
+    /**
+     * The CQLPORT.
+     */
+    String CQLPORT = PORT;
+    /**
+     * The RPCPORT.
+     */
+    String RPCPORT = PORT2;
+    /**
+     * The COLUMN _ fAMILY.
+     */
+    String COLUMN_FAMILY = "columnFamily";
+    /**
+     * The BISECT _ fACTOR.
+     */
+    String BISECT_FACTOR = "bisecFactor";
+    /**
+     * The CREATE _ ON _ WRITE.
+     */
+    String CREATE_ON_WRITE = "createOnWrite";
+    /**
+     * The BATCHSIZE.
+     */
+    String BATCHSIZE = "batchSize";
+    /**
+     * The READ _ CONSISTENCY _ lEVEL.
+     */
+    String READ_CONSISTENCY_LEVEL = "readConsistencyLevel";
+    /**
+     * The WRITE _ CONSISTENCY _ lEVEL.
+     */
+    String WRITE_CONSISTENCY_LEVEL = "writeConsistencyLevel";
+
+    /**
+     * The REPLICA _ SET.
+     */
+    String REPLICA_SET = "replicaSet";
+
+    /**
+     * The READ _ PREFERENCE.
+     */
+    String READ_PREFERENCE = "readPreference";
+
+    /**
+     * The SORT.
+     */
+    String SORT = "sort";
+
+    /**
+     * The FILTER _ FIELD.
+     */
+    String FILTER_FIELD = "filterField";
+
+    /**
+     * The FILTER _ QUERY.
+     */
+    String FILTER_QUERY = "filterQuery";
+
+    /**
+     * The INPUT _ kEY.
+     */
+    String INPUT_KEY = "inputKey";
+
+    /**
+     * The IGNORE _ ID _ FIELD.
+     */
+    String IGNORE_ID_FIELD = "ignoreIdField";
+
+    /**
+     * The USE _ sHARD.
+     */
+    String USE_SHARD = "useShard";
+
+    /**
+     * The USE _ SPLITS.
+     */
+    String USE_SPLITS = "useSplit";
+
+    /**
+     * The USE _ CHUNKS.
+     */
+    String USE_CHUNKS = "useChunk";
+
+    /**
+     * The SPLIT _ SIZE.
+     */
+    String SPLIT_SIZE = "splitSize";
+
+    /**
+     * The EQUALS _ IN _ FILTER.
+     */
+    String EQUALS_IN_FILTER = "equalsInFilter";
+
+    /**
+     * The HOSTS.
+     */
+    String HOSTS    = "Hosts";
+
+    /**
+     * The PORTS.
+     */
+    String PORTS    = "Port";
+
+    /**
+     * The HDFS.
+     */
+    String HDFS       = "hdfs";
+    /**
+     * The HDFS _ tYPE.
+     */
+    String HDFS_TYPE  = "hdfsType";
+    /**
+     * The HDFS _ fILEDATATABLE.
+     */
+    String HDFS_FILEDATATABLE = "TextFileDataTable";
+    /**
+     * The HDFS file Separator.
+     */
+    String HDFS_FILE_SEPARATOR = "FileSeparator";
+    /**
+     * The HDFS MAP.
+     */
+    String HDFS_MAP     = "map";
+    /**
+     * The HDFS Prefix
+     */
+    String HDFS_PREFIX = "hdfs://";
+    /**
+     * The HDFS file path.
+     */
+    String HDFS_FILE_PATH = "path";
+    /**
+     * The HDFS schema
+     */
+    String HDFS_SCHEMA = "schemaMap";
+    /**
+     * The HDFS file extension
+     */
+    String HDFS_FILE_EXTENSION = "Extension";
+
+    /**
+     * The TYPE
+     */
+    String TYPE_CONSTANT = "type";
+    /**
+     * The INNERCLASS.
+     */
+    String INNERCLASS  ="implClass";
 
 
-    public static  String CATALOG = "catalog";
-    public static  String KEYSPACE = CATALOG;
-    public static  String DATABASE = KEYSPACE;
-    public static  String INDEX = CATALOG;
-    public static  String TABLE    = "table";
-    public static  String COLLECTION = TABLE;
-    public static  String TYPE = TABLE;
-    public static  String HOST     = "host";
-    public static  String PORT     = "port";
-    public static  String INPUT_COLUMNS = "inputColumns";
-    public static  String USERNAME  ="user";
-    public static  String PAGE_SIZE = "page";
-    public static  String SESSION  = "session";
-    public static  String PORT2  = "port2";
-    public static  String CQLPORT  = PORT2;
-    public static  String RPCPORT  = PORT;
-    public static  String COLUMN_FAMILY  = "columnFamily";
-    public static  String BISECT_FACTOR  = "bisecFactor";
-    public static  String CREATE_ON_WRITE  = "createOnWrite";
-    public static  String BATCHSIZE  = "batchSize";
-    public static  String READ_CONSISTENCY_LEVEL = "readConsistencyLevel";
-    public static String WRITE_CONSISTENCY_LEVEL = "writeConsistencyLevel";
-
-    public static String REPLICA_SET = "replicaSet";
-
-    public static String READ_PREFERENCE = "readPreference";
-
-    public static String SORT = "sort";
-
-    public static String FILTER_FIELD = "filterField";
-
-    public static String FILTER_QUERY = "filterQuery";
-
-    public static String INPUT_KEY = "inputKey";
-
-    public static String IGNORE_ID_FIELD = "ignoreIdField";
-
-    public static String USE_SHARD = "useShard";
-
-    public static String USE_SPLITS = "useSplit";
-
-    public static String USE_CHUNKS = "useChunk";
-
-    public static String SPLIT_SIZE = "splitSize";
-
+    String WRITE_MODE = "writeMode";
 }

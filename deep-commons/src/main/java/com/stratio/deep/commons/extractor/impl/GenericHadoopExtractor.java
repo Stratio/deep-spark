@@ -17,12 +17,9 @@
 package com.stratio.deep.commons.extractor.impl;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
@@ -42,10 +39,9 @@ import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.HadoopConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.commons.rdd.IExtractor;
-import com.stratio.deep.commons.utils.Constants;
 import com.stratio.deep.commons.utils.DeepSparkHadoopMapReduceUtil;
 
 import scala.Tuple2;
@@ -53,17 +49,17 @@ import scala.Tuple2;
 /**
  * Created by rcrespo on 26/08/14.
  */
-public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, KOut, VOut> implements IExtractor<T, S> {
+public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, kOut, vOut> implements IExtractor<T, S> {
 
-    protected DeepJobConfig<T> deepJobConfig;
+    protected DeepJobConfig deepJobConfig;
 
     protected transient RecordReader<K, V> reader;
 
-    protected transient RecordWriter<KOut, VOut> writer;
+    protected transient RecordWriter<kOut, vOut> writer;
 
     protected transient InputFormat<K, V> inputFormat;
 
-    protected transient OutputFormat<KOut, VOut> outputFormat;
+    protected transient OutputFormat<kOut, vOut> outputFormat;
 
     protected transient String jobTrackerId;
 
@@ -83,25 +79,25 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, K
 
     }
 
-
+    @Override
+    public List<String> getPreferredLocations(Partition split) {
+        return null;
+    }
 
     @Override
     public Partition[] getPartitions(S config) {
 
-        if (config instanceof ExtractorConfig){
-            addSparkIdToDeepJobConfig((ExtractorConfig)config);
-        }else if ( config instanceof DeepJobConfig){
-            deepJobConfig = ((DeepJobConfig) config).initialize();
+        if (config instanceof ExtractorConfig) {
+            addSparkIdToDeepJobConfig((ExtractorConfig) config);
+        } else if (config instanceof DeepJobConfig) {
+            deepJobConfig = (DeepJobConfig) ((DeepJobConfig) config).initialize();
         }
-
-
 
         int id = config.getRddId();
 
         jobId = new JobID(jobTrackerId, id);
 
-
-        Configuration conf = ((HadoopConfig)deepJobConfig).getHadoopConfiguration();
+        Configuration conf = ((HadoopConfig) deepJobConfig).getHadoopConfiguration();
 
         JobContext jobContext = DeepSparkHadoopMapReduceUtil.newJobContext(conf, jobId);
 
@@ -146,7 +142,7 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, K
 
         Tuple2<K, V> tuple = null;
         try {
-            return transformElement(new Tuple2<>((K) reader.getCurrentKey(), (V) reader.getCurrentValue()),
+            return (T) transformElement(new Tuple2<>(reader.getCurrentKey(), reader.getCurrentValue()),
                     deepJobConfig);
         } catch (IOException | InterruptedException e) {
             LOG.error("Impossible to get next value " + e.getMessage());
@@ -169,21 +165,19 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, K
         }
     }
 
-
     private void addSparkIdToDeepJobConfig(ExtractorConfig<T> config) {
         int id = config.getRddId();
 
-        deepJobConfig = (DeepJobConfig<T>) deepJobConfig.initialize(config);
+        deepJobConfig = (DeepJobConfig) deepJobConfig.initialize(config);
 
         deepJobConfig.setRddId(id);
     }
 
-    public abstract T transformElement(Tuple2<K, V> tuple, DeepJobConfig<T> config);
-
+    public abstract T transformElement(Tuple2<K, V> tuple, DeepJobConfig<T, S> config);
 
     @Override
     public void saveRDD(T t) {
-        Tuple2<KOut, VOut> tuple = transformElement(t);
+        Tuple2<kOut, vOut> tuple = transformElement(t);
         try {
             writer.write(tuple._1(), tuple._2());
 
@@ -195,7 +189,7 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, K
     }
 
     @Override
-    public void initSave(S config, T first) {
+    public void initSave(S config, T first, UpdateQueryBuilder queryBuilder) {
         int id = config.getRddId();
 
         int partitionIndex = config.getPartitionId();
@@ -204,18 +198,19 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, K
                 .newTaskAttemptID(jobTrackerId, id, true, partitionIndex, 0);
 
         Configuration configuration = null;
-        if (config instanceof ExtractorConfig){
-            configuration = ((HadoopConfig)deepJobConfig.initialize((ExtractorConfig)config)).getHadoopConfiguration();
-        }else{
+        if (config instanceof ExtractorConfig) {
+            configuration = ((HadoopConfig) deepJobConfig.initialize((ExtractorConfig) config))
+                    .getHadoopConfiguration();
+        } else {
             configuration = ((HadoopConfig) config).getHadoopConfiguration();
         }
         hadoopAttemptContext = DeepSparkHadoopMapReduceUtil
-                .newTaskAttemptContext( configuration,
+                .newTaskAttemptContext(configuration,
                         attemptId);
         try {
             writer = outputFormat.getRecordWriter(hadoopAttemptContext);
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            throw new DeepGenericException(e);
         }
     }
 
@@ -230,9 +225,10 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, K
                 .newTaskAttemptID(jobTrackerId, id, true, split.index(), 0);
 
         Configuration configuration = null;
-        if (config instanceof ExtractorConfig){
-            configuration = ((HadoopConfig)deepJobConfig.initialize((ExtractorConfig)config)).getHadoopConfiguration();
-        }else{
+        if (config instanceof ExtractorConfig) {
+            configuration = ((HadoopConfig) deepJobConfig.initialize((ExtractorConfig) config))
+                    .getHadoopConfiguration();
+        } else {
             configuration = ((HadoopConfig) config).getHadoopConfiguration();
         }
 
@@ -243,9 +239,9 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, K
             reader = inputFormat.createRecordReader(split.serializableHadoopSplit().value(), hadoopAttemptContext);
             reader.initialize(split.serializableHadoopSplit().value(), hadoopAttemptContext);
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            throw new DeepGenericException(e);
         }
     }
 
-    public abstract Tuple2<KOut, VOut> transformElement(T record);
+    public abstract Tuple2<kOut, vOut> transformElement(T record);
 }

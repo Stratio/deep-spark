@@ -16,7 +16,6 @@
 package com.stratio.deep.core.rdd;
 
 import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.rdd.IExtractor;
 
 import scala.runtime.AbstractFunction0;

@@ -16,16 +16,16 @@
 
 package com.stratio.deep.examples.java;
 
+import org.apache.log4j.Logger;
+import org.apache.spark.rdd.RDD;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.examples.java.extractorconfig.mongodb.utils.ContextProperties;
 import com.stratio.deep.mongodb.config.MongoConfigFactory;
 import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
-
-import org.apache.log4j.Logger;
-import org.apache.spark.rdd.RDD;
-import org.bson.BSONObject;
-import org.bson.BasicBSONObject;
 
 /**
  * Example class to read a collection from mongoDB
@@ -36,11 +36,9 @@ public final class ReadingCellFromMongoDB {
     private ReadingCellFromMongoDB() {
     }
 
-
     public static void main(String[] args) {
         doMain(args);
     }
-
 
     public static void doMain(String[] args) {
         String job = "java:readingCellFromMongoDB";
@@ -52,19 +50,19 @@ public final class ReadingCellFromMongoDB {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
         QueryBuilder query = QueryBuilder.start();
         query.and("number").greaterThan(27).lessThan(30);
 
-        BSONObject bsonSort = new BasicBSONObject();
-        bsonSort.put("number",1);
+        DBObject bsonSort = new BasicDBObject();
+        bsonSort.put("number", 1);
 
-        BSONObject bsonFields = new BasicBSONObject();
-        bsonFields.put("number",1);
-        bsonFields.put("text",1);
-        bsonFields.put("_id",0);
+        DBObject bsonFields = new BasicDBObject();
+        bsonFields.put("number", 1);
+        bsonFields.put("text", 1);
+        bsonFields.put("_id", 0);
 
         MongoDeepJobConfig inputConfigEntity = MongoConfigFactory.createMongoDB().host(host).database(database)
                 .collection(inputCollection)
@@ -74,10 +72,8 @@ public final class ReadingCellFromMongoDB {
 
         RDD inputRDDEntity = deepContext.createRDD(inputConfigEntity);
 
-
-	    LOG.info("count : " + inputRDDEntity.count());
-	    LOG.info("prints first cell  : " + inputRDDEntity.first());
-
+        LOG.info("count : " + inputRDDEntity.count());
+        LOG.info("prints first cell  : " + inputRDDEntity.first());
 
         deepContext.stop();
     }

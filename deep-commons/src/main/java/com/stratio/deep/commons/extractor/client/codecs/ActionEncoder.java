@@ -19,6 +19,9 @@ import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.stratio.deep.commons.extractor.actions.Action;
 
 import io.netty.buffer.ByteBuf;
@@ -26,6 +29,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
 public class ActionEncoder extends MessageToByteEncoder<Action> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ActionEncoder.class);
 
     protected void encode(ChannelHandlerContext ctx, Action action, ByteBuf out) {
 
@@ -36,7 +41,7 @@ public class ActionEncoder extends MessageToByteEncoder<Action> {
             outObj = new ObjectOutputStream(bos);
             outObj.writeObject(action);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage());
         } finally {
             try {
                 if (outObj != null) {

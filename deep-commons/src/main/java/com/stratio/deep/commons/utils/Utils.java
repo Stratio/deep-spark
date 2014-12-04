@@ -16,17 +16,6 @@
 
 package com.stratio.deep.commons.utils;
 
-import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.entity.IDeepType;
-import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
-import com.stratio.deep.commons.exception.DeepGenericException;
-import com.stratio.deep.commons.exception.DeepIOException;
-import com.stratio.deep.commons.rdd.IExtractor;
-import org.apache.commons.lang.StringUtils;
-import scala.Tuple2;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -37,12 +26,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
@@ -65,6 +51,7 @@ public final class Utils {
     /**
      * Creates a new instance of the given class.
      *
+     * @param <T>   the type parameter
      * @param clazz the class object for which a new instance should be created.
      * @return the new instance of class clazz.
      */
@@ -79,7 +66,9 @@ public final class Utils {
     /**
      * Creates a new instance of the given class name.
      *
-     * @param className the class object for which a new instance should be created.
+     * @param <T>         the type parameter
+     * @param className   the class object for which a new instance should be created.
+     * @param returnClass the return class
      * @return the new instance of class clazz.
      */
     @SuppressWarnings("unchecked")
@@ -94,6 +83,9 @@ public final class Utils {
 
     /**
      * Quoting for working with uppercase
+     *
+     * @param identifier the identifier
+     * @return the string
      */
     public static String quote(String identifier) {
         if (StringUtils.isEmpty(identifier)) {
@@ -116,6 +108,9 @@ public final class Utils {
 
     /**
      * Quoting for working with uppercase
+     *
+     * @param identifier the identifier
+     * @return the string
      */
     public static String singleQuote(String identifier) {
         if (StringUtils.isEmpty(identifier)) {
@@ -134,8 +129,6 @@ public final class Utils {
 
         return res;
     }
-
-
 
     /**
      * Returns a CQL batch query wrapping the given statements.
@@ -217,6 +210,29 @@ public final class Utils {
     }
 
     /**
+     * @param object
+     * @param fieldName
+     * @param fieldValue
+     * @return
+     */
+    public static boolean setFieldWithReflection(Object object, String fieldName, Object fieldValue) {
+        Class<?> clazz = object.getClass();
+        while (clazz != null) {
+            try {
+                Field field = clazz.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                field.set(object, fieldValue);
+                return true;
+            } catch (NoSuchFieldException e) {
+                clazz = clazz.getSuperclass();
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return false;
+    }
+
+    /**
      * Resolves the getter name for the property whose name is 'propertyName' whose type is 'valueType'
      * in the entity bean whose class is 'entityClass'.
      * If we don't find a setter following Java's naming conventions, before throwing an exception we try to
@@ -262,11 +278,21 @@ public final class Utils {
 
     /**
      * Return the set of fields declared at all level of class hierachy
+     *
+     * @param clazz the clazz
+     * @return the field [ ]
      */
     public static Field[] getAllFields(Class clazz) {
         return getAllFieldsRec(clazz, new ArrayList<Field>());
     }
 
+    /**
+     * Get all fields rec.
+     *
+     * @param clazz  the clazz
+     * @param fields the fields
+     * @return the field [ ]
+     */
     private static Field[] getAllFieldsRec(Class clazz, List<Field> fields) {
         Class superClazz = clazz.getSuperclass();
         if (superClazz != null) {
@@ -285,8 +311,31 @@ public final class Utils {
     }
 
     /**
-     * @param hosts
-     * @return
+     * Remove address port.
+     *
+     * @param stringList the string list
+     * @return the list
+     */
+    public static List<String> removeAddressPort(List<String> stringList) {
+        List<String> adresNoPort = new ArrayList<>();
+
+        for (String s : stringList) {
+            int index = s.indexOf(":");
+            if (index > -1) {
+                adresNoPort.add(s.substring(0, index));
+                continue;
+            }
+            adresNoPort.add(s);
+
+        }
+        return adresNoPort;
+    }
+
+    /**
+     * Split list by comma.
+     *
+     * @param hosts the hosts
+     * @return string
      */
     public static String splitListByComma(List<String> hosts) {
         boolean firstHost = true;
@@ -301,6 +350,12 @@ public final class Utils {
         return hostConnection.toString();
     }
 
+    /**
+     * Gets extractor instance.
+     *
+     * @param config the config
+     * @return the extractor instance
+     */
     public static <T, S extends BaseConfig<T>> IExtractor<T, S> getExtractorInstance(S config) {
 
         try {
@@ -320,15 +375,17 @@ public final class Utils {
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             throw new DeepExtractorinitializationException(e.getMessage());
         }
+
     }
 
     /**
+     * Cast number type.
      *
-     * @param object
-     * @param clazz
-     * @return
+     * @param object the object
+     * @param clazz  the clazz
+     * @return object
      */
-   public static Object castNumberType(Object object, Object clazz) {
+    public static Object castNumberType(Object object, Object clazz) {
 
         if (object instanceof Number) {
 
@@ -351,6 +408,40 @@ public final class Utils {
             }
         }
         throw new ClassCastException("it is not a Number Type");
+    }
+
+    public static Object castingUtil(String value, Class classCasting) {
+        Object object = value;
+
+        //Numeric
+        if (Number.class.isAssignableFrom(classCasting)) {
+            if (classCasting.isAssignableFrom(Double.class)) {
+                return Double.valueOf(value);
+            } else if (classCasting.isAssignableFrom(Long.class)) {
+                return Long.valueOf(value);
+
+            } else if (classCasting.isAssignableFrom(Float.class)) {
+                return Float.valueOf(value);
+
+            } else if (classCasting.isAssignableFrom(Integer.class)) {
+                return Integer.valueOf(value);
+
+            } else if (classCasting.isAssignableFrom(Short.class)) {
+                return Short.valueOf(value);
+
+            } else if (classCasting.isAssignableFrom(Byte.class)) {
+                return Byte.valueOf(value);
+            }
+        } else if (String.class.isAssignableFrom(classCasting)) {
+            return object.toString();
+
+        } else {
+            //Class not recognise yet
+            return null;
+
+        }
+        return null;
+
     }
 
 }

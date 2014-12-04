@@ -26,14 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import com.google.common.io.Resources;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.es.extractor.ESCellExtractor;
-import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -47,6 +39,14 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
 
+import com.google.common.io.Resources;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.es.extractor.ESCellExtractor;
+import com.stratio.deep.utils.ContextProperties;
 
 import scala.Tuple2;
 
@@ -149,7 +149,7 @@ public final class GroupingCellWithES {
         JavaRDD<Cells> outputRDD = wordCountReduced.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
             public Cells call(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
-                return new Cells(Cell.create("word", stringIntegerTuple2._1()) , Cell.create("count",
+                return new Cells(Cell.create("word", stringIntegerTuple2._1()), Cell.create("count",
                         stringIntegerTuple2._2()));
             }
         });

@@ -14,13 +14,15 @@
  */
 package com.stratio.deep.core.extractor.client;
 
+import java.util.List;
+
 import javax.net.ssl.SSLException;
 
 import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.commons.rdd.IExtractor;
 
 import io.netty.bootstrap.Bootstrap;
@@ -32,8 +34,7 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 
 /**
- * Sends a list of continent/city pairs to a {@link } to get the local times of the
- * specified cities.
+ * Sends a list of continent/city pairs to a {@link } to get the local times of the specified cities.
  */
 public class ExtractorClient<T> implements IExtractor<T, ExtractorConfig<T>> {
 
@@ -41,6 +42,7 @@ public class ExtractorClient<T> implements IExtractor<T, ExtractorConfig<T>> {
 
     static final String HOST = System.getProperty("host", "127.0.0.1");
     static final int PORT = Integer.parseInt(System.getProperty("port", "8463"));
+    private static final long serialVersionUID = -7076154908311072669L;
 
     private transient EventLoopGroup group = new NioEventLoopGroup();
 
@@ -95,15 +97,19 @@ public class ExtractorClient<T> implements IExtractor<T, ExtractorConfig<T>> {
         handler.initIterator(dp, config);
     }
 
-
     @Override
     public void saveRDD(T t) {
         handler.saveRDD(t);
     }
 
     @Override
-    public void initSave(ExtractorConfig<T> config, T first) {
-        handler.initSave(config, first);
+    public void initSave(ExtractorConfig<T> config, T first, UpdateQueryBuilder queryBuilder) {
+        handler.initSave(config, first, queryBuilder);
+    }
+
+    @Override
+    public List<String> getPreferredLocations(Partition split) {
+        return null;
     }
 
     @Override
@@ -114,14 +120,12 @@ public class ExtractorClient<T> implements IExtractor<T, ExtractorConfig<T>> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(IDeepJobConfig, int)
      */
     @Override
     public Partition[] getPartitions(ExtractorConfig<T> config) {
         return this.handler.getPartitions(config);
     }
-
-
 
 }

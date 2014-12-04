@@ -18,20 +18,20 @@ package com.stratio.deep.examples.java;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-import com.stratio.deep.cassandra.config.CassandraConfigFactory;
-import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
-import com.stratio.deep.cassandra.entity.CassandraCell;
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.utils.ContextProperties;
-
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
+
+import com.google.common.collect.Lists;
+import com.stratio.deep.cassandra.config.CassandraConfigFactory;
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.utils.ContextProperties;
+
 import scala.Tuple2;
 
 /**
@@ -68,8 +68,7 @@ public final class WritingCellToCassandra {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
-
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // --- INPUT RDD
         CassandraDeepJobConfig<Cells> inputConfig = CassandraConfigFactory.create()
@@ -101,7 +100,6 @@ public final class WritingCellToCassandra {
             LOG.info(result);
         }
 
-
         // --- OUTPUT RDD
         CassandraDeepJobConfig<Cells> outputConfig = CassandraConfigFactory.createWriteConfig()
                 .host(p.getCassandraHost()).cqlPort(p.getCassandraCqlPort()).rpcPort(p.getCassandraThriftPort())
@@ -113,9 +111,9 @@ public final class WritingCellToCassandra {
         JavaRDD<Cells> outputRDD = numPerKey.map(new Function<Tuple2<String, Integer>, Cells>() {
             @Override
             public Cells call(Tuple2<String, Integer> t) {
-                Cell c1 = CassandraCell.create("domain", t._1(), true, false);
-                Cell c2 = CassandraCell.create("num_pages", t._2());
-                return new Cells(outputTableName,c1, c2);
+                Cell c1 = Cell.create("domain", t._1(), true, false);
+                Cell c2 = Cell.create("num_pages", t._2());
+                return new Cells(outputTableName, c1, c2);
             }
         });
 

@@ -16,158 +16,322 @@
 
 package com.stratio.deep.commons.config;
 
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.COLLECTION;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.DATABASE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.HOST;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PORT;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNAME;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.FILTER_QUERY;
 import java.io.Serializable;
-
-import org.apache.hadoop.conf.Configuration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.filter.Filter;
 
 /**
  * Created by rcrespo on 13/10/14.
+ *
+ * @param <T> the type parameter
  */
-public class DeepJobConfig<T> extends BaseConfig<T> implements IDeepJobConfig<T, DeepJobConfig<T>>, Serializable {
+public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
 
+    /**
+     * The Username.
+     */
     protected String username;
 
+    /**
+     * The Password.
+     */
     protected String password;
 
+    /**
+     * The Name space (catalog+table / database+collection).
+     */
     protected String nameSpace;
 
+    /**
+     * The Catalog / database.
+     */
     protected String catalog;
 
+    /**
+     * The Table / collection.
+     */
     protected String table;
 
-    protected int pageSize;
-
+    /**
+     * The Port.
+     */
     protected int port;
 
-    protected String host;
+    /**
+     * The Host.
+     */
+    protected List<String> host = new ArrayList<>();
 
-    protected String[] fields;
+    /**
+     * The inputColumns.
+     */
+    protected String[] inputColumns;
 
+    /**
+     * Database filters
+     */
+    protected Filter[] filters;
 
-    public DeepJobConfig(){
-//        super(Cells.class);
-        super(null);
+    /**
+     * Instantiates a new Deep job config.
+     */
+    public DeepJobConfig() {
+        super((Class<T>) Cells.class);
     }
 
+    /**
+     * Instantiates a new Deep job config.
+     *
+     * @param t the t
+     */
     public DeepJobConfig(Class<T> t) {
         super(t);
     }
 
+    /**
+     * Gets username.
+     *
+     * @return the username
+     */
     public String getUsername() {
         return username;
     }
 
-//    @Override
-    public DeepJobConfig host(String hostname) {
-        return this;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
+    /**
+     * Gets password.
+     *
+     * @return the password
+     */
     public String getPassword() {
         return password;
     }
 
-//    @Override
-    public DeepJobConfig pageSize(int pageSize) {
-        return null;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getNameSpace(){
-        if (nameSpace==null){
+    /**
+     * Get name space.
+     *
+     * @return the string
+     */
+    public String getNameSpace() {
+        if (nameSpace == null) {
             nameSpace = new StringBuilder().append(catalog).append(".").append(table).toString();
         }
         return nameSpace;
 
     }
 
-
-    public void setNameSpace(String nameSpace) {
-        this.nameSpace = nameSpace;
-    }
-
+    /**
+     * Gets catalog.
+     *
+     * @return the catalog
+     */
     public String getCatalog() {
         return catalog;
     }
 
-    public void setCatalog(String catalog) {
-        this.catalog = catalog;
-    }
-
+    /**
+     * Gets table.
+     *
+     * @return the table
+     */
     public String getTable() {
         return table;
     }
 
-    public void setTable(String table) {
-        this.table = table;
+    public String[] getInputColumns() {
+        return inputColumns;
     }
 
-    @Override
-    public int getPageSize() {
-        return pageSize;
+    public Filter[] getFilters() {
+        return filters;
     }
 
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
-    }
-
-    public String[] getFields() {
-        return fields;
-    }
-
-    public void setFields(String... fields) {
-        this.fields = fields;
-    }
-
+    /**
+     * Gets port.
+     *
+     * @return the port
+     */
     public int getPort() {
         return port;
     }
 
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public String getHost() {
+    /**
+     * Gets host.
+     *
+     * @return the host
+     */
+    public List<String> getHostList() {
         return host;
     }
 
+    public String getHost() {
+        return !host.isEmpty() ? host.get(0) : null;
+    }
+
+    /**
+     * Initialize s.
+     *
+     * @param extractorConfig the extractor config
+     * @return the s
+     */
+    public S initialize(ExtractorConfig extractorConfig) {
+        Map<String, Serializable> values = extractorConfig.getValues();
+
+        if (values.get(USERNAME) != null) {
+            username(extractorConfig.getString(USERNAME));
+        }
+
+        if (values.get(PASSWORD) != null) {
+            password(extractorConfig.getString(PASSWORD));
+        }
+
+        if (values.get(HOST) != null) {
+            host((extractorConfig.getStringArray(HOST)));
+        }
+
+        if (values.get(PORT) != null) {
+            port((extractorConfig.getInteger(PORT)));
+        }
+
+        if (values.get(COLLECTION) != null) {
+            table(extractorConfig.getString(COLLECTION));
+        }
+
+        if (values.get(INPUT_COLUMNS) != null) {
+            inputColumns(extractorConfig.getStringArray(INPUT_COLUMNS));
+        }
+
+        if (values.get(DATABASE) != null) {
+            catalog(extractorConfig.getString(DATABASE));
+        }
+
+        if (values.get(FILTER_QUERY) != null) {
+            filters(extractorConfig.getFilterArray(FILTER_QUERY));
+        }
+
+        return (S) this;
+    }
+
+    /**
+     * Host deep job config.
+     *
+     * @param hostName the hostname
+     * @return the deep job config
+     */
+    public S host(String hostName) {
+        host.add(hostName);
+        return (S) this;
+    }
+
+    public S host(String... hostNames) {
+        for (String hostName : hostNames) {
+            host.add(hostName);
+        }
+        return (S) this;
+    }
+
+    public S host(List<String> hostNames) {
+        this.host.addAll(hostNames);
+        return (S) this;
+    }
+
+    /**
+     * Password s.
+     *
+     * @param password the password
+     * @return the s
+     */
+    public S password(String password) {
+        this.password = password;
+        return (S) this;
+    }
+
+    public S table(String table) {
+        this.table = table;
+        return (S) this;
+    }
+
+    public S catalog(String catalog) {
+        this.catalog = catalog;
+        return (S) this;
+    }
+
+    /**
+     * Username s.
+     *
+     * @param username the username
+     * @return the s
+     */
+    public S username(String username) {
+        this.username = username;
+        return (S) this;
+    }
+
+    /**
+     * Port s.
+     *
+     * @param port the username
+     * @return the s
+     */
+    public S port(Integer port) {
+        this.port = port;
+        return (S) this;
+    }
+
+    /**
+     * @param inputColumns
+     * @return
+     */
+    public S inputColumns(String[] inputColumns) {
+        this.inputColumns = inputColumns;
+        return (S) this;
+    }
+
+    /**
+     * @param filters
+     * @return
+     */
+    public S filters(Filter[] filters) {
+        this.filters = filters;
+        return (S) this;
+    }
+
+    /**
+     * Initialize s.
+     *
+     * @return the s
+     */
+    public S initialize() {
+        return (S) this;
+    }
+
     @Override
-    public String[] getInputColumns() {
-        return new String[0];
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public <S extends DeepJobConfig> S initialize(ExtractorConfig extractorConfig){
-        return null;
-    }
-
-//    @Override
-    public <S extends DeepJobConfig> S inputColumns(String... columns) {
-        return null;
-    }
-
-//    @Override
-    public <S extends DeepJobConfig> S password(String password) {
-        return null;
-    }
-
-//    @Override
-    public <S extends DeepJobConfig> S username(String username) {
-        return null;
-    }
-
-    public <S extends DeepJobConfig> S initialize(){
-        return null;
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("DeepJobConfig{");
+        sb.append("username='").append(username).append('\'');
+        sb.append(", password='").append(password).append('\'');
+        sb.append(", nameSpace='").append(nameSpace).append('\'');
+        sb.append(", catalog='").append(catalog).append('\'');
+        sb.append(", table='").append(table).append('\'');
+        sb.append(", port=").append(port);
+        sb.append(", host=").append(host);
+        sb.append(", inputColumns=").append(inputColumns == null ? "null" : Arrays.asList(inputColumns).toString());
+        sb.append(", filters=").append(filters == null ? "null" : Arrays.asList(filters).toString());
+        sb.append('}');
+        sb.append(super.toString());
+        return sb.toString();
     }
 }

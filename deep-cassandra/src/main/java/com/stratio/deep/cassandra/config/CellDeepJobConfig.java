@@ -29,7 +29,7 @@ public final class CellDeepJobConfig extends CassandraDeepJobConfig<Cells> {
     private static final long serialVersionUID = -598862509865396541L;
 
     public CellDeepJobConfig() {
-       super(Cells.class);
+        super(Cells.class);
         this.setExtractorImplClass(CassandraCellExtractor.class);
     }
 
@@ -39,11 +39,5 @@ public final class CellDeepJobConfig extends CassandraDeepJobConfig<Cells> {
         this.createTableOnWrite = isWriteConfig;
 
     }
-
-
-
-
-
-
 
 }

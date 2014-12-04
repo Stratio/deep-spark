@@ -16,10 +16,9 @@
 
 package com.stratio.deep.cassandra.thrift;
 
-import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
-import com.stratio.deep.commons.exception.DeepGenericException;
-import com.stratio.deep.commons.rdd.DeepTokenRange;
-import com.stratio.deep.commons.utils.Utils;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.dht.IPartitioner;
@@ -32,9 +31,10 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
+import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.rdd.DeepTokenRange;
+import com.stratio.deep.commons.utils.Utils;
 
 /**
  * Class that provides several token range utilities using Cassandra's Thrift RPC API.
@@ -65,11 +65,11 @@ public class ThriftRangeUtils {
      * @param splitSize    the number of rows per split.
      */
     public ThriftRangeUtils(IPartitioner partitioner,
-                     String host,
-                     int rpcPort,
-                     String keyspace,
-                     String columnFamily,
-                     int splitSize) {
+                            String host,
+                            int rpcPort,
+                            String keyspace,
+                            String columnFamily,
+                            int splitSize) {
         this.host = host;
         this.rpcPort = rpcPort;
         this.splitSize = splitSize;
@@ -159,8 +159,8 @@ public class ThriftRangeUtils {
      */
     public List<DeepTokenRange> getSplits(DeepTokenRange deepTokenRange) {
 
-        String start = tokenAsString(deepTokenRange.getStartToken());
-        String end = tokenAsString(deepTokenRange.getEndToken());
+        String start = tokenAsString((Comparable) deepTokenRange.getStartToken());
+        String end = tokenAsString((Comparable) deepTokenRange.getEndToken());
         List<String> endpoints = deepTokenRange.getReplicas();
 
         for (String endpoint : endpoints) {
