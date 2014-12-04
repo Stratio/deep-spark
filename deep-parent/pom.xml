@@ -28,11 +28,11 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Cassandra -->
-        <cassandra.version>2.1.0</cassandra.version>
-        <datastax.driver.version>2.1.2</datastax.driver.version>
+        <cassandra.version>2.0.11</cassandra.version>
+        <datastax.driver.version>2.1.3</datastax.driver.version>
 
         <!-- Spark  -->
-        <spark.version>1.1.0</spark.version>
+        <spark.version>1.1.1</spark.version>
 
         <!-- Java  -->
         <java.version>1.7</java.version>
@@ -41,7 +41,7 @@
         <hadoop.version>2.4.1</hadoop.version>
 
         <!-- Guava -->
-        <guava.version>15.0</guava.version>
+        <guava.version>14.0.1</guava.version>
 
         <!-- mongodb driver -->
         <mongo.driver.version>2.12.4</mongo.driver.version>

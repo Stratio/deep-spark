@@ -78,7 +78,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
      * Read Preference primaryPreferred is the recommended read preference. If the primary node go down, can still read
      * from secundaries
      */
-    private ReadPreference readPreference = ReadPreference.nearest();
+    private String readPreference = ReadPreference.nearest().getName();
 
     /**
      * OPTIONAL filter query
@@ -297,7 +297,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
      */
     @Override
     public MongoDeepJobConfig<T> readPreference(String readPreference) {
-        this.readPreference = ReadPreference.valueOf(readPreference);
+        this.readPreference = readPreference;
         return this;
     }
 
@@ -680,7 +680,7 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
         return replicaSet;
     }
 
-    public ReadPreference getReadPreference() {
+    public String getReadPreference() {
         return readPreference;
     }
 

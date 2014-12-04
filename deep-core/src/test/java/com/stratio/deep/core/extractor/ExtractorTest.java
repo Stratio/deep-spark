@@ -94,7 +94,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      */
     private Integer port;
 
-    private Integer port2 = 9360;
+    private Integer port2 = 9160;
 
     /**
      * The Database.
