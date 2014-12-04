@@ -14,7 +14,7 @@ We provide two different interfaces:
 
   * The first one will let developers map Cassandra tables to plain old java objects (POJOs), just like if you were using any other ORM. We call this API the 'entity objects' API.
     This abstraction is quite handy, it will let you work on RDD<YourEntityHere> (under the hood Deep will transparently map Cassandra's columns to entity properties).
-    Your domain entities must be correctly annotated using Deep annotations (take a look at deep-examples example entities in package com.stratio.deep.testentity).
+    Your domain entities must be correctly annotated using Deep annotations (take a look at deep-core example entities in package com.stratio.deep.core.entity).
 
   * The second one is a more generic 'cell' API, that will let developerss work on RDD<com.stratio.deep.entity.Cells> where a 'Cells' object is a collection of com.stratio.deep.entity.Cell objects.
     Column metadata is automatically fetched from the data store. This interface is a little bit more cumbersome to work with (see the example below),
@@ -23,7 +23,7 @@ We provide two different interfaces:
     to get the value of column 'address' you can issue a c.getCellByName("address").getCellValue().
     Please, refer to the Deep API documentation to know more about the Cells and Cell objects.
 
-We encourage you to read the more comprehensive documentation hosted on the [Openstratio website](http://docs.openstratio.org/deep/0.3.3/about.html).
+We encourage you to read the more comprehensive documentation hosted on the [Openstratio website](http://www.openstratio.org/).
 
 Deep comes with an example sub project called 'deep-examples' containing a set of working examples, both in Java and Scala.
 Please, refer to the deep-example project README for further information on how to setup a working environment.
@@ -127,40 +127,23 @@ The package will be called ``spark-deep-distribution-X.Y.Z.tgz``, untar it to a 
         4. start spark shell and import the following:
         
 
-        //Commmons
         ``import com.stratio.deep.commons.annotations._``
         ``import com.stratio.deep.commons.config._``
         ``import com.stratio.deep.commons.entity._``
-
-
-        //Core
         ``import com.stratio.deep.core.context._``
-
-        //Cassandra
         ``import com.stratio.deep.cassandra.config._``
         ``import com.stratio.deep.cassandra.extractor._``
-
-
-        //MongoDB
         ``import com.stratio.deep.mongodb.config._``
-        import com.stratio.deep.mongodb.extractor._``
-
-        //ES
+        ``import com.stratio.deep.mongodb.extractor._``
         ``import com.stratio.deep.es.config._``
         ``import com.stratio.deep.es.extractor._``
-
-        //Aerospike
         ``import com.stratio.deep.aerospike.config._``
         ``import com.stratio.deep.aerospike.extractor._``
-
-        //Spark
         ``import org.apache.spark.rdd._``
         ``import org.apache.spark.SparkContext._``
         ``import org.apache.spark.sql.api.java.JavaSQLContext``
         ``import org.apache.spark.sql.api.java.JavaSchemaRDD``
         ``import org.apache.spark.sql.api.java.Row``
-
-        //Scala
         ``import scala.collection.JavaConversions._``
 			
 
