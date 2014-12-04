@@ -58,7 +58,7 @@ Cells:
 
 You can check out our first steps guide here:
 
-http://www.openstratio.org/tutorials/first-steps-with-stratio-deep-and-mongodb/
+[First steps with Deep-MongoDB](https://github.com/Stratio/deep-spark/blob/release/0.6/doc/t20-first-steps-deep-mongodb.md)
 
 
 We are working on further improvements!
