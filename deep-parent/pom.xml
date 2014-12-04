@@ -38,7 +38,7 @@
         <java.version>1.7</java.version>
 
         <!-- Hadoop  -->
-        <hadoop.version>2.4.1</hadoop.version>
+        <hadoop.version>2.4.0</hadoop.version>
 
         <!-- Guava -->
         <guava.version>14.0.1</guava.version>
