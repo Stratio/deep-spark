@@ -11,8 +11,9 @@ import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.core.hdfs.utils.SchemaMap;
+import com.stratio.deep.core.fs.utils.SchemaMap;
 import com.stratio.deep.examples.java.extractorconfig.hdfs.utils.ContextProperties;
+import org.apache.spark.rdd.RDD;
 
 public class AgregationData {
 
@@ -57,10 +58,10 @@ public class AgregationData {
         listSchemaMap.add(new SchemaMap("Single", String.class));
 
         values.put(ExtractorConstants.PORT, "9000");
-        values.put(ExtractorConstants.HDFS_FILE_SEPARATOR, ",");
-        values.put(ExtractorConstants.HDFS_FILE_PATH, "user/hadoop/test/songs.csv");
+        values.put(ExtractorConstants.FS_FILE_SEPARATOR, ",");
+        values.put(ExtractorConstants.FS_FILE_PATH, "user/hadoop/test/songs.csv");
         values.put(ExtractorConstants.HOST, "127.0.0.1");
-        values.put(ExtractorConstants.HDFS_SCHEMA, listSchemaMap);
+        values.put(ExtractorConstants.FS_SCHEMA, listSchemaMap);
         values.put(ExtractorConstants.HDFS_TYPE, ExtractorConstants.HDFS_TYPE);
         values.put(ExtractorConstants.TABLE, tableName);
         values.put(ExtractorConstants.CATALOG, keyspaceName);
@@ -68,7 +69,7 @@ public class AgregationData {
         extractorConfig.setValues(values);
 
         // Creating the RDD
-        JavaRDD<Cells> rdd = deepContext.createHDFSRDD(extractorConfig);
+        RDD<Cells> rdd = deepContext.createHDFSRDD(extractorConfig);
 
         rdd.collect();
         deepContext.stop();

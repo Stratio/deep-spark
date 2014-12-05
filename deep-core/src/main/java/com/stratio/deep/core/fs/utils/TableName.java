@@ -1,4 +1,4 @@
-package com.stratio.deep.core.hdfs.utils;
+package com.stratio.deep.core.fs.utils;
 
 public class TableName {
 

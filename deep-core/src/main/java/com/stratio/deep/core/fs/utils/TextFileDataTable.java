@@ -1,4 +1,4 @@
-package com.stratio.deep.core.hdfs.utils;
+package com.stratio.deep.core.fs.utils;
 
 import java.io.Serializable;
 import java.util.ArrayList;

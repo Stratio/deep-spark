@@ -1,4 +1,4 @@
-package com.stratio.deep.core.hdfs.utils;
+package com.stratio.deep.core.fs.utils;
 
 import java.util.List;
 
@@ -16,17 +16,17 @@ public class MapSchemaFromLines implements Function<String, Cells> {
     private final List<SchemaMap<?>> columns;
 
     /**
-     * Separator in the HDFS FIle
+     * Separator in the FS File
      */
     private String separator;
 
     /**
-     * TableName of the HDFS FIle
+     * TableName of the FS File
      */
     private String tableName;
 
     /**
-     * Catalog of the HDFS FIle
+     * Catalog of the FS File
      */
     private String catalogName;
 
