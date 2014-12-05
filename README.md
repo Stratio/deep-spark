@@ -14,7 +14,7 @@ We provide two different interfaces:
 
   * The first one will let developers map Cassandra tables to plain old java objects (POJOs), just like if you were using any other ORM. We call this API the 'entity objects' API.
     This abstraction is quite handy, it will let you work on RDD<YourEntityHere> (under the hood Deep will transparently map Cassandra's columns to entity properties).
-    Your domain entities must be correctly annotated using Deep annotations (take a look at deep-examples example entities in package com.stratio.deep.testentity).
+    Your domain entities must be correctly annotated using Deep annotations (take a look at deep-core example entities in package com.stratio.deep.core.entity).
 
   * The second one is a more generic 'cell' API, that will let developerss work on RDD<com.stratio.deep.entity.Cells> where a 'Cells' object is a collection of com.stratio.deep.entity.Cell objects.
     Column metadata is automatically fetched from the data store. This interface is a little bit more cumbersome to work with (see the example below),
@@ -23,7 +23,7 @@ We provide two different interfaces:
     to get the value of column 'address' you can issue a c.getCellByName("address").getCellValue().
     Please, refer to the Deep API documentation to know more about the Cells and Cell objects.
 
-We encourage you to read the more comprehensive documentation hosted on the [Openstratio website](http://www.openstratio.org/examples/using-stratio-deep/).
+We encourage you to read the more comprehensive documentation hosted on the [Openstratio website](http://www.openstratio.org/).
 
 Deep comes with an example sub project called 'deep-examples' containing a set of working examples, both in Java and Scala.
 Please, refer to the deep-example project README for further information on how to setup a working environment.
@@ -33,7 +33,7 @@ MongoDB integration
 
 Spark-MongoDB connector is based on Hadoop-mongoDB.
 
-Support for MongoDB has been added in version 0.3.0 and is not yet considered a complete feature.
+Support for MongoDB has been added in version 0.3.0.
 
 We provide two different interfaces:
 
@@ -58,17 +58,45 @@ Cells:
 
 You can check out our first steps guide here:
 
-http://www.openstratio.org/tutorials/first-steps-with-stratio-deep-and-mongodb/
+[First steps with Deep-MongoDB](https://github.com/Stratio/deep-spark/blob/release/0.6/doc/t20-first-steps-deep-mongodb.md)
 
 
 We are working on further improvements!
 
+ElasticSearch integration
+=========================
+
+Support for ElasticSearch has been added in version 0.5.0.
+
+
+Aerospike integration
+=========================
+
+Support for Aerospike has been added in version 0.6.0.
+
+Examples:
+
+Entities:
+
+  * com.stratio.deep.examples.java.ReadingEntityFromAerospike
+  * com.stratio.deep.examples.java.WritingEntityToAerospike
+  * com.stratio.deep.examples.java.GroupingEntityWithAerospike
+
+Cells:
+
+  * com.stratio.deep.examples.java.ReadingCellFromAerospike
+  * com.stratio.deep.examples.java.WritingCellToAerospike
+  * com.stratio.deep.examples.java.GroupingCellWithAerospike
+
+
 Requirements
 ============
 
-  * Cassandra, we tested versions from 1.2.8 up to 2.0.8 (for Spark <=> Cassandra integration).
+  * Cassandra, we tested versions from 1.2.8 up to 2.0.11 (for Spark <=> Cassandra integration).
   * MongoDB, we tested the integration with MongoDB versions 2.2, 2.4 y 2.6 using Standalone, Replica Set and Sharded Cluster (for Spark <=> MongoDB integration).
-  * Spark 1.0.0
+  * ElasticSearch, 1.3.0+
+  * Aerospike, 3.3.0+
+  * Spark 1.1.1
   * Apache Maven >= 3.0.4
   * Java 1.7
   * Scala 2.10.3
@@ -98,11 +126,44 @@ The package will be called ``spark-deep-distribution-X.Y.Z.tgz``, untar it to a 
         3. copy Datastax Java Driver jar (v 2.0.x) to Spark's 'jar' folder.
         4. start spark shell and import the following:
         
-			``import com.stratio.deep.config._``			
-			``import com.stratio.deep.entity._``			
-			``import com.stratio.deep.context._``			
-			``import com.stratideep.rdd._``
+
+      ``import com.stratio.deep.commons.annotations._``
+
+      ``import com.stratio.deep.commons.config._``
+      
+      ``import com.stratio.deep.commons.entity._``
+      
+      ``import com.stratio.deep.core.context._``
+      
+      ``import com.stratio.deep.cassandra.config._``
+      
+      ``import com.stratio.deep.cassandra.extractor._``
+      
+      ``import com.stratio.deep.mongodb.config._``
+      
+      ``import com.stratio.deep.mongodb.extractor._``
+      
+      ``import com.stratio.deep.es.config._``
+      
+      ``import com.stratio.deep.es.extractor._``
+      
+      ``import com.stratio.deep.aerospike.config._``
+      
+      ``import com.stratio.deep.aerospike.extractor._``
+      
+      ``import org.apache.spark.rdd._``
+      
+      ``import org.apache.spark.SparkContext._``
+      
+      ``import org.apache.spark.sql.api.java.JavaSQLContext``
+      
+      ``import org.apache.spark.sql.api.java.JavaSchemaRDD``
+      
+      ``import org.apache.spark.sql.api.java.Row``
+      
+      ``import scala.collection.JavaConversions._``
 			
+      
 
 Once you have a working development environment you can finally start testing Deep. This are the basic steps you will always have to perform in order to use Deep:
 
@@ -112,12 +173,12 @@ First steps with Spark and Cassandra
 * __Build an instance of a configuration object__: this will let you tell Deep the Cassandra endpoint, the keyspace, the table you want to access and much more.
   It will also let you specify which interface to use (the domain entity or the generic interface).
   We have a factory that will help you create a configuration object using a fluent API. Creating a configuration object is an expensive operation.
-  Please take the time to read the java and scala examples provided in 'deep-examples' subproject and to read the comprehensive documentation at [OpenStratio website](http://www.openstratio.org/examples/using-stratio-deep/).
+  Please take the time to read the java and scala examples provided in 'deep-examples' subproject and to read the comprehensive documentation at [OpenStratio website](https://github.com/Stratio/deep-spark/blob/release/0.6/doc/t10-first-steps-deep-cassandra.md).
 * __Create an RDD__: using the DeepSparkContext helper methods and providing the configuration object you've just instantiated.
-* __Perform some computation over this RDD(s)__: this is up to you, we only help you fetching the data efficiently from Cassandra, you can use the powerful [Spark API](https://spark.apache.org/docs/1.0.0/api/java/index.html).
+* __Perform some computation over this RDD(s)__: this is up to you, we only help you fetching the data efficiently from Cassandra, you can use the powerful [Spark API](https://spark.apache.org/docs/1.1.1/api/java/index.html).
 * __(optional) write the computation results out to Cassandra__: we provide a way to efficiently save the result of your computation to Cassandra.
   In order to do that you must have another configuration object where you specify the output keyspace/column family. We can create the output column family for you if needed.
-  Please, refer to the comprehensive Stratio Deep documentation at [Stratio website](http://www.openstratio.org/examples/using-stratio-deep/).
+  Please, refer to the comprehensive Stratio Deep documentation at [Stratio website](https://github.com/Stratio/deep-spark/blob/release/0.6/doc/about.md).
 
 First steps with Spark and MongoDB
 ==================================
@@ -125,9 +186,9 @@ First steps with Spark and MongoDB
 * __Build an instance of a configuration object__: this will let you tell Stratio Deep the MongoDB endpoint, the MongoDB database and collection you want to access and much more.
   It will also let you specify which interface to use (the domain entity).
   We have a factory that will help you create a configuration object using a fluent API. Creating a configuration object is an expensive operation.
-  Please take the time to read the java and scala examples provided in 'deep-examples' subproject and to read the comprehensive Deep documentation at [OpenStratio website](http://www.openstratio.org/examples/using-stratio-deep/).
+  Please take the time to read the java and scala examples provided in 'deep-examples' subproject and to read the comprehensive Deep documentation at [OpenStratio website](https://github.com/Stratio/deep-spark/blob/release/0.6/doc/t20-first-steps-deep-mongodb.md).
 * __Create an RDD__: using the DeepSparkContext helper methods and providing the configuration object you've just instantiated.
-* __Perform some computation over this RDD(s)__: this is up to you, we only help you fetching the data efficiently from MongoDB, you can use the powerful [Spark API](https://spark.apache.org/docs/1.0.0/api/java/index.html).
+* __Perform some computation over this RDD(s)__: this is up to you, we only help you fetching the data efficiently from MongoDB, you can use the powerful [Spark API](https://spark.apache.org/docs/1.1.1/api/java/index.html).
 * __(optional) write the computation results out to MongoDB__: we provide a way to efficiently save the result of your computation to MongoDB.
 
 Migrating from version 0.2.9
@@ -136,7 +197,7 @@ From version 0.4.x, Deep supports multiple datastores, in order to correctly imp
 
 New Project Structure
 ---------------------
-From version 0.4.x, Deep supports multiple datastores, in your project you should import only the maven dependency you will use: deep-cassandra or deep-mongodb.
+From version 0.4.x, Deep supports multiple datastores, in your project you should import only the maven dependency you will use: deep-cassandra, deep-mongodb, deep-elasticsearch or deep-aerospike.
 
 Changes to 'com.stratio.deep.entity.Cells'
 ------------------------------------------
@@ -171,5 +232,5 @@ RDD creation
 ----------------
 Methods used to create Cell and Entity RDD has been merged into one single method:
 
-* __CassandraDeepSparkContext__: cassandraEntityRDD(...) and cassandraGenericRDD(...) has been merged to cassandraRDD(...)
-* __MongoDeepSparkContext__: mongoEntityRDD(...) and mongoCellRDD(...) has been merged to mongoRDD(...)
+* __DeepSparkContext__: createRDD(...)
+
