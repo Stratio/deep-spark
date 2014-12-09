@@ -50,6 +50,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
@@ -200,7 +201,7 @@ public class DeepSparkContextTest {
         RDD<String> rdd = mock(RDD.class);
         JavaRDD<String> javaRdd = mock(JavaRDD.class);
         when(deepSparkContextSpy.sc().textFile(anyString(), anyInt())).thenReturn(rdd);
-
+        doReturn(javaRdd).when(deepSparkContextSpy).textFile(anyString());
         when(rdd.toJavaRDD()).thenReturn(javaRdd);
         when(rdd.toJavaRDD().map(any(Function.class))).thenReturn(singleRdd);
 
@@ -229,6 +230,7 @@ public class DeepSparkContextTest {
         JavaRDD<String> javaRDD = mock(JavaRDD.class);
 
         when(deepSparkContextSpy.sc().textFile(anyString(), anyInt())).thenReturn(rdd);
+        doReturn(javaRDD).when(deepSparkContextSpy).textFile(anyString());
         when(rdd.toJavaRDD()).thenReturn(javaRDD);
         when(rdd.toJavaRDD().map(any(Function.class))).thenReturn(singleRdd);
 
@@ -299,6 +301,7 @@ public class DeepSparkContextTest {
         values.put(ExtractorConstants.PORT, "9000");
         values.put(ExtractorConstants.FS_FILE_SEPARATOR, ",");
         values.put(ExtractorConstants.FS_FILE_PATH, "/user/hadoop/test/songs.csv");
+        values.put(ExtractorConstants.FS_PREFIX, ExtractorConstants.HDFS_PREFIX);
         values.put(ExtractorConstants.HOST, "127.0.0.1");
 
         values.put(ExtractorConstants.HDFS_TYPE, ExtractorConstants.HDFS_TYPE);
@@ -317,6 +320,7 @@ public class DeepSparkContextTest {
         Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.FS_FILE_SEPARATOR, ",");
         values.put(ExtractorConstants.S3_BUCKET, "bucket");
+        values.put(ExtractorConstants.FS_PREFIX, ExtractorConstants.S3_PREFIX);
         values.put(ExtractorConstants.FS_FILE_PATH, "/s3test.csv");
         values.put(ExtractorConstants.S3_TYPE, ExtractorConstants.S3_TYPE);
         values.put(ExtractorConstants.CATALOG, "");

@@ -57,7 +57,7 @@ public class ReadingCellFromS3 {
                 .putValue(ExtractorConstants.S3_BUCKET, "<YOUR S3 BUCKET>")
                 .putValue(ExtractorConstants.FS_SCHEMA, listSchemaMap)
                 .putValue(ExtractorConstants.FS_FILE_PATH, "<YOUR S3 FILE PATH>")
-                .putValue(ExtractorConstants.S3_ACCESS_KEY_ID, "<YOUR S3 ACCESS KEY>")
+                .putValue(ExtractorConstants.S3_ACCESS_KEY_ID, "<YOUR S3 ACCESS KEY ID>")
                 .putValue(ExtractorConstants.S3_SECRET_ACCESS_KEY, "<YOUR S3 SECRET ACCESS KEY>")
                 .putValue(ExtractorConstants.TABLE, tableName)
                 .putValue(ExtractorConstants.CATALOG, keyspaceName);

@@ -185,6 +185,12 @@ public interface ExtractorConstants {
      * The HDFS _ tYPE.
      */
     String HDFS_TYPE  = "hdfsType";
+
+    /**
+     * The FS prefix
+     */
+    String FS_PREFIX = "prefix";
+
     /**
      * The FS _ FileDataTable.
      */

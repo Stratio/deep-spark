@@ -17,6 +17,8 @@ package com.stratio.deep.core.context;
 import java.io.Serializable;
 import java.util.Map;
 
+import com.stratio.deep.core.fs.utils.*;
+import com.stratio.deep.core.fs.utils.UtilFS;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
@@ -32,10 +34,6 @@ import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.commons.utils.CellsUtils;
 import com.stratio.deep.core.function.PrepareSaveFunction;
-import com.stratio.deep.core.fs.utils.MapSchemaFromLines;
-import com.stratio.deep.core.fs.utils.SchemaMap;
-import com.stratio.deep.core.fs.utils.TableName;
-import com.stratio.deep.core.fs.utils.TextFileDataTable;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
 import org.apache.spark.api.java.function.Function;
@@ -135,6 +133,10 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      */
     public <T> RDD<T> createRDD(ExtractorConfig<T> config) {
         return new DeepRDD<>(this.sc(), config);
+    }
+
+    public <T> RDD<T> createRDD(DeepJobConfig<T, ?> deepJobConfig) {
+        return new DeepRDD<>(this.sc(), deepJobConfig);
     }
 
     /**
@@ -258,7 +260,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         Serializable port = config.getValues().get(ExtractorConstants.PORT);
         Serializable path = config.getValues().get(ExtractorConstants.FS_FILE_PATH);
 
-        final TextFileDataTable textFileDataTable = UtilHDFS.createTextFileMetaDataFromConfig(config,this);
+        final TextFileDataTable textFileDataTable = UtilFS.createTextFileMetaDataFromConfig(config, this);
 
         String filePath = path.toString();
         if (config.getExtractorImplClassName().equals(ExtractorConstants.HDFS)) {
@@ -278,7 +280,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         Serializable bucket = config.getValues().get(ExtractorConstants.S3_BUCKET);
         Serializable path = config.getValues().get(ExtractorConstants.FS_FILE_PATH);
 
-        final TextFileDataTable textFileDataTable = createTextFileMetaDataFromConfig(config);
+        final TextFileDataTable textFileDataTable = UtilFS.createTextFileMetaDataFromConfig(config, this);
 
         String filePath = path.toString();
         if (config.getExtractorImplClassName().equals(ExtractorConstants.S3)) {
@@ -297,29 +299,6 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         return resultCells.rdd();
     }
 
-    private TextFileDataTable createTextFileMetaDataFromConfig(ExtractorConfig<Cells> extractorConfig) {
 
-        if (extractorConfig.getValues().get(ExtractorConstants.FS_FILEDATATABLE) != null) {
-            final TextFileDataTable textFileDataTable = (TextFileDataTable) extractorConfig.getValues()
-                    .get(ExtractorConstants.FS_FILEDATATABLE);
-
-            return textFileDataTable;
-        } else {
-
-            Serializable separator = extractorConfig.getValues().get(ExtractorConstants.FS_FILE_SEPARATOR);
-            String catalogName = (String) extractorConfig.getValues().get(ExtractorConstants.CATALOG);
-            String tableName = (String) extractorConfig.getValues().get(ExtractorConstants.TABLE);
-
-            final String splitSep = separator.toString();
-            final ArrayList<SchemaMap<?>> columns = (ArrayList<SchemaMap<?>>) extractorConfig.getValues().get
-                    (ExtractorConstants.FS_SCHEMA);
-
-            final TextFileDataTable textFileDataTableTemp = new TextFileDataTable(new TableName(catalogName, tableName),
-                    columns);
-            textFileDataTableTemp.setLineSeparator(splitSep);
-            return textFileDataTableTemp;
-        }
-
-    }
 
 }
