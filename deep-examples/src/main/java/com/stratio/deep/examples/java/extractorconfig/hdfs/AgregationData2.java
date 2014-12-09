@@ -11,11 +11,10 @@ import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.core.fs.utils.SchemaMap;
 import com.stratio.deep.examples.java.extractorconfig.hdfs.utils.ContextProperties;
 import org.apache.spark.rdd.RDD;
 
-public class AgregationData {
+public class AgregationData2 {
 
     /**
      * Application entry point.
@@ -35,9 +34,10 @@ public class AgregationData {
         String job = "java:aggregatingDataHDFS";
 
         final String keyspaceName = "test";
-        final String tableName = "songs";
+        final String tableName    = "songs";
         String home = System.getProperty("hadoop.home.dir");
-        final String splitSep = ",";
+        final String  splitSep = ",";
+
 
         // fall back to the system/user-global env variable
 
@@ -49,29 +49,23 @@ public class AgregationData {
 
         Map<String, Serializable> values = new HashMap<>();
 
-        ArrayList<SchemaMap> listSchemaMap = new ArrayList<>();
-        listSchemaMap.add(new SchemaMap("id", String.class));
-        listSchemaMap.add(new SchemaMap("author", String.class));
-        listSchemaMap.add(new SchemaMap("Title", String.class));
-        listSchemaMap.add(new SchemaMap("Year", Integer.class));
-        listSchemaMap.add(new SchemaMap("Length", Integer.class));
-        listSchemaMap.add(new SchemaMap("Single", String.class));
-
-        values.put(ExtractorConstants.PORT, "9000");
-        values.put(ExtractorConstants.FS_FILE_SEPARATOR, ",");
-        values.put(ExtractorConstants.FS_FILE_PATH, "user/hadoop/test/songs.csv");
         values.put(ExtractorConstants.HOST, "127.0.0.1");
-        values.put(ExtractorConstants.FS_SCHEMA, listSchemaMap);
-        values.put(ExtractorConstants.HDFS_TYPE, ExtractorConstants.HDFS_TYPE);
-        values.put(ExtractorConstants.TABLE, tableName);
-        values.put(ExtractorConstants.CATALOG, keyspaceName);
+        values.put(ExtractorConstants.PORT, "9000");
+
+        values.put(ExtractorConstants.FS_FILE_SEPARATOR, ",");
+        values.put(ExtractorConstants.FS_FILE_PATH, "/user/hadoop/test/songs.csv");
+
+        values.put(ExtractorConstants.HDFS_TYPE,ExtractorConstants.HDFS_TYPE);
+        values.put(ExtractorConstants.TABLE,tableName);
+        values.put(ExtractorConstants.CATALOG,keyspaceName);
 
         extractorConfig.setValues(values);
+        extractorConfig.setExtractorImplClassName(ExtractorConstants.HDFS);
 
-        // Creating the RDD
-        RDD<Cells> rdd = deepContext.createHDFSRDD(extractorConfig);
+        RDD<Cells> rdd2 = deepContext.createHDFSRDD(extractorConfig);
 
-        rdd.collect();
         deepContext.stop();
     }
+
+
 }

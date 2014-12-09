@@ -19,6 +19,9 @@ public class TextFileDataTable<T> implements Serializable {
         this.lineSeparator = lineSeparator;
     }
 
+    public TextFileDataTable() {
+    }
+
     public TextFileDataTable(TableName tableName, ArrayList<SchemaMap<T>> columnMap) {
         this.tableName = tableName;
         this.columnMap = columnMap;

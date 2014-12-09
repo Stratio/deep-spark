@@ -15,7 +15,6 @@
 package com.stratio.deep.core.context;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
@@ -136,10 +135,6 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      */
     public <T> RDD<T> createRDD(ExtractorConfig<T> config) {
         return new DeepRDD<>(this.sc(), config);
-    }
-
-    public <T> RDD<T> createRDD(DeepJobConfig<T, ?> deepJobConfig) {
-        return new DeepRDD<>(this.sc(), deepJobConfig);
     }
 
     /**
@@ -263,7 +258,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         Serializable port = config.getValues().get(ExtractorConstants.PORT);
         Serializable path = config.getValues().get(ExtractorConstants.FS_FILE_PATH);
 
-        final TextFileDataTable textFileDataTable = createTextFileMetaDataFromConfig(config);
+        final TextFileDataTable textFileDataTable = UtilHDFS.createTextFileMetaDataFromConfig(config,this);
 
         String filePath = path.toString();
         if (config.getExtractorImplClassName().equals(ExtractorConstants.HDFS)) {
