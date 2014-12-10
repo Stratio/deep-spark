@@ -28,7 +28,7 @@
     <parent>
         <groupId>com.stratio.deep</groupId>
         <artifactId>deep-parent</artifactId>
-        <version>0.6.1</version>
+        <version>0.6.2</version>
         <relativePath>../deep-parent</relativePath>
     </parent>
 
@@ -79,6 +79,7 @@
             <groupId>com.stratio.deep</groupId>
             <artifactId>deep-core</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
             <type>test-jar</type>
         </dependency>
         <dependency>
