@@ -147,6 +147,7 @@
                 <module>../deep-elasticsearch</module>
                 <module>../deep-examples</module>
                 <module>../deep-aerospike</module>
+                <module>../deep-jdbc</module>
             </modules>
         </profile>
         <profile>
@@ -159,6 +160,7 @@
                 <module>../deep-elasticsearch</module>
                 <module>../deep-examples</module>
                 <module>../deep-aerospike</module>
+                <module>../deep-jdbc</module>
             </modules>
         </profile>
         <profile>
@@ -254,6 +256,7 @@
         <module>../deep-elasticsearch</module>
         <module>../deep-examples</module>
         <module>../deep-aerospike</module>
+        <module>../deep-jdbc</module>
     </modules>
 
 
