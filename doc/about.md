@@ -1,6 +1,6 @@
----
-title: About Stratio Deep
----
+About Stratio Deep
+=================
+
 
 Stratio Deep is one of the core modules on which the Stratio platform is based. It’s a thin integration layer between 
 [Apache Spark](http://spark.apache.org "Apache Spark project website") and 
@@ -16,7 +16,7 @@ Table of Contents
 Introduction
 ============
 
-Stratio Deep is the module in charge of the integration between [Apache Spark](http://spark.apache.org "Apache Spark project website") and several data stores. We currently support [Apache Cassandra](http://cassandra.apache.org "Cassandra project website"), [MongoDB](http://www.mongodb.org/ "MongoDB website") and [Elasticsearch](http://www.elasticsearch.org/ "Elasticsearch website") and we are working on adding others soon. Deep is completely open source so we encourage you to develop your own connectors for your data store.
+Stratio Deep is the module in charge of the integration between [Apache Spark](http://spark.apache.org "Apache Spark project website") and several data stores. We currently support [Apache Cassandra](http://cassandra.apache.org "Cassandra project website"), [MongoDB](http://www.mongodb.org/ "MongoDB website"), [Elasticsearch](http://www.elasticsearch.org/ "Elasticsearch website") and [Aerospike](http://www.aerospike.com/ "Aerospike website") and we are working on adding others soon. Deep is completely open source so we encourage you to develop your own connectors for your data store.
 
 By using Deep you can create Spark RDDs mapped to the data store tables or equivalents and write them back to your data store. Once you have created an RDD you can use all the transformations and actions supported by Spark to process and explore your data in depth. For instance, you can do a join between Cassandra and MongoDB, a group by in MongoDB, a join in Cassandra, map-reduce operations, etc.. You can check the Spark programming guide for further details.
 
@@ -25,7 +25,7 @@ Deep comes with a Java and Scala API for developers and an interactive shell all
 Features
 ========
 
--   Cassandra, MongoDB and Elasticsearch currenly supported
+-   Cassandra, MongoDB, Elasticsearch and Aerospike currenly supported
 -   Creates Spark Resilient Distributed Datasets (RDD) from your data store tables.
 -   Efficiently writes large RDDs out to your data store table. Will create automatically missing output tables.
 -   Ensures that data locality is respected: data is not shuffled to other machines unless strictly needed.
