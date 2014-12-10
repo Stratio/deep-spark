@@ -25,29 +25,32 @@ To get an operating virtual machine with Stratio Deep distribution up and runnin
 Running the sandbox
 ===================
 
-Initialize the current directory from the command line **`vagrant init stratio/deep-spark`**.
+Initialize the current directory from the command line: **`vagrant init stratio/deep-spark`**.
+Start the sandbox from command line: **` vagrant up `**
 
-To facilitate the reading of the document , we will refer to this directory as /install-folder.
+Please, be patient the first time it runs!!
 
-Please, be patient the first time it runs.
+Login into the sandbox as root user and start the services:
+Start Spark and Stratio Deep: **` service spark start `**
+Start Cassandra: **` service cassandra start `**
 
 
 What you will find in the sandbox
 =================================
 
 -    OS: CentOS 6.5
--    3GB RAM - 2 CPU
+-    6GB RAM - 2 CPU
 -    Two ethernet interfaces.
 
-Name|Version|Service name|Other
+Name | Version | Service name | Other
 
-Spark | 1.1.1 | spark | service spark start
+Spark | 1.1.0 | spark | service spark start
 
-Stratio Deep| 0.6 | |service streaming start
+Stratio Deep| 0.6 | | service streaming start
 
-Stratio Cassandra|2.1.05|cassandra|service cassandra start
+Stratio Cassandra | 2.1.05 | cassandra | service cassandra start
 
-Mongodb|2.6.5|mongod|service mongod start
+Mongodb | 2.6.5 | mongod| service mongod start
 
 Access to the sandbox and other useful commands
 ===============================================
