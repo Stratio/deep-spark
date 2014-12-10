@@ -25,14 +25,14 @@ To get an operating virtual machine with Stratio Deep distribution up and runnin
 Running the sandbox
 ===================
 
-Initialize the current directory from the command line: **`vagrant init stratio/deep-spark`**.
-Start the sandbox from command line: **` vagrant up `**
+-    Initialize the current directory from the command line: **`vagrant init stratio/deep-spark`**.
+-    Start the sandbox from command line: **` vagrant up `**
 
 Please, be patient the first time it runs!!
 
 Login into the sandbox as root user and start the services:
-Start Spark and Stratio Deep: **` service spark start `**
-Start Cassandra: **` service cassandra start `**
+-    Start Spark and Stratio Deep: **` service spark start `**
+-    Start Cassandra: **` service cassandra start `**
 
 
 What you will find in the sandbox
