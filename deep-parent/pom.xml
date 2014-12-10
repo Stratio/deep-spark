@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.stratio.deep</groupId>
     <artifactId>deep-parent</artifactId>
-    <version>0.6.1</version>
+    <version>0.6.2</version>
     <packaging>pom</packaging>
     <url>http://www.stratio.com</url>
     <name>deep parent</name>
@@ -38,7 +38,7 @@
         <java.version>1.7</java.version>
 
         <!-- Hadoop  -->
-        <hadoop.version>2.4.1</hadoop.version>
+        <hadoop.version>2.4.0</hadoop.version>
 
         <!-- Guava -->
         <guava.version>14.0.1</guava.version>
