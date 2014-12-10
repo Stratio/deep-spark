@@ -31,7 +31,6 @@ To facilitate the reading of the document , we will refer to this directory as /
 
 Please, be patient the first time it runs.
 
-![Vagrant console initialization](images/vagrant-shell.png)
 
 What you will find in the sandbox
 =================================
@@ -41,9 +40,13 @@ What you will find in the sandbox
 -    Two ethernet interfaces.
 
 Name|Version|Service name|Other
+
 Spark | 1.1.1 | spark | service spark start
+
 Stratio Deep| 0.6 | |service streaming start
+
 Stratio Cassandra|2.1.05|cassandra|service cassandra start
+
 Mongodb|2.6.5|mongod|service mongod start
 
 Access to the sandbox and other useful commands
