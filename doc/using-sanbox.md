@@ -11,12 +11,12 @@ Table of Contents
 -   [Access to the sandbox and other useful commands](#access-to-the-sandbox-and-other-useful-commands)
 -   [Starting the Stratio Deep Shell and other useful commands](#starting-the-stratio-deep-shell-and-other-useful-commands)
 -   [F.A.Q about the sandbox](#faq-about-the-sandbox)
--   [Stratio Deep demos](#stratio-deep-demos)
+
 
 Vagrant Setup
 =============
 
-To get an operating virtual machine with stratio streaming distribution up and running, we use [Vagrant](https://www.vagrantup.com/).
+To get an operating virtual machine with Stratio Deep distribution up and running, we use [Vagrant](https://www.vagrantup.com/).
 
 -    Download and install [Vagrant](https://www.vagrantup.com/downloads.html). 
 -    Download and install [VirtualBox](https://www.virtualbox.org/wiki/Downloads). 
@@ -25,7 +25,7 @@ To get an operating virtual machine with stratio streaming distribution up and r
 Running the sandbox
 ===================
 
-Create any system folder and using the command line, type **`vagrant init stratio/deep-spark`**.
+Initialize the current directory from the command line **`vagrant init stratio/deep-spark`**.
 
 To facilitate the reading of the document , we will refer to this directory as /install-folder.
 
