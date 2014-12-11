@@ -27,7 +27,6 @@ public class UtilJdbc {
     public static <T> T getObjectFromRow(Class<T> classEntity, Map<String, Object> row, DeepJobConfig<T, JdbcDeepJobConfig<T>> config) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         T t = classEntity.newInstance();
         Field[] fields = AnnotationUtils.filterDeepFields(classEntity);
-        Object insert = null;
         for (Field field : fields) {
             Object currentRow = null;
             Method method = null;
@@ -38,13 +37,13 @@ public class UtilJdbc {
                 currentRow = row.get(AnnotationUtils.deepFieldName(field));
 
                 if (currentRow != null) {
-                    method.invoke(t, insert);
+                    method.invoke(t, currentRow);
                 }
             } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
                 LOG.error("impossible to create a java object from column:" + field.getName() + " and type:"
                         + field.getType() + " and value:" + t + "; recordReceived:" + currentRow);
 
-                method.invoke(t, Utils.castNumberType(insert, classField.newInstance()));
+                method.invoke(t, Utils.castNumberType(currentRow, classField.newInstance()));
             }
         }
         return t;

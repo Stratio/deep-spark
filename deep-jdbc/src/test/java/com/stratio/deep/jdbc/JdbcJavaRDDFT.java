@@ -45,6 +45,8 @@ public class JdbcJavaRDDFT {
 
     public static final String OUTPUT_CELLS_TABLE = "outputcells";
 
+    public static final String OUTPUT_ENTITY_TABLE = "outputentity";
+
     public static final String SET_NAME_BOOK = "bookinput";
 
     @BeforeSuite
@@ -88,10 +90,14 @@ public class JdbcJavaRDDFT {
             LOG.error("Problem while creating database " + NAMESPACE_ENTITY + " (maybe is it already created?)", e);
         }
         try {
-            conn.setCatalog(NAMESPACE_ENTITY);
-            stmnt.executeUpdate("CREATE TABLE " + NAMESPACE_ENTITY + "." + INPUT_TABLE + "(id VARCHAR(255) NOT NULL, message VARCHAR(255), number INTEGER, PRIMARY KEY (id))");
+            stmnt.executeUpdate("CREATE TABLE " + NAMESPACE_ENTITY + "." + INPUT_TABLE + "(id VARCHAR(255) NOT NULL, message VARCHAR(255), number BIGINT, PRIMARY KEY (id))");
         } catch(SQLException e) {
             LOG.error("Problem while creating table " + INPUT_TABLE + " (maybe is it already created?)", e);
+        }
+        try {
+            stmnt.executeUpdate("CREATE TABLE " + NAMESPACE_ENTITY + "." + OUTPUT_ENTITY_TABLE + "(id VARCHAR(255) NOT NULL, message VARCHAR(255), number BIGINT, PRIMARY KEY (id))");
+        } catch(SQLException e) {
+            LOG.error("Problem while creating table " + OUTPUT_ENTITY_TABLE + " (maybe is it already created?)", e);
         }
         conn.close();
     }
@@ -106,6 +112,11 @@ public class JdbcJavaRDDFT {
             statement.executeUpdate("DELETE FROM " + OUTPUT_CELLS_TABLE);
         } catch(SQLException e) {
             LOG.error("Error deleting table " + OUTPUT_CELLS_TABLE + ", does the table exist?");
+        }
+        try {
+            statement.executeUpdate("DELETE FROM " + OUTPUT_ENTITY_TABLE);
+        } catch(SQLException e) {
+            LOG.error("Error deleting table " + OUTPUT_ENTITY_TABLE + ", does the table exist?");
         }
         try {
             statement.executeUpdate("DELETE FROM " + SET_NAME_BOOK);
