@@ -43,16 +43,16 @@ public interface IJdbcDeepJobConfig<T> {
 
     String getPassword();
 
-    IJdbcDeepJobConfig fieldNames(String [] fields);
+    IJdbcDeepJobConfig upperBound(int upperBound);
 
-    String[] getFieldNames();
+    int getUpperBound();
 
-    IJdbcDeepJobConfig orderBy(String orderBy);
+    IJdbcDeepJobConfig lowerBound(int lowerBound);
 
-    String getOrderBy();
+    int getLowerBound();
 
-    IJdbcDeepJobConfig filterQuery(String filterQuery);
+    IJdbcDeepJobConfig numPartitions(int numPartitions);
 
-    String getFilterQuery();
+    int getNumPartitions();
 
 }

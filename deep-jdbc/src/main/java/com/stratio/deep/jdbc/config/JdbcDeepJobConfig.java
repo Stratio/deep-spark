@@ -28,10 +28,7 @@ import org.apache.hadoop.mapred.lib.db.DBConfiguration;
 import java.io.Serializable;
 import java.util.Map;
 
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.FILTER_QUERY;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.CATALOG;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.TABLE;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.FILTER_FIELD;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.*;
 
 /**
  * Configuration class for Jdbc-Spark integration
@@ -55,11 +52,11 @@ public class JdbcDeepJobConfig<T> extends HadoopConfig<T, JdbcDeepJobConfig<T>> 
 
     private String query;
 
-    private String orderBy;
+    private int upperBound;
 
-    private String [] fieldNames;
+    private int lowerBound;
 
-    private String filterQuery;
+    private int numPartitions;
 
 
     /**
@@ -109,8 +106,8 @@ public class JdbcDeepJobConfig<T> extends HadoopConfig<T, JdbcDeepJobConfig<T>> 
 
     public String getJdbcUrl() {
         StringBuilder sb = new StringBuilder();
-        sb.append("jdbc://");
-        sb.append(host);
+        sb.append("jdbc:mysql://");
+        sb.append(host.get(0));
         sb.append(":");
         sb.append(port);
         sb.append("/");
@@ -152,60 +149,41 @@ public class JdbcDeepJobConfig<T> extends HadoopConfig<T, JdbcDeepJobConfig<T>> 
     }
 
     @Override
-    public JdbcDeepJobConfig fieldNames(String [] fields) {
-        this.fieldNames = fields;
+    public JdbcDeepJobConfig upperBound(int upperBound) {
+        this.upperBound = upperBound;
         return this;
     }
 
     @Override
-    public String[] getFieldNames() {
-        return this.fieldNames;
+    public int getUpperBound() {
+        return this.upperBound;
     }
 
     @Override
-    public JdbcDeepJobConfig orderBy(String orderBy) {
-        this.orderBy = orderBy;
+    public JdbcDeepJobConfig lowerBound(int lowerBound) {
+        this.lowerBound = lowerBound;
         return this;
     }
 
     @Override
-    public String getOrderBy() {
-        return this.orderBy;
+    public int getLowerBound() {
+        return this.lowerBound;
     }
 
     @Override
-    public JdbcDeepJobConfig filterQuery(String filterQuery) {
-        this.filterQuery = filterQuery;
+    public JdbcDeepJobConfig numPartitions(int numPartitions) {
+        this.numPartitions = numPartitions;
         return this;
     }
 
     @Override
-    public String getFilterQuery() {
-        return this.filterQuery;
+    public int getNumPartitions() {
+        return this.numPartitions;
     }
 
     @Override
     public JdbcDeepJobConfig<T> initialize() throws IllegalStateException {
         validate();
-        configHadoop = new Configuration();
-        DBConfiguration.configureDB(configHadoop,
-                                    driverClass,
-                                    getJdbcUrl(),
-                                    username,
-                                    password);
-        configHadoop.set(DBConfiguration.INPUT_TABLE_NAME_PROPERTY, table);
-        configHadoop.set(DBConfiguration.INPUT_QUERY, query);
-        configHadoop.set(DBConfiguration.OUTPUT_TABLE_NAME_PROPERTY, table);
-        if(fieldNames != null) {
-            configHadoop.set(DBConfiguration.INPUT_FIELD_NAMES_PROPERTY, fieldNames.toString());
-            configHadoop.set(DBConfiguration.OUTPUT_FIELD_NAMES_PROPERTY, fieldNames.toString());
-        }
-        if(!orderBy.isEmpty()) {
-            configHadoop.set(DBConfiguration.INPUT_ORDER_BY_PROPERTY, orderBy);
-        }
-        if(!filterQuery.isEmpty()) {
-            configHadoop.set(DBConfiguration.INPUT_CONDITIONS_PROPERTY, filterQuery);
-        }
         return this;
     }
 
@@ -249,31 +227,24 @@ public class JdbcDeepJobConfig<T> extends HadoopConfig<T, JdbcDeepJobConfig<T>> 
             table(extractorConfig.getString(TABLE));
         }
 
-        if (values.get(FILTER_QUERY) != null) {
-            filterQuery(extractorConfig.getFilterArray(FILTER_QUERY));
+        if (values.get(JDBC_DRIVER_CLASS) != null) {
+            driverClass(extractorConfig.getString(JDBC_DRIVER_CLASS));
         }
+
+        if (values.get(USERNAME) != null) {
+            username(extractorConfig.getString(USERNAME));
+        }
+
+        if (values.get(PASSWORD) != null) {
+            password(extractorConfig.getString(PASSWORD));
+        }
+
 
         this.initialize();
 
         return this;
     }
 
-    private JdbcDeepJobConfig<T> filterQuery(Filter[] filters) {
-        StringBuilder sb = new StringBuilder();
-        if (filters.length > 0) {
-            for(int i=0; i<filters.length; i++) {
-                Filter filter = filters[i];
-                sb.append(filter.getField());
-                sb.append(getSqlOperatorFromFilter(filter));
-                sb.append(filter.getValue());
-                if(i < (filters.length - 1)) {
-                    sb.append(" AND ");
-                }
-            }
-        }
-        filterQuery(sb.toString());
-        return this;
-    }
 
     private String getSqlOperatorFromFilter(Filter filter) {
         FilterType type = filter.getFilterType();

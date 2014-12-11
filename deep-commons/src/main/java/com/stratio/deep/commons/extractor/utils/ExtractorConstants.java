@@ -71,6 +71,10 @@ public interface ExtractorConstants {
      */
     String SESSION = "session";
     /**
+     * JDBC driver class name.
+     */
+    String JDBC_DRIVER_CLASS = "driverClass";
+    /**
      * The PORT 2.
      */
     String PORT2 = "port2";
