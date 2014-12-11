@@ -15,6 +15,7 @@
  */
 package com.stratio.deep.jdbc.config;
 
+import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.config.HadoopConfig;
 import com.stratio.deep.commons.entity.Cells;
@@ -35,20 +36,12 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.*;
  *
  * @param <T>
  */
-public class JdbcDeepJobConfig<T> extends HadoopConfig<T, JdbcDeepJobConfig<T>>  implements
-        IJdbcDeepJobConfig<T>, Serializable {
+public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>> implements
+        IJdbcDeepJobConfig<T, JdbcDeepJobConfig<T>>, Serializable {
 
     private static final long serialVersionUID = -6487437723098215934L;
 
     private String driverClass;
-
-    private String database;
-
-    private String table;
-
-    private String username;
-
-    private String password;
 
     private String query;
 
@@ -82,37 +75,36 @@ public class JdbcDeepJobConfig<T> extends HadoopConfig<T, JdbcDeepJobConfig<T>> 
         return this.driverClass;
     }
 
-    @Override
-    public JdbcDeepJobConfig database(String database) {
-        this.database = database;
-        return this;
-    }
-
-    @Override
-    public String getDatabase() {
-        return this.database;
-    }
-
-    @Override
-    public String getTable() {
-        return this.table;
-    }
-
-    @Override
-    public JdbcDeepJobConfig table(String table) {
-        this.table = table;
-        return this;
-    }
 
     public String getJdbcUrl() {
         StringBuilder sb = new StringBuilder();
-        sb.append("jdbc:mysql://");
+        sb.append("jdbc:");
+        sb.append(getJdbcProvider());
+        sb.append("://");
         sb.append(host.get(0));
         sb.append(":");
         sb.append(port);
         sb.append("/");
         sb.append(catalog);
+        sb.append("?");
         return sb.toString();
+    }
+
+    private String getJdbcProvider(){
+        int firstIndex = driverClass.indexOf(".");
+        int secondIndex = driverClass.indexOf(".", ++firstIndex);
+        return driverClass.substring(firstIndex, secondIndex);
+    }
+
+    @Override
+    public JdbcDeepJobConfig database(String database) {
+        this.catalog = database;
+        return this;
+    }
+
+    @Override
+    public String getDatabase() {
+        return catalog;
     }
 
     @Override
@@ -124,28 +116,6 @@ public class JdbcDeepJobConfig<T> extends HadoopConfig<T, JdbcDeepJobConfig<T>> 
     @Override
     public String getQuery() {
         return this.query;
-    }
-
-    @Override
-    public JdbcDeepJobConfig<T> username(String username) {
-        this.username = username;
-        return this;
-    }
-
-    @Override
-    public String getUsername() {
-        return this.username;
-    }
-
-    @Override
-    public JdbcDeepJobConfig<T> password(String password) {
-        this.password = password;
-        return this;
-    }
-
-    @Override
-    public String getPassword() {
-        return this.password;
     }
 
     @Override
@@ -206,37 +176,13 @@ public class JdbcDeepJobConfig<T> extends HadoopConfig<T, JdbcDeepJobConfig<T>> 
     }
 
     @Override
-    public Configuration getHadoopConfiguration() {
-        if (configHadoop == null) {
-            initialize();
-        }
-        return configHadoop;
-    }
-
-    @Override
     public JdbcDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
         super.initialize(extractorConfig);
 
         Map<String, Serializable> values = extractorConfig.getValues();
 
-        if (values.get(CATALOG) != null) {
-            catalog(extractorConfig.getString(CATALOG));
-        }
-
-        if (values.get(TABLE) != null) {
-            table(extractorConfig.getString(TABLE));
-        }
-
         if (values.get(JDBC_DRIVER_CLASS) != null) {
             driverClass(extractorConfig.getString(JDBC_DRIVER_CLASS));
-        }
-
-        if (values.get(USERNAME) != null) {
-            username(extractorConfig.getString(USERNAME));
-        }
-
-        if (values.get(PASSWORD) != null) {
-            password(extractorConfig.getString(PASSWORD));
         }
 
         if (values.get(JDBC_QUERY) != null) {

@@ -21,37 +21,26 @@ package com.stratio.deep.jdbc.config;
  *
  * @param <T>
  */
-public interface IJdbcDeepJobConfig<T> {
+public interface IJdbcDeepJobConfig<T, S extends IJdbcDeepJobConfig> {
 
-    IJdbcDeepJobConfig database(String database);
+    S database(String database);
 
     String getDatabase();
 
-    IJdbcDeepJobConfig table(String table);
-
-    String getTable();
-
-    IJdbcDeepJobConfig query(String query);
+    S query(String query);
 
     String getQuery();
 
-    IJdbcDeepJobConfig username(String username);
 
-    String getUsername();
-
-    IJdbcDeepJobConfig password(String password);
-
-    String getPassword();
-
-    IJdbcDeepJobConfig upperBound(int upperBound);
+    S upperBound(int upperBound);
 
     int getUpperBound();
 
-    IJdbcDeepJobConfig lowerBound(int lowerBound);
+    S lowerBound(int lowerBound);
 
     int getLowerBound();
 
-    IJdbcDeepJobConfig numPartitions(int numPartitions);
+    S numPartitions(int numPartitions);
 
     int getNumPartitions();
 

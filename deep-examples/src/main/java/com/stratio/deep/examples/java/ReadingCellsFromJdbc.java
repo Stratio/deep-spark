@@ -38,11 +38,13 @@ public class ReadingCellsFromJdbc {
                 p.getJars());
 
         JdbcDeepJobConfig inputConfigCell = JdbcConfigFactory.createJdbc().host(host).port(port)
-                .database(schema)
                 .table(table)
                 .username("root")
-                .password("root")
-                .query("select * from employee");
+                .password("")
+                .driverClass("com.mysql.jdbc.Driver")
+                .query("select * from employee")
+                .database(schema)
+                ;
 
         RDD inputRDDCell = deepContext.createRDD(inputConfigCell);
 
