@@ -94,8 +94,7 @@ public class UtilFS {
             String port  = extractorConfig.getString(ExtractorConstants.PORT);
             String path  = extractorConfig.getString(ExtractorConstants.FS_FILE_PATH);
             path = path.substring(0, path.lastIndexOf("/"));
-            return extractorConfig.getString(ExtractorConstants.FS_PREFIX)
-                    + host.toString() + ":" + port  + path.toString() + "/" + METADATA_FILE;
+            return ExtractorConstants.HDFS_PREFIX + host.toString() + ":" + port  + path.toString() + "/" + METADATA_FILE;
         } else if(ExtractorConstants.S3.equals(extractorConfig.getExtractorImplClassName())) {
             String bucket = extractorConfig.getString(ExtractorConstants.S3_BUCKET);
             String path = extractorConfig.getString(ExtractorConstants.FS_FILE_PATH);
