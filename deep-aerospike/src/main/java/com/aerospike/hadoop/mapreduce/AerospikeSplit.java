@@ -22,12 +22,13 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
 
 public class AerospikeSplit
-        extends InputSplit
-        implements org.apache.hadoop.mapred.InputSplit {
+    extends InputSplit
+    implements org.apache.hadoop.mapred.InputSplit {
 
     private String type;
     private String node;
@@ -35,6 +36,7 @@ public class AerospikeSplit
     private int port;
     private String namespace;
     private String setName;
+    private String[] binNames;
     private String numrangeBin;
     private long numrangeBegin;
     private long numrangeEnd;
@@ -43,14 +45,16 @@ public class AerospikeSplit
     }
 
     public AerospikeSplit(String type, String node, String host, int port,
-                          String ns, String setName, String numrangeBin,
-                          long numrangeBegin, long numrangeEnd) {
+                          String ns, String setName, String[] binNames,
+                          String numrangeBin, long numrangeBegin,
+                          long numrangeEnd) {
         this.type = type;
         this.node = node;
         this.host = host;
         this.port = port;
         this.namespace = ns;
         this.setName = setName;
+        this.binNames = binNames;
         this.numrangeBin = numrangeBin;
         this.numrangeBegin = numrangeBegin;
         this.numrangeEnd = numrangeEnd;
@@ -80,6 +84,10 @@ public class AerospikeSplit
         return setName;
     }
 
+    public String[] getBinNames() {
+        return binNames;
+    }
+
     public String getNumRangeBin() {
         return numrangeBin;
     }
@@ -98,7 +106,7 @@ public class AerospikeSplit
 
     public String toString() {
         return type + ':' + node + ":" + host + ":" + port + ":"
-                + namespace + ":" + setName;
+            + namespace + ":" + setName;
     }
 
     public void write(DataOutput out) throws IOException {
@@ -108,6 +116,13 @@ public class AerospikeSplit
         out.writeInt(port);
         Text.writeString(out, namespace);
         Text.writeString(out, setName);
+        if (binNames == null) {
+            out.writeInt(0);
+        } else {
+            out.writeInt(binNames.length);
+            for (String binName : binNames)
+                Text.writeString(out, binName);
+        }
         Text.writeString(out, numrangeBin);
         out.writeLong(numrangeBegin);
         out.writeLong(numrangeEnd);
@@ -120,13 +135,21 @@ public class AerospikeSplit
         port = in.readInt();
         namespace = new String(Text.readString(in));
         setName = new String(Text.readString(in));
+        int nBinNames = in.readInt();
+        if (nBinNames == 0) {
+            binNames = null;
+        } else {
+            binNames = new String[nBinNames];
+            for (int ii = 0; ii < nBinNames; ++ii)
+                binNames[ii] = new String(Text.readString(in));
+        }
         numrangeBin = new String(Text.readString(in));
         numrangeBegin = in.readLong();
         numrangeEnd = in.readLong();
     }
 
     public String[] getLocations() throws IOException {
-        return new String[] { host };
+        return new String[]{ host };
     }
 }
 

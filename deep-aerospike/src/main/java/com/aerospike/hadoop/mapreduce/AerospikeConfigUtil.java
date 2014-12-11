@@ -20,6 +20,7 @@ package com.aerospike.hadoop.mapreduce;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.apache.hadoop.conf.Configuration;
 
 public class AerospikeConfigUtil {
@@ -33,6 +34,8 @@ public class AerospikeConfigUtil {
     public static final int DEFAULT_INPUT_PORT = 3000;
     public static final String INPUT_NAMESPACE = "aerospike.input.namespace";
     public static final String INPUT_SETNAME = "aerospike.input.setname";
+    public static final String INPUT_BINNAMES = "aerospike.input.binnames";
+    public static final String DEFAULT_INPUT_BINNAMES = "";
     public static final String INPUT_OPERATION = "aerospike.input.operation";
     public static final String DEFAULT_INPUT_OPERATION = "scan";
     public static final String INPUT_NUMRANGE_BIN = "aerospike.input.numrange.bin";
@@ -82,10 +85,9 @@ public class AerospikeConfigUtil {
 
     public static String getInputNamespace(Configuration conf) {
         String namespace = conf.get(INPUT_NAMESPACE);
-        if (namespace == null) {
+        if (namespace == null)
             throw new UnsupportedOperationException
-                    ("you must set the input namespace");
-        }
+                ("you must set the input namespace");
         log.info("using " + INPUT_NAMESPACE + " = " + namespace);
         return namespace;
     }
@@ -101,12 +103,25 @@ public class AerospikeConfigUtil {
         return setname;
     }
 
+    public static void setInputBinNames(Configuration conf, String bins) {
+        log.info("setting " + INPUT_BINNAMES + " to " + bins);
+        conf.set(INPUT_BINNAMES, bins);
+    }
+
+    public static String[] getInputBinNames(Configuration conf) {
+        String bins = conf.get(INPUT_BINNAMES);
+        log.info("using " + INPUT_BINNAMES + " = " + bins);
+        if (bins == null || bins.equals(""))
+            return null;
+        else
+            return bins.split(",");
+    }
+
     public static void setInputOperation(Configuration conf, String operation) {
         if (!operation.equals("scan") &&
-                !operation.equals("numrange")) {
+                !operation.equals("numrange"))
             throw new UnsupportedOperationException
-                    ("input operation must be 'scan' or 'numrange'");
-        }
+                ("input operation must be 'scan' or 'numrange'");
         log.info("setting " + INPUT_OPERATION + " to " + operation);
         conf.set(INPUT_OPERATION, operation);
     }
@@ -114,10 +129,9 @@ public class AerospikeConfigUtil {
     public static String getInputOperation(Configuration conf) {
         String operation = conf.get(INPUT_OPERATION, DEFAULT_INPUT_OPERATION);
         if (!operation.equals("scan") &&
-                !operation.equals("numrange")) {
+                !operation.equals("numrange"))
             throw new UnsupportedOperationException
-                    ("input operation must be 'scan' or 'numrange'");
-        }
+                ("input operation must be 'scan' or 'numrange'");
         log.info("using " + INPUT_OPERATION + " = " + operation);
         return operation;
     }
@@ -140,10 +154,9 @@ public class AerospikeConfigUtil {
 
     public static long getInputNumRangeBegin(Configuration conf) {
         long begin = conf.getLong(INPUT_NUMRANGE_BEGIN, INVALID_LONG);
-        if (begin == INVALID_LONG && getInputOperation(conf).equals("numrange")) {
+        if (begin == INVALID_LONG && getInputOperation(conf).equals("numrange"))
             throw new UnsupportedOperationException
-                    ("missing input numrange begin");
-        }
+                ("missing input numrange begin");
         log.info("using " + INPUT_NUMRANGE_BEGIN + " = " + begin);
         return begin;
     }
@@ -155,10 +168,9 @@ public class AerospikeConfigUtil {
 
     public static long getInputNumRangeEnd(Configuration conf) {
         long end = conf.getLong(INPUT_NUMRANGE_END, INVALID_LONG);
-        if (end == INVALID_LONG && getInputOperation(conf).equals("numrange")) {
+        if (end == INVALID_LONG && getInputOperation(conf).equals("numrange"))
             throw new UnsupportedOperationException
-                    ("missing input numrange end");
-        }
+                ("missing input numrange end");
         log.info("using " + INPUT_NUMRANGE_END + " = " + end);
         return end;
     }
@@ -194,10 +206,9 @@ public class AerospikeConfigUtil {
 
     public static String getOutputNamespace(Configuration conf) {
         String namespace = conf.get(OUTPUT_NAMESPACE);
-        if (namespace == null) {
+        if (namespace == null)
             throw new UnsupportedOperationException
-                    ("you must set the output namespace");
-        }
+                ("you must set the output namespace");
         log.info("using " + OUTPUT_NAMESPACE + " = " + namespace);
         return namespace;
     }
@@ -239,8 +250,8 @@ public class AerospikeConfigUtil {
 
     public static org.apache.hadoop.mapred.JobConf asJobConf(Configuration cfg) {
         return cfg instanceof org.apache.hadoop.mapred.JobConf
-                ? (org.apache.hadoop.mapred.JobConf) cfg
-                : new org.apache.hadoop.mapred.JobConf(cfg);
+            ? (org.apache.hadoop.mapred.JobConf) cfg
+            : new org.apache.hadoop.mapred.JobConf(cfg);
     }
 }
 

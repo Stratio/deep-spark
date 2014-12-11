@@ -21,20 +21,26 @@ package com.aerospike.hadoop.mapreduce;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.hadoop.io.Writable;
 
+import com.aerospike.client.AerospikeException;
+import com.aerospike.client.command.Buffer;
+import com.aerospike.client.command.Command;
+import com.aerospike.client.Key;
 import com.aerospike.client.Record;
+import com.aerospike.client.ResultCode;
 import com.aerospike.client.util.Packer;
 import com.aerospike.client.util.Unpacker.ObjectUnpacker;
 
 public class AerospikeRecord implements Writable {
 
-    public Map<String, Object> bins;
-    public List<Map<String, Object>> duplicates;
+    public Map<String,Object> bins;
+    public List<Map<String,Object>> duplicates;
     public int generation;
     public int expiration;
 
@@ -90,7 +96,8 @@ public class AerospikeRecord implements Writable {
                 out.writeInt(buff.length);
                 out.write(buff);
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             throw new IOException(ex);
         }
     }
@@ -110,11 +117,12 @@ public class AerospikeRecord implements Writable {
                 Object obj = unpack.unpackObject();
                 bins.put(key, obj);
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             throw new IOException(ex);
         }
     }
-
+       
     public static AerospikeRecord read(DataInput in) throws IOException {
         AerospikeRecord rec = new AerospikeRecord();
         rec.readFields(in);

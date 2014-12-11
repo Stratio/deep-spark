@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.mapreduce.JobContext;
@@ -32,94 +33,92 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.util.Progressable;
 
 public abstract class AerospikeOutputFormat<KK, VV>
-        extends OutputFormat<KK, VV>
-        implements org.apache.hadoop.mapred.OutputFormat<KK, VV> {
+    extends OutputFormat<KK, VV>
+    implements org.apache.hadoop.mapred.OutputFormat<KK, VV> {
 
     private static final Log log =
-            LogFactory.getLog(AerospikeOutputFormat.class);
+        LogFactory.getLog(AerospikeOutputFormat.class);
 
     public static class AerospikeOutputCommitter extends OutputCommitter {
 
         @Override
         public void setupJob(JobContext jobContext)
-                throws IOException {
-        }
+            throws IOException {}
 
         // compatibility check with Hadoop 0.20.2
         @Deprecated
         public void cleanupJob(JobContext jobContext)
-                throws IOException {
-        }
+            throws IOException {}
 
         @Override
         public void setupTask(TaskAttemptContext taskContext)
-                throws IOException {
+            throws IOException {
             //no-op
         }
 
         @Override
         public boolean needsTaskCommit(TaskAttemptContext taskContext)
-                throws IOException {
+            throws IOException {
             //no-op
             return false;
         }
 
         @Override
         public void commitTask(TaskAttemptContext taskContext)
-                throws IOException {
+            throws IOException {
             //no-op
         }
 
         @Override
         public void abortTask(TaskAttemptContext taskContext)
-                throws IOException {
+            throws IOException {
             //no-op
         }
 
     }
 
     public static class AerospikeOldAPIOutputCommitter
-            extends org.apache.hadoop.mapred.OutputCommitter {
+        extends org.apache.hadoop.mapred.OutputCommitter {
 
         @Override
         public void setupJob(org.apache.hadoop.mapred.JobContext jobContext)
-                throws IOException {
+            throws IOException {
             //no-op
         }
 
         @Override
         public void setupTask(
-                org.apache.hadoop.mapred.TaskAttemptContext taskContext)
-                throws IOException {
+            org.apache.hadoop.mapred.TaskAttemptContext taskContext)
+            throws IOException {
             //no-op
         }
 
         @Override
         public boolean needsTaskCommit(
-                org.apache.hadoop.mapred.TaskAttemptContext taskContext)
-                throws IOException {
+            org.apache.hadoop.mapred.TaskAttemptContext taskContext)
+            throws IOException {
             //no-op
             return false;
         }
 
         @Override
         public void commitTask(
-                org.apache.hadoop.mapred.TaskAttemptContext taskContext)
-                throws IOException {
+            org.apache.hadoop.mapred.TaskAttemptContext taskContext)
+            throws IOException {
             //no-op
         }
 
         @Override
         public void abortTask(
-                org.apache.hadoop.mapred.TaskAttemptContext taskContext)
-                throws IOException {
+            org.apache.hadoop.mapred.TaskAttemptContext taskContext)
+            throws IOException {
             //no-op
         }
 
         @Override
         @Deprecated
         public void cleanupJob(org.apache.hadoop.mapred.JobContext context)
-                throws IOException {
+            throws IOException {
             // no-op
             // added for compatibility with hadoop 0.20.x (used by old
             // tools, such as Cascalog)
@@ -127,8 +126,8 @@ public abstract class AerospikeOutputFormat<KK, VV>
     }
 
     public abstract org.apache.hadoop.mapred.RecordWriter<KK, VV>
-    getAerospikeRecordWriter(Configuration conf, Progressable progress);
-
+        getAerospikeRecordWriter(Configuration conf, Progressable progress);
+    
     //
     // new API - just delegates to the Old API
     //
@@ -156,16 +155,16 @@ public abstract class AerospikeOutputFormat<KK, VV>
     //
     @Override
     public org.apache.hadoop.mapred.RecordWriter<KK, VV>
-    getRecordWriter(FileSystem ignored,
-                    org.apache.hadoop.mapred.JobConf job,
-                    String name, Progressable progress) {
+        getRecordWriter(FileSystem ignored,
+                        org.apache.hadoop.mapred.JobConf job,
+                        String name, Progressable progress) {
         return getAerospikeRecordWriter(job, progress);
     }
 
     @Override
     public void checkOutputSpecs(FileSystem ignored,
                                  org.apache.hadoop.mapred.JobConf cfg)
-            throws IOException {
+        throws IOException {
         init(cfg);
     }
 
