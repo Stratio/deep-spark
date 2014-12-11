@@ -239,6 +239,10 @@ public class JdbcDeepJobConfig<T> extends HadoopConfig<T, JdbcDeepJobConfig<T>> 
             password(extractorConfig.getString(PASSWORD));
         }
 
+        if (values.get(JDBC_QUERY) != null) {
+            query(extractorConfig.getString(JDBC_QUERY));
+        }
+
 
         this.initialize();
 
