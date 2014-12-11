@@ -69,6 +69,10 @@ public class BaseConfig<T> implements Serializable {
         this.extractorImplClassName = extractorImplClassName;
     }
 
+    public void setExtractorImplClassName(ExtractorType extractorType) {
+        this.extractorImplClassName = extractorType.getValue();
+    }
+
     public int getRddId() {
         return rddId;
     }
