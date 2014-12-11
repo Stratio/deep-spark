@@ -52,11 +52,11 @@ public class JdbcDeepJobConfig<T> extends HadoopConfig<T, JdbcDeepJobConfig<T>> 
 
     private String query;
 
-    private int upperBound;
+    private int upperBound = Integer.MAX_VALUE;
 
-    private int lowerBound;
+    private int lowerBound = 0;
 
-    private int numPartitions;
+    private int numPartitions = 1;
 
 
     /**
@@ -241,9 +241,9 @@ public class JdbcDeepJobConfig<T> extends HadoopConfig<T, JdbcDeepJobConfig<T>> 
 
         if (values.get(JDBC_QUERY) != null) {
             query(extractorConfig.getString(JDBC_QUERY));
+        } else {
+            query("SELECT * FROM " + getTable());
         }
-
-
         this.initialize();
 
         return this;

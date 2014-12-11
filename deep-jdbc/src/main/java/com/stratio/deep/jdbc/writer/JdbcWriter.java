@@ -27,6 +27,11 @@ public class JdbcWriter<T> {
 
     public void save(Map<String, Object> row) throws SQLException {
         PreparedStatement statement = conn.prepareStatement(sqlFromRow(row));
+        int i = 1;
+        for(Object value:row.values()) {
+            statement.setObject(i, value);
+            i++;
+        }
         statement.executeUpdate();
     }
 

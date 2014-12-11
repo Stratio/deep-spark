@@ -109,7 +109,7 @@ public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> implements
         try {
             this.jdbcWriter.save(transformElement(t));
         } catch(Exception e) {
-            throw new DeepGenericException("Unable to initialize JdbcWriter", e);
+            throw new DeepGenericException("Error while writing row", e);
         }
     }
 

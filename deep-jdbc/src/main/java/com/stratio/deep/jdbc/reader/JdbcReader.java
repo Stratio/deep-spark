@@ -41,7 +41,7 @@ public class JdbcReader {
         Map<String, Object> row = new HashMap<>();
         ResultSetMetaData metadata = resultSet.getMetaData();
         int columnsNumber = metadata.getColumnCount();
-        for(int i=0; i<columnsNumber; i++) {
+        for(int i=1; i<=columnsNumber; i++) {
             String columnName = metadata.getColumnName(i);
             row.put(columnName, resultSet.getObject(i));
         }

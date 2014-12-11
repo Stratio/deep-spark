@@ -41,7 +41,9 @@ public class JdbcJavaRDDFT {
 
     public static final String NAMESPACE_ENTITY = "jdbcentityextractor";
 
-    public static final String SET_NAME = "input";
+    public static final String INPUT_TABLE = "input";
+
+    public static final String OUTPUT_CELLS_TABLE = "outputcells";
 
     public static final String SET_NAME_BOOK = "bookinput";
 
@@ -71,9 +73,14 @@ public class JdbcJavaRDDFT {
             LOG.error("Problem while creating database " + NAMESPACE_CELL + " (maybe is it already created?)", e);
         }
         try {
-            stmnt.executeUpdate("CREATE TABLE " + NAMESPACE_CELL + "." + SET_NAME + "(id INTEGER NOT NULL, message VARCHAR(255), number INTEGER, PRIMARY KEY (id))");
+            stmnt.executeUpdate("CREATE TABLE " + NAMESPACE_CELL + "." + INPUT_TABLE + "(id VARCHAR(255) NOT NULL, message VARCHAR(255), number INTEGER, PRIMARY KEY (id))");
         } catch(SQLException e) {
-            LOG.error("Problem while creating table " + SET_NAME + " (maybe is it already created?)", e);
+            LOG.error("Problem while creating table " + INPUT_TABLE + " (maybe is it already created?)", e);
+        }
+        try {
+            stmnt.executeUpdate("CREATE TABLE " + NAMESPACE_CELL + "." + OUTPUT_CELLS_TABLE + "(id VARCHAR(255) NOT NULL, message VARCHAR(255), number INTEGER, PRIMARY KEY (id))");
+        } catch(SQLException e) {
+            LOG.error("Problem while creating table " + OUTPUT_CELLS_TABLE + " (maybe is it already created?)", e);
         }
         try {
             stmnt.executeUpdate("CREATE DATABASE " + NAMESPACE_ENTITY);
@@ -82,18 +89,23 @@ public class JdbcJavaRDDFT {
         }
         try {
             conn.setCatalog(NAMESPACE_ENTITY);
-            stmnt.executeUpdate("CREATE TABLE " + NAMESPACE_ENTITY + "." + SET_NAME + "(id INTEGER NOT NULL, message VARCHAR(255), number INTEGER, PRIMARY KEY (id))");
+            stmnt.executeUpdate("CREATE TABLE " + NAMESPACE_ENTITY + "." + INPUT_TABLE + "(id VARCHAR(255) NOT NULL, message VARCHAR(255), number INTEGER, PRIMARY KEY (id))");
         } catch(SQLException e) {
-            LOG.error("Problem while creating table " + SET_NAME + " (maybe is it already created?)", e);
+            LOG.error("Problem while creating table " + INPUT_TABLE + " (maybe is it already created?)", e);
         }
         conn.close();
     }
 
     private void deleteData() throws Exception {
         try {
-            statement.executeUpdate("DELETE FROM " + SET_NAME);
+            statement.executeUpdate("DELETE FROM " + INPUT_TABLE);
         } catch(SQLException e) {
-            LOG.error("Error deleting table " + SET_NAME + ", does the table exist?");
+            LOG.error("Error deleting table " + INPUT_TABLE + ", does the table exist?");
+        }
+        try {
+            statement.executeUpdate("DELETE FROM " + OUTPUT_CELLS_TABLE);
+        } catch(SQLException e) {
+            LOG.error("Error deleting table " + OUTPUT_CELLS_TABLE + ", does the table exist?");
         }
         try {
             statement.executeUpdate("DELETE FROM " + SET_NAME_BOOK);
