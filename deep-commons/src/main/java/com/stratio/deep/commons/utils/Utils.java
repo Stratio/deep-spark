@@ -32,7 +32,7 @@ import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
-import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
+import com.stratio.deep.commons.exception.DeepExtractorInitializationException;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.rdd.IExtractor;
@@ -373,7 +373,7 @@ public final class Utils {
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            throw new DeepExtractorinitializationException(e.getMessage());
+            throw new DeepExtractorInitializationException(e.getMessage());
         }
 
     }
