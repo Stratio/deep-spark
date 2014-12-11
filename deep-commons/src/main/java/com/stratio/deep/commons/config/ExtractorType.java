@@ -16,10 +16,12 @@
 
 package com.stratio.deep.commons.config;
 
+import java.io.Serializable;
+
 /**
  * Created by rcrespo on 11/12/14.
  */
-public enum ExtractorType {
+public enum ExtractorType implements Serializable {
 
     /**
      * The MONGO_DB.
