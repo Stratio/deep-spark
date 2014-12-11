@@ -6,23 +6,31 @@ import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.jdbc.reader.JdbcReader;
 import com.stratio.deep.jdbc.writer.JdbcWriter;
 import org.apache.spark.Partition;
+import org.apache.spark.SparkContext;
+import org.apache.spark.rdd.JdbcRDD;
+import scala.Function0;
+import scala.Function1;
+import scala.collection.Seq;
+import scala.reflect.ClassTag;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.util.List;
 
 /**
  * Created by mariomgal on 09/12/14.
  */
-public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> implements IExtractor<T, S> {
+public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> extends JdbcRDD<T> implements IExtractor<T, S> {
 
     private static final long serialVersionUID = -298383130965427783L;
 
-    private JdbcReader jdbcReader;
-
-    private JdbcWriter jdbcWriter;
+    public JdbcNativeExtractor(SparkContext sc, Function0<Connection> getConnection, String sql, long lowerBound, long upperBound, int numPartitions, Function1<ResultSet, T> mapRow, ClassTag<T> evidence$1) {
+        super(sc, getConnection, sql, lowerBound, upperBound, numPartitions, mapRow, evidence$1);
+    }
 
     @Override
     public Partition[] getPartitions(S config) {
-        return new Partition[0];
+        return super.getPartitions();
     }
 
     @Override
