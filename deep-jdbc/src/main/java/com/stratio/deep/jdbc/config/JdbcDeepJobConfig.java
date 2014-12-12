@@ -97,6 +97,18 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     }
 
     @Override
+    public JdbcDeepJobConfig username(String username) {
+        this.username = username;
+        return this;
+    }
+
+    @Override
+    public JdbcDeepJobConfig password(String password) {
+        this.password = password;
+        return this;
+    }
+
+    @Override
     public JdbcDeepJobConfig database(String database) {
         this.catalog = database;
         return this;
@@ -105,6 +117,17 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     @Override
     public String getDatabase() {
         return catalog;
+    }
+
+    @Override
+    public JdbcDeepJobConfig table(String table) {
+        this.table = table;
+        return this;
+    }
+
+    @Override
+    public String getTable() {
+        return table;
     }
 
     @Override
@@ -173,6 +196,9 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         if(table == null || table.isEmpty()) {
             throw new IllegalArgumentException("Table name must be specified");
         }
+        if(query == null || query.isEmpty()) {
+            query("SELECT * FROM " + getTable());
+        }
     }
 
     @Override
@@ -187,8 +213,6 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
 
         if (values.get(JDBC_QUERY) != null) {
             query(extractorConfig.getString(JDBC_QUERY));
-        } else {
-            query("SELECT * FROM " + getTable());
         }
         this.initialize();
 
