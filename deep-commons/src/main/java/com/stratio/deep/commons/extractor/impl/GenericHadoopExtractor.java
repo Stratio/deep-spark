@@ -173,7 +173,7 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, k
         deepJobConfig.setRddId(id);
     }
 
-    public abstract T transformElement(Tuple2<K, V> tuple, DeepJobConfig<T, S> config);
+    public abstract T transformElement(Tuple2<K, V> tuple, DeepJobConfig<T, ? extends DeepJobConfig> config);
 
     @Override
     public void saveRDD(T t) {

@@ -16,12 +16,14 @@
 
 package com.stratio.deep.jdbc.config;
 
+import com.stratio.deep.commons.config.DeepJobConfig;
+
 /**
  * Defines the public methods that each Stratio Deep Jdbc configuration object should implement.
  *
  * @param <T>
  */
-public interface IJdbcDeepJobConfig<T, S extends IJdbcDeepJobConfig> {
+public interface IJdbcDeepJobConfig<T, S extends DeepJobConfig> {
 
     S database(String database);
 

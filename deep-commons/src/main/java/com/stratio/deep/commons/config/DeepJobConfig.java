@@ -39,7 +39,7 @@ import com.stratio.deep.commons.filter.Filter;
  *
  * @param <T> the type parameter
  */
-public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
+public class DeepJobConfig<T, S extends DeepJobConfig> extends BaseConfig<T> implements Serializable {
 
     /**
      * The Username.

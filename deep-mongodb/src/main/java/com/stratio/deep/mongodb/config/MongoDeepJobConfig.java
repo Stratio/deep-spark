@@ -57,7 +57,8 @@ import com.stratio.deep.mongodb.extractor.MongoNativeEntityExtractor;
  *
  * @param <T> the type parameter
  */
-public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>> implements IMongoDeepJobConfig<T>,
+public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>> implements IMongoDeepJobConfig<T,
+        MongoDeepJobConfig<T>>,
         Serializable {
     /**
      * The constant serialVersionUID.

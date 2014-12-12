@@ -66,7 +66,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         }
     }
 
-    public JdbcDeepJobConfig driverClass(String driverClass) {
+    public JdbcDeepJobConfig<T> driverClass(String driverClass) {
         this.driverClass = driverClass;
         return this;
     }
@@ -97,7 +97,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     }
 
     @Override
-    public JdbcDeepJobConfig database(String database) {
+    public JdbcDeepJobConfig<T> database(String database) {
         this.catalog = database;
         return this;
     }
@@ -108,7 +108,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     }
 
     @Override
-    public JdbcDeepJobConfig query(String query) {
+    public JdbcDeepJobConfig<T> query(String query) {
         this.query = query;
         return this;
     }
@@ -119,7 +119,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     }
 
     @Override
-    public JdbcDeepJobConfig upperBound(int upperBound) {
+    public JdbcDeepJobConfig<T> upperBound(int upperBound) {
         this.upperBound = upperBound;
         return this;
     }
@@ -130,7 +130,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     }
 
     @Override
-    public JdbcDeepJobConfig lowerBound(int lowerBound) {
+    public JdbcDeepJobConfig<T> lowerBound(int lowerBound) {
         this.lowerBound = lowerBound;
         return this;
     }
@@ -141,7 +141,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     }
 
     @Override
-    public JdbcDeepJobConfig numPartitions(int numPartitions) {
+    public JdbcDeepJobConfig<T> numPartitions(int numPartitions) {
         this.numPartitions = numPartitions;
         return this;
     }
