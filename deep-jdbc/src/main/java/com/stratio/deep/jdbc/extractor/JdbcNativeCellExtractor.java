@@ -23,12 +23,15 @@ import com.stratio.deep.jdbc.utils.UtilJdbc;
 import java.util.Map;
 
 /**
- * Created by mariomgal on 09/12/14.
+ * Implementation of JdbcExtractor for Cells objects.
  */
 public class JdbcNativeCellExtractor extends JdbcNativeExtractor<Cells, JdbcDeepJobConfig<Cells>> {
 
     private static final long serialVersionUID = 5796562363902015583L;
 
+    /**
+     * Default constructor.
+     */
     public JdbcNativeCellExtractor() {
         this.jdbcDeepJobConfig = new JdbcDeepJobConfig<>(Cells.class);
     }
@@ -37,11 +40,21 @@ public class JdbcNativeCellExtractor extends JdbcNativeExtractor<Cells, JdbcDeep
         this.jdbcDeepJobConfig = new JdbcDeepJobConfig<>(Cells.class);
     }
 
+    /**
+     * Transforms a database row represented as a Map into a Cells object.
+     * @param entity Database row represented as a Map of column name:column value.
+     * @return Cells object with database row data.
+     */
     @Override
     protected Cells transformElement(Map<String, Object> entity) {
         return UtilJdbc.getCellsFromObject(entity, jdbcDeepJobConfig);
     }
 
+    /**
+     * Transforms a Cells object into a database row represented as a Map.
+     * @param cells Cells data object.
+     * @return Database row represented as a Map of column name:column value.
+     */
     @Override
     protected Map<String, Object> transformElement(Cells cells) {
         return UtilJdbc.getObjectFromCells(cells);

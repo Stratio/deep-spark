@@ -23,25 +23,69 @@ package com.stratio.deep.jdbc.config;
  */
 public interface IJdbcDeepJobConfig<T, S extends IJdbcDeepJobConfig> {
 
+    /**
+     * Sets the database schema.
+     * @param database Database schema.
+     * @return Configuration object.
+     */
     S database(String database);
 
+    /**
+     * Returns the database schema.
+     * @return Database schema.
+     */
     String getDatabase();
 
+    /**
+     * Sets the query to execute.
+     * @param query Query to execute.
+     * @return Configuration object.
+     */
     S query(String query);
 
+    /**
+     * Returns the query to execute.
+     * @return Query to execute.
+     */
     String getQuery();
 
-
+    /**
+     * Sets the upper bound used for partitioning.
+     * @param upperBound Upper bound for partitioning.
+     * @return Configuration object.
+     */
     S upperBound(int upperBound);
 
+    /**
+     * Returns the upper bound used for partitioning.
+     * @return
+     */
     int getUpperBound();
 
+    /**
+     * Sets the lower bound used for partitioning.
+     * @param lowerBound Lower bound used for partitioning.
+     * @return Configuration object.
+     */
     S lowerBound(int lowerBound);
 
+    /**
+     * Returns the lower bound used for partitioning.
+     * @return Lower bound user for partitioning.
+     */
     int getLowerBound();
 
+    /**
+     * Sets the number of partitions.
+     * @param numPartitions Number of partitions.
+     * @return Configuration object.
+     */
     S numPartitions(int numPartitions);
 
+    /**
+     * Returns the number of partitions.
+     * @return Number of partitions.
+     */
     int getNumPartitions();
 
 }

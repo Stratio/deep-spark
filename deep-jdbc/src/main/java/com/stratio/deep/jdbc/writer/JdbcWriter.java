@@ -25,14 +25,25 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by mariomgal on 09/12/14.
+ * Creates a new JDBC connection and provides methods for writing.
  */
 public class JdbcWriter<T> {
 
+    /**
+     * JDBC Deep Job configuration.
+     */
     private JdbcDeepJobConfig<T> jdbcDeepJobConfig;
 
+    /**
+     * JDBC connection.
+     */
     private Connection conn;
 
+    /**
+     * Instantiates a new JdbcWriter.
+     * @param jdbcDeepJobConfig Deep Job configuration.
+     * @throws Exception
+     */
     public JdbcWriter(JdbcDeepJobConfig jdbcDeepJobConfig) throws Exception {
         this.jdbcDeepJobConfig = jdbcDeepJobConfig;
         Class.forName(jdbcDeepJobConfig.getDriverClass());
@@ -41,6 +52,11 @@ public class JdbcWriter<T> {
                 jdbcDeepJobConfig.getPassword());
     }
 
+    /**
+     * Saves data.
+     * @param row Data structure representing a row as a Map of column_name:column_value
+     * @throws SQLException
+     */
     public void save(Map<String, Object> row) throws SQLException {
         PreparedStatement statement = conn.prepareStatement(sqlFromRow(row));
         int i = 1;
@@ -51,6 +67,10 @@ public class JdbcWriter<T> {
         statement.executeUpdate();
     }
 
+    /**
+     * Closes the JDBC Connection.
+     * @throws SQLException
+     */
     public void close() throws SQLException {
         conn.close();
     }

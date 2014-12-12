@@ -34,21 +34,36 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.*;
 /**
  * Configuration class for Jdbc-Spark integration
  *
- * @param <T>
+ * @param <T> Type of returned objects.
  */
 public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>> implements
         IJdbcDeepJobConfig<T, JdbcDeepJobConfig<T>>, Serializable {
 
     private static final long serialVersionUID = -6487437723098215934L;
 
+    /**
+     * JDBC driver class name.
+     */
     private String driverClass;
 
+    /**
+     * Query to be executed.
+     */
     private String query;
 
+    /**
+     * Upper bound used for partitioning.
+     */
     private int upperBound = Integer.MAX_VALUE;
 
+    /**
+     * Lower bound used for partitioning.
+     */
     private int lowerBound = 0;
 
+    /**
+     * Number of partitions.
+     */
     private int numPartitions = 1;
 
 
@@ -66,16 +81,25 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public JdbcDeepJobConfig driverClass(String driverClass) {
         this.driverClass = driverClass;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getDriverClass() {
         return this.driverClass;
     }
 
-
+    /**
+     * Builds the JDBC url from the configuration
+     * @return JDBC connection url.
+     */
     public String getJdbcUrl() {
         StringBuilder sb = new StringBuilder();
         sb.append("jdbc:");
@@ -90,90 +114,139 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         return sb.toString();
     }
 
+    /**
+     * Extracts the JDBC provider name from the driver class name.
+     * @return JDBC provider name.
+     */
     private String getJdbcProvider(){
         int firstIndex = driverClass.indexOf(".");
         int secondIndex = driverClass.indexOf(".", ++firstIndex);
         return driverClass.substring(firstIndex, secondIndex);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig username(String username) {
         this.username = username;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig password(String password) {
         this.password = password;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig database(String database) {
         this.catalog = database;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getDatabase() {
         return catalog;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig table(String table) {
         this.table = table;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getTable() {
         return table;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig query(String query) {
         this.query = query;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getQuery() {
         return this.query;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig upperBound(int upperBound) {
         this.upperBound = upperBound;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getUpperBound() {
         return this.upperBound;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig lowerBound(int lowerBound) {
         this.lowerBound = lowerBound;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getLowerBound() {
         return this.lowerBound;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig numPartitions(int numPartitions) {
         this.numPartitions = numPartitions;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getNumPartitions() {
         return this.numPartitions;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig<T> initialize() throws IllegalStateException {
         validate();
@@ -201,6 +274,9 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
         super.initialize(extractorConfig);
@@ -219,24 +295,4 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         return this;
     }
 
-
-    private String getSqlOperatorFromFilter(Filter filter) {
-        FilterType type = filter.getFilterType();
-        if(FilterType.EQ.equals(type)) {
-            return "=";
-        } else if(FilterType.GT.equals(type)) {
-            return ">";
-        } else if(FilterType.GTE.equals(type)) {
-            return ">=";
-        } else if(FilterType.LT.equals(type)) {
-            return "<";
-        } else if(FilterType.LTE.equals(type)) {
-            return "<=";
-        } else if(FilterType.NEQ.equals(type)) {
-            return "!=";
-        } else if(FilterType.IN.equals(type)) {
-            return "IN";
-        }
-        throw new UnsupportedOperationException();
-    }
 }

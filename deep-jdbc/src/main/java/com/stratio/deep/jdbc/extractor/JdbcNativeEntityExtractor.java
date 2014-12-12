@@ -24,16 +24,25 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 /**
- * Created by mariomgal on 09/12/14.
+ * Implementation of JdbcNativeExtractor for Stratio Deep Entity objects.
  */
 public class JdbcNativeEntityExtractor<T> extends JdbcNativeExtractor<T, JdbcDeepJobConfig<T>> {
 
     private static final long serialVersionUID = 957463022436044036L;
 
+    /**
+     * Instatiates a new entity extractor.
+     * @param t Stratio Deep entity.
+     */
     public JdbcNativeEntityExtractor(Class<T> t) {
         this.jdbcDeepJobConfig = new JdbcDeepJobConfig<>(t);
     }
 
+    /**
+     * Transforms a database row represented as a Map into a Stratio Deep Entity.
+     * @param entity Database row represented as a Map of column_name:column_value.
+     * @return Stratio Deep Entity carrying row data.
+     */
     @Override
     protected T transformElement(Map<String, Object> entity) {
         try {
@@ -43,6 +52,11 @@ public class JdbcNativeEntityExtractor<T> extends JdbcNativeExtractor<T, JdbcDee
         }
     }
 
+    /**
+     * Trasforms a Stratio Deep Entity into a database row represented as a Map.
+     * @param entity Stratio Deep entity.
+     * @return Database row represented as a Map of column_name:column_value.
+     */
     @Override
     protected Map<String, Object> transformElement(T entity) {
         try {

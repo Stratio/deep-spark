@@ -32,12 +32,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by mariomgal on 09/12/14.
+ * Utils for transforming Jdbc row data structures into Stratio Cells and Entities.
  */
 public class UtilJdbc {
 
     private static final Logger LOG = LoggerFactory.getLogger(UtilJdbc.class);
 
+    /**
+     * Returns a Stratio Entity from a Jdbc row represented as a map.
+     * @param classEntity Stratio Entity.
+     * @param row Jdbc row represented as a Map.
+     * @param config JDBC Deep Job configuration.
+     * @param <T> Stratio Entity class.
+     * @return Stratio Entity from a Jdbc row represented as a map.
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws InvocationTargetException
+     */
     public static <T> T getObjectFromRow(Class<T> classEntity, Map<String, Object> row, DeepJobConfig<T, JdbcDeepJobConfig<T>> config) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         T t = classEntity.newInstance();
         Field[] fields = AnnotationUtils.filterDeepFields(classEntity);
@@ -63,6 +74,15 @@ public class UtilJdbc {
         return t;
     }
 
+    /**
+     * Returns a JDBC row data structure from a Stratio Deep Entity.
+     * @param entity Stratio Deep entity.
+     * @param <T> Stratio Deep entity type.
+     * @return JDBC row data structure from a Stratio Deep Entity.
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws InvocationTargetException
+     */
     public static <T> Map<String, Object> getRowFromObject(T entity) throws IllegalAccessException, InstantiationException,
             InvocationTargetException {
         Field[] fields = AnnotationUtils.filterDeepFields(entity.getClass());
@@ -79,6 +99,12 @@ public class UtilJdbc {
         return row;
     }
 
+    /**
+     * Returns a Cells object from a JDBC row data structure.
+     * @param row JDBC row data structure as a Map.
+     * @param config JDBC Deep Job config.
+     * @return Cells object from a JDBC row data structure.
+     */
     public static Cells getCellsFromObject(Map<String, Object> row, DeepJobConfig<Cells, JdbcDeepJobConfig<Cells>> config) {
         Cells result = new Cells(config.getCatalog());
         for(Map.Entry<String, Object> entry:row.entrySet()) {
@@ -88,6 +114,11 @@ public class UtilJdbc {
         return result;
     }
 
+    /**
+     * Returns a JDBC row data structure from a Cells object.
+     * @param cells Cells object carrying information.
+     * @return JDBC row data structure from a Cells object.
+     */
     public static Map<String, Object> getObjectFromCells(Cells cells) {
         Map<String, Object> result = new HashMap<>();
         for(Cell cell:cells.getCells()) {

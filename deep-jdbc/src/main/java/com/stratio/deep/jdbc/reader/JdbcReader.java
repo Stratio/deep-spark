@@ -18,29 +18,45 @@ package com.stratio.deep.jdbc.reader;
 
 import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
 import org.apache.spark.Partition;
-import org.apache.spark.rdd.JdbcPartition;
 
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by mariomgal on 09/12/14.
+ * Creates a new JDBC connection and provides methods for reading from it.
  */
 public class JdbcReader {
 
+    /**
+     * JDBC Deep Job configuration.
+     */
     private JdbcDeepJobConfig jdbcDeepJobConfig;
 
+    /**
+     * JDBC Connection.
+     */
     private Connection conn;
 
+    /**
+     * JDBC ResultSet.
+     */
     private ResultSet resultSet;
 
+    /**
+     * Instantiaties a new JdbcReader.
+     * @param config JDBC Deep Job configuration.
+     */
     public JdbcReader(JdbcDeepJobConfig config) {
         this.jdbcDeepJobConfig = config;
     }
 
+    /**
+     * Initialized the reader
+     * @param p Spark partition.
+     * @throws Exception
+     */
     public void init(Partition p) throws Exception {
-        JdbcPartition partition = (JdbcPartition)p;
         Class.forName(jdbcDeepJobConfig.getDriverClass());
         conn = DriverManager.getConnection(jdbcDeepJobConfig.getJdbcUrl(),
                 jdbcDeepJobConfig.getUsername(),
@@ -49,10 +65,20 @@ public class JdbcReader {
         resultSet = statement.executeQuery(jdbcDeepJobConfig.getQuery());
     }
 
+    /**
+     * Checks if there are more results.
+     * @return True if there is another result.
+     * @throws SQLException
+     */
     public boolean hasNext() throws SQLException {
         return resultSet.next();
     }
 
+    /**
+     * Returns the next result row as a Map of column_name:column_value.
+     * @return Next result row.
+     * @throws SQLException
+     */
     public Map<String, Object> next() throws SQLException {
         Map<String, Object> row = new HashMap<>();
         ResultSetMetaData metadata = resultSet.getMetaData();
@@ -64,6 +90,10 @@ public class JdbcReader {
         return row;
     }
 
+    /**
+     * Closes the ResultSet and the JDBC Connection.
+     * @throws SQLException
+     */
     public void close() throws SQLException {
         try {
             if(resultSet != null) {

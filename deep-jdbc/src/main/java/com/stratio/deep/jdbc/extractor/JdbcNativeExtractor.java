@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by mariomgal on 09/12/14.
+ * Abstract class of Jdbc native extractor.
  */
 public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> implements IExtractor<T, S> {
 
@@ -42,12 +42,24 @@ public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> implements
 
     private static final Logger LOG = LoggerFactory.getLogger(JdbcNativeExtractor.class);
 
+    /**
+     * Jdbc Deep Job configuration.
+     */
     protected JdbcDeepJobConfig<T> jdbcDeepJobConfig;
 
+    /**
+     * Jdbc reader
+     */
     protected JdbcReader jdbcReader;
 
+    /**
+     * Jdbc writer
+     */
     protected JdbcWriter<T> jdbcWriter;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Partition[] getPartitions(S config) {
         initJdbcDeepJobConfig(config);
@@ -64,6 +76,9 @@ public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> implements
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean hasNext() {
         try {
@@ -73,6 +88,9 @@ public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> implements
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T next() {
         try {
@@ -82,6 +100,9 @@ public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> implements
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() {
         if(jdbcReader != null) {
@@ -100,6 +121,9 @@ public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> implements
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void initIterator(Partition dp, S config) {
         initJdbcDeepJobConfig(config);
@@ -111,6 +135,9 @@ public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> implements
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void saveRDD(T t) {
         try {
@@ -120,11 +147,17 @@ public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> implements
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getPreferredLocations(Partition split) {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void initSave(S config, T first, UpdateQueryBuilder queryBuilder) {
         initJdbcDeepJobConfig(config);
@@ -143,12 +176,6 @@ public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> implements
         }
     }
 
-    /**
-     * Transform element.
-     *
-     * @param entity the entity
-     * @return the dB object
-     */
     protected abstract T transformElement(Map<String, Object> entity);
 
     protected abstract Map<String, Object> transformElement(T entity);
