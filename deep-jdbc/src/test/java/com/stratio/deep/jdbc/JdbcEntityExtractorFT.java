@@ -1,7 +1,6 @@
 package com.stratio.deep.jdbc;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.MessageTestEntity;

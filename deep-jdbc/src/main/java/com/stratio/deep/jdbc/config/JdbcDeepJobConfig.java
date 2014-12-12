@@ -158,19 +158,19 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     }
 
     private void validate() {
-        if(host.isEmpty()) {
+        if(host == null || host.isEmpty()) {
             throw new IllegalArgumentException("Host must be specified");
         }
         if(port <= 0) {
             throw new IllegalArgumentException("Port must be valid");
         }
-        if(driverClass.isEmpty()) {
+        if(driverClass == null || driverClass.isEmpty()) {
             throw new IllegalArgumentException("Driver class must be specified");
         }
-        if(catalog.isEmpty()) {
+        if(catalog == null || catalog.isEmpty()) {
             throw new IllegalArgumentException("Schema name must be specified");
         }
-        if(table.isEmpty()) {
+        if(table == null || table.isEmpty()) {
             throw new IllegalArgumentException("Table name must be specified");
         }
     }
