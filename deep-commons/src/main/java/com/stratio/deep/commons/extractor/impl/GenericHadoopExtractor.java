@@ -51,7 +51,7 @@ import scala.Tuple2;
  */
 public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, kOut, vOut> implements IExtractor<T, S> {
 
-    protected DeepJobConfig deepJobConfig;
+    protected HadoopConfig deepJobConfig;
 
     protected transient RecordReader<K, V> reader;
 
@@ -90,14 +90,14 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, k
         if (config instanceof ExtractorConfig) {
             addSparkIdToDeepJobConfig((ExtractorConfig) config);
         } else if (config instanceof DeepJobConfig) {
-            deepJobConfig = (DeepJobConfig) ((DeepJobConfig) config).initialize();
+            deepJobConfig = (HadoopConfig) deepJobConfig.initialize((DeepJobConfig) config);
         }
 
         int id = config.getRddId();
 
         jobId = new JobID(jobTrackerId, id);
 
-        Configuration conf = ((HadoopConfig) deepJobConfig).getHadoopConfiguration();
+        Configuration conf = deepJobConfig.getHadoopConfiguration();
 
         JobContext jobContext = DeepSparkHadoopMapReduceUtil.newJobContext(conf, jobId);
 
@@ -113,7 +113,7 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, k
 
         } catch (IOException | InterruptedException | RuntimeException e) {
             LOG.error("Impossible to calculate partitions " + e.getMessage());
-            throw new DeepGenericException("Impossible to calculate partitions " + e.getMessage());
+            throw new DeepGenericException("Impossible to calculate partitions ", e);
         }
 
     }
@@ -125,7 +125,7 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, k
                 finished = !reader.nextKeyValue();
             } catch (IOException | InterruptedException e) {
                 LOG.error("Impossible to get hasNext " + e.getMessage());
-                throw new DeepGenericException("Impossible to get hasNext " + e.getMessage());
+                throw new DeepGenericException("Impossible to get hasNext ", e);
             }
             havePair = !finished;
 
@@ -146,7 +146,7 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, k
                     deepJobConfig);
         } catch (IOException | InterruptedException e) {
             LOG.error("Impossible to get next value " + e.getMessage());
-            throw new DeepGenericException("Impossible to get next value " + e.getMessage());
+            throw new DeepGenericException("Impossible to get next value ", e);
         }
     }
 
@@ -161,19 +161,19 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, k
             }
         } catch (IOException | InterruptedException e) {
             LOG.error("Impossible to close RecordReader " + e.getMessage());
-            throw new DeepGenericException("Impossible to close RecordReader " + e.getMessage());
+            throw new DeepGenericException("Impossible to close RecordReader ", e);
         }
     }
 
     private void addSparkIdToDeepJobConfig(ExtractorConfig<T> config) {
         int id = config.getRddId();
 
-        deepJobConfig = (DeepJobConfig) deepJobConfig.initialize(config);
+        deepJobConfig = (HadoopConfig) deepJobConfig.initialize(config);
 
         deepJobConfig.setRddId(id);
     }
 
-    public abstract T transformElement(Tuple2<K, V> tuple, DeepJobConfig<T, S> config);
+    public abstract T transformElement(Tuple2<K, V> tuple, DeepJobConfig<T, ? extends DeepJobConfig> config);
 
     @Override
     public void saveRDD(T t) {
@@ -183,7 +183,7 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, k
 
         } catch (IOException | InterruptedException e) {
             LOG.error("Impossible to saveRDD " + e.getMessage());
-            throw new DeepGenericException("Impossible to saveRDD " + e.getMessage());
+            throw new DeepGenericException("Impossible to saveRDD ", e);
         }
         return;
     }
@@ -229,7 +229,8 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, k
             configuration = ((HadoopConfig) deepJobConfig.initialize((ExtractorConfig) config))
                     .getHadoopConfiguration();
         } else {
-            configuration = ((HadoopConfig) config).getHadoopConfiguration();
+            configuration = ((HadoopConfig) deepJobConfig.initialize((DeepJobConfig) config)).getHadoopConfiguration();
+
         }
 
         TaskAttemptContext hadoopAttemptContext = DeepSparkHadoopMapReduceUtil

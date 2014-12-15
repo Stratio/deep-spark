@@ -56,10 +56,6 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T, AerospikeDeepJobC
     private transient Configuration configHadoop;
 
     private List<Integer> portList = new ArrayList<>();
-    /**
-     * Aerospike's set name.
-     */
-    private String set;
 
     /**
      * Aerospike's bin name.
@@ -124,7 +120,7 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T, AerospikeDeepJobC
      */
     @Override
     public AerospikeDeepJobConfig<T> namespace(String nameSpace) {
-        this.nameSpace = nameSpace;
+        this.catalog = nameSpace;
         return this;
     }
 
@@ -141,18 +137,18 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T, AerospikeDeepJobC
 
     @Override
     public AerospikeDeepJobConfig<T> set(String set) {
-        this.set = set;
+        this.table = set;
         return this;
     }
 
     @Override
     public String getNamespace() {
-        return this.nameSpace;
+        return this.catalog;
     }
 
     @Override
     public String getSet() {
-        return this.set;
+        return this.table;
     }
 
     @Override
@@ -230,9 +226,9 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T, AerospikeDeepJobC
 
         configHadoop.set(AerospikeConfigUtil.INPUT_PORT, Integer.toString(getAerospikePort()));
 
-        configHadoop.set(AerospikeConfigUtil.INPUT_NAMESPACE, nameSpace);
+        configHadoop.set(AerospikeConfigUtil.INPUT_NAMESPACE, catalog);
 
-        configHadoop.set(AerospikeConfigUtil.INPUT_SETNAME, set);
+        configHadoop.set(AerospikeConfigUtil.INPUT_SETNAME, table);
 
         configHadoop.set(AerospikeConfigUtil.INPUT_OPERATION, operation);
 
@@ -246,9 +242,9 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T, AerospikeDeepJobC
 
         configHadoop.set(AerospikeConfigUtil.OUTPUT_PORT, Integer.toString(getAerospikePort()));
 
-        configHadoop.set(AerospikeConfigUtil.OUTPUT_NAMESPACE, nameSpace);
+        configHadoop.set(AerospikeConfigUtil.OUTPUT_NAMESPACE, catalog);
 
-        configHadoop.set(AerospikeConfigUtil.OUTPUT_SETNAME, set);
+        configHadoop.set(AerospikeConfigUtil.OUTPUT_SETNAME, table);
 
         if (operation != null) {
             configHadoop.set(AerospikeConfigUtil.INPUT_OPERATION, operation);
@@ -264,14 +260,19 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T, AerospikeDeepJobC
         if (host.isEmpty()) {
             throw new IllegalArgumentException("host cannot be null");
         }
-        if (nameSpace == null) {
+        if (catalog == null) {
             throw new IllegalArgumentException("namespace cannot be null");
         }
-        if (set == null) {
+        if (table == null) {
             throw new IllegalArgumentException("set cannot be null");
         }
         if (portList.isEmpty()) {
-            throw new IllegalArgumentException("port cannot be null");
+            if(port>0){
+                port(port);
+            }else{
+                throw new IllegalArgumentException("port cannot be null");
+            }
+
         }
         if (host.size() != portList.size()) {
             throw new IllegalArgumentException("Host and ports cardinality must be the same");
@@ -297,7 +298,7 @@ public class AerospikeDeepJobConfig<T> extends HadoopConfig<T, AerospikeDeepJobC
         Map<String, Serializable> values = extractorConfig.getValues();
 
         if (values.get(NAMESPACE) != null) {
-            namespace(extractorConfig.getString(NAMESPACE));
+            catalog(extractorConfig.getString(NAMESPACE));
         }
 
         if (values.get(SET) != null) {

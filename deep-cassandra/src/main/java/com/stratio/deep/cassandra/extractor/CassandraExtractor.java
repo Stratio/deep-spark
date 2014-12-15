@@ -85,7 +85,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
         if (config instanceof ExtractorConfig) {
             initWithExtractorConfig((ExtractorConfig) config);
         } else {
-            cassandraJobConfig = (CassandraDeepJobConfig<T>) ((DeepJobConfig) config).initialize();
+            cassandraJobConfig = cassandraJobConfig.initialize((DeepJobConfig) config);
         }
 
         recordReader = initRecordReader((DeepPartition) dp, cassandraJobConfig);
@@ -118,7 +118,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
         if (config instanceof ExtractorConfig) {
             initWithExtractorConfig((ExtractorConfig) config);
         } else {
-            cassandraJobConfig = (CassandraDeepJobConfig) config;
+            cassandraJobConfig = cassandraJobConfig.initialize((DeepJobConfig) config);
         }
 
         List<DeepTokenRange> underlyingInputSplits = null;

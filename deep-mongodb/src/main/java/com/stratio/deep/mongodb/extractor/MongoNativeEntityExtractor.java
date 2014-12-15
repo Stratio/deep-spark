@@ -19,6 +19,7 @@ package com.stratio.deep.mongodb.extractor;
 import java.lang.reflect.InvocationTargetException;
 
 import com.mongodb.DBObject;
+import com.stratio.deep.commons.exception.DeepTransformException;
 import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
 
@@ -57,9 +58,8 @@ public final class MongoNativeEntityExtractor<T> extends MongoNativeExtractor<T,
         try {
             return UtilMongoDB.getBsonFromObject(entity);
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            e.printStackTrace();
+            throw new DeepTransformException("Could not transform from entity to BSON " + e.getMessage(), e);
         }
-        return null;
     }
 
 }

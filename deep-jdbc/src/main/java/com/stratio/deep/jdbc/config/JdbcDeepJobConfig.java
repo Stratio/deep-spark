@@ -81,9 +81,6 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public JdbcDeepJobConfig<T> driverClass(String driverClass) {
         this.driverClass = driverClass;
         return this;
@@ -162,24 +159,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     /**
      * {@inheritDoc}
      */
-    @Override
-    public JdbcDeepJobConfig<T> table(String table) {
-        this.table = table;
-        return this;
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTable() {
-        return table;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public JdbcDeepJobConfig<T> query(String query) {
         this.query = query;
         return this;

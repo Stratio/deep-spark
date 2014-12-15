@@ -55,7 +55,7 @@ public class AerospikeCellExtractor extends AerospikeExtractor<Cells> {
      */
     @Override
     public Cells transformElement(Tuple2<AerospikeKey, AerospikeRecord> tuple,
-                                  DeepJobConfig<Cells, AerospikeDeepJobConfig<Cells>> config) {
+                                  DeepJobConfig<Cells, ? extends DeepJobConfig> config) {
         try {
             return UtilAerospike.getCellFromRecord(tuple._1(), tuple._2(), (AerospikeDeepJobConfig) deepJobConfig);
         } catch (Exception e) {

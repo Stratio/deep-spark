@@ -39,7 +39,7 @@ import com.stratio.deep.commons.filter.Filter;
  *
  * @param <T> the type parameter
  */
-public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
+public class DeepJobConfig<T, S extends DeepJobConfig> extends BaseConfig<T> implements Serializable {
 
     /**
      * The Username.
@@ -223,6 +223,25 @@ public class DeepJobConfig<T, S> extends BaseConfig<T> implements Serializable {
         }
 
         return (S) this;
+    }
+
+    public S initialize(DeepJobConfig deepJobConfig){
+        if(deepJobConfig instanceof DeepJobConfig) {
+            this.catalog = deepJobConfig.getCatalog();
+            this.table = deepJobConfig.getTable();
+            this.username = deepJobConfig.getUsername();
+            this.password = deepJobConfig.getPassword();
+            this.filters = deepJobConfig.getFilters();
+            this.inputColumns = deepJobConfig.getInputColumns();
+            this.port = deepJobConfig.getPort();
+            this.host = deepJobConfig.getHostList();
+            this.extractorImplClass = deepJobConfig.getExtractorImplClass();
+            this.extractorImplClassName = deepJobConfig.getExtractorImplClassName();
+            this.entityClass = deepJobConfig.getEntityClass();
+        }else{
+            return (S) deepJobConfig.initialize();
+        }
+        return (S) this.initialize();
     }
 
     /**

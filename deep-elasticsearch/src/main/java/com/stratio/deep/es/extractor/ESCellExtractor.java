@@ -59,7 +59,7 @@ public final class ESCellExtractor
      */
     @Override
     public Cells transformElement(Tuple2<Object, LinkedMapWritable> tuple,
-                                  DeepJobConfig<Cells, ESDeepJobConfig<Cells>> config) {
+                                  DeepJobConfig<Cells, ? extends DeepJobConfig> config) {
 
         try {
             return UtilES.getCellFromJson(tuple._2(), deepJobConfig.getNameSpace());

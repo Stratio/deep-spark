@@ -18,27 +18,28 @@ package com.stratio.deep.mongodb.config;
 
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
+import com.stratio.deep.commons.config.DeepJobConfig;
 
 /**
  * Defines the public methods that each Stratio Deep MongoDB configuration object should implement.
  */
-public interface IMongoDeepJobConfig<T> {
+public interface IMongoDeepJobConfig<T, S extends DeepJobConfig> {
     /**
      * The MongoDB's collection name
      */
-    IMongoDeepJobConfig<T> collection(String collection);
+    S collection(String collection);
 
     String getCollection();
 
     /**
      * The MongoDB's database name
      */
-    IMongoDeepJobConfig<T> database(String database);
+    S database(String database);
 
     /**
      * The replica set identifier.
      */
-    IMongoDeepJobConfig<T> replicaSet(String replicaSet);
+    S replicaSet(String replicaSet);
 
     /**
      * Configures the 'readPreference' MongoDB's config property.
@@ -46,7 +47,7 @@ public interface IMongoDeepJobConfig<T> {
      * @param readPreference the property value to set.
      * @return this object.
      */
-    IMongoDeepJobConfig<T> readPreference(String readPreference);
+    S readPreference(String readPreference);
 
     /**
      * Filter query
@@ -54,7 +55,7 @@ public interface IMongoDeepJobConfig<T> {
      * @param query
      * @return this object.
      */
-    IMongoDeepJobConfig<T> filterQuery(DBObject query);
+    S filterQuery(DBObject query);
 
     /**
      * Filter query
@@ -62,7 +63,7 @@ public interface IMongoDeepJobConfig<T> {
      * @param query
      * @return this object.
      */
-    IMongoDeepJobConfig<T> filterQuery(QueryBuilder query);
+    S filterQuery(QueryBuilder query);
 
     /**
      * Fiels to be returned, you can also use inputFields() and ignoreIdField()
@@ -70,7 +71,7 @@ public interface IMongoDeepJobConfig<T> {
      * @param fields
      * @return this object.
      */
-    IMongoDeepJobConfig<T> fields(DBObject fields);
+    S fields(DBObject fields);
 
     /**
      * Sorting
@@ -78,7 +79,7 @@ public interface IMongoDeepJobConfig<T> {
      * @param sort
      * @return this object.
      */
-    IMongoDeepJobConfig<T> sort(String sort);
+    S sort(String sort);
 
     /**
      * Sorting
@@ -86,7 +87,7 @@ public interface IMongoDeepJobConfig<T> {
      * @param sort
      * @return this object.
      */
-    IMongoDeepJobConfig<T> sort(DBObject sort);
+    S sort(DBObject sort);
 
     /**
      * This is {@code true} by default now, but if {@code false}, only one InputSplit (your whole collection) will be
@@ -95,7 +96,7 @@ public interface IMongoDeepJobConfig<T> {
      * @param createInputSplit
      * @return this object.
      */
-    IMongoDeepJobConfig<T> createInputSplit(boolean createInputSplit);
+    S createInputSplit(boolean createInputSplit);
 
     /**
      * If {@code true} in a sharded setup splits will be made to connect to individual backend {@code mongod}s.  This
@@ -105,7 +106,7 @@ public interface IMongoDeepJobConfig<T> {
      * @param useShards
      * @return this object.
      */
-    IMongoDeepJobConfig<T> useShards(boolean useShards);
+    S useShards(boolean useShards);
 
     /**
      * If {@code true} have one split = one shard chunk.  If {SPLITS_USE_SHARDS} is not true splits will still
@@ -116,20 +117,20 @@ public interface IMongoDeepJobConfig<T> {
      * @param splitsUseChunks
      * @return this object.
      */
-    IMongoDeepJobConfig<T> splitsUseChunks(boolean splitsUseChunks);
+    S splitsUseChunks(boolean splitsUseChunks);
 
     /**
      * @param inputKey
      * @return this object.
      */
-    IMongoDeepJobConfig<T> inputKey(String inputKey);
+    S inputKey(String inputKey);
 
     /**
      * If use it, MongoDB will not return _id field.
      *
      * @return this object.
      */
-    IMongoDeepJobConfig<T> ignoreIdField();
+    S ignoreIdField();
 
     String getDatabase();
 
