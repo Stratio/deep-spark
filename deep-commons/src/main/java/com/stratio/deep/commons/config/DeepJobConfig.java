@@ -225,6 +225,25 @@ public class DeepJobConfig<T, S extends DeepJobConfig> extends BaseConfig<T> imp
         return (S) this;
     }
 
+    public S initialize(DeepJobConfig deepJobConfig){
+        if(deepJobConfig instanceof DeepJobConfig) {
+            this.catalog = deepJobConfig.getCatalog();
+            this.table = deepJobConfig.getTable();
+            this.username = deepJobConfig.getUsername();
+            this.password = deepJobConfig.getPassword();
+            this.filters = deepJobConfig.getFilters();
+            this.inputColumns = deepJobConfig.getInputColumns();
+            this.port = deepJobConfig.getPort();
+            this.host = deepJobConfig.getHostList();
+            this.extractorImplClass = deepJobConfig.getExtractorImplClass();
+            this.extractorImplClassName = deepJobConfig.getExtractorImplClassName();
+            this.entityClass = deepJobConfig.getEntityClass();
+        }else{
+            return (S) deepJobConfig.initialize();
+        }
+        return (S) this.initialize();
+    }
+
     /**
      * Host deep job config.
      *
