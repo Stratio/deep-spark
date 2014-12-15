@@ -73,7 +73,7 @@ public final class MongoCellExtractor extends MongoExtractor<Cells> {
             return UtilMongoDB.getCellFromBson(tuple._2(), deepJobConfig.getNameSpace());
         } catch (Exception e) {
             LOG.error("Cannot convert BSON: ", e);
-            throw new DeepTransformException("Could not transform from Bson to Cell " + e.getMessage());
+            throw new DeepTransformException("Could not transform from Bson to Cell " + e.getMessage(), e);
         }
     }
 
