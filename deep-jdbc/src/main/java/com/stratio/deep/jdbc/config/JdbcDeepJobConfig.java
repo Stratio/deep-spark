@@ -84,7 +84,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     /**
      * {@inheritDoc}
      */
-    public JdbcDeepJobConfig driverClass(String driverClass) {
+    public JdbcDeepJobConfig<T> driverClass(String driverClass) {
         this.driverClass = driverClass;
         return this;
     }
@@ -128,7 +128,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
      * {@inheritDoc}
      */
     @Override
-    public JdbcDeepJobConfig username(String username) {
+    public JdbcDeepJobConfig<T> username(String username) {
         this.username = username;
         return this;
     }
@@ -137,7 +137,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
      * {@inheritDoc}
      */
     @Override
-    public JdbcDeepJobConfig password(String password) {
+    public JdbcDeepJobConfig<T> password(String password) {
         this.password = password;
         return this;
     }
@@ -146,7 +146,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
      * {@inheritDoc}
      */
     @Override
-    public JdbcDeepJobConfig database(String database) {
+    public JdbcDeepJobConfig<T> database(String database) {
         this.catalog = database;
         return this;
     }
@@ -163,7 +163,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
      * {@inheritDoc}
      */
     @Override
-    public JdbcDeepJobConfig table(String table) {
+    public JdbcDeepJobConfig<T> table(String table) {
         this.table = table;
         return this;
     }
@@ -180,7 +180,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
      * {@inheritDoc}
      */
     @Override
-    public JdbcDeepJobConfig query(String query) {
+    public JdbcDeepJobConfig<T> query(String query) {
         this.query = query;
         return this;
     }
@@ -197,7 +197,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
      * {@inheritDoc}
      */
     @Override
-    public JdbcDeepJobConfig upperBound(int upperBound) {
+    public JdbcDeepJobConfig<T> upperBound(int upperBound) {
         this.upperBound = upperBound;
         return this;
     }
@@ -214,7 +214,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
      * {@inheritDoc}
      */
     @Override
-    public JdbcDeepJobConfig lowerBound(int lowerBound) {
+    public JdbcDeepJobConfig<T> lowerBound(int lowerBound) {
         this.lowerBound = lowerBound;
         return this;
     }
@@ -231,7 +231,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
      * {@inheritDoc}
      */
     @Override
-    public JdbcDeepJobConfig numPartitions(int numPartitions) {
+    public JdbcDeepJobConfig<T> numPartitions(int numPartitions) {
         this.numPartitions = numPartitions;
         return this;
     }
