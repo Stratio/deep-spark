@@ -272,7 +272,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
             query("SELECT * FROM \"" + getTable() + "\"");
         }
         if(connectionUrl == null || connectionUrl.isEmpty()) {
-            if((host != null || host.isEmpty()) && (port > 0)) {
+            if((host != null && !host.isEmpty()) && (port > 0)) {
                 connectionUrl(getJdbcUrl());
             } else {
                 throw new IllegalArgumentException("You must specify at least one of connectionUrl or host and port properties");

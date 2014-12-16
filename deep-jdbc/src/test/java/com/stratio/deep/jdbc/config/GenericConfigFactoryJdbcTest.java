@@ -77,14 +77,14 @@ public class GenericConfigFactoryJdbcTest {
     }
 
     @Test
-    public void testHostValidation() {
+    public void testHostPortJdbcUrlValidation() {
         JdbcDeepJobConfig<Cells> config = JdbcConfigFactory.createJdbc();
         config.port(PORT).driverClass(DRIVER_CLASS).database(DATABASE).table(TABLE);
         try {
             config.initialize();
             fail();
         } catch(IllegalArgumentException e) {
-            config.host(HOST);
+            config.connectionUrl("testUrl");
         }
         config.initialize();
     }
