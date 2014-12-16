@@ -22,7 +22,7 @@ import static com.stratio.deep.core.util.ExtractorClientUtil.getExtractorClient;
 import java.io.Serializable;
 
 import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
+import com.stratio.deep.commons.exception.DeepExtractorInitializationException;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.commons.rdd.IExtractor;
 
@@ -55,7 +55,7 @@ public class PrepareSaveFunction<T, S extends BaseConfig<T>> extends AbstractFun
         IExtractor<T, S> extractor;
         try {
             extractor = getExtractorInstance(config);
-        } catch (DeepExtractorinitializationException e) {
+        } catch (DeepExtractorInitializationException e) {
             extractor = getExtractorClient();
         }
 

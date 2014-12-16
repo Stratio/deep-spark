@@ -89,7 +89,7 @@ git checkout "$SPARK_BRANCH" || { echo "Cannot checkout branch: ${SPARK_BRANCH}"
 chmod +x bin/stratio-deep-shell
 
 #--hadoop 2.0.0-mr1-cdh4.4.0
-./make-distribution.sh --skip-java-test -Dhadoop.version=2.4.0 -Pyarn -Phive   || { echo "Cannot make Spark distribution"; exit 1; }
+./make-distribution.sh --skip-java-test -Dhadoop.version=2.4.0 -Pyarn -Phive -Pnetlib-lgpl  || { echo "Cannot make Spark distribution"; exit 1; }
 
 cd ..
 
