@@ -157,7 +157,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
                     .withPort(this.cqlPort)
                     .addContactPoint(this.getHost())
                     .withCredentials(this.username, this.password)
-                    .withProtocolVersion(ProtocolVersion.V2)
+                    .withProtocolVersion(ProtocolVersion.V3)
                     .build();
 
             session = cluster.connect(quote(this.catalog));

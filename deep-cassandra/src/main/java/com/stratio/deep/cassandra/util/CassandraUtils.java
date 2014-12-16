@@ -620,14 +620,14 @@ public class CassandraUtils {
                 Cell c = cells.getCellByIdx(i);
 
                 if (c.isKey()) {
-                    keys[i] = DataType.serializeValue(c.getValue(), ProtocolVersion.V2);
+                    keys[i] = DataType.serializeValue(c.getValue(), ProtocolVersion.V3);
                 }
             }
 
             partitionKey = CompositeType.build(keys);
         } else {
             Cell cell = cells.getCellByIdx(0);
-            partitionKey = DataType.serializeValue(cell.getValue(), ProtocolVersion.V2);
+            partitionKey = DataType.serializeValue(cell.getValue(), ProtocolVersion.V3);
         }
         return partitionKey;
     }
@@ -639,7 +639,7 @@ public class CassandraUtils {
 
         Object o = null;
         if (cellValue != null) {
-            o = ((DataType) metadata.getValue()).deserialize(cellValue, ProtocolVersion.V2);
+            o = ((DataType) metadata.getValue()).deserialize(cellValue, ProtocolVersion.V3);
 
         }
 

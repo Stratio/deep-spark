@@ -83,7 +83,7 @@ class CassandraClientProvider {
 
         synchronized (CLIENTS_CACHE) {
             final int port = conf.getCqlPort();
-            final String key = location + ":" + port + ":" + conf.getKeyspace() + ":" + balanced;
+            final String key = location + ":" + port ;
 
             if (CLIENTS_CACHE.containsKey(key)) {
                 LOG.trace("Found cached session at level 1 for key {{}}", key);
@@ -105,9 +105,9 @@ class CassandraClientProvider {
 
                 Cluster cluster = Cluster.builder()
                         .withPort(port)
-                        .addContactPoint(location)
+                        .addContactPoints(locationInet)
                         .withLoadBalancingPolicy(loadBalancingPolicy)
-                        .withProtocolVersion(ProtocolVersion.V2)
+                        .withProtocolVersion(ProtocolVersion.V3)
                         .withCredentials(conf.getUsername(), conf.getPassword())
                         .build();
 

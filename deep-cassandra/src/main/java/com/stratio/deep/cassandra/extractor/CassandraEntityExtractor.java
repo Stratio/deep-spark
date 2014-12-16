@@ -68,7 +68,7 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
         for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
             Cell metadata = columnDefinitions.get(entry.getKey());
             edjc.setInstancePropertyFromDbName(instance, entry.getKey(), ((DataType) metadata.getValue())
-                    .deserialize(entry.getValue(), ProtocolVersion.V2));
+                    .deserialize(entry.getValue(), ProtocolVersion.V3));
         }
 
         for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
@@ -80,7 +80,7 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
             try {
 
                 edjc.setInstancePropertyFromDbName(instance, entry.getKey(), ((DataType) metadata.getValue())
-                        .deserialize(entry.getValue(), ProtocolVersion.V2));
+                        .deserialize(entry.getValue(), ProtocolVersion.V3));
             } catch (DeepNoSuchFieldException e) {
                 LOG.error(e.getMessage());
             }
