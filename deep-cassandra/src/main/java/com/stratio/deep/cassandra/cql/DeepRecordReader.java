@@ -17,6 +17,7 @@
 package com.stratio.deep.cassandra.cql;
 
 import static com.stratio.deep.cassandra.cql.CassandraClientProvider.trySessionForLocation;
+import static com.stratio.deep.cassandra.util.CassandraUtils.isFilterdByKey;
 import static com.stratio.deep.cassandra.util.CassandraUtils.isTokenIncludedInRange;
 
 import java.io.Serializable;
@@ -60,6 +61,7 @@ import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.exception.DeepIllegalAccessException;
+import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.impl.DeepPartitionLocationComparator;
 import com.stratio.deep.commons.rdd.DeepTokenRange;
 import com.stratio.deep.commons.rdd.IDeepRecordReader;
@@ -138,6 +140,8 @@ public class DeepRecordReader implements IDeepRecordReader {
      */
     private Session session;
 
+
+    private boolean filterByKey = false;
     /**
      * public constructor. Takes a list of filters to pass to the underlying data stores.
      *
@@ -337,10 +341,8 @@ public class DeepRecordReader implements IDeepRecordReader {
             // Checking whether the job is a EQUALS_IN special query or not
             if (equalsInValue == null) {
                 String whereClause = whereClause();
-                generatedQuery = String.format("SELECT %s FROM %s%s%s ALLOW FILTERING",
-                        generatedColumns, quote(cfName), whereClause,
-                        CassandraUtils.additionalFilterGenerator(config.getAdditionalFilters(), config.getFilters(),
-                                getLuceneIndex()));
+                generatedQuery = String.format("SELECT %s FROM %s%s ALLOW FILTERING",
+                        generatedColumns, quote(cfName), whereClause);
             } else {
                 // partitioner.getToken(getPartitionKey(equalsInValue));
                 String equalsInClause = equalsInWhereClause(equalsInValue);
@@ -475,8 +477,24 @@ public class DeepRecordReader implements IDeepRecordReader {
             }
             // initial
             // query token(k) >= start_token and token(k) <= end_token
-            return String.format(" WHERE token(%s) > ? AND token(%s) <= ?", partitionKeyString,
-                    partitionKeyString);
+
+            filterByKey = isFilterdByKey(config.getFilters(), partitionKeyString);
+
+            String filterGenerator = CassandraUtils.additionalFilterGenerator(config.getAdditionalFilters(),
+                    config.getFilters(), getLuceneIndex());
+
+            StringBuffer sb = new StringBuffer();
+
+            sb.append(" WHERE ");
+            if(filterByKey){
+                filterGenerator = filterGenerator.substring(4);
+            }else{
+                sb.append(String.format(" token(%s) > ? AND token(%s) <= ?", partitionKeyString,
+                        partitionKeyString));
+            }
+            sb.append(filterGenerator);
+
+            return sb.toString();
         }
 
         /**
@@ -534,11 +552,14 @@ public class DeepRecordReader implements IDeepRecordReader {
         private List<Object> preparedQueryBindValues() {
             List<Object> values = new LinkedList<>();
 
-            Object startToken = split.getStartToken();
-            Object endToken = split.getEndToken();
+            if(!filterByKey){
+                Object startToken = split.getStartToken();
+                Object endToken = split.getEndToken();
 
-            values.add(startToken);
-            values.add(endToken);
+                values.add(startToken);
+                values.add(endToken);
+            }
+
             return values;
         }
 
