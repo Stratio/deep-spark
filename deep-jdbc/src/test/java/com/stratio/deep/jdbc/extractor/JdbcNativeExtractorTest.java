@@ -82,7 +82,7 @@ public class JdbcNativeExtractorTest {
     @Test
     public void testSaveRdd() throws Exception {
         JdbcNativeExtractor extractor = createJdbcNativeExtractor();
-        when(extractor.transformElement(any(Object.class))).thenReturn(new HashMap());
+        doReturn(new HashMap()).when(extractor).transformElement(any(Object.class));
         extractor.saveRDD(new Object());
         verify(jdbcWriter, times(1)).save(any(Map.class));
     }
