@@ -131,9 +131,6 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig<T>> impl
         if (catalog == null) {
             throw new IllegalArgumentException("index cannot be null");
         }
-        if (table == null) {
-            throw new IllegalArgumentException("type cannot be null");
-        }
     }
 
     /**

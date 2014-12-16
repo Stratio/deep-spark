@@ -67,8 +67,7 @@ public class AerospikeEntityExtractor<T> extends AerospikeExtractor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T transformElement(Tuple2<AerospikeKey, AerospikeRecord> tuple, DeepJobConfig<T,
-            AerospikeDeepJobConfig<T>> config) {
+    public T transformElement(Tuple2<AerospikeKey, AerospikeRecord> tuple, DeepJobConfig<T, ? extends DeepJobConfig> config) {
         try {
             return (T) UtilAerospike.getObjectFromRecord(config.getEntityClass(), tuple._2(),
                     (AerospikeDeepJobConfig) this.deepJobConfig);

@@ -42,6 +42,7 @@ import com.mongodb.QueryBuilder;
 import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
 import com.stratio.deep.commons.config.BaseConfig;
+import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.impl.DeepPartition;
@@ -388,7 +389,7 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
         if (config instanceof ExtractorConfig) {
             mongoDeepJobConfig.initialize((ExtractorConfig) config);
         } else {
-            mongoDeepJobConfig = (MongoDeepJobConfig) config;
+            mongoDeepJobConfig = mongoDeepJobConfig.initialize((DeepJobConfig) config);
         }
     }
 

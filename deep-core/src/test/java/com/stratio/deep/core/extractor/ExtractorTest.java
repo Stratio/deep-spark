@@ -453,7 +453,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      * @param clazz the clazz
      * @return the extractor config
      */
-    private <W> ExtractorConfig<W> getExtractorConfig(Class<W> clazz) {
+    protected <W> ExtractorConfig<W> getExtractorConfig(Class<W> clazz) {
         return new ExtractorConfig<>(clazz);
     }
 

@@ -59,13 +59,13 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T transformElement(Tuple2<Object, BSONObject> tuple, DeepJobConfig<T, MongoDeepJobConfig<T>> config) {
+    public T transformElement(Tuple2<Object, BSONObject> tuple, DeepJobConfig<T, ? extends DeepJobConfig> config) {
 
         try {
             return (T) UtilMongoDB.getObjectFromBson(config.getEntityClass(), tuple._2());
         } catch (Exception e) {
             LOG.error("Cannot convert BSON: ", e);
-            throw new DeepTransformException("Could not transform from Bson to Entity " + e.getMessage());
+            throw new DeepTransformException("Could not transform from Bson to Entity " + e.getMessage(), e);
         }
 
     }
@@ -76,7 +76,7 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
             return new Tuple2<>(null, (BSONObject) UtilMongoDB.getBsonFromObject(record));
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             LOG.error(e.getMessage());
-            throw new DeepTransformException(e.getMessage());
+            throw new DeepTransformException(e.getMessage(), e);
         }
     }
 
