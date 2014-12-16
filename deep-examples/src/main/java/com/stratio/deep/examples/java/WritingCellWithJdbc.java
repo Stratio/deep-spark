@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 
 /**
- * Usage of JDBC extractor for writing Cells to a MySQL database.
+ * Usage of JDBC extractor for writing Cells to an Oracle database.
  */
 public class WritingCellWithJdbc {
 
@@ -37,17 +37,13 @@ public class WritingCellWithJdbc {
     }
 
     public static void doMain(String[] args) {
-        String job = "java:writingCellWithJdbc";
+        String job = "java:readingCellFromJdbc";
 
         String host = "127.0.0.1";
-        int port = 3306;
-        String driverClass = "com.mysql.jdbc.Driver";
-        String user = "root";
-        String password = "root";
+        int port = 1521;
 
-        String database = "test";
-        String inputTable = "test_table";
-        String outputTable = "test_table_output";
+        String table = "CARS";
+        String outputTable = "CARS_OUTPUT";
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -55,12 +51,13 @@ public class WritingCellWithJdbc {
                 p.getJars());
 
         JdbcDeepJobConfig inputConfigCell = JdbcConfigFactory.createJdbc().host(host).port(port)
-                .username(user)
-                .password(password)
-                .driverClass(driverClass)
-                .database(database)
-                .table(inputTable);
-        inputConfigCell.initialize();
+                .connectionUrl("jdbc:oracle:thin:system/manager@localhost:1521:XE")
+                .table(table)
+                .username("system")
+                .password("manager")
+                .driverClass("oracle.jdbc.driver.OracleDriver")
+                .query("select * from cars")
+                ;
 
         RDD inputRDDCell = deepContext.createRDD(inputConfigCell);
 
@@ -68,12 +65,12 @@ public class WritingCellWithJdbc {
         LOG.info("prints first entity  : " + inputRDDCell.first());
 
         JdbcDeepJobConfig outputConfigCell = JdbcConfigFactory.createJdbc().host(host).port(port)
-                .username(user)
-                .password(password)
-                .driverClass(driverClass)
-                .database(database)
-                .table(outputTable);
-        inputConfigCell.initialize();
+                .connectionUrl("jdbc:oracle:thin:system/manager@localhost:1521:XE")
+                .table(outputTable)
+                .username("system")
+                .password("manager")
+                .driverClass("oracle.jdbc.driver.OracleDriver");
+        outputConfigCell.initialize();
 
         deepContext.saveRDD(inputRDDCell, outputConfigCell);
 
