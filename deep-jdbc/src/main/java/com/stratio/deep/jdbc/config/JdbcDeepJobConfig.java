@@ -27,6 +27,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.lib.db.DBConfiguration;
 
 import java.io.Serializable;
+import java.sql.DriverManager;
 import java.util.Map;
 
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.*;
@@ -40,6 +41,11 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         IJdbcDeepJobConfig<T, JdbcDeepJobConfig<T>>, Serializable {
 
     private static final long serialVersionUID = -6487437723098215934L;
+
+    /**
+     * JDBC connection URL.
+     */
+    private String connectionUrl;
 
     /**
      * JDBC driver class name.
@@ -94,6 +100,24 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public JdbcDeepJobConfig<T> connectionUrl(String connectionUrl) {
+        this.connectionUrl = connectionUrl;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getConnectionUrl() {
+        if(connectionUrl == null || connectionUrl.isEmpty()) {
+            return getJdbcUrl();
+        }
+        return connectionUrl;
+    }
+
+    /**
      * Builds the JDBC url from the configuration
      * @return JDBC connection url.
      */
@@ -116,6 +140,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
      * @return JDBC provider name.
      */
     private String getJdbcProvider(){
+
         int firstIndex = driverClass.indexOf(".");
         int secondIndex = driverClass.indexOf(".", ++firstIndex);
         return driverClass.substring(firstIndex, secondIndex);
@@ -234,12 +259,6 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     }
 
     private void validate() {
-        if(host == null || host.isEmpty()) {
-            throw new IllegalArgumentException("Host must be specified");
-        }
-        if(port <= 0) {
-            throw new IllegalArgumentException("Port must be valid");
-        }
         if(driverClass == null || driverClass.isEmpty()) {
             throw new IllegalArgumentException("Driver class must be specified");
         }
@@ -250,7 +269,14 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
             throw new IllegalArgumentException("Table name must be specified");
         }
         if(query == null || query.isEmpty()) {
-            query("SELECT * FROM " + getTable());
+            query("SELECT * FROM \"" + getTable() + "\"");
+        }
+        if(connectionUrl == null || connectionUrl.isEmpty()) {
+            if((host != null || host.isEmpty()) && (port > 0)) {
+                connectionUrl(getJdbcUrl());
+            } else {
+                throw new IllegalArgumentException("You must specify at least one of connectionUrl or host and port properties");
+            }
         }
     }
 
@@ -265,6 +291,10 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
 
         if (values.get(JDBC_DRIVER_CLASS) != null) {
             driverClass(extractorConfig.getString(JDBC_DRIVER_CLASS));
+        }
+
+        if (values.get(JDBC_CONNECTION_URL) != null) {
+            connectionUrl(extractorConfig.getString(JDBC_CONNECTION_URL));
         }
 
         if (values.get(JDBC_QUERY) != null) {

@@ -27,10 +27,10 @@ public class ReadingCellsFromJdbc {
         String job = "java:readingCellFromJdbc";
 
         String host = "127.0.0.1";
-        int port = 3306;
+        int port = 1521;
 
         String schema = "deeptest";
-        String table = "employee";
+        String table = "cars";
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -38,12 +38,12 @@ public class ReadingCellsFromJdbc {
                 p.getJars());
 
         JdbcDeepJobConfig inputConfigCell = JdbcConfigFactory.createJdbc().host(host).port(port)
+                .connectionUrl("jdbc:oracle:thin:system/manager@localhost:1521:XE")
                 .table(table)
-                .username("root")
-                .password("")
-                .driverClass("com.mysql.jdbc.Driver")
-                .query("select * from employee")
-                .database(schema)
+                .username("system")
+                .password("manager")
+                .driverClass("oracle.jdbc.driver.OracleDriver")
+                .query("select * from cars")
                 ;
 
         RDD inputRDDCell = deepContext.createRDD(inputConfigCell);

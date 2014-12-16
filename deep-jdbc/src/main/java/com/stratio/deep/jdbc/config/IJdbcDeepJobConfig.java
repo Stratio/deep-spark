@@ -26,6 +26,19 @@ import com.stratio.deep.commons.config.DeepJobConfig;
 public interface IJdbcDeepJobConfig<T, S extends DeepJobConfig> {
 
     /**
+     * Sets the database connection URL.
+     * @param connectionUrl Database JDBC connection URL.
+     * @return Configuration object.
+     */
+    S connectionUrl(String connectionUrl);
+
+    /**
+     * Gets the database connection URL.
+     * @return Database JDBC connection URL.
+     */
+    String getConnectionUrl();
+
+    /**
      * Sets the database schema.
      * @param database Database schema.
      * @return Configuration object.

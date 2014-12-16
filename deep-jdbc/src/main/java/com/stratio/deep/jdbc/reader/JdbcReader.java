@@ -58,7 +58,7 @@ public class JdbcReader {
      */
     public void init(Partition p) throws Exception {
         Class.forName(jdbcDeepJobConfig.getDriverClass());
-        conn = DriverManager.getConnection(jdbcDeepJobConfig.getJdbcUrl(),
+        conn = DriverManager.getConnection(jdbcDeepJobConfig.getConnectionUrl(),
                 jdbcDeepJobConfig.getUsername(),
                 jdbcDeepJobConfig.getPassword());
         Statement statement = conn.createStatement();

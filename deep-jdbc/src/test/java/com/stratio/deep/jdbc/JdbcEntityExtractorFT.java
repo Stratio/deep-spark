@@ -30,7 +30,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.AssertJUnit.assertNull;
 
 /**
- * Created by mariomgal on 11/12/14.
+ * Tests for JdbcEntityExtractor
  */
 @Test(groups = { "JdbcEntityExtractorFT", "FunctionalTests" }, dependsOnGroups = { "JdbcJavaRDDFT" })
 public class JdbcEntityExtractorFT extends ExtractorEntityTest {
@@ -47,7 +47,7 @@ public class JdbcEntityExtractorFT extends ExtractorEntityTest {
         try {
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity = getReadExtractorConfig();
-            inputConfigEntity.putValue(ExtractorConstants.JDBC_QUERY, "select * from input");
+            inputConfigEntity.putValue(ExtractorConstants.JDBC_QUERY, "select * from \"input\"");
             RDD<MessageTestEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
 
             //Import dataSet was OK and we could read it
@@ -67,7 +67,7 @@ public class JdbcEntityExtractorFT extends ExtractorEntityTest {
         try {
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity = getReadExtractorConfig();
-            inputConfigEntity.putValue(ExtractorConstants.JDBC_QUERY, "select id from input");
+            inputConfigEntity.putValue(ExtractorConstants.JDBC_QUERY, "select \"id\" from \"input\"");
             RDD<MessageTestEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
 
             assertEquals(inputRDDEntity.count(), 1, "Expected read entity count is 1");
@@ -77,7 +77,7 @@ public class JdbcEntityExtractorFT extends ExtractorEntityTest {
             assertNull(message.getNumber());
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity2 = getReadExtractorConfig();
-            inputConfigEntity2.putValue(ExtractorConstants.JDBC_QUERY, "select message, number from input");
+            inputConfigEntity2.putValue(ExtractorConstants.JDBC_QUERY, "select \"message\", \"number\" from \"input\"");
             RDD<MessageTestEntity> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
 
             assertEquals(inputRDDEntity2.count(), 1, "Expected read entity count is 1");
@@ -99,14 +99,14 @@ public class JdbcEntityExtractorFT extends ExtractorEntityTest {
         try {
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity = getReadExtractorConfig();
-            inputConfigEntity.putValue(ExtractorConstants.JDBC_QUERY, "select * from input where number=3");
+            inputConfigEntity.putValue(ExtractorConstants.JDBC_QUERY, "select * from \"input\" where \"number\"=3");
             RDD<MessageTestEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
 
             //Import dataSet was OK and we could read it
             assertEquals(inputRDDEntity.count(), 1, "Expected read entity count is 1");
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity2 = getReadExtractorConfig();
-            inputConfigEntity2.putValue(ExtractorConstants.JDBC_QUERY, "select * from input where number=2");
+            inputConfigEntity2.putValue(ExtractorConstants.JDBC_QUERY, "select * from \"input\" where \"number\"=2");
             RDD<MessageTestEntity> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
 
             //Import dataSet was OK and we could read it
@@ -125,14 +125,14 @@ public class JdbcEntityExtractorFT extends ExtractorEntityTest {
         try {
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity = getReadExtractorConfig();
-            inputConfigEntity.putValue(ExtractorConstants.JDBC_QUERY, "select * from input where number!=1");
+            inputConfigEntity.putValue(ExtractorConstants.JDBC_QUERY, "select * from \"input\" where \"number\"!=1");
             RDD<MessageTestEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
 
             //Import dataSet was OK and we could read it
             assertEquals(inputRDDEntity.count(), 1, "Expected read entity count is 1");
 
             ExtractorConfig<MessageTestEntity> inputConfigEntity2 = getReadExtractorConfig();
-            inputConfigEntity2.putValue(ExtractorConstants.JDBC_QUERY, "select * from input where number!=3");
+            inputConfigEntity2.putValue(ExtractorConstants.JDBC_QUERY, "select * from \"input\" where \"number\"!=3");
             RDD<MessageTestEntity> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
 
             //Import dataSet was OK and we could read it
@@ -157,6 +157,7 @@ public class JdbcEntityExtractorFT extends ExtractorEntityTest {
     public ExtractorConfig getReadExtractorConfig() {
         ExtractorConfig<MessageTestEntity> extractorConfig = super.getExtractorConfig(MessageTestEntity.class);
         extractorConfig.putValue(ExtractorConstants.HOST, JdbcJavaRDDFT.HOST)
+                .putValue(ExtractorConstants.JDBC_CONNECTION_URL, "jdbc:hsqldb:file:" + JdbcJavaRDDFT.NAMESPACE_ENTITY)
                 .putValue(ExtractorConstants.USERNAME, JdbcJavaRDDFT.USER)
                 .putValue(ExtractorConstants.PASSWORD, JdbcJavaRDDFT.PASSWORD)
                 .putValue(ExtractorConstants.CATALOG, JdbcJavaRDDFT.NAMESPACE_ENTITY)
@@ -171,6 +172,7 @@ public class JdbcEntityExtractorFT extends ExtractorEntityTest {
     public ExtractorConfig getWriteExtractorConfig(String tableOutput, Class entityClass) {
         ExtractorConfig<MessageTestEntity> extractorConfig = super.getExtractorConfig(MessageTestEntity.class);
         extractorConfig.putValue(ExtractorConstants.HOST, JdbcJavaRDDFT.HOST)
+                .putValue(ExtractorConstants.JDBC_CONNECTION_URL, "jdbc:hsqldb:file:" + JdbcJavaRDDFT.NAMESPACE_ENTITY)
                 .putValue(ExtractorConstants.USERNAME, JdbcJavaRDDFT.USER)
                 .putValue(ExtractorConstants.PASSWORD, JdbcJavaRDDFT.PASSWORD)
                 .putValue(ExtractorConstants.CATALOG, JdbcJavaRDDFT.NAMESPACE_ENTITY)

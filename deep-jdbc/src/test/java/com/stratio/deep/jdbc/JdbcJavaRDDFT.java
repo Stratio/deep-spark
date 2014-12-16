@@ -16,21 +16,21 @@
 
 package com.stratio.deep.jdbc;
 
+import org.apache.derby.jdbc.EmbeddedDriver;
+import org.hsqldb.jdbc.JDBCDriver;
+import org.hsqldb.jdbcDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 import static org.testng.Assert.assertEquals;
 
 /**
- * Created by mariomgal on 11/12/14.
+ * Generic Functional Test for JDBC Extractor
  */
 @Test(groups = { "JdbcJavaRDDFT", "FunctionalTests" })
 public class JdbcJavaRDDFT {
@@ -41,17 +41,15 @@ public class JdbcJavaRDDFT {
 
     private Connection connEntity;
 
-    private Statement statement;
+    public static final String HOST = null;
 
-    public static final String HOST = "127.0.0.1";
+    public static final int PORT = -1;
 
-    public static final int PORT = 3306;
+    public static final String DRIVER_CLASS = "org.hsqldb.jdbc.JDBCDriver";
 
-    public static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
+    public static final String USER = "SA";
 
-    public static final String USER = "root";
-
-    public static final String PASSWORD = "root";
+    public static final String PASSWORD = "";
 
     public static final String NAMESPACE_CELL = "jdbccellextractor";
 
@@ -59,22 +57,22 @@ public class JdbcJavaRDDFT {
 
     public static final String INPUT_TABLE = "input";
 
-    public static final String OUTPUT_CELLS_TABLE = "outputcells";
+    public static final String OUTPUT_CELLS_TABLE = "outputCells";
 
-    public static final String OUTPUT_ENTITY_TABLE = "outputentity";
+    public static final String OUTPUT_ENTITY_TABLE = "outputEntity";
 
     public static final String SET_NAME_BOOK = "bookinput";
 
     @BeforeSuite
     public void init() throws Exception {
-        DriverManager.registerDriver(new com.mysql.jdbc.Driver());
-        createDatabases();
-        connCell = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/" + NAMESPACE_CELL, USER, PASSWORD);
-        statement = connCell.createStatement();
-        deleteData();
-        connEntity = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/" + NAMESPACE_ENTITY, USER, PASSWORD);
-        statement = connEntity.createStatement();
-        deleteData();
+        DriverManager.registerDriver(new JDBCDriver());
+        connCell = DriverManager.getConnection("jdbc:hsqldb:file:" + NAMESPACE_CELL);
+        createTables(connCell, NAMESPACE_CELL, INPUT_TABLE, OUTPUT_CELLS_TABLE);
+        deleteData(connCell, INPUT_TABLE, OUTPUT_CELLS_TABLE);
+        connEntity = DriverManager.getConnection("jdbc:hsqldb:file:" + NAMESPACE_ENTITY);
+        createTables(connEntity, NAMESPACE_ENTITY, INPUT_TABLE, OUTPUT_ENTITY_TABLE);
+        deleteData(connEntity, INPUT_TABLE, OUTPUT_ENTITY_TABLE);
+
     }
 
     @Test
@@ -82,62 +80,31 @@ public class JdbcJavaRDDFT {
         assertEquals(true, true, "Dummy test");
     }
 
-    private void createDatabases() throws Exception {
-        Connection conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/", USER, PASSWORD);
+    private void createTables(Connection conn, String namespace, String inputTable, String outputTable) throws Exception {
         Statement stmnt = conn.createStatement();
         try {
-            stmnt.executeUpdate("CREATE DATABASE " + NAMESPACE_CELL);
+            stmnt.executeUpdate("CREATE TABLE \"" + inputTable + "\"(\"id\" VARCHAR(255) NOT NULL, \"message\" VARCHAR(255), \"number\" BIGINT, PRIMARY KEY (\"id\"))");
         } catch(SQLException e) {
-            LOG.error("Problem while creating database " + NAMESPACE_CELL + " (maybe is it already created?)", e);
+            LOG.error("Problem while creating table " + inputTable + " (maybe is it already created?)", e);
         }
         try {
-            stmnt.executeUpdate("CREATE TABLE " + NAMESPACE_CELL + "." + INPUT_TABLE + "(id VARCHAR(255) NOT NULL, message VARCHAR(255), number INTEGER, PRIMARY KEY (id))");
+            stmnt.executeUpdate("CREATE TABLE \"" + outputTable + "\"(\"id\" VARCHAR(255) NOT NULL, \"message\" VARCHAR(255), \"number\" BIGINT, PRIMARY KEY (\"id\"))");
         } catch(SQLException e) {
-            LOG.error("Problem while creating table " + INPUT_TABLE + " (maybe is it already created?)", e);
+            LOG.error("Problem while creating table " + outputTable + " (maybe is it already created?)", e);
         }
-        try {
-            stmnt.executeUpdate("CREATE TABLE " + NAMESPACE_CELL + "." + OUTPUT_CELLS_TABLE + "(id VARCHAR(255) NOT NULL, message VARCHAR(255), number INTEGER, PRIMARY KEY (id))");
-        } catch(SQLException e) {
-            LOG.error("Problem while creating table " + OUTPUT_CELLS_TABLE + " (maybe is it already created?)", e);
-        }
-        try {
-            stmnt.executeUpdate("CREATE DATABASE " + NAMESPACE_ENTITY);
-        } catch(SQLException e) {
-            LOG.error("Problem while creating database " + NAMESPACE_ENTITY + " (maybe is it already created?)", e);
-        }
-        try {
-            stmnt.executeUpdate("CREATE TABLE " + NAMESPACE_ENTITY + "." + INPUT_TABLE + "(id VARCHAR(255) NOT NULL, message VARCHAR(255), number BIGINT, PRIMARY KEY (id))");
-        } catch(SQLException e) {
-            LOG.error("Problem while creating table " + INPUT_TABLE + " (maybe is it already created?)", e);
-        }
-        try {
-            stmnt.executeUpdate("CREATE TABLE " + NAMESPACE_ENTITY + "." + OUTPUT_ENTITY_TABLE + "(id VARCHAR(255) NOT NULL, message VARCHAR(255), number BIGINT, PRIMARY KEY (id))");
-        } catch(SQLException e) {
-            LOG.error("Problem while creating table " + OUTPUT_ENTITY_TABLE + " (maybe is it already created?)", e);
-        }
-        conn.close();
     }
 
-    private void deleteData() throws Exception {
+    private void deleteData(Connection conn, String inputTable, String outputTable) throws Exception {
+        Statement statement = conn.createStatement();
         try {
-            statement.executeUpdate("DELETE FROM " + INPUT_TABLE);
-        } catch(SQLException e) {
-            LOG.error("Error deleting table " + INPUT_TABLE + ", does the table exist?");
+            statement.executeUpdate("DELETE FROM \"" + inputTable + "\"");
+        } catch (SQLException e) {
+            LOG.error("Error deleting table " + inputTable + ", does the table exist?");
         }
         try {
-            statement.executeUpdate("DELETE FROM " + OUTPUT_CELLS_TABLE);
-        } catch(SQLException e) {
-            LOG.error("Error deleting table " + OUTPUT_CELLS_TABLE + ", does the table exist?");
-        }
-        try {
-            statement.executeUpdate("DELETE FROM " + OUTPUT_ENTITY_TABLE);
-        } catch(SQLException e) {
-            LOG.error("Error deleting table " + OUTPUT_ENTITY_TABLE + ", does the table exist?");
-        }
-        try {
-            statement.executeUpdate("DELETE FROM " + SET_NAME_BOOK);
-        } catch(SQLException e) {
-            LOG.error("Error deleting table " + SET_NAME_BOOK + ", does the table exist?");
+            statement.executeUpdate("DELETE FROM \"" + outputTable + "\"");
+        } catch (SQLException e) {
+            LOG.error("Error deleting table " + outputTable + ", does the table exist?");
         }
     }
 

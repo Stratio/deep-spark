@@ -18,11 +18,10 @@ package com.stratio.deep.jdbc.writer;
 
 import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
 import org.apache.commons.lang3.StringUtils;
+import scala.Tuple2;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Creates a new JDBC connection and provides methods for writing.
@@ -47,7 +46,7 @@ public class JdbcWriter<T> {
     public JdbcWriter(JdbcDeepJobConfig jdbcDeepJobConfig) throws Exception {
         this.jdbcDeepJobConfig = jdbcDeepJobConfig;
         Class.forName(jdbcDeepJobConfig.getDriverClass());
-        this.conn = DriverManager.getConnection(jdbcDeepJobConfig.getJdbcUrl(),
+        this.conn = DriverManager.getConnection(jdbcDeepJobConfig.getConnectionUrl(),
                 jdbcDeepJobConfig.getUsername(),
                 jdbcDeepJobConfig.getPassword());
     }
@@ -58,10 +57,11 @@ public class JdbcWriter<T> {
      * @throws SQLException
      */
     public void save(Map<String, Object> row) throws SQLException {
-        PreparedStatement statement = conn.prepareStatement(sqlFromRow(row));
+        Tuple2<List<String>, String> data = sqlFromRow(row);
+        PreparedStatement statement = conn.prepareStatement(data._2());
         int i = 1;
-        for(Object value:row.values()) {
-            statement.setObject(i, value);
+        for(String columnName:data._1()) {
+            statement.setObject(i, row.get(columnName));
             i++;
         }
         statement.executeUpdate();
@@ -75,20 +75,27 @@ public class JdbcWriter<T> {
         conn.close();
     }
 
-    private String sqlFromRow(Map<String, Object> row) {
+    private Tuple2<List<String>, String> sqlFromRow(Map<String, Object> row) {
+
         List<String> params = new ArrayList<>();
         for(int i=0; i<row.size(); i++) {
             params.add("?");
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("INSERT INTO ");
+        sb.append("INSERT INTO \"");
         sb.append(jdbcDeepJobConfig.getTable());
-        sb.append(" (");
-        sb.append(StringUtils.join(row.keySet(), ","));
+        sb.append("\" (");
+        List<String> columns = new ArrayList<>(row.keySet());
+        List<String> quotedColumns = new ArrayList<>();
+        for(String column:columns) {
+            quotedColumns.add(String.format("\"%s\"", column));
+        }
+        sb.append(StringUtils.join(quotedColumns, ","));
         sb.append(" ) VALUES (");
         sb.append(StringUtils.join(params, ","));
         sb.append(")");
-        return sb.toString();
+        Tuple2<List<String>, String> result = new Tuple2<>(columns, sb.toString());
+        return result;
     }
 
 
