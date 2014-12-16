@@ -38,19 +38,6 @@ public class GenericConfigFactoryJdbcTest {
     private static final String TABLE = "table";
 
     @Test
-    public void testDatabaseValidation() {
-        JdbcDeepJobConfig<Cells> config = JdbcConfigFactory.createJdbc();
-        config.host(HOST).port(PORT).driverClass(DRIVER_CLASS).table(TABLE);
-        try {
-            config.initialize();
-            fail();
-        } catch(IllegalArgumentException e) {
-            config.database(DATABASE);
-        }
-        config.initialize();
-    }
-
-    @Test
     public void testDriverClassValidation() {
         JdbcDeepJobConfig<Cells> config = JdbcConfigFactory.createJdbc();
         config.host(HOST).port(PORT).database(DATABASE).table(TABLE);
