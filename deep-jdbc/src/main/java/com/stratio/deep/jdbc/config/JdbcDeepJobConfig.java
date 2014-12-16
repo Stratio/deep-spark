@@ -262,9 +262,6 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         if(driverClass == null || driverClass.isEmpty()) {
             throw new IllegalArgumentException("Driver class must be specified");
         }
-        if(catalog == null || catalog.isEmpty()) {
-            throw new IllegalArgumentException("Schema name must be specified");
-        }
         if(table == null || table.isEmpty()) {
             throw new IllegalArgumentException("Table name must be specified");
         }
