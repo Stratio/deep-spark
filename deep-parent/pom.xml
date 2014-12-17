@@ -258,12 +258,12 @@
 
 
     <dependencies>
-
+<!--
         <dependency>
             <groupId>com.github.jbellis</groupId>
             <artifactId>jamm</artifactId>
             <version>0.2.6</version>
-        </dependency>
+        </dependency>-->
         <!-- spark artifact -->
         <dependency>
             <groupId>org.apache.spark</groupId>
