@@ -85,11 +85,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     @Override
     public void initIterator(final Partition dp,
                              S config) {
-        if (config instanceof ExtractorConfig) {
-            initWithExtractorConfig((ExtractorConfig) config);
-        } else {
-            cassandraJobConfig = cassandraJobConfig.initialize((DeepJobConfig) config);
-        }
+        initCassandraDeepJobConfig(config);
 
         recordReader = initRecordReader((DeepPartition) dp, cassandraJobConfig);
     }
@@ -118,11 +114,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     @Override
     public Partition[] getPartitions(S config) {
 
-        if (config instanceof ExtractorConfig) {
-            initWithExtractorConfig((ExtractorConfig) config);
-        } else {
-            cassandraJobConfig = cassandraJobConfig.initialize((DeepJobConfig) config);
-        }
+        initCassandraDeepJobConfig(config);
 
         List<DeepTokenRange> underlyingInputSplits = null;
         if(isFilterdByKey(cassandraJobConfig.getFilters(), cassandraJobConfig.fetchTableMetadata().getPartitionKey()
@@ -153,6 +145,23 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     }
 
     /**
+     * Init mongo deep job config.
+     *
+     * @param config the config
+     */
+    private void initCassandraDeepJobConfig(S config) {
+
+        if (config instanceof ExtractorConfig) {
+            initWithExtractorConfig((ExtractorConfig) config);
+        } else if (config instanceof CassandraDeepJobConfig) {
+            cassandraJobConfig = (CassandraDeepJobConfig<T>) config;
+        } else {
+            cassandraJobConfig = cassandraJobConfig.initialize((DeepJobConfig) config);
+        }
+
+    }
+
+    /**
      * Returns a list of hosts on which the given split resides.
      */
     @Override
@@ -179,12 +188,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     @Override
     public void initSave(S config, T first, UpdateQueryBuilder queryBuilder) {
 
-        if (config instanceof ExtractorConfig) {
-            cassandraJobConfig = (CassandraDeepJobConfig<T>) ((DeepJobConfig) cassandraJobConfig)
-                    .initialize((ExtractorConfig) config);
-        } else if (config instanceof CassandraDeepJobConfig) {
-            cassandraJobConfig = (CassandraDeepJobConfig) config;
-        }
+        initCassandraDeepJobConfig(config);
 
         cassandraJobConfig
                 .createOutputTableIfNeeded((Tuple2<Cells, Cells>) transformer.apply(first));

@@ -388,9 +388,12 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
 
         if (config instanceof ExtractorConfig) {
             mongoDeepJobConfig.initialize((ExtractorConfig) config);
-        } else {
+        } else if (mongoDeepJobConfig instanceof MongoDeepJobConfig){
+            mongoDeepJobConfig = (MongoDeepJobConfig<T>) config;
+        }else{
             mongoDeepJobConfig = mongoDeepJobConfig.initialize((DeepJobConfig) config);
         }
+        mongoDeepJobConfig.initialize();
     }
 
     @Override
