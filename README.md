@@ -88,6 +88,23 @@ Cells:
   * com.stratio.deep.examples.java.WritingCellToAerospike
   * com.stratio.deep.examples.java.GroupingCellWithAerospike
 
+JDBC integration
+================
+
+Support for JDBC has been added in version 0.7.0.
+
+Examples:
+
+  * package com.stratio.deep.examples.java.ReadingEntityWithJdbc
+  * package com.stratio.deep.examples.java.WritingEntityWithJdbc
+
+Entities:
+
+Cells:
+
+  * package com.stratio.deep.examples.java.ReadingCellWithJdbc
+  * package com.stratio.deep.examples.java.WritingCellWithJdbc  
+
 
 Requirements
 ============
