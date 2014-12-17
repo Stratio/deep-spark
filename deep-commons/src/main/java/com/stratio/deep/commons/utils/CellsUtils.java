@@ -62,10 +62,16 @@ public class CellsUtils {
                 if (Collection.class.isAssignableFrom(cell.getCellValue().getClass())) {
                     Collection c = (Collection) cell.getCellValue();
                     Iterator iterator = c.iterator();
-                    List<JSONObject> innerJsonList = new ArrayList<>();
+                    List innerJsonList = new ArrayList<>();
 
                     while (iterator.hasNext()) {
-                        innerJsonList.add(getJsonFromCell((Cells) iterator.next()));
+                        Object innerObject = iterator.next();
+                        if(innerObject instanceof Cells){
+                            innerJsonList.add(getJsonFromCell((Cells)innerObject ));
+                        }else{
+                            innerJsonList.add(innerObject);
+                        }
+
                     }
                     json.put(cell.getCellName(), innerJsonList);
                 } else if (Cells.class.isAssignableFrom(cell.getCellValue().getClass())) {
@@ -159,7 +165,7 @@ public class CellsUtils {
                     }
                 }
             } catch (IllegalAccessException | InstantiationException | InvocationTargetException | IllegalArgumentException e) {
-                                LOG.error("impossible to create a java cell from Bson field:"+key);
+                                LOG.error("impossible to create a java cell from Json field:"+key);
             }
 
         }

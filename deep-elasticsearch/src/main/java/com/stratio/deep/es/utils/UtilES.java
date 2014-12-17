@@ -266,9 +266,14 @@ public final class UtilES {
                 cells.add(Cell.create(entry.getKey().toString(), innerCells));
             } else if (ArrayWritable.class.isAssignableFrom(entry.getValue().getClass())) {
                 Writable[] writetable = ((ArrayWritable) entry.getValue()).get();
-                List<Cells> innerCell = new ArrayList<>();
+                List innerCell = new ArrayList<>();
                 for (int i = 0; i < writetable.length; i++) {
-                    innerCell.add(getCellFromJson((LinkedMapWritable) writetable[i], null));
+                    if(writetable[i] instanceof LinkedMapWritable){
+                        innerCell.add(getCellFromJson((LinkedMapWritable) writetable[i], null));
+                    }else{
+                        innerCell.add(getObjectFromWritable(entry.getValue()));
+                    }
+
                 }
                 cells.add(Cell.create(entry.getKey().toString(), innerCell));
             } else {
