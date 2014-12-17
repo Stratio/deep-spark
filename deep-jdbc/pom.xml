@@ -97,7 +97,7 @@
             <version>5.1.34</version>
         </dependency>
         <dependency>
-            <groupId>org.neo4j</groupId>
+        <!--    <groupId>org.neo4j</groupId>
             <artifactId>neo4j-jdbc</artifactId>
             <version>2.1.4</version>
         </dependency>
@@ -105,7 +105,7 @@
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
             <version>11.2.0.4</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
