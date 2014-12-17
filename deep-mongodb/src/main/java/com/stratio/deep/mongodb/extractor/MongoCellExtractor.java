@@ -79,7 +79,7 @@ public final class MongoCellExtractor extends MongoExtractor<Cells> {
 
     @Override
     public Tuple2<Object, BSONObject> transformElement(Cells record) {
-        return new Tuple2<>(null, UtilMongoDB.getBsonFromCell(record));
+        return new Tuple2<>(null, (BSONObject) UtilMongoDB.getDBObjectFromCell(record));
     }
 
 }
