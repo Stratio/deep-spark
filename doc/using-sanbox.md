@@ -46,8 +46,6 @@ Name | Version | Service name | Other
 
 Spark | 1.1.0 | spark | service spark start
 
-Stratio Deep| 0.6 | | service streaming start
-
 Stratio Cassandra | 2.1.05 | cassandra | service cassandra start
 
 Mongodb | 2.6.5 | mongod| service mongod start
