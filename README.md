@@ -95,10 +95,10 @@ Support for JDBC has been added in version 0.7.0.
 
 Examples:
 
+Entities:
+
   * package com.stratio.deep.examples.java.ReadingEntityWithJdbc
   * package com.stratio.deep.examples.java.WritingEntityWithJdbc
-
-Entities:
 
 Cells:
 
