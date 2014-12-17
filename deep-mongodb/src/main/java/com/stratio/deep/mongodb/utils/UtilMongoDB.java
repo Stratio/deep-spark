@@ -166,10 +166,10 @@ public final class UtilMongoDB {
                 if (Collection.class.isAssignableFrom(field.getType())) {
                     Collection c = (Collection) object;
                     Iterator iterator = c.iterator();
-                    List<DBObject> innerBsonList = new ArrayList<>();
+                    List innerBsonList = new ArrayList<>();
 
                     while (iterator.hasNext()) {
-                        innerBsonList.add(getBsonFromObject((IDeepType) iterator.next()));
+                        innerBsonList.add(getBsonFromObject(iterator.next()));
                     }
                     bson.put(AnnotationUtils.deepFieldName(field), innerBsonList);
                 } else if (IDeepType.class.isAssignableFrom(field.getType())) {
@@ -228,9 +228,14 @@ public final class UtilMongoDB {
             try {
 
                 if (List.class.isAssignableFrom(entry.getValue().getClass())) {
-                    List<Cells> innerCell = new ArrayList<>();
-                    for (BSONObject innerBson : (List<BSONObject>) entry.getValue()) {
-                        innerCell.add(getCellFromBson(innerBson, null));
+                    List innerCell = new ArrayList<>();
+                    for (Object innerBson : (List)entry.getValue()) {
+                        if(innerBson instanceof DBObject){
+                            innerCell.add(getCellFromBson((DBObject)innerBson, null));
+                        }else{
+                            innerCell.add(innerBson);
+                        }
+
                     }
                     cells.add(Cell.create(entry.getKey(), innerCell));
                 } else if (BSONObject.class.isAssignableFrom(entry.getValue().getClass())) {
@@ -248,37 +253,6 @@ public final class UtilMongoDB {
         return cells;
     }
 
-    /**
-     * converts from and entity class with deep's anotations to BsonObject
-     *
-     * @param cells the cells
-     * @return bson from cell
-     */
-    public static BSONObject getBsonFromCell(Cells cells) {
-
-        BSONObject bson = new BasicBSONObject();
-        for (Cell cell : cells) {
-            if (cell.getValue() != null) {
-                if (Collection.class.isAssignableFrom(cell.getCellValue().getClass())) {
-                    Collection c = (Collection) cell.getCellValue();
-                    Iterator iterator = c.iterator();
-                    List<BSONObject> innerBsonList = new ArrayList<>();
-
-                    while (iterator.hasNext()) {
-                        innerBsonList.add(getBsonFromCell((Cells) iterator.next()));
-                    }
-                    bson.put(cell.getCellName(), innerBsonList);
-                } else if (Cells.class.isAssignableFrom(cell.getCellValue().getClass())) {
-                    bson.put(cell.getCellName(), getBsonFromCell((Cells) cell.getCellValue()));
-                } else {
-                    bson.put(cell.getCellName(), cell.getCellValue());
-                }
-            }
-
-        }
-
-        return bson;
-    }
 
     /**
      * converts from and entity class with deep's anotations to BsonObject
@@ -294,14 +268,19 @@ public final class UtilMongoDB {
                 if (Collection.class.isAssignableFrom(cell.getCellValue().getClass())) {
                     Collection c = (Collection) cell.getCellValue();
                     Iterator iterator = c.iterator();
-                    List<DBObject> innerBsonList = new ArrayList<>();
+                    List<Object> innerBsonList = new ArrayList<>();
 
                     while (iterator.hasNext()) {
-                        innerBsonList.add(getDBObjectFromCell((Cells) iterator.next()));
+                        Object currentO = iterator.next();
+                        if(currentO instanceof Cells){
+                            innerBsonList.add(getDBObjectFromCell((Cells) currentO));
+                        }else{
+                            innerBsonList.add(currentO);
+                        }
                     }
                     bson.put(cell.getCellName(), innerBsonList);
                 } else if (Cells.class.isAssignableFrom(cell.getCellValue().getClass())) {
-                    bson.put(cell.getCellName(), getBsonFromCell((Cells) cell.getCellValue()));
+                    bson.put(cell.getCellName(), getDBObjectFromCell((Cells) cell.getCellValue()));
                 } else {
                     bson.put(cell.getCellName(), cell.getCellValue());
                 }
@@ -310,5 +289,6 @@ public final class UtilMongoDB {
 
         return bson;
     }
+
 
 }
