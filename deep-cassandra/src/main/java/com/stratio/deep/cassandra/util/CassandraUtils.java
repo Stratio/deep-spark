@@ -684,4 +684,17 @@ public class CassandraUtils {
         return isIncluded;
     }
 
+    public static boolean isFilterdByKey (Filter[] filters, String partitionKeyString){
+
+
+        if(filters!=null) {
+            for (int i = 0; i < filters.length; i++) {
+                if (quote(filters[i].getField()).equalsIgnoreCase(quote(partitionKeyString))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }

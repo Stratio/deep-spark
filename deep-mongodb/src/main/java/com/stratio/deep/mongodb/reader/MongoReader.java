@@ -33,7 +33,7 @@ import com.mongodb.MongoCredential;
 import com.mongodb.QueryBuilder;
 import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
-import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
+import com.stratio.deep.commons.exception.DeepExtractorInitializationException;
 import com.stratio.deep.commons.impl.DeepPartition;
 import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
 import com.stratio.deep.mongodb.partition.MongoPartition;
@@ -145,7 +145,7 @@ public class MongoReader<T> {
                     mongoDeepJobConfig.getDBFields());
 
         } catch (UnknownHostException e) {
-            throw new DeepExtractorinitializationException(e);
+            throw new DeepExtractorInitializationException(e);
         }
     }
 

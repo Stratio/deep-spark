@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.config.ExtractorType;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.core.context.DeepSparkContext;
@@ -62,8 +63,9 @@ public final class ReadingCellFromES {
 
         values.put(ExtractorConstants.DATABASE, database);
         values.put(ExtractorConstants.HOST, host);
-
-        config.setExtractorImplClass(ESCellExtractor.class);
+        values.put(ExtractorConstants.INDEX, index);
+        values.put(ExtractorConstants.TYPE, type);
+        config.setExtractorImplClassName(ExtractorType.ELASTIC_SEARCH);
         config.setValues(values);
 
         // Creating the RDD

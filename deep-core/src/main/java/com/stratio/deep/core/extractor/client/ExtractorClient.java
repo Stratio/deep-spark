@@ -21,7 +21,7 @@ import javax.net.ssl.SSLException;
 import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
+import com.stratio.deep.commons.exception.DeepExtractorInitializationException;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.commons.rdd.IExtractor;
 
@@ -50,7 +50,7 @@ public class ExtractorClient<T> implements IExtractor<T, ExtractorConfig<T>> {
 
     private ExtractorClientHandler<T> handler;
 
-    public ExtractorClient initialize() throws DeepExtractorinitializationException {
+    public ExtractorClient initialize() throws DeepExtractorInitializationException {
         try {
             // Configure SSL.
             final SslContext sslCtx;
@@ -71,7 +71,7 @@ public class ExtractorClient<T> implements IExtractor<T, ExtractorConfig<T>> {
             // Get the handler instance to initiate the request.
             this.handler = ch.pipeline().get(ExtractorClientHandler.class);
         } catch (SSLException | InterruptedException e) {
-            throw new DeepExtractorinitializationException(e);
+            throw new DeepExtractorInitializationException(e);
 
         }
         return this;

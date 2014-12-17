@@ -14,7 +14,10 @@
 
 package com.stratio.deep.cassandra.extractor;
 
+import static com.stratio.deep.cassandra.util.CassandraUtils.isFilterdByKey;
+
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -122,23 +125,31 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
         }
 
         List<DeepTokenRange> underlyingInputSplits = null;
-        if (cassandraJobConfig.isBisectModeSet()) {
-            underlyingInputSplits = RangeUtils.getSplits(cassandraJobConfig);
-        } else {
-            underlyingInputSplits = ThriftRangeUtils.build(cassandraJobConfig).getSplits();
+        if(isFilterdByKey(cassandraJobConfig.getFilters(), cassandraJobConfig.fetchTableMetadata().getPartitionKey()
+                .get(0).getName())) {
+
+            underlyingInputSplits = new ArrayList<>();
+            underlyingInputSplits.add(new DeepTokenRange(Long.MIN_VALUE, Long.MAX_VALUE, cassandraJobConfig.getHostList()));
+        }else{
+
+            if (cassandraJobConfig.isBisectModeSet()) {
+                underlyingInputSplits = RangeUtils.getSplits(cassandraJobConfig);
+            } else {
+                underlyingInputSplits = ThriftRangeUtils.build(cassandraJobConfig).getSplits();
+            }
         }
-        Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
+            Partition[] partitions = new DeepPartition[underlyingInputSplits.size()];
 
-        int i = 0;
+            int i = 0;
 
-        for (DeepTokenRange split : underlyingInputSplits) {
-            partitions[i] = new DeepPartition(cassandraJobConfig.getRddId(), i, split);
+            for (DeepTokenRange split : underlyingInputSplits) {
+                partitions[i] = new DeepPartition(cassandraJobConfig.getRddId(), i, split);
+//                log().debug("Detected partition: " + partitions[i]);
+                ++i;
+            }
 
-            // log().debug("Detected partition: " + partitions[i]);
-            ++i;
-        }
+            return partitions;
 
-        return partitions;
     }
 
     /**

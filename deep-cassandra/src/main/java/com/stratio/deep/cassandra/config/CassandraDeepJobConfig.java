@@ -92,10 +92,6 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
      */
     private final Map<String, Serializable> additionalFilters = new TreeMap<>();
 
-    /**
-     * Defines a projection over the CF columns.
-     */
-    private String[] inputColumns;
 
     /**
      * Size of the batch created when writing to Cassandra.
@@ -197,7 +193,8 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
      */
     protected void checkInitialized() {
         if (!isInitialized) {
-            throw new DeepIllegalAccessException("ICassandraDeepJobConfig has not been initialized!");
+            initialize();
+            LOG.warn("CassandraDeepJobConfig has not been initialized!");
         }
     }
 

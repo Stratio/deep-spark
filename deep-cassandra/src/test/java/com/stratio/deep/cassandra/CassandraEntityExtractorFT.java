@@ -176,11 +176,6 @@ public class CassandraEntityExtractorFT extends ExtractorEntityTest {
 
     }
 
-    //TODO
-    @Override
-    public void testFilterEQ() {
-
-    }
 
     //TODO
     @Override

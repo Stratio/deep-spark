@@ -31,7 +31,7 @@ import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.rdd.RDD;
 
 import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
+import com.stratio.deep.commons.exception.DeepExtractorInitializationException;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.rdd.IExtractor;
 
@@ -123,7 +123,7 @@ public class DeepRDD<T, S extends BaseConfig<T>> extends RDD<T> implements Seria
             if (extractorClient == null) {
                 extractorClient = getExtractorInstance(config.getValue());
             }
-        } catch (DeepExtractorinitializationException e) {
+        } catch (DeepExtractorInitializationException e) {
             extractorClient = getExtractorClient();
         }
 
