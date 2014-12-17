@@ -15,3 +15,7 @@ target/
 *GitIgnored*
 *.asc
 *.gpg
+deep-jdbc/jdbccellextractor.properties
+deep-jdbc/jdbccellextractor.script
+deep-jdbc/jdbcentityextractor.properties
+deep-jdbc/jdbcentityextractor.script
