@@ -22,6 +22,7 @@ import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.utils.CellsUtils;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -49,6 +50,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
@@ -143,6 +145,51 @@ public class DeepSparkContextTest {
     }
 
     @Test
+    public void textFileHDFSTest() throws Exception {
+        deepSparkContext = createDeepSparkContext();
+        DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
+        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
+        Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
+        RDD<Cells> result = mock(RDD.class);
+
+        ExtractorConfig<Cells> config = createHDFSDeepJobConfig();
+        PowerMockito.doReturn(result).when(deepSparkContextSpy).createHDFSRDD(config);
+        deepSparkContextSpy.textFile(config);
+
+        verify(deepSparkContextSpy, times(1)).createHDFSRDD(config);
+    }
+
+    @Test
+    public void textFileS3Test() throws Exception {
+        deepSparkContext = createDeepSparkContext();
+        DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
+        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
+        Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
+        RDD<Cells> result = mock(RDD.class);
+
+        ExtractorConfig<Cells> config = createS3DeepJobConfig();
+        PowerMockito.doReturn(result).when(deepSparkContextSpy).createS3RDD(config);
+        deepSparkContextSpy.textFile(config);
+
+        verify(deepSparkContextSpy, times(1)).createS3RDD(config);
+
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void textFileInvalidConfig() throws Exception {
+        deepSparkContext = createDeepSparkContext();
+        DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
+        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
+        Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
+
+        ExtractorConfig<Cells> config = mock(ExtractorConfig.class);
+        deepSparkContextSpy.textFile(config);
+    }
+
+    @Test
     public void createHDFSRDDTest() throws Exception {
 
         deepSparkContext = createDeepSparkContext();
@@ -154,18 +201,47 @@ public class DeepSparkContextTest {
         RDD<String> rdd = mock(RDD.class);
         JavaRDD<String> javaRdd = mock(JavaRDD.class);
         when(deepSparkContextSpy.sc().textFile(anyString(), anyInt())).thenReturn(rdd);
-
+        doReturn(javaRdd).when(deepSparkContextSpy).textFile(anyString());
         when(rdd.toJavaRDD()).thenReturn(javaRdd);
         when(rdd.toJavaRDD().map(any(Function.class))).thenReturn(singleRdd);
 
         ExtractorConfig<Cells> config = createHDFSDeepJobConfig();
 
-        JavaRDD rddReturn = deepSparkContextSpy.createHDFSRDD(config);
+        RDD rddReturn = deepSparkContextSpy.createHDFSRDD(config);
 
         verify(deepSparkContextSpy.sc(), times(1)).textFile(anyString(), anyInt());
 
         verify(javaRdd, times(1)).map(any(Function.class));
 
+    }
+
+    @Test
+    public void createS3RDDTest() throws Exception {
+
+        deepSparkContext = createDeepSparkContext();
+        Configuration hadoopConf = mock(Configuration.class);
+        when(sparkContext.hadoopConfiguration()).thenReturn(hadoopConf);
+        DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
+        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
+        Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
+
+        RDD<String> rdd = mock(RDD.class);
+        JavaRDD<String> javaRDD = mock(JavaRDD.class);
+
+        when(deepSparkContextSpy.sc().textFile(anyString(), anyInt())).thenReturn(rdd);
+        doReturn(javaRDD).when(deepSparkContextSpy).textFile(anyString());
+        when(rdd.toJavaRDD()).thenReturn(javaRDD);
+        when(rdd.toJavaRDD().map(any(Function.class))).thenReturn(singleRdd);
+
+        ExtractorConfig<Cells> config = createS3DeepJobConfig();
+
+        deepSparkContextSpy.createS3RDD(config);
+
+        verify(hadoopConf, times(1)).set("fs.s3n.awsAccessKeyId", config.getString(ExtractorConstants.S3_ACCESS_KEY_ID));
+        verify(hadoopConf, times(1)).set("fs.s3n.awsSecretAccessKey", config.getString(ExtractorConstants.S3_SECRET_ACCESS_KEY));
+        verify(deepSparkContextSpy.sc(), times(1)).textFile(anyString(), anyInt());
+        verify(javaRDD, times(1)).map(any(Function.class));
     }
 
     @Test
@@ -223,8 +299,9 @@ public class DeepSparkContextTest {
         extractorConfig.setExtractorImplClassName("hdfs");
         Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.PORT, "9000");
-        values.put(ExtractorConstants.HDFS_FILE_SEPARATOR, ",");
-        values.put(ExtractorConstants.HDFS_FILE_PATH, "/user/hadoop/test/songs.csv");
+        values.put(ExtractorConstants.FS_FILE_SEPARATOR, ",");
+        values.put(ExtractorConstants.FS_FILE_PATH, "/user/hadoop/test/songs.csv");
+        values.put(ExtractorConstants.FS_PREFIX, ExtractorConstants.HDFS_PREFIX);
         values.put(ExtractorConstants.HOST, "127.0.0.1");
 
         values.put(ExtractorConstants.HDFS_TYPE, ExtractorConstants.HDFS_TYPE);
@@ -233,6 +310,23 @@ public class DeepSparkContextTest {
 
         extractorConfig.setValues(values);
 
+        return extractorConfig;
+    }
+
+    private ExtractorConfig createS3DeepJobConfig() {
+        ExtractorConfig extractorConfig = new ExtractorConfig();
+        extractorConfig.setExtractorImplClassName(ExtractorConstants.S3);
+
+        Map<String, Serializable> values = new HashMap<>();
+        values.put(ExtractorConstants.FS_FILE_SEPARATOR, ",");
+        values.put(ExtractorConstants.S3_BUCKET, "bucket");
+        values.put(ExtractorConstants.FS_PREFIX, ExtractorConstants.S3_PREFIX);
+        values.put(ExtractorConstants.FS_FILE_PATH, "/s3test.csv");
+        values.put(ExtractorConstants.S3_TYPE, ExtractorConstants.S3_TYPE);
+        values.put(ExtractorConstants.CATALOG, "");
+        values.put(ExtractorConstants.TABLE, "");
+
+        extractorConfig.setValues(values);
         return extractorConfig;
     }
 

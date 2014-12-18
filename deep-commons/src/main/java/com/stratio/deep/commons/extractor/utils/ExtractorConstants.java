@@ -197,14 +197,20 @@ public interface ExtractorConstants {
      * The HDFS _ tYPE.
      */
     String HDFS_TYPE  = "hdfsType";
+
     /**
-     * The HDFS _ fILEDATATABLE.
+     * The FS prefix
      */
-    String HDFS_FILEDATATABLE = "TextFileDataTable";
+    String FS_PREFIX = "prefix";
+
     /**
-     * The HDFS file Separator.
+     * The FS _ FileDataTable.
      */
-    String HDFS_FILE_SEPARATOR = "FileSeparator";
+    String FS_FILEDATATABLE = "TextFileDataTable";
+    /**
+     * The FS file Separator.
+     */
+    String FS_FILE_SEPARATOR = "FileSeparator";
     /**
      * The HDFS MAP.
      */
@@ -216,15 +222,51 @@ public interface ExtractorConstants {
     /**
      * The HDFS file path.
      */
-    String HDFS_FILE_PATH = "path";
+    String FS_FILE_PATH = "path";
     /**
-     * The HDFS schema
+     * The FS schema
      */
-    String HDFS_SCHEMA = "schemaMap";
+    String FS_SCHEMA = "schemaMap";
     /**
      * The HDFS file extension
      */
     String HDFS_FILE_EXTENSION = "Extension";
+
+    /**
+     * S3
+     */
+    String S3 = "s3";
+
+    /**
+     * S3 Prefix
+     */
+    String S3_PREFIX = "s3n://";
+
+    /**
+     * S3 type
+     */
+    String S3_TYPE = "s3Type";
+
+    /**
+     * S3 Bucket
+     */
+    String S3_BUCKET = "bucket";
+
+    /**
+     * S3 AWS Access Key ID
+     */
+    String S3_ACCESS_KEY_ID = "s3Key";
+
+    /**
+     * S3 Secret Access Key
+     */
+    String S3_SECRET_ACCESS_KEY = "s3Secret";
+
+    /**
+     * S3 File path
+     */
+    String S3_FILE_PATH = "path";
+
 
     /**
      * The TYPE

@@ -15,9 +15,11 @@
 package com.stratio.deep.core.context;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Map;
 
+import com.stratio.deep.core.fs.utils.*;
+import com.stratio.deep.core.fs.utils.UtilFS;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
@@ -32,28 +34,15 @@ import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.commons.utils.CellsUtils;
 import com.stratio.deep.core.function.PrepareSaveFunction;
-import com.stratio.deep.core.hdfs.utils.MapSchemaFromLines;
-import com.stratio.deep.core.hdfs.utils.SchemaMap;
-import com.stratio.deep.core.hdfs.utils.TableName;
-import com.stratio.deep.core.hdfs.utils.TextFileDataTable;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
-import org.apache.log4j.Logger;
-import org.apache.spark.SparkContext;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
-import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.api.java.JavaSQLContext;
 import org.apache.spark.sql.api.java.JavaSchemaRDD;
 import org.apache.spark.sql.api.java.Row;
 import org.apache.spark.sql.api.java.StructType;
 
 import javax.activation.UnsupportedDataTypeException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * Entry point to the Cassandra-aware Spark context.
@@ -245,49 +234,71 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         return this.sqlContext;
     }
 
-    public JavaRDD<Cells> createHDFSRDD(ExtractorConfig<Cells> config) {
+    /**
+     * Returns a Cells RDD from a HDFS or S3 ExtractorConfig.
+     * @param config ExtractorConfig for HDFS or S3.
+     * @return RDD of Cells.
+     * @throws IllegalArgumentException
+     */
+    public RDD textFile(ExtractorConfig<Cells> config) throws IllegalArgumentException {
+        if(ExtractorConstants.HDFS.equals(config.getExtractorImplClassName())) {
+            return createHDFSRDD(config);
+        } else if(ExtractorConstants.S3.equals(config.getExtractorImplClassName())) {
+            return createS3RDD(config);
+        }
+        throw new IllegalArgumentException("Valid configurations are HDFS paths, S3 paths or local file paths.");
+    }
+
+    /**
+     * Returns a Cells RDD from HDFS.
+     * @param config HDFS ExtractorConfig.
+     * @return Cells RDD.
+     */
+    public RDD<Cells> createHDFSRDD(ExtractorConfig<Cells> config) {
 
         Serializable host = config.getValues().get(ExtractorConstants.HOST);
         Serializable port = config.getValues().get(ExtractorConstants.PORT);
-        Serializable path = config.getValues().get(ExtractorConstants.HDFS_FILE_PATH);
+        Serializable path = config.getValues().get(ExtractorConstants.FS_FILE_PATH);
 
-        final TextFileDataTable textFileDataTable = createTextFileMetaDataFromConfig(config);
+        final TextFileDataTable textFileDataTable = UtilFS.createTextFileMetaDataFromConfig(config, this);
 
+        String filePath = path.toString();
         if (config.getExtractorImplClassName().equals(ExtractorConstants.HDFS)) {
-            path = ExtractorConstants.HDFS_PREFIX + host.toString() + ":" + port + path.toString();
-        } else {
-            path = path.toString();
+            filePath = ExtractorConstants.HDFS_PREFIX + host.toString() + ":" + port + path.toString();
         }
-        RDD<String> result = this.sc().textFile(path.toString(), 1);
 
+        return createRDDFromFilePath(filePath, textFileDataTable);
+    }
+
+    /**
+     * Returns a Cells RDD from S3 fileSystem.
+     * @param config Amazon S3 ExtractorConfig.
+     * @return RDD of Cells.
+     */
+    public RDD<Cells> createS3RDD(ExtractorConfig<Cells> config) {
+
+        Serializable bucket = config.getValues().get(ExtractorConstants.S3_BUCKET);
+        Serializable path = config.getValues().get(ExtractorConstants.FS_FILE_PATH);
+
+        final TextFileDataTable textFileDataTable = UtilFS.createTextFileMetaDataFromConfig(config, this);
+
+        String filePath = path.toString();
+        if (config.getExtractorImplClassName().equals(ExtractorConstants.S3)) {
+            filePath = ExtractorConstants.S3_PREFIX + bucket.toString() + path.toString();
+        }
+        Configuration hadoopConf = this.sc().hadoopConfiguration();
+        hadoopConf.set("fs.s3n.impl", "org.apache.hadoop.fs.s3native.NativeS3FileSystem");
+        hadoopConf.set("fs.s3n.awsAccessKeyId", config.getString(ExtractorConstants.S3_ACCESS_KEY_ID));
+        hadoopConf.set("fs.s3n.awsSecretAccessKey", config.getString(ExtractorConstants.S3_SECRET_ACCESS_KEY));
+        return createRDDFromFilePath(filePath, textFileDataTable);
+    }
+
+    private RDD<Cells> createRDDFromFilePath(String filePath, TextFileDataTable textFileDataTable) {
+        RDD<String> result = this.sc().textFile(filePath.toString(), 1);
         JavaRDD<Cells> resultCells = result.toJavaRDD().map(new MapSchemaFromLines(textFileDataTable));
-
-        return resultCells;
+        return resultCells.rdd();
     }
 
-    private TextFileDataTable createTextFileMetaDataFromConfig(ExtractorConfig<Cells> extractorConfig) {
 
-        if (extractorConfig.getValues().get(ExtractorConstants.HDFS_FILEDATATABLE) != null) {
-            final TextFileDataTable textFileDataTable = (TextFileDataTable) extractorConfig.getValues()
-                    .get(ExtractorConstants.HDFS_FILEDATATABLE);
-
-            return textFileDataTable;
-        } else {
-
-            Serializable separator = extractorConfig.getValues().get(ExtractorConstants.HDFS_FILE_SEPARATOR);
-            String catalogName = (String) extractorConfig.getValues().get(ExtractorConstants.CATALOG);
-            String tableName = (String) extractorConfig.getValues().get(ExtractorConstants.TABLE);
-
-            final String splitSep = separator.toString();
-            final ArrayList<SchemaMap<?>> columns = (ArrayList<SchemaMap<?>>) extractorConfig.getValues().get
-                    (ExtractorConstants.HDFS_SCHEMA);
-
-            final TextFileDataTable textFileDataTableTemp = new TextFileDataTable(new TableName(catalogName, tableName),
-                    columns);
-            textFileDataTableTemp.setLineSeparator(splitSep);
-            return textFileDataTableTemp;
-        }
-
-    }
 
 }
