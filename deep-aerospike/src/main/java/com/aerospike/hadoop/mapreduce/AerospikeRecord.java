@@ -40,47 +40,41 @@ import com.aerospike.client.util.Unpacker.ObjectUnpacker;
 public class AerospikeRecord implements Writable {
 
     public Map<String,Object> bins;
-    public List<Map<String,Object>> duplicates;
     public int generation;
     public int expiration;
 
     public AerospikeRecord() {
         this.bins = null;
-        this.duplicates = null;
         this.generation = 0;
         this.expiration = 0;
     }
 
     public AerospikeRecord(Record rec) {
         this.bins = rec.bins;
-        this.duplicates = rec.duplicates;
         this.generation = rec.generation;
         this.expiration = rec.expiration;
     }
 
     public AerospikeRecord(AerospikeRecord rec) {
         this.bins = rec.bins;
-        this.duplicates = rec.duplicates;
         this.generation = rec.generation;
         this.expiration = rec.expiration;
     }
 
     public void set(Record rec) {
         this.bins = rec.bins;
-        this.duplicates = rec.duplicates;
         this.generation = rec.generation;
         this.expiration = rec.expiration;
     }
 
     public void set(AerospikeRecord rec) {
         this.bins = rec.bins;
-        this.duplicates = rec.duplicates;
         this.generation = rec.generation;
         this.expiration = rec.expiration;
     }
 
     public Record toRecord() {
-        return new Record(bins, duplicates, generation, expiration);
+        return new Record(bins, generation, expiration);
     }
 
     public void write(DataOutput out) throws IOException {
