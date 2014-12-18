@@ -4,6 +4,9 @@ What is Deep?
 Deep is a thin integration layer between Apache Spark and several NoSQL datastores.
 We actually support Apache Cassandra and MongoDB, but in the near future we will add support for sever other datastores.
 
+- JIRA: https://deep-spark.atlassian.net
+
+
 Apache Cassandra integration
 ============================
 
