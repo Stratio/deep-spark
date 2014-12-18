@@ -16,6 +16,7 @@
 
 package com.stratio.deep.mongodb.extractor;
 
+import static com.stratio.deep.commons.utils.Utils.initConfig;
 import static com.stratio.deep.commons.utils.Utils.removeAddressPort;
 import static com.stratio.deep.mongodb.utils.UtilMongoDB.MONGO_DEFAULT_ID;
 import java.net.UnknownHostException;
@@ -102,7 +103,7 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
 
         try {
 
-            initMongoDeepJobConfig(config);
+            mongoDeepJobConfig = initConfig(config, mongoDeepJobConfig);
 
             DBCollection collection;
             ServerAddress address = new ServerAddress(mongoDeepJobConfig.getHost());
@@ -373,28 +374,13 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
     @Override
     public void initIterator(Partition dp, S config) {
 
-        initMongoDeepJobConfig(config);
+        mongoDeepJobConfig = initConfig(config, mongoDeepJobConfig);
 
         reader = new MongoReader(mongoDeepJobConfig);
         reader.init(dp);
     }
 
-    /**
-     * Init mongo deep job config.
-     *
-     * @param config the config
-     */
-    private void initMongoDeepJobConfig(S config) {
 
-        if (config instanceof ExtractorConfig) {
-            mongoDeepJobConfig.initialize((ExtractorConfig) config);
-        } else if (mongoDeepJobConfig instanceof MongoDeepJobConfig){
-            mongoDeepJobConfig = (MongoDeepJobConfig<T>) config;
-        }else{
-            mongoDeepJobConfig = mongoDeepJobConfig.initialize((DeepJobConfig) config);
-        }
-        mongoDeepJobConfig.initialize();
-    }
 
     @Override
     public void saveRDD(T entity) {
@@ -403,7 +389,8 @@ public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implement
 
     @Override
     public void initSave(S config, T first, UpdateQueryBuilder queryBuilder) {
-        initMongoDeepJobConfig(config);
+
+        mongoDeepJobConfig = initConfig(config, mongoDeepJobConfig);
 
         try {
             writer = new MongoWriter(getServerAddressList(mongoDeepJobConfig.getHostList()),

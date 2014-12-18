@@ -16,7 +16,10 @@
 
 package com.stratio.deep.jdbc.extractor;
 
+import static com.stratio.deep.commons.utils.Utils.initConfig;
+
 import com.stratio.deep.commons.config.BaseConfig;
+import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
@@ -62,7 +65,8 @@ public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> implements
      */
     @Override
     public Partition[] getPartitions(S config) {
-        initJdbcDeepJobConfig(config);
+        jdbcDeepJobConfig = initConfig(config, jdbcDeepJobConfig);
+
         int upperBound = jdbcDeepJobConfig.getUpperBound();
         int lowerBound = jdbcDeepJobConfig.getLowerBound();
         int numPartitions = jdbcDeepJobConfig.getNumPartitions();
@@ -126,7 +130,7 @@ public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> implements
      */
     @Override
     public void initIterator(Partition dp, S config) {
-        initJdbcDeepJobConfig(config);
+        jdbcDeepJobConfig = initConfig(config, jdbcDeepJobConfig);
         this.jdbcReader = new JdbcReader(jdbcDeepJobConfig);
         try {
             this.jdbcReader.init(dp);
@@ -160,7 +164,9 @@ public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> implements
      */
     @Override
     public void initSave(S config, T first, UpdateQueryBuilder queryBuilder) {
-        initJdbcDeepJobConfig(config);
+
+        jdbcDeepJobConfig = initConfig(config, jdbcDeepJobConfig);
+
         try {
             this.jdbcWriter = new JdbcWriter<>(jdbcDeepJobConfig);
         } catch(Exception e) {
@@ -168,13 +174,6 @@ public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> implements
         }
     }
 
-    private void initJdbcDeepJobConfig(S config) {
-        if (config instanceof ExtractorConfig) {
-            jdbcDeepJobConfig.initialize((ExtractorConfig) config);
-        } else {
-            jdbcDeepJobConfig = (JdbcDeepJobConfig) config;
-        }
-    }
 
     protected abstract T transformElement(Map<String, Object> entity);
 

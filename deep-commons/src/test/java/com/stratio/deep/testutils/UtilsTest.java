@@ -19,11 +19,13 @@ package com.stratio.deep.testutils;
 import static com.stratio.deep.commons.utils.Utils.batchQueryGenerator;
 import static com.stratio.deep.commons.utils.Utils.findSetter;
 import static com.stratio.deep.commons.utils.Utils.getAllFields;
+import static com.stratio.deep.commons.utils.Utils.initConfig;
 import static com.stratio.deep.commons.utils.Utils.newTypeInstance;
 import static com.stratio.deep.commons.utils.Utils.quote;
 import static com.stratio.deep.commons.utils.Utils.singleQuote;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
@@ -35,6 +37,9 @@ import java.util.UUID;
 
 import org.testng.annotations.Test;
 
+import com.stratio.deep.commons.config.BaseConfig;
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepIOException;
@@ -168,6 +173,53 @@ public class UtilsTest {
         Field[] fields = getAllFields(CommonsTestEntity.class);
         assertTrue(fields.length >= 11);
     }
+
+    @Test
+    public void initConfigTest(){
+
+        ExtractorConfig extractorConfig = new ExtractorConfig();
+        extractorConfig.setExtractorImplClassName("testExtractor");
+
+        DeepJobConfig deepJobConfig = new DeepJobConfig();
+        deepJobConfig.setExtractorImplClassName("testDeepJobConfig");
+
+        ChildDeepJobConfig childDeepJobConfig = new ChildDeepJobConfig();
+        childDeepJobConfig.setExtractorImplClassName("testChildDeepJobConfig");
+        childDeepJobConfig.setTestFiled("testField");
+
+        ChildDeepJobConfig test = initConfig(extractorConfig, new ChildDeepJobConfig());
+
+        assertEquals(test.getExtractorImplClassName(), extractorConfig.getExtractorImplClassName());
+        assertNull(test.getTestFiled());
+
+        test = initConfig(deepJobConfig, new ChildDeepJobConfig());
+
+        assertEquals(test.getExtractorImplClassName(), deepJobConfig.getExtractorImplClassName());
+        assertNull(test.getTestFiled());
+
+        test = initConfig(childDeepJobConfig, new ChildDeepJobConfig());
+
+        assertEquals(test.getExtractorImplClassName(), childDeepJobConfig.getExtractorImplClassName());
+        assertEquals(test.getTestFiled(), childDeepJobConfig.getTestFiled());
+
+    }
+
+
+
+
+    class ChildDeepJobConfig extends DeepJobConfig {
+
+        private String testFiled;
+
+        public String getTestFiled() {
+            return testFiled;
+        }
+
+        public void setTestFiled(String testFiled) {
+            this.testFiled = testFiled;
+        }
+    }
+
 
     class TestSetterClass implements IDeepType {
         private Integer id;

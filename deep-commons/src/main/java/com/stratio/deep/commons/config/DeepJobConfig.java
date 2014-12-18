@@ -188,6 +188,12 @@ public class DeepJobConfig<T, S extends DeepJobConfig> extends BaseConfig<T> imp
      * @return the s
      */
     public S initialize(ExtractorConfig extractorConfig) {
+
+        setExtractorImplClassName(extractorConfig.getExtractorImplClassName());
+        setEntityClass(extractorConfig.getEntityClass());
+        setRddId(extractorConfig.getRddId());
+        setPartitionId(extractorConfig.getPartitionId());
+
         Map<String, Serializable> values = extractorConfig.getValues();
 
         if (values.get(USERNAME) != null) {

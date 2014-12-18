@@ -51,6 +51,7 @@ public class BaseConfig<T> implements Serializable {
 
     public void setExtractorImplClass(Class extractorImplClass) {
         this.extractorImplClass = extractorImplClass;
+        this.extractorImplClassName = extractorImplClass.getName();
     }
 
     public Class getEntityClass() {
