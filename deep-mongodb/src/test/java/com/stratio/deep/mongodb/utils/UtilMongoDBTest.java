@@ -32,6 +32,8 @@ import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 import org.testng.annotations.Test;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.core.entity.BookEntity;
@@ -156,24 +158,24 @@ public class UtilMongoDBTest {
         assertNull(UtilMongoDB.getId(wordCount));
     }
 
-    private BSONObject createBsonTest() {
-        BSONObject bson = new BasicBSONObject();
+    private DBObject createBsonTest() {
+        DBObject bson = new BasicDBObject();
 
-        BSONObject metadata = new BasicBSONObject();
+        DBObject metadata = new BasicDBObject();
         metadata.put("author", AUTHOR);
         metadata.put("title", TITLE);
         metadata.put("source", SOURCE);
 
-        BSONObject cantoI = new BasicBSONObject();
+        DBObject cantoI = new BasicDBObject();
 
         cantoI.put("canto", CANTO_I);
         cantoI.put("text", TEXT_I);
 
-        BSONObject cantoII = new BasicBSONObject();
+        DBObject cantoII = new BasicDBObject();
         cantoII.put("canto", CANTO_II);
         cantoII.put("text", TEXT_II);
 
-        List<BSONObject> cantosList = new ArrayList<>();
+        List<DBObject> cantosList = new ArrayList<>();
         cantosList.add(cantoI);
         cantosList.add(cantoII);
 
@@ -188,7 +190,7 @@ public class UtilMongoDBTest {
             throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
             InstantiationException {
 
-        BSONObject bson = createBsonTest();
+        DBObject bson = createBsonTest();
 
         Cells cells = UtilMongoDB.getCellFromBson(bson, "book");
 

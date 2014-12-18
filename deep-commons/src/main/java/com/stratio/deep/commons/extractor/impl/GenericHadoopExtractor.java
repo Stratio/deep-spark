@@ -16,6 +16,8 @@
 
 package com.stratio.deep.commons.extractor.impl;
 
+import static com.stratio.deep.commons.utils.Utils.initConfig;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -87,17 +89,14 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, k
     @Override
     public Partition[] getPartitions(S config) {
 
-        if (config instanceof ExtractorConfig) {
-            addSparkIdToDeepJobConfig((ExtractorConfig) config);
-        } else if (config instanceof DeepJobConfig) {
-            deepJobConfig = (HadoopConfig) deepJobConfig.initialize((DeepJobConfig) config);
-        }
 
         int id = config.getRddId();
 
         jobId = new JobID(jobTrackerId, id);
 
-        Configuration conf = deepJobConfig.getHadoopConfiguration();
+
+
+        Configuration conf = getHadoopConfig(config);
 
         JobContext jobContext = DeepSparkHadoopMapReduceUtil.newJobContext(conf, jobId);
 
@@ -165,12 +164,11 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, k
         }
     }
 
-    private void addSparkIdToDeepJobConfig(ExtractorConfig<T> config) {
-        int id = config.getRddId();
+    private Configuration getHadoopConfig(S config) {
 
-        deepJobConfig = (HadoopConfig) deepJobConfig.initialize(config);
+        deepJobConfig = initConfig(config, deepJobConfig);
 
-        deepJobConfig.setRddId(id);
+        return deepJobConfig.getHadoopConfiguration();
     }
 
     public abstract T transformElement(Tuple2<K, V> tuple, DeepJobConfig<T, ? extends DeepJobConfig> config);
@@ -197,13 +195,9 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, k
         TaskAttemptID attemptId = DeepSparkHadoopMapReduceUtil
                 .newTaskAttemptID(jobTrackerId, id, true, partitionIndex, 0);
 
-        Configuration configuration = null;
-        if (config instanceof ExtractorConfig) {
-            configuration = ((HadoopConfig) deepJobConfig.initialize((ExtractorConfig) config))
-                    .getHadoopConfiguration();
-        } else {
-            configuration = ((HadoopConfig) config).getHadoopConfiguration();
-        }
+        Configuration configuration = getHadoopConfig(config);
+
+
         hadoopAttemptContext = DeepSparkHadoopMapReduceUtil
                 .newTaskAttemptContext(configuration,
                         attemptId);
@@ -224,14 +218,7 @@ public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, k
         TaskAttemptID attemptId = DeepSparkHadoopMapReduceUtil
                 .newTaskAttemptID(jobTrackerId, id, true, split.index(), 0);
 
-        Configuration configuration = null;
-        if (config instanceof ExtractorConfig) {
-            configuration = ((HadoopConfig) deepJobConfig.initialize((ExtractorConfig) config))
-                    .getHadoopConfiguration();
-        } else {
-            configuration = ((HadoopConfig) deepJobConfig.initialize((DeepJobConfig) config)).getHadoopConfiguration();
-
-        }
+        Configuration configuration = getHadoopConfig(config);
 
         TaskAttemptContext hadoopAttemptContext = DeepSparkHadoopMapReduceUtil
                 .newTaskAttemptContext(configuration, attemptId);

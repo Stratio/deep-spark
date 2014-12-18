@@ -15,6 +15,7 @@
 package com.stratio.deep.cassandra.extractor;
 
 import static com.stratio.deep.cassandra.util.CassandraUtils.isFilterdByKey;
+import static com.stratio.deep.commons.utils.Utils.initConfig;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -85,16 +86,12 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     @Override
     public void initIterator(final Partition dp,
                              S config) {
-        initCassandraDeepJobConfig(config);
+
+        cassandraJobConfig = initConfig(config, cassandraJobConfig);
 
         recordReader = initRecordReader((DeepPartition) dp, cassandraJobConfig);
     }
 
-    private ICassandraDeepJobConfig<T> initWithExtractorConfig(ExtractorConfig<T> config) {
-        int id = config.getRddId();
-        cassandraJobConfig.setRddId(id);
-        return (ICassandraDeepJobConfig<T>) ((DeepJobConfig) cassandraJobConfig).initialize(config);
-    }
 
     public abstract T transformElement(
             Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem,
@@ -114,7 +111,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     @Override
     public Partition[] getPartitions(S config) {
 
-        initCassandraDeepJobConfig(config);
+        cassandraJobConfig = initConfig(config, cassandraJobConfig);
 
         List<DeepTokenRange> underlyingInputSplits = null;
         if(isFilterdByKey(cassandraJobConfig.getFilters(), cassandraJobConfig.fetchTableMetadata().getPartitionKey()
@@ -145,23 +142,6 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     }
 
     /**
-     * Init mongo deep job config.
-     *
-     * @param config the config
-     */
-    private void initCassandraDeepJobConfig(S config) {
-
-        if (config instanceof ExtractorConfig) {
-            initWithExtractorConfig((ExtractorConfig) config);
-        } else if (config instanceof CassandraDeepJobConfig) {
-            cassandraJobConfig = (CassandraDeepJobConfig<T>) config;
-        } else {
-            cassandraJobConfig = cassandraJobConfig.initialize((DeepJobConfig) config);
-        }
-
-    }
-
-    /**
      * Returns a list of hosts on which the given split resides.
      */
     @Override
@@ -188,7 +168,7 @@ public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements 
     @Override
     public void initSave(S config, T first, UpdateQueryBuilder queryBuilder) {
 
-        initCassandraDeepJobConfig(config);
+        cassandraJobConfig = initConfig(config, cassandraJobConfig);
 
         cassandraJobConfig
                 .createOutputTableIfNeeded((Tuple2<Cells, Cells>) transformer.apply(first));

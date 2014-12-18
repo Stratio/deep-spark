@@ -29,6 +29,8 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 import com.stratio.deep.commons.config.BaseConfig;
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
@@ -443,5 +445,19 @@ public final class Utils {
         return null;
 
     }
+
+    public static <S extends BaseConfig, W extends DeepJobConfig> W initConfig(S config, W deepJobConfig) {
+        if (config instanceof ExtractorConfig) {
+            deepJobConfig.initialize((ExtractorConfig) config);
+        } else if (deepJobConfig.getClass().isAssignableFrom(config.getClass())) {
+            deepJobConfig = (W)((W) config).initialize();
+        } else {
+            deepJobConfig.initialize((DeepJobConfig) config);
+        }
+        return deepJobConfig;
+
+    }
+
+
 
 }
