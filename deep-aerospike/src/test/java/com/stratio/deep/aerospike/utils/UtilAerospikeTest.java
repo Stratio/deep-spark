@@ -57,7 +57,7 @@ public class UtilAerospikeTest {
         bins.put("id", "3");
         bins.put("message", "Message");
         bins.put("number", 3L);
-        Record data = new Record(bins, null, 0, 0);
+        Record data = new Record(bins, 0, 0);
         AerospikeRecord record = new AerospikeRecord(data);
         MessageTestEntity messageEntity = UtilAerospike.getObjectFromRecord(MessageTestEntity.class, record,
                 new AerospikeDeepJobConfig(MessageTestEntity.class));

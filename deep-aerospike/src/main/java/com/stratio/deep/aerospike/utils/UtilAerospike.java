@@ -142,7 +142,7 @@ final public class UtilAerospike {
                 bins.put(field.getName(), object);
             }
         }
-        Record record = new Record(bins, null, 0, 0);
+        Record record = new Record(bins, 0, 0);
         return new AerospikeRecord(record);
     }
 
@@ -220,7 +220,7 @@ final public class UtilAerospike {
             bins.put(cell.getCellName(), cell.getValue());
         }
         // Expiration time = 0, defaults to namespace configuration ("default-ttl")ø
-        Record record = new Record(bins, null, 0, 0);
+        Record record = new Record(bins, 0, 0);
         return new AerospikeRecord(record);
     }
 

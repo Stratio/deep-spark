@@ -16,8 +16,8 @@
 
 package com.stratio.deep.jdbc.extractor;
 
+import com.stratio.deep.core.entity.MessageTestEntity;
 import com.stratio.deep.jdbc.reader.JdbcReader;
-import com.stratio.deep.jdbc.testentity.MessageTestEntity;
 import com.stratio.deep.jdbc.writer.JdbcWriter;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.api.mockito.PowerMockito;

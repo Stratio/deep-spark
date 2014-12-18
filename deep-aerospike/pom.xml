@@ -89,7 +89,7 @@
         <dependency>
             <groupId>com.aerospike</groupId>
             <artifactId>aerospike-client</artifactId>
-            <version>3.0.31</version>
+            <version>3.0.32</version>
         </dependency>
     </dependencies>
 
