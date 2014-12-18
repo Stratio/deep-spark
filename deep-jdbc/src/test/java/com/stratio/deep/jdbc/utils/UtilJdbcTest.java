@@ -20,8 +20,8 @@ import static org.testng.Assert.*;
 
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.core.entity.MessageTestEntity;
 import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
-import com.stratio.deep.jdbc.testentity.MessageTestEntity;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
