@@ -57,7 +57,7 @@ public class AerospikeCellExtractor extends AerospikeExtractor<Cells> {
     public Cells transformElement(Tuple2<AerospikeKey, AerospikeRecord> tuple,
                                   DeepJobConfig<Cells, ? extends DeepJobConfig> config) {
         try {
-            return UtilAerospike.getCellFromRecord(tuple._1(), tuple._2(), (AerospikeDeepJobConfig) deepJobConfig);
+            return UtilAerospike.getCellFromAerospikeRecord(tuple._1(), tuple._2(), (AerospikeDeepJobConfig) deepJobConfig);
         } catch (Exception e) {
             LOG.error("Cannot convert AerospikeRecord: ", e);
             throw new DeepTransformException("Could not transform from AerospikeRecord to Cell " + e.getMessage(), e);
@@ -70,7 +70,7 @@ public class AerospikeCellExtractor extends AerospikeExtractor<Cells> {
     @Override
     public Tuple2<Object, AerospikeRecord> transformElement(Cells cells) {
         try {
-            return new Tuple2<>(null, UtilAerospike.getRecordFromCell(cells));
+            return new Tuple2<>(null, UtilAerospike.getAerospikeRecordFromCell(cells));
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             LOG.error("Cannot transform Cells into AerospikeRecord", e.getMessage(), e);
             throw new DeepTransformException(e.getMessage(), e);

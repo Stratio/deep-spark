@@ -64,8 +64,8 @@ final public class UtilAerospike {
      * @throws InstantiationException
      * @throws java.lang.reflect.InvocationTargetException
      */
-    public static <T> T getObjectFromRecord(Class<T> classEntity, AerospikeRecord aerospikeRecord,
-                                            AerospikeDeepJobConfig aerospikeConfig)
+    public static <T> T getObjectFromAerospikeRecord(Class<T> classEntity, AerospikeRecord aerospikeRecord,
+                                                     AerospikeDeepJobConfig aerospikeConfig)
             throws IllegalAccessException, InstantiationException,
             InvocationTargetException {
         Tuple2<String, Object> equalsFilter = aerospikeConfig.getEqualsFilter();
@@ -129,7 +129,7 @@ final public class UtilAerospike {
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
-    public static <T> AerospikeRecord getRecordFromObject(T t) throws IllegalAccessException, InstantiationException,
+    public static <T> AerospikeRecord getAerospikeRecordFromObject(T t) throws IllegalAccessException, InstantiationException,
             InvocationTargetException {
         Field[] fields = AnnotationUtils.filterDeepFields(t.getClass());
 
@@ -157,8 +157,8 @@ final public class UtilAerospike {
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
-    public static Cells getCellFromRecord(AerospikeKey key, AerospikeRecord aerospikeRecord,
-                                          AerospikeDeepJobConfig aerospikeConfig) throws IllegalAccessException,
+    public static Cells getCellFromAerospikeRecord(AerospikeKey key, AerospikeRecord aerospikeRecord,
+                                                   AerospikeDeepJobConfig aerospikeConfig) throws IllegalAccessException,
             InstantiationException, InvocationTargetException {
 
         String namespace = aerospikeConfig.getNamespace() + "." + aerospikeConfig.getSet();
@@ -205,7 +205,7 @@ final public class UtilAerospike {
     }
 
     /**
-     * Converts from and entity class with deep's anotations to BsonObject.
+     * Converts from and entity class with deep's anotations to AerospikeRecord.
      *
      * @param cells
      * @return
@@ -213,7 +213,7 @@ final public class UtilAerospike {
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
-    public static AerospikeRecord getRecordFromCell(Cells cells) throws IllegalAccessException, InstantiationException,
+    public static AerospikeRecord getAerospikeRecordFromCell(Cells cells) throws IllegalAccessException, InstantiationException,
             InvocationTargetException {
         Map<String, Object> bins = new HashMap<>();
         for (Cell cell : cells.getCells()) {
@@ -222,6 +222,62 @@ final public class UtilAerospike {
         // Expiration time = 0, defaults to namespace configuration ("default-ttl")ø
         Record record = new Record(bins, 0, 0);
         return new AerospikeRecord(record);
+    }
+
+    /**
+     * Converts from an entity class with deep's anotations to Aerospike Record.
+     *
+     * @param t   an instance of an object of type T to convert to Aerospike Record.
+     * @param <T> the type of the object to convert.
+     * @return the provided object converted to Aerospike Record.
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws InvocationTargetException
+     */
+    public static <T> Record getRecordFromObject(T t) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        return getAerospikeRecordFromObject(t).toRecord();
+    }
+
+    /**
+     * Converts from and entity class with deep's anotations to Aerospike Record.
+     *
+     * @param cells
+     * @return Aerospike Record built from Cells data.
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws InvocationTargetException
+     */
+    public static Record getRecordFromCell(Cells cells) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        return getAerospikeRecordFromCell(cells).toRecord();
+    }
+
+    /**
+     * Converts from Aerospike Record to cell class with deep's anotations.
+     *
+     * @param record
+     * @param aerospikeConfig
+     * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws InvocationTargetException
+     */
+    public static Cells getCellsFromRecord(Record record, AerospikeDeepJobConfig aerospikeConfig) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        return getCellFromAerospikeRecord(null, new AerospikeRecord(record), aerospikeConfig);
+    }
+
+    /**
+     * Converts from Aerospike Record to an entity class with deep's anotations.
+     *
+     * @param classEntity     the entity name.
+     * @param aerospikeConfig Aerospike configuration object.
+     * @param <T>             return type.
+     * @return the provided Aerospike Record converted to an instance of T.
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws java.lang.reflect.InvocationTargetException
+     */
+    public static <T> T getObjectFromRecord(Class<T> classEntity, Record record, AerospikeDeepJobConfig aerospikeConfig) throws IllegalAccessException, InvocationTargetException, InstantiationException{
+        return getObjectFromAerospikeRecord(classEntity, new AerospikeRecord(record), aerospikeConfig);
     }
 
 }

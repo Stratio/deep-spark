@@ -55,6 +55,7 @@ public abstract class AerospikeRecordWriter<KK, VV>
     public AerospikeRecordWriter(Configuration cfg, Progressable progressable) {
         this.cfg = cfg;
         this.progressable = progressable;
+        writePolicy.sendKey = true;
     }
 
     public abstract void writeAerospike(KK key,
@@ -70,7 +71,7 @@ public abstract class AerospikeRecordWriter<KK, VV>
             initialized = true;
             init();
         }
-
+        writePolicy.sendKey = true;
         writeAerospike(key, value, client, writePolicy, namespace, setName);
     }
 
@@ -93,6 +94,7 @@ public abstract class AerospikeRecordWriter<KK, VV>
         client = AerospikeClientSingleton.getInstance(policy, host, port);
 
         writePolicy = new WritePolicy();
+        writePolicy.sendKey = true;
     }
 
     @Override

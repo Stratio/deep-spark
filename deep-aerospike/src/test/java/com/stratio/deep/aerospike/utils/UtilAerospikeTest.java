@@ -41,7 +41,7 @@ public class UtilAerospikeTest {
         messageEntity.setId("3");
         messageEntity.setMessage("Test message");
 
-        AerospikeRecord record = UtilAerospike.getRecordFromObject(messageEntity);
+        AerospikeRecord record = UtilAerospike.getAerospikeRecordFromObject(messageEntity);
         Map<String, Object> bins = record.bins;
 
         assertEquals(bins.get("id"), messageEntity.getId());
@@ -59,7 +59,7 @@ public class UtilAerospikeTest {
         bins.put("number", 3L);
         Record data = new Record(bins, 0, 0);
         AerospikeRecord record = new AerospikeRecord(data);
-        MessageTestEntity messageEntity = UtilAerospike.getObjectFromRecord(MessageTestEntity.class, record,
+        MessageTestEntity messageEntity = UtilAerospike.getObjectFromAerospikeRecord(MessageTestEntity.class, record,
                 new AerospikeDeepJobConfig(MessageTestEntity.class));
 
         assertEquals(messageEntity.getId(), bins.get("id"));

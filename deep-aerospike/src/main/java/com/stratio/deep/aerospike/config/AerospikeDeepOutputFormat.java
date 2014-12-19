@@ -62,6 +62,7 @@ public class AerospikeDeepOutputFormat extends AerospikeOutputFormat<Object, Aer
             //TODO -> How should I generate the key?
             Key k = new Key(namespace, setName, Long.toString(System.nanoTime()));
             List<Bin> bins = new ArrayList<>();
+            writePolicy.sendKey = true;
             for (Map.Entry<String, Object> bin : record.bins.entrySet()) {
                 Bin aerospikeBin = new Bin(bin.getKey(), bin.getValue());
                 bins.add(aerospikeBin);
