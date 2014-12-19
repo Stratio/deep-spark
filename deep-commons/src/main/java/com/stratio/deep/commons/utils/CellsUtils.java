@@ -34,7 +34,6 @@ import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
 
-import javax.activation.UnsupportedDataTypeException;
 
 /**
  * Created by rcrespo on 20/10/14.
@@ -328,8 +327,6 @@ public class CellsUtils {
             dataType = DataType.BooleanType;
         } else if(cls.equals(Timestamp.class)) {
             dataType = DataType.TimestampType;
-        } else if(cls.equals(BigDecimal.class)) {
-            dataType = DataType.DecimalType;
         } else if(cls.equals(Double.class)) {
             dataType = DataType.DoubleType;
         } else if(cls.equals(Float.class)) {

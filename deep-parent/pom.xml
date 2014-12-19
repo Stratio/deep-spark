@@ -32,7 +32,7 @@
         <datastax.driver.version>2.1.3</datastax.driver.version>
 
         <!-- Spark  -->
-        <spark.version>1.1.1</spark.version>
+        <spark.version>1.2.0</spark.version>
 
         <!-- Java  -->
         <java.version>1.7</java.version>
@@ -46,6 +46,9 @@
         <!-- mongodb driver -->
         <mongo.driver.version>2.12.4</mongo.driver.version>
 
+        <scala.version>2.11.2</scala.version>
+
+        <scala.binary.version>2.11</scala.binary.version>
         <!-- Artifacts include -->
         <distribution.include>
             org.apache.cassandra,org.apache.thrift,com.github.stephenc.high-scale-lib,com.googlecode.concurrentlinkedhashmap,com.github.stephenc,org.apache.commons,net.jpountz.lz4,com.yammer.metrics,org.yaml,org.antlr,com.datastax.cassandra,de.javakaffee,commons-cli,org.mongodb,org.elasticsearch,com.github.jbellis,com.google.guava,com.google.protobuf,com.aerospike,org.gnu,org.luaj,org.postgresql,mysql
@@ -265,7 +268,7 @@
         <!-- spark artifact -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.10</artifactId>
+            <artifactId>spark-core_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
             <exclusions>
                 <exclusion>
@@ -301,7 +304,7 @@
 
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_2.10</artifactId>
+            <artifactId>spark-sql_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
             <exclusions>
                 <exclusion>
@@ -558,7 +561,7 @@
                             <goal>compile</goal>
                         </goals>
                         <configuration>
-                            <scalaVersion>2.10.3</scalaVersion>
+                            <scalaVersion>${scala.version}</scalaVersion>
                         </configuration>
                     </execution>
                     <execution>
@@ -568,7 +571,7 @@
                             <goal>testCompile</goal>
                         </goals>
                         <configuration>
-                            <scalaVersion>2.10.3</scalaVersion>
+                            <scalaVersion>${scala.version}</scalaVersion>
                         </configuration>
                     </execution>
                 </executions>
