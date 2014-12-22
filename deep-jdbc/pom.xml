@@ -171,7 +171,7 @@
                             <goal>compile</goal>
                         </goals>
                         <configuration>
-                            <scalaVersion>2.10.3</scalaVersion>
+                            <scalaVersion>${scala.version}</scalaVersion>
                         </configuration>
                     </execution>
                     <execution>

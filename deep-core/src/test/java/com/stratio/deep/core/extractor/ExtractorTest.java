@@ -109,14 +109,14 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
     /**
      * The constant READ_COUNT_EXPECTED.
      */
-    private static final long READ_COUNT_EXPECTED = 1l;
+    protected static final long READ_COUNT_EXPECTED = 1l;
 
     /**
      * The constant READ_FIELD_EXPECTED.
      */
-    private static final String READ_FIELD_EXPECTED = "new message test";
+    protected static final String READ_FIELD_EXPECTED = "new message test";
 
-    private static final String ID_MESSAGE_EXPECTED = "messageTest";
+    protected static final String ID_MESSAGE_EXPECTED = "messageTest";
 
     /**
      * The Extractor.
