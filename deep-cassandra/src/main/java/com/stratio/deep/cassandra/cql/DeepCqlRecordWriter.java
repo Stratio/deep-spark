@@ -72,6 +72,8 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
 
     private final CassandraUpdateQueryBuilder queryBuilder;
 
+    private Session sessionWithHost;
+
     /**
      * Con
      *
@@ -85,6 +87,9 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
         this.queryBuilder = queryBuilder;
         try {
             this.localhost = InetAddress.getLocalHost();
+            sessionWithHost = CassandraClientProvider.trySessionForLocation(localhost.getHostAddress(),
+                    (CassandraDeepJobConfig) writeConfig, false).left;
+            sessionWithHost.init();
         } catch (UnknownHostException e) {
             throw new DeepInstantiationException("Cannot resolve local hostname", e);
         }
@@ -140,14 +145,11 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
      * retrieve the key validator from system.schema_columnfamilies table
      */
     protected void retrievePartitionKeyValidator() throws ConfigurationException {
-        Pair<Session, String> sessionWithHost =
-                CassandraClientProvider.trySessionForLocation(localhost.getHostAddress(),
-                        (CassandraDeepJobConfig) writeConfig, false);
 
         String keyspace = writeConfig.getKeyspace();
         String cfName = writeConfig.getColumnFamily();
 
-        Row row = getRowMetadata(sessionWithHost, keyspace, cfName);
+        Row row = getRowMetadata(keyspace, cfName);
 
         if (row == null) {
             throw new DeepIOException(String.format("cannot find metadata for %s.%s", keyspace, cfName));
@@ -175,18 +177,17 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
     /**
      * Fetches row metadata for the given column family.
      *
-     * @param sessionWithHost the connection to the DB.
      * @param keyspace        the keyspace name
      * @param cfName          the column family
      * @return the Row object
      */
-    private static Row getRowMetadata(Pair<Session, String> sessionWithHost, String keyspace, String cfName) {
+    private Row getRowMetadata(String keyspace, String cfName) {
         String query =
                 "SELECT key_validator,key_aliases,column_aliases " +
                         "FROM system.schema_columnfamilies " +
                         "WHERE keyspace_name='%s' and columnfamily_name='%s' ";
         String formatted = String.format(query, keyspace, cfName);
-        ResultSet resultSet = sessionWithHost.left.execute(formatted);
+        ResultSet resultSet = sessionWithHost.execute(formatted);
         return resultSet.one();
     }
 
@@ -301,9 +302,7 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
         @Override
         public void run() {
             LOG.debug("[" + this + "] Initializing cassandra client");
-            Pair<Session, String> sessionWithHost = CassandraClientProvider.trySessionForLocation(localhost
-                    .getHostAddress(), (CassandraDeepJobConfig) writeConfig, false);
-            sessionWithHost.left.execute(cql, bindVariables.toArray(new Object[bindVariables.size()]));
+            sessionWithHost.execute(cql, bindVariables.toArray(new Object[bindVariables.size()]));
         }
     }
 }
