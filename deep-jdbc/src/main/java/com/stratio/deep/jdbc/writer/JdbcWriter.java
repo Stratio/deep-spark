@@ -82,13 +82,23 @@ public class JdbcWriter<T> {
             params.add("?");
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("INSERT INTO \"");
+        sb.append("INSERT INTO ");
+        if(jdbcDeepJobConfig.getQuoteSql()) {
+            sb.append("\"");
+        }
         sb.append(jdbcDeepJobConfig.getTable());
-        sb.append("\" (");
+        if(jdbcDeepJobConfig.getQuoteSql()) {
+            sb.append("\"");
+        }
+        sb.append("(");
         List<String> columns = new ArrayList<>(row.keySet());
         List<String> quotedColumns = new ArrayList<>();
         for(String column:columns) {
-            quotedColumns.add(String.format("\"%s\"", column));
+            if(jdbcDeepJobConfig.getQuoteSql()) {
+                quotedColumns.add(String.format("\"%s\"", column));
+            } else {
+                quotedColumns.add(String.format("%s", column));
+            }
         }
         sb.append(StringUtils.join(quotedColumns, ","));
         sb.append(" ) VALUES (");

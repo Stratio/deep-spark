@@ -163,7 +163,8 @@ public class JdbcEntityExtractorFT extends ExtractorEntityTest {
                 .putValue(ExtractorConstants.CATALOG, JdbcJavaRDDFT.NAMESPACE_ENTITY)
                 .putValue(ExtractorConstants.JDBC_DRIVER_CLASS, JdbcJavaRDDFT.DRIVER_CLASS)
                 .putValue(ExtractorConstants.PORT, JdbcJavaRDDFT.PORT)
-                .putValue(ExtractorConstants.TABLE, JdbcJavaRDDFT.INPUT_TABLE);
+                .putValue(ExtractorConstants.TABLE, JdbcJavaRDDFT.INPUT_TABLE)
+                .putValue(ExtractorConstants.JDBC_QUOTE_SQL, true);
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;
     }
@@ -178,7 +179,8 @@ public class JdbcEntityExtractorFT extends ExtractorEntityTest {
                 .putValue(ExtractorConstants.CATALOG, JdbcJavaRDDFT.NAMESPACE_ENTITY)
                 .putValue(ExtractorConstants.JDBC_DRIVER_CLASS, JdbcJavaRDDFT.DRIVER_CLASS)
                 .putValue(ExtractorConstants.PORT, JdbcJavaRDDFT.PORT)
-                .putValue(ExtractorConstants.TABLE, tableOutput);
+                .putValue(ExtractorConstants.TABLE, tableOutput)
+                .putValue(ExtractorConstants.JDBC_QUOTE_SQL, true);
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;
     }
