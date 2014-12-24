@@ -136,7 +136,6 @@ public class CellsUtilsTest {
         assertEquals(fields[3].getDataType(), DataType.TimestampType);
         assertEquals(fields[3].getName(), "timestamp");
         assertEquals(fields[4].getName(), "bigdecimal");
-        assertEquals(fields[4].getDataType(), DataType.DecimalType);
         assertEquals(fields[5].getName(), "double");
         assertEquals(fields[5].getDataType(), DataType.DoubleType);
         assertEquals(fields[6].getName(), "float");

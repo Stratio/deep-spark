@@ -17,6 +17,7 @@
 package com.stratio.deep.jdbc.extractor;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.jdbc.config.JdbcConfigFactory;
 import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
@@ -97,6 +98,7 @@ public class JdbcNativeExtractorTest {
 
     private JdbcNativeExtractor createJdbcNativeExtractor() {
         JdbcNativeExtractor extractor = PowerMockito.mock(JdbcNativeExtractor.class, Mockito.CALLS_REAL_METHODS);
+        Whitebox.setInternalState(extractor, "jdbcDeepJobConfig", new JdbcDeepJobConfig<>(Cells.class));
         Whitebox.setInternalState(extractor, "jdbcReader", jdbcReader);
         Whitebox.setInternalState(extractor, "jdbcWriter", jdbcWriter);
         return extractor;

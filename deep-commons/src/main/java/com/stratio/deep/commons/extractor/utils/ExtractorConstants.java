@@ -83,6 +83,10 @@ public interface ExtractorConstants {
      */
     String JDBC_QUERY = "jdbcQuery";
     /**
+     * Quoted SQL table names and fields.
+     */
+    String JDBC_QUOTE_SQL = "jdbcQuoteSQL";
+    /**
      * The PORT 2.
      */
     String PORT2 = "port2";

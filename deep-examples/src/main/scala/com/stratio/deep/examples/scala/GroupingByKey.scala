@@ -21,7 +21,8 @@ import com.stratio.deep.cassandra.config.CassandraConfigFactory
 import com.stratio.deep.core.context.DeepSparkContext
 import com.stratio.deep.testentity.TweetEntity
 import com.stratio.deep.utils.ContextProperties
-import org.apache.spark.rdd.{PairRDDFunctions, RDD}
+import org.apache.spark.rdd.RDD
+import org.apache.spark.SparkContext._
 
 /**
  * Author: Emmanuelle Raffenne
@@ -55,10 +56,8 @@ object GroupingByKey {
       e: TweetEntity => (e.getAuthor, e)
     }
 
-    val pairRDDFunctions = new PairRDDFunctions(pairsRDD)
-
     // grouping by key
-    val groups: RDD[(String, Iterable[TweetEntity])] = pairRDDFunctions.groupByKey
+    val groups: RDD[(String, Iterable[TweetEntity])] = pairsRDD.groupByKey
 
     // counting elements in groups
     val counts: RDD[(String, Int)] = groups map {

@@ -103,4 +103,16 @@ public interface IJdbcDeepJobConfig<T, S extends DeepJobConfig> {
      */
     int getNumPartitions();
 
+    /**
+     * Check if Sql tables and fields must be quoted.
+     * @param quoteSql
+     * @return
+     */
+    S quoteSql(boolean quoteSql);
+
+    /**
+     * Returns if SQL tables and fields must be quoted.
+     * @return SQL tables and fields quoted or not.
+     */
+    boolean getQuoteSql();
 }
