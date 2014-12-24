@@ -90,7 +90,7 @@ public class UtilFS {
 
     public static String buildFilePath(ExtractorConfig extractorConfig) throws IllegalArgumentException {
         if(ExtractorConstants.HDFS.equals(extractorConfig.getExtractorImplClassName())) {
-            String host  = extractorConfig.getString(ExtractorConstants.HOST);
+            String host  = extractorConfig.getString(ExtractorConstants.HOSTS);
             String port  = extractorConfig.getString(ExtractorConstants.PORT);
             String path  = extractorConfig.getString(ExtractorConstants.FS_FILE_PATH);
             path = path.substring(0, path.lastIndexOf("/"));

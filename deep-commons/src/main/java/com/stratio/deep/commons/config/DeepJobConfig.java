@@ -18,12 +18,14 @@ package com.stratio.deep.commons.config;
 
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.COLLECTION;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.DATABASE;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.FILTER_QUERY;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.HOST;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.INPUT_COLUMNS;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PASSWORD;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.PORT;
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.USERNAME;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.FILTER_QUERY;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.ES_REST_PORTS;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.filter.Filter;
 
 /**
@@ -208,9 +209,14 @@ public class DeepJobConfig<T, S extends DeepJobConfig> extends BaseConfig<T> imp
             host((extractorConfig.getStringArray(HOST)));
         }
 
+        if (values.get(ES_REST_PORTS) != null) {
+            port((extractorConfig.getInteger(ES_REST_PORTS)));
+        }
+
         if (values.get(PORT) != null) {
             port((extractorConfig.getInteger(PORT)));
         }
+
 
         if (values.get(COLLECTION) != null) {
             table(extractorConfig.getString(COLLECTION));
