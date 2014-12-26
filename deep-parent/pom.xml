@@ -46,9 +46,9 @@
         <!-- mongodb driver -->
         <mongo.driver.version>2.12.4</mongo.driver.version>
 
-        <scala.version>2.11.2</scala.version>
+        <scala.version>2.10.3</scala.version>
 
-        <scala.binary.version>2.11</scala.binary.version>
+        <scala.binary.version>2.10</scala.binary.version>
         <!-- Artifacts include -->
         <distribution.include>
             org.apache.cassandra,org.apache.thrift,com.github.stephenc.high-scale-lib,com.googlecode.concurrentlinkedhashmap,com.github.stephenc,org.apache.commons,net.jpountz.lz4,com.yammer.metrics,org.yaml,org.antlr,com.datastax.cassandra,de.javakaffee,commons-cli,org.mongodb,org.elasticsearch,com.github.jbellis,com.google.guava,com.google.protobuf,com.aerospike,org.gnu,org.luaj,org.postgresql,mysql
