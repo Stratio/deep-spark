@@ -82,6 +82,13 @@ public class AggregatingData {
         // Creating the RDD
         JavaRDD<TweetEntity> rdd = deepContext.createJavaRDD(config);
 
+        JavaRDD<TweetEntity> rddOrder = rdd.sortBy(new Function<TweetEntity, String>() {
+            @Override
+            public String call(TweetEntity tableEntity) {
+                return tableEntity.getAuthor();
+            }},false,1);
+
+        rddOrder.collect();
         // grouping to get key-value pairs
         JavaPairRDD<String, Integer> groups = rdd.groupBy(new Function<TweetEntity, String>() {
             @Override
