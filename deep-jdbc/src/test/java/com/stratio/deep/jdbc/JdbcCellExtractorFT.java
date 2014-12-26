@@ -20,9 +20,11 @@ import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.entity.MessageTestEntity;
 import com.stratio.deep.core.extractor.ExtractorCellTest;
 import com.stratio.deep.jdbc.extractor.JdbcNativeCellExtractor;
 import org.apache.spark.rdd.RDD;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -38,6 +40,79 @@ public class JdbcCellExtractorFT extends ExtractorCellTest {
 
     public JdbcCellExtractorFT() {
         super(JdbcNativeCellExtractor.class, JdbcJavaRDDFT.HOST, JdbcJavaRDDFT.PORT, true);
+    }
+
+    @Test
+    @Override
+    public void testRead() {
+
+        DeepSparkContext context = getDeepSparkContext();
+
+        try {
+
+            ExtractorConfig inputConfigEntity = getReadExtractorConfig(databaseExtractorName, tableRead,
+                    Cells.class);
+            inputConfigEntity.putValue(ExtractorConstants.JDBC_QUERY, "SELECT * FROM \"" + tableRead + "\"");
+
+            RDD inputRDDEntity = context.createRDD(inputConfigEntity);
+
+            Assert.assertEquals(READ_COUNT_EXPECTED, inputRDDEntity.count());
+
+            if (inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)) {
+                Assert.assertEquals(((Cells) inputRDDEntity.first()).getCellByName("message").getCellValue(),
+                        READ_FIELD_EXPECTED);
+
+                Assert.assertEquals(((Cells) inputRDDEntity.first()).getCellByName("id").getCellValue(),
+                        ID_MESSAGE_EXPECTED);
+            } else {
+                Assert.assertEquals(((MessageTestEntity) inputRDDEntity.first()).getMessage(), READ_FIELD_EXPECTED);
+
+                Assert.assertEquals(((MessageTestEntity) inputRDDEntity.first()).getId(), ID_MESSAGE_EXPECTED);
+            }
+
+        } finally {
+            context.stop();
+        }
+
+    }
+
+    @Test
+    @Override
+    public void testWrite() {
+
+        DeepSparkContext context = getDeepSparkContext();
+
+        try {
+
+            ExtractorConfig inputConfigEntity = getReadExtractorConfig(databaseExtractorName, tableRead,
+                    Cells.class);
+            inputConfigEntity.putValue(ExtractorConstants.JDBC_QUERY, "SELECT * FROM \"" + tableRead + "\"");
+
+            RDD inputRDDEntity = context.createRDD(inputConfigEntity);
+
+            ExtractorConfig outputConfigEntity;
+            if (inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)) {
+                outputConfigEntity = getWriteExtractorConfig("outputCells", Cells.class);
+            } else {
+                outputConfigEntity = getWriteExtractorConfig("outputEntity", MessageTestEntity.class);
+            }
+
+            // Save RDD in DataSource
+            context.saveRDD(inputRDDEntity, outputConfigEntity);
+
+            RDD outputRDDEntity = context.createRDD(outputConfigEntity);
+
+            if (inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)) {
+                Assert.assertEquals(((Cells) outputRDDEntity.first()).getCellByName("message").getCellValue(),
+                        READ_FIELD_EXPECTED);
+            } else {
+
+                Assert.assertEquals(((MessageTestEntity) outputRDDEntity.first()).getMessage(), READ_FIELD_EXPECTED);
+            }
+        } finally {
+            context.stop();
+        }
+
     }
 
     @Test
@@ -165,7 +240,8 @@ public class JdbcCellExtractorFT extends ExtractorCellTest {
                 .putValue(ExtractorConstants.CATALOG, JdbcJavaRDDFT.NAMESPACE_CELL)
                 .putValue(ExtractorConstants.JDBC_DRIVER_CLASS, JdbcJavaRDDFT.DRIVER_CLASS)
                 .putValue(ExtractorConstants.PORT, JdbcJavaRDDFT.PORT)
-                .putValue(ExtractorConstants.TABLE, JdbcJavaRDDFT.INPUT_TABLE);
+                .putValue(ExtractorConstants.TABLE, JdbcJavaRDDFT.INPUT_TABLE)
+                .putValue(ExtractorConstants.JDBC_QUOTE_SQL, true);
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;
     }
@@ -180,7 +256,8 @@ public class JdbcCellExtractorFT extends ExtractorCellTest {
                 .putValue(ExtractorConstants.CATALOG, JdbcJavaRDDFT.NAMESPACE_CELL)
                 .putValue(ExtractorConstants.JDBC_DRIVER_CLASS, JdbcJavaRDDFT.DRIVER_CLASS)
                 .putValue(ExtractorConstants.PORT, JdbcJavaRDDFT.PORT)
-                .putValue(ExtractorConstants.TABLE, tableOutput);
+                .putValue(ExtractorConstants.TABLE, tableOutput)
+                .putValue(ExtractorConstants.JDBC_QUOTE_SQL, true);
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;
     }

@@ -17,14 +17,19 @@ package com.stratio.deep.core.context;
 import java.io.Serializable;
 import java.util.Map;
 
-import com.stratio.deep.core.fs.utils.*;
-import com.stratio.deep.core.fs.utils.UtilFS;
+import javax.activation.UnsupportedDataTypeException;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function;
 import org.apache.spark.rdd.RDD;
+import org.apache.spark.sql.api.java.JavaSQLContext;
+import org.apache.spark.sql.api.java.JavaSchemaRDD;
+import org.apache.spark.sql.api.java.Row;
+import org.apache.spark.sql.api.java.StructType;
 
 import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.DeepJobConfig;
@@ -33,16 +38,12 @@ import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.commons.utils.CellsUtils;
+import com.stratio.deep.core.fs.utils.MapSchemaFromLines;
+import com.stratio.deep.core.fs.utils.TextFileDataTable;
+import com.stratio.deep.core.fs.utils.UtilFS;
 import com.stratio.deep.core.function.PrepareSaveFunction;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.sql.api.java.JavaSQLContext;
-import org.apache.spark.sql.api.java.JavaSchemaRDD;
-import org.apache.spark.sql.api.java.Row;
-import org.apache.spark.sql.api.java.StructType;
-
-import javax.activation.UnsupportedDataTypeException;
 
 /**
  * Entry point to the Cassandra-aware Spark context.
@@ -256,7 +257,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      */
     public RDD<Cells> createHDFSRDD(ExtractorConfig<Cells> config) {
 
-        Serializable host = config.getValues().get(ExtractorConstants.HOST);
+        Serializable host = config.getValues().get(ExtractorConstants.HOSTS);
         Serializable port = config.getValues().get(ExtractorConstants.PORT);
         Serializable path = config.getValues().get(ExtractorConstants.FS_FILE_PATH);
 

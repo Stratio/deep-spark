@@ -72,6 +72,11 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
      */
     private int numPartitions = 1;
 
+    /**
+     * Quote or not SQL tableNames and fields
+     */
+    private boolean quoteSql = false;
+
 
     /**
      * Constructor for Entity class-based configuration.
@@ -115,6 +120,21 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
             return getJdbcUrl();
         }
         return connectionUrl;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public JdbcDeepJobConfig<T> quoteSql(boolean quoteSql) {
+        this.quoteSql = quoteSql;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean getQuoteSql() {
+        return this.quoteSql;
     }
 
     /**
@@ -266,7 +286,11 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
             throw new IllegalArgumentException("Table name must be specified");
         }
         if(query == null || query.isEmpty()) {
-            query("SELECT * FROM \"" + getTable() + "\"");
+            if(quoteSql) {
+                query("SELECT * FROM \"" + getTable() + "\"");
+            } else {
+                query("SELECT * FROM " + getTable());
+            }
         }
         if(connectionUrl == null || connectionUrl.isEmpty()) {
             if((host != null && !host.isEmpty()) && (port > 0)) {
@@ -296,6 +320,9 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
 
         if (values.get(JDBC_QUERY) != null) {
             query(extractorConfig.getString(JDBC_QUERY));
+        }
+        if (values.get(JDBC_QUOTE_SQL) != null) {
+            quoteSql(extractorConfig.getBoolean(JDBC_QUOTE_SQL));
         }
         this.initialize();
 

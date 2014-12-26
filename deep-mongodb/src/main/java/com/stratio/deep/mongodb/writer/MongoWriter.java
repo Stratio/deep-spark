@@ -38,17 +38,20 @@ public class MongoWriter {
      */
     private DBCollection dbCollection = null;
 
-
     private WriteConcern writeConcern = null;
 
     /**
      * Instantiates a new Mongo writer.
-     *
-     * @param serverAddresses the server addresses
-     * @param databaseName    the database name
-     * @param collectionName  the collection name
+     * 
+     * @param serverAddresses
+     *            the server addresses
+     * @param databaseName
+     *            the database name
+     * @param collectionName
+     *            the collection name
      */
-    public MongoWriter(List<ServerAddress> serverAddresses, String databaseName, String collectionName, WriteConcern writeConcern) {
+    public MongoWriter(List<ServerAddress> serverAddresses, String databaseName, String collectionName,
+            WriteConcern writeConcern) {
         mongoClient = new MongoClient(serverAddresses);
         dbCollection = mongoClient.getDB(databaseName).getCollection(collectionName);
         this.writeConcern = writeConcern;
@@ -56,11 +59,12 @@ public class MongoWriter {
 
     /**
      * Save void.
-     *
-     * @param dbObject the db object
+     * 
+     * @param dbObject
+     *            the db object
      */
     public void save(DBObject dbObject) {
-        dbCollection.insert(writeConcern, dbObject);
+        dbCollection.save(dbObject, writeConcern);
     }
 
     /**

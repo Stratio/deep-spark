@@ -83,6 +83,10 @@ public interface ExtractorConstants {
      */
     String JDBC_QUERY = "jdbcQuery";
     /**
+     * Quoted SQL table names and fields.
+     */
+    String JDBC_QUOTE_SQL = "jdbcQuoteSQL";
+    /**
      * The PORT 2.
      */
     String PORT2 = "port2";
@@ -94,6 +98,11 @@ public interface ExtractorConstants {
      * The RPCPORT.
      */
     String RPCPORT = PORT2;
+
+    /**
+     * The RES_PORT.for ElasticSearch
+     */
+    String ES_REST_PORTS = "Restful Ports";;
     /**
      * The COLUMN _ fAMILY.
      */
