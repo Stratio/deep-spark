@@ -17,17 +17,11 @@ package com.stratio.deep.jdbc.config;
 
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.config.HadoopConfig;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.filter.Filter;
-import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.jdbc.extractor.JdbcNativeCellExtractor;
 import com.stratio.deep.jdbc.extractor.JdbcNativeEntityExtractor;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapred.lib.db.DBConfiguration;
 
 import java.io.Serializable;
-import java.sql.DriverManager;
 import java.util.Map;
 
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.*;

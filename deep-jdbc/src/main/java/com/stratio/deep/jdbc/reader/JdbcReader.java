@@ -50,11 +50,6 @@ public class JdbcReader {
     private ResultSet resultSet;
 
     /**
-     * Flag to control if the next element has already been fetched
-     */
-    private boolean isNextFetched = false;
-
-    /**
      * Flag to control if the result set has a next element
      */
     private boolean hasNext = false;
@@ -83,6 +78,9 @@ public class JdbcReader {
                 jdbcDeepJobConfig.getPassword());
         Statement statement = conn.createStatement();
         resultSet = statement.executeQuery(jdbcDeepJobConfig.getQuery());
+
+        // Fetches first element
+        this.hasNext = resultSet.next();
     }
 
     /**
@@ -92,12 +90,6 @@ public class JdbcReader {
      * @throws SQLException
      */
     public boolean hasNext() throws SQLException {
-
-        if (!isNextFetched) {
-            this.hasNext = resultSet.next();
-            this.isNextFetched = true;
-        }
-
         return hasNext;
     }
 
@@ -116,7 +108,7 @@ public class JdbcReader {
             row.put(columnName, resultSet.getObject(i));
         }
 
-        this.isNextFetched = false;
+        this.hasNext = resultSet.next();
 
         return row;
     }
