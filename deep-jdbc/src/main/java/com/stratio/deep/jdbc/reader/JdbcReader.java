@@ -16,12 +16,18 @@
 
 package com.stratio.deep.jdbc.reader;
 
-import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
-import org.apache.spark.Partition;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.spark.Partition;
+
+import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
 
 /**
  * Creates a new JDBC connection and provides methods for reading from it.
@@ -31,7 +37,7 @@ public class JdbcReader {
     /**
      * JDBC Deep Job configuration.
      */
-    private JdbcDeepJobConfig jdbcDeepJobConfig;
+    private final JdbcDeepJobConfig jdbcDeepJobConfig;
 
     /**
      * JDBC Connection.
@@ -44,8 +50,20 @@ public class JdbcReader {
     private ResultSet resultSet;
 
     /**
+     * Flag to control if the next element has already been fetched
+     */
+    private boolean isNextFetched = false;
+
+    /**
+     * Flag to control if the result set has a next element
+     */
+    private boolean hasNext = false;
+
+    /**
      * Instantiaties a new JdbcReader.
-     * @param config JDBC Deep Job configuration.
+     * 
+     * @param config
+     *            JDBC Deep Job configuration.
      */
     public JdbcReader(JdbcDeepJobConfig config) {
         this.jdbcDeepJobConfig = config;
@@ -53,7 +71,9 @@ public class JdbcReader {
 
     /**
      * Initialized the reader
-     * @param p Spark partition.
+     * 
+     * @param p
+     *            Spark partition.
      * @throws Exception
      */
     public void init(Partition p) throws Exception {
@@ -67,15 +87,23 @@ public class JdbcReader {
 
     /**
      * Checks if there are more results.
+     * 
      * @return True if there is another result.
      * @throws SQLException
      */
     public boolean hasNext() throws SQLException {
-        return resultSet.next();
+
+        if (!isNextFetched) {
+            this.hasNext = resultSet.next();
+            this.isNextFetched = true;
+        }
+
+        return hasNext;
     }
 
     /**
      * Returns the next result row as a Map of column_name:column_value.
+     * 
      * @return Next result row.
      * @throws SQLException
      */
@@ -83,24 +111,28 @@ public class JdbcReader {
         Map<String, Object> row = new HashMap<>();
         ResultSetMetaData metadata = resultSet.getMetaData();
         int columnsNumber = metadata.getColumnCount();
-        for(int i=1; i<=columnsNumber; i++) {
+        for (int i = 1; i <= columnsNumber; i++) {
             String columnName = metadata.getColumnName(i);
             row.put(columnName, resultSet.getObject(i));
         }
+
+        this.isNextFetched = false;
+
         return row;
     }
 
     /**
      * Closes the ResultSet and the JDBC Connection.
+     * 
      * @throws SQLException
      */
     public void close() throws SQLException {
         try {
-            if(resultSet != null) {
+            if (resultSet != null) {
                 resultSet.close();
             }
         } finally {
-            if(conn != null) {
+            if (conn != null) {
                 conn.close();
             }
         }
