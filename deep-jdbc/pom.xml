@@ -74,12 +74,6 @@
         </dependency>
         <dependency>
             <groupId>com.stratio.deep</groupId>
-            <artifactId>deep-commons</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.stratio.deep</groupId>
             <artifactId>deep-core</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
