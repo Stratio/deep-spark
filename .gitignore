@@ -7,6 +7,7 @@ nohup.out
 */.project
 */.settings
 */.cache
+*/test-output/
 *.log
 data/*
 spark-deep-distribution*
