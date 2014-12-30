@@ -250,15 +250,6 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
      * {@inheritDoc}
      */
     @Override
-    public JdbcDeepJobConfig<T> numPartitions(int numPartitions) {
-        this.numPartitions = numPartitions;
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public int getNumPartitions() {
         return this.numPartitions;
     }

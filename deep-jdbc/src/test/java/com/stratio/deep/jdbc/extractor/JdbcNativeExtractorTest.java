@@ -47,9 +47,7 @@ public class JdbcNativeExtractorTest {
     private static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
     private static final String DATABASE = "database";
     private static final String TABLE = "table";
-    private static final int LOWER_BOUND = 0;
-    private static final int UPPER_BOUND = 19;
-    private static final int NUM_PARTITIONS = 2;
+    private static final int NUM_PARTITIONS = 1;
 
     private JdbcReader jdbcReader = PowerMockito.mock(JdbcReader.class);
 
@@ -65,12 +63,7 @@ public class JdbcNativeExtractorTest {
         JdbcPartition partition0 = (JdbcPartition)partitions[0];
         assertEquals(partition0.index(), 0);
         assertEquals(partition0.lower(), 0);
-        assertEquals(partition0.upper(), 9);
-
-        JdbcPartition partition1 = (JdbcPartition)partitions[1];
-        assertEquals(partition1.index(), 1);
-        assertEquals(partition1.lower(), 10);
-        assertEquals(partition1.upper(), 19);
+        assertEquals(partition0.upper(), Integer.MAX_VALUE);
     }
 
     @Test
@@ -106,7 +99,6 @@ public class JdbcNativeExtractorTest {
 
     private JdbcDeepJobConfig createJdbcDeepJobConfig() {
         JdbcDeepJobConfig result = JdbcConfigFactory.createJdbc();
-        result.lowerBound(LOWER_BOUND).upperBound(UPPER_BOUND).numPartitions(NUM_PARTITIONS);
         ExtractorConfig config = new ExtractorConfig();
         config.putValue(ExtractorConstants.HOST, HOST);
         config.putValue(ExtractorConstants.PORT, PORT);

@@ -91,13 +91,6 @@ public interface IJdbcDeepJobConfig<T, S extends DeepJobConfig> {
     int getLowerBound();
 
     /**
-     * Sets the number of partitions.
-     * @param numPartitions Number of partitions.
-     * @return Configuration object.
-     */
-    S numPartitions(int numPartitions);
-
-    /**
      * Returns the number of partitions.
      * @return Number of partitions.
      */
