@@ -59,8 +59,7 @@ public class AerospikeDeepOutputFormat extends AerospikeOutputFormat<Object, Aer
                                    WritePolicy writePolicy,
                                    String namespace,
                                    String setName) throws IOException {
-            //TODO -> How should I generate the key?
-            Key k = new Key(namespace, setName, Long.toString(System.nanoTime()));
+            Key k = new Key(namespace, setName, key.toString());
             List<Bin> bins = new ArrayList<>();
             for (Map.Entry<String, Object> bin : record.bins.entrySet()) {
                 Bin aerospikeBin = new Bin(bin.getKey(), bin.getValue());

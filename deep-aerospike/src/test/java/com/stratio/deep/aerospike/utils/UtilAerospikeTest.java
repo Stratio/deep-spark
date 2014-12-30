@@ -22,6 +22,9 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.utils.Pair;
 import org.testng.annotations.Test;
 
 import com.aerospike.client.Record;
@@ -41,8 +44,11 @@ public class UtilAerospikeTest {
         messageEntity.setId("3");
         messageEntity.setMessage("Test message");
 
-        AerospikeRecord record = UtilAerospike.getRecordFromObject(messageEntity);
-        Map<String, Object> bins = record.bins;
+        Pair<Object, AerospikeRecord> record = UtilAerospike.getAerospikeRecordFromObject(messageEntity);
+        Map<String, Object> bins = record.right.bins;
+
+        Object key = record.left;
+        assertEquals(messageEntity.getId().toString(), key.toString());
 
         assertEquals(bins.get("id"), messageEntity.getId());
         assertEquals(bins.get("message"), messageEntity.getMessage());
@@ -59,11 +65,43 @@ public class UtilAerospikeTest {
         bins.put("number", 3L);
         Record data = new Record(bins, 0, 0);
         AerospikeRecord record = new AerospikeRecord(data);
-        MessageTestEntity messageEntity = UtilAerospike.getObjectFromRecord(MessageTestEntity.class, record,
+        MessageTestEntity messageEntity = UtilAerospike.getObjectFromAerospikeRecord(MessageTestEntity.class, record,
                 new AerospikeDeepJobConfig(MessageTestEntity.class));
 
         assertEquals(messageEntity.getId(), bins.get("id"));
         assertEquals(messageEntity.getMessage(), bins.get("message"));
 
     }
+
+    @Test
+    public void testGetCellFromRecord() throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        Cells cells = new Cells();
+        cells.add(Cell.create("id", "1", true));
+        cells.add(Cell.create("message", "message", false));
+
+        Pair<Object, AerospikeRecord> record = UtilAerospike.getAerospikeRecordFromCell(cells);
+        Map<String, Object> bins = record.right.bins;
+
+        Object key = record.left;
+        assertEquals(cells.getString("id"), key.toString());
+
+        assertEquals(cells.size(), bins.size());
+        assertEquals(cells.getString("id"), bins.get("id"));
+        assertEquals(cells.getString("message"), bins.get("message"));
+    }
+
+    public void testGetRecordFromCell() throws UnknownHostException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+            InstantiationException {
+        Map<String, Object> bins = new HashMap<>();
+        bins.put("id", "3");
+        bins.put("message", "Message");
+        Record data = new Record(bins, 0, 0);
+        AerospikeRecord record = new AerospikeRecord(data);
+        Cells cells = UtilAerospike.getCellFromAerospikeRecord(null, record, new AerospikeDeepJobConfig(Cells.class));
+
+        assertEquals(bins.size(), cells.size());
+        assertEquals(bins.get("id"), cells.getString("id"));
+        assertEquals(bins.get("message"), cells.getString("message"));
+    }
+
 }

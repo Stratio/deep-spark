@@ -23,6 +23,7 @@ import static org.testng.AssertJUnit.assertNull;
 import java.util.List;
 import java.util.Map;
 
+import com.stratio.deep.core.entity.SimpleBookEntity;
 import org.apache.spark.rdd.RDD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ public class AerospikeEntityExtractorFT extends ExtractorEntityTest {
     private static final Logger LOG = LoggerFactory.getLogger(AerospikeEntityExtractorFT.class);
 
     public AerospikeEntityExtractorFT() {
-        super(AerospikeEntityExtractor.class, AerospikeJavaRDDFT.HOST, AerospikeJavaRDDFT.PORT, false);
+        super(AerospikeEntityExtractor.class, AerospikeJavaRDDFT.HOST, AerospikeJavaRDDFT.PORT, false, SimpleBookEntity.class);
     }
 
     @Override

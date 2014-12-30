@@ -18,6 +18,7 @@ package com.stratio.deep.aerospike.extractor;
 
 import java.lang.reflect.InvocationTargetException;
 
+import com.stratio.deep.commons.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,8 @@ public class AerospikeEntityExtractor<T> extends AerospikeExtractor<T> {
     @Override
     public Tuple2<Object, AerospikeRecord> transformElement(T record) {
         try {
-            return new Tuple2<>(null, UtilAerospike.getRecordFromObject(record));
+            Pair<Object, AerospikeRecord> pair = UtilAerospike.getAerospikeRecordFromObject(record);
+            return new Tuple2<>(pair.left, pair.right);
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             LOG.error(e.getMessage());
             throw new DeepTransformException(e.getMessage(), e);
@@ -69,7 +71,7 @@ public class AerospikeEntityExtractor<T> extends AerospikeExtractor<T> {
     @Override
     public T transformElement(Tuple2<AerospikeKey, AerospikeRecord> tuple, DeepJobConfig<T, ? extends DeepJobConfig> config) {
         try {
-            return (T) UtilAerospike.getObjectFromRecord(config.getEntityClass(), tuple._2(),
+            return (T) UtilAerospike.getObjectFromAerospikeRecord(config.getEntityClass(), tuple._2(),
                     (AerospikeDeepJobConfig) this.deepJobConfig);
         } catch (Exception e) {
             LOG.error("Cannot convert AerospikeRecord: ", e);

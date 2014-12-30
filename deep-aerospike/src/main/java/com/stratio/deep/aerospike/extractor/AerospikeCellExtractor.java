@@ -17,6 +17,7 @@ package com.stratio.deep.aerospike.extractor;
 
 import java.lang.reflect.InvocationTargetException;
 
+import com.stratio.deep.commons.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ public class AerospikeCellExtractor extends AerospikeExtractor<Cells> {
     public Cells transformElement(Tuple2<AerospikeKey, AerospikeRecord> tuple,
                                   DeepJobConfig<Cells, ? extends DeepJobConfig> config) {
         try {
-            return UtilAerospike.getCellFromRecord(tuple._1(), tuple._2(), (AerospikeDeepJobConfig) deepJobConfig);
+            return UtilAerospike.getCellFromAerospikeRecord(tuple._1(), tuple._2(), (AerospikeDeepJobConfig) deepJobConfig);
         } catch (Exception e) {
             LOG.error("Cannot convert AerospikeRecord: ", e);
             throw new DeepTransformException("Could not transform from AerospikeRecord to Cell " + e.getMessage(), e);
@@ -70,7 +71,8 @@ public class AerospikeCellExtractor extends AerospikeExtractor<Cells> {
     @Override
     public Tuple2<Object, AerospikeRecord> transformElement(Cells cells) {
         try {
-            return new Tuple2<>(null, UtilAerospike.getRecordFromCell(cells));
+            Pair<Object, AerospikeRecord> pair = UtilAerospike.getAerospikeRecordFromCell(cells);
+            return new Tuple2<>(pair.left, pair.right);
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             LOG.error("Cannot transform Cells into AerospikeRecord", e.getMessage(), e);
             throw new DeepTransformException(e.getMessage(), e);

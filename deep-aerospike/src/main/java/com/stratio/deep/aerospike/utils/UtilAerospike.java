@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.stratio.deep.commons.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,8 +65,8 @@ final public class UtilAerospike {
      * @throws InstantiationException
      * @throws java.lang.reflect.InvocationTargetException
      */
-    public static <T> T getObjectFromRecord(Class<T> classEntity, AerospikeRecord aerospikeRecord,
-                                            AerospikeDeepJobConfig aerospikeConfig)
+    public static <T> T getObjectFromAerospikeRecord(Class<T> classEntity, AerospikeRecord aerospikeRecord,
+                                                     AerospikeDeepJobConfig aerospikeConfig)
             throws IllegalAccessException, InstantiationException,
             InvocationTargetException {
         Tuple2<String, Object> equalsFilter = aerospikeConfig.getEqualsFilter();
@@ -124,26 +125,41 @@ final public class UtilAerospike {
      *
      * @param t   an instance of an object of type T to convert to AerospikeRecord.
      * @param <T> the type of the object to convert.
-     * @return the provided object converted to AerospikeRecord.
+     * @return A pair with the Record key and the Record itself.
      * @throws IllegalAccessException
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
-    public static <T> AerospikeRecord getRecordFromObject(T t) throws IllegalAccessException, InstantiationException,
+    public static <T> Pair<Object, AerospikeRecord> getAerospikeRecordFromObject(T t) throws IllegalAccessException, InstantiationException,
             InvocationTargetException {
         Field[] fields = AnnotationUtils.filterDeepFields(t.getClass());
+        Pair<Field[], Field[]> keysAndFields = AnnotationUtils.filterKeyFields(t.getClass());
+        Field[] keys = keysAndFields.left;
 
+        Object key;
         Map<String, Object> bins = new HashMap<>();
+
+        if(keys.length == 0) {
+            throw new InvocationTargetException(new Exception("One key field must be defined."));
+        } else if(keys.length > 1) {
+            throw new InvocationTargetException(new Exception("Aerospike only supports one key field"));
+        } else {
+            Field keyField = keys[0];
+            Method method = Utils.findGetter(keyField.getName(), t.getClass());
+            key = method.invoke(t);
+        }
 
         for (Field field : fields) {
             Method method = Utils.findGetter(field.getName(), t.getClass());
             Object object = method.invoke(t);
             if (object != null) {
-                bins.put(field.getName(), object);
+                bins.put(AnnotationUtils.deepFieldName(field), object);
             }
         }
         Record record = new Record(bins, 0, 0);
-        return new AerospikeRecord(record);
+        AerospikeRecord aerospikeRecord = new AerospikeRecord(record);
+        Pair<Object, AerospikeRecord> result = Pair.create(key, aerospikeRecord);
+        return result;
     }
 
     /**
@@ -157,8 +173,8 @@ final public class UtilAerospike {
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
-    public static Cells getCellFromRecord(AerospikeKey key, AerospikeRecord aerospikeRecord,
-                                          AerospikeDeepJobConfig aerospikeConfig) throws IllegalAccessException,
+    public static Cells getCellFromAerospikeRecord(AerospikeKey key, AerospikeRecord aerospikeRecord,
+                                                   AerospikeDeepJobConfig aerospikeConfig) throws IllegalAccessException,
             InstantiationException, InvocationTargetException {
 
         String namespace = aerospikeConfig.getNamespace() + "." + aerospikeConfig.getSet();
@@ -177,6 +193,10 @@ final public class UtilAerospike {
                     String binName = inputColumns[i];
                     if (map.containsKey(binName)) {
                         Cell cell = Cell.create(binName, map.get(binName));
+                        if(i == 0) {
+                            cell.setIsClusterKey(true);
+                            cell.setIsKey(true);
+                        }
                         cells.add(namespace, cell);
                     } else {
                         throw new InvocationTargetException(new Exception("There is no [" + binName
@@ -186,9 +206,15 @@ final public class UtilAerospike {
             }
         } else {
             if (equalsFilter == null || checkEqualityFilter(map, equalsFilterBin, equalsFilterValue)) {
+                int index = 0;
                 for (Map.Entry<String, Object> bin : map.entrySet()) {
                     Cell cell = Cell.create(bin.getKey(), bin.getValue());
+                    if(index == 0) {
+                        cell.setIsClusterKey(true);
+                        cell.setIsKey(true);
+                    }
                     cells.add(namespace, cell);
+                    index ++;
                 }
             }
         }
@@ -205,7 +231,7 @@ final public class UtilAerospike {
     }
 
     /**
-     * Converts from and entity class with deep's anotations to BsonObject.
+     * Converts from and entity class with deep's anotations to AerospikeRecord.
      *
      * @param cells
      * @return
@@ -213,15 +239,28 @@ final public class UtilAerospike {
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
-    public static AerospikeRecord getRecordFromCell(Cells cells) throws IllegalAccessException, InstantiationException,
+    public static Pair<Object, AerospikeRecord> getAerospikeRecordFromCell(Cells cells) throws IllegalAccessException, InstantiationException,
             InvocationTargetException {
         Map<String, Object> bins = new HashMap<>();
+        Object key = null;
         for (Cell cell : cells.getCells()) {
+            if(key == null) {
+                if(cell.isKey()) {
+                    key = cell.getValue();
+                }
+            } else {
+                if(cell.isKey()) {
+                    throw new InvocationTargetException(new Exception("Aerospike records must have only one key"));
+                }
+            }
             bins.put(cell.getCellName(), cell.getValue());
         }
-        // Expiration time = 0, defaults to namespace configuration ("default-ttl")ø
+        if(key == null) {
+            throw new InvocationTargetException(new Exception("Aerospike records must have one primary key"));
+        }
+        // Expiration time = 0, defaults to namespace configuration ("default-ttl")
         Record record = new Record(bins, 0, 0);
-        return new AerospikeRecord(record);
+        return Pair.create(key, new AerospikeRecord(record));
     }
 
 }
