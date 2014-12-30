@@ -150,30 +150,31 @@ public class JdbcEntityExtractorFT extends ExtractorEntityTest {
 
     @Override
     public ExtractorConfig getReadExtractorConfig(String database, String collection, Class entityClass) {
-        return this.getReadExtractorConfig();
-    }
-
-    @Override
-    public ExtractorConfig getReadExtractorConfig() {
-        ExtractorConfig<MessageTestEntity> extractorConfig = super.getExtractorConfig(MessageTestEntity.class);
+        ExtractorConfig extractorConfig = super.getExtractorConfig(entityClass);
         extractorConfig.putValue(ExtractorConstants.HOST, JdbcJavaRDDFT.HOST)
-                .putValue(ExtractorConstants.JDBC_CONNECTION_URL, "jdbc:hsqldb:file:" + JdbcJavaRDDFT.NAMESPACE_ENTITY)
+                .putValue(ExtractorConstants.JDBC_CONNECTION_URL, "jdbc:hsqldb:mem:" + JdbcJavaRDDFT.NAMESPACE_ENTITY)
                 .putValue(ExtractorConstants.USERNAME, JdbcJavaRDDFT.USER)
                 .putValue(ExtractorConstants.PASSWORD, JdbcJavaRDDFT.PASSWORD)
                 .putValue(ExtractorConstants.CATALOG, JdbcJavaRDDFT.NAMESPACE_ENTITY)
                 .putValue(ExtractorConstants.JDBC_DRIVER_CLASS, JdbcJavaRDDFT.DRIVER_CLASS)
                 .putValue(ExtractorConstants.PORT, JdbcJavaRDDFT.PORT)
-                .putValue(ExtractorConstants.TABLE, JdbcJavaRDDFT.INPUT_TABLE)
+                .putValue(ExtractorConstants.TABLE, collection)
                 .putValue(ExtractorConstants.JDBC_QUOTE_SQL, true);
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;
     }
 
     @Override
-    public ExtractorConfig getWriteExtractorConfig(String tableOutput, Class entityClass) {
-        ExtractorConfig<MessageTestEntity> extractorConfig = super.getExtractorConfig(MessageTestEntity.class);
+    public ExtractorConfig getReadExtractorConfig() {
+        return this.getReadExtractorConfig(JdbcJavaRDDFT.NAMESPACE_ENTITY, JdbcJavaRDDFT.INPUT_TABLE,
+                MessageTestEntity.class);
+    }
+
+    @Override
+    public  ExtractorConfig getWriteExtractorConfig(String tableOutput, Class entityClass) {
+        ExtractorConfig extractorConfig = super.getExtractorConfig(entityClass);
         extractorConfig.putValue(ExtractorConstants.HOST, JdbcJavaRDDFT.HOST)
-                .putValue(ExtractorConstants.JDBC_CONNECTION_URL, "jdbc:hsqldb:file:" + JdbcJavaRDDFT.NAMESPACE_ENTITY)
+                .putValue(ExtractorConstants.JDBC_CONNECTION_URL, "jdbc:hsqldb:mem:" + JdbcJavaRDDFT.NAMESPACE_ENTITY)
                 .putValue(ExtractorConstants.USERNAME, JdbcJavaRDDFT.USER)
                 .putValue(ExtractorConstants.PASSWORD, JdbcJavaRDDFT.PASSWORD)
                 .putValue(ExtractorConstants.CATALOG, JdbcJavaRDDFT.NAMESPACE_ENTITY)

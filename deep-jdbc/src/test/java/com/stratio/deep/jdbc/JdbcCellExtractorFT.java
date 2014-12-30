@@ -234,7 +234,7 @@ public class JdbcCellExtractorFT extends ExtractorCellTest {
     public ExtractorConfig  getReadExtractorConfig() {
         ExtractorConfig<Cells> extractorConfig = super.getExtractorConfig(Cells.class);
         extractorConfig.putValue(ExtractorConstants.HOST, JdbcJavaRDDFT.HOST)
-                .putValue(ExtractorConstants.JDBC_CONNECTION_URL, "jdbc:hsqldb:file:" + JdbcJavaRDDFT.NAMESPACE_CELL)
+                .putValue(ExtractorConstants.JDBC_CONNECTION_URL, "jdbc:hsqldb:mem:" + JdbcJavaRDDFT.NAMESPACE_CELL)
                 .putValue(ExtractorConstants.USERNAME, JdbcJavaRDDFT.USER)
                 .putValue(ExtractorConstants.PASSWORD, JdbcJavaRDDFT.PASSWORD)
                 .putValue(ExtractorConstants.CATALOG, JdbcJavaRDDFT.NAMESPACE_CELL)
@@ -250,7 +250,7 @@ public class JdbcCellExtractorFT extends ExtractorCellTest {
     public ExtractorConfig getWriteExtractorConfig(String tableOutput, Class entityClass) {
         ExtractorConfig<Cells> extractorConfig = super.getExtractorConfig(Cells.class);
         extractorConfig.putValue(ExtractorConstants.HOST, JdbcJavaRDDFT.HOST)
-                .putValue(ExtractorConstants.JDBC_CONNECTION_URL, "jdbc:hsqldb:file:" + JdbcJavaRDDFT.NAMESPACE_CELL)
+                .putValue(ExtractorConstants.JDBC_CONNECTION_URL, "jdbc:hsqldb:mem:" + JdbcJavaRDDFT.NAMESPACE_CELL)
                 .putValue(ExtractorConstants.USERNAME, JdbcJavaRDDFT.USER)
                 .putValue(ExtractorConstants.PASSWORD, JdbcJavaRDDFT.PASSWORD)
                 .putValue(ExtractorConstants.CATALOG, JdbcJavaRDDFT.NAMESPACE_CELL)

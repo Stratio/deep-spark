@@ -28,7 +28,7 @@ import com.stratio.deep.mongodb.extractor.MongoNativeEntityExtractor;
  */
 
 @Test(suiteName = "mongoRddTests", groups = { "MongoNativeEntityExtractorTest", "FunctionalTests" },
-        dependsOnGroups = "MongoNativeCellExtractorTest")
+        dependsOnGroups = "MongoJavaRDDTest")
 public class MongoNativeEntityExtractorFT extends ExtractorEntityTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoNativeEntityExtractorFT.class);

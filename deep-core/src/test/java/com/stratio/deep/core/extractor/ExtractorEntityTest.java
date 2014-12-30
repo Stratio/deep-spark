@@ -35,12 +35,15 @@ import org.json.simple.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.google.common.base.Optional;
 import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.exception.DeepTransformException;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.CantoEntity;
+import com.stratio.deep.core.entity.PlayerEntity;
+import com.stratio.deep.core.entity.TeamEntity;
 import com.stratio.deep.core.entity.WordCount;
 
 import scala.Tuple2;
@@ -72,6 +75,172 @@ public abstract class ExtractorEntityTest<T, S extends BaseConfig<T>> extends Ex
             return getObjectFromJson(entityClass, jsonObject);
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new DeepTransformException(e.getMessage());
+        }
+    }
+
+    /**
+     * Prepares team data to use in join tests. Maps teams to pair with id as key.
+     *
+     * @param context the deep context
+     */
+    protected JavaPairRDD<Long, TeamEntity> prepareTeamRDD(DeepSparkContext context) {
+        ExtractorConfig<TeamEntity> teamsConfigEntity = getReadExtractorConfig(this.databaseExtractorName,
+                FOOTBALL_TEAM_INPUT, TeamEntity.class);
+
+        return context.createJavaRDD(teamsConfigEntity)
+                .mapToPair
+                        (new PairFunction<TeamEntity, Long, TeamEntity>() {
+                            @Override
+                            public Tuple2<Long, TeamEntity> call(TeamEntity teamEntity)
+                                    throws Exception {
+                                return new Tuple2<>(teamEntity.getId(), teamEntity);
+                            }
+                        });
+    }
+
+    /**
+     * Prepares player data to use in join tests. Maps players to pair with teamId as key.
+     *
+     * @param context the deep context
+     */
+    protected JavaPairRDD<Long, PlayerEntity> preparePlayerRDD(DeepSparkContext context) {
+        ExtractorConfig<PlayerEntity> playersConfigEntity = getReadExtractorConfig(this.databaseExtractorName,
+                FOOTBALL_PLAYER_INPUT, PlayerEntity.class);
+
+        return context.createJavaRDD(playersConfigEntity)
+                .mapToPair
+                        (new PairFunction<PlayerEntity, Long, PlayerEntity>() {
+                            @Override
+                            public Tuple2<Long, PlayerEntity> call(PlayerEntity playerEntity)
+                                    throws Exception {
+                                return new Tuple2<>(playerEntity.getTeamId(), playerEntity);
+                            }
+                        });
+    }
+
+    /**
+     * It tests if the extractor can group by key players data set
+     */
+    @Test
+    protected void testGroupByKey() {
+        DeepSparkContext context = getDeepSparkContext();
+
+        try {
+
+            JavaPairRDD<Long, PlayerEntity> playersRDD = preparePlayerRDD(context);
+
+            assertEquals(playersRDD.count(), 5);
+            assertEquals(playersRDD.groupByKey().count(), 4);
+
+        } finally {
+            context.stop();
+        }
+    }
+
+    /**
+     * It tests if the extractor can filter players data set
+     */
+    @Test
+    protected void testFilterSpark() {
+        DeepSparkContext context = getDeepSparkContext();
+
+        try {
+
+            JavaPairRDD<Long, PlayerEntity> playersRDD = preparePlayerRDD(context);
+
+            JavaPairRDD<Long, PlayerEntity> playersFilteredEqRDD = playersRDD.filter(
+                    new Function<Tuple2<Long, PlayerEntity>, Boolean>() {
+                        @Override
+                        public Boolean call(Tuple2<Long, PlayerEntity> player) throws Exception {
+                            return player._2().getId() == 3;
+                        }
+                    });
+
+            JavaPairRDD<Long, PlayerEntity> playersFilteredNEqRDD = playersRDD.filter(
+                    new Function<Tuple2<Long, PlayerEntity>, Boolean>() {
+                        @Override
+                        public Boolean call(Tuple2<Long, PlayerEntity> player) throws Exception {
+                            return player._2().getId() != 1;
+                        }
+                    });
+
+            assertEquals(playersRDD.count(), 5);
+            assertEquals(playersFilteredEqRDD.count(), 1);
+            assertEquals(playersFilteredEqRDD.collect().size(), 1);
+            assertEquals(playersFilteredEqRDD.first()._2().getId().longValue(), 3L);
+            assertEquals(playersFilteredNEqRDD.count(), 4);
+            assertEquals(playersFilteredNEqRDD.collect().size(), 4);
+
+        } finally {
+            context.stop();
+        }
+    }
+
+    /**
+     * It tests if the extractor can join two data sets
+     */
+    @Test
+    protected void testInnerJoin() {
+        DeepSparkContext context = getDeepSparkContext();
+
+        try {
+
+            JavaPairRDD<Long, TeamEntity> teamsRDD = prepareTeamRDD(context);
+
+            JavaPairRDD<Long, Iterable<PlayerEntity>> playersRDD = preparePlayerRDD(context).groupByKey();
+
+            JavaPairRDD<Long, Tuple2<TeamEntity, Iterable<PlayerEntity>>> joinRDD = teamsRDD.join(playersRDD);
+
+            assertEquals(joinRDD.count(), 4);
+
+        } finally {
+            context.stop();
+        }
+    }
+
+    /**
+     * It tests if the extractor can left join two data sets
+     */
+    @Test
+    protected void testLeftOuterJoin() {
+        DeepSparkContext context = getDeepSparkContext();
+
+        try {
+
+            JavaPairRDD<Long, TeamEntity> teamsRDD = prepareTeamRDD(context);
+
+            JavaPairRDD<Long, Iterable<PlayerEntity>> playersRDD = preparePlayerRDD(context).groupByKey();
+
+            JavaPairRDD<Long, Tuple2<TeamEntity, Optional<Iterable<PlayerEntity>>>> joinRDD =
+                    teamsRDD.leftOuterJoin(playersRDD);
+
+            assertEquals(joinRDD.count(), teamsRDD.count());
+
+        } finally {
+            context.stop();
+        }
+    }
+
+    /**
+     * It tests if the extractor can right join two data sets
+     */
+    @Test
+    protected void testRightOuterJoin() {
+        DeepSparkContext context = getDeepSparkContext();
+
+        try {
+
+            JavaPairRDD<Long, TeamEntity> teamsRDD = prepareTeamRDD(context);
+
+            JavaPairRDD<Long, PlayerEntity> playersRDD = preparePlayerRDD(context);
+
+            JavaPairRDD<Long, Tuple2<Optional<TeamEntity>, PlayerEntity>> joinRDD =
+                    teamsRDD.rightOuterJoin(playersRDD);
+
+            assertEquals(joinRDD.count(), playersRDD.count());
+
+        } finally {
+            context.stop();
         }
     }
 

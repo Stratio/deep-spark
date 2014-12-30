@@ -1,0 +1,5 @@
+{"id":1, "firstname":"Manuel", "lastname":"Neuer", "date_of_birth":"1986-3-27", "place_of_birth":"Gelsenkirchen", "position_name":"Goalkeeper", "team_id":1}
+{"id":2, "firstname":"Julian", "lastname":"Schieber", "date_of_birth":"1989-2-13", "place_of_birth":"Backnang", "position_name":"Centre Forward", "team_id":3}
+{"id":3, "firstname":"Dennis ", "lastname":"Diekmeier", "date_of_birth":"1989-10-20", "place_of_birth":"Thedinghausen", "position_name":"Right Wing", "team_id":2}
+{"id":4, "firstname":"Zlatan", "lastname":"Ibrahimovic", "date_of_birth":"1981-10-03", "place_of_birth":"Malmö", "position_name":"Centre Forward", "team_id":5}
+{"id":5, "firstname":"Xabier", "lastname":"Alonso", "date_of_birth":"1981-11-25", "place_of_birth":"Tolosa", "position_name":"Midfielder", "team_id":1}

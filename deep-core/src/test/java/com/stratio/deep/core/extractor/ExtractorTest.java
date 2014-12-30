@@ -22,7 +22,6 @@ import static org.testng.AssertJUnit.assertNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -49,6 +48,8 @@ import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.MessageTestEntity;
+import com.stratio.deep.core.entity.PlayerEntity;
+import com.stratio.deep.core.entity.TeamEntity;
 
 /**
  * Created by rcrespo on 9/09/14.
@@ -138,6 +139,10 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      */
     protected static final String BOOK_OUTPUT = "bookoutput";
 
+    public static final String FOOTBALL_TEAM_INPUT = "footballteam";
+    public static final String FOOTBALL_PLAYER_INPUT = "footballplayer";
+    protected static final String FOOTBALL_OUTPUT = "footballoutput";
+
     /**
      * The WORD _ cOUNT _ sPECTED.
      */
@@ -146,6 +151,10 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
     private static final String DATA_TEST_DIVINE_COMEDY = "/divineComedy.json";
 
     private static final String DATA_TEST_MESSAGE = "/message.json";
+
+    private static final String DATA_TEST_FOOTBALL_TEAMS = "/football_teams.json";
+
+    private static final String DATA_TEST_FOOTBALL_PLAYERS = "/football_players.json";
 
     private String customDataSet;
 
@@ -196,21 +205,20 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      * @return the list
      */
     protected List<String> readFile(String path) {
-        List<String> lineas = new ArrayList<>();
-        try {
-            InputStream in = getClass().getResourceAsStream(path);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            String uniqueLine = reader.readLine();
+        List<String> readLines = new ArrayList<>();
 
-            lineas.add(uniqueLine);
-            reader.close();
-            in.close();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(path)))) {
+
+            String currentLine;
+            while ((currentLine = reader.readLine()) != null) {
+                readLines.add(currentLine);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
-
         }
-        return lineas;
+
+        return readLines;
     }
 
     /**
@@ -254,6 +262,8 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
         initDataSetMessage(context);
 
+        initDataSetFootball(context);
+
         context.stop();
     }
 
@@ -284,6 +294,21 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
         DeepSparkContext.saveRDD(javaRDD.rdd(), (ExtractorConfig<T>) getWriteExtractorConfig(tableRead,
                 inputEntity));
+    }
+
+    protected void initDataSetFootball(DeepSparkContext context) {
+        // Football teams data set
+        List<String> teams = readFile(DATA_TEST_FOOTBALL_TEAMS);
+        JavaRDD<TeamEntity> teamsRDD = transformRDD(context.parallelize(teams), TeamEntity.class);
+        DeepSparkContext.saveRDD(teamsRDD.rdd(), getWriteExtractorConfig(FOOTBALL_TEAM_INPUT,
+                TeamEntity.class));
+
+        // Football players data set
+        List<String> players = readFile(DATA_TEST_FOOTBALL_PLAYERS);
+        JavaRDD<PlayerEntity> playersRDD = transformRDD(context.parallelize(players), PlayerEntity.class);
+        DeepSparkContext.saveRDD(playersRDD.rdd(), getWriteExtractorConfig(FOOTBALL_PLAYER_INPUT,
+                PlayerEntity.class));
+
     }
 
     /**
@@ -353,9 +378,10 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
 
             ExtractorConfig<W> outputConfigEntity;
             if (inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)) {
-                outputConfigEntity = getWriteExtractorConfig("outputCells", Cells.class);
+                outputConfigEntity = (ExtractorConfig<W>) getWriteExtractorConfig("outputCells", Cells.class);
             } else {
-                outputConfigEntity = getWriteExtractorConfig("outputEntity", MessageTestEntity.class);
+                outputConfigEntity = (ExtractorConfig<W>) getWriteExtractorConfig("outputEntity",
+                        MessageTestEntity.class);
             }
 
             // Save RDD in DataSource
@@ -513,8 +539,8 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      * @param entityClass the entity class
      * @return the write extractor config
      */
-    public <W> ExtractorConfig<W> getWriteExtractorConfig(String tableOutput, Class entityClass) {
-        ExtractorConfig<W> extractorConfig = getExtractorConfig(entityClass);
+    public ExtractorConfig getWriteExtractorConfig(String tableOutput, Class entityClass) {
+        ExtractorConfig extractorConfig = getExtractorConfig(entityClass);
         extractorConfig.putValue(ExtractorConstants.HOST, host)
                 .putValue(ExtractorConstants.DATABASE, databaseExtractorName)
                 .putValue(ExtractorConstants.PORT, port)
@@ -542,7 +568,7 @@ public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Seria
      * @param entityClass the entity class
      * @return the read extractor config
      */
-    public <W> ExtractorConfig<W> getReadExtractorConfig(String database, String collection, Class entityClass) {
+    public <W> ExtractorConfig<W> getReadExtractorConfig(String database, String collection, Class<W> entityClass) {
 
         ExtractorConfig<W> extractorConfig = getExtractorConfig(entityClass);
         extractorConfig.putValue(ExtractorConstants.HOST, host)

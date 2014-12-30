@@ -41,6 +41,7 @@ import com.aerospike.client.policy.ScanPolicy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.client.query.IndexType;
 import com.google.common.io.Resources;
+import com.stratio.deep.core.extractor.ExtractorTest;
 
 @Test(groups = { "AerospikeJavaRDDFT", "FunctionalTests" })
 public class AerospikeJavaRDDFT {
@@ -130,6 +131,18 @@ public class AerospikeJavaRDDFT {
                 }
             }, new String[] { });
             aerospike.scanAll(new ScanPolicy(), NAMESPACE_ENTITY, SET_NAME_BOOK, new ScanCallback() {
+                @Override
+                public void scanCallback(Key key, Record record) throws AerospikeException {
+                    aerospike.delete(new WritePolicy(), key);
+                }
+            }, new String[] { });
+            aerospike.scanAll(new ScanPolicy(), NAMESPACE_ENTITY, ExtractorTest.FOOTBALL_TEAM_INPUT, new ScanCallback() {
+                @Override
+                public void scanCallback(Key key, Record record) throws AerospikeException {
+                    aerospike.delete(new WritePolicy(), key);
+                }
+            }, new String[] { });
+            aerospike.scanAll(new ScanPolicy(), NAMESPACE_ENTITY, ExtractorTest.FOOTBALL_PLAYER_INPUT, new ScanCallback() {
                 @Override
                 public void scanCallback(Key key, Record record) throws AerospikeException {
                     aerospike.delete(new WritePolicy(), key);

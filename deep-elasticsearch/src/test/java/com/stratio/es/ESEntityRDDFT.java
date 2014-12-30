@@ -26,7 +26,7 @@ import com.stratio.deep.es.extractor.ESEntityExtractor;
 /**
  * Created by rcrespo on 29/08/14.
  */
-@Test(suiteName = "ESRddTests", groups = { "ESEntityRDDTest", "FunctionalTests" }, dependsOnGroups = "ESCellRDDTest")
+@Test(suiteName = "ESRddTests", groups = { "ESEntityRDDTest", "FunctionalTests" }, dependsOnGroups = "ESJavaRDDTest")
 public class ESEntityRDDFT extends ExtractorEntityTest implements Serializable {
 
     public ESEntityRDDFT() {

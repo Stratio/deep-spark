@@ -66,10 +66,10 @@ public class JdbcJavaRDDFT {
     @BeforeSuite
     public void init() throws Exception {
         DriverManager.registerDriver(new JDBCDriver());
-        connCell = DriverManager.getConnection("jdbc:hsqldb:file:" + NAMESPACE_CELL);
+        connCell = DriverManager.getConnection("jdbc:hsqldb:mem:" + NAMESPACE_CELL);
         createTables(connCell, NAMESPACE_CELL, INPUT_TABLE, OUTPUT_CELLS_TABLE);
         deleteData(connCell, INPUT_TABLE, OUTPUT_CELLS_TABLE);
-        connEntity = DriverManager.getConnection("jdbc:hsqldb:file:" + NAMESPACE_ENTITY);
+        connEntity = DriverManager.getConnection("jdbc:hsqldb:mem:" + NAMESPACE_ENTITY);
         createTables(connEntity, NAMESPACE_ENTITY, INPUT_TABLE, OUTPUT_ENTITY_TABLE);
         deleteData(connEntity, INPUT_TABLE, OUTPUT_ENTITY_TABLE);
 
@@ -92,6 +92,22 @@ public class JdbcJavaRDDFT {
         } catch(SQLException e) {
             LOG.error("Problem while creating table " + outputTable + " (maybe is it already created?)", e);
         }
+        try {
+            stmnt.executeUpdate("create table \"footballteam\" (\"id\" bigint not null, \"name\" varchar(255) not null, "
+                    + "\"short_name\" varchar(255) not null, "
+                    + "\"arena_name\" varchar(255) not null, \"coach_name\" varchar(255) not null, \"city_name\" varchar(255) not null, \"league_name\" varchar(255) not null, "
+                    + "primary key (\"id\"))");
+        } catch(SQLException e) {
+            LOG.error("Problem while creating table " + "footballteam" + " (maybe is it already created?)", e);
+        }
+        try {
+            stmnt.executeUpdate("create table \"footballplayer\" (\"id\" bigint not null, \"firstname\" varchar(255) not "
+                    + "null, \"lastname\" varchar(255) not null, "
+                    + "\"date_of_birth\" varchar(255) not null, \"place_of_birth\" varchar(255) not null, \"position_name\" varchar(255) not null, \"team_id\" bigint not null, "
+                    + "primary key (\"id\"), foreign key (\"team_id\") references \"footballteam\"(\"id\"))");
+        } catch(SQLException e) {
+            LOG.error("Problem while creating table " + "footballplayer" + " (maybe is it already created?)", e);
+        }
     }
 
     private void deleteData(Connection conn, String inputTable, String outputTable) throws Exception {
@@ -105,6 +121,16 @@ public class JdbcJavaRDDFT {
             statement.executeUpdate("DELETE FROM \"" + outputTable + "\"");
         } catch (SQLException e) {
             LOG.error("Error deleting table " + outputTable + ", does the table exist?");
+        }
+        try {
+            statement.executeUpdate("DELETE FROM \"" + "footballteam" + "\"");
+        } catch (SQLException e) {
+            LOG.error("Error deleting table " + "footballteam" + ", does the table exist?");
+        }
+        try {
+            statement.executeUpdate("DELETE FROM \"" + "footballplayer" + "\"");
+        } catch (SQLException e) {
+            LOG.error("Error deleting table " + "footballplayer" + ", does the table exist?");
         }
     }
 
