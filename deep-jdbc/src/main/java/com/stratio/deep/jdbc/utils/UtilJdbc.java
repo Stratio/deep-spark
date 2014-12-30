@@ -93,7 +93,7 @@ public class UtilJdbc {
             Method method = Utils.findGetter(field.getName(), entity.getClass());
             Object object = method.invoke(entity);
             if (object != null) {
-                row.put(field.getName(), object);
+                row.put(AnnotationUtils.deepFieldName(field), object);
             }
         }
         return row;
