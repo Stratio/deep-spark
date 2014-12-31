@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.DataType;
-import com.datastax.driver.core.ProtocolVersion;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.EntityDeepJobConfig;
 import com.stratio.deep.cassandra.functions.DeepType2TupleFunction;
@@ -68,7 +67,7 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
         for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
             Cell metadata = columnDefinitions.get(entry.getKey());
             edjc.setInstancePropertyFromDbName(instance, entry.getKey(), ((DataType) metadata.getValue())
-                    .deserialize(entry.getValue(), ProtocolVersion.V3));
+                    .deserialize(entry.getValue(),CassandraDeepJobConfig.PROTOCOL_VERSION));
         }
 
         for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
@@ -80,7 +79,7 @@ public final class CassandraEntityExtractor<T extends IDeepType> extends Cassand
             try {
 
                 edjc.setInstancePropertyFromDbName(instance, entry.getKey(), ((DataType) metadata.getValue())
-                        .deserialize(entry.getValue(), ProtocolVersion.V3));
+                        .deserialize(entry.getValue(),CassandraDeepJobConfig.PROTOCOL_VERSION));
             } catch (DeepNoSuchFieldException e) {
                 LOG.error(e.getMessage());
             }

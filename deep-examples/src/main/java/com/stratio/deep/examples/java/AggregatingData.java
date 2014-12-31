@@ -16,6 +16,8 @@
 
 package com.stratio.deep.examples.java;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -82,13 +84,23 @@ public class AggregatingData {
         // Creating the RDD
         JavaRDD<TweetEntity> rdd = deepContext.createJavaRDD(config);
 
+        //....TESTING ORDER BY ...
+
+        //get the 4892 elements ordered by comparator function
+        List<TweetEntity> orderedList = rdd.takeOrdered(4892, new ComparatorEntity<>());
+
+        //sort by the field indicates in the function
         JavaRDD<TweetEntity> rddOrder = rdd.sortBy(new Function<TweetEntity, String>() {
             @Override
             public String call(TweetEntity tableEntity) {
-                return tableEntity.getAuthor();
-            }},false,1);
+                return tableEntity.getTweetID().toString();
+            }
+        }, true, 1);
 
-        rddOrder.collect();
+        List<TweetEntity> collectList = rddOrder.collect();
+
+        //....TESTING ORDER BY ...
+
         // grouping to get key-value pairs
         JavaPairRDD<String, Integer> groups = rdd.groupBy(new Function<TweetEntity, String>() {
             @Override

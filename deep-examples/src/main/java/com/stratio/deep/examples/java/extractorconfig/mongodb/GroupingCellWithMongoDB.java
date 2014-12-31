@@ -71,6 +71,11 @@ public final class GroupingCellWithMongoDB {
 
         RDD<Cells> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
 
+//        inputRDDEntity.sortBy(new Function<Cells, String>() {
+//            @Override
+//            public String call(Cells cells) {
+//                return cells.getCellByName("","");
+//            }},false,1);
         JavaRDD<String> words = inputRDDEntity.toJavaRDD().flatMap(new FlatMapFunction<Cells, String>() {
             @Override
             public Iterable<String> call(Cells cells) throws Exception {

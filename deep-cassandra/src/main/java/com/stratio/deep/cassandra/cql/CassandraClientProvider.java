@@ -107,7 +107,7 @@ class CassandraClientProvider {
                         .withPort(port)
                         .addContactPoints(locationInet)
                         .withLoadBalancingPolicy(loadBalancingPolicy)
-                        .withProtocolVersion(ProtocolVersion.V3)
+                        .withProtocolVersion(ProtocolVersion.V2)
                         .withCredentials(conf.getUsername(), conf.getPassword())
                         .build();
 

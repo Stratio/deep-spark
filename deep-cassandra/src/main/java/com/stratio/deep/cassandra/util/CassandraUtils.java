@@ -47,7 +47,6 @@ import org.apache.spark.TaskContext;
 import org.apache.spark.rdd.RDD;
 
 import com.datastax.driver.core.DataType;
-import com.datastax.driver.core.ProtocolVersion;
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
@@ -620,14 +619,14 @@ public class CassandraUtils {
                 Cell c = cells.getCellByIdx(i);
 
                 if (c.isKey()) {
-                    keys[i] = DataType.serializeValue(c.getValue(), ProtocolVersion.V3);
+                    keys[i] = DataType.serializeValue(c.getValue(), CassandraDeepJobConfig.PROTOCOL_VERSION);
                 }
             }
 
             partitionKey = CompositeType.build(keys);
         } else {
             Cell cell = cells.getCellByIdx(0);
-            partitionKey = DataType.serializeValue(cell.getValue(), ProtocolVersion.V3);
+            partitionKey = DataType.serializeValue(cell.getValue(), CassandraDeepJobConfig.PROTOCOL_VERSION);
         }
         return partitionKey;
     }
@@ -639,7 +638,7 @@ public class CassandraUtils {
 
         Object o = null;
         if (cellValue != null) {
-            o = ((DataType) metadata.getValue()).deserialize(cellValue, ProtocolVersion.V3);
+            o = ((DataType) metadata.getValue()).deserialize(cellValue, CassandraDeepJobConfig.PROTOCOL_VERSION);
 
         }
 
