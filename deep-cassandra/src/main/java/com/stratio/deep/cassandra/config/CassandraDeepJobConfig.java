@@ -54,7 +54,6 @@ import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepIOException;
-import com.stratio.deep.commons.exception.DeepIllegalAccessException;
 import com.stratio.deep.commons.exception.DeepIndexNotFoundException;
 import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
@@ -157,7 +156,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
                     .withPort(this.cqlPort)
                     .addContactPoint(this.getHost())
                     .withCredentials(this.username, this.password)
-                    .withProtocolVersion(ProtocolVersion.V3)
+                    .withProtocolVersion(PROTOCOL_VERSION)
                     .build();
 
             session = cluster.connect(quote(this.catalog));
@@ -881,5 +880,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
     public void setEqualsInValue(EqualsInValue equalsInValue) {
         this.equalsInValue = equalsInValue;
     }
+
+    public static ProtocolVersion PROTOCOL_VERSION  = ProtocolVersion.V2;
 
 }
