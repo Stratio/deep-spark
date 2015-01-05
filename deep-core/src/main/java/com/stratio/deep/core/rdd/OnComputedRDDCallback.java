@@ -22,13 +22,12 @@ import scala.runtime.AbstractFunction0;
 
 /**
  * Helper callback class called by Spark when the current RDD is computed successfully. This class
- * simply closes the {@link org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader} passed as an
- * argument.
+ * simply closes data base connections
  *
  * @param <T>
  * @author Luca Rosellini <luca@strat.io>
  */
-public class OnComputedRDDCallback<T, S extends BaseConfig<T>> extends AbstractFunction0<T> {
+public class OnComputedRDDCallback<T, S extends BaseConfig> extends AbstractFunction0<T> {
     private final IExtractor<T, S> extractorClient;
 
     public OnComputedRDDCallback(IExtractor<T, S> extractorClient) {

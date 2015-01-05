@@ -39,7 +39,7 @@ import java.util.Map;
 /**
  * Abstract class of Jdbc native extractor.
  */
-public abstract class JdbcNativeExtractor<T, S extends BaseConfig<T>> implements IExtractor<T, S> {
+public abstract class JdbcNativeExtractor<T, S extends BaseConfig> implements IExtractor<T, S> {
 
     private static final long serialVersionUID = -298383130965427783L;
 

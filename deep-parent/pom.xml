@@ -46,7 +46,7 @@
         <!-- mongodb driver -->
         <mongo.driver.version>2.12.4</mongo.driver.version>
 
-        <scala.version>2.10.3</scala.version>
+        <scala.version>2.10.4</scala.version>
 
         <scala.binary.version>2.10</scala.binary.version>
         <!-- Artifacts include -->

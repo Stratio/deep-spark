@@ -51,7 +51,7 @@ import scala.Tuple2;
 /**
  * Created by rcrespo on 17/11/14.
  */
-public abstract class ExtractorEntityTest<T, S extends BaseConfig<T>> extends ExtractorTest<T, S> {
+public abstract class ExtractorEntityTest<T, S extends BaseConfig> extends ExtractorTest<T, S> {
 
     private static final long serialVersionUID = 6367238996895716537L;
 

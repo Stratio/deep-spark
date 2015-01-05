@@ -20,11 +20,15 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -358,7 +362,7 @@ public final class Utils {
      * @param config the config
      * @return the extractor instance
      */
-    public static <T, S extends BaseConfig<T>> IExtractor<T, S> getExtractorInstance(S config) {
+    public static <T, S extends BaseConfig> IExtractor<T, S> getExtractorInstance(S config) {
 
         try {
             Class<T> rdd = (Class<T>) config.getExtractorImplClass();
@@ -458,6 +462,55 @@ public final class Utils {
 
     }
 
+    /**
+     * Returns an instance clone.
+     * this method gets every class property by reflection, including its parents properties
+     * @param t
+     * @param <T>
+     * @return
+     */
+    public static <T> T cloneObjectWithParents (T t) throws IllegalAccessException, InstantiationException {
+        T clone =  (T) t.getClass().newInstance();
+
+        List<Field> allFields = new ArrayList<>();
+
+        Class parentClass = t.getClass().getSuperclass();
+
+        while(parentClass != null){
+            Collections.addAll(allFields, parentClass.getDeclaredFields());
+            parentClass = parentClass.getSuperclass();
+        }
+
+        Collections.addAll(allFields, t.getClass().getDeclaredFields());
+
+        for(Field field : allFields){
+            int modifiers = field.getModifiers();
+            //We skip final and static fields
+            if ((Modifier.FINAL & modifiers) !=0 || (Modifier.STATIC & modifiers) !=0 ){
+                continue;
+            }
+            field.setAccessible(true);
+
+            Object value = field.get(t);
+
+            if(Collection.class.isAssignableFrom(field.getType()))
+            {
+                Collection collection = (Collection)field.get(clone);
+                if(collection == null){
+                    collection = (Collection) field.get(t).getClass().newInstance();
+                }
+                collection.addAll((Collection) field.get(t));
+                value = collection;
+            }else if (Map.class.isAssignableFrom(field.getType())){
+                Map clonMap = (Map) field.get(t).getClass().newInstance();
+                clonMap.putAll((Map) field.get(t));
+                value = clonMap;
+            }
+            field.set(clone, value);
+        }
+
+        return clone;
+    }
 
 
 }
