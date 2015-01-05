@@ -33,7 +33,7 @@ import scala.runtime.BoxedUnit;
 /**
  * Created by rcrespo on 28/08/14.
  */
-public class PrepareSaveFunction<T, S extends BaseConfig<T>> extends AbstractFunction1<Iterator<T>,
+public class PrepareSaveFunction<T, S extends BaseConfig> extends AbstractFunction1<Iterator<T>,
         BoxedUnit> implements Serializable {
 
     private static final long serialVersionUID = -7556596901637129564L;

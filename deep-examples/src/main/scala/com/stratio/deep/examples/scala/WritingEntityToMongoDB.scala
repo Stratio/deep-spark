@@ -48,7 +48,7 @@ object WritingEntityToMongoDB {
 
     val inputConfigEntity: MongoDeepJobConfig[MessageTestEntity] = MongoConfigFactory.createMongoDB(classOf[MessageTestEntity]).host(host).database(database).collection(inputCollection).readPreference(readPreference).initialize
 
-    val inputRDDEntity: RDD[MessageTestEntity] = deepContext.createJavaRDD(inputConfigEntity)
+    val inputRDDEntity: RDD[MessageTestEntity] = deepContext.createRDD(inputConfigEntity)
 
     val outputConfigEntity: MongoDeepJobConfig[MessageTestEntity] = MongoConfigFactory.createMongoDB(classOf[MessageTestEntity]).host(host).database(database).collection(outputCollection).readPreference(readPreference).initialize
 

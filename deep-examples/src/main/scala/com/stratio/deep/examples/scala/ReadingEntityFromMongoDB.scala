@@ -41,7 +41,7 @@ object ReadingEntityFromMongoDB {
 
     val inputConfigEntity: MongoDeepJobConfig[MessageTestEntity] = MongoConfigFactory.createMongoDB(classOf[MessageTestEntity]).host(host).database(database).collection(inputCollection).initialize
 
-    val inputRDDEntity: RDD[MessageTestEntity] = deepContext.createJavaRDD(inputConfigEntity)
+    val inputRDDEntity: RDD[MessageTestEntity] = deepContext.createRDD(inputConfigEntity)
 
     System.out.println("count : " + inputRDDEntity.cache.count)
 

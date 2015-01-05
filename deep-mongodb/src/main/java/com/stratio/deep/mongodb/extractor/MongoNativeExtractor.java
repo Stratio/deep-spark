@@ -62,7 +62,7 @@ import com.stratio.deep.mongodb.writer.MongoWriter;
  * @param <T> the type parameter
  * @param <S> the type parameter
  */
-public abstract class MongoNativeExtractor<T, S extends BaseConfig<T>> implements IExtractor<T, S> {
+public abstract class MongoNativeExtractor<T, S extends BaseConfig> implements IExtractor<T, S> {
 
     /**
      * The constant SPLIT_KEYS.

@@ -24,15 +24,19 @@ import static com.stratio.deep.commons.utils.Utils.newTypeInstance;
 import static com.stratio.deep.commons.utils.Utils.quote;
 import static com.stratio.deep.commons.utils.Utils.singleQuote;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.testng.annotations.Test;
@@ -40,6 +44,7 @@ import org.testng.annotations.Test;
 import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.entity.IDeepType;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepIOException;
@@ -205,6 +210,31 @@ public class UtilsTest {
     }
 
 
+    @Test
+    public void cloneObjectWithParentsTest(){
+
+        Map<String, Serializable> map = new HashMap<>();
+        map.put("key1","val1");
+        map.put("key2","val2");
+        map.put("key3","val3");
+
+        ExtractorConfig<Cells> extractorConfig = new ExtractorConfig();
+        extractorConfig.setExtractorImplClassName("testExtractor");
+        extractorConfig.setValues(map);
+
+        ExtractorConfig<Cells> clone = extractorConfig.clone();
+
+        assertEquals(clone.getExtractorImplClassName(), extractorConfig.getExtractorImplClassName());
+        assertEquals(clone.getValues(), extractorConfig.getValues());
+
+        map.remove("key1");
+
+        assertEquals(map.size(),2);
+
+
+        assertNotEquals(clone.getValues(), extractorConfig.getValues());
+
+    }
 
 
     class ChildDeepJobConfig extends DeepJobConfig {

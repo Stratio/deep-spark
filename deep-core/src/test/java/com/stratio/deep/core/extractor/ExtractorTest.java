@@ -60,7 +60,7 @@ import com.stratio.deep.core.entity.MessageTestEntity;
  * @param <T> the type parameter
  * @param <S> the type parameter
  */
-public abstract class ExtractorTest<T, S extends BaseConfig<T>> implements Serializable {
+public abstract class ExtractorTest<T, S extends BaseConfig> implements Serializable {
 
     /**
      * The constant LOG.

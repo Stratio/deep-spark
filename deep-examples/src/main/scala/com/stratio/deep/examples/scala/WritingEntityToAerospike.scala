@@ -44,7 +44,7 @@ object WritingEntityToAerospike {
 
     val inputConfigEntity: AerospikeDeepJobConfig[MessageEntity] = AerospikeConfigFactory.createAerospike(classOf[MessageEntity]).host(host).port(port).namespace(namespace).set(inputSet).initialize
 
-    val inputRDDEntity: RDD[MessageEntity] = deepContext.createJavaRDD(inputConfigEntity)
+    val inputRDDEntity: RDD[MessageEntity] = deepContext.createRDD(inputConfigEntity)
 
     val outputConfigEntity: AerospikeDeepJobConfig[MessageEntity] = AerospikeConfigFactory.createAerospike(classOf[MessageEntity]).host(host).port(port).namespace(namespace).set(outputSet).initialize
 

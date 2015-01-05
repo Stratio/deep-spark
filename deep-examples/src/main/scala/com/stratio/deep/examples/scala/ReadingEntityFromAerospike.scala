@@ -43,7 +43,7 @@ object ReadingEntityFromAerospike {
 
     val inputConfigEntity: AerospikeDeepJobConfig[MessageEntity] = AerospikeConfigFactory.createAerospike(classOf[MessageEntity]).host(host).port(port).namespace(namespace).set(set).initialize
 
-    val inputRDDEntity: RDD[MessageEntity] = deepContext.createJavaRDD(inputConfigEntity)
+    val inputRDDEntity: RDD[MessageEntity] = deepContext.createRDD(inputConfigEntity)
 
     System.out.println("count : " + inputRDDEntity.cache.count)
 

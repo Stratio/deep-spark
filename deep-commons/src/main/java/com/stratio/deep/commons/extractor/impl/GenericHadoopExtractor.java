@@ -51,7 +51,7 @@ import scala.Tuple2;
 /**
  * Created by rcrespo on 26/08/14.
  */
-public abstract class GenericHadoopExtractor<T, S extends BaseConfig<T>, K, V, kOut, vOut> implements IExtractor<T, S> {
+public abstract class GenericHadoopExtractor<T, S extends BaseConfig, K, V, kOut, vOut> implements IExtractor<T, S> {
 
     protected HadoopConfig deepJobConfig;
 

@@ -51,7 +51,7 @@ import scala.Tuple2;
  * Implementors should only provide a way to convert an object of type T to a
  * {@link com.stratio.deep.commons.entity.Cells} element.
  */
-public abstract class CassandraExtractor<T, S extends BaseConfig<T>> implements IExtractor<T, S> {
+public abstract class CassandraExtractor<T, S extends BaseConfig> implements IExtractor<T, S> {
 
     protected transient IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
 

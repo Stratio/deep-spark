@@ -20,15 +20,21 @@ import java.io.Serializable;
 
 import org.apache.hadoop.conf.Configuration;
 
+import com.stratio.deep.commons.entity.Cells;
+
 /**
  * Created by rcrespo on 13/10/14.
  */
-public class HadoopConfig<T, S extends DeepJobConfig> extends DeepJobConfig<T, S> implements Serializable {
+public class HadoopConfig<T, S extends DeepJobConfig<T, S>> extends DeepJobConfig<T, S> implements Serializable {
 
     protected transient Configuration configHadoop;
 
     public HadoopConfig(Class<T> t) {
         super(t);
+    }
+
+    public HadoopConfig(){
+        super((Class<T>) Cells.class);
     }
 
     public Configuration getHadoopConfiguration() {

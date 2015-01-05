@@ -14,7 +14,7 @@ import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
  * @param <T> the type parameter
  * @param <S> the type parameter
  */
-public interface IExtractor<T, S extends BaseConfig<T>> extends Serializable, AutoCloseable {
+public interface IExtractor<T, S extends BaseConfig> extends Serializable, AutoCloseable {
 
     /**
      * Gets partitions.

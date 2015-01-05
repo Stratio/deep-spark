@@ -129,6 +129,10 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
 
     private WriteConcern writeConcern = WriteConcern.NORMAL;
 
+
+    public MongoDeepJobConfig() {
+    }
+
     /**
      * Instantiates a new Mongo deep job config.
      *
@@ -141,7 +145,6 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
         } else {
             extractorImplClass = MongoNativeEntityExtractor.class;
         }
-
     }
 
     /**

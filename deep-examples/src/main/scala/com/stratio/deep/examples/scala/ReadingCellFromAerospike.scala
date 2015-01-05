@@ -43,7 +43,7 @@ object ReadingCellFromAerospike {
 
     val inputConfigEntity: AerospikeDeepJobConfig[Cells] = AerospikeConfigFactory.createAerospike().host(host).port(port).namespace(namespace).set(set).initialize
 
-    val inputRDDEntity: RDD[Cells] = deepContext.createJavaRDD(inputConfigEntity)
+    val inputRDDEntity: RDD[Cells] = deepContext.createRDD(inputConfigEntity)
 
     System.out.println("count : " + inputRDDEntity.cache.count)
 

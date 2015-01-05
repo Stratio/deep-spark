@@ -16,18 +16,22 @@
 
 package com.stratio.deep.commons.config;
 
+import static com.stratio.deep.commons.utils.Utils.cloneObjectWithParents;
+
 import java.io.Serializable;
 
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepInstantiationException;
 
 /**
  * Created by rcrespo on 13/10/14.
  */
-public class BaseConfig<T> implements Serializable {
+public class BaseConfig<T, S extends BaseConfig> implements Serializable, Cloneable {
 
     private static final long serialVersionUID = -6575509538810299996L;
 
-    protected Class entityClass;
+    protected Class<T> entityClass;
+
 
     protected Class extractorImplClass;
 
@@ -42,7 +46,7 @@ public class BaseConfig<T> implements Serializable {
     }
 
     public BaseConfig() {
-        entityClass = Cells.class;
+        entityClass = (Class<T>) Cells.class;
     }
 
     public Class getExtractorImplClass() {
@@ -88,6 +92,14 @@ public class BaseConfig<T> implements Serializable {
 
     public void setPartitionId(int partitionId) {
         this.partitionId = partitionId;
+    }
+
+    public S clone(){
+        try {
+            return (S) cloneObjectWithParents(this);
+        } catch (IllegalAccessException | InstantiationException e) {
+            throw new DeepInstantiationException("It was not possible to clone the object",e);
+        }
     }
 
     @Override

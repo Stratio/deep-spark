@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.utils.Pair;
 import com.stratio.deep.commons.utils.Utils;
@@ -29,7 +30,7 @@ import com.stratio.deep.commons.utils.Utils;
  *
  * @param <T> the type parameter
  */
-public class ExtractorConfig<T> extends BaseConfig<T> implements Serializable, Cloneable {
+public class ExtractorConfig<T> extends BaseConfig<T, ExtractorConfig> implements Serializable, Cloneable {
 
     private static final long serialVersionUID = -8418401138615339258L;
 
@@ -48,7 +49,7 @@ public class ExtractorConfig<T> extends BaseConfig<T> implements Serializable, C
      * Instantiates a new Extractor config.
      */
     public ExtractorConfig() {
-        super();
+        super((Class<T>) Cells.class);
     }
 
     /**
@@ -252,15 +253,4 @@ public class ExtractorConfig<T> extends BaseConfig<T> implements Serializable, C
         }
     }
 
-    @Override
-    public ExtractorConfig<T> clone() {
-
-        ExtractorConfig<T> clonedObject = new ExtractorConfig<>();
-        clonedObject.getValues().putAll(this.getValues());
-        clonedObject.setExtractorImplClass(this.getExtractorImplClass());
-        clonedObject.setExtractorImplClassName(this.getExtractorImplClassName());
-        clonedObject.setEntityClass(this.getEntityClass());
-        return clonedObject;
-
-    }
 }

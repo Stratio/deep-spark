@@ -44,7 +44,7 @@ object WritingCellToAerospike {
 
     val inputConfigEntity: AerospikeDeepJobConfig[Cells] = AerospikeConfigFactory.createAerospike().host(host).port(port).namespace(namespace).set(inputSet)
 
-    val inputRDDEntity: RDD[Cells] = deepContext.createJavaRDD(inputConfigEntity)
+    val inputRDDEntity: RDD[Cells] = deepContext.createRDD(inputConfigEntity)
 
     val outputConfigEntity: AerospikeDeepJobConfig[Cells] = AerospikeConfigFactory.createAerospike().host(host).port(port).namespace(namespace).set(outputSet)
 

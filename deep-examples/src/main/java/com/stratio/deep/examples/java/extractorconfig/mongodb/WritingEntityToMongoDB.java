@@ -16,7 +16,6 @@
 
 package com.stratio.deep.examples.java.extractorconfig.mongodb;
 
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;

@@ -16,6 +16,7 @@
 package com.stratio.deep.core.rdd;
 
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.rdd.RDD;
 
 import com.stratio.deep.commons.config.BaseConfig;
 
@@ -25,7 +26,7 @@ import scala.reflect.ClassTag$;
 /**
  * Created by rcrespo on 12/08/14.
  */
-public class DeepJavaRDD<T, S extends BaseConfig<T>> extends JavaRDD<T> {
+public class DeepJavaRDD<T, S extends BaseConfig> extends JavaRDD<T> {
 
     public DeepJavaRDD(DeepRDD<T, S> rdd) {
         super(rdd, ClassTag$.MODULE$.<T>apply(rdd.config.value().getEntityClass()));
@@ -33,7 +34,8 @@ public class DeepJavaRDD<T, S extends BaseConfig<T>> extends JavaRDD<T> {
 
     @Override
     public ClassTag<T> classTag() {
-        return ClassTag$.MODULE$.<T>apply(((DeepRDD<T, S>) this.rdd()).config.value().getEntityClass());
+        return ClassTag$.MODULE$.<T>apply(((BaseConfig<T,BaseConfig>)((DeepRDD) this.rdd()).config.value())
+                .getEntityClass());
     }
 
 }

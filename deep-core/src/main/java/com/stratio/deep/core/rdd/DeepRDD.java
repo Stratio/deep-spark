@@ -42,7 +42,7 @@ import scala.reflect.ClassTag$;
 /**
  * Created by rcrespo on 11/08/14.
  */
-public class DeepRDD<T, S extends BaseConfig<T>> extends RDD<T> implements Serializable {
+public class DeepRDD<T, S extends BaseConfig> extends RDD<T> implements Serializable {
 
     private static final long serialVersionUID = -5360986039609466526L;
 
