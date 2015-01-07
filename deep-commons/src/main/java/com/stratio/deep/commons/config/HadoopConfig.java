@@ -27,6 +27,8 @@ import com.stratio.deep.commons.entity.Cells;
  */
 public class HadoopConfig<T, S extends DeepJobConfig<T, S>> extends DeepJobConfig<T, S> implements Serializable {
 
+    private static final long serialVersionUID = -3800967311704235141L;
+    
     protected transient Configuration configHadoop;
 
     public HadoopConfig(Class<T> t) {
