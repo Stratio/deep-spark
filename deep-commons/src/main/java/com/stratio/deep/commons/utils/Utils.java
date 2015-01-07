@@ -29,6 +29,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -470,38 +476,37 @@ public final class Utils {
      * @return
      */
     public static <T> T cloneObjectWithParents (T t) throws IllegalAccessException, InstantiationException {
-        T clone =  (T) t.getClass().newInstance();
+        T clone = (T) t.getClass().newInstance();
 
         List<Field> allFields = new ArrayList<>();
 
         Class parentClass = t.getClass().getSuperclass();
 
-        while(parentClass != null){
+        while (parentClass != null) {
             Collections.addAll(allFields, parentClass.getDeclaredFields());
             parentClass = parentClass.getSuperclass();
         }
 
         Collections.addAll(allFields, t.getClass().getDeclaredFields());
 
-        for(Field field : allFields){
+        for (Field field : allFields) {
             int modifiers = field.getModifiers();
             //We skip final and static fields
-            if ((Modifier.FINAL & modifiers) !=0 || (Modifier.STATIC & modifiers) !=0 ){
+            if ((Modifier.FINAL & modifiers) != 0 || (Modifier.STATIC & modifiers) != 0) {
                 continue;
             }
             field.setAccessible(true);
 
             Object value = field.get(t);
 
-            if(Collection.class.isAssignableFrom(field.getType()))
-            {
-                Collection collection = (Collection)field.get(clone);
-                if(collection == null){
+            if (Collection.class.isAssignableFrom(field.getType())) {
+                Collection collection = (Collection) field.get(clone);
+                if (collection == null) {
                     collection = (Collection) field.get(t).getClass().newInstance();
                 }
                 collection.addAll((Collection) field.get(t));
                 value = collection;
-            }else if (Map.class.isAssignableFrom(field.getType())){
+            } else if (Map.class.isAssignableFrom(field.getType())) {
                 Map clonMap = (Map) field.get(t).getClass().newInstance();
                 clonMap.putAll((Map) field.get(t));
                 value = clonMap;
@@ -512,5 +517,27 @@ public final class Utils {
         return clone;
     }
 
+    /**
+     * Returns an instance of ThreadPoolExecutor using an bounded queue and blocking when the worker queue is full.
+     * @param nThreads thread pool size
+     * @param queueSize workers queue size
+     * @return thread pool executor
+     */
+    public static ExecutorService newBlockingFixedThreadPoolExecutor(int nThreads, int queueSize) {
+        BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(queueSize);
+        RejectedExecutionHandler blockingRejectedExecutionHandler = new RejectedExecutionHandler() {
+            @Override
+            public void rejectedExecution(Runnable task, ThreadPoolExecutor executor) {
+                try {
+                    executor.getQueue().put(task);
+                } catch (InterruptedException e) {
+                }
+            }
 
+        };
+
+        return new ThreadPoolExecutor(nThreads, nThreads,
+                0L, TimeUnit.MILLISECONDS, blockingQueue,
+                blockingRejectedExecutionHandler);
+    }
 }
