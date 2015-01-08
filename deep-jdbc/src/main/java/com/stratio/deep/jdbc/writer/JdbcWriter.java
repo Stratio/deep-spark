@@ -26,7 +26,7 @@ import java.util.*;
 /**
  * Creates a new JDBC connection and provides methods for writing.
  */
-public class JdbcWriter<T> {
+public class JdbcWriter<T> implements AutoCloseable {
 
     /**
      * JDBC Deep Job configuration.

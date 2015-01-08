@@ -32,7 +32,7 @@ import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
 /**
  * Creates a new JDBC connection and provides methods for reading from it.
  */
-public class JdbcReader {
+public class JdbcReader implements AutoCloseable {
 
     /**
      * JDBC Deep Job configuration.

@@ -35,6 +35,7 @@ import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
 import com.stratio.deep.commons.exception.DeepExtractorInitializationException;
 import com.stratio.deep.commons.impl.DeepPartition;
+import com.stratio.deep.commons.rdd.IDeepRecordReader;
 import com.stratio.deep.mongodb.config.MongoDeepJobConfig;
 import com.stratio.deep.mongodb.partition.MongoPartition;
 
@@ -43,7 +44,7 @@ import com.stratio.deep.mongodb.partition.MongoPartition;
  *
  * @param <T> the type parameter
  */
-public class MongoReader<T> {
+public class MongoReader<T> implements IDeepRecordReader<DBObject> {
 
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoReader.class);

@@ -27,18 +27,19 @@ import com.mongodb.WriteConcern;
 /**
  * Created by rcrespo on 5/11/14.
  */
-public class MongoWriter {
+public class MongoWriter implements AutoCloseable {
 
     /**
      * The Mongo client.
      */
-    private MongoClient mongoClient = null;
+    protected MongoClient mongoClient = null;
     /**
      * The Db collection.
      */
-    private DBCollection dbCollection = null;
+    protected DBCollection dbCollection = null;
 
-    private WriteConcern writeConcern = null;
+    protected WriteConcern writeConcern = null;
+
 
     /**
      * Instantiates a new Mongo writer.
