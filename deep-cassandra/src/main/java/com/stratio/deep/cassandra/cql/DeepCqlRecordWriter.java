@@ -169,21 +169,18 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
         private final UUID id = UUID.randomUUID();
 
         private final String cql;
-        private final List<Object> values = new ArrayList<>();
-
-        private int size = 0;
+        private final List<List<Object>> records = new ArrayList<>();
 
         public WriteTask(String cql) {
             this.cql = cql;
         }
 
         public void add(List<Object> values) {
-            this.values.addAll(values);
-            ++size;
+            this.records.add(values);
         }
 
         public int size() {
-            return this.size;
+            return this.records.size();
         }
 
         public String getId() {
@@ -198,8 +195,9 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
             LOG.debug("[" + this + "] Executing batch write to cassandra");
             final PreparedStatement preparedStatement = sessionWithHost.prepare(cql);
             final BatchStatement batchStatement = new BatchStatement(BatchStatement.Type.UNLOGGED);
-            batchStatement.add(preparedStatement.bind(values.toArray(new Object[values.size()])));
-
+            for (List<Object> record: records) {
+                batchStatement.add(preparedStatement.bind(record.toArray(new Object[record.size()])));
+            }
             sessionWithHost.execute(batchStatement);
         }
     }
