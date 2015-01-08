@@ -157,7 +157,10 @@ public class CassandraEntityExtractorFT extends ExtractorEntityTest {
             JavaRDD<WordCount> outputRDD = wordCountReduced.map(new Function<Tuple2<String, Long>, WordCount>() {
                 @Override
                 public WordCount call(Tuple2<String, Long> stringIntegerTuple2) throws Exception {
-                    return new WordCount(stringIntegerTuple2._1(), stringIntegerTuple2._2());
+                    final String word = stringIntegerTuple2._1() != null && !stringIntegerTuple2._1().isEmpty() ?
+                            stringIntegerTuple2._1() :
+                            "stratio-deep";
+                    return new WordCount(word, stringIntegerTuple2._2());
                 }
             });
 
@@ -167,7 +170,7 @@ public class CassandraEntityExtractorFT extends ExtractorEntityTest {
 
             RDD<WordCount> outputRDDEntity = context.createRDD(outputConfigEntity);
 
-            Assert.assertEquals(WORD_COUNT_SPECTED.longValue() - 1l, ((Long) outputRDDEntity.cache().count()).longValue
+            Assert.assertEquals(WORD_COUNT_SPECTED.longValue(), ((Long) outputRDDEntity.cache().count()).longValue
                     ());
 
         } finally {
@@ -175,7 +178,6 @@ public class CassandraEntityExtractorFT extends ExtractorEntityTest {
         }
 
     }
-
 
     //TODO
     @Override

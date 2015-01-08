@@ -153,7 +153,7 @@ public class CassandraCellExtractorFT extends ExtractorCellTest {
                 public Cells call(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
                     return new Cells(Cell.create("word", stringIntegerTuple2._1() != null && !stringIntegerTuple2._1()
                                     .isEmpty() ? stringIntegerTuple2._1()
-                                    : "space",
+                                    : "stratio-deep",
                             true, true),
                             Cell.create("count", stringIntegerTuple2._2()));
                 }
@@ -165,7 +165,7 @@ public class CassandraCellExtractorFT extends ExtractorCellTest {
 
             RDD<Cells> outputRDDEntity = context.createRDD(outputConfigEntity);
 
-            Assert.assertEquals(WORD_COUNT_SPECTED.longValue() - 1l,
+            Assert.assertEquals(WORD_COUNT_SPECTED.longValue(),
                     ((Long) outputRDDEntity.cache().count()).longValue()
             );
         } finally {

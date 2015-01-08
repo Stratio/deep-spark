@@ -193,12 +193,17 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
         @Override
         public void run() {
             LOG.debug("[" + this + "] Executing batch write to cassandra");
-            final PreparedStatement preparedStatement = sessionWithHost.prepare(cql);
-            final BatchStatement batchStatement = new BatchStatement(BatchStatement.Type.UNLOGGED);
-            for (List<Object> record: records) {
-                batchStatement.add(preparedStatement.bind(record.toArray(new Object[record.size()])));
+            try {
+                final PreparedStatement preparedStatement = sessionWithHost.prepare(cql);
+                final BatchStatement batchStatement = new BatchStatement(BatchStatement.Type.UNLOGGED);
+                for (final List<Object> record : records) {
+                    batchStatement.add(preparedStatement.bind(record.toArray(new Object[record.size()])));
+                }
+                sessionWithHost.execute(batchStatement);
+            } catch (Exception e) {
+                LOG.error("[" + this + "] Exception occurred while trying to execute batch in cassandra: " +
+                        e.getMessage());
             }
-            sessionWithHost.execute(batchStatement);
         }
     }
 }
