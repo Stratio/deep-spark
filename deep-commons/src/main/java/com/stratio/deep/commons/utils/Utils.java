@@ -33,7 +33,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang.StringUtils;
 
 import com.stratio.deep.commons.config.BaseConfig;
@@ -466,7 +471,7 @@ public final class Utils {
      * @param <T>
      * @return
      */
-    public static <T> T cloneObjectWithParents(T t) throws IllegalAccessException, InstantiationException {
+    public static <T> T cloneObjectWithParents (T t) throws IllegalAccessException, InstantiationException {
         T clone = (T) t.getClass().newInstance();
 
         List<Field> allFields = new ArrayList<>();
@@ -508,5 +513,27 @@ public final class Utils {
         return clone;
     }
 
+    /**
+     * Returns an instance of ThreadPoolExecutor using an bounded queue and blocking when the worker queue is full.
+     * @param nThreads thread pool size
+     * @param queueSize workers queue size
+     * @return thread pool executor
+     */
+    public static ExecutorService newBlockingFixedThreadPoolExecutor(int nThreads, int queueSize) {
+        BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(queueSize);
+        RejectedExecutionHandler blockingRejectedExecutionHandler = new RejectedExecutionHandler() {
+            @Override
+            public void rejectedExecution(Runnable task, ThreadPoolExecutor executor) {
+                try {
+                    executor.getQueue().put(task);
+                } catch (InterruptedException e) {
+                }
+            }
 
+        };
+
+        return new ThreadPoolExecutor(nThreads, nThreads,
+                0L, TimeUnit.MILLISECONDS, blockingQueue,
+                blockingRejectedExecutionHandler);
+    }
 }

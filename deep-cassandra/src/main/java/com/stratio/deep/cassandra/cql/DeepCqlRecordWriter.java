@@ -16,41 +16,30 @@
 
 package com.stratio.deep.cassandra.cql;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
-import org.apache.cassandra.db.marshal.AbstractType;
-import org.apache.cassandra.db.marshal.LongType;
-import org.apache.cassandra.db.marshal.TypeParser;
-import org.apache.cassandra.dht.IPartitioner;
-import org.apache.cassandra.dht.Token;
-import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.cassandra.exceptions.SyntaxException;
-import org.apache.cassandra.utils.FBUtilities;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
+import com.datastax.driver.core.BatchStatement;
+import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.Session;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.stratio.deep.cassandra.config.CassandraDeepJobConfig;
 import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.querybuilder.CassandraUpdateQueryBuilder;
-import com.stratio.deep.cassandra.util.CassandraUtils;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepGenericException;
-import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.exception.DeepInstantiationException;
 import com.stratio.deep.commons.handler.DeepRecordWriter;
-import com.stratio.deep.commons.utils.Pair;
+import com.stratio.deep.commons.utils.Utils;
 
 /**
  * Handles the distributed write to cassandra in batch.
@@ -58,42 +47,39 @@ import com.stratio.deep.commons.utils.Pair;
 public final class DeepCqlRecordWriter extends DeepRecordWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(DeepCqlRecordWriter.class);
+    private final static int MAX_PARALLEL_QUERIES = 4;
+    private final static int WORK_QUEUE_SIZE = 8;
 
-    // handles for clients for each range exhausted in the threadpool
-    private final Map<Token, RangeClient> clients;
-    private final Map<Token, RangeClient> removedClients;
-
-    private AbstractType<?> keyValidator;
-    private String[] partitionKeyColumns;
+    private final ListeningExecutorService taskExecutorService;
+    private final ConcurrentHashMap<String, ListenableFuture<?>> pendingTasks;
+    private WriteTask currentTask;
+    private boolean hasCurrentTask = false;
 
     private final ICassandraDeepJobConfig writeConfig;
-    private final IPartitioner partitioner;
-    private final InetAddress localhost;
-
     private final CassandraUpdateQueryBuilder queryBuilder;
 
     private Session sessionWithHost;
 
     /**
-     * Con
+     * Cassandra record writer constructor.
      *
-     * @param writeConfig
+     * @param writeConfig write configuration
+     * @param queryBuilder query builder
      */
     public DeepCqlRecordWriter(ICassandraDeepJobConfig writeConfig, CassandraUpdateQueryBuilder queryBuilder) {
-        this.clients = new HashMap<>();
-        this.removedClients = new HashMap<>();
+        this.taskExecutorService = MoreExecutors.listeningDecorator(Utils.newBlockingFixedThreadPoolExecutor
+                (MAX_PARALLEL_QUERIES, WORK_QUEUE_SIZE));
+        this.pendingTasks = new ConcurrentHashMap<>();
         this.writeConfig = writeConfig;
-        this.partitioner = RangeUtils.getPartitioner(writeConfig);
         this.queryBuilder = queryBuilder;
         try {
-            this.localhost = InetAddress.getLocalHost();
+            InetAddress localhost = InetAddress.getLocalHost();
             sessionWithHost = CassandraClientProvider.trySessionForLocation(localhost.getHostAddress(),
                     (CassandraDeepJobConfig) writeConfig, false).left;
             sessionWithHost.init();
         } catch (UnknownHostException e) {
             throw new DeepInstantiationException("Cannot resolve local hostname", e);
         }
-        init();
     }
 
     /**
@@ -101,94 +87,14 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
      */
     @Override
     public void close() {
-        LOG.debug("Closing all clients");
-        // close all the clients before throwing anything
-        for (RangeClient client : clients.values()) {
-            try {
-                IOUtils.closeQuietly(client);
-            } catch (Exception e) {
-                LOG.error("exception", e);
-            }
+        LOG.debug("Closing all writer tasks");
+
+        if (hasCurrentTask) {
+            executeTaskAsync();
         }
 
-        for (RangeClient client : removedClients.values()) {
-            try {
-                IOUtils.closeQuietly(client);
-            } catch (Exception e) {
-                LOG.error("exception", e);
-            }
-        }
-    }
-
-    private void init() {
-        try {
-            retrievePartitionKeyValidator();
-
-        } catch (Exception e) {
-            throw new DeepGenericException(e);
-        }
-    }
-
-    private AbstractType<?> parseType(String type) throws ConfigurationException {
-        try {
-            // always treat counters like longs, specifically CCT.serialize is not what we need
-            if (type != null && "org.apache.cassandra.db.marshal.CounterColumnType".equals(type)) {
-                return LongType.instance;
-            }
-            return TypeParser.parse(type);
-        } catch (SyntaxException e) {
-            throw new ConfigurationException(e.getMessage(), e);
-        }
-    }
-
-    /**
-     * retrieve the key validator from system.schema_columnfamilies table
-     */
-    protected void retrievePartitionKeyValidator() throws ConfigurationException {
-
-        String keyspace = writeConfig.getKeyspace();
-        String cfName = writeConfig.getColumnFamily();
-
-        Row row = getRowMetadata(keyspace, cfName);
-
-        if (row == null) {
-            throw new DeepIOException(String.format("cannot find metadata for %s.%s", keyspace, cfName));
-        }
-
-        String validator = row.getString("key_validator");
-        keyValidator = parseType(validator);
-
-        String keyString = row.getString("key_aliases");
-        LOG.debug("partition keys: " + keyString);
-
-        List<String> keys = FBUtilities.fromJsonList(keyString);
-        partitionKeyColumns = new String[keys.size()];
-        int i = 0;
-        for (String key : keys) {
-            partitionKeyColumns[i] = key;
-            i++;
-        }
-
-        String clusterColumnString = row.getString("column_aliases");
-
-        LOG.debug("cluster columns: " + clusterColumnString);
-    }
-
-    /**
-     * Fetches row metadata for the given column family.
-     *
-     * @param keyspace        the keyspace name
-     * @param cfName          the column family
-     * @return the Row object
-     */
-    private Row getRowMetadata(String keyspace, String cfName) {
-        String query =
-                "SELECT key_validator,key_aliases,column_aliases " +
-                        "FROM system.schema_columnfamilies " +
-                        "WHERE keyspace_name='%s' and columnfamily_name='%s' ";
-        String formatted = String.format(query, keyspace, cfName);
-        ResultSet resultSet = sessionWithHost.execute(formatted);
-        return resultSet.one();
+        waitForCompletion();
+        taskExecutorService.shutdown();
     }
 
     /**
@@ -199,110 +105,102 @@ public final class DeepCqlRecordWriter extends DeepRecordWriter {
      * @param values the Cells object containing all the other row columns.
      */
     public void write(Cells keys, Cells values) {
-        /* generate SQL */
 
-        String localCql = queryBuilder.prepareQuery(keys, values);
-
-        Token range = partitioner.getToken(CassandraUtils.getPartitionKey(keys, keyValidator,
-                partitionKeyColumns.length));
+        if (!hasCurrentTask) {
+            String localCql = queryBuilder.prepareQuery(keys, values);
+            currentTask = new WriteTask(localCql);
+            hasCurrentTask = true;
+        }
 
         // add primary key columns to the bind variables
         List<Object> allValues = new ArrayList<>(values.getCellValues());
         allValues.addAll(keys.getCellValues());
+        currentTask.add(allValues);
 
-        // get the client for the given range, or create a new one
-        RangeClient client = clients.get(range);
-        if (client == null) {
-            // haven't seen keys for this range: create new client
-            client = new RangeClient();
-            clients.put(range, client);
+        if (isBatchSizeReached()) {
+            executeTaskAsync();
         }
-
-        if (client.put(localCql, allValues)) {
-            removedClients.put(range, clients.remove(range));
-        }
-
     }
 
     /**
-     * A client that runs in a threadpool and connects to the list of endpoints for a particular range. Bound variables
-     * for keys in that range are sent to this client via a queue.
+     * Validates if batch size threshold has been reached.
      */
-    protected class RangeClient extends Thread implements Closeable {
+    private boolean isBatchSizeReached() {
+        return currentTask.size() >= writeConfig.getBatchSize();
+    }
 
-        private final int batchSize = writeConfig.getBatchSize();
-        private final List<String> batchStatements = new ArrayList<>();
-        private final List<Object> bindVariables = new ArrayList<>();
-        private final UUID identity = UUID.randomUUID();
-        private String cql;
+    /**
+     * Submits the task for future execution. Task is added to pending tasks
+     * and removed when the execution is done.
+     */
+    private void executeTaskAsync() {
+        final String taskId = currentTask.getId();
 
-        /**
-         * Returns true if adding the current element triggers the batch execution.
-         *
-         * @param stmt   the query to add to the batch.
-         * @param values the list of binding values.
-         * @return a boolean indicating if the batch has been triggered or not.
-         */
-        public synchronized boolean put(String stmt, List<Object> values) {
-            batchStatements.add(stmt);
-            bindVariables.addAll(values);
+        ListenableFuture<?> future = taskExecutorService.submit(currentTask);
+        pendingTasks.put(taskId, future);
 
-            boolean res = batchStatements.size() >= batchSize;
-            if (res) {
-                triggerBatch();
+        future.addListener(new Runnable() {
+            @Override
+            public void run() {
+                pendingTasks.remove(taskId);
             }
-            return res;
-        }
+        }, MoreExecutors.sameThreadExecutor());
 
-        /**
-         * Triggers the execution of the batch
-         */
-        private void triggerBatch() {
-            if (getState() != Thread.State.NEW) {
-                return;
-            }
+        hasCurrentTask = false;
+    }
 
-            cql = queryBuilder.prepareBatchQuery(batchStatements);
-            this.start();
-        }
-
-        /**
-         * Constructs an {@link RangeClient} for the given endpoints.
-         */
-        public RangeClient() {
-            LOG.debug("Create client " + this);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return identity.toString();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void close() throws IOException {
-            LOG.debug("[" + this + "] Called close on client, state: " + this.getState());
-            triggerBatch();
-
+    /**
+     * Waits until all pending tasks completed.
+     */
+    private void waitForCompletion() {
+        for (ListenableFuture<?> future : pendingTasks.values()) {
             try {
-                this.join();
-            } catch (InterruptedException e) {
-                throw new AssertionError(e);
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                LOG.error("[" + this + "] Error waiting for writes to complete: " + e.getMessage());
             }
+        }
+    }
+
+    /**
+     * A task that executes async writes to cassandra.
+     */
+    class WriteTask implements Runnable {
+        private final UUID id = UUID.randomUUID();
+
+        private final String cql;
+        private final List<Object> values = new ArrayList<>();
+
+        private int size = 0;
+
+        public WriteTask(String cql) {
+            this.cql = cql;
+        }
+
+        public void add(List<Object> values) {
+            this.values.addAll(values);
+            ++size;
+        }
+
+        public int size() {
+            return this.size;
+        }
+
+        public String getId() {
+            return id.toString();
         }
 
         /**
-         * Loops collecting cql binded variable values from the queue and sending to Cassandra
+         * Executes cql batch statements in Cassandra
          */
         @Override
         public void run() {
-            LOG.debug("[" + this + "] Initializing cassandra client");
-            sessionWithHost.execute(cql, bindVariables.toArray(new Object[bindVariables.size()]));
+            LOG.debug("[" + this + "] Executing batch write to cassandra");
+            final PreparedStatement preparedStatement = sessionWithHost.prepare(cql);
+            final BatchStatement batchStatement = new BatchStatement(BatchStatement.Type.UNLOGGED);
+            batchStatement.add(preparedStatement.bind(values.toArray(new Object[values.size()])));
+
+            sessionWithHost.execute(batchStatement);
         }
     }
 }
