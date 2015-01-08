@@ -53,7 +53,7 @@ import scala.Tuple2;
  */
 public abstract class CassandraExtractor<T, S extends BaseConfig> implements IExtractor<T, S> {
 
-    protected transient IDeepRecordReader<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> recordReader;
+    protected transient DeepRecordReader recordReader;
 
     protected transient DeepCqlRecordWriter writer;
 
@@ -156,10 +156,10 @@ public abstract class CassandraExtractor<T, S extends BaseConfig> implements IEx
      * @param dp a spark deep partition
      * @return the deep record reader associated to the provided partition.
      */
-    private IDeepRecordReader initRecordReader(final DeepPartition dp,
+    private DeepRecordReader initRecordReader(final DeepPartition dp,
                                                CassandraDeepJobConfig<T> config) {
 
-        IDeepRecordReader recordReader = new DeepRecordReader(config, dp.splitWrapper());
+        DeepRecordReader recordReader = new DeepRecordReader(config, dp.splitWrapper());
 
         return recordReader;
 
