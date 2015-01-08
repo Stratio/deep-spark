@@ -16,13 +16,28 @@
 
 package com.stratio.deep.commons.utils;
 
+import static com.stratio.deep.commons.utils.Utils.castNumberType;
+import static com.stratio.deep.commons.utils.Utils.getExtractorInstance;
 import static com.stratio.deep.commons.utils.Utils.removeAddressPort;
+import static com.stratio.deep.commons.utils.Utils.splitListByComma;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.spark.Partition;
 import org.junit.Test;
+
+import com.stratio.deep.commons.config.BaseConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
+import com.stratio.deep.commons.rdd.IExtractor;
 
 /**
  * The type Utils test.
@@ -164,6 +179,14 @@ public class UtilsTest {
     @Test
     public void testSplitListByComma() throws Exception {
 
+        List<String> hostList = new ArrayList<>();
+        hostList.add("host1");
+        hostList.add("host2");
+        hostList.add("host3");
+
+        String hosts = splitListByComma(hostList);
+
+        assertEquals("host1,host2,host3", hosts);
     }
 
     /**
@@ -174,6 +197,20 @@ public class UtilsTest {
     @Test
     public void testGetExtractorInstance() throws Exception {
 
+
+
+
+
+        BaseConfig<Cells, BaseConfig> baseConfig = new BaseConfig<>();
+
+        baseConfig.setEntityClass(Cells.class);
+        baseConfig.setExtractorImplClass(testExtractor.class);
+
+        IExtractor extractorInstance1 = getExtractorInstance(baseConfig);
+
+
+        assertNotNull(extractorInstance1);
+
     }
 
     /**
@@ -183,6 +220,112 @@ public class UtilsTest {
      */
     @Test
     public void testCastNumberType() throws Exception {
+        Object aDouble = 10D;
+
+
+
+//        AtomicInteger, AtomicLong, BigDecimal, BigInteger, Byte, Double, Float, Integer, Long, Short
+
+        Object o ;
+
+        o = castNumberType(aDouble, AtomicInteger.class);
+
+        assertEquals(AtomicInteger.class, o.getClass());
+
+
+        o = castNumberType(aDouble, AtomicLong.class);
+
+        assertEquals(AtomicLong.class, o.getClass());
+
+
+        o = castNumberType(aDouble, BigDecimal.class);
+
+        assertEquals(BigDecimal.class, o.getClass());
+
+
+        o = castNumberType(aDouble, BigInteger.class);
+
+        assertEquals(BigInteger.class, o.getClass());
+
+
+        o = castNumberType(aDouble, Byte.class);
+
+        assertEquals(Byte.class, o.getClass());
+
+        o = castNumberType(aDouble, Double.class);
+        assertEquals(Double.class, o.getClass());
+
+
+        o = castNumberType(aDouble, Float.class);
+
+        assertEquals(Float.class, o.getClass());
+
+
+        o = castNumberType(aDouble, Integer.class);
+
+        assertEquals(Integer.class, o.getClass());
+
+        o = castNumberType(aDouble, Long.class);
+
+        assertEquals(Long.class, o.getClass());
+
+        o = castNumberType(aDouble, Short.class);
+
+        assertEquals(Short.class, o.getClass());
 
     }
+
+
+
+    static class testExtractor<T> implements IExtractor<T, BaseConfig> {
+
+        public testExtractor(){
+
+        }
+
+        public testExtractor(Class<T> tClass){
+            super();
+        }
+
+        @Override
+        public Partition[] getPartitions(BaseConfig config) {
+            return new Partition[0];
+        }
+
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        @Override
+        public T next() {
+            return null;
+        }
+
+        @Override
+        public void close() {
+
+        }
+
+        @Override
+        public void initIterator(Partition dp, BaseConfig config) {
+
+        }
+
+        @Override
+        public void saveRDD(Object o) {
+
+        }
+
+        @Override
+        public List<String> getPreferredLocations(Partition split) {
+            return null;
+        }
+
+        @Override
+        public void initSave(BaseConfig config, Object first, UpdateQueryBuilder queryBuilder) {
+
+        }
+    }
+
 }

@@ -21,6 +21,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -29,6 +31,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -391,29 +395,41 @@ public final class Utils {
      * @param clazz  the clazz
      * @return object
      */
-    public static Object castNumberType(Object object, Object clazz) {
+    public static Object castNumberType(Object object, Class clazz) {
 
-        if (object instanceof Number) {
-
-            if (clazz instanceof Double) {
+        if (Number.class.isAssignableFrom(clazz)) {
+            //            AtomicInteger, AtomicLong, BigDecimal, BigInteger, Byte, Double, Float, Integer, Long, Short
+            if (Double.class.isAssignableFrom(clazz)) {
                 return ((Number) object).doubleValue();
-            } else if (clazz instanceof Long) {
+            } else if (Long.class.isAssignableFrom(clazz)) {
                 return ((Number) object).longValue();
 
-            } else if (clazz instanceof Float) {
+            } else if (Float.class.isAssignableFrom(clazz)) {
                 return ((Number) object).floatValue();
 
-            } else if (clazz instanceof Integer) {
+            } else if (Integer.class.isAssignableFrom(clazz)) {
                 return ((Number) object).intValue();
 
-            } else if (clazz instanceof Short) {
+            } else if (Short.class.isAssignableFrom(clazz)) {
                 return ((Number) object).shortValue();
 
-            } else if (clazz instanceof Byte) {
+            } else if (Byte.class.isAssignableFrom(clazz)) {
                 return ((Number) object).byteValue();
+
+            } else if (BigInteger.class.isAssignableFrom(clazz)) {
+                return BigInteger.valueOf(((Number) object).longValue());
+
+            } else if (BigDecimal.class.isAssignableFrom(clazz)) {
+                return BigDecimal.valueOf(((Number) object).longValue());
+
+            } else if (AtomicLong.class.isAssignableFrom(clazz)) {
+                return new AtomicLong(((Number) object).longValue());
+
+            } else if (AtomicInteger.class.isAssignableFrom(clazz)) {
+                return new AtomicInteger(((Number) object).intValue());
             }
         }
-        throw new ClassCastException("it is not a Number Type");
+        throw new ClassCastException("it is not a Number Type" + object.getClass() + "|" + clazz);
     }
 
     public static Object castingUtil(String value, Class classCasting) {
@@ -421,40 +437,21 @@ public final class Utils {
 
         //Numeric
         if (Number.class.isAssignableFrom(classCasting)) {
-            if (classCasting.isAssignableFrom(Double.class)) {
-                return Double.valueOf(value);
-            } else if (classCasting.isAssignableFrom(Long.class)) {
-                return Long.valueOf(value);
-
-            } else if (classCasting.isAssignableFrom(Float.class)) {
-                return Float.valueOf(value);
-
-            } else if (classCasting.isAssignableFrom(Integer.class)) {
-                return Integer.valueOf(value);
-
-            } else if (classCasting.isAssignableFrom(Short.class)) {
-                return Short.valueOf(value);
-
-            } else if (classCasting.isAssignableFrom(Byte.class)) {
-                return Byte.valueOf(value);
-            }
+            return castNumberType(value, classCasting);
         } else if (String.class.isAssignableFrom(classCasting)) {
             return object.toString();
-
         } else {
             //Class not recognise yet
             return null;
 
         }
-        return null;
-
     }
 
     public static <S extends BaseConfig, W extends DeepJobConfig> W initConfig(S config, W deepJobConfig) {
         if (config instanceof ExtractorConfig) {
             deepJobConfig.initialize((ExtractorConfig) config);
         } else if (deepJobConfig.getClass().isAssignableFrom(config.getClass())) {
-            deepJobConfig = (W)((W) config).initialize();
+            deepJobConfig = (W) ((W) config).initialize();
         } else {
             deepJobConfig.initialize((DeepJobConfig) config);
         }
@@ -469,39 +466,38 @@ public final class Utils {
      * @param <T>
      * @return
      */
-    public static <T> T cloneObjectWithParents (T t) throws IllegalAccessException, InstantiationException {
-        T clone =  (T) t.getClass().newInstance();
+    public static <T> T cloneObjectWithParents(T t) throws IllegalAccessException, InstantiationException {
+        T clone = (T) t.getClass().newInstance();
 
         List<Field> allFields = new ArrayList<>();
 
         Class parentClass = t.getClass().getSuperclass();
 
-        while(parentClass != null){
+        while (parentClass != null) {
             Collections.addAll(allFields, parentClass.getDeclaredFields());
             parentClass = parentClass.getSuperclass();
         }
 
         Collections.addAll(allFields, t.getClass().getDeclaredFields());
 
-        for(Field field : allFields){
+        for (Field field : allFields) {
             int modifiers = field.getModifiers();
             //We skip final and static fields
-            if ((Modifier.FINAL & modifiers) !=0 || (Modifier.STATIC & modifiers) !=0 ){
+            if ((Modifier.FINAL & modifiers) != 0 || (Modifier.STATIC & modifiers) != 0) {
                 continue;
             }
             field.setAccessible(true);
 
             Object value = field.get(t);
 
-            if(Collection.class.isAssignableFrom(field.getType()))
-            {
-                Collection collection = (Collection)field.get(clone);
-                if(collection == null){
+            if (Collection.class.isAssignableFrom(field.getType())) {
+                Collection collection = (Collection) field.get(clone);
+                if (collection == null) {
                     collection = (Collection) field.get(t).getClass().newInstance();
                 }
                 collection.addAll((Collection) field.get(t));
                 value = collection;
-            }else if (Map.class.isAssignableFrom(field.getType())){
+            } else if (Map.class.isAssignableFrom(field.getType())) {
                 Map clonMap = (Map) field.get(t).getClass().newInstance();
                 clonMap.putAll((Map) field.get(t));
                 value = clonMap;

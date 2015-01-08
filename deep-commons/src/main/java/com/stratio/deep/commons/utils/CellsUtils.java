@@ -218,7 +218,7 @@ public class CellsUtils {
                                         .getType() + " and value:" + t + "; bsonReceived:" + currentBson + ", bsonClassReceived:"
                                         + currentBson.getClass());
 
-                method.invoke(t, Utils.castNumberType(insert, t));
+                method.invoke(t, Utils.castNumberType(insert, t.getClass()));
             }
 
         }
@@ -268,7 +268,7 @@ public class CellsUtils {
                                 LOG.error("impossible to create a java object from Bson field:" + field.getName() + " and type:" + field
                                         .getType() + " and value:" + t + "; bsonReceived:" + currentBson + ", bsonClassReceived:"
                                         + currentBson.getClass());
-                                method.invoke(t, Utils.castNumberType(insert, t));
+                                method.invoke(t, Utils.castNumberType(insert, t.getClass()));
             }
 
         }

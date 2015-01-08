@@ -120,7 +120,12 @@ public class Cell implements Serializable {
         if (this.cellValue == null) {
             return null;
         } else {
-            return (T) this.cellValue;
+            if(Number.class.isAssignableFrom(cellValue.getClass())){
+                return null;
+            }else{
+                return (T) this.cellValue;
+            }
+
         }
     }
 

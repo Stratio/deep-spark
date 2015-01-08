@@ -111,7 +111,7 @@ public final class UtilMongoDB {
                         .getType() + " and value:" + t + "; bsonReceived:" + currentBson + ", bsonClassReceived:"
                         + currentBson.getClass());
 
-                method.invoke(t, Utils.castNumberType(insert, t));
+                method.invoke(t, Utils.castNumberType(insert, t.getClass()));
             }
 
         }

@@ -116,7 +116,7 @@ public final class UtilES {
                         method.invoke(t, getObjectFromWritable((Writable) insert));
                     } catch (Exception e) {
                         LOG.error("impossible to convert field " + t + " :" + field + " error: " + e.getMessage());
-                        method.invoke(t, Utils.castNumberType(getObjectFromWritable((Writable) insert), t));
+                        method.invoke(t, Utils.castNumberType(getObjectFromWritable((Writable) insert), t.getClass()));
                     }
 
                 }

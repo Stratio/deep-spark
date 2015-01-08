@@ -240,8 +240,8 @@ public class ExtractorConfig<T> extends BaseConfig<T, ExtractorConfig> implement
             } catch (ClassCastException e) {
                 if (Number.class.isAssignableFrom(clazz)) {
                     try {
-                        return (W) Utils.castNumberType(values.get(key), clazz.newInstance());
-                    } catch (InstantiationException | IllegalAccessException e1) {
+                        return (W) Utils.castNumberType(values.get(key), clazz);
+                    } catch (ClassCastException e1) {
                         return null;
                     }
                 } else {

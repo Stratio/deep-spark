@@ -113,7 +113,7 @@ final public class UtilAerospike {
                     LOG.error("impossible to create a java object from Bin:" + field.getName() + " and type:"
                             + field.getType() + " and value:" + t + "; recordReceived:" + currentBin);
 
-                    method.invoke(t, Utils.castNumberType(insert, classField.newInstance()));
+                    method.invoke(t, Utils.castNumberType(insert, classField));
                 }
             }
         }

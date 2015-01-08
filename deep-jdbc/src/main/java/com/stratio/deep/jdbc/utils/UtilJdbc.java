@@ -68,7 +68,7 @@ public class UtilJdbc {
                 LOG.error("impossible to create a java object from column:" + field.getName() + " and type:"
                         + field.getType() + " and value:" + t + "; recordReceived:" + currentRow);
 
-                method.invoke(t, Utils.castNumberType(currentRow, classField.newInstance()));
+                method.invoke(t, Utils.castNumberType(currentRow, classField));
             }
         }
         return t;
