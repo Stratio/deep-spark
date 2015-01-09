@@ -106,7 +106,7 @@ public class UtilJdbc {
      * @return Cells object from a JDBC row data structure.
      */
     public static Cells getCellsFromObject(Map<String, Object> row, DeepJobConfig<Cells, JdbcDeepJobConfig<Cells>> config) {
-        Cells result = new Cells(config.getCatalog());
+        Cells result = new Cells(config.getCatalog() + "." + config.getTable());
         for(Map.Entry<String, Object> entry:row.entrySet()) {
             Cell cell = Cell.create(entry.getKey(), entry.getValue());
             result.add(cell);
