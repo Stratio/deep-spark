@@ -114,9 +114,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:Stratio/stratio-deep.git</connection>
-        <developerConnection>scm:git:git@github.com:Stratio/stratio-deep.git</developerConnection>
-        <url>https://github.com/Stratio/stratio-deep</url>
+        <connection>scm:git:git@github.com:Stratio/deep-spark.git</connection>
+        <developerConnection>scm:git:git@github.com:Stratio/deep-spark.git</developerConnection>
+        <url>https://github.com/Stratio/deep-spark</url>
     </scm>
 
     <distributionManagement>
