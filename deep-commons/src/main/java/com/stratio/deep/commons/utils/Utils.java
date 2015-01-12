@@ -442,14 +442,29 @@ public final class Utils {
 
         //Numeric
         if (Number.class.isAssignableFrom(classCasting)) {
-            return castNumberType(value, classCasting);
+            if (classCasting.isAssignableFrom(Double.class)) {
+                return Double.valueOf(value);
+            } else if (classCasting.isAssignableFrom(Long.class)) {
+                return Long.valueOf(value);
+
+            } else if (classCasting.isAssignableFrom(Float.class)) {
+                return Float.valueOf(value);
+
+            } else if (classCasting.isAssignableFrom(Integer.class)) {
+                return Integer.valueOf(value);
+
+            } else if (classCasting.isAssignableFrom(Short.class)) {
+                return Short.valueOf(value);
+
+            } else if (classCasting.isAssignableFrom(Byte.class)) {
+                return Byte.valueOf(value);
+            }
         } else if (String.class.isAssignableFrom(classCasting)) {
             return object.toString();
-        } else {
-            //Class not recognise yet
-            return null;
-
         }
+        //Class not recognise yet
+        return null;
+
     }
 
     public static <S extends BaseConfig, W extends DeepJobConfig> W initConfig(S config, W deepJobConfig) {
