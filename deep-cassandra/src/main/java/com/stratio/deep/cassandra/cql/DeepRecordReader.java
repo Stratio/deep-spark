@@ -342,12 +342,12 @@ public class DeepRecordReader implements IDeepRecordReader {
             if (equalsInValue == null) {
                 String whereClause = whereClause();
                 generatedQuery = String.format("SELECT %s FROM %s%s ALLOW FILTERING",
-                        generatedColumns, quote(cfName), whereClause);
+                        generatedColumns, Utils.quote(cfName), whereClause);
             } else {
                 // partitioner.getToken(getPartitionKey(equalsInValue));
                 String equalsInClause = equalsInWhereClause(equalsInValue);
                 generatedQuery = String.format("SELECT %s FROM %s %s",
-                        generatedColumns, quote(cfName), equalsInClause);
+                        generatedColumns, Utils.quote(cfName), equalsInClause);
             }
             return generatedQuery;
         }
