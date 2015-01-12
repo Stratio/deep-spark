@@ -257,7 +257,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      */
     public RDD<Cells> createHDFSRDD(ExtractorConfig<Cells> config) {
 
-        Serializable host = config.getValues().get(ExtractorConstants.HOSTS);
+        Serializable host = config.getValues().get(ExtractorConstants.HOST);
         Serializable port = config.getValues().get(ExtractorConstants.PORT);
         Serializable path = config.getValues().get(ExtractorConstants.FS_FILE_PATH);
 
