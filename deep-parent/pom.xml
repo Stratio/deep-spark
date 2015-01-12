@@ -153,6 +153,7 @@
                 <module>../deep-examples</module>
                 <module>../deep-aerospike</module>
                 <module>../deep-jdbc</module>
+		<module>../deep-external</module>
             </modules>
         </profile>
         <profile>
@@ -166,6 +167,7 @@
                 <module>../deep-examples</module>
                 <module>../deep-aerospike</module>
                 <module>../deep-jdbc</module>
+		<module>../deep-external</module>
             </modules>
         </profile>
         <profile>
@@ -262,6 +264,7 @@
         <module>../deep-examples</module>
         <module>../deep-aerospike</module>
         <module>../deep-jdbc</module>
+        <module>../deep-external</module>
     </modules>
 
 
@@ -480,10 +483,6 @@
             <version>${guava.version}</version>
         </dependency>
     </dependencies>
-
-
-
-
 
     <build>
         <pluginManagement>
