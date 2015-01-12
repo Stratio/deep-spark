@@ -150,7 +150,6 @@
                 <module>../deep-core</module>
                 <module>../deep-mongodb</module>
                 <module>../deep-elasticsearch</module>
-                <module>../deep-examples</module>
                 <module>../deep-aerospike</module>
                 <module>../deep-jdbc</module>
 		<module>../deep-external</module>
