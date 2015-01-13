@@ -152,7 +152,6 @@
                 <module>../deep-elasticsearch</module>
                 <module>../deep-aerospike</module>
                 <module>../deep-jdbc</module>
-		<module>../deep-external</module>
             </modules>
         </profile>
         <profile>
@@ -165,7 +164,6 @@
                 <module>../deep-elasticsearch</module>
                 <module>../deep-aerospike</module>
                 <module>../deep-jdbc</module>
-		<module>../deep-external</module>
             </modules>
         </profile>
         <profile>
@@ -261,7 +259,6 @@
         <module>../deep-elasticsearch</module>
         <module>../deep-aerospike</module>
         <module>../deep-jdbc</module>
-        <module>../deep-external</module>
     </modules>
 
 
