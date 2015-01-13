@@ -148,21 +148,21 @@ public class DeepSparkContextTest {
         verify(sqlContext).sql(query);
     }
 
-//    @Test
-//    public void textFileHDFSTest() throws Exception {
-//        deepSparkContext = createDeepSparkContext();
-//        DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
-//        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
-//        Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
-//        Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
-//        RDD<Cells> result = mock(RDD.class);
-//
-//        ExtractorConfig<Cells> config = createHDFSDeepJobConfig();
-//        PowerMockito.doReturn(result).when(deepSparkContextSpy).createHDFSRDD(config);
-//        deepSparkContextSpy.textFile(config);
-//
-//        verify(deepSparkContextSpy, times(1)).createHDFSRDD(config);
-//    }
+    @Test
+    public void textFileHDFSTest() throws Exception {
+        deepSparkContext = createDeepSparkContext();
+        DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
+        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
+        Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
+        RDD<Cells> result = mock(RDD.class);
+
+        ExtractorConfig<Cells> config = createHDFSDeepJobConfig();
+        PowerMockito.doReturn(result).when(deepSparkContextSpy).createHDFSRDD(config);
+        deepSparkContextSpy.textFile(config);
+
+        verify(deepSparkContextSpy, times(1)).createHDFSRDD(config);
+    }
 
     @Test
     public void textFileS3Test() throws Exception {
