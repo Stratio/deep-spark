@@ -74,6 +74,14 @@ echo -e "[${RELEASE_VER}]\n\n$(git log ${latest_tag}..HEAD)\n\n$(cat ChangeLog.t
 #    $LOCAL_EDITOR ${TMPDIR}/ChangeLog.txt
 #fi
 
+#### Create Deep external extractors jars from github
+
+echo "################################################"
+echo "Compiling Deep external extractors"
+echo "################################################"
+
+../deep-scripts/make-distribution-deep-external.sh ${TMPDIR}
+
 echo "################################################"
 echo "Creating Spark distribuition"
 echo "################################################"
