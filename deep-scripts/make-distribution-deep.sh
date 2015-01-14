@@ -58,7 +58,7 @@ echo "################################################"
 echo "Compiling Deep"
 echo "################################################"
 echo "$(pwd)"
-mvn clean package -DskipTests || { echo "Cannot build Deep project, aborting"; exit 1; }
+mvn clean install package -DskipTests || { echo "Cannot build Deep project, aborting"; exit 1; }
 
 mkdir -p ${TMPDIR}/lib || { echo "Cannot create output lib directory"; exit 1; }
 
