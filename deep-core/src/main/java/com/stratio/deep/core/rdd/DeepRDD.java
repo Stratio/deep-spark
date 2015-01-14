@@ -35,9 +35,12 @@ import com.stratio.deep.commons.exception.DeepExtractorInitializationException;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.rdd.IExtractor;
 
+import scala.Function1;
+import scala.Unit;
 import scala.collection.Iterator;
 import scala.collection.Seq;
 import scala.reflect.ClassTag$;
+import scala.runtime.AbstractFunction1;
 
 /**
  * Created by rcrespo on 11/08/14.
@@ -82,9 +85,17 @@ public class DeepRDD<T, S extends BaseConfig> extends RDD<T> implements Serializ
 
         initExtractorClient();
 
-        context.addOnCompleteCallback(new OnComputedRDDCallback(extractorClient));
-
         extractorClient.initIterator(split, config.getValue());
+
+        context.addTaskCompletionListener(new AbstractFunction1<TaskContext, Unit> (){
+
+            @Override
+            public Unit apply(TaskContext v1) {
+                extractorClient.close();
+                return null;
+            }
+        });
+
         java.util.Iterator<T> iterator = new java.util.Iterator<T>() {
 
             @Override
