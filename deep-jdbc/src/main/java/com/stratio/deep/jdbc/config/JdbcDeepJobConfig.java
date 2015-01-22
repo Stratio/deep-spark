@@ -1,6 +1,23 @@
+/*
+ * Copyright 2014, Stratio.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.stratio.deep.jdbc.config;
 
-import com.healthmarketscience.sqlbuilder.*;
+import com.healthmarketscience.sqlbuilder.BinaryCondition;
+import com.healthmarketscience.sqlbuilder.ComboCondition;
+import com.healthmarketscience.sqlbuilder.SelectQuery;
 import com.healthmarketscience.sqlbuilder.dbspec.Column;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.DbColumn;
 import com.healthmarketscience.sqlbuilder.dbspec.basic.DbSchema;
@@ -9,7 +26,6 @@ import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.jdbc.extractor.JdbcNativeCellExtractor;
@@ -20,42 +36,84 @@ import java.util.List;
 import java.util.Map;
 
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.*;
-import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.JDBC_QUOTE_SQL;
 
 /**
- * Created by mariomgal on 20/01/15.
+ * Configuration class for Jdbc-Spark integration
+ *
+ * @param <T> Type of returned objects.
  */
 public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         implements IJdbcDeepJobConfig<T, JdbcDeepJobConfig<T>>, Serializable{
 
     private static final long serialVersionUID = -3772553194634727039L;
 
+    /**
+     * JDBC Driver class.
+     */
     private Class driverClass;
 
+    /**
+     * JDBC connection url.
+     */
     private String connectionUrl;
 
+    /**
+     * Database root object.
+     */
     private transient DbSpec dbSpec = new DbSpec();
 
+    /**
+     * Query to be executed.
+     */
     private transient SelectQuery query;
 
+    /**
+     * Database schema.
+     */
     private transient DbSchema dbSchema;
 
+    /**
+     * Database table.
+     */
     private transient DbTable dbTable;
 
+    /**
+     * Column used for sorting (optional).
+     */
     private DbColumn sort;
 
+    /**
+     * Partitioning upper bound.
+     */
     private int upperBound = Integer.MAX_VALUE;
 
+    /**
+     * Partitioning lower bound.
+     */
     private int lowerBound = 0;
 
+    /**
+     * Number of partitions.
+     */
     private int numPartitions = 1;
 
+    /**
+     * Quote or not schema and tables names.
+     */
     private boolean quoteSql;
 
+    /**
+     * Default constructor.
+     */
     public JdbcDeepJobConfig() {
 
     }
 
+    /**
+     * Constructor for Entity class-based configuration.
+     *
+     * @param entityClass
+     */
     public JdbcDeepJobConfig(Class<T> entityClass) {
         super(entityClass);
         if (Cells.class.isAssignableFrom(entityClass)) {
@@ -65,12 +123,18 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig<T> initialize() throws IllegalStateException {
         this.validate();
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
         Map<String, Serializable> values = extractorConfig.getValues();
@@ -103,6 +167,9 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         return this;
     }
 
+    /**
+     * Validates configuration object.
+     */
     private void validate() {
         if(driverClass == null) {
             throw new IllegalArgumentException("Driver class must be specified");
@@ -122,12 +189,18 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig<T> filters(Filter[] filters) {
         this.filters = filters;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SelectQuery getQuery() {
         SelectQuery selectQuery = new SelectQuery();
@@ -146,12 +219,18 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         return query;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig<T> connectionUrl(String connectionUrl) {
         this.connectionUrl = connectionUrl;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getConnectionUrl() {
         if(connectionUrl == null || connectionUrl.isEmpty()) {
@@ -160,6 +239,9 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         return this.connectionUrl;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig<T> driverClass(Class driverClass) {
         this.driverClass = driverClass;
@@ -171,6 +253,9 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         return this.driverClass.getCanonicalName();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig<T> database(String database) {
         this.catalog = database;
@@ -178,11 +263,17 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getDatabase() {
         return this.catalog;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig<T> table(String table) {
         this.table = table;
@@ -192,6 +283,9 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig<T> inputColumns(String... columns) {
         if(dbTable != null) {
@@ -202,6 +296,9 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig<T> sort(String sort) {
         if(dbTable != null) {
@@ -210,50 +307,77 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DbColumn getSort() {
         return this.sort;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig<T> upperBound(int upperBound) {
         this.upperBound = upperBound;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getUpperBound() {
         return this.upperBound;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig<T> lowerBound(int lowerBound) {
         this.lowerBound = lowerBound;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getLowerBound() {
         return this.lowerBound;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig<T> numPartitions(int numPartitions) {
         this.numPartitions = numPartitions;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getNumPartitions() {
         return this.numPartitions;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JdbcDeepJobConfig<T> quoteSql(boolean quoteSql) {
         this.quoteSql = quoteSql;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean getQuoteSql() {
         return this.quoteSql;
