@@ -17,9 +17,7 @@
 package com.stratio.deep.jdbc.reader;
 
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertEquals;
 
 import java.lang.reflect.Field;
@@ -31,6 +29,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 
+import com.healthmarketscience.sqlbuilder.SelectQuery;
+import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
 import org.apache.spark.Partition;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,8 +38,6 @@ import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ JdbcReader.class })
@@ -200,6 +198,7 @@ public class JdbcReaderTest {
         when(config.getConnectionUrl()).thenReturn(WHATEVER_CONSTANT);
         when(config.getUsername()).thenReturn(WHATEVER_CONSTANT);
         when(config.getPassword()).thenReturn(WHATEVER_CONSTANT);
+        when(config.getQuery()).thenReturn(mock(SelectQuery.class));
         when(DriverManager.getConnection(anyString(), anyString(), anyString())).thenReturn(conn);
         when(conn.createStatement()).thenReturn(statement);
         when(statement.executeQuery(anyString())).thenReturn(resultSet);
@@ -227,6 +226,7 @@ public class JdbcReaderTest {
         when(config.getConnectionUrl()).thenReturn(WHATEVER_CONSTANT);
         when(config.getUsername()).thenReturn(WHATEVER_CONSTANT);
         when(config.getPassword()).thenReturn(WHATEVER_CONSTANT);
+        when(config.getQuery()).thenReturn(mock(SelectQuery.class));
         when(DriverManager.getConnection(anyString(), anyString(), anyString())).thenReturn(conn);
         when(conn.createStatement()).thenReturn(statement);
         when(statement.executeQuery(anyString())).thenReturn(resultSet);

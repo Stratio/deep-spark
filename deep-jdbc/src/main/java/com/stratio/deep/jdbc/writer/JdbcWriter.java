@@ -86,6 +86,14 @@ public class JdbcWriter<T> implements AutoCloseable {
         if(jdbcDeepJobConfig.getQuoteSql()) {
             sb.append("\"");
         }
+        sb.append(jdbcDeepJobConfig.getDatabase());
+        if(jdbcDeepJobConfig.getQuoteSql()) {
+            sb.append("\"");
+        }
+        sb.append(".");
+        if(jdbcDeepJobConfig.getQuoteSql()) {
+            sb.append("\"");
+        }
         sb.append(jdbcDeepJobConfig.getTable());
         if(jdbcDeepJobConfig.getQuoteSql()) {
             sb.append("\"");

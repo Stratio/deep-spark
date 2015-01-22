@@ -18,6 +18,7 @@ package com.stratio.deep.jdbc.config;
 
 import static org.testng.Assert.fail;
 
+import com.mysql.jdbc.Driver;
 import com.stratio.deep.commons.entity.Cells;
 import org.testng.annotations.Test;
 
@@ -31,7 +32,7 @@ public class GenericConfigFactoryJdbcTest {
 
     private static final int PORT = 3306;
 
-    private static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
+    private static final Class DRIVER_CLASS = Driver.class;
 
     private static final String DATABASE = "test";
 

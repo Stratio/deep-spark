@@ -16,9 +16,7 @@
 
 package com.stratio.deep.jdbc;
 
-import org.apache.derby.jdbc.EmbeddedDriver;
-import org.hsqldb.jdbc.JDBCDriver;
-import org.hsqldb.jdbcDriver;
+import org.h2.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterSuite;
@@ -45,7 +43,7 @@ public class JdbcJavaRDDFT {
 
     public static final int PORT = -1;
 
-    public static final String DRIVER_CLASS = "org.hsqldb.jdbc.JDBCDriver";
+    public static final String DRIVER_CLASS = "org.h2.Driver";
 
     public static final String USER = "SA";
 
@@ -61,17 +59,15 @@ public class JdbcJavaRDDFT {
 
     public static final String OUTPUT_ENTITY_TABLE = "outputEntity";
 
-    public static final String SET_NAME_BOOK = "bookinput";
-
     @BeforeSuite
     public void init() throws Exception {
-        DriverManager.registerDriver(new JDBCDriver());
-        connCell = DriverManager.getConnection("jdbc:hsqldb:mem:" + NAMESPACE_CELL);
+        DriverManager.registerDriver(new Driver());
+        connCell = DriverManager.getConnection("jdbc:h2:~/" + NAMESPACE_CELL + ";DATABASE_TO_UPPER=FALSE", "sa", "");
         createTables(connCell, NAMESPACE_CELL, INPUT_TABLE, OUTPUT_CELLS_TABLE);
-        deleteData(connCell, INPUT_TABLE, OUTPUT_CELLS_TABLE);
-        connEntity = DriverManager.getConnection("jdbc:hsqldb:mem:" + NAMESPACE_ENTITY);
+        deleteData(connCell, NAMESPACE_CELL, INPUT_TABLE, OUTPUT_CELLS_TABLE);
+        connEntity = DriverManager.getConnection("jdbc:h2:~/" + NAMESPACE_ENTITY + ";DATABASE_TO_UPPER=FALSE", "sa", "");
         createTables(connEntity, NAMESPACE_ENTITY, INPUT_TABLE, OUTPUT_ENTITY_TABLE);
-        deleteData(connEntity, INPUT_TABLE, OUTPUT_ENTITY_TABLE);
+        deleteData(connEntity, NAMESPACE_ENTITY, INPUT_TABLE, OUTPUT_ENTITY_TABLE);
 
     }
 
@@ -82,56 +78,58 @@ public class JdbcJavaRDDFT {
 
     private void createTables(Connection conn, String namespace, String inputTable, String outputTable) throws Exception {
         Statement stmnt = conn.createStatement();
+        stmnt.executeUpdate("CREATE SCHEMA IF NOT EXISTS " + namespace + " AUTHORIZATION " + USER);
         try {
-            stmnt.executeUpdate("CREATE TABLE \"" + inputTable + "\"(\"id\" VARCHAR(255) NOT NULL, \"message\" VARCHAR(255), \"number\" BIGINT, PRIMARY KEY (\"id\"))");
+            stmnt.executeUpdate("CREATE TABLE " + namespace + "." + inputTable + "(id VARCHAR(255) NOT NULL, message VARCHAR(255), number BIGINT, PRIMARY KEY (id))");
         } catch(SQLException e) {
-            LOG.error("Problem while creating table " + inputTable + " (maybe is it already created?)", e);
+            LOG.error("Problem while creating table " + namespace + "." + inputTable + " (maybe is it already created?)", e);
         }
         try {
-            stmnt.executeUpdate("CREATE TABLE \"" + outputTable + "\"(\"id\" VARCHAR(255) NOT NULL, \"message\" VARCHAR(255), \"number\" BIGINT, PRIMARY KEY (\"id\"))");
+            stmnt.executeUpdate("CREATE TABLE " + namespace + "." + outputTable + "(id VARCHAR(255) NOT NULL, message VARCHAR(255), number BIGINT, PRIMARY KEY (id))");
         } catch(SQLException e) {
-            LOG.error("Problem while creating table " + outputTable + " (maybe is it already created?)", e);
+            LOG.error("Problem while creating table " + namespace + "." + outputTable + " (maybe is it already created?)", e);
         }
         try {
-            stmnt.executeUpdate("create table \"footballteam\" (\"id\" bigint not null, \"name\" varchar(255) not null, "
-                    + "\"short_name\" varchar(255) not null, "
-                    + "\"arena_name\" varchar(255) not null, \"coach_name\" varchar(255) not null, \"city_name\" varchar(255) not null, \"league_name\" varchar(255) not null, "
-                    + "primary key (\"id\"))");
+            stmnt.executeUpdate("create table " + namespace + "." + "footballteam (id bigint not null, name varchar(255) not null, "
+                    + "short_name varchar(255) not null, "
+                    + "arena_name varchar(255) not null, coach_name varchar(255) not null, city_name varchar(255) not null, league_name varchar(255) not null, "
+                    + "primary key (id))");
         } catch(SQLException e) {
             LOG.error("Problem while creating table " + "footballteam" + " (maybe is it already created?)", e);
         }
         try {
-            stmnt.executeUpdate("create table \"footballplayer\" (\"id\" bigint not null, \"firstname\" varchar(255) not "
-                    + "null, \"lastname\" varchar(255) not null, "
-                    + "\"date_of_birth\" varchar(255) not null, \"place_of_birth\" varchar(255) not null, \"position_name\" varchar(255) not null, \"team_id\" bigint not null, "
-                    + "primary key (\"id\"), foreign key (\"team_id\") references \"footballteam\"(\"id\"))");
+            stmnt.executeUpdate("create table " + namespace + "." + "footballplayer (id bigint not null, firstname varchar(255) not "
+                    + "null, lastname varchar(255) not null, "
+                    + "date_of_birth varchar(255) not null, place_of_birth varchar(255) not null, position_name varchar(255) not null, team_id bigint not null, "
+                    + "primary key (id), foreign key (team_id) references footballteam(id))");
         } catch(SQLException e) {
             LOG.error("Problem while creating table " + "footballplayer" + " (maybe is it already created?)", e);
         }
     }
 
-    private void deleteData(Connection conn, String inputTable, String outputTable) throws Exception {
+    private void deleteData(Connection conn, String namespace, String inputTable, String outputTable) throws Exception {
         Statement statement = conn.createStatement();
         try {
-            statement.executeUpdate("DELETE FROM \"" + inputTable + "\"");
+            statement.executeUpdate("DELETE FROM " + namespace + "." + inputTable + "");
         } catch (SQLException e) {
             LOG.error("Error deleting table " + inputTable + ", does the table exist?");
         }
         try {
-            statement.executeUpdate("DELETE FROM \"" + outputTable + "\"");
+            statement.executeUpdate("DELETE FROM " + namespace + "." + outputTable + "");
         } catch (SQLException e) {
             LOG.error("Error deleting table " + outputTable + ", does the table exist?");
         }
         try {
-            statement.executeUpdate("DELETE FROM \"" + "footballteam" + "\"");
-        } catch (SQLException e) {
-            LOG.error("Error deleting table " + "footballteam" + ", does the table exist?");
-        }
-        try {
-            statement.executeUpdate("DELETE FROM \"" + "footballplayer" + "\"");
+            statement.executeUpdate("DELETE FROM " + namespace + ".footballplayer" + "");
         } catch (SQLException e) {
             LOG.error("Error deleting table " + "footballplayer" + ", does the table exist?");
         }
+        try {
+            statement.executeUpdate("DELETE FROM " + namespace + ".footballteam" + "");
+        } catch (SQLException e) {
+            LOG.error("Error deleting table " + "footballteam" + ", does the table exist?");
+        }
+
     }
 
     @AfterSuite

@@ -107,15 +107,11 @@
             <version>11.2.0.4</version>
         </dependency>-->
         <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-            <version>10.11.1.1</version>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.185</version>
         </dependency>
-        <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>2.3.2</version>
-        </dependency>
+
 
         <dependency>
             <groupId>org.powermock</groupId>
@@ -129,6 +125,12 @@
             <version>1.5.5</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.healthmarketscience.sqlbuilder</groupId>
+            <artifactId>sqlbuilder</artifactId>
+            <version>2.0.13</version>
+        </dependency>
+
 
     </dependencies>
 

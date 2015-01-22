@@ -103,6 +103,13 @@ public class ExtractorConfig<T> extends BaseConfig<T, ExtractorConfig> implement
     }
 
     /**
+     * Gets class.
+     */
+    public Class getClass(String key) {
+        return getValue(Class.class, key);
+    }
+
+    /**
      * Gets integer.
      *
      * @param key the key

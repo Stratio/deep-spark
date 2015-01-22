@@ -25,9 +25,8 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.spark.Partition;
-
 import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
+import org.apache.spark.Partition;
 
 /**
  * Creates a new JDBC connection and provides methods for reading from it.
@@ -77,7 +76,7 @@ public class JdbcReader implements AutoCloseable {
                 jdbcDeepJobConfig.getUsername(),
                 jdbcDeepJobConfig.getPassword());
         Statement statement = conn.createStatement();
-        resultSet = statement.executeQuery(jdbcDeepJobConfig.getQuery());
+        resultSet = statement.executeQuery(jdbcDeepJobConfig.getQuery().toString());
 
         // Fetches first element
         this.hasNext = resultSet.next();
@@ -114,9 +113,9 @@ public class JdbcReader implements AutoCloseable {
     }
 
     /**
-     * Closes the ResultSet and the JDBC Connection.
-     * 
-     * @throws SQLException
+     * closes the resultset and the jdbc connection.
+     *
+     * @throws sqlexception
      */
     public void close() throws SQLException {
         try {

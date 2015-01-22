@@ -19,8 +19,6 @@ package com.stratio.deep.jdbc.extractor;
 import static com.stratio.deep.commons.utils.Utils.initConfig;
 
 import com.stratio.deep.commons.config.BaseConfig;
-import com.stratio.deep.commons.config.DeepJobConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.commons.rdd.IExtractor;

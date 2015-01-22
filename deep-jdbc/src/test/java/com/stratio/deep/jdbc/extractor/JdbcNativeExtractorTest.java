@@ -16,6 +16,7 @@
 
 package com.stratio.deep.jdbc.extractor;
 
+import com.mysql.jdbc.Driver;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
@@ -44,7 +45,7 @@ public class JdbcNativeExtractorTest {
 
     private static final String HOST = "localhost";
     private static final int PORT = 3306;
-    private static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
+    private static final Class DRIVER_CLASS = Driver.class;
     private static final String DATABASE = "database";
     private static final String TABLE = "table";
     private static final int NUM_PARTITIONS = 1;

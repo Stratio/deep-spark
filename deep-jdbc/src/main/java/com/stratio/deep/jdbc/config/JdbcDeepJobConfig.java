@@ -1,82 +1,61 @@
-/*
- * Copyright 2014, Stratio.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.stratio.deep.jdbc.config;
 
+import com.healthmarketscience.sqlbuilder.*;
+import com.healthmarketscience.sqlbuilder.dbspec.Column;
+import com.healthmarketscience.sqlbuilder.dbspec.basic.DbColumn;
+import com.healthmarketscience.sqlbuilder.dbspec.basic.DbSchema;
+import com.healthmarketscience.sqlbuilder.dbspec.basic.DbSpec;
+import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepGenericException;
+import com.stratio.deep.commons.filter.Filter;
+import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.jdbc.extractor.JdbcNativeCellExtractor;
 import com.stratio.deep.jdbc.extractor.JdbcNativeEntityExtractor;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.*;
+import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.JDBC_QUOTE_SQL;
 
 /**
- * Configuration class for Jdbc-Spark integration
- *
- * @param <T> Type of returned objects.
+ * Created by mariomgal on 20/01/15.
  */
-public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>> implements
-        IJdbcDeepJobConfig<T, JdbcDeepJobConfig<T>>, Serializable {
+public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
+        implements IJdbcDeepJobConfig<T, JdbcDeepJobConfig<T>>, Serializable{
 
-    private static final long serialVersionUID = -6487437723098215934L;
+    private static final long serialVersionUID = -3772553194634727039L;
 
-    /**
-     * JDBC connection URL.
-     */
+    private Class driverClass;
+
     private String connectionUrl;
 
-    /**
-     * JDBC driver class name.
-     */
-    private String driverClass;
+    private transient DbSpec dbSpec = new DbSpec();
 
-    /**
-     * Query to be executed.
-     */
-    private String query;
+    private transient SelectQuery query;
 
-    /**
-     * Upper bound used for partitioning.
-     */
+    private transient DbSchema dbSchema;
+
+    private transient DbTable dbTable;
+
+    private DbColumn sort;
+
     private int upperBound = Integer.MAX_VALUE;
 
-    /**
-     * Lower bound used for partitioning.
-     */
     private int lowerBound = 0;
 
-    /**
-     * Number of partitions.
-     */
     private int numPartitions = 1;
 
-    /**
-     * Quote or not SQL tableNames and fields
-     */
-    private boolean quoteSql = false;
+    private boolean quoteSql;
 
+    public JdbcDeepJobConfig() {
 
-    /**
-     * Constructor for Entity class-based configuration.
-     *
-     * @param entityClass
-     */
+    }
+
     public JdbcDeepJobConfig(Class<T> entityClass) {
         super(entityClass);
         if (Cells.class.isAssignableFrom(entityClass)) {
@@ -86,56 +65,201 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         }
     }
 
-    public JdbcDeepJobConfig<T> driverClass(String driverClass) {
-        this.driverClass = driverClass;
+    @Override
+    public JdbcDeepJobConfig<T> initialize() throws IllegalStateException {
+        this.validate();
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getDriverClass() {
-        return this.driverClass;
+    @Override
+    public JdbcDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
+        Map<String, Serializable> values = extractorConfig.getValues();
+        if (values.get(CATALOG) != null) {
+            this.database(extractorConfig.getString(CATALOG));
+        }
+
+        if (values.get(TABLE) != null) {
+            this.table(extractorConfig.getString(TABLE));
+        }
+        super.initialize(extractorConfig);
+        if (values.get(FILTER_QUERY) != null) {
+            this.filters(extractorConfig.getFilterArray(FILTER_QUERY));
+        }
+
+        if (values.get(JDBC_DRIVER_CLASS) != null) {
+            driverClass(extractorConfig.getClass(JDBC_DRIVER_CLASS));
+
+        }
+
+        if (values.get(JDBC_CONNECTION_URL) != null) {
+            connectionUrl(extractorConfig.getString(JDBC_CONNECTION_URL));
+        }
+
+        if (values.get(JDBC_QUOTE_SQL) != null) {
+            quoteSql(extractorConfig.getBoolean(JDBC_QUOTE_SQL));
+        }
+        this.initialize();
+
+        return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    private void validate() {
+        if(driverClass == null) {
+            throw new IllegalArgumentException("Driver class must be specified");
+        }
+        if(catalog == null || catalog.isEmpty()) {
+            throw new IllegalArgumentException("Schema name must be specified");
+        }
+        if(table == null || table.isEmpty()) {
+            throw new IllegalArgumentException("Table name must be specified");
+        }
+        if(connectionUrl == null || connectionUrl.isEmpty()) {
+            if((host != null && !host.isEmpty()) && (port > 0)) {
+                connectionUrl(getJdbcUrl());
+            } else {
+                throw new IllegalArgumentException("You must specify at least one of connectionUrl or host and port properties");
+            }
+        }
+    }
+
+    @Override
+    public JdbcDeepJobConfig<T> filters(Filter[] filters) {
+        this.filters = filters;
+        return this;
+    }
+
+    @Override
+    public SelectQuery getQuery() {
+        SelectQuery selectQuery = new SelectQuery();
+        List<DbColumn> columns = dbTable.getColumns();
+        if(!columns.isEmpty()) {
+            selectQuery.addColumns(columns.toArray(new Column[columns.size()]));
+        } else {
+            selectQuery.addAllTableColumns(dbTable);
+        }
+        selectQuery.addFromTable(dbTable);
+        if(sort != null) {
+            selectQuery.addOrderings(sort);
+        }
+        applyFilters(selectQuery);
+        query = selectQuery;
+        return query;
+    }
+
+    @Override
     public JdbcDeepJobConfig<T> connectionUrl(String connectionUrl) {
         this.connectionUrl = connectionUrl;
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getConnectionUrl() {
         if(connectionUrl == null || connectionUrl.isEmpty()) {
             return getJdbcUrl();
         }
-        return connectionUrl;
+        return this.connectionUrl;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public JdbcDeepJobConfig<T> driverClass(Class driverClass) {
+        this.driverClass = driverClass;
+        return this;
+    }
+
+    @Override
+    public String getDriverClass() {
+        return this.driverClass.getCanonicalName();
+    }
+
+    @Override
+    public JdbcDeepJobConfig<T> database(String database) {
+        this.catalog = database;
+        dbSchema = new DbSchema(dbSpec, catalog);
+        return this;
+    }
+
+    @Override
+    public String getDatabase() {
+        return this.catalog;
+    }
+
+    @Override
+    public JdbcDeepJobConfig<T> table(String table) {
+        this.table = table;
+        if(dbSchema != null) {
+            dbTable = new DbTable(dbSchema, table, table);
+        }
+        return this;
+    }
+
+    @Override
+    public JdbcDeepJobConfig<T> inputColumns(String... columns) {
+        if(dbTable != null) {
+            for(String column:columns) {
+                dbTable.addColumn(column);
+            }
+        }
+        return this;
+    }
+
+    @Override
+    public JdbcDeepJobConfig<T> sort(String sort) {
+        if(dbTable != null) {
+            this.sort = new DbColumn(dbTable, sort, "");
+        }
+        return this;
+    }
+
+    @Override
+    public DbColumn getSort() {
+        return this.sort;
+    }
+
+    @Override
+    public JdbcDeepJobConfig<T> upperBound(int upperBound) {
+        this.upperBound = upperBound;
+        return this;
+    }
+
+    @Override
+    public int getUpperBound() {
+        return this.upperBound;
+    }
+
+    @Override
+    public JdbcDeepJobConfig<T> lowerBound(int lowerBound) {
+        this.lowerBound = lowerBound;
+        return this;
+    }
+
+    @Override
+    public int getLowerBound() {
+        return this.lowerBound;
+    }
+
+    @Override
+    public JdbcDeepJobConfig<T> numPartitions(int numPartitions) {
+        this.numPartitions = numPartitions;
+        return this;
+    }
+
+    @Override
+    public int getNumPartitions() {
+        return this.numPartitions;
+    }
+
+    @Override
     public JdbcDeepJobConfig<T> quoteSql(boolean quoteSql) {
         this.quoteSql = quoteSql;
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean getQuoteSql() {
         return this.quoteSql;
     }
 
-    /**
-     * Builds the JDBC url from the configuration
-     * @return JDBC connection url.
-     */
-    public String getJdbcUrl() {
+    private String getJdbcUrl() {
         StringBuilder sb = new StringBuilder();
         sb.append("jdbc:");
         sb.append(getJdbcProvider());
@@ -149,169 +273,39 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         return sb.toString();
     }
 
-    /**
-     * Extracts the JDBC provider name from the driver class name.
-     * @return JDBC provider name.
-     */
     private String getJdbcProvider(){
-
-        int firstIndex = driverClass.indexOf(".");
-        int secondIndex = driverClass.indexOf(".", ++firstIndex);
-        return driverClass.substring(firstIndex, secondIndex);
+        int firstIndex = driverClass.toString().indexOf(".");
+        int secondIndex = driverClass.toString().indexOf(".", ++firstIndex);
+        return driverClass.toString().substring(firstIndex, secondIndex);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public JdbcDeepJobConfig<T> username(String username) {
-        this.username = username;
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public JdbcDeepJobConfig<T> password(String password) {
-        this.password = password;
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public JdbcDeepJobConfig<T> database(String database) {
-        this.catalog = database;
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getDatabase() {
-        return catalog;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-
-    public JdbcDeepJobConfig<T> query(String query) {
-        this.query = query;
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getQuery() {
-        return this.query;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public JdbcDeepJobConfig<T> upperBound(int upperBound) {
-        this.upperBound = upperBound;
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getUpperBound() {
-        return this.upperBound;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public JdbcDeepJobConfig<T> lowerBound(int lowerBound) {
-        this.lowerBound = lowerBound;
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getLowerBound() {
-        return this.lowerBound;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getNumPartitions() {
-        return this.numPartitions;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public JdbcDeepJobConfig<T> initialize() throws IllegalStateException {
-        validate();
-        return this;
-    }
-
-    private void validate() {
-        if(driverClass == null || driverClass.isEmpty()) {
-            throw new IllegalArgumentException("Driver class must be specified");
-        }
-        if(table == null || table.isEmpty()) {
-            throw new IllegalArgumentException("Table name must be specified");
-        }
-        if(query == null || query.isEmpty()) {
-            if(quoteSql) {
-                query("SELECT * FROM \"" + getTable() + "\"");
-            } else {
-                query("SELECT * FROM " + getTable());
+    private void applyFilters(SelectQuery query) {
+        if(this.filters != null && this.filters.length > 0) {
+            ComboCondition comboCondition = new ComboCondition(ComboCondition.Op.AND);
+            if (filters.length > 0) {
+                for(int i=0; i<filters.length; i++) {
+                    Filter filter = filters[i];
+                    FilterType filterType = filter.getFilterType();
+                    DbColumn filterColumn = new DbColumn(dbTable, filter.getField(), "");
+                    if(filterType.equals(FilterType.EQ)) {
+                        comboCondition.addCondition(BinaryCondition.equalTo(filterColumn, filter.getValue()));
+                    } else if(filterType.equals(FilterType.GT)) {
+                        comboCondition.addCondition(BinaryCondition.greaterThan(filterColumn, filter.getValue(), false));
+                    } else if(filterType.equals(FilterType.LT)) {
+                        comboCondition.addCondition(BinaryCondition.lessThan(filterColumn, filter.getValue(), false));
+                    } else if(filterType.equals(FilterType.GTE)) {
+                        comboCondition.addCondition(BinaryCondition.greaterThan(filterColumn, filter.getValue(), true));
+                    } else if(filterType.equals(FilterType.LTE)) {
+                        comboCondition.addCondition(BinaryCondition.lessThan(filterColumn, filter.getValue(), true));
+                    } else if(filterType.equals(FilterType.NEQ)) {
+                        comboCondition.addCondition(BinaryCondition.notEqualTo(filterColumn, filter.getValue()));
+                    } else {
+                        throw new UnsupportedOperationException("Currently, the filter operation " + filterType + " is not supported");
+                    }
+                }
             }
+            query.addCondition(comboCondition);
         }
-        if(connectionUrl == null || connectionUrl.isEmpty()) {
-            if((host != null && !host.isEmpty()) && (port > 0)) {
-                connectionUrl(getJdbcUrl());
-            } else {
-                throw new IllegalArgumentException("You must specify at least one of connectionUrl or host and port properties");
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public JdbcDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
-        super.initialize(extractorConfig);
-
-        Map<String, Serializable> values = extractorConfig.getValues();
-
-        if (values.get(JDBC_DRIVER_CLASS) != null) {
-            driverClass(extractorConfig.getString(JDBC_DRIVER_CLASS));
-        }
-
-        if (values.get(JDBC_CONNECTION_URL) != null) {
-            connectionUrl(extractorConfig.getString(JDBC_CONNECTION_URL));
-        }
-
-        if (values.get(JDBC_QUERY) != null) {
-            query(extractorConfig.getString(JDBC_QUERY));
-        }
-        if (values.get(JDBC_QUOTE_SQL) != null) {
-            quoteSql(extractorConfig.getBoolean(JDBC_QUOTE_SQL));
-        }
-        this.initialize();
-
-        return this;
     }
 
 }
