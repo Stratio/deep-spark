@@ -29,9 +29,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 
+import com.healthmarketscience.sqlbuilder.BinaryCondition;
+import com.healthmarketscience.sqlbuilder.ComboCondition;
+import com.healthmarketscience.sqlbuilder.Condition;
 import com.healthmarketscience.sqlbuilder.SelectQuery;
+import com.healthmarketscience.sqlbuilder.dbspec.basic.DbColumn;
 import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
 import org.apache.spark.Partition;
+import org.apache.spark.rdd.JdbcPartition;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -55,6 +60,9 @@ public class JdbcReaderTest {
 
     private static final String WHATEVER_CONSTANT = "whatever";
 
+    private static final int NUM_PARTITIONS = 2;
+
+
     @Mock
     private JdbcDeepJobConfig<?> config;
 
@@ -65,7 +73,7 @@ public class JdbcReaderTest {
     private ResultSetMetaData metadata;
 
     @Mock
-    private Partition partition;
+    private JdbcPartition partition;
 
     @Mock
     private Connection conn;
@@ -242,6 +250,62 @@ public class JdbcReaderTest {
         Field hasNextField = clazz.getDeclaredField("hasNext");
         hasNextField.setAccessible(true);
         assertEquals(hasNextField.get(reader), true, "hasNext field should be set to TRUE");
+    }
+
+    @Test
+    public void testConditionIsAddedForPartitioning() throws Exception {
+
+        PowerMockito.mockStatic(DriverManager.class);
+        SelectQuery selectQuery = PowerMockito.mock(SelectQuery.class);
+        ComboCondition comboCondition = PowerMockito.mock(ComboCondition.class);
+
+        when(selectQuery.getWhereClause()).thenReturn(comboCondition);
+        when(comboCondition.addCondition(any(Condition.class))).thenReturn(comboCondition);
+        when(config.getDriverClass()).thenReturn(JDBC_CELL_EXTRACTOR_CLASSNAME_CONSTANT);
+        when(config.getConnectionUrl()).thenReturn(WHATEVER_CONSTANT);
+        when(config.getUsername()).thenReturn(WHATEVER_CONSTANT);
+        when(config.getPassword()).thenReturn(WHATEVER_CONSTANT);
+        when(config.getPartitionKey()).thenReturn(PowerMockito.mock(DbColumn.class));
+        when(config.getNumPartitions()).thenReturn(NUM_PARTITIONS);
+        when(config.getQuery()).thenReturn(selectQuery);
+        when(DriverManager.getConnection(anyString(), anyString(), anyString())).thenReturn(conn);
+        when(partition.lower()).thenReturn(0L);
+        when(partition.upper()).thenReturn(100L);
+        when(conn.createStatement()).thenReturn(statement);
+        when(statement.executeQuery(anyString())).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+
+        JdbcReader reader = new JdbcReader(config);
+
+        reader.init(partition);
+
+        verify(comboCondition, times(2)).addCondition(any((BinaryCondition.class)));
+    }
+
+    @Test
+    public void testNoConditionsAddedIfNotPartitioning() throws Exception {
+        PowerMockito.mockStatic(DriverManager.class);
+        SelectQuery selectQuery = PowerMockito.mock(SelectQuery.class);
+        ComboCondition comboCondition = PowerMockito.mock(ComboCondition.class);
+
+        when(selectQuery.getWhereClause()).thenReturn(comboCondition);
+        when(comboCondition.addCondition(any(Condition.class))).thenReturn(comboCondition);
+        when(config.getDriverClass()).thenReturn(JDBC_CELL_EXTRACTOR_CLASSNAME_CONSTANT);
+        when(config.getConnectionUrl()).thenReturn(WHATEVER_CONSTANT);
+        when(config.getUsername()).thenReturn(WHATEVER_CONSTANT);
+        when(config.getPassword()).thenReturn(WHATEVER_CONSTANT);
+        when(config.getQuery()).thenReturn(selectQuery);
+        when(DriverManager.getConnection(anyString(), anyString(), anyString())).thenReturn(conn);
+        when(conn.createStatement()).thenReturn(statement);
+        when(statement.executeQuery(anyString())).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+
+        JdbcReader reader = new JdbcReader(config);
+
+        reader.init(partition);
+
+        verify(comboCondition, times(0)).addCondition(any((BinaryCondition.class)));
+
     }
 
 }

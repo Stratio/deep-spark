@@ -79,6 +79,19 @@ public interface IJdbcDeepJobConfig<T, S extends DeepJobConfig> {
     DbColumn getSort();
 
     /**
+     * Sets the column user for partitioning. Must be a numeric value.
+     * @param partitionKey Name of the column used for partitioning.
+     * @return Configuration object.
+     */
+    S partitionKey(String partitionKey);
+
+    /**
+     * Returns the name of the column used for partitioning.
+     * @return Name of the column used for partitioning.
+     */
+    DbColumn getPartitionKey();
+
+    /**
      * Sets the upper bound used for partitioning.
      * @param upperBound Upper bound for partitioning.
      * @return Configuration object.

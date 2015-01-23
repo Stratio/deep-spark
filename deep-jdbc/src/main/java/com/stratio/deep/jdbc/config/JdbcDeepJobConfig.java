@@ -26,6 +26,7 @@ import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.jdbc.extractor.JdbcNativeCellExtractor;
@@ -80,12 +81,17 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     /**
      * Column used for sorting (optional).
      */
-    private DbColumn sort;
+    private transient DbColumn sort;
+
+    /**
+     * Column used for partitioning (must be numeric).
+     */
+    private transient DbColumn partitionKey;
 
     /**
      * Partitioning upper bound.
      */
-    private int upperBound = Integer.MAX_VALUE;
+    private int upperBound = Integer.MAX_VALUE - 1;
 
     /**
      * Partitioning lower bound.
@@ -162,6 +168,21 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         if (values.get(JDBC_QUOTE_SQL) != null) {
             quoteSql(extractorConfig.getBoolean(JDBC_QUOTE_SQL));
         }
+        if (values.get(JDBC_PARTITION_KEY) != null) {
+            partitionKey(extractorConfig.getString(JDBC_PARTITION_KEY));
+        }
+
+        if (values.get(JDBC_NUM_PARTITIONS) != null) {
+            numPartitions(extractorConfig.getInteger(JDBC_NUM_PARTITIONS));
+        }
+
+        if (values.get(JDBC_PARTITIONS_LOWER_BOUND) != null) {
+            lowerBound(extractorConfig.getInteger(JDBC_PARTITIONS_LOWER_BOUND));
+        }
+
+        if (values.get(JDBC_PARTITIONS_UPPER_BOUND) != null) {
+            upperBound(extractorConfig.getInteger(JDBC_PARTITIONS_UPPER_BOUND));
+        }
         this.initialize();
 
         return this;
@@ -186,6 +207,9 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
             } else {
                 throw new IllegalArgumentException("You must specify at least one of connectionUrl or host and port properties");
             }
+        }
+        if(partitionKey == null && numPartitions > 1) {
+            throw new IllegalArgumentException("You must define a valid partition key for using more than one partition.");
         }
     }
 
@@ -313,6 +337,25 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     @Override
     public DbColumn getSort() {
         return this.sort;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JdbcDeepJobConfig<T> partitionKey(String partitionKey) {
+        if(dbTable != null) {
+            this.partitionKey = new DbColumn(dbTable, partitionKey, "");
+        }
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DbColumn getPartitionKey() {
+        return this.partitionKey;
     }
 
     /**

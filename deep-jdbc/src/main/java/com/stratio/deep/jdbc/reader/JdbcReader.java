@@ -25,8 +25,12 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.healthmarketscience.sqlbuilder.BinaryCondition;
+import com.healthmarketscience.sqlbuilder.SelectQuery;
+import com.healthmarketscience.sqlbuilder.dbspec.Column;
 import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
 import org.apache.spark.Partition;
+import org.apache.spark.rdd.JdbcPartition;
 
 /**
  * Creates a new JDBC connection and provides methods for reading from it.
@@ -76,8 +80,14 @@ public class JdbcReader implements AutoCloseable {
                 jdbcDeepJobConfig.getUsername(),
                 jdbcDeepJobConfig.getPassword());
         Statement statement = conn.createStatement();
-        resultSet = statement.executeQuery(jdbcDeepJobConfig.getQuery().toString());
-
+        SelectQuery query = jdbcDeepJobConfig.getQuery();
+        JdbcPartition jdbcPartition = (JdbcPartition)p;
+        if(jdbcDeepJobConfig.getNumPartitions() > 1) {
+            Column partitionKey = jdbcDeepJobConfig.getPartitionKey();
+            query.getWhereClause().addCondition(BinaryCondition.lessThan(partitionKey, jdbcPartition.upper(), true))
+                    .addCondition(BinaryCondition.greaterThan(partitionKey, jdbcPartition.lower(), true));
+        }
+        resultSet = statement.executeQuery(query.toString());
         // Fetches first element
         this.hasNext = resultSet.next();
     }
@@ -115,7 +125,7 @@ public class JdbcReader implements AutoCloseable {
     /**
      * closes the resultset and the jdbc connection.
      *
-     * @throws sqlexception
+     * @throws java.sql.SQLException
      */
     public void close() throws SQLException {
         try {
