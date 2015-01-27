@@ -1,22 +1,5 @@
-/*
- * Copyright 2014, Stratio.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.stratio.deep.jdbc.extractor;
 
-import com.mysql.jdbc.Driver;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
@@ -24,48 +7,35 @@ import com.stratio.deep.jdbc.config.JdbcConfigFactory;
 import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
 import com.stratio.deep.jdbc.reader.JdbcReader;
 import com.stratio.deep.jdbc.writer.JdbcWriter;
-import org.apache.spark.Partition;
-import org.apache.spark.rdd.JdbcPartition;
 import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
+import org.neo4j.jdbc.Driver;
 import org.powermock.api.mockito.PowerMockito;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
- * Created by mariomgal on 12/12/14.
+ * Created by mariomgal on 26/01/15.
  */
 @Test(groups = { "UnitTests" })
-public class JdbcNativeExtractorTest {
+public class JdbcNeo4JNativeExtractorTest {
 
     private static final String HOST = "localhost";
     private static final int PORT = 3306;
     private static final Class DRIVER_CLASS = Driver.class;
-    private static final String DATABASE = "database";
+    private static final String DATABASE = "NEO4J";
     private static final String TABLE = "table";
-    private static final int NUM_PARTITIONS = 1;
 
     private JdbcReader jdbcReader = PowerMockito.mock(JdbcReader.class);
 
     private JdbcWriter jdbcWriter = PowerMockito.mock(JdbcWriter.class);
-
-    @Test
-    public void testPartitions() {
-        JdbcNativeExtractor extractor = createJdbcNativeExtractor();
-
-        Partition [] partitions = extractor.getPartitions(createJdbcDeepJobConfig());
-        assertEquals(partitions.length, NUM_PARTITIONS);
-
-        JdbcPartition partition0 = (JdbcPartition)partitions[0];
-        assertEquals(partition0.index(), 0);
-        assertEquals(partition0.lower(), 0);
-        assertEquals(partition0.upper(), Integer.MAX_VALUE - 1);
-    }
 
     @Test
     public void testHasNext() throws Exception {
@@ -98,15 +68,4 @@ public class JdbcNativeExtractorTest {
         return extractor;
     }
 
-    private JdbcDeepJobConfig createJdbcDeepJobConfig() {
-        JdbcDeepJobConfig result = JdbcConfigFactory.createJdbc();
-        ExtractorConfig config = new ExtractorConfig();
-        config.putValue(ExtractorConstants.HOST, HOST);
-        config.putValue(ExtractorConstants.PORT, PORT);
-        config.putValue(ExtractorConstants.JDBC_DRIVER_CLASS, DRIVER_CLASS);
-        config.putValue(ExtractorConstants.CATALOG, DATABASE);
-        config.putValue(ExtractorConstants.TABLE, TABLE);
-        result.initialize(config);
-        return result;
-    }
 }

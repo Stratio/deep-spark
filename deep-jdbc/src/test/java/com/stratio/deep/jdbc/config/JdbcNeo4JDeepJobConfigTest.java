@@ -1,44 +1,30 @@
-/*
- * Copyright 2014, Stratio.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.stratio.deep.jdbc.config;
 
-import com.mysql.jdbc.Driver;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import org.neo4j.jdbc.Driver;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
- * Created by mariomgal on 12/12/14.
+ * Created by mariomgal on 26/01/15.
  */
 @Test(groups = { "UnitTests" })
-public class JdbcDeepJobConfigTest {
+public class JdbcNeo4JDeepJobConfigTest {
 
     private static final String HOST = "localhost";
     private static final int PORT = 3306;
     private static final Class DRIVER_CLASS = Driver.class;
-    private static final String DATABASE = "database";
+    private static final String DATABASE = "NEO4J";
     private static final String TABLE = "table";
+    private static final String CYPHER_QUERY = "query";
+    private static final String CONNECTION_URL = "connectionUrl";
 
     @Test
     public void testInitialize() throws Exception {
-        JdbcDeepJobConfig deepJobConfig = new JdbcDeepJobConfig(Cells.class);
+        JdbcNeo4JDeepJobConfig deepJobConfig = new JdbcNeo4JDeepJobConfig(Cells.class);
         deepJobConfig.initialize(getExtractorConfig());
 
         assertEquals(deepJobConfig.getHost(), HOST);
@@ -55,6 +41,8 @@ public class JdbcDeepJobConfigTest {
         config.putValue(ExtractorConstants.JDBC_DRIVER_CLASS, DRIVER_CLASS);
         config.putValue(ExtractorConstants.CATALOG, DATABASE);
         config.putValue(ExtractorConstants.TABLE, TABLE);
+        config.putValue(ExtractorConstants.JDBC_CONNECTION_URL, CONNECTION_URL);
+        config.putValue(ExtractorConstants.JDBC_QUERY, CYPHER_QUERY);
         return config;
     }
 }

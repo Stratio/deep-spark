@@ -18,6 +18,7 @@ package com.stratio.deep.jdbc.config;
 
 import static org.testng.Assert.fail;
 
+import com.mysql.jdbc.Driver;
 import com.stratio.deep.commons.entity.Cells;
 import org.testng.annotations.Test;
 
@@ -31,11 +32,17 @@ public class GenericConfigFactoryJdbcTest {
 
     private static final int PORT = 3306;
 
-    private static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
+    private static final Class DRIVER_CLASS = Driver.class;
 
     private static final String DATABASE = "test";
 
     private static final String TABLE = "table";
+
+    private static final Integer ONE_PARTITION = 1;
+
+    private static final Integer TWO_PARTITIONS = 2;
+
+    private static final String PARTITION_KEY = "rowid";
 
     @Test
     public void testDriverClassValidation() {
@@ -87,6 +94,30 @@ public class GenericConfigFactoryJdbcTest {
             config.port(PORT);
         }
         config.initialize();
+    }
+
+    @Test
+    public void testPartitionKeyValidation() {
+        JdbcDeepJobConfig<Cells> config = JdbcConfigFactory.createJdbc();
+        config.host(HOST).driverClass(DRIVER_CLASS).database(DATABASE).table(TABLE).port(PORT).numPartitions(TWO_PARTITIONS);
+        try {
+            config.initialize();
+            fail();
+        } catch(IllegalArgumentException e) {
+            config.partitionKey(PARTITION_KEY);
+        }
+        config.initialize();
+    }
+
+    @Test
+    public void testPartitionKeyValidationNotRequired() {
+        JdbcDeepJobConfig<Cells> config = JdbcConfigFactory.createJdbc();
+        config.host(HOST).driverClass(DRIVER_CLASS).database(DATABASE).table(TABLE).port(PORT).numPartitions(ONE_PARTITION);
+        try {
+            config.initialize();
+        } catch(IllegalArgumentException e) {
+            fail();
+        }
     }
 
 }

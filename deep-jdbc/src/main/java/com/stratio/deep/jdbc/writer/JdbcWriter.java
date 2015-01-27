@@ -26,7 +26,7 @@ import java.util.*;
 /**
  * Creates a new JDBC connection and provides methods for writing.
  */
-public class JdbcWriter<T> implements AutoCloseable {
+public class JdbcWriter<T> implements IJdbcWriter {
 
     /**
      * JDBC Deep Job configuration.
@@ -36,7 +36,14 @@ public class JdbcWriter<T> implements AutoCloseable {
     /**
      * JDBC connection.
      */
-    private Connection conn;
+    protected Connection conn;
+
+    /**
+     * Default constructor
+     */
+    protected JdbcWriter() {
+
+    }
 
     /**
      * Instantiates a new JdbcWriter.
@@ -56,7 +63,7 @@ public class JdbcWriter<T> implements AutoCloseable {
      * @param row Data structure representing a row as a Map of column_name:column_value
      * @throws SQLException
      */
-    public void save(Map<String, Object> row) throws SQLException {
+    public void save(Map<String, Object> row) throws Exception {
         Tuple2<List<String>, String> data = sqlFromRow(row);
         PreparedStatement statement = conn.prepareStatement(data._2());
         int i = 1;
@@ -83,6 +90,14 @@ public class JdbcWriter<T> implements AutoCloseable {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("INSERT INTO ");
+        if(jdbcDeepJobConfig.getQuoteSql()) {
+            sb.append("\"");
+        }
+        sb.append(jdbcDeepJobConfig.getDatabase());
+        if(jdbcDeepJobConfig.getQuoteSql()) {
+            sb.append("\"");
+        }
+        sb.append(".");
         if(jdbcDeepJobConfig.getQuoteSql()) {
             sb.append("\"");
         }

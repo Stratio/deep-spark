@@ -19,6 +19,8 @@ package com.stratio.deep.jdbc;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.filter.Filter;
+import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.MessageTestEntity;
 import com.stratio.deep.core.extractor.ExtractorCellTest;
@@ -52,7 +54,6 @@ public class JdbcCellExtractorFT extends ExtractorCellTest {
 
             ExtractorConfig inputConfigEntity = getReadExtractorConfig(databaseExtractorName, tableRead,
                     Cells.class);
-            inputConfigEntity.putValue(ExtractorConstants.JDBC_QUERY, "SELECT * FROM \"" + tableRead + "\"");
 
             RDD inputRDDEntity = context.createRDD(inputConfigEntity);
 
@@ -86,7 +87,6 @@ public class JdbcCellExtractorFT extends ExtractorCellTest {
 
             ExtractorConfig inputConfigEntity = getReadExtractorConfig(databaseExtractorName, tableRead,
                     Cells.class);
-            inputConfigEntity.putValue(ExtractorConstants.JDBC_QUERY, "SELECT * FROM \"" + tableRead + "\"");
 
             RDD inputRDDEntity = context.createRDD(inputConfigEntity);
 
@@ -123,7 +123,6 @@ public class JdbcCellExtractorFT extends ExtractorCellTest {
         try {
 
             ExtractorConfig<Cells> inputConfigEntity = getReadExtractorConfig();
-            inputConfigEntity.putValue(ExtractorConstants.JDBC_QUERY, "select * from \"input\"");
             RDD<Cells> inputRDDEntity = context.createRDD(inputConfigEntity);
 
             //Import dataSet was OK and we could read it
@@ -143,14 +142,20 @@ public class JdbcCellExtractorFT extends ExtractorCellTest {
         try {
 
             ExtractorConfig<Cells> inputConfigEntity = getReadExtractorConfig();
-            inputConfigEntity.putValue(ExtractorConstants.JDBC_QUERY, "select * from \"input\" where \"number\"!=1");
+            Filter[] filters = new Filter[1];
+            Filter filter = new Filter("number", FilterType.NEQ, 1);
+            filters[0] = filter;
+            inputConfigEntity.putValue(ExtractorConstants.FILTER_QUERY, filters);
             RDD<Cells> inputRDDEntity = context.createRDD(inputConfigEntity);
 
             //Import dataSet was OK and we could read it
             assertEquals(inputRDDEntity.count(), 1, "Expected read entity count is 1");
 
+            Filter[] filters2 = new Filter[1];
+            Filter filter2 = new Filter("number", FilterType.NEQ, 3);
+            filters2[0] = filter2;
             ExtractorConfig<Cells> inputConfigEntity2 = getReadExtractorConfig();
-            inputConfigEntity2.putValue(ExtractorConstants.JDBC_QUERY, "select * from \"input\" where \"number\"!=3");
+            inputConfigEntity2.putValue(ExtractorConstants.FILTER_QUERY, filters2);
             RDD<Cells> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
 
             //Import dataSet was OK and we could read it
@@ -169,14 +174,20 @@ public class JdbcCellExtractorFT extends ExtractorCellTest {
         try {
 
             ExtractorConfig<Cells> inputConfigEntity = getReadExtractorConfig();
-            inputConfigEntity.putValue(ExtractorConstants.JDBC_QUERY, "select * from \"input\" where \"number\"=3");
+            Filter[] filters = new Filter[1];
+            Filter filter = new Filter("number", FilterType.EQ, 3);
+            filters[0] = filter;
+            inputConfigEntity.putValue(ExtractorConstants.FILTER_QUERY, filters);
             RDD<Cells> inputRDDEntity = context.createRDD(inputConfigEntity);
 
             //Import dataSet was OK and we could read it
             assertEquals(inputRDDEntity.count(), 1, "Expected read entity count is 1");
 
+            Filter[] filters2 = new Filter[1];
+            Filter filter2 = new Filter("number", FilterType.EQ, 2);
+            filters2[0] = filter2;
             ExtractorConfig<Cells> inputConfigEntity2 = getReadExtractorConfig();
-            inputConfigEntity2.putValue(ExtractorConstants.JDBC_QUERY, "select * from \"input\" where \"number\"=2");
+            inputConfigEntity2.putValue(ExtractorConstants.FILTER_QUERY, filters2);
             RDD<Cells> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
 
             //Import dataSet was OK and we could read it
@@ -194,8 +205,10 @@ public class JdbcCellExtractorFT extends ExtractorCellTest {
 
         try {
 
+            String [] inputColumns = new String [1];
+            inputColumns[0] = "id";
             ExtractorConfig<Cells> inputConfigEntity = getReadExtractorConfig();
-            inputConfigEntity.putValue(ExtractorConstants.JDBC_QUERY, "select \"id\" from \"input\"");
+            inputConfigEntity.putValue(ExtractorConstants.INPUT_COLUMNS, inputColumns);
             RDD<Cells> inputRDDEntity = context.createRDD(inputConfigEntity);
 
             assertEquals(inputRDDEntity.count(), 1, "Expected read entity count is 1");
@@ -204,8 +217,11 @@ public class JdbcCellExtractorFT extends ExtractorCellTest {
             assertNull(cells.getCellByName("message"));
             assertNull(cells.getCellByName("number"));
 
+            String [] inputColumns2 = new String [2];
+            inputColumns2[0] = "message";
+            inputColumns2[1] = "number";
             ExtractorConfig<Cells> inputConfigEntity2 = getReadExtractorConfig();
-            inputConfigEntity2.putValue(ExtractorConstants.JDBC_QUERY, "select \"message\", \"number\" from \"input\"");
+            inputConfigEntity2.putValue(ExtractorConstants.INPUT_COLUMNS, inputColumns2);
             RDD<Cells> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
 
             assertEquals(inputRDDEntity2.count(), 1, "Expected read entity count is 1");
@@ -234,14 +250,14 @@ public class JdbcCellExtractorFT extends ExtractorCellTest {
     public ExtractorConfig  getReadExtractorConfig() {
         ExtractorConfig<Cells> extractorConfig = super.getExtractorConfig(Cells.class);
         extractorConfig.putValue(ExtractorConstants.HOST, JdbcJavaRDDFT.HOST)
-                .putValue(ExtractorConstants.JDBC_CONNECTION_URL, "jdbc:hsqldb:mem:" + JdbcJavaRDDFT.NAMESPACE_CELL)
+                .putValue(ExtractorConstants.JDBC_CONNECTION_URL, "jdbc:h2:~/" + JdbcJavaRDDFT.NAMESPACE_CELL + ";DATABASE_TO_UPPER=FALSE")
                 .putValue(ExtractorConstants.USERNAME, JdbcJavaRDDFT.USER)
                 .putValue(ExtractorConstants.PASSWORD, JdbcJavaRDDFT.PASSWORD)
-                .putValue(ExtractorConstants.CATALOG, JdbcJavaRDDFT.NAMESPACE_CELL)
+                .putValue(ExtractorConstants.CATALOG, "" + JdbcJavaRDDFT.NAMESPACE_CELL + "")
                 .putValue(ExtractorConstants.JDBC_DRIVER_CLASS, JdbcJavaRDDFT.DRIVER_CLASS)
                 .putValue(ExtractorConstants.PORT, JdbcJavaRDDFT.PORT)
                 .putValue(ExtractorConstants.TABLE, JdbcJavaRDDFT.INPUT_TABLE)
-                .putValue(ExtractorConstants.JDBC_QUOTE_SQL, true);
+                .putValue(ExtractorConstants.JDBC_QUOTE_SQL, false);
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;
     }
@@ -250,14 +266,14 @@ public class JdbcCellExtractorFT extends ExtractorCellTest {
     public ExtractorConfig getWriteExtractorConfig(String tableOutput, Class entityClass) {
         ExtractorConfig<Cells> extractorConfig = super.getExtractorConfig(Cells.class);
         extractorConfig.putValue(ExtractorConstants.HOST, JdbcJavaRDDFT.HOST)
-                .putValue(ExtractorConstants.JDBC_CONNECTION_URL, "jdbc:hsqldb:mem:" + JdbcJavaRDDFT.NAMESPACE_CELL)
+                .putValue(ExtractorConstants.JDBC_CONNECTION_URL, "jdbc:h2:~/" + JdbcJavaRDDFT.NAMESPACE_CELL + ";DATABASE_TO_UPPER=FALSE")
                 .putValue(ExtractorConstants.USERNAME, JdbcJavaRDDFT.USER)
                 .putValue(ExtractorConstants.PASSWORD, JdbcJavaRDDFT.PASSWORD)
-                .putValue(ExtractorConstants.CATALOG, JdbcJavaRDDFT.NAMESPACE_CELL)
+                .putValue(ExtractorConstants.CATALOG, "" + JdbcJavaRDDFT.NAMESPACE_CELL + "")
                 .putValue(ExtractorConstants.JDBC_DRIVER_CLASS, JdbcJavaRDDFT.DRIVER_CLASS)
                 .putValue(ExtractorConstants.PORT, JdbcJavaRDDFT.PORT)
                 .putValue(ExtractorConstants.TABLE, tableOutput)
-                .putValue(ExtractorConstants.JDBC_QUOTE_SQL, true);
+                .putValue(ExtractorConstants.JDBC_QUOTE_SQL, false);
         extractorConfig.setExtractorImplClass(extractor);
         return extractorConfig;
     }

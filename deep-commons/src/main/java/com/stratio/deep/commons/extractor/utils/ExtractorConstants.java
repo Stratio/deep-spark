@@ -87,6 +87,22 @@ public interface ExtractorConstants {
      */
     String JDBC_QUOTE_SQL = "jdbcQuoteSQL";
     /**
+     * Column name use for JDBC partitioning.
+     */
+    String JDBC_PARTITION_KEY = "partitionKey";
+    /**
+     * Jdbc partitions lower bound
+     */
+    String JDBC_PARTITIONS_LOWER_BOUND = "lowerBound";
+    /**
+     * Jdbc partitions upper bound
+     */
+    String JDBC_PARTITIONS_UPPER_BOUND = "upperBound";
+    /**
+     * Jdbc number of partitions
+     */
+    String JDBC_NUM_PARTITIONS = "numPartitions";
+    /**
      * The PORT 2.
      */
     String PORT2 = "port2";

@@ -1,41 +1,7 @@
-/*
- * Copyright 2014, Stratio.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.stratio.deep.jdbc.reader;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.assertEquals;
-
-import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Map;
-
-import com.healthmarketscience.sqlbuilder.BinaryCondition;
-import com.healthmarketscience.sqlbuilder.ComboCondition;
-import com.healthmarketscience.sqlbuilder.Condition;
 import com.healthmarketscience.sqlbuilder.SelectQuery;
-import com.healthmarketscience.sqlbuilder.dbspec.basic.DbColumn;
-import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
-import org.apache.spark.Partition;
+import com.stratio.deep.jdbc.config.JdbcNeo4JDeepJobConfig;
 import org.apache.spark.rdd.JdbcPartition;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,9 +10,17 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.lang.reflect.Field;
+import java.sql.*;
+import java.util.Map;
+
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
+import static org.testng.Assert.assertEquals;
+
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ JdbcReader.class })
-public class JdbcReaderTest {
+@PrepareForTest({ JdbcNeo4JReader.class })
+public class JdbcNeo4JReaderTest {
 
     private static final String COLUMN_NAME1_CONSTANT = "column_name_1";
 
@@ -62,9 +36,8 @@ public class JdbcReaderTest {
 
     private static final int NUM_PARTITIONS = 2;
 
-
     @Mock
-    private JdbcDeepJobConfig<?> config;
+    private JdbcNeo4JDeepJobConfig<?> config;
 
     @Mock
     private ResultSet resultSet;
@@ -81,6 +54,7 @@ public class JdbcReaderTest {
     @Mock
     private Statement statement;
 
+
     @Test
     public void testRowMappingWhenCallingNext() throws SQLException, IllegalArgumentException, IllegalAccessException,
             NoSuchFieldException, SecurityException {
@@ -94,10 +68,10 @@ public class JdbcReaderTest {
         when(resultSet.getObject(2)).thenReturn(COLUMN_VALUE2_CONSTANT);
 
         // Setting up test scenario
-        JdbcReader reader = new JdbcReader(config);
+        JdbcNeo4JReader reader = new JdbcNeo4JReader(config);
 
-        Class<?> clazz = JdbcReader.class;
-        Field resultSetField = clazz.getDeclaredField("resultSet");
+        Class<?> clazz = JdbcNeo4JReader.class;
+        Field resultSetField = clazz.getSuperclass().getDeclaredField("resultSet");
         resultSetField.setAccessible(true);
 
         resultSetField.set(reader, resultSet);
@@ -121,12 +95,12 @@ public class JdbcReaderTest {
         when(metadata.getColumnCount()).thenReturn(0);
 
         // Setting up test scenario
-        JdbcReader reader = new JdbcReader(config);
+        JdbcNeo4JReader reader = new JdbcNeo4JReader(config);
 
-        Class<?> clazz = JdbcReader.class;
-        Field hasNextField = clazz.getDeclaredField("hasNext");
+        Class<?> clazz = JdbcNeo4JReader.class;
+        Field hasNextField = clazz.getSuperclass().getDeclaredField("hasNext");
         hasNextField.setAccessible(true);
-        Field resultSetField = clazz.getDeclaredField("resultSet");
+        Field resultSetField = clazz.getSuperclass().getDeclaredField("resultSet");
         resultSetField.setAccessible(true);
 
         hasNextField.set(reader, true);
@@ -150,12 +124,12 @@ public class JdbcReaderTest {
         when(metadata.getColumnCount()).thenReturn(0);
 
         // Setting up test scenario
-        JdbcReader reader = new JdbcReader(config);
+        JdbcNeo4JReader reader = new JdbcNeo4JReader(config);
 
-        Class<?> clazz = JdbcReader.class;
-        Field hasNextField = clazz.getDeclaredField("hasNext");
+        Class<?> clazz = JdbcNeo4JReader.class;
+        Field hasNextField = clazz.getSuperclass().getDeclaredField("hasNext");
         hasNextField.setAccessible(true);
-        Field resultSetField = clazz.getDeclaredField("resultSet");
+        Field resultSetField = clazz.getSuperclass().getDeclaredField("resultSet");
         resultSetField.setAccessible(true);
 
         hasNextField.set(reader, true);
@@ -177,12 +151,12 @@ public class JdbcReaderTest {
         when(resultSet.getMetaData()).thenThrow(SQLException.class);
 
         // Setting up test scenario
-        JdbcReader reader = new JdbcReader(config);
+        JdbcNeo4JReader reader = new JdbcNeo4JReader(config);
 
-        Class<?> clazz = JdbcReader.class;
-        Field hasNextField = clazz.getDeclaredField("hasNext");
+        Class<?> clazz = JdbcNeo4JReader.class;
+        Field hasNextField = clazz.getSuperclass().getDeclaredField("hasNext");
         hasNextField.setAccessible(true);
-        Field resultSetField = clazz.getDeclaredField("resultSet");
+        Field resultSetField = clazz.getSuperclass().getDeclaredField("resultSet");
         resultSetField.setAccessible(true);
 
         hasNextField.set(reader, false);
@@ -202,7 +176,6 @@ public class JdbcReaderTest {
         // Stubbing external objects
         PowerMockito.mockStatic(DriverManager.class);
 
-        when(config.getDriverClass()).thenReturn(JDBC_CELL_EXTRACTOR_CLASSNAME_CONSTANT);
         when(config.getConnectionUrl()).thenReturn(WHATEVER_CONSTANT);
         when(config.getUsername()).thenReturn(WHATEVER_CONSTANT);
         when(config.getPassword()).thenReturn(WHATEVER_CONSTANT);
@@ -213,13 +186,13 @@ public class JdbcReaderTest {
         when(resultSet.next()).thenReturn(false);
 
         // Setting up test scenario
-        JdbcReader reader = new JdbcReader(config);
+        JdbcNeo4JReader reader = new JdbcNeo4JReader(config);
 
         reader.init(partition);
 
         // Assertions
-        Class<?> clazz = JdbcReader.class;
-        Field hasNextField = clazz.getDeclaredField("hasNext");
+        Class<?> clazz = JdbcNeo4JReader.class;
+        Field hasNextField = clazz.getSuperclass().getDeclaredField("hasNext");
         hasNextField.setAccessible(true);
         assertEquals(hasNextField.get(reader), false, "hasNext field should be set to FALSE");
     }
@@ -230,7 +203,6 @@ public class JdbcReaderTest {
         // Stubbing external objects
         PowerMockito.mockStatic(DriverManager.class);
 
-        when(config.getDriverClass()).thenReturn(JDBC_CELL_EXTRACTOR_CLASSNAME_CONSTANT);
         when(config.getConnectionUrl()).thenReturn(WHATEVER_CONSTANT);
         when(config.getUsername()).thenReturn(WHATEVER_CONSTANT);
         when(config.getPassword()).thenReturn(WHATEVER_CONSTANT);
@@ -241,71 +213,15 @@ public class JdbcReaderTest {
         when(resultSet.next()).thenReturn(true);
 
         // Setting up test scenario
-        JdbcReader reader = new JdbcReader(config);
+        JdbcNeo4JReader reader = new JdbcNeo4JReader(config);
 
         reader.init(partition);
 
         // Assertions
-        Class<?> clazz = JdbcReader.class;
-        Field hasNextField = clazz.getDeclaredField("hasNext");
+        Class<?> clazz = JdbcNeo4JReader.class;
+        Field hasNextField = clazz.getSuperclass().getDeclaredField("hasNext");
         hasNextField.setAccessible(true);
         assertEquals(hasNextField.get(reader), true, "hasNext field should be set to TRUE");
-    }
-
-    @Test
-    public void testConditionIsAddedForPartitioning() throws Exception {
-
-        PowerMockito.mockStatic(DriverManager.class);
-        SelectQuery selectQuery = PowerMockito.mock(SelectQuery.class);
-        ComboCondition comboCondition = PowerMockito.mock(ComboCondition.class);
-
-        when(selectQuery.getWhereClause()).thenReturn(comboCondition);
-        when(comboCondition.addCondition(any(Condition.class))).thenReturn(comboCondition);
-        when(config.getDriverClass()).thenReturn(JDBC_CELL_EXTRACTOR_CLASSNAME_CONSTANT);
-        when(config.getConnectionUrl()).thenReturn(WHATEVER_CONSTANT);
-        when(config.getUsername()).thenReturn(WHATEVER_CONSTANT);
-        when(config.getPassword()).thenReturn(WHATEVER_CONSTANT);
-        when(config.getPartitionKey()).thenReturn(PowerMockito.mock(DbColumn.class));
-        when(config.getNumPartitions()).thenReturn(NUM_PARTITIONS);
-        when(config.getQuery()).thenReturn(selectQuery);
-        when(DriverManager.getConnection(anyString(), anyString(), anyString())).thenReturn(conn);
-        when(partition.lower()).thenReturn(0L);
-        when(partition.upper()).thenReturn(100L);
-        when(conn.createStatement()).thenReturn(statement);
-        when(statement.executeQuery(anyString())).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-
-        JdbcReader reader = new JdbcReader(config);
-
-        reader.init(partition);
-
-        verify(comboCondition, times(2)).addCondition(any((BinaryCondition.class)));
-    }
-
-    @Test
-    public void testNoConditionsAddedIfNotPartitioning() throws Exception {
-        PowerMockito.mockStatic(DriverManager.class);
-        SelectQuery selectQuery = PowerMockito.mock(SelectQuery.class);
-        ComboCondition comboCondition = PowerMockito.mock(ComboCondition.class);
-
-        when(selectQuery.getWhereClause()).thenReturn(comboCondition);
-        when(comboCondition.addCondition(any(Condition.class))).thenReturn(comboCondition);
-        when(config.getDriverClass()).thenReturn(JDBC_CELL_EXTRACTOR_CLASSNAME_CONSTANT);
-        when(config.getConnectionUrl()).thenReturn(WHATEVER_CONSTANT);
-        when(config.getUsername()).thenReturn(WHATEVER_CONSTANT);
-        when(config.getPassword()).thenReturn(WHATEVER_CONSTANT);
-        when(config.getQuery()).thenReturn(selectQuery);
-        when(DriverManager.getConnection(anyString(), anyString(), anyString())).thenReturn(conn);
-        when(conn.createStatement()).thenReturn(statement);
-        when(statement.executeQuery(anyString())).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-
-        JdbcReader reader = new JdbcReader(config);
-
-        reader.init(partition);
-
-        verify(comboCondition, times(0)).addCondition(any((BinaryCondition.class)));
-
     }
 
 }

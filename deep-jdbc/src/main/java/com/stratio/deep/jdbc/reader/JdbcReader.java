@@ -25,34 +25,44 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.spark.Partition;
-
+import com.healthmarketscience.sqlbuilder.BinaryCondition;
+import com.healthmarketscience.sqlbuilder.SelectQuery;
+import com.healthmarketscience.sqlbuilder.dbspec.Column;
 import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
+import org.apache.spark.Partition;
+import org.apache.spark.rdd.JdbcPartition;
 
 /**
  * Creates a new JDBC connection and provides methods for reading from it.
  */
-public class JdbcReader implements AutoCloseable {
+public class JdbcReader implements IJdbcReader {
 
     /**
      * JDBC Deep Job configuration.
      */
-    private final JdbcDeepJobConfig jdbcDeepJobConfig;
+    private JdbcDeepJobConfig jdbcDeepJobConfig;
 
     /**
      * JDBC Connection.
      */
-    private Connection conn;
+    protected Connection conn;
 
     /**
      * JDBC ResultSet.
      */
-    private ResultSet resultSet;
+    protected ResultSet resultSet;
 
     /**
      * Flag to control if the result set has a next element
      */
-    private boolean hasNext = false;
+    protected boolean hasNext = false;
+
+    /**
+     * Default constructor
+     */
+    protected JdbcReader() {
+
+    }
 
     /**
      * Instantiaties a new JdbcReader.
@@ -77,8 +87,14 @@ public class JdbcReader implements AutoCloseable {
                 jdbcDeepJobConfig.getUsername(),
                 jdbcDeepJobConfig.getPassword());
         Statement statement = conn.createStatement();
-        resultSet = statement.executeQuery(jdbcDeepJobConfig.getQuery());
-
+        SelectQuery query = jdbcDeepJobConfig.getQuery();
+        JdbcPartition jdbcPartition = (JdbcPartition)p;
+        if(jdbcDeepJobConfig.getNumPartitions() > 1) {
+            Column partitionKey = jdbcDeepJobConfig.getPartitionKey();
+            query.getWhereClause().addCondition(BinaryCondition.lessThan(partitionKey, jdbcPartition.upper(), true))
+                    .addCondition(BinaryCondition.greaterThan(partitionKey, jdbcPartition.lower(), true));
+        }
+        resultSet = statement.executeQuery(query.toString());
         // Fetches first element
         this.hasNext = resultSet.next();
     }
@@ -114,11 +130,11 @@ public class JdbcReader implements AutoCloseable {
     }
 
     /**
-     * Closes the ResultSet and the JDBC Connection.
-     * 
-     * @throws SQLException
+     * closes the resultset and the jdbc connection.
+     *
+     * @throws java.lang.Exception
      */
-    public void close() throws SQLException {
+    public void close() throws Exception {
         try {
             if (resultSet != null) {
                 resultSet.close();
@@ -129,4 +145,9 @@ public class JdbcReader implements AutoCloseable {
             }
         }
     }
+
+    public void setJdbcDeepJobConfig(JdbcDeepJobConfig jdbcDeepJobConfig) {
+        this.jdbcDeepJobConfig = jdbcDeepJobConfig;
+    }
+
 }

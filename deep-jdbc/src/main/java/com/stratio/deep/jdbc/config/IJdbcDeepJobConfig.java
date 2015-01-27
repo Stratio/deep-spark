@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.stratio.deep.jdbc.config;
 
+import com.healthmarketscience.sqlbuilder.SelectQuery;
+import com.healthmarketscience.sqlbuilder.dbspec.basic.DbColumn;
 import com.stratio.deep.commons.config.DeepJobConfig;
 
 /**
@@ -24,6 +25,19 @@ import com.stratio.deep.commons.config.DeepJobConfig;
  * @param <T>
  */
 public interface IJdbcDeepJobConfig<T, S extends DeepJobConfig> {
+
+    /**
+     * Sets the database driver class.
+     * @param driverClass Database driver class.
+     * @return Configuration object.
+     */
+    S driverClass(Class driverClass);
+
+    /**
+     * Gets the database driver class.
+     * @return Database driver class.
+     */
+    String getDriverClass();
 
     /**
      * Sets the database connection URL.
@@ -52,17 +66,30 @@ public interface IJdbcDeepJobConfig<T, S extends DeepJobConfig> {
     String getDatabase();
 
     /**
-     * Sets the query to execute.
-     * @param query Query to execute.
+     * Sets the column for applying sort (optional).
+     * @param sort Column for sorting.
      * @return Configuration object.
      */
-    S query(String query);
+    S sort(String sort);
 
     /**
-     * Returns the query to execute.
-     * @return Query to execute.
+     * Gets the column used for sorting.
+     * @return Column used for sorting.
      */
-    String getQuery();
+    DbColumn getSort();
+
+    /**
+     * Sets the column user for partitioning. Must be a numeric value.
+     * @param partitionKey Name of the column used for partitioning.
+     * @return Configuration object.
+     */
+    S partitionKey(String partitionKey);
+
+    /**
+     * Returns the name of the column used for partitioning.
+     * @return Name of the column used for partitioning.
+     */
+    DbColumn getPartitionKey();
 
     /**
      * Sets the upper bound used for partitioning.
@@ -94,7 +121,19 @@ public interface IJdbcDeepJobConfig<T, S extends DeepJobConfig> {
      * Returns the number of partitions.
      * @return Number of partitions.
      */
+    S numPartitions(int numPartitions);
+
+    /**
+     * Returns the number of partitions.
+     * @return Number of partitions.
+     */
     int getNumPartitions();
+
+    /**
+     * Returns the query to execute.
+     * @return Query to execute.
+     */
+    SelectQuery getQuery();
 
     /**
      * Check if Sql tables and fields must be quoted.
@@ -108,4 +147,5 @@ public interface IJdbcDeepJobConfig<T, S extends DeepJobConfig> {
      * @return SQL tables and fields quoted or not.
      */
     boolean getQuoteSql();
+
 }

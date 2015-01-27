@@ -15,13 +15,24 @@
  */
 package com.stratio.deep.jdbc.config;
 
+import com.healthmarketscience.sqlbuilder.BinaryCondition;
+import com.healthmarketscience.sqlbuilder.ComboCondition;
+import com.healthmarketscience.sqlbuilder.SelectQuery;
+import com.healthmarketscience.sqlbuilder.dbspec.Column;
+import com.healthmarketscience.sqlbuilder.dbspec.basic.DbColumn;
+import com.healthmarketscience.sqlbuilder.dbspec.basic.DbSchema;
+import com.healthmarketscience.sqlbuilder.dbspec.basic.DbSpec;
+import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.filter.Filter;
+import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.jdbc.extractor.JdbcNativeCellExtractor;
 import com.stratio.deep.jdbc.extractor.JdbcNativeEntityExtractor;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.*;
@@ -31,33 +42,58 @@ import static com.stratio.deep.commons.extractor.utils.ExtractorConstants.*;
  *
  * @param <T> Type of returned objects.
  */
-public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>> implements
-        IJdbcDeepJobConfig<T, JdbcDeepJobConfig<T>>, Serializable {
+public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
+        implements IJdbcDeepJobConfig<T, JdbcDeepJobConfig<T>>, Serializable{
 
-    private static final long serialVersionUID = -6487437723098215934L;
+    private static final long serialVersionUID = -3772553194634727039L;
 
     /**
-     * JDBC connection URL.
+     * JDBC Driver class.
+     */
+    private Class driverClass;
+
+    /**
+     * JDBC connection url.
      */
     private String connectionUrl;
 
     /**
-     * JDBC driver class name.
+     * Database root object.
      */
-    private String driverClass;
+    private transient DbSpec dbSpec = new DbSpec();
 
     /**
      * Query to be executed.
      */
-    private String query;
+    private transient SelectQuery query;
 
     /**
-     * Upper bound used for partitioning.
+     * Database schema.
      */
-    private int upperBound = Integer.MAX_VALUE;
+    private transient DbSchema dbSchema;
 
     /**
-     * Lower bound used for partitioning.
+     * Database table.
+     */
+    private transient DbTable dbTable;
+
+    /**
+     * Column used for sorting (optional).
+     */
+    private transient DbColumn sort;
+
+    /**
+     * Column used for partitioning (must be numeric).
+     */
+    private transient DbColumn partitionKey;
+
+    /**
+     * Partitioning upper bound.
+     */
+    private int upperBound = Integer.MAX_VALUE - 1;
+
+    /**
+     * Partitioning lower bound.
      */
     private int lowerBound = 0;
 
@@ -67,10 +103,16 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     private int numPartitions = 1;
 
     /**
-     * Quote or not SQL tableNames and fields
+     * Quote or not schema and tables names.
      */
-    private boolean quoteSql = false;
+    private boolean quoteSql;
 
+    /**
+     * Default constructor.
+     */
+    public JdbcDeepJobConfig() {
+
+    }
 
     /**
      * Constructor for Entity class-based configuration.
@@ -86,21 +128,124 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         }
     }
 
-    public JdbcDeepJobConfig<T> driverClass(String driverClass) {
-        this.driverClass = driverClass;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JdbcDeepJobConfig<T> initialize() throws IllegalStateException {
+        this.validate();
         return this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getDriverClass() {
-        return this.driverClass;
+    @Override
+    public JdbcDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
+        Map<String, Serializable> values = extractorConfig.getValues();
+        if (values.get(CATALOG) != null) {
+            this.database(extractorConfig.getString(CATALOG));
+        }
+
+        if (values.get(TABLE) != null) {
+            this.table(extractorConfig.getString(TABLE));
+        }
+        super.initialize(extractorConfig);
+        if (values.get(FILTER_QUERY) != null) {
+            this.filters(extractorConfig.getFilterArray(FILTER_QUERY));
+        }
+
+        if (values.get(JDBC_DRIVER_CLASS) != null) {
+            driverClass(extractorConfig.getClass(JDBC_DRIVER_CLASS));
+
+        }
+
+        if (values.get(JDBC_CONNECTION_URL) != null) {
+            connectionUrl(extractorConfig.getString(JDBC_CONNECTION_URL));
+        }
+
+        if (values.get(JDBC_QUOTE_SQL) != null) {
+            quoteSql(extractorConfig.getBoolean(JDBC_QUOTE_SQL));
+        }
+        if (values.get(JDBC_PARTITION_KEY) != null) {
+            partitionKey(extractorConfig.getString(JDBC_PARTITION_KEY));
+        }
+
+        if (values.get(JDBC_NUM_PARTITIONS) != null) {
+            numPartitions(extractorConfig.getInteger(JDBC_NUM_PARTITIONS));
+        }
+
+        if (values.get(JDBC_PARTITIONS_LOWER_BOUND) != null) {
+            lowerBound(extractorConfig.getInteger(JDBC_PARTITIONS_LOWER_BOUND));
+        }
+
+        if (values.get(JDBC_PARTITIONS_UPPER_BOUND) != null) {
+            upperBound(extractorConfig.getInteger(JDBC_PARTITIONS_UPPER_BOUND));
+        }
+        this.initialize();
+
+        return this;
+    }
+
+    /**
+     * Validates configuration object.
+     */
+    private void validate() {
+        if(driverClass == null) {
+            throw new IllegalArgumentException("Driver class must be specified");
+        }
+        if(catalog == null || catalog.isEmpty()) {
+            throw new IllegalArgumentException("Schema name must be specified");
+        }
+        if(table == null || table.isEmpty()) {
+            throw new IllegalArgumentException("Table name must be specified");
+        }
+        if(connectionUrl == null || connectionUrl.isEmpty()) {
+            if((host != null && !host.isEmpty()) && (port > 0)) {
+                connectionUrl(getJdbcUrl());
+            } else {
+                throw new IllegalArgumentException("You must specify at least one of connectionUrl or host and port properties");
+            }
+        }
+        if(partitionKey == null && numPartitions > 1) {
+            throw new IllegalArgumentException("You must define a valid partition key for using more than one partition.");
+        }
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
+    public JdbcDeepJobConfig<T> filters(Filter[] filters) {
+        this.filters = filters;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SelectQuery getQuery() {
+        SelectQuery selectQuery = new SelectQuery();
+        List<DbColumn> columns = dbTable.getColumns();
+        if(!columns.isEmpty()) {
+            selectQuery.addColumns(columns.toArray(new Column[columns.size()]));
+        } else {
+            selectQuery.addAllTableColumns(dbTable);
+        }
+        selectQuery.addFromTable(dbTable);
+        if(sort != null) {
+            selectQuery.addOrderings(sort);
+        }
+        applyFilters(selectQuery);
+        query = selectQuery;
+        return query;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public JdbcDeepJobConfig<T> connectionUrl(String connectionUrl) {
         this.connectionUrl = connectionUrl;
         return this;
@@ -109,73 +254,26 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getConnectionUrl() {
         if(connectionUrl == null || connectionUrl.isEmpty()) {
             return getJdbcUrl();
         }
-        return connectionUrl;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public JdbcDeepJobConfig<T> quoteSql(boolean quoteSql) {
-        this.quoteSql = quoteSql;
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean getQuoteSql() {
-        return this.quoteSql;
-    }
-
-    /**
-     * Builds the JDBC url from the configuration
-     * @return JDBC connection url.
-     */
-    public String getJdbcUrl() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("jdbc:");
-        sb.append(getJdbcProvider());
-        sb.append("://");
-        sb.append(host.get(0));
-        sb.append(":");
-        sb.append(port);
-        sb.append("/");
-        sb.append(catalog);
-        sb.append("?");
-        return sb.toString();
-    }
-
-    /**
-     * Extracts the JDBC provider name from the driver class name.
-     * @return JDBC provider name.
-     */
-    private String getJdbcProvider(){
-
-        int firstIndex = driverClass.indexOf(".");
-        int secondIndex = driverClass.indexOf(".", ++firstIndex);
-        return driverClass.substring(firstIndex, secondIndex);
+        return this.connectionUrl;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public JdbcDeepJobConfig<T> username(String username) {
-        this.username = username;
+    public JdbcDeepJobConfig<T> driverClass(Class driverClass) {
+        this.driverClass = driverClass;
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public JdbcDeepJobConfig<T> password(String password) {
-        this.password = password;
-        return this;
+    public String getDriverClass() {
+        return this.driverClass.getCanonicalName();
     }
 
     /**
@@ -184,6 +282,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     @Override
     public JdbcDeepJobConfig<T> database(String database) {
         this.catalog = database;
+        dbSchema = new DbSchema(dbSpec, catalog);
         return this;
     }
 
@@ -192,15 +291,18 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
      */
     @Override
     public String getDatabase() {
-        return catalog;
+        return this.catalog;
     }
 
     /**
      * {@inheritDoc}
      */
-
-    public JdbcDeepJobConfig<T> query(String query) {
-        this.query = query;
+    @Override
+    public JdbcDeepJobConfig<T> table(String table) {
+        this.table = table;
+        if(dbSchema != null) {
+            dbTable = new DbTable(dbSchema, table, table);
+        }
         return this;
     }
 
@@ -208,8 +310,51 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
      * {@inheritDoc}
      */
     @Override
-    public String getQuery() {
-        return this.query;
+    public JdbcDeepJobConfig<T> inputColumns(String... columns) {
+        if(dbTable != null) {
+            for(String column:columns) {
+                dbTable.addColumn(column);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JdbcDeepJobConfig<T> sort(String sort) {
+        if(dbTable != null) {
+            this.sort = new DbColumn(dbTable, sort, "");
+        }
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DbColumn getSort() {
+        return this.sort;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JdbcDeepJobConfig<T> partitionKey(String partitionKey) {
+        if(dbTable != null) {
+            this.partitionKey = new DbColumn(dbTable, partitionKey, "");
+        }
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DbColumn getPartitionKey() {
+        return this.partitionKey;
     }
 
     /**
@@ -250,6 +395,15 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
      * {@inheritDoc}
      */
     @Override
+    public JdbcDeepJobConfig<T> numPartitions(int numPartitions) {
+        this.numPartitions = numPartitions;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int getNumPartitions() {
         return this.numPartitions;
     }
@@ -258,60 +412,66 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
      * {@inheritDoc}
      */
     @Override
-    public JdbcDeepJobConfig<T> initialize() throws IllegalStateException {
-        validate();
+    public JdbcDeepJobConfig<T> quoteSql(boolean quoteSql) {
+        this.quoteSql = quoteSql;
         return this;
-    }
-
-    private void validate() {
-        if(driverClass == null || driverClass.isEmpty()) {
-            throw new IllegalArgumentException("Driver class must be specified");
-        }
-        if(table == null || table.isEmpty()) {
-            throw new IllegalArgumentException("Table name must be specified");
-        }
-        if(query == null || query.isEmpty()) {
-            if(quoteSql) {
-                query("SELECT * FROM \"" + getTable() + "\"");
-            } else {
-                query("SELECT * FROM " + getTable());
-            }
-        }
-        if(connectionUrl == null || connectionUrl.isEmpty()) {
-            if((host != null && !host.isEmpty()) && (port > 0)) {
-                connectionUrl(getJdbcUrl());
-            } else {
-                throw new IllegalArgumentException("You must specify at least one of connectionUrl or host and port properties");
-            }
-        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public JdbcDeepJobConfig<T> initialize(ExtractorConfig extractorConfig) {
-        super.initialize(extractorConfig);
+    public boolean getQuoteSql() {
+        return this.quoteSql;
+    }
 
-        Map<String, Serializable> values = extractorConfig.getValues();
+    private String getJdbcUrl() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("jdbc:");
+        sb.append(getJdbcProvider());
+        sb.append("://");
+        sb.append(host.get(0));
+        sb.append(":");
+        sb.append(port);
+        sb.append("/");
+        sb.append(catalog);
+        sb.append("?");
+        return sb.toString();
+    }
 
-        if (values.get(JDBC_DRIVER_CLASS) != null) {
-            driverClass(extractorConfig.getString(JDBC_DRIVER_CLASS));
+    private String getJdbcProvider(){
+        int firstIndex = driverClass.toString().indexOf(".");
+        int secondIndex = driverClass.toString().indexOf(".", ++firstIndex);
+        return driverClass.toString().substring(firstIndex, secondIndex);
+    }
+
+    private void applyFilters(SelectQuery query) {
+        if(this.filters != null && this.filters.length > 0) {
+            ComboCondition comboCondition = new ComboCondition(ComboCondition.Op.AND);
+            if (filters.length > 0) {
+                for(int i=0; i<filters.length; i++) {
+                    Filter filter = filters[i];
+                    FilterType filterType = filter.getFilterType();
+                    DbColumn filterColumn = new DbColumn(dbTable, filter.getField(), "");
+                    if(filterType.equals(FilterType.EQ)) {
+                        comboCondition.addCondition(BinaryCondition.equalTo(filterColumn, filter.getValue()));
+                    } else if(filterType.equals(FilterType.GT)) {
+                        comboCondition.addCondition(BinaryCondition.greaterThan(filterColumn, filter.getValue(), false));
+                    } else if(filterType.equals(FilterType.LT)) {
+                        comboCondition.addCondition(BinaryCondition.lessThan(filterColumn, filter.getValue(), false));
+                    } else if(filterType.equals(FilterType.GTE)) {
+                        comboCondition.addCondition(BinaryCondition.greaterThan(filterColumn, filter.getValue(), true));
+                    } else if(filterType.equals(FilterType.LTE)) {
+                        comboCondition.addCondition(BinaryCondition.lessThan(filterColumn, filter.getValue(), true));
+                    } else if(filterType.equals(FilterType.NEQ)) {
+                        comboCondition.addCondition(BinaryCondition.notEqualTo(filterColumn, filter.getValue()));
+                    } else {
+                        throw new UnsupportedOperationException("Currently, the filter operation " + filterType + " is not supported");
+                    }
+                }
+            }
+            query.addCondition(comboCondition);
         }
-
-        if (values.get(JDBC_CONNECTION_URL) != null) {
-            connectionUrl(extractorConfig.getString(JDBC_CONNECTION_URL));
-        }
-
-        if (values.get(JDBC_QUERY) != null) {
-            query(extractorConfig.getString(JDBC_QUERY));
-        }
-        if (values.get(JDBC_QUOTE_SQL) != null) {
-            quoteSql(extractorConfig.getBoolean(JDBC_QUOTE_SQL));
-        }
-        this.initialize();
-
-        return this;
     }
 
 }
