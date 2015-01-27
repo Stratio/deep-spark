@@ -21,6 +21,7 @@ import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.utils.AnnotationUtils;
 import com.stratio.deep.commons.utils.Utils;
+import com.stratio.deep.jdbc.config.IJdbcDeepJobConfig;
 import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,7 @@ public class UtilJdbc {
      * @throws InstantiationException
      * @throws InvocationTargetException
      */
-    public static <T> T getObjectFromRow(Class<T> classEntity, Map<String, Object> row, DeepJobConfig<T, JdbcDeepJobConfig<T>> config) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    public static <T, S extends DeepJobConfig> T getObjectFromRow(Class<T> classEntity, Map<String, Object> row, DeepJobConfig<T, S> config) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         T t = classEntity.newInstance();
         Field[] fields = AnnotationUtils.filterDeepFields(classEntity);
         for (Field field : fields) {
@@ -105,7 +106,7 @@ public class UtilJdbc {
      * @param config JDBC Deep Job config.
      * @return Cells object from a JDBC row data structure.
      */
-    public static Cells getCellsFromObject(Map<String, Object> row, DeepJobConfig<Cells, JdbcDeepJobConfig<Cells>> config) {
+    public static<T extends DeepJobConfig> Cells getCellsFromObject(Map<String, Object> row, DeepJobConfig<Cells, T> config) {
         Cells result = new Cells(config.getCatalog() + "." + config.getTable());
         for(Map.Entry<String, Object> entry:row.entrySet()) {
             Cell cell = Cell.create(entry.getKey(), entry.getValue());

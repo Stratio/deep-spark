@@ -23,6 +23,7 @@ import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.querybuilder.UpdateQueryBuilder;
 import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.jdbc.config.JdbcDeepJobConfig;
+import com.stratio.deep.jdbc.reader.IJdbcReader;
 import com.stratio.deep.jdbc.reader.JdbcReader;
 import com.stratio.deep.jdbc.writer.JdbcWriter;
 import org.apache.spark.Partition;
@@ -51,7 +52,7 @@ public abstract class JdbcNativeExtractor<T, S extends BaseConfig> implements IE
     /**
      * Jdbc reader
      */
-    protected JdbcReader jdbcReader;
+    protected IJdbcReader jdbcReader;
 
     /**
      * Jdbc writer
@@ -110,14 +111,14 @@ public abstract class JdbcNativeExtractor<T, S extends BaseConfig> implements IE
         if(jdbcReader != null) {
             try {
                 jdbcReader.close();
-            } catch(SQLException e) {
+            } catch(Exception e) {
                 LOG.error("Unable to close jdbcReader", e);
             }
         }
         if(jdbcWriter != null) {
             try {
                 jdbcWriter.close();
-            } catch(SQLException e) {
+            } catch(Exception e) {
                 LOG.error("Unable to close jdbcWriter", e);
             }
         }

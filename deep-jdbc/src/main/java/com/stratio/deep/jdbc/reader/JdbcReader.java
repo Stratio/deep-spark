@@ -35,27 +35,34 @@ import org.apache.spark.rdd.JdbcPartition;
 /**
  * Creates a new JDBC connection and provides methods for reading from it.
  */
-public class JdbcReader implements AutoCloseable {
+public class JdbcReader implements IJdbcReader {
 
     /**
      * JDBC Deep Job configuration.
      */
-    private final JdbcDeepJobConfig jdbcDeepJobConfig;
+    private JdbcDeepJobConfig jdbcDeepJobConfig;
 
     /**
      * JDBC Connection.
      */
-    private Connection conn;
+    protected Connection conn;
 
     /**
      * JDBC ResultSet.
      */
-    private ResultSet resultSet;
+    protected ResultSet resultSet;
 
     /**
      * Flag to control if the result set has a next element
      */
-    private boolean hasNext = false;
+    protected boolean hasNext = false;
+
+    /**
+     * Default constructor
+     */
+    protected JdbcReader() {
+
+    }
 
     /**
      * Instantiaties a new JdbcReader.
@@ -125,9 +132,9 @@ public class JdbcReader implements AutoCloseable {
     /**
      * closes the resultset and the jdbc connection.
      *
-     * @throws java.sql.SQLException
+     * @throws java.lang.Exception
      */
-    public void close() throws SQLException {
+    public void close() throws Exception {
         try {
             if (resultSet != null) {
                 resultSet.close();
@@ -138,4 +145,9 @@ public class JdbcReader implements AutoCloseable {
             }
         }
     }
+
+    public void setJdbcDeepJobConfig(JdbcDeepJobConfig jdbcDeepJobConfig) {
+        this.jdbcDeepJobConfig = jdbcDeepJobConfig;
+    }
+
 }

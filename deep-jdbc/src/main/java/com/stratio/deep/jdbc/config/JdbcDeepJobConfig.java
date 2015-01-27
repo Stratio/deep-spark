@@ -26,7 +26,6 @@ import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.jdbc.extractor.JdbcNativeCellExtractor;
