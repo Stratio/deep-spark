@@ -112,7 +112,9 @@ public class ExtractorConfig<T> extends BaseConfig<T, ExtractorConfig> implement
         try {
             return getValue(Integer.class, key);
         } catch (ClassCastException e) {
-            return Integer.parseInt(getString(key));
+            String value = getString(key);
+
+            return Integer.parseInt(value.split(",")[0]);
         }
     }
 
