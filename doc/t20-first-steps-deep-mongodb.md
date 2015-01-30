@@ -41,7 +41,7 @@ Before you start
 Prerequisites
 -------------
 
--   MongoDB and Stratio Deep: see [Getting Started](/getting-started.html "Getting Started") for installation instructions
+-   MongoDB and Stratio Deep: see [Getting Started](/getting-started.md "Getting Started") for installation instructions
 -   Basic knowledge of SQL, Java and/or Scala
 
 Resources used in this tutorial
@@ -168,4 +168,4 @@ Where to go from here
 =====================
 
 Congratulations! You have completed the “First steps with Stratio Deep” tutorial. If you want to learn more, 
-we recommend the “[Writing and Running a Basic Application](t40-basic-application.html "Writing and Running a Basic Application")” tutorial.
+we recommend the “[Writing and Running a Basic Application](t40-basic-application.md "Writing and Running a Basic Application")” tutorial.
