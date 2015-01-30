@@ -31,7 +31,7 @@ public interface IJdbcDeepJobConfig<T, S extends DeepJobConfig> {
      * @param driverClass Database driver class.
      * @return Configuration object.
      */
-    S driverClass(Class driverClass);
+    S driverClass(String driverClass);
 
     /**
      * Gets the database driver class.

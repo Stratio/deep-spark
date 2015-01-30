@@ -32,7 +32,7 @@ public class JdbcDeepJobConfigTest {
 
     private static final String HOST = "localhost";
     private static final int PORT = 3306;
-    private static final Class DRIVER_CLASS = Driver.class;
+    private static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
     private static final String DATABASE = "database";
     private static final String TABLE = "table";
 
@@ -43,7 +43,7 @@ public class JdbcDeepJobConfigTest {
 
         assertEquals(deepJobConfig.getHost(), HOST);
         assertEquals(deepJobConfig.getPort(), PORT);
-        assertEquals(deepJobConfig.getDriverClass(), DRIVER_CLASS.getCanonicalName());
+        assertEquals(deepJobConfig.getDriverClass(), DRIVER_CLASS);
         assertEquals(deepJobConfig.getDatabase(), DATABASE);
         assertEquals(deepJobConfig.getTable(), TABLE);
     }

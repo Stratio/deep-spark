@@ -122,7 +122,7 @@ public class JdbcNeo4JDeepJobConfig<T> extends DeepJobConfig<T, JdbcNeo4JDeepJob
      * {@inheritDoc}
      */
     @Override
-    public JdbcNeo4JDeepJobConfig<T> driverClass(Class driverClass) {
+    public JdbcNeo4JDeepJobConfig<T> driverClass(String driverClass) {
         return this;
     }
 

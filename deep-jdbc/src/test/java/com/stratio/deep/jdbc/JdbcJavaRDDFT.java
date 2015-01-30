@@ -43,7 +43,7 @@ public class JdbcJavaRDDFT {
 
     public static final int PORT = -1;
 
-    public static final Class DRIVER_CLASS = Driver.class;
+    public static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
 
     public static final String USER = "SA";
 

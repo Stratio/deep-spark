@@ -26,6 +26,7 @@ import com.healthmarketscience.sqlbuilder.dbspec.basic.DbTable;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.filter.Filter;
 import com.stratio.deep.commons.filter.FilterType;
 import com.stratio.deep.jdbc.extractor.JdbcNativeCellExtractor;
@@ -156,7 +157,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
         }
 
         if (values.get(JDBC_DRIVER_CLASS) != null) {
-            driverClass(extractorConfig.getClass(JDBC_DRIVER_CLASS));
+           driverClass(extractorConfig.getString(JDBC_DRIVER_CLASS));
 
         }
 
@@ -266,8 +267,12 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
      * {@inheritDoc}
      */
     @Override
-    public JdbcDeepJobConfig<T> driverClass(Class driverClass) {
-        this.driverClass = driverClass;
+    public JdbcDeepJobConfig<T> driverClass(String driverClass) {
+        try {
+            this.driverClass = Class.forName(driverClass);
+        } catch(ClassNotFoundException e) {
+            throw new DeepGenericException("Class " + driverClass + "not found", e);
+        }
         return this;
     }
 

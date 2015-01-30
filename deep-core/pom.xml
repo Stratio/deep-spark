@@ -19,7 +19,7 @@
     <parent>
         <groupId>com.stratio.deep</groupId>
         <artifactId>deep-parent</artifactId>
-        <version>0.7.0-RC2</version>
+        <version>0.7.0-RC3</version>
         <relativePath>../deep-parent</relativePath>
     </parent>
 
