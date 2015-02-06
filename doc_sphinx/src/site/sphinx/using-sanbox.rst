@@ -18,14 +18,14 @@ Running the sandbox
 ===================
 
 -  Initialize the current directory from the command line:
-   **``vagrant init stratio/deep-spark``**.
--  Start the sandbox from command line: **``vagrant up``**
+   **vagrant init stratio/deep-spark**.
+-  Start the sandbox from command line: **vagrant up**
 
 Please, be patient the first time it runs!!
 
-Login into the sandbox as root user and start the services: - Start
-Spark and Stratio Deep: **``service spark start``** - Start Cassandra:
-**``service cassandra start``**
+Login into the sandbox as **root user** and start the services: 
+-  Start Spark and Stratio Deep: **service spark start** 
+-  Start Cassandra: **service cassandra start**
 
 What you will find in the sandbox
 =================================
@@ -34,13 +34,15 @@ What you will find in the sandbox
 -  6GB RAM - 2 CPU
 -  Two ethernet interfaces.
 
-Name \| Version \| Service name \| Other
-
-Spark \| 1.1.0 \| spark \| service spark start
-
-Stratio Cassandra \| 2.1.05 \| cassandra \| service cassandra start
-
-Mongodb \| 2.6.5 \| mongod\| service mongod start
++------------+----------+-----------+-------------------------+
+|    Name    | Version  |  Service  |         Command         |
++============+==========+===========+=========================+
+| Spark      | 1.2.0    | spark     | service spark start     |
++------------+----------+-----------+-------------------------+
+| Cassandra  | 2.1.05   |cassandra  | service cassandra start |
++------------+----------+-----------+-------------------------+
+| MongoDB    | 2.6.5    | mongod    | service mongod start    |
++------------+----------+-----------+-------------------------+
 
 Access to the sandbox and other useful commands
 ===============================================
@@ -48,15 +50,15 @@ Access to the sandbox and other useful commands
 Useful commands
 ---------------
 
--  Start the sandbox: **``vagrant up``**
--  Shut down the sandbox: **``vagrant halt``**
--  In the sandbox, to exit to the host: **``exit``**
+-  Start the sandbox: **vagrant up**
+-  Shut down the sandbox: **vagrant halt**
+-  In the sandbox, to exit to the host: **exit**
 
 Accessing the sandbox
 ---------------------
 
 -  Located in /install-folder
--  **``vagrant ssh``**
+-  Run the command: **vagrant ssh**
 
 Starting the Stratio Deep Shell
 ===============================
@@ -64,16 +66,15 @@ Starting the Stratio Deep Shell
 From the sandbox (vagrant ssh):
 
 -  Starting the Stratio Deep Shell:
-   **``/opt/sds/spark/bin/stratio-deep-shell``**
--  Exit the Stratio Stratio Deep Shell: **``exit``**
+   **/opt/sds/spark/bin/stratio-deep-shell**
+-  Exit the Stratio Stratio Deep Shell: **exit**
 
 F.A.Q about the sandbox
 =======================
 
-**I am in the same directory that I copy the Vagrant file but I have this error:**
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+I am in the same directory that I copy the Vagrant file but I have this error:
 
-::
+.. code:: bash
 
         A Vagrant environment or target machine is required to run this
         command. Run vagrant init to create a new Vagrant environment. Or,
@@ -86,10 +87,9 @@ VagrantFile.
 
 --------------
 
-**When I execute vagrant ssh I have this error:**
-'''''''''''''''''''''''''''''''''''''''''''''''''
+When I execute vagrant ssh I have this error:
 
-::
+.. code:: bash
 
         ssh executable not found in any directories in the %PATH% variable. Is an
         SSH client installed? Try installing Cygwin, MinGW or Git, all of which
