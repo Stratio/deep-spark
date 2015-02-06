@@ -27,24 +27,6 @@ learn:
    data.
 -  How to write data from a RDD to Aerospike.
 
-Table of Contents
-=================
-
--  `Summary <#summary>`__
--  `Before you start <#before-you-start>`__
-
-   -  `Prerequisites <#prerequisites>`__
-
--  `Loading the dataset <#loading-the-dataset>`__
--  `Using the Stratio Deep Shell <#using-the-stratio-deep-shell>`__
-
-   -  `Step 1: Creating a RDD <#step-1-creating-a-rdd>`__
-   -  `Step 2: Word Count <#step-2-word-count>`__
-   -  `Step 3: Writing the results to
-      Aerospike <#step-3-writing-the-results-to-aerospike>`__
-
--  `Where to go from here <#where-to-go-from-here>`__
-
 Before you start
 ================
 

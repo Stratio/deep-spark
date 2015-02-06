@@ -34,51 +34,6 @@ You will learn:
    data.
 -  How to write data from a RDD to Cassandra.
 
-Table of Contents
-=================
-
--  `Summary <#summary>`__
--  `Before you start <#before-you-start>`__
-
-   -  `Prerequisites <#prerequisites>`__
-   -  `Configuration <#configuration>`__
-   -  `Notes <#notes>`__
-
-      -  `Changes in Cassandra version
-         2 <#changes-in-cassandra-version-2>`__
-      -  `Method invocation syntax in
-         Scala <#method-invocation-syntax-in-scala>`__
-
--  `Creating the keyspace and table in
-   Cassandra <#creating-the-keyspace-and-table-in-cassandra>`__
-
-   -  `Step 1: Creating the keyspace <#step-1-creating-the-keyspace>`__
-   -  `Step 2: Creating the table
-      schemas <#step-2-creating-the-table-schemas>`__
-
--  `Loading the dataset <#loading-the-dataset>`__
-
-   -  `Alt 1: Using SSTables <#alt-1-using-sstables>`__
-   -  `Alt 2: Using the CSV file <#alt-2-using-the-csv-file>`__
-   -  `Alt 3: Using the JSON dump <#alt-3-using-the-json-dump>`__
-
--  `Using the Stratio Deep Shell <#using-the-stratio-deep-shell>`__
-
-   -  `Step 1: Creating a RDD <#step-1-creating-a-rdd>`__
-   -  `Step 2: Filtering data <#step-2-filtering-data>`__
-   -  `Step 3: Caching data <#step-3-caching-data>`__
-   -  `Step 4: Grouping data <#step-4-grouping-data>`__
-   -  `Step 5: Writing the results to
-      Cassandra <#step-5-writing-the-results-to-cassandra>`__
-
--  `Where to go from here <#where-to-go-from-here>`__
--  `Troubleshooting <#troubleshooting>`__
-
-   -  `“TSocket read 0 bytes” when bulk loading data into
-      Cassandra <#tsocket-read-0-bytes-when-bulk-loading-data-into-cassandra>`__
-   -  `NullPointer exception when writing to
-      Cassandra <#nullpointer-exception-when-writing-to-cassandra>`__
-
 Before you start
 ================
 

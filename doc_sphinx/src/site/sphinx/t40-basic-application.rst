@@ -6,31 +6,6 @@ project for building Stratio Deep applications and how to run it on a
 local instance or a standalone cluster. Instructions are based on the
 Eclipse environment but any equivalent can be used.
 
-Table of Contents
-=================
-
--  `Before you start <#before-you-start>`__
-
-   -  `Prerequisites <#prerequisites>`__
-   -  `Resources <#resources>`__
-
--  `Creating the project <#creating-the-project>`__
-
-   -  `Step 1: Create an empty
-      project <#step-1-create-an-empty-project>`__
-   -  `Step 2: Import the project
-      skeleton <#step-2-import-the-project-skeleton>`__
-   -  `Step 3: Update dependency
-      versions <#step-3-update-dependency-versions>`__
-
--  `Running the application <#running-the-application>`__
-
-   -  `Step 1: Configure the context <#step-1-configure-the-context>`__
-   -  `Step 2: Build the application <#step-2-build-the-application>`__
-   -  `Step 3: Run it <#step-3-run-it>`__
-
--  `Where to go from here <#where-to-go-from-here>`__
-
 Before you start
 ================
 

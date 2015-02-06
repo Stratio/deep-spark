@@ -1,20 +1,6 @@
 Stratio Deep sandbox and demo
 *****************************
 
-Table of Contents
-=================
-
--  `Vagrant Setup <#vagrant-setup>`__
--  `Running the sandbox <#running-the-sandbox>`__
--  `What you will find in the
-   sandbox <#what-you-will-find-in-the-sandbox>`__
--  `Access to the sandbox and other useful
-   commands <#access-to-the-sandbox-and-other-useful-commands>`__
--  `Starting the Stratio Deep Shell and other useful
-   commands <#starting-the-stratio-deep-shell-and-other-useful-commands>`__
--  `F.A.Q about the sandbox <#faq-about-the-sandbox>`__
--  `Stratio Deep Demos <#stratio-deep-demos>`__
-
 Vagrant Setup
 =============
 

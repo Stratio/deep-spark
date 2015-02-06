@@ -6,13 +6,6 @@ based. It’s a thin integration layer between `Apache
 Spark <http://spark.apache.org>`__ and `Apache
 Cassandra <http://cassandra.apache.org>`__.
 
-Table of Contents
-=================
-
--  `Introduction <#introduction>`__
--  `Features <#features>`__
--  `Architecture <#architecture>`__
-
 Introduction
 ============
 

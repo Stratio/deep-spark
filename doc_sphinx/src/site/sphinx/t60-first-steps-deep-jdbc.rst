@@ -28,24 +28,6 @@ through JDBC. You will learn:
    the data.
 -  How to write data from a RDD to a database using a JDBC connection.
 
-Table of Contents
-=================
-
--  `Summary <#summary>`__
--  `Before you start <#before-you-start>`__
-
-   -  `Prerequisites <#prerequisites>`__
-
--  `Loading the dataset <#loading-the-dataset>`__
--  `Using the Stratio Deep Shell <#using-the-stratio-deep-shell>`__
-
-   -  `Step 1: Creating a RDD <#step-1-creating-a-rdd>`__
-   -  `Step 2: Word Count <#step-2-word-count>`__
-   -  `Step 3: Writing the results to
-      MySQL <#step-3-writing-the-results-to-mysql>`__
-
--  `Where to go from here <#where-to-go-from-here>`__
-
 Before you start
 ================
 

@@ -5,34 +5,6 @@ You will learn how to write an entity object for a Cassandra schema that
 can be used with Spark and Stratio Deep to access the data from a Java
 or Scala program through RDDs.
 
-Table of Contents
-=================
-
--  `Before you start <#before-you-start>`__
--  `Creating the tweets schema in
-   Cassandra <#creating-the-tweets-schema-in-cassandra>`__
-
-   -  `Step 1: Defining the schema <#step-1-defining-the-schema>`__
-   -  `Step 2: Creating the table <#step-2-creating-the-table>`__
-   -  `Step 3: Populating the table <#step-3-populating-the-table>`__
-
--  `Creating the Tweet entity <#creating-the-tweet-entity>`__
-
-   -  `Step 1: Create a Maven
-      Project <#step-1-create-a-maven-project>`__
-   -  `Step 2: Set the dependencies <#step-2-set-the-dependencies>`__
-   -  `Step 3: Code the TweetEntity
-      class <#step-3-code-the-tweetentity-class>`__
-   -  `Step 4: Package the entity <#step-4-package-the-entity>`__
-
--  `Using the entity with Stratio
-   Deep <#using-the-entity-with-stratio-deep>`__
--  `Where to go from here <#where-to-go-from-here>`__
--  `Annexes <#annexes>`__
-
-   -  `Cassandra-Java datatype
-      Mapping <#cassandra-java-datatype-mapping>`__
-
 Before you start
 ================
 
