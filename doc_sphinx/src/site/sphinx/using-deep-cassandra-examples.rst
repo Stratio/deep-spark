@@ -10,20 +10,13 @@ objects:
 
 Replace them with your own object names before using these snippets.
 
--  `Creating a Deep Context <#creating-a-deep-context>`__
--  `Creating a Cassandra RDD <#creating-a-cassandra-rdd>`__
--  `Grouping Tuples <#grouping-tuples>`__
--  `Map and Reduce <#map-and-reduce>`__
--  `Writing to Cassandra <#writing-to-cassandra>`__
--  `Aggregation <#aggregation>`__
-
 Creating a Deep Context
 =======================
 
 Local context
 -------------
 
-{% tabgroup %} {% tab Scala %}
+Scala Code:
 
 .. code:: scala
 
@@ -34,7 +27,7 @@ Local context
 
     val deepContext: DeepSparkContext = new DeepSparkContext(cluster, job, sparkHome, jarList)
 
-{% endtab %} {% tab Java %}
+Java Code:
 
 .. code:: java
 
@@ -46,12 +39,11 @@ Local context
     // Creating the Deep Context where args are Spark Master and Job Name
     DeepSparkContext deepContext = new DeepSparkContext(cluster, job, sparkHome, jarList);
 
-{% endtab %} {% endtabgroup %}
 
 Cluster context
 ---------------
 
-{% tabgroup %} {% tab Scala %}
+Scala Code:
 
 .. code:: scala
 
@@ -63,7 +55,7 @@ Cluster context
     // Add jars to the context
     deepContext.addJar("/path/to/jarfile.jar")
 
-{% endtab %} {% tab Java %}
+Java Code:
 
 .. code:: java
 
@@ -76,7 +68,6 @@ Cluster context
     // Add jars to the context
     deepContext.addJar("/path/to/jarfile.jar")
 
-{% endtab %} {% endtabgroup %}
 
 Creating a Cassandra RDD
 ========================
@@ -88,7 +79,7 @@ A cell (or generic) RDD does not need an entity object to operate with
 Cassandra data. In this case, columns are bound to generic cells that
 include metadata along with the values.
 
-{% tabgroup %} {% tab Scala %}
+Scala Code:
 
 .. code:: scala
 
@@ -104,7 +95,7 @@ include metadata along with the values.
     // Creating the RDD
     val rdd: RDD[Cells] = deepContext.createRDD(config)
 
-{% endtab %} {% tab Java %}
+Java Code:
 
 .. code:: java
 
@@ -120,14 +111,13 @@ include metadata along with the values.
     // Creating the RDD
     JavaRDD rdd = deepContext.createJavaRDD(config);
 
-{% endtab %} {% endtabgroup %}
 
 Entity RDD
 ----------
 
 When working with entity objects, an entity RDD must be used.
 
-{% tabgroup %} {% tab Scala %}
+Scala Code:
 
 .. code:: scala
 
@@ -143,7 +133,7 @@ When working with entity objects, an entity RDD must be used.
     // Create the RDD
     val rdd: RDD[TableEntity] = deepContext.createRDD(config)
 
-{% endtab %} {% tab Java %}
+Java Code:
 
 .. code:: java
 
@@ -159,7 +149,6 @@ When working with entity objects, an entity RDD must be used.
     // Creating the RDD
     JavaRDD rdd = deepContext.createJavaRDD(config);
 
-{% endtab %} {% endtabgroup %}
 
 Grouping Tuples
 ===============
@@ -167,7 +156,7 @@ Grouping Tuples
 Using GroupBy
 -------------
 
-{% tabgroup %} {% tab Scala %}
+Scala Code:
 
 .. code:: scala
 
@@ -180,7 +169,7 @@ Using GroupBy
     // fetching results
     val result: Array[(String, Int)] = counts.collect()
 
-{% endtab %} {% tab Java %}
+Java Code:
 
 .. code:: java
 
@@ -204,12 +193,11 @@ Using GroupBy
     // fetching the results
     List<Tuple2<String,Integer>> results = counts.collect();
 
-{% endtab %} {% endtabgroup %}
 
 Using GroupByKey
 ----------------
 
-{% tabgroup %} {% tab Scala %}
+Scala Code:
 
 .. code:: scala
 
@@ -230,7 +218,7 @@ Using GroupByKey
     // fetching results
     val result: Array[(String, Int)] = counts.collect()
 
-{% endtab %} {% tab Java %}
+Java Code:
 
 .. code:: java
 
@@ -257,12 +245,11 @@ Using GroupByKey
     // fetching results
     List<Tuple2<String, Integer>> result = counts.collect();
 
-{% endtab %} {% endtabgroup %}
 
 Map and Reduce
 ==============
 
-{% tabgroup %} {% tab Scala %}
+Scala Code:
 
 .. code:: scala
 
@@ -281,7 +268,7 @@ Map and Reduce
     // Fetching the results
     val results: Array[(String, Int)] = counts.collect()
 
-{% endtab %} {% tab Java %}
+Java Code:
 
 .. code:: java
 
@@ -304,7 +291,6 @@ Map and Reduce
     // Fetching the results
     List<Tuple2<String,Integer>> results = counts.collect();
 
-{% endtab %} {% endtabgroup %}
 
 Writing to Cassandra
 ====================
@@ -312,7 +298,7 @@ Writing to Cassandra
 Writing a Cell RDD
 ------------------
 
-{% tabgroup %} {% tab Scala %}
+Scala Code:
 
 .. code:: scala
 
@@ -347,7 +333,7 @@ Writing a Cell RDD
     // Write to Cassandra
     DeepSparkContext.saveRDD(outputRDD, outputConfig)
 
-{% endtab %} {% tab Java %}
+Java Code:
 
 .. code:: java
 
@@ -395,12 +381,11 @@ Writing a Cell RDD
     // Write to Cassandra
     deepContext.saveRDD(outputRDD.rdd(), outputConfig);
 
-{% endtab %} {% endtabgroup %}
 
 Writing an Entity RDD
 ---------------------
 
-{% tabgroup %} {% tab Scala %}
+Scala Code:
 
 .. code:: scala
 
@@ -430,7 +415,7 @@ Writing an Entity RDD
     // Write to Cassandra
     DeepSparkContext.saveRDD(outputRDD, outputConfig)
 
-{% endtab %} {% tab Java %}
+Java Code:
 
 .. code:: java
 
@@ -478,12 +463,11 @@ Writing an Entity RDD
     // Write to Cassandra
     deepContext.saveRDD(outputRDD.rdd(), outputConfig);
 
-{% endtab %} {% endtabgroup %}
 
 Aggregation
 ===========
 
-{% tabgroup %} {% tab Scala %}
+Scala Code:
 
 .. code:: scala
 
@@ -504,7 +488,7 @@ Aggregation
     val variance: Double = (sumOfSquares.toDouble / n.toDouble) - pow(avg,2)
     val stddev: Double = sqrt(variance)
 
-{% endtab %} {% tab Java %}
+Java Code:
 
 .. code:: java
 
@@ -552,5 +536,4 @@ Aggregation
     Double avg = sumOfX / numOfX;
     Double variance = (sumOfSquares / numOfX) - Math.pow(avg,2);
     Double stddev = Math.sqrt(variance);
-
-{% endtab %} {% endtabgroup %}
+	
