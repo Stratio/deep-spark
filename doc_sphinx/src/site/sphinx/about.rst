@@ -11,10 +11,10 @@ Introduction
 
 Stratio Deep is the module in charge of the integration between `Apache
 Spark <http://spark.apache.org>`__ and several data stores. We currently
-support `Apache Cassandra <http://cassandra.apache.org>`__,
+support the major NoSQL data stores (`Apache Cassandra <http://cassandra.apache.org>`__,
 `MongoDB <http://www.mongodb.org/>`__,
 `Elasticsearch <http://www.elasticsearch.org/>`__ and
-`Aerospike <http://www.aerospike.com/>`__ and we are working on adding
+`Aerospike <http://www.aerospike.com/>`__) and we are working on adding
 others soon. Deep is completely open source so we encourage you to
 develop your own connectors for your data store.
 
@@ -32,21 +32,16 @@ shell allowing you to analyze your dataset.
 Features
 ========
 
--  Cassandra, MongoDB, Elasticsearch and Aerospike currenly supported
--  Creates Spark Resilient Distributed Datasets (RDD) from your data
-   store tables.
--  Efficiently writes large RDDs out to your data store table. Will
-   create automatically missing output tables.
--  Ensures that data locality is respected: data is not shuffled to
-   other machines unless strictly needed.
--  Provides ORM-like interface using annotations to map your data store
-   tables to Java/Scala objects.
--  Provides an alternative generic interface to your data store tables
-   using a Cells abstraction avoiding the need to create mapping
-   Java/Scala objects.
+-  Cassandra, MongoDB, ElasticSearch,  Aerospike, HDFS and JDBC currently supported.
+-  Creates Spark Resilient Distributed Datasets (RDD) from your data store tables.
+-  Provides ORM-like interface using annotations to map your data store tables to Java/Scala objects.
+-  Provides an alternative generic interface to your data store tables using a Cells abstraction avoiding the need to create a mapping Java/Scala objects.
+-  Efficiently large RDDs writing to your data store table. Missing output tables will be created automatically.
+-  Allow filtering data at data store level avoiding unnecesary data shuffling.
+-  Ensures that data locality is respected: data is not shuffled to other machines unless strictly needed.
+-  Provides direct integration based on native APIs instead of the Hadoop Inputformats for the most used data sources.
 -  Friendly API for both Java and Scala developers.
--  Provides a way to register your own callback to handle computation
-   termination events.
+-  Interactive shell to quickly prototype your distributed programs.
 
 Architecture
 ============
