@@ -123,7 +123,7 @@ going to learn how to create RDDs of the Cassandra dataset we imported
 in the previous section and how to make basic operations on them. Start
 the shell:
 
-.. code:: shell-session
+.. code:: bash
 
     $ stratio-deep-shell
 
@@ -140,13 +140,13 @@ and port properties of the configuration object: Define a configuration
 object for the RDD that contains the connection string for Cassandra,
 namely the keyspace and the table name:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val config : CassandraDeepJobConfig[Cells] = CassandraConfigFactory.create().host("localhost").rpcPort(9160).keyspace("crawler").table("Page").initialize
 
 Create an RDD in the Deep context using the configuration object:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val rdd: RDD[Cells] = deepContext.createRDD(config)
 
@@ -157,13 +157,13 @@ The CassandraRDD class provides a filter method that returns a new RDD
 containing only the elements that satisfy a predicate. We will use it to
 obtain a RDD with pages from domains containing the “abc.es” string:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val containsAbcRDD = rdd filter {c :Cells => c.getCellByName("domainName").getCellValue.asInstanceOf[String].contains("abc.es") }
 
 Count the number of rows in the resulting object:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> containsAbcRDD.count
 
@@ -173,7 +173,7 @@ Step 3: Caching Data
 The RDD class, extended by CassandraRDD, provides a straightforward
 method for caching:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val containsAbcCached = containsAbcRDD.cache
 
@@ -181,7 +181,7 @@ In turn, cached RDD can be filtered the same way it is done on
 non-cached RDDs. In this case, the content of the RDD is filtered on the
 “responseCode” column:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val responseOkCached = containsAbcCached filter { c:Cells => c.getCellByName("responseCode").getCellValue == java.math.BigInteger.valueOf(200) }
 
@@ -192,19 +192,19 @@ A two steps method can be used to group data. Firstly the data is
 transformed into a list of key-value pairs and then grouped by key.
 Transformation into key-value pairs:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val byDomainPairs = rdd map { c:Cells => (c.getCellByName("domainName").getCellValue.asInstanceOf[String], c) }
 
 Grouping by domain name:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val domainsGroupedByKey = byDomainPairs.groupByKey
 
 Count the number of pages for each domain:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val numPagePerDomainPairs = domainsGroupedByKey map { t:(String, Iterable[Cells]) => ( t._1, t._2.size ) }
 
@@ -221,7 +221,7 @@ for populating the “listdomains” table are obtained by applying a
 transformation function to the tuples of the CassandraRDD object
 “numPagePerDomainPairs” to construct the cells:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val outputRDD: RDD[Cells] = numPagePerDomainPairs map {
           t: (String, Int) =>
@@ -233,13 +233,13 @@ transformation function to the tuples of the CassandraRDD object
 Now that we have a RDD of cells to be written, we create the new
 configuration for the listdomains table:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val outputConfig = CassandraConfigFactory.createWriteConfig().host("localhost").rpcPort(9160).keyspace("crawler").table("listdomains").createTableOnWrite(true).initialize
 
 Then write the outRDD to Cassandra:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> DeepSparkContext.saveRDD(outputRDD, outputConfig)
 
@@ -247,7 +247,7 @@ To check that the data has been correctly written to Cassandra, exit the
 Deep shell, open a CQL shell and look at the contents of the
 “listdomains” table:
 
-.. code:: shell-session
+.. code:: bash
 
     $ cqlsh
     cqlsh> use crawler;

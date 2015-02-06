@@ -45,7 +45,7 @@ example. We will use a "test" namespace. Open the aerospike
 configuration file (usually /etc/aerospike.conf) and add the namespace
 configuration:
 
-.. code:: shell-session
+.. code:: bash
 
     namespace test {
             replication-factor 2
@@ -62,13 +62,13 @@ configuration:
 The data can be loaded using the Aerospike shell. First of all, enter
 the shell with "aql" command.
 
-.. code:: shell-session
+.. code:: bash
 
     $ aql
 
 That will produce the Aerospike shell:
 
-.. code:: shell-session
+.. code:: bash
 
     Aerospike Query
     Copyright 2013 Aerospike. All rights reserved.
@@ -77,7 +77,7 @@ That will produce the Aerospike shell:
 
 Now, insert some test data:
 
-.. code:: shell-session
+.. code:: bash
 
     aql> INSERT INTO test.input (PK, id, message, number) VALUES ('1', '1', 'message test 1', 1)
     aql> INSERT INTO test.input (PK, id, message, number) VALUES ('2', '2', 'message test 2', 2)
@@ -85,7 +85,7 @@ Now, insert some test data:
 From the same Aerospike shell, check that there are 2 rows in the
 “input” table:
 
-.. code:: shell-session
+.. code:: bash
 
     > select * from test.input;
 
@@ -98,7 +98,7 @@ going to learn how to create RDDs of the Aerospike dataset we imported
 in the previous section and how to make basic operations on them. Start
 the shell:
 
-.. code:: shell-session
+.. code:: bash
 
     $ stratio-deep-shell
 
@@ -120,14 +120,14 @@ port properties of the configuration object: Define a configuration
 object for the RDD that contains the connection string for Aerospike,
 namely the database and the collection name:
 
-.. code:: shell-session
+.. code:: bash
 
     val inputConfigEntity: AerospikeDeepJobConfig[MessageTestEntity] = 
     AerospikeConfigFactory.createAerospike(classOf[MessageTestEntity]).host("localhost").port(3000).namespace("test").set("input").initialize
 
 Create a RDD in the Deep context using the configuration object:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val inputRDDEntity: RDD[MessageTestEntity] = deepContext.createJavaRDD(inputConfigEntity)
 
@@ -136,7 +136,7 @@ Step 2: Word Count
 
 We create a JavaRDD<String> from the MessageTestEntity
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val words: RDD[String] = inputRDDEntity flatMap {
           e: MessageTestEntity => (for (message <- e.getMessage) yield message.split(" ")).flatten
@@ -145,19 +145,19 @@ We create a JavaRDD<String> from the MessageTestEntity
 Now we make a JavaPairRDD<String, Integer>, counting one unit for each
 word
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val wordCount : RDD[(String, Long)] = words map { s:String => (s,1) }
 
 We group by word
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val wordCountReduced  = wordCount reduceByKey { (a,b) => a + b }
 
 Create a new WordCount Object from
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val outputRDD = wordCountReduced map { e:(String, Long) => new WordCount(e._1, e._2) }
 
@@ -170,21 +170,21 @@ this result to the output collection, we will need a configuration that
 binds the RDD to the given collection and then writes its contents to
 Aerospike using that configuration:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val outputConfigEntity: AerospikeDeepJobConfig[WordCount] = AerospikeConfigFactory.createAerospike(classOf[WordCount]).host("localhost").
     port(3000).namespace("test").set("input").initialize
 
 Then write the outRDD to Aerospike:
 
-.. code:: shell-session
+.. code:: bash
 
     scala>DeepSparkContext.saveRDD(outputRDD, outputConfigEntity)
 
 To check that the data has been correctly written to Aerospike, open an
 Aerospike shell and look at the contents of the “output” collection:
 
-.. code:: shell-session
+.. code:: bash
 
     $ aql
     aql> select * from test.output

@@ -126,7 +126,7 @@ table for that purpose:
 
 -  Launch the Cassandra shell in the Sandbox:
 
-.. code:: shell-session
+.. code:: bash
 
     $ cqlsh
     Connected to Test Cluster at localhost:9160.
@@ -136,7 +136,7 @@ table for that purpose:
 
 -  Then create a keyspace, a table and fill it with at least one row:
 
-.. code:: shell-session
+.. code:: bash
 
     cqlsh> CREATE KEYSPACE test WITH replication = {
           'class': 'SimpleStrategy',
@@ -220,7 +220,7 @@ Once compiled, the jar can be packaged:
 For a Java or Scala project, the result should be similar to the
 following:
 
-.. code:: shell-session
+.. code:: bash
 
     Results :
 
@@ -233,7 +233,7 @@ following:
 
 And as follow for a mixed one:
 
-.. code:: shell-session
+.. code:: bash
 
     Results :
 
@@ -248,7 +248,7 @@ Finally, copy the jar to the same location that has been set in "`Step
 1: Configure the Context <#step-1-configure-the-context>`__\ " (variable
 "jar"):
 
-.. code:: shell-session
+.. code:: bash
 
     $ cp /PATH/TO/ECLIPSE_WORKSPACE/MyProject/target/MyProject-0.0.1.jar /PATH/TO/JAR
 
@@ -257,7 +257,7 @@ Step 3: Run it
 
 In a terminal, enter at the prompt:
 
-.. code:: shell-session
+.. code:: bash
 
     # For a Java or mixed project:
     $ bin/spark-submit --master CLUSTER_ADDRESS --class com.stratio.examples.JavaExample --jars /PATH/TO/JAR/MyProject-0.0.1.jar /PATH/TO/JAR/MyProject-0.0.1.jar
@@ -271,7 +271,7 @@ file.
 
 In both case the last lines of the output should be similar to:
 
-.. code:: shell-session
+.. code:: bash
 
     14/03/2014 17:32:49 INFO SparkContext: Successfully stopped SparkContext
     Rows in the RDD (JavaClass): 1

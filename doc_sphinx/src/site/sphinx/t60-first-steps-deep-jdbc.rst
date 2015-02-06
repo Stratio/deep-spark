@@ -44,21 +44,21 @@ Loading the dataset
 First of all, you need to create the MySQL database and tables used in
 the example. We will use a "test" database. Open the MySQL shell:
 
-.. code:: shell-session
+.. code:: bash
 
     mysql -u [your user] -p[your password]
     }
 
 Now execute the SQL command that will create the database:
 
-.. code:: shell-session
+.. code:: bash
 
     mysql> CREATE DATABASE test;
     Query OK, 1 row affected (0.01 sec)
 
 Create the tables that will be used in this tutorial:
 
-.. code:: shell-session
+.. code:: bash
 
     mysql> use test;
     mysql> CREATE TABLE `test_table` (`id` varchar(256) NOT NULL DEFAULT '', `message` varchar(256) DEFAULT NULL, `number` bigint(20) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB;
@@ -69,7 +69,7 @@ Create the tables that will be used in this tutorial:
 
 Now, insert some test data into the input table:
 
-.. code:: shell-session
+.. code:: bash
 
     mysql> INSERT INTO `test_table` (`id`, `message`, `number`) VALUES ('1', 'test message', 1);
     Query OK, 1 row affected (0.01 sec)
@@ -79,7 +79,7 @@ Now, insert some test data into the input table:
 From the same MySQL shell, check that there are 2 rows in the
 “test\_table” table:
 
-.. code:: shell-session
+.. code:: bash
 
     mysql> select * from test_table;
 
@@ -92,7 +92,7 @@ learn how to create RDDs of the database dataset we imported in the
 previous section and how to make basic operations on them. Start the
 shell:
 
-.. code:: shell-session
+.. code:: bash
 
     $ stratio-deep-shell
 
@@ -111,14 +111,14 @@ the RDD needs more information to access MySQL data such as the schema
 and table names. Define a configuration object for the RDD that contains
 the connection string for MySQL, namely the database and the table name:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val inputConfigCell: JdbcDeepJobConfig[Cells] = JdbcConfigFactory.createJdbc.host(host).port(port).username(user).password(password).driverClass(driverClass).database(database).table(table)
     scala> inputConfigCell.initialize
 
 Create a RDD in the Deep context using the configuration object:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val carPrices: RDD[Cells] = deepContext.createRDD(inputConfigCell)
 
@@ -127,7 +127,7 @@ Step 2: Word Count
 
 We create a JavaRDD<String> from the MessageTestEntity
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val words: RDD[String] = inputRDDEntity flatMap {
           e: Cells => (for (message <- e.getCellByName("message")) yield message.split(" ")).flatten
@@ -136,19 +136,19 @@ We create a JavaRDD<String> from the MessageTestEntity
 Now we make a JavaPairRDD<String, Integer>, counting one unit for each
 word
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val wordCount : RDD[(String, Long)] = words map { s:String => (s,1) }
 
 We group by word
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val wordCountReduced  = wordCount reduceByKey { (a,b) => a + b }
 
 Create a new WordCount Object from
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val outputRDD = wordCountReduced map { e:(String, Long) => new WordCount(e._1, e._2) }
 
@@ -161,20 +161,20 @@ this result to the output collection, we will need a configuration that
 binds the RDD to the given collection and then writes its contents to
 MySQL using that configuration:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val outputConfigEntity: JdbcDeepJobConfig[WordCount] = JdbcConfigFactory.createJdbc(classOf[WordCount]).host(host).port(port).username(user).password(password).driverClass(driverClass).database(database).table(table)
 
 Then write the outRDD to MySQL:
 
-.. code:: shell-session
+.. code:: bash
 
     scala>DeepSparkContext.saveRDD(outputRDD, outputConfigEntity)
 
 To check that the data has been correctly written to MySQL, open a MySQL
 shell and look at the contents of the “output” collection:
 
-.. code:: shell-session
+.. code:: bash
 
     $ mysql -u [your user] -p[your password]
     mysql> use test;

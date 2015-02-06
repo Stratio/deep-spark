@@ -57,13 +57,13 @@ Step 2: Creating the table
 
 Start the CQL shell:
 
-.. code:: shell-session
+.. code:: bash
 
     $ cqlsh
 
 Create a keyspace:
 
-.. code:: shell-session
+.. code:: bash
 
     cqlsh> CREATE KEYSPACE IF NOT EXISTS test 
     WITH replication = {
@@ -73,7 +73,7 @@ Create a keyspace:
 
 Create the table where tweets will be stored:
 
-.. code:: shell-session
+.. code:: bash
 
     cqlsh> use test;
     cqlsh:test> CREATE TABLE IF NOT EXISTS tweets (
@@ -93,7 +93,7 @@ Import the tweets dataset
 (`test-tweets.csv <http://docs.openstratio.org/resources/datasets/test-tweets.csv>`__)
 to populate the table you just created:
 
-.. code:: shell-session
+.. code:: bash
 
     cqlsh> use test;
     cqlsh:test> copy tweets (tweet_id, tweet_date, author, hashtags, favorite_count, content, truncated) from '/PATH/TO/FILE/test-tweets.csv';
@@ -627,20 +627,20 @@ Step 4: Package the Entity
 Navigate to the directory that contains your TweetPojo project. It
 contains two subdirectories (src and target) and the pom.xml file:
 
-.. code:: shell-session
+.. code:: bash
 
     $ ls
     pom.xml   src/   target/
 
 Use Maven to package the TweetPojo project:
 
-.. code:: shell-session
+.. code:: bash
 
     $ mvn package
 
 You should get an output similar to the following:
 
-.. code:: shell-session
+.. code:: bash
 
     [INFO] Scanning for projects...
     [INFO] 
@@ -680,7 +680,7 @@ You should get an output similar to the following:
 
 The jar has been placed in the target subdirectory:
 
-.. code:: shell-session
+.. code:: bash
 
     $ ls target/
     classes  maven-archiver  surefire  test-classes  TweetPojo-0.0.1-SNAPSHOT.jar
@@ -694,13 +694,13 @@ If you are using the Stratio Sandbox, copy the TweetPojo jar to the
 virtual machine. Also, to use the TweetEntity in the Stratio Deep shell,
 we have to add it to the Spark classpath:
 
-.. code:: shell-session
+.. code:: bash
 
     $ export SPARK_CLASSPATH=/path/to/jars/TweetPojo-0.0.1-SNAPSHOT.jar
 
 Then start the Stratio Deep shell:
 
-.. code:: shell-session
+.. code:: bash
 
     $ stratio-deep-shell
 
@@ -709,30 +709,30 @@ is already created for you, in the variable called deepContext. The
 TweetPojo JAR has to be added to this context so the workers can use
 TweetEntity objects.
 
-.. code:: shell-session
+.. code:: bash
 
     scala> deepContext.addJar("/path/to/jars/TweetPojo-0.0.1-SNAPSHOT.jar")
 
 Import the entity object:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> import com.example.TweetEntity
 
 TweetEntity can now be used to create a RDD out of the Cassandra table
 “tweets”:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val config = CassandraConfigFactory.create(classOf[TweetEntity]).host("localhost").rpcPort(9160).keyspace("test").table("tweets").initialize
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val rdd: RDD[TweetEntity] = deepContext.createRDD(config)
 
 Check the number of tweet objects in the RDD:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> rdd.count
 
