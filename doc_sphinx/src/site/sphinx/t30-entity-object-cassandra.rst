@@ -1,5 +1,5 @@
 Creating an Entity Object for Cassandra in Stratio Deep
-=======================================================
+*******************************************************
 
 You will learn how to write an entity object for a Cassandra schema that
 can be used with Spark and Stratio Deep to access the data from a Java

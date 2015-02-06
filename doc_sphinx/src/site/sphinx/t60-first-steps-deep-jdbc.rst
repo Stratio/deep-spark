@@ -1,5 +1,5 @@
 First Steps with Stratio Deep and databases accessible through JDBC
-===================================================================
+*******************************************************************
 
 StratioDeep-JDBC is an integration layer between Spark, a distributed
 computing framework and JDBC, a Java database accesibility technology.

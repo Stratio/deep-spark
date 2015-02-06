@@ -1,5 +1,5 @@
 First Steps with Stratio Deep and Aerospike
-===========================================
+*******************************************
 
 StratioDeep-Aerospike is an integration layer between Spark, a
 distributed computing framework and Aerospike, a flash-optimized,

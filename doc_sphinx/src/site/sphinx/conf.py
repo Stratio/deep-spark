@@ -40,7 +40,7 @@ source_suffix = '.rst'
 master_doc = 'about'
 
 # General information about the project.
-project = u'Crossdata'
+project = u'Deep'
 copyright = u'2015 Stratio'
 
 # The version info for the project you're documenting, acts as replacement for

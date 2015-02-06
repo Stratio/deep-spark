@@ -1,5 +1,5 @@
 First Steps with Stratio Deep and Cassandra
-===========================================
+*******************************************
 
 StratioDeep is an integration layer between Spark, a distributed
 computing framework and Cassandra.

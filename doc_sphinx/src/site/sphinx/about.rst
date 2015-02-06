@@ -1,5 +1,5 @@
 About Stratio Deep
-==================
+******************
 
 Stratio Deep is one of the core modules on which the Stratio platform is
 based. It’s a thin integration layer between `Apache

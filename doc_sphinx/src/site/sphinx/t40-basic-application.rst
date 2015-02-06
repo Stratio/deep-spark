@@ -1,5 +1,5 @@
 Writing and Running a Basic Application for Stratio Deep
-========================================================
+********************************************************
 
 In this tutorial you will learn how to write a java, scala or mixed
 project for building Stratio Deep applications and how to run it on a
