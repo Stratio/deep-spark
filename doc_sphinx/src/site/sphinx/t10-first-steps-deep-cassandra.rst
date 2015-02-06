@@ -41,9 +41,7 @@ Prerequisites
 -------------
 
 This tutorial assumes the reader has installed Cassandra and Stratio
-Deep on a single machine. Follow the instructions of the `Getting
-Started </getting-started.html>`__ page if you need to install the
-software.
+Deep on a single machine.
 
 Regarding programming skills, basic knowledge of CQL (or a SQL like
 language), Java and/or Scala are required.
@@ -112,7 +110,7 @@ date, page contents, etc. Before loading the data, the destination
 keyspace and table must be created. If Cassandra is not running yet,
 launch it using the following command:
 
-.. code:: shell-session
+.. code:: bash
 
     $ /PATH/TO/CASSANDRA/bin/cassandra -f
 
@@ -121,13 +119,13 @@ Step 1: Creating the keyspace
 
 Launch the CQL shell:
 
-.. code:: shell-session
+.. code:: bash
 
     $ /PATH/TO/CASSANDRA/bin/cqlsh
 
 The shell will start displaying a welcome message and the prompt:
 
-.. code:: shell-session
+.. code:: bash
 
     Connected to Test Cluster at localhost:9160.
     [cqlsh 4.1.1 | Cassandra 2.0.82 | CQL spec 3.1.1 | Thrift protocol 19.39.0]
@@ -135,7 +133,7 @@ The shell will start displaying a welcome message and the prompt:
 
 Create the keyspace:
 
-.. code:: shell-session
+.. code:: bash
 
     cqlsh> CREATE KEYSPACE crawler WITH replication = {
           'class': 'SimpleStrategy',
@@ -145,14 +143,14 @@ Create the keyspace:
 If the keyspace has been created successfully, no feedback will be
 shown. To get a list of existing keyspaces, use the following command:
 
-.. code:: shell-session
+.. code:: bash
 
     cqlsh> describe keyspaces
 
 Unless you have previously created others keyspaces, you should see a
 list similar to the one below:
 
-.. code:: shell-session
+.. code:: bash
 
     cqlsh> describe keyspaces
     system crawler system_traces
@@ -166,14 +164,14 @@ provided with this tutorial:
 prefer so, you can create the schema manually by entering the statements
 in the CQL shell. Source the script from the CQL shell:
 
-.. code:: shell-session
+.. code:: bash
 
     cqlsh> use crawler;
     cqlsh:crawler> SOURCE '/PATH/TO/SCRIPT/table-Page-create.cql';
 
 Check the tables have been created correctly:
 
-.. code:: shell-session
+.. code:: bash
 
      cqlsh:crawler> describe table "Page";
 
@@ -183,7 +181,7 @@ interpreted as “page” instead of “Page”. Once the creation script has
 been run, the “describe table” command should produce the following
 output:
 
-.. code:: shell-session
+.. code:: bash
 
     CREATE TABLE "Page" (
      key text,
@@ -223,20 +221,20 @@ Then same steps will be repeated to create the schema for the table
 `table-listdomains-create.cql <resources/table-listdomains-create.cql>`__
 script: Source the script from the CQL shell:
 
-.. code:: shell-session
+.. code:: bash
 
     cqlsh:crawler> SOURCE '/PATH/TO/SCRIPT/table-listdomains-create.cql';
 
 Then check that the table has been created correctly:
 
-.. code:: shell-session
+.. code:: bash
 
     cqlsh:crawler> describe table listdomains;
 
 Once the creation script has been run, the “describe table” command
 should produce the following output:
 
-.. code:: shell-session
+.. code:: bash
 
     CREATE TABLE listdomains (
      domain text,
@@ -283,7 +281,7 @@ We will use sttableloader to load the Page table contents
 The listdomains one will remain empty for now, we will use it later to
 store results of operations computed on “Page”:
 
-.. code:: shell-session
+.. code:: bash
 
     $ cd /PATH/TO/DATASET
     $ tar -zxvf crawler-Page.tgz
@@ -291,7 +289,7 @@ store results of operations computed on “Page”:
 
 You should get an output similar to the following:
 
-.. code:: shell-session
+.. code:: bash
 
     Established connection to initial hosts
     Opening sstables and calculating sections to stream
@@ -300,7 +298,7 @@ You should get an output similar to the following:
 
 Open a CQL shell to verify the data has been correctly loaded:
 
-.. code:: shell-session
+.. code:: bash
 
     cqlsh> use crawler;
     cqlsh:crawler> select count(*) from "Page" limit 30000;
@@ -315,7 +313,7 @@ Alt 2: Using the CSV file
    (`crawler-Page.csv <http://docs.openstratio.org/resources/datasets/crawler-Page.csv>`__)
    into the table:
 
-.. code:: shell-session
+.. code:: bash
 
     cqlsh> use crawler;
     cqlsh:crawler> copy "Page" (key, "___class", charset, content, domainName, downloadTime, enqueuedForTransforming, etag, firstDownloadTime, lastModified, responseCode, responseTime, timeTransformed, title, url)
@@ -325,7 +323,7 @@ Alt 2: Using the CSV file
 Once the process has completed, you should see a message saying 21992
 rows have been imported. You can double-check using:
 
-.. code:: shell-session
+.. code:: bash
 
     cqlsh:crawler> select count(*) from "Page" limit 30000;
 
@@ -337,14 +335,14 @@ recommended other than for testing and debugging purposes. Use
 json2sstable to import the JSON data
 (`crawler-Page.json <http://docs.openstratio.org/resources/datasets/crawler-Page.json>`__):
 
-.. code:: shell-session
+.. code:: bash
 
      $ cd /PATH/TO/FILE/
      $ json2sstable -K crawler -c Page crawler-Page.json /var/cassandra/data/crawler/Page/crawler-Page-jb-1-Data.db
 
 That will produce the following output:
 
-.. code:: shell-session
+.. code:: bash
 
     Importing 21992 keys...
     Currently imported 1891 keys.
@@ -352,7 +350,7 @@ That will produce the following output:
 
 Start the CQL shell and check there are 21992 rows in the “Page” table:
 
-.. code:: shell-session
+.. code:: bash
 
     cqlsh> use crawler;
     cqlsh:crawler> select count(*) from "Page" limit 30000;
@@ -369,7 +367,7 @@ going to learn how to create RDDs of the Cassandra dataset we imported
 in the previous section and how to make basic operations on them. Start
 the shell:
 
-.. code:: shell-session
+.. code:: bash
 
     $ stratio-deep-shell
 
@@ -394,13 +392,13 @@ and port properties of the configuration object: Define a configuration
 object for the RDD that contains the connection string for Cassandra,
 namely the keyspace and the table name:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val config : CassandraDeepJobConfig[Cells] = CassandraConfigFactory.create().host("localhost").rpcPort(9160).keyspace("crawler").table("Page").initialize
 
 Create an RDD in the Deep context using the configuration object:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val rdd: RDD[Cells] = deepContext.createRDD(config)
 
@@ -411,13 +409,13 @@ The CassandraRDD class provides a filter method that returns a new RDD
 containing only the elements that satisfy a predicate. We will use it to
 obtain a RDD with pages from domains containing the “abc.es” string:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val containsAbcRDD = rdd filter {c :Cells => c.getCellByName("domainName").getCellValue.asInstanceOf[String].contains("abc.es") }
 
 Count the number of rows in the resulting object:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> containsAbcRDD.count
 
@@ -427,7 +425,7 @@ Step 3: Caching data
 The RDD class, extended by CassandraRDD, provides a straightforward
 method for caching:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val containsAbcCached = containsAbcRDD.cache
 
@@ -435,7 +433,7 @@ In turn, cached RDD can be filtered the same way it is done on
 non-cached RDDs. In this case, the content of the RDD is filtered on the
 “responseCode” column:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val responseOkCached = containsAbcCached filter { c:Cells => c.getCellByName("responseCode").getCellValue == java.math.BigInteger.valueOf(200) }
 
@@ -446,19 +444,19 @@ A two steps method can be used to group data. Firstly the data is
 transformed into a list of key-value pairs and then grouped by key.
 Transformation into key-value pairs:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val byDomainPairs = rdd map { c:Cells => (c.getCellByName("domainName").getCellValue.asInstanceOf[String], c) }
 
 Grouping by domain name:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val domainsGroupedByKey = byDomainPairs.groupByKey
 
 Count the number of pages for each domain:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val numPagePerDomainPairs = domainsGroupedByKey map { t:(String, Iterable[Cells]) => ( t._1, t._2.size ) }
 
@@ -475,7 +473,7 @@ for populating the “listdomains” table are obtained by applying a
 transformation function to the tuples of the CassandraRDD object
 “numPagePerDomainPairs” to construct the cells:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val outputRDD: RDD[Cells] = numPagePerDomainPairs map {
           t: (String, Int) =>
@@ -487,13 +485,13 @@ transformation function to the tuples of the CassandraRDD object
 Now that we have a RDD of cells to be written, we create the new
 configuration for the listdomains table:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> val outputConfig = CassandraConfigFactory.createWriteConfig().host("localhost").rpcPort(9160).keyspace("crawler").table("listdomains").createTableOnWrite(true).initialize
 
 Then write the outRDD to Cassandra:
 
-.. code:: shell-session
+.. code:: bash
 
     scala> DeepSparkContext.saveRDD(outputRDD, outputConfig)
 
@@ -501,7 +499,7 @@ To check that the data has been correctly written to Cassandra, exit the
 Deep shell, open a CQL shell and look at the contents of the
 “listdomains” table:
 
-.. code:: shell-session
+.. code:: bash
 
     $ cqlsh
     cqlsh> use crawler;
@@ -527,7 +525,7 @@ please refer to the documentation of the issuing component.
 
 This error may occur when copying a CSV file into a table:
 
-.. code:: shell-session
+.. code:: bash
 
     cqlsh:crawler> copy "Page" (...) from 'crawler-Page.csv' with header='true';
 
@@ -548,7 +546,7 @@ should work for a machine with more than 4Gb of memory. Depending on
 your machine, you may try different values. Do not forget to stop and
 restart your Cassandra service after changing those parameters.
 
-.. code:: shell-session
+.. code:: bash
 
     $ /PATH/TO/CASSANDRA/bin/cassandra -f
 
@@ -557,7 +555,7 @@ NullPointer exception when writing to Cassandra
 
 The error looks like the following:
 
-.. code:: shell-session
+.. code:: bash
 
     ERROR [Executor task launch worker-2] Executor:86 - Exception in task ID xxxx
     java.lang.NullPointerException at org.apache.cassandra.dht.Murmur3Partitioner.getToken(Murmur3Partitioner.java:89)
@@ -569,6 +567,6 @@ from Stratio Deep. Make sure the partition key parameter has been set to
 true when defining the cell corresponding to, or part of, the PRIMARY
 KEY:
 
-.. code:: shell-session
+.. code:: bash
 
     val domainNameCell = Cell.create("domain", t._1, true, false);

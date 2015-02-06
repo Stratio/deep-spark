@@ -34,8 +34,7 @@ Before you start
 Prerequisites
 -------------
 
--  MySQL and Stratio Deep: see `Getting Started </getting-started.md>`__
-   for installation instructions
+-  MySQL and Stratio Deep
 -  Basic knowledge of SQL, Java and/or Scala
 -  Some input data loaded into MySQL.
 

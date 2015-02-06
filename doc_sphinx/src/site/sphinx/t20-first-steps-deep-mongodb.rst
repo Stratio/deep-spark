@@ -32,8 +32,7 @@ Before you start
 Prerequisites
 -------------
 
--  MongoDB and Stratio Deep: see `Getting
-   Started </getting-started.md>`__ for installation instructions
+-  MongoDB and Stratio Deep
 -  Basic knowledge of SQL, Java and/or Scala
 
 Resources used in this tutorial

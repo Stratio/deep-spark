@@ -10,7 +10,7 @@ Before you start
 
 To follow this tutorial you will need the following:
 
--  A `Stratio instance </getting-started.html>`__
+-  A `Stratio instance`__
 -  A Java IDE (e.g., Eclipse for Java Developers)
 -  `Oracle JDK
    7 <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`__

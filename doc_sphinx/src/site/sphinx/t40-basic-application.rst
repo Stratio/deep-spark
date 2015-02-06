@@ -12,7 +12,7 @@ Before you start
 Prerequisites
 -------------
 
--  A `Stratio Installation </getting-started.html>`__
+-  A `Stratio Installation`__
 -  `Eclipse <https://www.eclipse.org/>`__ or an equivalent IDE.
 -  `Oracle JDK
    7 <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`__.

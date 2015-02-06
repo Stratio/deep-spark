@@ -33,8 +33,7 @@ Before you start
 Prerequisites
 -------------
 
--  Aerospike and Stratio Deep: see `Getting
-   Started </getting-started.md>`__ for installation instructions
+-  Aerospike and Stratio Deep
 -  Basic knowledge of SQL, Java and/or Scala
 -  Some input data loaded into Aerospike.
 
