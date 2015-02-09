@@ -31,9 +31,9 @@ Running the sandbox
 
 Please, be patient the first time it runs!!
 
-Login into the sandbox as root user and start the services:
--    Start Spark and Stratio Deep: **` service spark start `**
--    Start Cassandra: **` service cassandra start `**
+Login into the sandbox as vagrant user and start the services:
+-    Start Spark and Stratio Deep: **`sudo service spark start `**
+-    Start Cassandra: **`sudo service cassandra start `**
 
 
 What you will find in the sandbox
@@ -45,9 +45,9 @@ What you will find in the sandbox
 
 Name | Version | Service name | Other
 
-Spark | 1.1.0 | spark | service spark start
+Spark | 1.2.0 | spark | service spark start
 
-Stratio Cassandra | 2.1.05 | cassandra | service cassandra start
+Cassandra | 2.1.05 | cassandra | service cassandra start
 
 Mongodb | 2.6.5 | mongod| service mongod start
 
@@ -121,7 +121,7 @@ In this section, you are going to learn how to create RDDs of the Cassandra data
 section and how to make basic operations on them. Start the shell:
 
 ```shell-session
-$ stratio-deep-shell
+$ /opt/sds/spark/bin/stratio-deep-shell
 ```
 
 #### Step 1: Creating an RDD
@@ -206,8 +206,8 @@ tuples of the CassandraRDD object “numPagePerDomainPairs” to construct the c
 ```shell-session
 scala> val outputRDD: RDD[Cells] = numPagePerDomainPairs map {
       t: (String, Int) =>
-        val c1 = CassandraCell.create("domain", t._1, true, false);
-        val c2 = CassandraCell.create("num_pages", t._2);
+        val c1 = Cell.create("domain", t._1, true, false);
+        val c2 = Cell.create("num_pages", t._2);
         new Cells("crawler", c1, c2)
     }
 ```

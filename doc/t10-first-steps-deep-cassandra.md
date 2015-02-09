@@ -354,7 +354,7 @@ In this section, you are going to learn how to create RDDs of the Cassandra data
 section and how to make basic operations on them. Start the shell:
 
 ```shell-session
-$ stratio-deep-shell
+$ /opt/sds/spark/bin/stratio-deep-shell
 ```
 
 A welcome screen will be displayed (figure 2).
@@ -450,8 +450,8 @@ tuples of the CassandraRDD object “numPagePerDomainPairs” to construct the c
 ```shell-session
 scala> val outputRDD: RDD[Cells] = numPagePerDomainPairs map {
       t: (String, Int) =>
-        val c1 = CassandraCell.create("domain", t._1, true, false);
-        val c2 = CassandraCell.create("num_pages", t._2);
+        val c1 = Cell.create("domain", t._1, true, false);
+        val c2 = Cell.create("num_pages", t._2);
         new Cells("crawler", c1, c2)
     }
 ```
