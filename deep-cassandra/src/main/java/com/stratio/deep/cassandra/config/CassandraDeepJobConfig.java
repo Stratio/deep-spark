@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -149,9 +150,23 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
      * {@inheritDoc}
      */
 
+
+    private static Map<String, Session > cassandraSession = new HashedMap();
     @Override
     public synchronized Session getSession() {
-        if (session == null) {
+        String id = this.getHost()+":"+this.cqlPort;
+        if (!cassandraSession.containsKey(id)){
+            Cluster cluster = Cluster.builder()
+                    .withPort(this.cqlPort)
+                    .addContactPoint(this.getHost())
+                    .withCredentials(this.username, this.password)
+                    .withProtocolVersion(PROTOCOL_VERSION)
+                    .build();
+
+            session = cluster.connect(quote(this.catalog));
+            cassandraSession.put(id,session);
+        }
+      /*  if (session == null) {
             Cluster cluster = Cluster.builder()
                     .withPort(this.cqlPort)
                     .addContactPoint(this.getHost())
@@ -162,7 +177,8 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
             session = cluster.connect(quote(this.catalog));
         }
 
-        return session;
+        return session;*/
+        return cassandraSession.get(id);
     }
 
     /**
