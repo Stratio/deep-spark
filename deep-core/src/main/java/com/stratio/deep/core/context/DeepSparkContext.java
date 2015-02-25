@@ -21,6 +21,7 @@ import javax.activation.UnsupportedDataTypeException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.Logger;
+import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -44,6 +45,7 @@ import com.stratio.deep.core.fs.utils.UtilFS;
 import com.stratio.deep.core.function.PrepareSaveFunction;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
+import scala.tools.cmd.gen.AnyVals;
 
 /**
  * Entry point to the Cassandra-aware Spark context.
@@ -121,9 +123,19 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
     public DeepSparkContext(String master, String appName, String sparkHome, String[] jars,
                             Map<String, String> environment) {
 
+
         super(master, appName, sparkHome, jars, environment);
         sqlContext = new JavaSQLContext(this);
     }
+
+
+    public DeepSparkContext(DeepSparkConfig deepSparkConfig) {
+
+         super(deepSparkConfig);
+
+        sqlContext = new JavaSQLContext(this);
+    }
+
 
     /**
      * Creates a RDD.
