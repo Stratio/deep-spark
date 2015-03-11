@@ -71,7 +71,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
         AutoCloseable,
         ICassandraDeepJobConfig<T> {
 
-    private static final Logger LOG = Logger.getLogger("com.stratio.deep.config.GenericICassandraDeepJobConfig");
+    private static final Logger LOG = Logger.getLogger(CassandraDeepJobConfig.class);
 
     private static final long serialVersionUID = -7179376653643603038L;
 
@@ -166,18 +166,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
             session = cluster.connect(quote(this.catalog));
             cassandraSession.put(id,session);
         }
-      /*  if (session == null) {
-            Cluster cluster = Cluster.builder()
-                    .withPort(this.cqlPort)
-                    .addContactPoint(this.getHost())
-                    .withCredentials(this.username, this.password)
-                    .withProtocolVersion(PROTOCOL_VERSION)
-                    .build();
 
-            session = cluster.connect(quote(this.catalog));
-        }
-
-        return session;*/
         return cassandraSession.get(id);
     }
 
