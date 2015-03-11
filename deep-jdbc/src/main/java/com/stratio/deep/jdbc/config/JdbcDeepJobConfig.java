@@ -470,7 +470,15 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
                         comboCondition.addCondition(BinaryCondition.lessThan(filterColumn, filter.getValue(), true));
                     } else if(filterType.equals(FilterType.NEQ)) {
                         comboCondition.addCondition(BinaryCondition.notEqualTo(filterColumn, filter.getValue()));
-                    } else {
+                    } else if(filterType.equals(FilterType.IN)) {
+                        ComboCondition comboConditionOR = new ComboCondition(ComboCondition.Op.OR);
+                        String[] condicion =filter.getValue().toString().split(",");
+                        for (int z=0; z < condicion.length ; z++) {
+                            comboConditionOR.addCondition(BinaryCondition.equalTo(filterColumn, condicion[z]));
+                        }
+                        comboCondition.addCondition(comboConditionOR);
+                    }
+                    else {
                         throw new UnsupportedOperationException("Currently, the filter operation " + filterType + " is not supported");
                     }
                 }
