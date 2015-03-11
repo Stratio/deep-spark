@@ -396,7 +396,7 @@ public final class Utils {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             String message = "A exception happens and we wrap with DeepExtractorInitializationException" + e.getMessage();
-            LOG.info(message);
+            LOG.error(message);
             throw new DeepExtractorInitializationException(message,e);
         }
 
