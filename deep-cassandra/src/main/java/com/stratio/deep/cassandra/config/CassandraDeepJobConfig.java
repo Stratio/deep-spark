@@ -634,9 +634,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
             throw new IllegalArgumentException("pageSize cannot be zero");
         }
 
-        if (pageSize > Constants.DEFAULT_MAX_PAGE_SIZE) {
-            throw new IllegalArgumentException("pageSize cannot exceed " + Constants.DEFAULT_MAX_PAGE_SIZE);
-        }
+        
 
         validateConsistencyLevels();
 
