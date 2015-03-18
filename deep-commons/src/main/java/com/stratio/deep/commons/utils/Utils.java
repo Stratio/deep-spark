@@ -52,6 +52,7 @@ import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.rdd.IExtractor;
 
+import org.apache.log4j.Logger;
 import scala.Tuple2;
 
 /**
@@ -62,6 +63,12 @@ import scala.Tuple2;
  * @author Luca Rosellini <luca@strat.io>
  */
 public final class Utils {
+
+
+    /**
+     * The Log.
+     */
+    private static transient final Logger LOG = Logger.getLogger(Utils.class);
 
     /**
      * Creates a new instance of the given class.
@@ -388,7 +395,9 @@ public final class Utils {
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            throw new DeepExtractorInitializationException(e.getMessage());
+            String message = "A exception happens and we wrap with DeepExtractorInitializationException" + e.getMessage();
+            LOG.error(message);
+            throw new DeepExtractorInitializationException(message,e);
         }
 
     }
