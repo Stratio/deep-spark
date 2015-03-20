@@ -330,7 +330,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     @Override
     public JdbcDeepJobConfig<T> sort(String sort) {
         if(dbTable != null) {
-            this.sort = new DbColumn(dbTable, sort, "");
+            this.sort = new DbColumn(dbTable, sort, "",null,null);
         }
         return this;
     }
@@ -349,7 +349,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     @Override
     public JdbcDeepJobConfig<T> partitionKey(String partitionKey) {
         if(dbTable != null) {
-            this.partitionKey = new DbColumn(dbTable, partitionKey, "");
+            this.partitionKey = new DbColumn(dbTable, partitionKey, "",null,null);
         }
         return this;
     }
@@ -457,7 +457,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
                 for(int i=0; i<filters.length; i++) {
                     Filter filter = filters[i];
                     FilterType filterType = filter.getFilterType();
-                    DbColumn filterColumn = new DbColumn(dbTable, filter.getField(), "");
+                    DbColumn filterColumn = new DbColumn(dbTable, filter.getField(), "",null,null);
                     if(filterType.equals(FilterType.EQ)) {
                         comboCondition.addCondition(BinaryCondition.equalTo(filterColumn, filter.getValue()));
                     } else if(filterType.equals(FilterType.GT)) {

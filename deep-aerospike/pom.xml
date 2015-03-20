@@ -188,7 +188,7 @@
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
                             <excludeArtifactIds>::*</excludeArtifactIds>
-                            <includeGroupIds>${distribution.include}</includeGroupIds>
+                            <includeGroupIds>${distribution.groupIdInclude}</includeGroupIds>
                         </configuration>
                     </execution>
                 </executions>
