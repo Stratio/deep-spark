@@ -61,32 +61,32 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     /**
      * Database root object.
      */
-    private transient DbSpec dbSpec = new DbSpec();
+    private  DbSpec dbSpec = new DbSpec();
 
     /**
      * Query to be executed.
      */
-    private transient SelectQuery query;
+    private  SelectQuery query;
 
     /**
      * Database schema.
      */
-    private transient DbSchema dbSchema;
+    private  DbSchema dbSchema;
 
     /**
      * Database table.
      */
-    private transient DbTable dbTable;
+    private  DbTable dbTable;
 
     /**
      * Column used for sorting (optional).
      */
-    private transient DbColumn sort;
+    private  DbColumn sort;
 
     /**
      * Column used for partitioning (must be numeric).
      */
-    private transient DbColumn partitionKey;
+    private  DbColumn partitionKey;
 
     /**
      * Partitioning upper bound.
