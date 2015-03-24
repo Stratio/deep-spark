@@ -18,7 +18,8 @@
         <groupId>com.stratio.deep</groupId>
         <artifactId>deep-parent</artifactId>
         <version>0.8.0-SNAPSHOT</version>
-    </parent>
+		<relativePath>../deep-parent</relativePath>           
+	</parent>    
 
     <groupId>com.stratio.deep.doc</groupId>
     <artifactId>deep-doc</artifactId>
