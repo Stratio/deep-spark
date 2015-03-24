@@ -37,7 +37,7 @@ source_suffix = '.rst'
 # source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'about'
+master_doc = 'index'
 
 # General information about the project.
 project = u'Deep'
@@ -100,15 +100,21 @@ highlight_language = 'scala'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+html_theme = 'stratio'
 
+#html_logo = "logo.gif"
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_theme_options = {    
+    'versions' : ['0.8.0'],
+    'github' : 'https://github.com/Stratio/deep-spark',
+    'jira': '',
+    'module_name' : 'deep'
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
+html_theme_path = ['_themes']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -192,7 +198,7 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'index'
+htmlhelp_basename = 'Deepdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -214,8 +220,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 #latex_documents = [
-#    ('about', 'Grammar', u'GettingStarted',
-#     'Juanjo Lopez, Daniel Higuero, Miguel Angel Fernandez'),
+#    ('index', 'StreamingCEP.tex', u'Streaming CEP Documentation',
+#     u'David Morales, Alberto Rodríguez, Antonio Jesus Navarro', 'manual'),
 #]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -243,10 +249,10 @@ latex_elements = {
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    ('about', 'Grammar', u'GettingStarted',
-     [u'Juanjo Lopez, Daniel Higuero, Migel Angel Fernandez'], 1)
-]
+#man_pages = [
+#    ('index', 'streamingcep', u'Streaming CEP Documentation',
+#     [u'David Morales, Alberto Rodríguez, Antonio Jesus Navarro'], 1)
+#]
 
 # If true, show URL addresses after external links.
 #man_show_urls = False
@@ -257,10 +263,12 @@ man_pages = [
 # Grouping the document tree into Texinfo files. List of tuples
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
-texinfo_documents = [
-    ('about', 'Grammar', u'GettingStarted',
-     'Juanjo Lopez, Daniel Higuero, Miguel Angel Fernandez'),
-]
+#texinfo_documents = [
+#    ('index', 'StreamingCEP', u'Streaming CEP Documentation',
+#     u'David Morales, Alberto Rodríguez, Antonio Jesus Navarro', 'StreamingCEP',
+#     'One line description of project.',
+#     'Miscellaneous'),
+#]
 
 # Documents to append as an appendix to all manuals.
 #texinfo_appendices = []
@@ -275,7 +283,7 @@ texinfo_documents = [
 #texinfo_no_detailmenu = False
 
 pdf_documents = [
-    ('about', u'${project.name}', u'${project.name}', u'${project.name}'),
+    ('index', u'${project.name}', u'${project.name}', u'${project.name}'),
     ]
 
 pdf_stylesheets = ['sphinx','kerning','a4']
