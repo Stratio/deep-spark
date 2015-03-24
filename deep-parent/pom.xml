@@ -48,13 +48,35 @@
 
         <scala.version>2.10.4</scala.version>
 
-		<slf4j.version>1.7.7</slf4j.version>
+        <slf4j.version>1.7.7</slf4j.version>
 
         <scala.binary.version>2.10</scala.binary.version>
         <!-- Artifacts include -->
-        <distribution.include>
-            org.apache.cassandra,org.apache.thrift,com.github.stephenc.high-scale-lib,com.googlecode.concurrentlinkedhashmap,com.github.stephenc,org.apache.commons,net.jpountz.lz4,com.yammer.metrics,org.yaml,org.antlr,com.datastax.cassandra,de.javakaffee,commons-cli,org.mongodb,org.elasticsearch,com.github.jbellis,com.google.guava,com.google.protobuf,com.aerospike,org.gnu,org.luaj,org.postgresql,mysql
-        </distribution.include>
+        <distribution.groupIdInclude>
+            org.apache.cassandra,org.apache.thrift,
+            com.github.stephenc.high-scale-lib,
+            com.googlecode.concurrentlinkedhashmap,
+            com.github.stephenc,
+            org.apache.commons,
+            net.jpountz.lz4,
+            com.yammer.metrics,
+            org.yaml,
+            org.antlr,
+            com.datastax.cassandra,
+            de.javakaffee,commons-cli,
+            org.mongodb,org.elasticsearch,
+            com.github.jbellis,
+            com.google.guava,
+            com.google.protobuf,
+            com.aerospike,
+            org.gnu,
+            org.luaj,
+            org.postgresql,
+            mysql,
+            com.oracle,
+            com.healthmarketscience.common,
+            edu.toronto.cs.medsavant
+        </distribution.groupIdInclude>
     </properties>
 
     <developers>
@@ -233,7 +255,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                <plugin>
+                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>2.9.1</version>
@@ -434,11 +456,11 @@
             <version>2.24.0</version>
         </dependency>
 
-    <!--    <dependency>
-            <groupId>com.twitter</groupId>
-            <artifactId>chill_2.10</artifactId>
-            <version>0.3.6</version>
-        </dependency> -->
+        <!--    <dependency>
+                <groupId>com.twitter</groupId>
+                <artifactId>chill_2.10</artifactId>
+                <version>0.3.6</version>
+            </dependency> -->
 
         <dependency>
             <groupId>org.powermock</groupId>
@@ -594,11 +616,12 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}/alternateLocation
                             </outputDirectory>
+                            <excludeTransitive>false</excludeTransitive>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
                             <excludeArtifactIds>::*</excludeArtifactIds>
-                            <includeGroupIds>${distribution.include}</includeGroupIds>
+                            <includeGroupIds>${distribution.groupIdInclude}</includeGroupIds>
                         </configuration>
                     </execution>
                 </executions>
@@ -680,6 +703,20 @@
                     </execution>
                 </executions>
             </plugin>
+
+
+            <plugin>
+                <groupId>com.jcabi</groupId>
+                <artifactId>jcabi-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>ajc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
 
         </plugins>
 

@@ -1,0 +1,104 @@
+﻿
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Your branch is up-to-date with 'origin/master'.
+#
+# Changes to be committed:
+#	new file:   ../../../../../.gitmodules
+#	deleted:    ../../../../about.md
+#	deleted:    ../../../../images/about-architecture.png
+#	deleted:    ../../../../images/about-cassandra-cells.png
+#	deleted:    ../../../../images/about-cassandra-entities.png
+#	deleted:    ../../../../images/about-cassandra-ring.png
+#	deleted:    ../../../../images/about-spark-architecture.png
+#	deleted:    ../../../../images/t10-deepshell.png
+#	deleted:    ../../../../images/t30-01-create-maven-project.png
+#	deleted:    ../../../../images/t30-02-check-simple-project.png
+#	deleted:    ../../../../images/t30-03-artifact-data.png
+#	deleted:    ../../../../images/t30-04-pom-edition.png
+#	deleted:    ../../../../images/t30-05-pom-dependencies.png
+#	deleted:    ../../../../images/t30-06-pom-dependency-add2.png
+#	deleted:    ../../../../images/t30-07-new-java-class.png
+#	deleted:    ../../../../images/t30-09-generate-getters-setters.png
+#	deleted:    ../../../../images/t40-01-newProject.png
+#	deleted:    ../../../../images/t40-02-projectName.png
+#	deleted:    ../../../../images/t40-03-importWindow.png
+#	deleted:    ../../../../images/t40-04-importFromFile1.png
+#	deleted:    ../../../../images/t40-05-deepVersion1.png
+#	deleted:    ../../../../images/t40-06-runAsMaven11.png
+#	deleted:    ../../../../resources/JavaProject.zip
+#	deleted:    ../../../../resources/MixedProject.zip
+#	deleted:    ../../../../resources/ScalaProject.zip
+#	deleted:    ../../../../resources/keyspace-crawler-create.cql
+#	deleted:    ../../../../resources/table-Page-create.cql
+#	deleted:    ../../../../resources/table-listdomains-create.cql
+#	deleted:    ../../../../resources/test-tweets-create.cql
+#	new file:   stratio
+#	deleted:    ../../../../t10-first-steps-deep-cassandra.md
+#	deleted:    ../../../../t20-first-steps-deep-mongodb.md
+#	deleted:    ../../../../t30-entity-object-cassandra.md
+#	deleted:    ../../../../t40-basic-application.md
+#	deleted:    ../../../../t50-first-steps-deep-aerospike.md
+#	deleted:    ../../../../t60-first-steps-deep-jdbc.md
+#	deleted:    ../../../../using-deep-cassandra-examples.md
+#	deleted:    ../../../../using-sanbox.md
+#	deleted:    ../../../../../doc_sphinx/.gitignore
+#	deleted:    ../../../../../doc_sphinx/pom.xml
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/about.rst
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/conf.py
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/about-architecture.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/about-cassandra-cells.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/about-cassandra-entities.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/about-cassandra-ring.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/about-spark-architecture.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/t10-deepshell.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/t30-01-create-maven-project.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/t30-02-check-simple-project.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/t30-03-artifact-data.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/t30-04-pom-edition.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/t30-05-pom-dependencies.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/t30-06-pom-dependency-add2.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/t30-07-new-java-class.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/t30-09-generate-getters-setters.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/t40-01-newProject.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/t40-02-projectName.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/t40-03-importWindow.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/t40-04-importFromFile1.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/t40-05-deepVersion1.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/images/t40-06-runAsMaven11.png
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/index.rst
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/resources/JavaProject.zip
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/resources/MixedProject.zip
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/resources/ScalaProject.zip
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/resources/keyspace-crawler-create.cql
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/resources/table-Page-create.cql
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/resources/table-listdomains-create.cql
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/resources/test-tweets-create.cql
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/t10-first-steps-deep-cassandra.rst
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/t20-first-steps-deep-mongodb.rst
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/t30-entity-object-cassandra.rst
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/t40-basic-application.rst
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/t50-first-steps-deep-aerospike.rst
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/t60-first-steps-deep-jdbc.rst
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/using-deep-cassandra-examples.rst
+#	deleted:    ../../../../../doc_sphinx/src/site/sphinx/using-sanbox.rst
+#
+# Untracked files:
+#	../../../../.gitignore
+#	../../../../pom.xml
+#	../about.rst
+#	../conf.py
+#	../images/
+#	../index.rst
+#	../resources/
+#	../t10-first-steps-deep-cassandra.rst
+#	../t20-first-steps-deep-mongodb.rst
+#	../t30-entity-object-cassandra.rst
+#	../t40-basic-application.rst
+#	../t50-first-steps-deep-aerospike.rst
+#	../t60-first-steps-deep-jdbc.rst
+#	../using-deep-cassandra-examples.rst
+#	../using-sanbox.rst
+#
+

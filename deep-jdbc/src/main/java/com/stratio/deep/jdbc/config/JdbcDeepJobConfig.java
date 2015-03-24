@@ -61,32 +61,32 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     /**
      * Database root object.
      */
-    private transient DbSpec dbSpec = new DbSpec();
+    private  DbSpec dbSpec = new DbSpec();
 
     /**
      * Query to be executed.
      */
-    private transient SelectQuery query;
+    private  SelectQuery query;
 
     /**
      * Database schema.
      */
-    private transient DbSchema dbSchema;
+    private  DbSchema dbSchema;
 
     /**
      * Database table.
      */
-    private transient DbTable dbTable;
+    private  DbTable dbTable;
 
     /**
      * Column used for sorting (optional).
      */
-    private transient DbColumn sort;
+    private  DbColumn sort;
 
     /**
      * Column used for partitioning (must be numeric).
      */
-    private transient DbColumn partitionKey;
+    private  DbColumn partitionKey;
 
     /**
      * Partitioning upper bound.
@@ -330,7 +330,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     @Override
     public JdbcDeepJobConfig<T> sort(String sort) {
         if(dbTable != null) {
-            this.sort = new DbColumn(dbTable, sort, "");
+            this.sort = new DbColumn(dbTable, sort, "",null,null);
         }
         return this;
     }
@@ -349,7 +349,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
     @Override
     public JdbcDeepJobConfig<T> partitionKey(String partitionKey) {
         if(dbTable != null) {
-            this.partitionKey = new DbColumn(dbTable, partitionKey, "");
+            this.partitionKey = new DbColumn(dbTable, partitionKey, "",null,null);
         }
         return this;
     }
@@ -457,7 +457,7 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
                 for(int i=0; i<filters.length; i++) {
                     Filter filter = filters[i];
                     FilterType filterType = filter.getFilterType();
-                    DbColumn filterColumn = new DbColumn(dbTable, filter.getField(), "");
+                    DbColumn filterColumn = new DbColumn(dbTable, filter.getField(), "",null,null);
                     if(filterType.equals(FilterType.EQ)) {
                         comboCondition.addCondition(BinaryCondition.equalTo(filterColumn, filter.getValue()));
                     } else if(filterType.equals(FilterType.GT)) {
@@ -470,7 +470,15 @@ public class JdbcDeepJobConfig<T> extends DeepJobConfig<T, JdbcDeepJobConfig<T>>
                         comboCondition.addCondition(BinaryCondition.lessThan(filterColumn, filter.getValue(), true));
                     } else if(filterType.equals(FilterType.NEQ)) {
                         comboCondition.addCondition(BinaryCondition.notEqualTo(filterColumn, filter.getValue()));
-                    } else {
+                    } else if(filterType.equals(FilterType.IN)) {
+                        ComboCondition comboConditionOR = new ComboCondition(ComboCondition.Op.OR);
+                        String[] condicion =filter.getValue().toString().split(",");
+                        for (int z=0; z < condicion.length ; z++) {
+                            comboConditionOR.addCondition(BinaryCondition.equalTo(filterColumn, condicion[z]));
+                        }
+                        comboCondition.addCondition(comboConditionOR);
+                    }
+                    else {
                         throw new UnsupportedOperationException("Currently, the filter operation " + filterType + " is not supported");
                     }
                 }
