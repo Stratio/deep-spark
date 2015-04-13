@@ -49,7 +49,7 @@ BASEDIR="/opt/sds/spark"
 CONFDIR="/etc/sds/spark"
 LOGFILE="/var/log/sds/spark/spark.log"
 pidDir="/var/run/sds"
-serviceUser="spark"
+serviceUser="root"
 
 # If JAVA_HOME has not been set, try to determine it.
 JVM_SEARCH_DIRS="/usr/java/default /usr/java/latest /opt/java"

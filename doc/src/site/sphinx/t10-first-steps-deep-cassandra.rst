@@ -369,7 +369,7 @@ the shell:
 
 .. code:: bash
 
-    $ stratio-deep-shell
+    $ /opt/sds/spark/bin/stratio-deep-shell
 
 A welcome screen will be displayed (figure 2).
 
@@ -477,8 +477,8 @@ transformation function to the tuples of the CassandraRDD object
 
     scala> val outputRDD: RDD[Cells] = numPagePerDomainPairs map {
           t: (String, Int) =>
-            val c1 = CassandraCell.create("domain", t._1, true, false);
-            val c2 = CassandraCell.create("num_pages", t._2);
+            val c1 = Cell.create("domain", t._1, true, false);
+            val c2 = Cell.create("num_pages", t._2);
             new Cells("crawler", c1, c2)
         }
 
