@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Deep-spark by Stratio</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Deep-spark</h1>
+          <h2>Connecting Apache Spark with different data stores</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/Stratio/deep-spark/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/Stratio/deep-spark/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/Stratio/deep-spark" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a id="what-is-deep" class="anchor" href="#what-is-deep" aria-hidden="true"><span class="octicon octicon-link"></span></a>What is Deep?</h1>
+
+<p>Deep is a thin integration layer between Apache Spark and several NoSQL datastores.
+We actually support Apache Cassandra, MongoDB, Elastic Search, Aerospike, HDFS, S3 and any database accessible through JDBC, but in the near future we will add support for sever other datastores.</p>
+
+<ul>
+<li>JIRA: <a href="https://deep-spark.atlassian.net">https://deep-spark.atlassian.net</a>
+</li>
+</ul>
+
+<h1>
+<a id="apache-cassandra-integration" class="anchor" href="#apache-cassandra-integration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Apache Cassandra integration</h1>
+
+<p>The integration is <em>not</em> based on the Cassandra's Hadoop interface.</p>
+
+<p>Deep comes with an user friendly API that lets developers create Spark RDDs mapped to Cassandra column families.
+We provide two different interfaces:</p>
+
+<ul>
+<li><p>The first one will let developers map Cassandra tables to plain old java objects (POJOs), just like if you were using any other ORM. We call this API the 'entity objects' API.
+This abstraction is quite handy, it will let you work on RDD (under the hood Deep will transparently map Cassandra's columns to entity properties).
+Your domain entities must be correctly annotated using Deep annotations (take a look at deep-core example entities in package com.stratio.deep.core.entity).</p></li>
+<li><p>The second one is a more generic 'cell' API, that will let developerss work on RDD where a 'Cells' object is a collection of com.stratio.deep.entity.Cell objects.
+Column metadata is automatically fetched from the data store. This interface is a little bit more cumbersome to work with (see the example below),
+but has the advantage that it doesn't require the definition of additional entity classes.
+Example: you have a table called 'users' and you decide to use the 'Cells' interface. Once you get an instance 'c' of the Cells object,
+to get the value of column 'address' you can issue a c.getCellByName("address").getCellValue().
+Please, refer to the Deep API documentation to know more about the Cells and Cell objects.</p></li>
+</ul>
+
+<p>We encourage you to read the more comprehensive documentation hosted on the <a href="http://www.openstratio.org/">Openstratio website</a>.</p>
+
+<p>Deep comes with an example sub project called 'deep-examples' containing a set of working examples, both in Java and Scala.
+Please, refer to the deep-example project README for further information on how to setup a working environment.</p>
+
+<h1>
+<a id="mongodb-integration" class="anchor" href="#mongodb-integration" aria-hidden="true"><span class="octicon octicon-link"></span></a>MongoDB integration</h1>
+
+<p>Spark-MongoDB connector is based on Hadoop-mongoDB.</p>
+
+<p>Support for MongoDB has been added in version 0.3.0.</p>
+
+<p>We provide two different interfaces:</p>
+
+<ul>
+<li><p>ORM API, you just have to annotate your POJOs with Deep annotations and magic will begin, you will be able to connect MongoDB with Spark using your own model entities.</p></li>
+<li><p>Generic cell API, you do not need to specify the collection's schema or add anything to your POJOs, each document will be transform to an object "Cells".</p></li>
+</ul>
+
+<p>We added a few working examples for MongoDB in deep-examples subproject, take a look at:</p>
+
+<p>Entities:</p>
+
+<ul>
+<li>com.stratio.deep.examples.java.ReadingEntityFromMongoDB</li>
+<li>com.stratio.deep.examples.java.WritingEntityToMongoDB</li>
+<li>com.stratio.deep.examples.java.GroupingEntityWithMongoDB</li>
+</ul>
+
+<p>Cells:</p>
+
+<ul>
+<li>com.stratio.deep.examples.java.ReadingCellFromMongoDB</li>
+<li>com.stratio.deep.examples.java.WritingCellToMongoDB</li>
+<li>com.stratio.deep.examples.java.GroupingCellWithMongoDB</li>
+</ul>
+
+<p>You can check out our first steps guide here:</p>
+
+<p><a href="https://github.com/Stratio/deep-spark/blob/release/0.6/doc/t20-first-steps-deep-mongodb.md">First steps with Deep-MongoDB</a></p>
+
+<p>We are working on further improvements!</p>
+
+<h1>
+<a id="elasticsearch-integration" class="anchor" href="#elasticsearch-integration" aria-hidden="true"><span class="octicon octicon-link"></span></a>ElasticSearch integration</h1>
+
+<p>Support for ElasticSearch has been added in version 0.5.0.</p>
+
+<h1>
+<a id="aerospike-integration" class="anchor" href="#aerospike-integration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Aerospike integration</h1>
+
+<p>Support for Aerospike has been added in version 0.6.0.</p>
+
+<p>Examples:</p>
+
+<p>Entities:</p>
+
+<ul>
+<li>com.stratio.deep.examples.java.ReadingEntityFromAerospike</li>
+<li>com.stratio.deep.examples.java.WritingEntityToAerospike</li>
+<li>com.stratio.deep.examples.java.GroupingEntityWithAerospike</li>
+</ul>
+
+<p>Cells:</p>
+
+<ul>
+<li>com.stratio.deep.examples.java.ReadingCellFromAerospike</li>
+<li>com.stratio.deep.examples.java.WritingCellToAerospike</li>
+<li>com.stratio.deep.examples.java.GroupingCellWithAerospike</li>
+</ul>
+
+<h1>
+<a id="jdbc-integration" class="anchor" href="#jdbc-integration" aria-hidden="true"><span class="octicon octicon-link"></span></a>JDBC integration</h1>
+
+<p>Support for JDBC has been added in version 0.7.0.</p>
+
+<p>Examples:</p>
+
+<p>Entities:</p>
+
+<ul>
+<li>package com.stratio.deep.examples.java.ReadingEntityWithJdbc</li>
+<li>package com.stratio.deep.examples.java.WritingEntityWithJdbc</li>
+</ul>
+
+<p>Cells:</p>
+
+<ul>
+<li>package com.stratio.deep.examples.java.ReadingCellWithJdbc</li>
+<li>package com.stratio.deep.examples.java.WritingCellWithJdbc<br>
+</li>
+</ul>
+
+<h1>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h1>
+
+<ul>
+<li>Cassandra, we tested versions from 1.2.8 up to 2.0.11 (for Spark &lt;=&gt; Cassandra integration).</li>
+<li>MongoDB, we tested the integration with MongoDB versions 2.2, 2.4 y 2.6 using Standalone, Replica Set and Sharded Cluster (for Spark &lt;=&gt; MongoDB integration).</li>
+<li>ElasticSearch, 1.3.0+</li>
+<li>Aerospike, 3.3.0+</li>
+<li>Spark 1.1.1</li>
+<li>Apache Maven &gt;= 3.0.4</li>
+<li>Java 1.7</li>
+<li>Scala 2.10.3</li>
+</ul>
+
+<h1>
+<a id="configure-the-development-and-test-environment" class="anchor" href="#configure-the-development-and-test-environment" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configure the development and test environment</h1>
+
+<ul>
+<li>Clone the project</li>
+<li>To configure a development environment in Eclipse: import as Maven project. In IntelliJ: open the project by selecting the deep-parent POM file</li>
+<li>Install the project in you local maven repository. Enter deep-parent subproject and perform: mvn clean install (add -DskipTests to skip tests)</li>
+<li>
+<p>Put Deep to work on a working cassandra + spark cluster. You have several options:</p>
+
+<ul>
+<li>Download a pre-configured Stratio platform VM <a href="http://www.stratio.com/">Stratio's BigData platform (SDS)</a>.
+This VM will work on both Virtualbox and VMWare, and comes with a fully configured distribution that also includes Stratio Deep. We also distribute the VM with several preloaded datasets in Cassandra. This distribution will include Stratio's customized Cassandra distribution containing our powerful <a href="https://github.com/Stratio/stratio-cassandra">open-source lucene-based secondary indexes</a>, see Stratio documentation for further information.
+Once your VM is up and running you can test Deep using the shell. Enter /opt/sds and run bin/stratio-deep-shell.</li>
+<li>Install a new cluster using the Stratio installer. Please refer to Stratio's website to download the installer and its documentation.</li>
+<li>
+<p>You already have a working Cassandra server on your development machine: you need a spark+deep bundle, we suggest to create one by running:</p>
+
+<p><code>cd deep-scripts</code></p>
+
+<p><code>./make-distribution-deep.sh</code></p>
+</li>
+</ul>
+
+<p>this will build a Spark distribution package with StratioDeep and Cassandra's jars included (depending on your machine this script could take a while, since it will compile Spark from sources).
+The package will be called <code>spark-deep-distribution-X.Y.Z.tgz</code>, untar it to a folder of your choice, enter that folder and issue a <code>./stratio-deep-shell</code>, this will start an interactive shell where you can test StratioDeep (you may have noticed this is will start a development cluster started with MASTER="local").</p>
+
+<ul>
+<li>
+<p>You already have a working installation os Cassandra and Spark on your development machine: this is the most difficult way to start testing Deep, but you know what you're doing you will have to</p>
+
+<ol>
+<li>copy the Stratio Deep jars to Spark's 'jars' folder (<code>$SPARK_HOME/jars</code>).</li>
+<li>copy Cassandra's jars to Spark's 'jar' folder.</li>
+<li>copy Datastax Java Driver jar (v 2.0.x) to Spark's 'jar' folder.</li>
+<li>start spark shell and import the following:</li>
+</ol>
+
+<p><code>import com.stratio.deep.commons.annotations._</code></p>
+
+<p><code>import com.stratio.deep.commons.config._</code></p>
+
+<p><code>import com.stratio.deep.commons.entity._</code></p>
+
+<p><code>import com.stratio.deep.core.context._</code></p>
+
+<p><code>import com.stratio.deep.cassandra.config._</code></p>
+
+<p><code>import com.stratio.deep.cassandra.extractor._</code></p>
+
+<p><code>import com.stratio.deep.mongodb.config._</code></p>
+
+<p><code>import com.stratio.deep.mongodb.extractor._</code></p>
+
+<p><code>import com.stratio.deep.es.config._</code></p>
+
+<p><code>import com.stratio.deep.es.extractor._</code></p>
+
+<p><code>import com.stratio.deep.aerospike.config._</code></p>
+
+<p><code>import com.stratio.deep.aerospike.extractor._</code></p>
+
+<p><code>import org.apache.spark.rdd._</code></p>
+
+<p><code>import org.apache.spark.SparkContext._</code></p>
+
+<p><code>import org.apache.spark.sql.api.java.JavaSQLContext</code></p>
+
+<p><code>import org.apache.spark.sql.api.java.JavaSchemaRDD</code></p>
+
+<p><code>import org.apache.spark.sql.api.java.Row</code></p>
+
+<p><code>import scala.collection.JavaConversions._</code></p>
+</li>
+</ul>
+</li>
+</ul>
+
+<p>Once you have a working development environment you can finally start testing Deep. This are the basic steps you will always have to perform in order to use Deep:</p>
+
+<h1>
+<a id="first-steps-with-spark-and-cassandra" class="anchor" href="#first-steps-with-spark-and-cassandra" aria-hidden="true"><span class="octicon octicon-link"></span></a>First steps with Spark and Cassandra</h1>
+
+<ul>
+<li>
+<strong>Build an instance of a configuration object</strong>: this will let you tell Deep the Cassandra endpoint, the keyspace, the table you want to access and much more.
+It will also let you specify which interface to use (the domain entity or the generic interface).
+We have a factory that will help you create a configuration object using a fluent API. Creating a configuration object is an expensive operation.
+Please take the time to read the java and scala examples provided in 'deep-examples' subproject and to read the comprehensive documentation at <a href="https://github.com/Stratio/deep-spark/blob/release/0.6/doc/t10-first-steps-deep-cassandra.md">OpenStratio website</a>.</li>
+<li>
+<strong>Create an RDD</strong>: using the DeepSparkContext helper methods and providing the configuration object you've just instantiated.</li>
+<li>
+<strong>Perform some computation over this RDD(s)</strong>: this is up to you, we only help you fetching the data efficiently from Cassandra, you can use the powerful <a href="https://spark.apache.org/docs/1.1.1/api/java/index.html">Spark API</a>.</li>
+<li>
+<strong>(optional) write the computation results out to Cassandra</strong>: we provide a way to efficiently save the result of your computation to Cassandra.
+In order to do that you must have another configuration object where you specify the output keyspace/column family. We can create the output column family for you if needed.
+Please, refer to the comprehensive Stratio Deep documentation at <a href="https://github.com/Stratio/deep-spark/blob/release/0.6/doc/about.md">Stratio website</a>.</li>
+</ul>
+
+<h1>
+<a id="first-steps-with-spark-and-mongodb" class="anchor" href="#first-steps-with-spark-and-mongodb" aria-hidden="true"><span class="octicon octicon-link"></span></a>First steps with Spark and MongoDB</h1>
+
+<ul>
+<li>
+<strong>Build an instance of a configuration object</strong>: this will let you tell Stratio Deep the MongoDB endpoint, the MongoDB database and collection you want to access and much more.
+It will also let you specify which interface to use (the domain entity).
+We have a factory that will help you create a configuration object using a fluent API. Creating a configuration object is an expensive operation.
+Please take the time to read the java and scala examples provided in 'deep-examples' subproject and to read the comprehensive Deep documentation at <a href="https://github.com/Stratio/deep-spark/blob/release/0.6/doc/t20-first-steps-deep-mongodb.md">OpenStratio website</a>.</li>
+<li>
+<strong>Create an RDD</strong>: using the DeepSparkContext helper methods and providing the configuration object you've just instantiated.</li>
+<li>
+<strong>Perform some computation over this RDD(s)</strong>: this is up to you, we only help you fetching the data efficiently from MongoDB, you can use the powerful <a href="https://spark.apache.org/docs/1.1.1/api/java/index.html">Spark API</a>.</li>
+<li>
+<strong>(optional) write the computation results out to MongoDB</strong>: we provide a way to efficiently save the result of your computation to MongoDB.</li>
+</ul>
+
+<h1>
+<a id="migrating-from-version-029" class="anchor" href="#migrating-from-version-029" aria-hidden="true"><span class="octicon octicon-link"></span></a>Migrating from version 0.2.9</h1>
+
+<p>From version 0.4.x, Deep supports multiple datastores, in order to correctly implement this new feature Deep has undergone an huge refactor between versions 0.2.9 and 0.4.x. To port your code to the new version you should take into account a few changes we made.</p>
+
+<h2>
+<a id="new-project-structure" class="anchor" href="#new-project-structure" aria-hidden="true"><span class="octicon octicon-link"></span></a>New Project Structure</h2>
+
+<p>From version 0.4.x, Deep supports multiple datastores, in your project you should import only the maven dependency you will use: deep-cassandra, deep-mongodb, deep-elasticsearch or deep-aerospike.</p>
+
+<h2>
+<a id="changes-to-comstratiodeepentitycells" class="anchor" href="#changes-to-comstratiodeepentitycells" aria-hidden="true"><span class="octicon octicon-link"></span></a>Changes to 'com.stratio.deep.entity.Cells'</h2>
+
+<ul>
+<li>Until version 0.4.x the 'Cells' was implicitly associated to a record coming from a specific table. When performing a join in Spark, 'Cell' objects coming from different tables are mixed into an single 'Cells' object.
+Deep now keeps track of the original table a Cell object comes from, changing the internal structure of 'Cells', where each 'Cell' is associated to its 'table'.
+
+<ol>
+<li>If you are a user of 'Cells' objects returned from Deep, nothing changes for you. The 'Cells' API keeps working as usual.</li>
+<li>If you manually create 'Cells' objects you can keep using the original API, in this case each Cell you add to your Cells object is automatically associated to a default table name.</li>
+<li>You can specify the default table name, or let Deep chose an internal default table name for you.</li>
+<li>We added a new constructor to 'Cells' accepting the default table name. This way the 'old' API will always manipulate 'Cell' objects associated to the specified default table.</li>
+<li>For each method manipulating the content of a 'Cells' object, we added a new method that also accepts the table name: if you call the method  whose signature does <em>not</em> have the table name, the table action is performed over the Cell associated to the default table, otherwise the action is performed over the 'Cell'(s) associated to the specified table. </li>
+<li>size() y isEmpty() will compute their results taking into account all the 'Cell' objects contained. </li>
+<li>size(String tableName) and isEmpty(tableName) compute their result taking into account only the 'Cell' objects associated to the specified table.<br>
+</li>
+<li>Obviously, when dealing with Cells objects, Deep always associates a Cell to the correct table name.</li>
+</ol>
+</li>
+</ul>
+
+<p>Examples:</p>
+
+<pre>
+Cells cells1 = new Cells(); // instantiate a Cells object whose default table name is generated internally.
+Cells cells2 = new Cells("my_default_table"); // creates a new Cells object whose default table name is specified by the user
+cells2.add(new Cell(...)); // adds to the 'cells2' object a new Cell object associated to the default table
+cells2.add("my_other_table", new Cell(...)); // adds to the 'cells2' object a new Cell associated to "my_other_table"  
+</pre>
+
+<h2>
+<a id="changes-to-objects-hierarchy" class="anchor" href="#changes-to-objects-hierarchy" aria-hidden="true"><span class="octicon octicon-link"></span></a>Changes to objects hierarchy</h2>
+
+<ul>
+<li>IDeepJobConfig interface has been splitted into ICassandraDeepJobConfig and IMongoDeepJobConfig sub-interfaces. Each sub-interface exposes only the configuration properties that make sense for each data base.
+com.stratio.deep.config.DeepJobConfigFactory's factory methods now return the proper subinterface.</li>
+<li>
+<strong>DeepSparkContext</strong> has been splitted into <strong>CassandraDeepSparkContext</strong> and <strong>MongoDeepSparkContext</strong>.</li>
+<li>
+<strong>DeepJobConfigFactory</strong> has been renamed to <strong>ConfigFactory</strong> (to reduce verbosity).</li>
+</ul>
+
+<h2>
+<a id="rdd-creation" class="anchor" href="#rdd-creation" aria-hidden="true"><span class="octicon octicon-link"></span></a>RDD creation</h2>
+
+<p>Methods used to create Cell and Entity RDD has been merged into one single method:</p>
+
+<ul>
+<li>
+<strong>DeepSparkContext</strong>: createRDD(...)</li>
+</ul>
+        </section>
+
+        <footer>
+          Deep-spark is maintained by <a href="https://github.com/Stratio">Stratio</a><br>
+          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
