@@ -32,13 +32,13 @@
         <datastax.driver.version>2.1.4</datastax.driver.version>
 
         <!-- Spark  -->
-        <spark.version>1.2.0</spark.version>
+        <spark.version>1.3.1</spark.version>
 
         <!-- Java  -->
         <java.version>1.7</java.version>
 
         <!-- Hadoop  -->
-        <hadoop.version>2.4.0</hadoop.version>
+        <hadoop.version>2.6.0</hadoop.version>
 
         <!-- Guava -->
         <guava.version>14.0.1</guava.version>
@@ -125,6 +125,14 @@
                 <role>architect</role>
                 <role>developer</role>
                 <role>contributor</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>jmgomez</id>
+            <name>Jose Manuel Gomez</name>
+            <email>jmgomez@stratio.com</email>
+            <roles>
+                <role>developer</role>
             </roles>
         </developer>
     </developers>

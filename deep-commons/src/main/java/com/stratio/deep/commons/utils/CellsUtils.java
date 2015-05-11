@@ -25,7 +25,11 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
 
+
 import org.apache.spark.sql.api.java.*;
+import org.apache.spark.sql.*;
+
+import org.apache.spark.sql.types.*;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -284,7 +288,7 @@ public class CellsUtils {
      */
     public static Row getRowFromCells(Cells cells) {
         Object[] values = cells.getCellValues().toArray();
-        return Row.create(values);
+        return RowFactory.create(values);
     }
 
     /**
@@ -308,11 +312,12 @@ public class CellsUtils {
             StructField field = getStructFieldFromCell(cell);
             fields.add(field);
         }
-        return StructType.createStructType(fields);
+        return new StructType(fields.toArray(new StructField[0]));
     }
 
     private static StructField getStructFieldFromCell(Cell cell) {
-        StructField field = DataType.createStructField(cell.getName(), getDataType(cell.getValue()), false);
+        Metadata metadata = null;
+        StructField field = new StructField(cell.getName(), getDataType(cell.getValue()), false,metadata);
         return field;
     }
 
@@ -320,42 +325,42 @@ public class CellsUtils {
         Class cls = value.getClass();
         DataType dataType;
         if(cls.equals(String.class)) {
-            dataType = DataType.StringType;
+            dataType = DataTypes.StringType;
         } else if(cls.equals(Byte[].class)) {
-            dataType = DataType.BinaryType;
+            dataType = DataTypes.BinaryType;
         } else if(cls.equals(Boolean.class)) {
-            dataType = DataType.BooleanType;
+            dataType = DataTypes.BooleanType;
         } else if(cls.equals(Timestamp.class)) {
-            dataType = DataType.TimestampType;
+            dataType = DataTypes.TimestampType;
         } else if(cls.equals(Double.class)) {
-            dataType = DataType.DoubleType;
+            dataType = DataTypes.DoubleType;
         } else if(cls.equals(Float.class)) {
-            dataType = DataType.FloatType;
+            dataType = DataTypes.FloatType;
         } else if(cls.equals(Byte.class)) {
-            dataType = DataType.ByteType;
+            dataType = DataTypes.ByteType;
         } else if(cls.equals(Integer.class)) {
-            dataType = DataType.IntegerType;
+            dataType = DataTypes.IntegerType;
         } else if(cls.equals(Long.class)) {
-            dataType = DataType.LongType;
+            dataType = DataTypes.LongType;
         } else if(cls.equals(Short.class)) {
-            dataType = DataType.ShortType;
+            dataType = DataTypes.ShortType;
         } else if(value instanceof List) {
             List listValue = (List)value;
             if(listValue.isEmpty()) {
-                dataType = DataType.createArrayType(DataType.StringType);
+                dataType = DataTypes.createArrayType(DataTypes.StringType);
             } else {
-                dataType = DataType.createArrayType(getDataType(listValue.get(0)));
+                dataType = DataTypes.createArrayType(getDataType(listValue.get(0)));
             }
         } else if(value instanceof Map) {
             Map mapValue = (Map)value;
             if(mapValue.isEmpty()) {
-                dataType = DataType.createMapType(DataType.StringType, DataType.StringType);
+                dataType = DataTypes.createMapType(DataTypes.StringType, DataTypes.StringType);
             } else {
                 Map.Entry entry = (Map.Entry) mapValue.entrySet().iterator().next();
-                dataType = DataType.createMapType(getDataType(entry.getKey()), getDataType(entry.getValue()));
+                dataType = DataTypes.createMapType(getDataType(entry.getKey()), getDataType(entry.getValue()));
             }
         } else {
-            dataType = DataType.StringType;
+            dataType = DataTypes.StringType;
         }
         return dataType;
     }

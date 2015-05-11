@@ -41,6 +41,7 @@ import scala.collection.Iterator;
 import scala.collection.Seq;
 import scala.reflect.ClassTag$;
 import scala.runtime.AbstractFunction1;
+import scala.runtime.BoxedUnit;
 
 /**
  * Created by rcrespo on 11/08/14.
@@ -87,10 +88,10 @@ public class DeepRDD<T, S extends BaseConfig> extends RDD<T> implements Serializ
 
         extractorClient.initIterator(split, config.getValue());
 
-        context.addTaskCompletionListener(new AbstractFunction1<TaskContext, Unit> (){
+        context.addTaskCompletionListener(new AbstractFunction1<TaskContext, BoxedUnit>() {
 
             @Override
-            public Unit apply(TaskContext v1) {
+            public BoxedUnit apply(TaskContext v1) {
                 extractorClient.close();
                 return null;
             }

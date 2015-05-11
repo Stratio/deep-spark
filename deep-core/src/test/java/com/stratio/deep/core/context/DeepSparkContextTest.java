@@ -40,9 +40,10 @@ import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.api.java.JavaSQLContext;
-import org.apache.spark.sql.api.java.Row;
-import org.apache.spark.sql.api.java.StructType;
+
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.types.StructType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -98,7 +99,7 @@ public class DeepSparkContextTest {
     public void createJavaSchemaRDDTest() throws Exception {
         deepSparkContext = createDeepSparkContext();
         DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
-        JavaSQLContext sqlContext = PowerMockito.mock(JavaSQLContext.class);
+        SQLContext sqlContext = PowerMockito.mock(SQLContext.class);
         ExtractorConfig config = createDeepJobConfig();
         Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
         Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
@@ -121,7 +122,7 @@ public class DeepSparkContextTest {
     public void createJavaSchemaFromEmptyRDDTest() throws Exception {
         deepSparkContext = createDeepSparkContext();
         DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
-        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        SQLContext sqlContext = mock(SQLContext.class);
         ExtractorConfig config = createDeepJobConfig();
         Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
         Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
@@ -138,7 +139,7 @@ public class DeepSparkContextTest {
     public void deepSparkContextSQL() {
         deepSparkContext = createDeepSparkContext();
         DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
-        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        SQLContext sqlContext = mock(SQLContext.class);
         Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
         Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
         String query = "SELECT * FROM input";
@@ -152,7 +153,7 @@ public class DeepSparkContextTest {
     public void textFileHDFSTest() throws Exception {
         deepSparkContext = createDeepSparkContext();
         DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
-        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        SQLContext sqlContext = mock(SQLContext.class);
         Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
         Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
         RDD<Cells> result = mock(RDD.class);
@@ -168,7 +169,7 @@ public class DeepSparkContextTest {
     public void textFileS3Test() throws Exception {
         deepSparkContext = createDeepSparkContext();
         DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
-        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        SQLContext sqlContext = mock(SQLContext.class);
         Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
         Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
         RDD<Cells> result = mock(RDD.class);
@@ -185,7 +186,7 @@ public class DeepSparkContextTest {
     public void textFileInvalidConfig() throws Exception {
         deepSparkContext = createDeepSparkContext();
         DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
-        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        SQLContext sqlContext = mock(SQLContext.class);
         Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
         Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
 
@@ -198,7 +199,7 @@ public class DeepSparkContextTest {
 
         deepSparkContext = createDeepSparkContext();
         DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
-        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        SQLContext sqlContext = mock(SQLContext.class);
         Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
         Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
 
@@ -226,7 +227,7 @@ public class DeepSparkContextTest {
         Configuration hadoopConf = mock(Configuration.class);
         when(sparkContext.hadoopConfiguration()).thenReturn(hadoopConf);
         DeepSparkContext deepSparkContextSpy = PowerMockito.spy(deepSparkContext);
-        JavaSQLContext sqlContext = mock(JavaSQLContext.class);
+        SQLContext sqlContext = mock(SQLContext.class);
         Whitebox.setInternalState(deepSparkContextSpy, "sc", sparkContext);
         Whitebox.setInternalState(deepSparkContextSpy, "sqlContext", sqlContext);
 

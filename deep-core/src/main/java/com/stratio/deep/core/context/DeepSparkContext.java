@@ -27,10 +27,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.api.java.JavaSQLContext;
-import org.apache.spark.sql.api.java.JavaSchemaRDD;
-import org.apache.spark.sql.api.java.Row;
-import org.apache.spark.sql.api.java.StructType;
+
 
 import com.stratio.deep.commons.config.BaseConfig;
 import com.stratio.deep.commons.config.DeepJobConfig;
@@ -45,6 +42,10 @@ import com.stratio.deep.core.fs.utils.UtilFS;
 import com.stratio.deep.core.function.PrepareSaveFunction;
 import com.stratio.deep.core.rdd.DeepJavaRDD;
 import com.stratio.deep.core.rdd.DeepRDD;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.types.StructType;
 import scala.tools.cmd.gen.AnyVals;
 
 /**
@@ -54,15 +55,22 @@ import scala.tools.cmd.gen.AnyVals;
  */
 public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
+
     /**
-     * The constant LOG.
+     * Return the sparkContext.
+     * @return the sparkContext.
      */
-    private static final Logger LOG = Logger.getLogger(DeepSparkContext.class);
+    @Override
+    public SparkContext sc() {
+        return this.sc();
+
+    }
+
 
     /**
      * JavaSQLContext for executing SparkSQL queries.
      */
-    private JavaSQLContext sqlContext;
+    private SQLContext sqlContext;
 
     /**
      * Overridden superclass constructor.
@@ -71,7 +79,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      */
     public DeepSparkContext(SparkContext sc) {
         super(sc);
-        sqlContext = new JavaSQLContext(this);
+        sqlContext = new SQLContext(this);
     }
 
     /**
@@ -82,7 +90,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      */
     public DeepSparkContext(String master, String appName) {
         super(master, appName);
-        sqlContext = new JavaSQLContext(this);
+        sqlContext = new SQLContext(this);
     }
 
     /**
@@ -95,7 +103,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String jarFile) {
         super(master, appName, sparkHome, jarFile);
-        sqlContext = new JavaSQLContext(this);
+        sqlContext = new SQLContext(this);
     }
 
     /**
@@ -108,7 +116,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      */
     public DeepSparkContext(String master, String appName, String sparkHome, String[] jars) {
         super(master, appName, sparkHome, jars);
-        sqlContext = new JavaSQLContext(this);
+        sqlContext = new SQLContext(this);
     }
 
     /**
@@ -125,7 +133,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
 
         super(master, appName, sparkHome, jars, environment);
-        sqlContext = new JavaSQLContext(this);
+        sqlContext = new SQLContext(this);
     }
 
 
@@ -133,7 +141,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
 
          super(deepSparkConfig);
 
-        sqlContext = new JavaSQLContext(this);
+        sqlContext = new SQLContext(this);
     }
 
 
@@ -191,7 +199,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * @return A JavaSchemaRDD built from Cells.
      * @throws UnsupportedDataTypeException
      */
-    public JavaSchemaRDD createJavaSchemaRDD(ExtractorConfig<Cells> config) throws UnsupportedDataTypeException, UnsupportedOperationException {
+    public DataFrame createJavaSchemaRDD(ExtractorConfig<Cells> config) throws UnsupportedDataTypeException, UnsupportedOperationException {
         JavaRDD<Cells> cellsRDD = createJavaRDD(config);
         JavaRDD<Row> rowsRDD = DeepSparkContext.createJavaRowRDD(cellsRDD);
         try {
@@ -208,7 +216,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * @param query SparkSQL query.
      * @return A JavaSchemaRDD containing the result of the executed query.
      */
-    public JavaSchemaRDD sql(String query) {
+    public DataFrame sql(String query) {
         return sqlContext.sql(query);
     }
 
@@ -243,7 +251,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * Returns the associated JavaSQLContext.
      * @return Associated JavaSQLContext.
      */
-    public JavaSQLContext getSQLContext() {
+    public SQLContext getSQLContext() {
         return this.sqlContext;
     }
 
@@ -311,7 +319,6 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
         JavaRDD<Cells> resultCells = result.toJavaRDD().map(new MapSchemaFromLines(textFileDataTable));
         return resultCells.rdd();
     }
-
 
 
 }
