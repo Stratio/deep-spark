@@ -62,7 +62,7 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      */
     @Override
     public SparkContext sc() {
-        return this.sc();
+        return super.sc();
 
     }
 
