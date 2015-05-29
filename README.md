@@ -6,6 +6,40 @@ We actually support Apache Cassandra, MongoDB, Elastic Search, Aerospike, HDFS, 
 
 - JIRA: https://deep-spark.atlassian.net
 
+Install ojdbc driver
+=====================
+
+In order to compile the deep-jdbc module is necessary to add the Oracle ojdbc driver into your local repository. You can download it from the URL: http://www.oracle.com/technetwork/database/features/jdbc/default-2280470.html. When you are on the web you must click in "Accept License Agreement" and later downlad ojdbc7.jar library. You need a free oracle account to download the official driver.
+
+To install the ojdbc driver in your local repository you must execute the command below:
+
+> mvn install:install-file -Dfile=<path-to-file> -DgroupId=com.oracle -DartifactId=ojdbc7  -Dversion=12.1.0.2 -Dpackaging=jar
+
+
+Compiling Deep
+=====================
+
+After that you can compile Deep executing the following steps:
+
+> cd deep-parent
+
+> mvn clean install
+
+Creating Deep Dristribution 
+=====================
+
+If you want to create a Deep distribution you must execute the following steps:
+
+> cd deep-scripts
+
+> make-distribution-deep.sh
+
+During the creation you'll see the following question:
+
+> What tag want to use for Aerospike native repository?
+
+You must type 0.7.0 and press enter.
+
 
 Apache Cassandra integration
 ============================
