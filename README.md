@@ -95,7 +95,7 @@ Cells:
 
 You can check out our first steps guide here:
 
-[First steps with Deep-MongoDB](https://github.com/Stratio/deep-spark/blob/release/0.6/doc/t20-first-steps-deep-mongodb.md)
+[First steps with Deep-MongoDB](https://github.com/Stratio/deep-spark/blob/master/doc/src/site/sphinx/t20-first-steps-deep-mongodb.rst)
 
 
 We are working on further improvements!
