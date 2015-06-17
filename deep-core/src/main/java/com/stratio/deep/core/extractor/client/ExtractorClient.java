@@ -34,7 +34,7 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 
 /**
- * Sends a list of continent/city pairs to a {@link } to get the local times of the specified cities.
+ * The extractor client.
  */
 public class ExtractorClient<T> implements IExtractor<T, ExtractorConfig<T>> {
 

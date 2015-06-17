@@ -164,7 +164,6 @@ public class DeepSparkContext extends JavaSparkContext implements Serializable {
      * Creates a JavaRDD.
      *
      * @param <T>    the type parameter
-     * @param <>     the type parameter
      * @param config the config
      * @return the java rDD
      */

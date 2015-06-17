@@ -147,10 +147,12 @@ public class MongoDeepJobConfig<T> extends HadoopConfig<T, MongoDeepJobConfig<T>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
 
+    /**
+     * set the page size.
+     * @param pageSize the page size.
+     * @return the mongo config.
+     */
     public MongoDeepJobConfig<T> pageSize(int pageSize) {
         this.splitSize = pageSize;
         return this;

@@ -324,7 +324,7 @@ public class DeepJobConfig<T, S extends DeepJobConfig> extends BaseConfig<T, S> 
 
     /**
      * @param inputColumns
-     * @return
+     * @return the s
      */
     public S inputColumns(String[] inputColumns) {
         this.inputColumns = inputColumns;
@@ -333,7 +333,7 @@ public class DeepJobConfig<T, S extends DeepJobConfig> extends BaseConfig<T, S> 
 
     /**
      * @param filters
-     * @return
+     * @return the s
      */
     public S filters(Filter[] filters) {
         this.filters = filters;

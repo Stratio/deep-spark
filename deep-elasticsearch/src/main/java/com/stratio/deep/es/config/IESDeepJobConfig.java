@@ -60,7 +60,7 @@ public interface IESDeepJobConfig<T> {
      * these configurations are not validated, so be careful
      *
      * @param customConfiguration
-     * @return
+     * @return the IESDeepJobConfig.
      */
     IESDeepJobConfig<T> customConfiguration(Map<String, Serializable> customConfiguration);
 

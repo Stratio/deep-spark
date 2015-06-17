@@ -235,7 +235,7 @@ public final class Utils {
      * @param object
      * @param fieldName
      * @param fieldValue
-     * @return
+     * @return if the operation has been correct.
      */
     public static boolean setFieldWithReflection(Object object, String fieldName, Object fieldValue) {
         Class<?> clazz = object.getClass();
@@ -493,7 +493,7 @@ public final class Utils {
      * this method gets every class property by reflection, including its parents properties
      * @param t
      * @param <T>
-     * @return
+     * @return T object.
      */
     public static <T> T cloneObjectWithParents (T t) throws IllegalAccessException, InstantiationException {
         T clone = (T) t.getClass().newInstance();

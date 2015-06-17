@@ -56,7 +56,7 @@ import com.stratio.deep.commons.utils.Pair;
 import com.stratio.deep.commons.utils.Utils;
 
 /**
- * {@link CqlPagingRecordReader} implementation that returns an instance of a {@link DeepRecordReader}.
+ * Implementation that returns an instance of a {@link DeepRecordReader}.
  *
  * @author Luca Rosellini <luca@strat.io>
  */

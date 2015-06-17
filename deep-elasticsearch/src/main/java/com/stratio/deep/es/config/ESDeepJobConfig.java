@@ -96,18 +96,7 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig<T>> impl
         configHadoop.set(ConfigurationOptions.ES_PORT, String.valueOf(port));
         configHadoop.set(ConfigurationOptions.ES_INPUT_JSON, "yes");
 
-        // index (default)
-        // new data is added while existing data (based on its id) is replaced (reindexed).
-        // create
-        // adds new data - if the data already exists (based on its id), an exception is thrown.
-        //
-        // update
-        // updates existing data (based on its id). If no data is found, an exception is thrown.
-        //
-        // upsert
-        // known as merge or insert if the data does not exist, updates if the data exists (based on its id).
 
-        // configHadoop.set("es.write.operation","");
 
         if (customConfiguration != null) {
             Set<Map.Entry<String, Serializable>> set = customConfiguration.entrySet();
@@ -164,7 +153,7 @@ public class ESDeepJobConfig<T> extends HadoopConfig<T, ESDeepJobConfig<T>> impl
     /**
      * Same as type
      *
-     * @param type
+     * @param type the ESDeepJobConfig
      * @return
      */
     public ESDeepJobConfig<T> tipe(String type) {
