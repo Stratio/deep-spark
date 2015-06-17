@@ -263,17 +263,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9.1</version>
-                        <configuration>
-                            <minmemory>64m</minmemory>
-                            <maxmemory>2g</maxmemory>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                            <detectLinks>true</detectLinks>
-                        </configuration>
-                    </plugin>
+
 
 
                 </plugins>
@@ -677,15 +667,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <version>2.10.3</version>
+                <configuration>
+                    <minmemory>64m</minmemory>
+                    <maxmemory>2g</maxmemory>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <detectLinks>true</detectLinks>
+                </configuration>
             </plugin>
 
 
