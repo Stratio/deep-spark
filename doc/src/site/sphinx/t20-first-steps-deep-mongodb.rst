@@ -169,6 +169,6 @@ Where to go from here
 
 Congratulations! You have completed the “First steps with Stratio Deep”
 tutorial. If you want to learn more, we recommend the “\ `Writing and
-Running a Basic Application <t40-basic-application.md>`__\ ” tutorial.
+Running a Basic Application <t40-basic-application.rst>`__\ ” tutorial.
 
 .. |Stratio Deep shell Welcome Screen| image:: http://www.openstratio.org/wp-content/uploads/2014/01/stratio-deep-shell-WelcomeScreen.png
