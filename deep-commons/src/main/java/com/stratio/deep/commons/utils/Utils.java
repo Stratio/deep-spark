@@ -284,19 +284,6 @@ public final class Utils {
         return getter;
     }
 
-    /**
-     * Returns the inet address for the specified location.
-     *
-     * @param location the address as String
-     * @return the InetAddress object associated to the provided address.
-     */
-    public static InetAddress inetAddressFromLocation(String location) {
-        try {
-            return InetAddress.getByName(location);
-        } catch (UnknownHostException e) {
-            throw new DeepIOException(e);
-        }
-    }
 
     /**
      * Return the set of fields declared at all level of class hierachy

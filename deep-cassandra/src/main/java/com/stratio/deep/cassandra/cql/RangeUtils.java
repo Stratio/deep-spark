@@ -259,11 +259,11 @@ public class RangeUtils {
                                                         @Nullable
                                                         Row row) {
             assert row != null;
-            InetAddress host;
+            String host;
             try {
-                host = row.getInet("peer");
+                host = row.getInet("peer").getHostName();
             } catch (IllegalArgumentException e) {
-                host = Utils.inetAddressFromLocation(sessionWithHost.right);
+                host = sessionWithHost.right;
             }
 
             Iterable<Comparable> sortedTokens =
@@ -278,7 +278,7 @@ public class RangeUtils {
                             }
                     );
 
-            return Pair.create(host.getHostName(), sortedTokens);
+            return Pair.create(host, sortedTokens);
         }
     }
 
