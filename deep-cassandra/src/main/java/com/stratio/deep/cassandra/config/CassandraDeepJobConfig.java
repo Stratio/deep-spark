@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.stratio.deep.cassandra.util.InetAddressConverter;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -158,7 +159,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
         if (!cassandraSession.containsKey(id)){
             Cluster cluster = Cluster.builder()
                     .withPort(this.cqlPort)
-                    .addContactPoint(this.getHost())
+                    .addContactPoints(InetAddressConverter.toInetAddress(this.getHost()))
                     .withCredentials(this.username, this.password)
                     .withProtocolVersion(PROTOCOL_VERSION)
                     .build();
@@ -166,20 +167,11 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
             session = cluster.connect(quote(this.catalog));
             cassandraSession.put(id,session);
         }
-      /*  if (session == null) {
-            Cluster cluster = Cluster.builder()
-                    .withPort(this.cqlPort)
-                    .addContactPoint(this.getHost())
-                    .withCredentials(this.username, this.password)
-                    .withProtocolVersion(PROTOCOL_VERSION)
-                    .build();
 
-            session = cluster.connect(quote(this.catalog));
-        }
-
-        return session;*/
         return cassandraSession.get(id);
     }
+
+
 
     /**
      * {@inheritDoc}

@@ -19,10 +19,12 @@ package com.stratio.deep.cassandra.cql;
 import static com.stratio.deep.commons.utils.Utils.quote;
 
 import java.net.InetAddress;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.stratio.deep.cassandra.util.InetAddressConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,13 +101,13 @@ class CassandraClientProvider {
             try {
 
                 LOG.debug("No cached session found for key {{}}", key);
-                InetAddress locationInet = InetAddress.getByName(location);
+                Collection<InetAddress> locationInet = InetAddressConverter.toInetAddress(location);
                 LoadBalancingPolicy loadBalancingPolicy = balanced ? Policies.defaultLoadBalancingPolicy() : new
                         LocalMachineLoadBalancingPolicy(locationInet);
 
                 Cluster cluster = Cluster.builder()
                         .withPort(port)
-                        .addContactPoint(location)
+                        .addContactPoints(InetAddressConverter.toInetAddress(location))
                         .withLoadBalancingPolicy(loadBalancingPolicy)
                         .withProtocolVersion(ProtocolVersion.V2)
                         .withCredentials(conf.getUsername(), conf.getPassword())

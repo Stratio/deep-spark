@@ -20,6 +20,7 @@ import java.net.InetAddress;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -34,12 +35,12 @@ import com.google.common.collect.AbstractIterator;
  * Load balancing policy that, unlike round robin, sticks to one host.
  */
 public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
-    private InetAddress host;
+    private Collection<InetAddress> host;
 
     /**
      * Public constructor.
      */
-    public LocalMachineLoadBalancingPolicy(InetAddress host) {
+    public LocalMachineLoadBalancingPolicy(Collection<InetAddress> host) {
         this.host = host;
     }
 
@@ -53,12 +54,23 @@ public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
     public void init(Cluster cluster, Collection<Host> hosts) {
 
         for (Host h : hosts) {
-            if (h.getAddress().equals(host)) {
+            if (existsAddress(h)) {
                 this.liveHosts.add(h);
                 this.index.set(0);
                 break;
             }
         }
+    }
+
+    private boolean existsAddress(Host h) {
+        boolean exists = false;
+        for (InetAddress address: host){
+            if (h.getAddress().equals(address)){
+                exists = true;
+                break;
+            }
+        }
+        return exists;
     }
 
     /**
