@@ -15,8 +15,8 @@ public class CassandraClusterBuilder {
 
     public static Cluster createCassandraCluster(String host, int port, String username, String password, ProtocolVersion protocolVersion, LoadBalancingPolicy loadBalancingPolicy){
         PoolingOptions options = new PoolingOptions();
-        options.setMaxConnectionsPerHost(HostDistance.LOCAL, 5);
-        options.setMaxConnectionsPerHost(HostDistance.REMOTE, 500);
+        options.setMaxConnectionsPerHost(HostDistance.LOCAL, 10);
+        options.setMaxConnectionsPerHost(HostDistance.REMOTE, 20);
 
         Cluster.Builder builder = Cluster.builder()
                 .withPort(port)
