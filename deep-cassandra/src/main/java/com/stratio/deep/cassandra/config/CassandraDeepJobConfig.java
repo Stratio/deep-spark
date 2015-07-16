@@ -36,20 +36,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.stratio.deep.cassandra.util.InetAddressConverter;
+import com.datastax.driver.core.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.ColumnMetadata;
-import com.datastax.driver.core.ConsistencyLevel;
-import com.datastax.driver.core.KeyspaceMetadata;
-import com.datastax.driver.core.Metadata;
-import com.datastax.driver.core.ProtocolVersion;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.core.TableMetadata;
 import com.stratio.deep.cassandra.filter.value.EqualsInValue;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
@@ -157,13 +149,7 @@ public abstract class CassandraDeepJobConfig<T> extends DeepJobConfig<T, Cassand
     public synchronized Session getSession() {
         String id = this.getHost()+":"+this.cqlPort;
         if (!cassandraSession.containsKey(id)){
-            Cluster cluster = Cluster.builder()
-                    .withPort(this.cqlPort)
-                    .addContactPoints(InetAddressConverter.toInetAddress(this.getHost()))
-                    .withCredentials(this.username, this.password)
-                    .withProtocolVersion(PROTOCOL_VERSION)
-                    .build();
-
+            Cluster cluster =  CassandraClusterBuilder.createCassandraCluster(this.getHost(), this.cqlPort, this.username, this.password, PROTOCOL_VERSION, null);
             session = cluster.connect(quote(this.catalog));
             cassandraSession.put(id,session);
         }

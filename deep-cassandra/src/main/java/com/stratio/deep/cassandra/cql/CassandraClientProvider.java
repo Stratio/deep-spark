@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.stratio.deep.cassandra.config.CassandraClusterBuilder;
 import com.stratio.deep.cassandra.util.InetAddressConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,13 +106,9 @@ class CassandraClientProvider {
                 LoadBalancingPolicy loadBalancingPolicy = balanced ? Policies.defaultLoadBalancingPolicy() : new
                         LocalMachineLoadBalancingPolicy(locationInet);
 
-                Cluster cluster = Cluster.builder()
-                        .withPort(port)
-                        .addContactPoints(InetAddressConverter.toInetAddress(location))
-                        .withLoadBalancingPolicy(loadBalancingPolicy)
-                        .withProtocolVersion(ProtocolVersion.V2)
-                        .withCredentials(conf.getUsername(), conf.getPassword())
-                        .build();
+                Cluster cluster = CassandraClusterBuilder.createCassandraCluster(location, port,conf.getUsername(), conf.getPassword(), ProtocolVersion.V2,loadBalancingPolicy);
+
+
 
                 Session session = cluster.connect(quote(conf.getKeyspace()));
                 CLIENTS_CACHE.put(key, session);
