@@ -1,3 +1,6 @@
+*Disclaimer: As of 01/06/2015 this project has been deprecated. Thank you for your understanding and continued help throughout the project's life.
+
+
 What is Deep?
 =====================
 
